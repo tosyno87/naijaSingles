@@ -1,11 +1,12 @@
 import 'package:cached_network_image/cached_network_image.dart';
+import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:intl/intl.dart';
 
 import '../../data/models/enhanced_event_model.dart';
 import '../../data/models/event_model.dart';
 import 'rsvp_button.dart';
+import '../../../../common/constants/app_colors.dart';
 
 class EnhancedEventCard extends StatelessWidget {
   const EnhancedEventCard({
@@ -70,7 +71,7 @@ class EnhancedEventCard extends StatelessWidget {
             borderRadius: BorderRadius.circular(16),
             boxShadow: [
               BoxShadow(
-                color: Colors.black.withOpacity(0.08),
+                color: Colors.black.withValues(alpha: 0.08),
                 blurRadius: 12,
                 offset: const Offset(0, 4),
               ),
@@ -132,7 +133,7 @@ class EnhancedEventCard extends StatelessWidget {
                     color: Color(0xFFF0F0F0),
                     child: Center(
                       child: CircularProgressIndicator(
-                        valueColor: AlwaysStoppedAnimation(Color(0xFF008037)),
+                        valueColor: AlwaysStoppedAnimation(AppColors.primaryGreen),
                       ),
                     ),
                   ),
@@ -166,7 +167,7 @@ class EnhancedEventCard extends StatelessWidget {
                       padding: const EdgeInsets.symmetric(
                           horizontal: 8, vertical: 4),
                       decoration: BoxDecoration(
-                        color: Colors.blue.withOpacity(0.9),
+                        color: Colors.blue.withValues(alpha: 0.9),
                         borderRadius: BorderRadius.circular(12),
                       ),
                       child: Row(
@@ -195,7 +196,7 @@ class EnhancedEventCard extends StatelessWidget {
                       padding: const EdgeInsets.symmetric(
                           horizontal: 8, vertical: 4),
                       decoration: BoxDecoration(
-                        color: Colors.purple.withOpacity(0.9),
+                        color: Colors.purple.withValues(alpha: 0.9),
                         borderRadius: BorderRadius.circular(12),
                       ),
                       child: Row(
@@ -232,7 +233,7 @@ class EnhancedEventCard extends StatelessWidget {
                   padding:
                       const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
                   decoration: BoxDecoration(
-                    color: Colors.orange.withOpacity(0.9),
+                    color: Colors.orange.withValues(alpha: 0.9),
                     borderRadius: BorderRadius.circular(12),
                   ),
                   child: Text(
@@ -253,7 +254,7 @@ class EnhancedEventCard extends StatelessWidget {
                   padding:
                       const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
                   decoration: BoxDecoration(
-                    color: Colors.green.withOpacity(0.9),
+                    color: Colors.green.withValues(alpha: 0.9),
                     borderRadius: BorderRadius.circular(12),
                   ),
                   child: Text(
@@ -278,7 +279,7 @@ class EnhancedEventCard extends StatelessWidget {
               Container(
                 padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
                 decoration: BoxDecoration(
-                  color: const Color(0xFF008037).withOpacity(0.1),
+                  color: AppColors.primaryGreen.withValues(alpha: 0.1),
                   borderRadius: BorderRadius.circular(6),
                 ),
                 child: Text(
@@ -286,7 +287,7 @@ class EnhancedEventCard extends StatelessWidget {
                   style: GoogleFonts.montserrat(
                     fontSize: 12,
                     fontWeight: FontWeight.w600,
-                    color: const Color(0xFF008037),
+                    color: AppColors.primaryGreen,
                   ),
                 ),
               ),
@@ -295,7 +296,7 @@ class EnhancedEventCard extends StatelessWidget {
                 const Icon(
                   Icons.verified_user,
                   size: 16,
-                  color: Color(0xFF008037),
+                  color: AppColors.primaryGreen,
                 ),
             ],
           ),
@@ -378,7 +379,7 @@ class EnhancedEventCard extends StatelessWidget {
             Expanded(
               child: _buildStatItem(
                 icon: Icons.people,
-                label: 'Attending',
+                label: 'Attending'.tr(),
                 value: attendeeCount.toString(),
               ),
             ),
@@ -390,7 +391,7 @@ class EnhancedEventCard extends StatelessWidget {
             Expanded(
               child: _buildStatItem(
                 icon: Icons.favorite,
-                label: 'Interested',
+                label: 'Interested'.tr(),
                 value: rsvpCount.toString(),
               ),
             ),
@@ -401,10 +402,10 @@ class EnhancedEventCard extends StatelessWidget {
                 color: const Color(0xFFE0E0E0),
               ),
               Expanded(
-                child: _buildStatItem(
-                  icon: Icons.event_seat,
-                  label: 'Capacity',
-                  value: event.maxAttendees.toString(),
+              child: _buildStatItem(
+                icon: Icons.event_seat,
+                label: 'Capacity'.tr(),
+                value: event.maxAttendees.toString(),
                 ),
               ),
             ],
@@ -422,7 +423,7 @@ class EnhancedEventCard extends StatelessWidget {
           Icon(
             icon,
             size: 16,
-            color: const Color(0xFF008037),
+            color: AppColors.primaryGreen,
           ),
           const SizedBox(height: 4),
           Text(
@@ -454,7 +455,7 @@ class EnhancedEventCard extends StatelessWidget {
         child: ElevatedButton(
           onPressed: onTap,
           style: ElevatedButton.styleFrom(
-            backgroundColor: const Color(0xFF008037),
+            backgroundColor: AppColors.primaryGreen,
             foregroundColor: Colors.white,
             padding: const EdgeInsets.symmetric(vertical: 12),
             shape: RoundedRectangleBorder(

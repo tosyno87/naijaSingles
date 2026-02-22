@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import '../../../../common/routes/route_name.dart';
 import '../../data/services/event_templates_service.dart';
+import '../../../../common/constants/app_colors.dart';
 
 class EventTemplateSelectionScreen extends StatelessWidget {
   const EventTemplateSelectionScreen({super.key});
@@ -87,21 +88,21 @@ class EventTemplateSelectionScreen extends StatelessWidget {
                 child: OutlinedButton.icon(
                   onPressed: () => _navigateToCreateEvent(context, null),
                   style: OutlinedButton.styleFrom(
-                    side: const BorderSide(color: Color(0xFF008037), width: 2),
+                    side: const BorderSide(color: AppColors.primaryGreen, width: 2),
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(16),
                     ),
                   ),
                   icon: const Icon(
                     Icons.edit,
-                    color: Color(0xFF008037),
+                    color: AppColors.primaryGreen,
                   ),
                   label: Text(
                     'Create from Scratch',
                     style: GoogleFonts.montserrat(
                       fontSize: 16,
                       fontWeight: FontWeight.w600,
-                      color: const Color(0xFF008037),
+                      color: AppColors.primaryGreen,
                     ),
                   ),
                 ),
@@ -122,7 +123,7 @@ class EventTemplateSelectionScreen extends StatelessWidget {
             borderRadius: BorderRadius.circular(16),
             boxShadow: [
               BoxShadow(
-                color: Colors.black.withOpacity(0.08),
+                color: Colors.black.withValues(alpha: 0.08),
                 blurRadius: 10,
                 offset: const Offset(0, 4),
               ),
@@ -134,7 +135,7 @@ class EventTemplateSelectionScreen extends StatelessWidget {
               Container(
                 height: 80,
                 decoration: BoxDecoration(
-                  color: Color(template.color).withOpacity(0.1),
+                  color: Color(template.color).withValues(alpha: 0.1),
                   borderRadius: const BorderRadius.only(
                     topLeft: Radius.circular(16),
                     topRight: Radius.circular(16),

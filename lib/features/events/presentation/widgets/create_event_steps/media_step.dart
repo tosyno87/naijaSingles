@@ -64,7 +64,7 @@ class _MediaStepState extends State<MediaStep> {
           color: AppColors.backgroundColor,
           borderRadius: BorderRadius.circular(12),
           border: Border.all(
-            color: const Color(0xFF008037).withOpacity(0.3),
+            color: AppColors.primaryGreen.withValues(alpha: 0.3),
             width: 1.5,
           ),
         ),
@@ -74,7 +74,7 @@ class _MediaStepState extends State<MediaStep> {
             const Icon(
               Icons.cloud_upload_outlined,
               size: 40,
-              color: Color(0xFF008037),
+              color: AppColors.primaryGreen,
             ),
             const SizedBox(height: 12),
             Text(
@@ -98,8 +98,8 @@ class _MediaStepState extends State<MediaStep> {
               onPressed: _isProcessingImage ? null : _selectImages,
               style: ElevatedButton.styleFrom(
                 backgroundColor: _isProcessingImage
-                    ? const Color(0xFF008037).withOpacity(0.6)
-                    : const Color(0xFF008037),
+                    ? AppColors.primaryGreen.withValues(alpha: 0.6)
+                    : AppColors.primaryGreen,
                 foregroundColor: Colors.white,
                 padding:
                     const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
@@ -211,7 +211,7 @@ class _MediaStepState extends State<MediaStep> {
         borderRadius: BorderRadius.circular(16),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.08),
+            color: Colors.black.withValues(alpha: 0.08),
             blurRadius: 12,
             offset: const Offset(0, 4),
           ),
@@ -266,7 +266,7 @@ class _MediaStepState extends State<MediaStep> {
                     padding:
                         const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
                     decoration: BoxDecoration(
-                      color: const Color(0xFF008037),
+                      color: AppColors.primaryGreen,
                       borderRadius: BorderRadius.circular(12),
                     ),
                     child: Text(
@@ -288,7 +288,7 @@ class _MediaStepState extends State<MediaStep> {
                     padding:
                         const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
                     decoration: BoxDecoration(
-                      color: Colors.black.withOpacity(0.7),
+                      color: Colors.black.withValues(alpha: 0.7),
                       borderRadius: BorderRadius.circular(12),
                     ),
                     child: Row(
@@ -366,7 +366,7 @@ class _MediaStepState extends State<MediaStep> {
         decoration: BoxDecoration(
           borderRadius: BorderRadius.circular(8),
           border: Border.all(
-            color: const Color(0xFF008037).withOpacity(0.3),
+            color: AppColors.primaryGreen.withValues(alpha: 0.3),
             width: 1.5,
           ),
         ),
@@ -419,8 +419,8 @@ class _MediaStepState extends State<MediaStep> {
                       height: 24,
                       decoration: BoxDecoration(
                         color: _isProcessingImage
-                            ? const Color(0xFF008037).withOpacity(0.6)
-                            : const Color(0xFF008037),
+                            ? AppColors.primaryGreen.withValues(alpha: 0.6)
+                            : AppColors.primaryGreen,
                         borderRadius: BorderRadius.circular(12),
                       ),
                       child: const Icon(
@@ -461,7 +461,7 @@ class _MediaStepState extends State<MediaStep> {
                   padding:
                       const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
                   decoration: BoxDecoration(
-                    color: const Color(0xFF008037),
+                    color: AppColors.primaryGreen,
                     borderRadius: BorderRadius.circular(8),
                   ),
                   child: Text(
@@ -502,7 +502,7 @@ class _MediaStepState extends State<MediaStep> {
         uiSettings: [
           AndroidUiSettings(
             toolbarTitle: 'Crop Event Photo',
-            toolbarColor: const Color(0xFF008037),
+            toolbarColor: AppColors.primaryGreen,
             toolbarWidgetColor: Colors.white,
             initAspectRatio: CropAspectRatioPreset.original,
             lockAspectRatio: false,
@@ -653,12 +653,12 @@ class _MediaStepState extends State<MediaStep> {
             children: [
               ListTile(
                 leading:
-                    const Icon(Icons.photo_library, color: Color(0xFF008037)),
+                    const Icon(Icons.photo_library, color: AppColors.primaryGreen),
                 title: Text('Gallery', style: GoogleFonts.montserrat()),
                 onTap: () => Navigator.pop(context, ImageSource.gallery),
               ),
               ListTile(
-                leading: const Icon(Icons.camera_alt, color: Color(0xFF008037)),
+                leading: const Icon(Icons.camera_alt, color: AppColors.primaryGreen),
                 title: Text('Camera', style: GoogleFonts.montserrat()),
                 onTap: () => Navigator.pop(context, ImageSource.camera),
               ),
@@ -683,7 +683,7 @@ class _MediaStepState extends State<MediaStep> {
         uiSettings: [
           AndroidUiSettings(
             toolbarTitle: 'Crop Event Photo',
-            toolbarColor: const Color(0xFF008037),
+            toolbarColor: AppColors.primaryGreen,
             toolbarWidgetColor: Colors.white,
             initAspectRatio: CropAspectRatioPreset.original,
             lockAspectRatio: false,
@@ -724,7 +724,7 @@ class _MediaStepState extends State<MediaStep> {
           message,
           style: GoogleFonts.montserrat(color: Colors.white),
         ),
-        backgroundColor: const Color(0xFF008037),
+        backgroundColor: AppColors.primaryGreen,
         behavior: SnackBarBehavior.floating,
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(10),
@@ -769,7 +769,7 @@ class _MediaStepState extends State<MediaStep> {
             ),
           ],
         ),
-        backgroundColor: const Color(0xFF008037),
+        backgroundColor: AppColors.primaryGreen,
         behavior: SnackBarBehavior.floating,
         duration: const Duration(seconds: 30), // Long duration for loading
         shape: RoundedRectangleBorder(

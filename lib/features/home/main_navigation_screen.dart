@@ -16,6 +16,7 @@ import '../../common/utils/profile_completion_guard.dart';
 import '../../common/widgets/custom_3d_icons.dart';
 import '../../debug/quick_analysis.dart';
 import '../../models/user_model.dart';
+import '../account_status/presentation/widgets/account_status_banner.dart';
 import '../communities/ui/screens/discover_page_v2.dart';
 import '../explore/explore_screen.dart';
 import '../messages/messages_screen.dart';
@@ -323,16 +324,23 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
 
     return Scaffold(
       backgroundColor: AppColors.backgroundColor,
-      // The body will switch between screens based on the selected index
-      body: Stack(
+      // Column: banner takes layout space above content so pages shift down.
+      body: Column(
         children: [
-          // Main content
-          IndexedStack(
-            index: _validSelectedIndex,
-            children: _pages,
-          ),
+          // Account status banner (paused / incognito).
+          // Returns SizedBox.shrink() when status is active, so zero height.
+          const AccountStatusBanner(),
 
-          // Background task indicator
+          // Main content fills remaining space.
+          Expanded(
+            child: Stack(
+              children: [
+                IndexedStack(
+                  index: _validSelectedIndex,
+                  children: _pages,
+                ),
+
+                // Background task indicator
           if (_backgroundTasksRunning)
             Positioned(
               top: MediaQuery.of(context).padding.top + 8,
@@ -383,12 +391,15 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
               child: FloatingActionButton(
                 heroTag: 'analysis_fab',
                 mini: true,
-                backgroundColor: Colors.blue.withOpacity(0.8),
+                backgroundColor: Colors.blue.withValues(alpha: 0.8),
                 child:
                     const Icon(Icons.analytics, color: Colors.white, size: 16),
                 onPressed: () => _runUserAnalysis(context),
               ),
             ),
+              ],
+            ),
+          ),
         ],
       ),
 

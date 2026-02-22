@@ -1,7 +1,7 @@
+import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:intl/intl.dart';
 import 'package:share_plus/share_plus.dart';
 
 import '../../../../common/constants/app_colors.dart';
@@ -71,7 +71,7 @@ class EventSharingWidget extends StatelessWidget {
           color: AppColors.backgroundColor,
           borderRadius: BorderRadius.circular(12),
           border: Border.all(
-            color: const Color(0xFF008037).withOpacity(0.2),
+            color: AppColors.primaryGreen.withValues(alpha: 0.2),
           ),
         ),
         child: Column(
@@ -134,7 +134,7 @@ class EventSharingWidget extends StatelessWidget {
               Container(
                 padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
                 decoration: BoxDecoration(
-                  color: const Color(0xFF4CAF50).withOpacity(0.1),
+                  color: const Color(0xFF4CAF50).withValues(alpha: 0.1),
                   borderRadius: BorderRadius.circular(12),
                 ),
                 child: Text(
@@ -223,12 +223,12 @@ class EventSharingWidget extends StatelessWidget {
               Container(
                 padding: const EdgeInsets.all(12),
                 decoration: BoxDecoration(
-                  color: const Color(0xFF008037).withOpacity(0.1),
+                  color: AppColors.primaryGreen.withValues(alpha: 0.1),
                   borderRadius: BorderRadius.circular(12),
                 ),
                 child: Icon(
                   icon,
-                  color: const Color(0xFF008037),
+                  color: AppColors.primaryGreen,
                   size: 24,
                 ),
               ),
@@ -274,25 +274,25 @@ class EventSharingWidget extends StatelessWidget {
               _buildSocialButton(
                 icon: Icons.facebook,
                 color: const Color(0xFF1877F2),
-                label: 'Facebook',
+                label: 'Facebook'.tr(),
                 onTap: () => _shareToFacebook(context),
               ),
               _buildSocialButton(
                 icon: Icons.alternate_email,
                 color: const Color(0xFF1DA1F2),
-                label: 'Twitter',
+                label: 'Twitter'.tr(),
                 onTap: () => _shareToTwitter(context),
               ),
               _buildSocialButton(
                 icon: Icons.camera_alt,
                 color: const Color(0xFFE4405F),
-                label: 'Instagram',
+                label: 'Instagram'.tr(),
                 onTap: () => _shareToInstagram(context),
               ),
               _buildSocialButton(
                 icon: Icons.chat,
                 color: const Color(0xFF25D366),
-                label: 'WhatsApp',
+                label: 'WhatsApp'.tr(),
                 onTap: () => _shareToWhatsApp(context),
               ),
             ],
@@ -313,7 +313,7 @@ class EventSharingWidget extends StatelessWidget {
             Container(
               padding: const EdgeInsets.all(12),
               decoration: BoxDecoration(
-                color: color.withOpacity(0.1),
+                color: color.withValues(alpha: 0.1),
                 borderRadius: BorderRadius.circular(12),
               ),
               child: Icon(
@@ -336,7 +336,7 @@ class EventSharingWidget extends StatelessWidget {
 
   void _shareGeneral(BuildContext context) {
     final shareText = _buildShareText();
-    Share.share(shareText);
+    SharePlus.instance.share(ShareParams(text: shareText));
     Navigator.pop(context);
   }
 
@@ -352,7 +352,7 @@ class EventSharingWidget extends StatelessWidget {
           'Event link copied to clipboard!',
           style: GoogleFonts.montserrat(color: Colors.white),
         ),
-        backgroundColor: const Color(0xFF008037),
+        backgroundColor: AppColors.primaryGreen,
         behavior: SnackBarBehavior.floating,
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(10),
@@ -363,22 +363,22 @@ class EventSharingWidget extends StatelessWidget {
 
   void _shareText(BuildContext context) {
     final shareText = _buildDetailedShareText();
-    Share.share(shareText);
+    SharePlus.instance.share(ShareParams(text: shareText));
     Navigator.pop(context);
   }
 
   void _shareWithImage(BuildContext context) {
     if (event.imageUrl != null && event.imageUrl!.isNotEmpty) {
-      Share.shareXFiles(
-        [
+      SharePlus.instance.share(ShareParams(
+        text: _buildShareText(),
+        files: [
           XFile.fromData(
             Uint8List(0), // Placeholder - would need to download image
             name: 'event_image.jpg',
             mimeType: 'image/jpeg',
           ),
         ],
-        text: _buildShareText(),
-      );
+      ));
     } else {
       _shareText(context);
     }
@@ -387,13 +387,13 @@ class EventSharingWidget extends StatelessWidget {
 
   void _shareToFacebook(BuildContext context) {
     final shareText = _buildSocialShareText();
-    Share.share(shareText);
+    SharePlus.instance.share(ShareParams(text: shareText));
     Navigator.pop(context);
   }
 
   void _shareToTwitter(BuildContext context) {
     final shareText = _buildTwitterShareText();
-    Share.share(shareText);
+    SharePlus.instance.share(ShareParams(text: shareText));
     Navigator.pop(context);
   }
 
@@ -409,7 +409,7 @@ class EventSharingWidget extends StatelessWidget {
 
   void _shareToWhatsApp(BuildContext context) {
     final shareText = _buildWhatsAppShareText();
-    Share.share(shareText);
+    SharePlus.instance.share(ShareParams(text: shareText));
     Navigator.pop(context);
   }
 
@@ -420,9 +420,9 @@ class EventSharingWidget extends StatelessWidget {
 📍 ${event.location.displayAddress.isNotEmpty ? event.location.displayAddress : 'Location TBA'}
 ${event.isFree ? '🆓 FREE EVENT' : '🎫 Paid Event'}
 
-${event.ticketUrl ?? 'Check out NaijaSingles app for more details!'}
+${event.ticketUrl ?? 'Check out the Afropeep app for more details!'}
 
-#NaijaSingles #AfrocentricEvents
+#Afropeep #AfrocentricEvents
 ''';
 
   String _buildDetailedShareText() => '''
@@ -439,9 +439,9 @@ ${event.description.isNotEmpty ? '📝 About:\n${event.description.length > 200 
 
 ${event.rsvpCount > 0 ? '👥 ${event.rsvpCount} people are already going!\n\n' : ''}
 
-Get tickets: ${event.ticketUrl ?? 'Check NaijaSingles app'}
+Get tickets: ${event.ticketUrl ?? 'Check the Afropeep app'}
 
-#NaijaSingles #AfrocentricEvents #${event.category.replaceAll(' ', '')}
+#Afropeep #AfrocentricEvents #${event.category.replaceAll(' ', '')}
 ''';
 
   String _buildSocialShareText() => '''
@@ -451,7 +451,7 @@ Get tickets: ${event.ticketUrl ?? 'Check NaijaSingles app'}
 📍 ${event.location.city ?? 'TBA'}
 ${event.isFree ? '🆓 FREE' : '🎫 Paid'}
 
-#NaijaSingles #AfrocentricEvents #${event.category.replaceAll(' ', '')}
+#Afropeep #AfrocentricEvents #${event.category.replaceAll(' ', '')}
 
 ${event.ticketUrl ?? ''}
 ''';
@@ -464,7 +464,7 @@ ${event.ticketUrl ?? ''}
 📍 ${event.location.city ?? 'TBA'}
 ${event.isFree ? '🆓 FREE' : '🎫 Paid'}
 
-#NaijaSingles #AfrocentricEvents #${event.category.replaceAll(' ', '')}
+#Afropeep #AfrocentricEvents #${event.category.replaceAll(' ', '')}
 ''';
 
     // Twitter has character limit, so truncate if necessary
@@ -475,7 +475,7 @@ ${event.isFree ? '🆓 FREE' : '🎫 Paid'}
 📅 ${DateFormat('MMM d').format(event.startDate)}
 ${event.isFree ? '🆓 FREE' : '🎫 Paid'}
 
-#NaijaSingles #AfrocentricEvents
+#Afropeep #AfrocentricEvents
 ''';
     }
 
@@ -489,7 +489,7 @@ ${event.isFree ? '🆓 FREE' : '🎫 Paid'}
 📍 ${event.location.displayAddress}
 ${event.isFree ? '🆓 FREE EVENT' : '🎫 Paid Event'}
 
-#NaijaSingles #AfrocentricEvents #${event.category.replaceAll(' ', '')} #Event #Culture #Community
+#Afropeep #AfrocentricEvents #${event.category.replaceAll(' ', '')} #Event #Culture #Community
 ''';
 
   String _buildWhatsAppShareText() => '''
@@ -504,9 +504,9 @@ ${event.description.isNotEmpty ? '\n📝 *About:*\n${event.description.length > 
 
 ${event.rsvpCount > 0 ? '👥 *${event.rsvpCount} people are going!*\n' : ''}
 
-Get more details: ${event.ticketUrl ?? 'NaijaSingles app'}
+Get more details: ${event.ticketUrl ?? 'Afropeep app'}
 
-#NaijaSingles #AfrocentricEvents
+#Afropeep #AfrocentricEvents
 ''';
 
   void _showInstagramInstructions(BuildContext context) {
@@ -562,7 +562,7 @@ Get more details: ${event.ticketUrl ?? 'NaijaSingles app'}
               style: GoogleFonts.montserrat(
                 fontSize: 16,
                 fontWeight: FontWeight.w600,
-                color: const Color(0xFF008037),
+                color: AppColors.primaryGreen,
               ),
             ),
           ),

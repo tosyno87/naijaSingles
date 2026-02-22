@@ -20,7 +20,6 @@ class _LocationScreenState extends State<LocationScreen> {
   bool _locationPermissionDenied = false;
 
   // Afropeep MVP theme colors
-  static const Color backgroundColor = Colors.white;
   static const Color afropeepGreen = Color(0xFF008037); // MVP green
   static const Color cardBackground = Color(0xFFF7E8DA);
   static const Color textDarkBrown = Color(0xFF3A1D0F);
@@ -347,9 +346,9 @@ class _LocationScreenState extends State<LocationScreen> {
                 width: double.infinity,
                 padding: const EdgeInsets.all(16),
                 decoration: BoxDecoration(
-                  color: afropeepGreen.withOpacity(0.1),
+                  color: afropeepGreen.withValues(alpha: 0.1),
                   borderRadius: BorderRadius.circular(12),
-                  border: Border.all(color: afropeepGreen.withOpacity(0.3)),
+                  border: Border.all(color: afropeepGreen.withValues(alpha: 0.3)),
                 ),
                 child: Row(
                   children: [
@@ -397,9 +396,9 @@ class _LocationScreenState extends State<LocationScreen> {
             Container(
               padding: const EdgeInsets.all(16),
               decoration: BoxDecoration(
-                color: afropeepGreen.withOpacity(0.1),
+                color: afropeepGreen.withValues(alpha: 0.1),
                 borderRadius: BorderRadius.circular(12),
-                border: Border.all(color: afropeepGreen.withOpacity(0.3)),
+                border: Border.all(color: afropeepGreen.withValues(alpha: 0.3)),
               ),
               child: Row(
                 children: [

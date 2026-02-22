@@ -56,7 +56,10 @@ class DiscoveryService {
 
       if (isMigrated) {
         debugPrint('🔒 Using privacy-aware discovery');
-        final users = await PrivacyAwareUserSearchRepo.getUserList(currentUser);
+        final users = await PrivacyAwareUserSearchRepo.getUserList(
+          currentUser,
+          intentFilter: intentFilter,
+        );
         debugPrint(
           '🔒 Privacy-aware discovery returned: ${users.length} users',
         );
@@ -303,12 +306,16 @@ class DiscoveryService {
       final checkedUserIds = await _getCheckedUserIds(currentUser.id!);
       debugPrint('   - Already checked: ${checkedUserIds.length} users');
 
+      // Resolve the effective mode from the user's onboarding intent.
+      final effectiveMode =
+          intentFilter ?? currentUser.lookingFor ?? 'Dating';
+
       // Build optimized query with mode-specific filtering
       Query query = _buildOptimizedQuery(currentUser, intentFilter);
       query = ModeSpecificFilteringService.applyModeSpecificFilters(
         query,
         currentUser,
-        intentFilter ?? 'Dating',
+        effectiveMode,
       );
 
       // Execute query
@@ -333,9 +340,9 @@ class DiscoveryService {
           // Apply mode-specific validation
           if (!ModeSpecificFilteringService.validateModeMatch(
             user,
-            intentFilter ?? 'Dating',
+            effectiveMode,
           )) {
-            debugPrint('⚠️ User $userId does not match $intentFilter criteria');
+            debugPrint('⚠️ User $userId does not match $effectiveMode criteria');
             continue;
           }
 
@@ -414,10 +421,19 @@ class DiscoveryService {
       );
     }
 
-    // Filter by intent if specified
+    // Filter by intent if specified.
+    // 'Mixed' means "All of the Above" — these users should appear in every
+    // mode, and a 'Mixed' current-user should see everyone.
     if (intentFilter != null && intentFilter.isNotEmpty) {
-      query = query.where('lookingFor', isEqualTo: intentFilter);
-      debugPrint('🔍 Filtering by intent: $intentFilter');
+      if (intentFilter == 'Mixed') {
+        debugPrint('🔍 Intent is Mixed — showing all intents');
+      } else {
+        query = query.where(
+          'lookingFor',
+          whereIn: [intentFilter, 'Mixed'],
+        );
+        debugPrint('🔍 Filtering by intent: $intentFilter + Mixed');
+      }
     }
 
     return query;
@@ -453,6 +469,11 @@ class DiscoveryService {
       return false;
     }
 
+    // Skip users who are not discoverable (paused, incognito, deleted, banned)
+    if (!user.isDiscoverable) {
+      return false;
+    }
+
     // Skip blocked users
     if (user.isBlocked ?? false) {
       return false;
@@ -476,7 +497,13 @@ class DiscoveryService {
     return true;
   }
 
-  /// Apply smart matching with mode-specific compatibility
+  /// Apply smart matching with mode-specific compatibility.
+  ///
+  /// SmartMatchService fetches its own user set from cache, which is not
+  /// intent-filtered. To avoid reintroducing users that were already
+  /// excluded by intent/mode filters, we intersect the smart-match output
+  /// with the already-filtered [userList], preserving intent filtering
+  /// while getting the compatibility-based ordering benefit.
   static Future<List<UserModel>> _applySmartMatching(
     UserModel currentUser,
     List<UserModel> userList,
@@ -486,9 +513,8 @@ class DiscoveryService {
       debugPrint('🧠 Applying smart matching for ${userList.length} users');
 
       final smartMatchService = SmartMatchService();
-      final mode = intentFilter ?? 'Dating';
+      final mode = intentFilter ?? currentUser.lookingFor ?? 'Dating';
 
-      // Use SmartMatchService to get optimized ordering
       final result = await smartMatchService.getOptimizedUserList(
         currentUser: currentUser,
         mode: mode,
@@ -496,10 +522,30 @@ class DiscoveryService {
       );
 
       if (result.isSuccess && result.users.isNotEmpty) {
-        debugPrint('✅ Smart matching applied: ${result.users.length} users');
-        return result.users;
+        final filteredIds = userList.map((u) => u.id).toSet();
+
+        // Keep only users that passed intent/mode filtering, in the
+        // smart-match compatibility order.
+        final intersected = result.users
+            .where((u) => filteredIds.contains(u.id))
+            .toList();
+
+        // Append any filtered users that the cache missed so no results
+        // are silently dropped.
+        final returnedIds = intersected.map((u) => u.id).toSet();
+        for (final user in userList) {
+          if (!returnedIds.contains(user.id)) {
+            intersected.add(user);
+          }
+        }
+
+        debugPrint(
+          '✅ Smart matching applied: ${intersected.length} users '
+          '(${result.users.length} from cache, ${filteredIds.length} from filters)',
+        );
+        return intersected;
       } else {
-        debugPrint('⚠️ Smart matching failed, returning original list');
+        debugPrint('⚠️ Smart matching returned empty, keeping original list');
         return userList;
       }
     } catch (e) {

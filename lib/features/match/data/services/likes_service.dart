@@ -221,6 +221,18 @@ class LikesService {
         return null;
       }
 
+      // Prevent match creation if either user is deactivated/incognito
+      final userAStatus =
+          (userADoc.data() as Map<String, dynamic>?)?['accountStatus'] as String? ?? 'active';
+      final userBStatus =
+          (userBDoc.data() as Map<String, dynamic>?)?['accountStatus'] as String? ?? 'active';
+      if (userAStatus != 'active' || userBStatus != 'active') {
+        debugPrint(
+          '⏸️ Skipping match creation — userA status: $userAStatus, userB status: $userBStatus',
+        );
+        return null;
+      }
+
       final userAData = userADoc.data() as Map<String, dynamic>;
       final userBData = userBDoc.data() as Map<String, dynamic>;
 

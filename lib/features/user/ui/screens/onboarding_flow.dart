@@ -7,7 +7,7 @@ import '../../../../common/routes/route_name.dart';
 import '../../../onboarding/bloc/onboarding_bloc.dart';
 import '../../../onboarding/bloc/onboarding_data.dart';
 
-/// A multi-step onboarding flow with cultural focus for NaijaSingles app.
+/// A multi-step onboarding flow with cultural focus for the Afropeep app.
 ///
 /// This widget provides a 3-screen onboarding experience using PageView
 /// with OnboardingBloc to maintain state across screens.
@@ -21,9 +21,6 @@ class OnboardingFlow extends StatefulWidget {
 class _OnboardingFlowState extends State<OnboardingFlow> {
   final PageController _pageController = PageController();
   int _currentPage = 0;
-
-  // Warm Afrocentric background color
-  static const Color afrocentricBackground = Color(0xFFFDF6EC);
 
   @override
   void dispose() {
@@ -60,7 +57,7 @@ class _OnboardingFlowState extends State<OnboardingFlow> {
 
   Widget _buildContent(BuildContext context, OnboardingData data) {
     return Scaffold(
-      backgroundColor: afrocentricBackground,
+      backgroundColor: AppColors.backgroundColor,
       body: SafeArea(
         child: Column(
           children: [

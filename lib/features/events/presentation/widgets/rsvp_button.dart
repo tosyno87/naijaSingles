@@ -5,6 +5,7 @@ import 'package:google_fonts/google_fonts.dart';
 
 import '../../data/models/rsvp_model.dart';
 import '../bloc/rsvp_bloc.dart';
+import '../../../../common/constants/app_colors.dart';
 
 class RSVPButton extends StatefulWidget {
   const RSVPButton({
@@ -118,7 +119,7 @@ class _RSVPButtonState extends State<RSVPButton>
                   state.message,
                   style: GoogleFonts.montserrat(color: Colors.white),
                 ),
-                backgroundColor: const Color(0xFF008037),
+                backgroundColor: AppColors.primaryGreen,
                 behavior: SnackBarBehavior.floating,
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(10),
@@ -336,7 +337,7 @@ class _RSVPButtonState extends State<RSVPButton>
         margin: const EdgeInsets.only(bottom: 12),
         padding: const EdgeInsets.all(16),
         decoration: BoxDecoration(
-          color: isSelected ? color.withOpacity(0.1) : Colors.grey[50],
+          color: isSelected ? color.withValues(alpha: 0.1) : Colors.grey[50],
           borderRadius: BorderRadius.circular(12),
           border: Border.all(
             color: isSelected ? color : Colors.grey[300]!,
@@ -391,11 +392,11 @@ class _RSVPButtonState extends State<RSVPButton>
       case RSVPStatus.going:
         return const Color(0xFF4CAF50);
       case RSVPStatus.interested:
-        return const Color(0xFFFF9800).withOpacity(0.1);
+        return const Color(0xFFFF9800).withValues(alpha: 0.1);
       case RSVPStatus.notGoing:
-        return const Color(0xFFF44336).withOpacity(0.1);
+        return const Color(0xFFF44336).withValues(alpha: 0.1);
       case RSVPStatus.none:
-        return const Color(0xFF008037);
+        return AppColors.primaryGreen;
     }
   }
 
@@ -408,7 +409,7 @@ class _RSVPButtonState extends State<RSVPButton>
       case RSVPStatus.notGoing:
         return const Color(0xFFF44336);
       case RSVPStatus.none:
-        return const Color(0xFF008037);
+        return AppColors.primaryGreen;
     }
   }
 

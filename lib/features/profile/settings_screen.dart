@@ -5,8 +5,11 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 
 import '../../common/bloc/user/user_bloc.dart';
+import '../../common/constants/app_colors.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import '../../common/routes/route_name.dart';
+import '../account_status/presentation/screens/account_status_screen.dart';
+import '../account_status/presentation/bloc/account_status_bloc.dart';
 import '../settings/account_deletion_screen.dart';
 import '../settings/help_center_screen.dart';
 import '../settings/language_settings_screen.dart';
@@ -26,7 +29,6 @@ class _SettingsScreenState extends State<SettingsScreen> {
   final FirebaseAuth _auth = FirebaseAuth.instance;
 
   // New Afropeep theme colors
-  static const Color backgroundColor = Colors.white; // Clean white
   static const Color primaryColor = Color(0xFF008037); // Deep green
   static const Color cardColor = Colors.white; // White cards with shadows
   static const Color textPrimary = Color(0xFF3E1F0D); // Deep brown
@@ -34,9 +36,9 @@ class _SettingsScreenState extends State<SettingsScreen> {
 
   @override
   Widget build(BuildContext context) => Scaffold(
-        backgroundColor: backgroundColor,
+        backgroundColor: AppColors.backgroundColor,
         appBar: AppBar(
-          backgroundColor: backgroundColor,
+          backgroundColor: AppColors.backgroundColor,
           elevation: 0,
           leading: IconButton(
             icon: const Icon(Icons.arrow_back_ios, color: textPrimary),
@@ -223,7 +225,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                         side: BorderSide(color: Colors.red.shade300, width: 2),
                       ),
                       elevation: 2,
-                      shadowColor: Colors.black.withOpacity(0.1),
+                      shadowColor: Colors.black.withValues(alpha: 0.1),
                     ),
                     child: Text(
                       'Sign Out',
@@ -232,6 +234,52 @@ class _SettingsScreenState extends State<SettingsScreen> {
                         fontWeight: FontWeight.w600,
                         color: Colors.red.shade700,
                       ),
+                    ),
+                  ),
+                ),
+              ),
+
+              const SizedBox(height: 16),
+
+              // Take a Break / Pause Account — non-destructive alternative
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 16),
+                child: SizedBox(
+                  width: double.infinity,
+                  height: 56,
+                  child: ElevatedButton.icon(
+                    onPressed: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (_) => BlocProvider(
+                            create: (_) => AccountStatusBloc(),
+                            child: const AccountStatusScreen(),
+                          ),
+                        ),
+                      );
+                    },
+                    icon: const Icon(Icons.pause_circle_outline, size: 22),
+                    label: Text(
+                      'Take a Break',
+                      style: GoogleFonts.montserrat(
+                        fontSize: 16,
+                        fontWeight: FontWeight.w600,
+                        color: AppColors.primaryGreen,
+                      ),
+                    ),
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: Colors.white,
+                      foregroundColor: AppColors.primaryGreen,
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(20),
+                        side: const BorderSide(
+                          color: AppColors.primaryGreen,
+                          width: 2,
+                        ),
+                      ),
+                      elevation: 2,
+                      shadowColor: Colors.black.withValues(alpha: 0.1),
                     ),
                   ),
                 ),
@@ -255,7 +303,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                         side: BorderSide(color: Colors.red.shade300, width: 2),
                       ),
                       elevation: 2,
-                      shadowColor: Colors.black.withOpacity(0.1),
+                      shadowColor: Colors.black.withValues(alpha: 0.1),
                     ),
                     child: Text(
                       'Delete Account',
@@ -289,11 +337,11 @@ class _SettingsScreenState extends State<SettingsScreen> {
           color: cardColor,
           borderRadius: BorderRadius.circular(16),
           border: Border.all(
-            color: primaryColor.withOpacity(0.1),
+            color: primaryColor.withValues(alpha: 0.1),
           ),
           boxShadow: [
             BoxShadow(
-              color: Colors.black.withOpacity(0.05),
+              color: Colors.black.withValues(alpha: 0.05),
               blurRadius: 10,
               offset: const Offset(0, 2),
             ),
@@ -322,7 +370,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                   width: 40,
                   height: 40,
                   decoration: BoxDecoration(
-                    color: (iconColor ?? primaryColor).withOpacity(0.1),
+                    color: (iconColor ?? primaryColor).withValues(alpha: 0.1),
                     shape: BoxShape.circle,
                   ),
                   child: Icon(
@@ -688,7 +736,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
               borderRadius: BorderRadius.circular(16),
               boxShadow: [
                 BoxShadow(
-                  color: Colors.black.withOpacity(0.1),
+                  color: Colors.black.withValues(alpha: 0.1),
                   blurRadius: 10,
                   offset: const Offset(0, 4),
                 ),
@@ -808,7 +856,9 @@ class _SettingsScreenState extends State<SettingsScreen> {
             ),
             const SizedBox(height: 12),
             Text(
-              'Afropeep is a dating app designed to connect Nigerian singles worldwide. Find meaningful connections, chat with matches, and discover love.',
+              'Afropeep is a community platform built for Africans in the diaspora. '
+              'Connect with your people through friendships, shared culture, events, '
+              'and meaningful relationships.',
               style: GoogleFonts.montserrat(
                 fontSize: 14,
                 color: textSecondary,
@@ -817,7 +867,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
             ),
             const SizedBox(height: 16),
             Text(
-              '© 2024 Afropeep. All rights reserved.',
+              '© 2025 Afropeep. All rights reserved.',
               style: GoogleFonts.montserrat(
                 fontSize: 12,
                 color: textSecondary,

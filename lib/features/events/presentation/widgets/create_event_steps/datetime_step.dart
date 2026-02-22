@@ -1,6 +1,6 @@
+import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:intl/intl.dart';
 
 import '../../../../../common/constants/app_colors.dart';
 import '../../../data/models/enhanced_event_model.dart';
@@ -72,7 +72,7 @@ class _DateTimeStepState extends State<DateTimeStep> {
               Expanded(
                 flex: 2,
                 child: _buildDateSelector(
-                  label: 'Date',
+                  label: 'Date'.tr(),
                   selectedDate: widget.eventData.startDate,
                   onDateSelected: (date) {
                     setState(() {
@@ -107,7 +107,7 @@ class _DateTimeStepState extends State<DateTimeStep> {
               const SizedBox(width: 16),
               Expanded(
                 child: _buildTimeSelector(
-                  label: 'Time',
+                  label: 'Time'.tr(),
                   selectedTime: widget.eventData.startDate != null
                       ? TimeOfDay.fromDateTime(widget.eventData.startDate!)
                       : null,
@@ -158,7 +158,7 @@ class _DateTimeStepState extends State<DateTimeStep> {
               Expanded(
                 flex: 2,
                 child: _buildDateSelector(
-                  label: 'Date',
+                  label: 'Date'.tr(),
                   selectedDate: widget.eventData.endDate,
                   onDateSelected: (date) {
                     setState(() {
@@ -184,7 +184,7 @@ class _DateTimeStepState extends State<DateTimeStep> {
               const SizedBox(width: 16),
               Expanded(
                 child: _buildTimeSelector(
-                  label: 'Time',
+                  label: 'Time'.tr(),
                   selectedTime: widget.eventData.endDate != null
                       ? TimeOfDay.fromDateTime(widget.eventData.endDate!)
                       : null,
@@ -235,11 +235,11 @@ class _DateTimeStepState extends State<DateTimeStep> {
               padding: const EdgeInsets.all(16),
               decoration: BoxDecoration(
                 color:
-                    AppColors.backgroundColor, // NaijaSingles cream background
+                    AppColors.backgroundColor, // Afropeep cream background
                 borderRadius: BorderRadius.circular(12),
                 border: Border.all(
-                  color: const Color(0xFF008037)
-                      .withOpacity(0.3), // NaijaSingles green border
+                  color: AppColors.primaryGreen
+                      .withValues(alpha: 0.3), // Afropeep green border
                   width: 1.5,
                 ),
               ),
@@ -247,7 +247,7 @@ class _DateTimeStepState extends State<DateTimeStep> {
                 children: [
                   const Icon(
                     Icons.calendar_today,
-                    color: Color(0xFF008037),
+                    color: AppColors.primaryGreen,
                     size: 20,
                   ),
                   const SizedBox(width: 12),
@@ -260,8 +260,8 @@ class _DateTimeStepState extends State<DateTimeStep> {
                         fontSize: 16,
                         color: selectedDate != null
                             ? const Color(0xFF333333)
-                            : const Color(0xFF008037)
-                                .withOpacity(0.7), // NaijaSingles green hint
+                            : AppColors.primaryGreen
+                                .withValues(alpha: 0.7), // Afropeep green hint
                       ),
                     ),
                   ),
@@ -296,11 +296,11 @@ class _DateTimeStepState extends State<DateTimeStep> {
               padding: const EdgeInsets.all(16),
               decoration: BoxDecoration(
                 color:
-                    AppColors.backgroundColor, // NaijaSingles cream background
+                    AppColors.backgroundColor, // Afropeep cream background
                 borderRadius: BorderRadius.circular(12),
                 border: Border.all(
-                  color: const Color(0xFF008037)
-                      .withOpacity(0.3), // NaijaSingles green border
+                  color: AppColors.primaryGreen
+                      .withValues(alpha: 0.3), // Afropeep green border
                   width: 1.5,
                 ),
               ),
@@ -308,7 +308,7 @@ class _DateTimeStepState extends State<DateTimeStep> {
                 children: [
                   const Icon(
                     Icons.access_time,
-                    color: Color(0xFF008037),
+                    color: AppColors.primaryGreen,
                     size: 20,
                   ),
                   const SizedBox(width: 12),
@@ -321,8 +321,8 @@ class _DateTimeStepState extends State<DateTimeStep> {
                         fontSize: 16,
                         color: selectedTime != null
                             ? const Color(0xFF333333)
-                            : const Color(0xFF008037)
-                                .withOpacity(0.7), // NaijaSingles green hint
+                            : AppColors.primaryGreen
+                                .withValues(alpha: 0.7), // Afropeep green hint
                       ),
                     ),
                   ),
@@ -356,17 +356,17 @@ class _DateTimeStepState extends State<DateTimeStep> {
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: const Color(0xFF008037).withOpacity(0.1),
+        color: AppColors.primaryGreen.withValues(alpha: 0.1),
         borderRadius: BorderRadius.circular(12),
         border: Border.all(
-          color: const Color(0xFF008037).withOpacity(0.3),
+          color: AppColors.primaryGreen.withValues(alpha: 0.3),
         ),
       ),
       child: Row(
         children: [
           const Icon(
             Icons.schedule,
-            color: Color(0xFF008037),
+            color: AppColors.primaryGreen,
             size: 24,
           ),
           const SizedBox(width: 12),
@@ -379,7 +379,7 @@ class _DateTimeStepState extends State<DateTimeStep> {
                   style: GoogleFonts.montserrat(
                     fontSize: 14,
                     fontWeight: FontWeight.w600,
-                    color: const Color(0xFF008037),
+                    color: AppColors.primaryGreen,
                   ),
                 ),
                 Text(
@@ -387,7 +387,7 @@ class _DateTimeStepState extends State<DateTimeStep> {
                   style: GoogleFonts.montserrat(
                     fontSize: 16,
                     fontWeight: FontWeight.w500,
-                    color: const Color(0xFF008037),
+                    color: AppColors.primaryGreen,
                   ),
                 ),
               ],

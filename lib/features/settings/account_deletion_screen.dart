@@ -6,6 +6,7 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:pin_code_fields/pin_code_fields.dart';
 
+import '../../common/constants/app_colors.dart';
 import '../../common/data/repo/googlelogin_repo.dart';
 import '../../common/data/repo/phone_auth_repo.dart';
 import '../../common/routes/route_name.dart';
@@ -26,7 +27,6 @@ class _AccountDeletionScreenState extends State<AccountDeletionScreen> {
   final _reasonController = TextEditingController();
 
   // Afropeep MVP Color Scheme
-  static const Color backgroundColor = Colors.white; // MVP white background
   static const Color primaryColor = Color(0xFF008037); // Deep green
   static const Color cardColor = Color(0xFFFFFFFF); // White for cards
   static const Color errorColor = Color(0xFFFF5A5F); // Red for errors/danger
@@ -110,9 +110,9 @@ class _AccountDeletionScreenState extends State<AccountDeletionScreen> {
 
   @override
   Widget build(BuildContext context) => Scaffold(
-        backgroundColor: backgroundColor,
+        backgroundColor: AppColors.backgroundColor,
         appBar: AppBar(
-          backgroundColor: backgroundColor,
+          backgroundColor: AppColors.backgroundColor,
           elevation: 0,
           leading: IconButton(
             icon: Icon(Icons.arrow_back_ios, color: textPrimary),
@@ -172,9 +172,9 @@ class _AccountDeletionScreenState extends State<AccountDeletionScreen> {
   Widget _buildWarningHeader() => Container(
         padding: const EdgeInsets.all(20),
         decoration: BoxDecoration(
-          color: errorColor.withOpacity(0.05),
+          color: errorColor.withValues(alpha: 0.05),
           borderRadius: BorderRadius.circular(16),
-          border: Border.all(color: errorColor.withOpacity(0.3)),
+          border: Border.all(color: errorColor.withValues(alpha: 0.3)),
         ),
         child: Column(
           children: [
@@ -182,7 +182,7 @@ class _AccountDeletionScreenState extends State<AccountDeletionScreen> {
               width: 80,
               height: 80,
               decoration: BoxDecoration(
-                color: errorColor.withOpacity(0.1),
+                color: errorColor.withValues(alpha: 0.1),
                 shape: BoxShape.circle,
               ),
               child: const Icon(
@@ -222,7 +222,7 @@ class _AccountDeletionScreenState extends State<AccountDeletionScreen> {
           borderRadius: BorderRadius.circular(16),
           boxShadow: [
             BoxShadow(
-              color: Colors.black.withOpacity(0.06),
+              color: Colors.black.withValues(alpha: 0.06),
               blurRadius: 10,
               offset: const Offset(0, 3),
             ),
@@ -256,7 +256,7 @@ class _AccountDeletionScreenState extends State<AccountDeletionScreen> {
             Container(
               padding: const EdgeInsets.all(12),
               decoration: BoxDecoration(
-                color: warningColor.withOpacity(0.1),
+                color: warningColor.withValues(alpha: 0.1),
                 borderRadius: BorderRadius.circular(8),
               ),
               child: Row(
@@ -306,7 +306,7 @@ class _AccountDeletionScreenState extends State<AccountDeletionScreen> {
           borderRadius: BorderRadius.circular(16),
           boxShadow: [
             BoxShadow(
-              color: Colors.black.withOpacity(0.06),
+              color: Colors.black.withValues(alpha: 0.06),
               blurRadius: 10,
               offset: const Offset(0, 3),
             ),
@@ -368,7 +368,7 @@ class _AccountDeletionScreenState extends State<AccountDeletionScreen> {
         padding: const EdgeInsets.all(12),
         decoration: BoxDecoration(
           color:
-              isSelected ? primaryColor.withOpacity(0.1) : Colors.transparent,
+              isSelected ? primaryColor.withValues(alpha: 0.1) : Colors.transparent,
           borderRadius: BorderRadius.circular(8),
           border: Border.all(
             color: isSelected ? primaryColor : Colors.grey.shade300,
@@ -416,7 +416,7 @@ class _AccountDeletionScreenState extends State<AccountDeletionScreen> {
           borderRadius: BorderRadius.circular(16),
           boxShadow: [
             BoxShadow(
-              color: Colors.black.withOpacity(0.06),
+              color: Colors.black.withValues(alpha: 0.06),
               blurRadius: 10,
               offset: const Offset(0, 3),
             ),
@@ -481,7 +481,7 @@ class _AccountDeletionScreenState extends State<AccountDeletionScreen> {
           borderRadius: BorderRadius.circular(16),
           boxShadow: [
             BoxShadow(
-              color: Colors.black.withOpacity(0.06),
+              color: Colors.black.withValues(alpha: 0.06),
               blurRadius: 10,
               offset: const Offset(0, 3),
             ),
@@ -562,7 +562,7 @@ class _AccountDeletionScreenState extends State<AccountDeletionScreen> {
           borderRadius: BorderRadius.circular(16),
           boxShadow: [
             BoxShadow(
-              color: Colors.black.withOpacity(0.06),
+              color: Colors.black.withValues(alpha: 0.06),
               blurRadius: 10,
               offset: const Offset(0, 3),
             ),
@@ -711,9 +711,9 @@ class _AccountDeletionScreenState extends State<AccountDeletionScreen> {
   Widget _buildAlternativeOptionsSection() => Container(
         padding: const EdgeInsets.all(16),
         decoration: BoxDecoration(
-          color: primaryColor.withOpacity(0.05),
+          color: primaryColor.withValues(alpha: 0.05),
           borderRadius: BorderRadius.circular(12),
-          border: Border.all(color: primaryColor.withOpacity(0.2)),
+          border: Border.all(color: primaryColor.withValues(alpha: 0.2)),
         ),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
@@ -1184,7 +1184,7 @@ class _AccountDeletionScreenState extends State<AccountDeletionScreen> {
               width: 80,
               height: 80,
               decoration: BoxDecoration(
-                color: errorColor.withOpacity(0.1),
+                color: errorColor.withValues(alpha: 0.1),
                 shape: BoxShape.circle,
               ),
               child: const Icon(Icons.delete_forever, color: errorColor, size: 40),
@@ -1216,9 +1216,9 @@ class _AccountDeletionScreenState extends State<AccountDeletionScreen> {
             Container(
               padding: const EdgeInsets.all(12),
               decoration: BoxDecoration(
-                color: errorColor.withOpacity(0.05),
+                color: errorColor.withValues(alpha: 0.05),
                 borderRadius: BorderRadius.circular(12),
-                border: Border.all(color: errorColor.withOpacity(0.2)),
+                border: Border.all(color: errorColor.withValues(alpha: 0.2)),
               ),
               child: Row(
                 children: [
@@ -1293,7 +1293,7 @@ class _AccountDeletionScreenState extends State<AccountDeletionScreen> {
           borderRadius: BorderRadius.circular(16),
           boxShadow: [
             BoxShadow(
-              color: Colors.black.withOpacity(0.06),
+              color: Colors.black.withValues(alpha: 0.06),
               blurRadius: 10,
               offset: const Offset(0, 3),
             ),
@@ -1322,9 +1322,9 @@ class _AccountDeletionScreenState extends State<AccountDeletionScreen> {
             Container(
               padding: const EdgeInsets.all(12),
               decoration: BoxDecoration(
-                color: warningColor.withOpacity(0.1),
+                color: warningColor.withValues(alpha: 0.1),
                 borderRadius: BorderRadius.circular(8),
-                border: Border.all(color: warningColor.withOpacity(0.3)),
+                border: Border.all(color: warningColor.withValues(alpha: 0.3)),
               ),
               child: Row(
                 children: [

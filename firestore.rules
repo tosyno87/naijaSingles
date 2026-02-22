@@ -7,23 +7,38 @@ service cloud.firestore {
                // Owner always reads own profile document.
                request.auth.uid == userId ||
                (
-                 // Non-owners can read only active/public profiles.
-                 resource.data.isProfilePrivate != true &&
-                 resource.data.isDeleted != true &&
-                 resource.data.accountStatus != 'deleted' &&
-                 resource.data.accountStatus != 'banned'
+                // Non-owners can read active/public profiles.
+                // Paused and incognito profiles are blocked here so that
+                // privacy is enforced server-side, not just app-side.
+                // The messages screen gracefully falls back to cached
+                // thread data (userNames) when a profile read is denied.
+                resource.data.isProfilePrivate != true &&
+                resource.data.isDeleted != true &&
+                resource.data.accountStatus != 'deleted' &&
+                resource.data.accountStatus != 'banned' &&
+                resource.data.accountStatus != 'paused' &&
+                resource.data.accountStatus != 'incognito'
                )
              );
     }
 
     // Users collection - allow authenticated users to read others for matching
     match /users/{userId} {
-      // Users can read and write their own data
+      // Owner can always read/write their own data.
       allow read, write: if request.auth != null && request.auth.uid == userId;
-      
-      // Authenticated users can read active/public profiles for matching/discovery.
-      // Private or deleted/banned profiles are hidden from non-owners.
-      allow read: if canReadUserProfile(userId);
+
+      // Single-document reads by non-owners enforce privacy server-side.
+      // Paused, incognito, deleted, and banned profiles are hidden.
+      allow get: if canReadUserProfile(userId);
+
+      // Collection queries (discovery, search) are allowed for any
+      // authenticated user. Firestore cannot statically verify per-document
+      // privacy checks (accountStatus, isDeleted, etc.) against query
+      // constraints, so list operations would always fail with
+      // permission-denied if gated by canReadUserProfile.
+      // App-side filtering (_passesAdditionalFilters, isDiscoverable)
+      // handles privacy for discovery results.
+      allow list: if request.auth != null;
       
       // Allow users to update their own profile with data validation
       allow update: if request.auth != null && 

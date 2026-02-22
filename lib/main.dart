@@ -96,24 +96,17 @@ Future<void> main() async {
     await NotificationService.initialize();
     log('🔔 Notification Service initialized');
 
-    // Initialize seed events if database is empty (only if user is authenticated)
-    // Events seeding requires authentication per Firestore security rules
-    // This will be handled after user login in UserBloc or similar
-    try {
-      final currentUser = FirebaseAuth.instance.currentUser;
-      if (currentUser != null) {
-        final seedService = SeedEventsService();
-        await seedService.seedEventsIfEmpty();
-        log('🎉 Events seeding completed');
-      } else {
-        log('⏭️ Skipping events seeding - no authenticated user (expected at app startup)');
-      }
-    } catch (e) {
-      // Silently skip if permission denied (expected when no user is authenticated)
-      if (e.toString().contains('permission-denied')) {
-        log('⏭️ Skipping events seeding - requires authentication (expected)');
-      } else {
-        log('⚠️ Events seeding error: $e');
+    // Seed events only in debug mode to prevent fake data in production
+    if (kDebugMode) {
+      try {
+        final currentUser = FirebaseAuth.instance.currentUser;
+        if (currentUser != null) {
+          final seedService = SeedEventsService();
+          await seedService.seedEventsIfEmpty();
+          log('🎉 Events seeding completed (debug only)');
+        }
+      } catch (e) {
+        log('⚠️ Events seeding error (debug only): $e');
       }
     }
   } catch (e) {
@@ -134,19 +127,12 @@ Future<void> main() async {
         CrashlyticsService().clearUserId();
       }
 
-      // Seed events when user authenticates (seedEventsIfEmpty checks if events exist, so safe to call multiple times)
-      if (user != null) {
-        // Use unawaited to properly handle the future without blocking the stream listener
+      if (kDebugMode && user != null) {
         unawaited(
           SeedEventsService().seedEventsIfEmpty().then((_) {
-            log('🎉 Events seeding completed (after authentication)');
+            log('🎉 Events seeding completed (debug only, after auth)');
           }).catchError((e) {
-            // Silently skip if permission denied (shouldn't happen when authenticated, but handle gracefully)
-            if (e.toString().contains('permission-denied')) {
-              log('⚠️ Events seeding failed - permission denied (unexpected for authenticated user)');
-            } else {
-              log('⚠️ Events seeding error: $e');
-            }
+            log('⚠️ Events seeding error (debug only): $e');
           }),
         );
       }

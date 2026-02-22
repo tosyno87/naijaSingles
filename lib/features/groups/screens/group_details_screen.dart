@@ -100,7 +100,7 @@ class _GroupDetailsScreenState extends State<GroupDetailsScreen> {
           color: Colors.white,
           boxShadow: [
             BoxShadow(
-              color: Colors.grey.withOpacity(0.1),
+              color: Colors.grey.withValues(alpha: 0.1),
               blurRadius: 4,
               offset: const Offset(0, 2),
             ),
@@ -110,7 +110,7 @@ class _GroupDetailsScreenState extends State<GroupDetailsScreen> {
           children: [
             CircleAvatar(
               radius: 20,
-              backgroundColor: AppColors.primaryGreen.withOpacity(0.2),
+              backgroundColor: AppColors.primaryGreen.withValues(alpha: 0.2),
               child: widget.group.imageUrl != null
                   ? ClipRRect(
                       borderRadius: BorderRadius.circular(20),
@@ -298,7 +298,7 @@ class _GroupDetailsScreenState extends State<GroupDetailsScreen> {
           color: Colors.white,
           boxShadow: [
             BoxShadow(
-              color: Colors.grey.withOpacity(0.1),
+              color: Colors.grey.withValues(alpha: 0.1),
               blurRadius: 4,
               offset: const Offset(0, -2),
             ),
@@ -443,7 +443,7 @@ class _GroupDetailsScreenState extends State<GroupDetailsScreen> {
                 widget.group.description,
                 style: GoogleFonts.montserrat(
                   fontSize: 16,
-                  color: Colors.white.withOpacity(0.9),
+                  color: Colors.white.withValues(alpha: 0.9),
                 ),
                 textAlign: TextAlign.center,
                 maxLines: 3,
@@ -462,10 +462,10 @@ class _GroupDetailsScreenState extends State<GroupDetailsScreen> {
           width: 100,
           height: 100,
           decoration: BoxDecoration(
-            color: Colors.white.withOpacity(0.2),
+            color: Colors.white.withValues(alpha: 0.2),
             borderRadius: BorderRadius.circular(20),
             border: Border.all(
-              color: Colors.white.withOpacity(0.3),
+              color: Colors.white.withValues(alpha: 0.3),
               width: 2,
             ),
           ),
@@ -486,7 +486,7 @@ class _GroupDetailsScreenState extends State<GroupDetailsScreen> {
   Widget _buildDefaultAvatar() => Icon(
         Icons.group,
         size: 50,
-        color: Colors.white.withOpacity(0.8),
+        color: Colors.white.withValues(alpha: 0.8),
       );
 
   Widget _buildGroupStats() => Row(
@@ -519,7 +519,7 @@ class _GroupDetailsScreenState extends State<GroupDetailsScreen> {
         children: [
           Icon(
             icon,
-            color: Colors.white.withOpacity(0.8),
+            color: Colors.white.withValues(alpha: 0.8),
             size: 20,
           ),
           const SizedBox(height: 4),
@@ -535,7 +535,7 @@ class _GroupDetailsScreenState extends State<GroupDetailsScreen> {
             label,
             style: GoogleFonts.montserrat(
               fontSize: 12,
-              color: Colors.white.withOpacity(0.8),
+              color: Colors.white.withValues(alpha: 0.8),
             ),
           ),
         ],
@@ -549,7 +549,7 @@ class _GroupDetailsScreenState extends State<GroupDetailsScreen> {
           borderRadius: BorderRadius.circular(16),
           boxShadow: [
             BoxShadow(
-              color: Colors.grey.withOpacity(0.1),
+              color: Colors.grey.withValues(alpha: 0.1),
               blurRadius: 8,
               offset: const Offset(0, 2),
             ),
@@ -643,7 +643,7 @@ class _GroupDetailsScreenState extends State<GroupDetailsScreen> {
           borderRadius: BorderRadius.circular(16),
           boxShadow: [
             BoxShadow(
-              color: Colors.grey.withOpacity(0.1),
+              color: Colors.grey.withValues(alpha: 0.1),
               blurRadius: 8,
               offset: const Offset(0, 2),
             ),
@@ -724,7 +724,7 @@ class _GroupDetailsScreenState extends State<GroupDetailsScreen> {
           contentPadding: EdgeInsets.zero,
           leading: CircleAvatar(
             radius: 20,
-            backgroundColor: AppColors.primaryGreen.withOpacity(0.2),
+            backgroundColor: AppColors.primaryGreen.withValues(alpha: 0.2),
             backgroundImage: avatarUrl != null ? NetworkImage(avatarUrl) : null,
             child: avatarUrl == null
                 ? Text(
@@ -865,7 +865,7 @@ class _GroupDetailsScreenState extends State<GroupDetailsScreen> {
           borderRadius: BorderRadius.circular(12),
           boxShadow: [
             BoxShadow(
-              color: Colors.grey.withOpacity(0.2),
+              color: Colors.grey.withValues(alpha: 0.2),
               blurRadius: 8,
               offset: const Offset(0, 2),
             ),
@@ -1210,7 +1210,7 @@ class _GroupDetailsScreenState extends State<GroupDetailsScreen> {
                 leading: Container(
                   padding: const EdgeInsets.all(8),
                   decoration: BoxDecoration(
-                    color: AppColors.primaryGreen.withOpacity(0.1),
+                    color: AppColors.primaryGreen.withValues(alpha: 0.1),
                     borderRadius: BorderRadius.circular(8),
                   ),
                   child: const Icon(
@@ -1241,7 +1241,7 @@ class _GroupDetailsScreenState extends State<GroupDetailsScreen> {
                 leading: Container(
                   padding: const EdgeInsets.all(8),
                   decoration: BoxDecoration(
-                    color: AppColors.primaryGreen.withOpacity(0.1),
+                    color: AppColors.primaryGreen.withValues(alpha: 0.1),
                     borderRadius: BorderRadius.circular(8),
                   ),
                   child: const Icon(
@@ -1269,7 +1269,7 @@ class _GroupDetailsScreenState extends State<GroupDetailsScreen> {
               leading: Container(
                 padding: const EdgeInsets.all(8),
                 decoration: BoxDecoration(
-                  color: Colors.grey.withOpacity(0.1),
+                  color: Colors.grey.withValues(alpha: 0.1),
                   borderRadius: BorderRadius.circular(8),
                 ),
                 child: Icon(

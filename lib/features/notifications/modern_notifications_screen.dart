@@ -178,7 +178,7 @@ class _ModernNotificationsScreenState extends State<ModernNotificationsScreen>
           borderRadius: BorderRadius.circular(16),
           boxShadow: [
             BoxShadow(
-              color: Colors.black.withOpacity(0.05),
+              color: Colors.black.withValues(alpha: 0.05),
               blurRadius: 10,
               offset: const Offset(0, 2),
             ),
@@ -401,16 +401,16 @@ class _ModernNotificationsScreenState extends State<ModernNotificationsScreen>
         decoration: BoxDecoration(
           color: notification.isRead
               ? Colors.white
-              : AppColors.primaryGreen.withOpacity(0.05),
+              : AppColors.primaryGreen.withValues(alpha: 0.05),
           borderRadius: BorderRadius.circular(16),
           border: Border.all(
             color: notification.isRead
                 ? Colors.grey.shade200
-                : AppColors.primaryGreen.withOpacity(0.2),
+                : AppColors.primaryGreen.withValues(alpha: 0.2),
           ),
           boxShadow: [
             BoxShadow(
-              color: Colors.black.withOpacity(0.05),
+              color: Colors.black.withValues(alpha: 0.05),
               blurRadius: 10,
               offset: const Offset(0, 2),
             ),
@@ -464,7 +464,7 @@ class _ModernNotificationsScreenState extends State<ModernNotificationsScreen>
         decoration: BoxDecoration(
           shape: BoxShape.circle,
           border: Border.all(
-            color: notification.typeColor.withOpacity(0.3),
+            color: notification.typeColor.withValues(alpha: 0.3),
             width: 2,
           ),
         ),
@@ -481,7 +481,7 @@ class _ModernNotificationsScreenState extends State<ModernNotificationsScreen>
               ),
             ),
             errorWidget: (context, url, error) => ColoredBox(
-              color: notification.typeColor.withOpacity(0.1),
+              color: notification.typeColor.withValues(alpha: 0.1),
               child: Icon(
                 notification.typeIcon,
                 color: notification.typeColor,
@@ -497,10 +497,10 @@ class _ModernNotificationsScreenState extends State<ModernNotificationsScreen>
       width: 48,
       height: 48,
       decoration: BoxDecoration(
-        color: notification.typeColor.withOpacity(0.1),
+        color: notification.typeColor.withValues(alpha: 0.1),
         shape: BoxShape.circle,
         border: Border.all(
-          color: notification.typeColor.withOpacity(0.3),
+          color: notification.typeColor.withValues(alpha: 0.3),
           width: 2,
         ),
       ),
@@ -528,7 +528,7 @@ class _ModernNotificationsScreenState extends State<ModernNotificationsScreen>
           Container(
             padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
             decoration: BoxDecoration(
-              color: notification.typeColor.withOpacity(0.1),
+              color: notification.typeColor.withValues(alpha: 0.1),
               borderRadius: BorderRadius.circular(12),
             ),
             child: Text(
@@ -579,13 +579,13 @@ class _ModernNotificationsScreenState extends State<ModernNotificationsScreen>
               width: 120,
               height: 120,
               decoration: BoxDecoration(
-                color: AppColors.primaryGreen.withOpacity(0.1),
+                color: AppColors.primaryGreen.withValues(alpha: 0.1),
                 shape: BoxShape.circle,
               ),
               child: Icon(
                 Icons.notifications_off_outlined,
                 size: 60,
-                color: AppColors.primaryGreen.withOpacity(0.6),
+                color: AppColors.primaryGreen.withValues(alpha: 0.6),
               ),
             ),
             const SizedBox(height: 24),

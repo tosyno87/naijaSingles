@@ -5,6 +5,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:image_picker/image_picker.dart';
 
+import '../../../common/constants/app_colors.dart';
 import '../bloc/onboarding_bloc.dart';
 
 /// Enum representing different types of photos for user profiles
@@ -41,7 +42,6 @@ class EnhancedPhotoUploadScreen extends StatefulWidget {
 class _EnhancedPhotoUploadScreenState extends State<EnhancedPhotoUploadScreen> {
   // MVP Color Scheme
   static const Color primaryGreen = Color(0xFF008037);
-  static const Color backgroundColor = Colors.white;
   static const Color textPrimary = Color(0xFF3E1F0D);
   static const Color dividerColor = Color(0xFFE5E5E5);
 
@@ -58,9 +58,9 @@ class _EnhancedPhotoUploadScreenState extends State<EnhancedPhotoUploadScreen> {
 
   Widget _buildContent(BuildContext context, List<File?> uploadedPhotos) {
     return Scaffold(
-      backgroundColor: backgroundColor,
+      backgroundColor: AppColors.backgroundColor,
       appBar: AppBar(
-        backgroundColor: backgroundColor,
+        backgroundColor: AppColors.backgroundColor,
         elevation: 0,
         leading: IconButton(
           icon: const Icon(Icons.arrow_back_ios, color: primaryGreen),
@@ -206,7 +206,7 @@ class _EnhancedPhotoUploadScreenState extends State<EnhancedPhotoUploadScreen> {
                     child: Container(
                       padding: const EdgeInsets.all(6),
                       decoration: BoxDecoration(
-                        color: Colors.black.withOpacity(0.7),
+                        color: Colors.black.withValues(alpha: 0.7),
                         shape: BoxShape.circle,
                       ),
                       child: const Icon(

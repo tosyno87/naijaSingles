@@ -107,7 +107,7 @@ class _GroupNotificationToggleState extends State<GroupNotificationToggle> {
                 Container(
                   padding: const EdgeInsets.all(12),
                   decoration: BoxDecoration(
-                    color: AppColors.primaryGreen.withOpacity(0.1),
+                    color: AppColors.primaryGreen.withValues(alpha: 0.1),
                     borderRadius: BorderRadius.circular(12),
                   ),
                   child: Icon(
@@ -193,7 +193,7 @@ class _GroupNotificationToggleState extends State<GroupNotificationToggle> {
                       value: !_isMuted, // Switch shows "enabled" state
                       onChanged: (_) => _toggleMute(),
                       activeThumbColor: AppColors.primaryGreen,
-                      activeTrackColor: AppColors.primaryGreen.withOpacity(0.3),
+                      activeTrackColor: AppColors.primaryGreen.withValues(alpha: 0.3),
                     ),
                 ],
               ),

@@ -49,14 +49,19 @@ class PrivacyAwareUserSearchRepo {
     return querySnapshot.docs.length;
   }
 
-  /// Get privacy-filtered user list for discovery
+  /// Get privacy-filtered user list for discovery.
+  /// [intentFilter] restricts results to users whose `lookingFor` matches.
+  /// 'Mixed' users are always included; a 'Mixed' filter shows everyone.
   static Future<List<UserModel>> getUserList(
-    UserModel currentUser,
-  ) async {
+    UserModel currentUser, {
+    String? intentFilter,
+  }) async {
     final List<String> checkedUserIds = [];
 
     try {
+      final effectiveIntent = intentFilter ?? currentUser.lookingFor;
       debugPrint('🔍 Getting privacy-aware user list for: ${currentUser.id}');
+      debugPrint('🔍 Effective intent filter: $effectiveIntent');
 
       // Get already checked users
       final snapshot =
@@ -87,6 +92,23 @@ class PrivacyAwareUserSearchRepo {
           '📋 No privacy-aware users found, falling back to traditional search',
         );
         userList = await _getFallbackUsers(currentUser, checkedUserIds);
+      }
+
+      // Apply intent filtering in-memory (same logic as the unified path).
+      if (effectiveIntent != null &&
+          effectiveIntent.isNotEmpty &&
+          effectiveIntent != 'Mixed') {
+        userList = userList
+            .where(
+              (u) =>
+                  u.lookingFor == null ||
+                  u.lookingFor == effectiveIntent ||
+                  u.lookingFor == 'Mixed',
+            )
+            .toList();
+        debugPrint(
+          '🎯 After intent filter ($effectiveIntent): ${userList.length} users',
+        );
       }
 
       debugPrint('✅ Final privacy-aware user list size: ${userList.length}');
@@ -151,6 +173,9 @@ class PrivacyAwareUserSearchRepo {
           }
 
           // Apply other filters
+          if (!user.isDiscoverable) {
+            continue;
+          }
           if (user.isBlocked ?? false) {
             continue;
           }
@@ -307,8 +332,10 @@ class PrivacyAwareUserSearchRepo {
                   .where((url) => url.toString().isNotEmpty))
               : [],
       isBlocked: data['isBlocked'] ?? false,
-      // Only include data that user has chosen to share
-      sexualOrientation: data['sexualOrientation'], // Only if privacy allows
+      lookingFor: data['lookingFor']?.toString() ?? 'Dating',
+      bio: data['bio']?.toString(),
+      accountStatus: data['accountStatus']?.toString(),
+      sexualOrientation: data['sexualOrientation'],
     );
   }
 

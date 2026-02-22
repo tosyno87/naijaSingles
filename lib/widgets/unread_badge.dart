@@ -32,7 +32,7 @@ class UnreadBadge extends StatelessWidget {
         borderRadius: BorderRadius.circular(badgeSize / 2),
         boxShadow: [
           BoxShadow(
-            color: bgColor.withOpacity(0.3),
+            color: bgColor.withValues(alpha: 0.3),
             blurRadius: 4,
             offset: const Offset(0, 2),
           ),
@@ -79,7 +79,7 @@ class UnreadDot extends StatelessWidget {
         shape: BoxShape.circle,
         boxShadow: [
           BoxShadow(
-            color: dotColor.withOpacity(0.3),
+            color: dotColor.withValues(alpha: 0.3),
             blurRadius: 4,
             offset: const Offset(0, 1),
           ),

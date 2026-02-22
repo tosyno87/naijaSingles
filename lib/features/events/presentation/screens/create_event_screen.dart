@@ -15,6 +15,7 @@ import '../widgets/create_event_steps/cultural_heritage_step.dart';
 import '../widgets/create_event_steps/datetime_step.dart';
 import '../widgets/create_event_steps/location_step.dart';
 import '../widgets/create_event_steps/preview_step.dart';
+import '../../../../common/constants/app_colors.dart';
 
 class CreateEventScreen extends StatefulWidget {
   // For template-based creation
@@ -176,7 +177,7 @@ class _CreateEventScreenState extends State<CreateEventScreen> {
                 style: GoogleFonts.montserrat(
                   fontSize: 14,
                   fontWeight: FontWeight.w500,
-                  color: const Color(0xFF008037),
+                  color: AppColors.primaryGreen,
                 ),
               ),
             ),
@@ -200,7 +201,7 @@ class _CreateEventScreenState extends State<CreateEventScreen> {
                     ),
                     decoration: BoxDecoration(
                       color: isCompleted || isActive
-                          ? const Color(0xFF008037)
+                          ? AppColors.primaryGreen
                           : const Color(0xFFE0E0E0),
                       borderRadius: BorderRadius.circular(2),
                     ),
@@ -240,7 +241,7 @@ class _CreateEventScreenState extends State<CreateEventScreen> {
                 child: OutlinedButton(
                   onPressed: _previousStep,
                   style: OutlinedButton.styleFrom(
-                    side: const BorderSide(color: Color(0xFF008037)),
+                    side: const BorderSide(color: AppColors.primaryGreen),
                     padding: const EdgeInsets.symmetric(vertical: 16),
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(12),
@@ -251,7 +252,7 @@ class _CreateEventScreenState extends State<CreateEventScreen> {
                     style: GoogleFonts.montserrat(
                       fontSize: 16,
                       fontWeight: FontWeight.w600,
-                      color: const Color(0xFF008037),
+                      color: AppColors.primaryGreen,
                     ),
                   ),
                 ),
@@ -268,7 +269,7 @@ class _CreateEventScreenState extends State<CreateEventScreen> {
                   return ElevatedButton(
                     onPressed: isDisabled ? null : _handleNextStep,
                     style: ElevatedButton.styleFrom(
-                      backgroundColor: const Color(0xFF008037),
+                      backgroundColor: AppColors.primaryGreen,
                       foregroundColor: Colors.white,
                       padding: const EdgeInsets.symmetric(vertical: 16),
                       shape: RoundedRectangleBorder(
@@ -548,7 +549,7 @@ class _CreateEventScreenState extends State<CreateEventScreen> {
         contentPadding: const EdgeInsets.all(20),
         title: Row(
           children: [
-            const Icon(Icons.check_circle, color: Color(0xFF008037), size: 28),
+            const Icon(Icons.check_circle, color: AppColors.primaryGreen, size: 28),
             const SizedBox(width: 12),
             Expanded(
               // Prevent text overflow
@@ -611,7 +612,7 @@ class _CreateEventScreenState extends State<CreateEventScreen> {
                       _navigateToMyEvents();
                     },
                     style: ElevatedButton.styleFrom(
-                      backgroundColor: const Color(0xFF008037),
+                      backgroundColor: AppColors.primaryGreen,
                       foregroundColor: Colors.white,
                       padding: const EdgeInsets.symmetric(vertical: 12),
                       shape: RoundedRectangleBorder(
@@ -637,7 +638,7 @@ class _CreateEventScreenState extends State<CreateEventScreen> {
                 Navigator.of(context).pop(); // Close create event screen
               },
               style: ElevatedButton.styleFrom(
-                backgroundColor: const Color(0xFF008037),
+                backgroundColor: AppColors.primaryGreen,
                 foregroundColor: Colors.white,
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(8),
@@ -685,7 +686,7 @@ class _CreateEventScreenState extends State<CreateEventScreen> {
               'Event created successfully! Check the Events tab to view your event.',
               style: GoogleFonts.montserrat(color: Colors.white),
             ),
-            backgroundColor: const Color(0xFF008037),
+            backgroundColor: AppColors.primaryGreen,
             behavior: SnackBarBehavior.floating,
             shape: RoundedRectangleBorder(
               borderRadius: BorderRadius.circular(10),
@@ -726,7 +727,7 @@ class _CreateEventScreenState extends State<CreateEventScreen> {
               Container(
                 padding: const EdgeInsets.all(8),
                 decoration: BoxDecoration(
-                  color: Colors.orange.withOpacity(0.1),
+                  color: Colors.orange.withValues(alpha: 0.1),
                   borderRadius: BorderRadius.circular(8),
                 ),
                 child: const Icon(
@@ -783,7 +784,7 @@ class _CreateEventScreenState extends State<CreateEventScreen> {
                 _saveAsDraft();
               },
               style: ElevatedButton.styleFrom(
-                backgroundColor: const Color(0xFF008037),
+                backgroundColor: AppColors.primaryGreen,
                 foregroundColor: Colors.white,
                 padding:
                     const EdgeInsets.symmetric(horizontal: 20, vertical: 12),

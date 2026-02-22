@@ -87,12 +87,12 @@ class DeepLinkingService {
       );
 
       final String text =
-          shareText ?? 'Check out $userName\'s profile on NaijaSingles! $link';
+          shareText ?? 'Check out $userName\'s profile on Afropeep! $link';
 
-      await Share.share(
-        text,
-        subject: 'Profile from NaijaSingles',
-      );
+      await SharePlus.instance.share(ShareParams(
+        text: text,
+        subject: 'Profile from Afropeep',
+      ));
 
       log('🔗 Profile shared successfully');
     } catch (e) {
@@ -115,12 +115,12 @@ class DeepLinkingService {
       );
 
       final String text = shareText ??
-          'I have a new match with $matchName on NaijaSingles! $link';
+          'I have a new match with $matchName on Afropeep! $link';
 
-      await Share.share(
-        text,
-        subject: 'New Match on NaijaSingles',
-      );
+      await SharePlus.instance.share(ShareParams(
+        text: text,
+        subject: 'New Match on Afropeep',
+      ));
 
       log('🔗 Match shared successfully');
     } catch (e) {
@@ -146,10 +146,10 @@ class DeepLinkingService {
 
       final String text = shareText ?? 'Join $eventName on $eventDate! $link';
 
-      await Share.share(
-        text,
-        subject: 'Event on NaijaSingles',
-      );
+      await SharePlus.instance.share(ShareParams(
+        text: text,
+        subject: 'Event on Afropeep',
+      ));
 
       log('🔗 Event shared successfully');
     } catch (e) {

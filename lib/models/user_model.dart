@@ -45,6 +45,10 @@ class UserModel {
     this.languages,
     this.religion,
     this.occupation,
+    // Account status fields
+    this.accountStatus,
+    this.deactivatedAt,
+    this.deactivationReason,
   });
 
   factory UserModel.fromDocument(DocumentSnapshot doc) {
@@ -214,6 +218,13 @@ class UserModel {
             safeGetNested<String>('editInfo', 'religion', ''),
         occupation: safeGet<String>('occupation') ??
             safeGetNested<String>('editInfo', 'occupation', ''),
+        // Account status fields
+        accountStatus: safeGet<String>('accountStatus', 'active'),
+        deactivatedAt:
+            data.containsKey('deactivatedAt') && data['deactivatedAt'] is Timestamp
+                ? (data['deactivatedAt'] as Timestamp).toDate()
+                : null,
+        deactivationReason: safeGet<String>('deactivationReason'),
       );
     } catch (e) {
       debugPrint('Error creating UserModel from document ${doc.id}: $e');
@@ -328,6 +339,12 @@ class UserModel {
             (json['editInfo'] != null ? json['editInfo']['religion'] : null),
         occupation: json['occupation'] ??
             (json['editInfo'] != null ? json['editInfo']['occupation'] : null),
+        // Account status fields
+        accountStatus: json['accountStatus'] ?? 'active',
+        deactivatedAt: json['deactivatedAt'] != null
+            ? DateTime.tryParse(json['deactivatedAt'].toString())
+            : null,
+        deactivationReason: json['deactivationReason'],
       );
 
   /// Create UserModel from Map (for caching)
@@ -384,6 +401,12 @@ class UserModel {
             map['languages'] is List ? List<String>.from(map['languages']) : [],
         religion: map['religion']?.toString(),
         occupation: map['occupation']?.toString(),
+        // Account status fields
+        accountStatus: map['accountStatus']?.toString() ?? 'active',
+        deactivatedAt: map['deactivatedAt'] != null
+            ? DateTime.tryParse(map['deactivatedAt'].toString())
+            : null,
+        deactivationReason: map['deactivationReason']?.toString(),
       );
   final String? id;
   final String? name;
@@ -414,8 +437,8 @@ class UserModel {
   final String? drinkingStatus;
   final String? smokingStatus;
   final DateTime? lastSeen;
-  final String?
-      lookingFor; // What the user is looking for: Dating, Friendship, Networking
+  String?
+      lookingFor; // What the user is looking for: Dating, Friendship, Networking, Mixed
 
   // Cultural fields
   final String? nationality;
@@ -423,6 +446,14 @@ class UserModel {
   final List<String>? languages;
   final String? religion;
   final String? occupation;
+
+  // Account status fields
+  /// One of: 'active', 'paused', 'incognito', 'deleted', 'banned'.
+  /// Defaults to 'active'. 'paused' hides from discovery entirely.
+  /// 'incognito' hides from discovery but keeps matches/chats accessible.
+  final String? accountStatus;
+  final DateTime? deactivatedAt;
+  final String? deactivationReason;
 
   List? imageUrl = [];
   int? distanceBW;
@@ -477,6 +508,10 @@ class UserModel {
         'languages': languages,
         'religion': religion,
         'occupation': occupation,
+        // Account status fields
+        'accountStatus': accountStatus,
+        'deactivatedAt': deactivatedAt?.toIso8601String(),
+        'deactivationReason': deactivationReason,
       };
 
   // Add missing getters for compatibility with new services
@@ -508,4 +543,20 @@ class UserModel {
 
   /// Get distance range preference
   int? get distanceRange => maxDistance;
+
+  /// Whether this user is discoverable (shown in swipe/search/recommendations).
+  /// Users are NOT discoverable when paused, incognito, deleted, or banned.
+  bool get isDiscoverable =>
+      accountStatus == null ||
+      accountStatus == 'active';
+
+  /// Whether the account is temporarily deactivated (paused or incognito).
+  bool get isDeactivated =>
+      accountStatus == 'paused' || accountStatus == 'incognito';
+
+  /// Whether the account is in incognito mode specifically.
+  bool get isIncognito => accountStatus == 'incognito';
+
+  /// Whether the account is paused specifically.
+  bool get isPaused => accountStatus == 'paused';
 }

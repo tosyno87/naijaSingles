@@ -76,7 +76,7 @@ class _CulturalProfileScreenState extends State<CulturalProfileScreen> {
             Container(
               margin: const EdgeInsets.only(right: 16),
               decoration: BoxDecoration(
-                color: Colors.white.withOpacity(0.2),
+                color: Colors.white.withValues(alpha: 0.2),
                 borderRadius: BorderRadius.circular(12),
               ),
               child: IconButton(
@@ -142,7 +142,7 @@ class _CulturalProfileScreenState extends State<CulturalProfileScreen> {
         borderRadius: BorderRadius.circular(24),
         boxShadow: [
           BoxShadow(
-            color: AppColors.primaryGreen.withOpacity(0.3),
+            color: AppColors.primaryGreen.withValues(alpha: 0.3),
             blurRadius: 20,
             offset: const Offset(0, 8),
           ),
@@ -162,7 +162,7 @@ class _CulturalProfileScreenState extends State<CulturalProfileScreen> {
               ),
               boxShadow: [
                 BoxShadow(
-                  color: Colors.black.withOpacity(0.2),
+                  color: Colors.black.withValues(alpha: 0.2),
                   blurRadius: 15,
                   offset: const Offset(0, 8),
                 ),
@@ -174,12 +174,12 @@ class _CulturalProfileScreenState extends State<CulturalProfileScreen> {
                       mainPhoto,
                       fit: BoxFit.cover,
                       errorBuilder: (context, error, stackTrace) => ColoredBox(
-                        color: Colors.white.withOpacity(0.2),
+                        color: Colors.white.withValues(alpha: 0.2),
                         child: Custom3DIcons.profile(size: 60),
                       ),
                     )
                   : ColoredBox(
-                      color: Colors.white.withOpacity(0.2),
+                      color: Colors.white.withValues(alpha: 0.2),
                       child: Custom3DIcons.profile(size: 60),
                     ),
             ),
@@ -202,10 +202,10 @@ class _CulturalProfileScreenState extends State<CulturalProfileScreen> {
           Container(
             padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
             decoration: BoxDecoration(
-              color: Colors.white.withOpacity(0.2),
+              color: Colors.white.withValues(alpha: 0.2),
               borderRadius: BorderRadius.circular(24),
               border: Border.all(
-                color: Colors.white.withOpacity(0.3),
+                color: Colors.white.withValues(alpha: 0.3),
               ),
             ),
             child: Row(
@@ -234,10 +234,10 @@ class _CulturalProfileScreenState extends State<CulturalProfileScreen> {
             Container(
               padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
               decoration: BoxDecoration(
-                color: Colors.white.withOpacity(0.15),
+                color: Colors.white.withValues(alpha: 0.15),
                 borderRadius: BorderRadius.circular(20),
                 border: Border.all(
-                  color: Colors.white.withOpacity(0.2),
+                  color: Colors.white.withValues(alpha: 0.2),
                 ),
               ),
               child: Row(
@@ -250,7 +250,7 @@ class _CulturalProfileScreenState extends State<CulturalProfileScreen> {
                     style: GoogleFonts.montserrat(
                       fontSize: 12,
                       fontWeight: FontWeight.w500,
-                      color: Colors.white.withOpacity(0.9),
+                      color: Colors.white.withValues(alpha: 0.9),
                     ),
                   ),
                 ],
@@ -364,11 +364,11 @@ class _CulturalProfileScreenState extends State<CulturalProfileScreen> {
         color: AppColors.cardColor,
         borderRadius: BorderRadius.circular(16),
         border: Border.all(
-          color: AppColors.primaryGreen.withOpacity(0.2),
+          color: AppColors.primaryGreen.withValues(alpha: 0.2),
         ),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.05),
+            color: Colors.black.withValues(alpha: 0.05),
             blurRadius: 10,
             offset: const Offset(0, 2),
           ),
@@ -397,10 +397,10 @@ class _CulturalProfileScreenState extends State<CulturalProfileScreen> {
           Container(
             padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
             decoration: BoxDecoration(
-              color: AppColors.primaryGreen.withOpacity(0.1),
+              color: AppColors.primaryGreen.withValues(alpha: 0.1),
               borderRadius: BorderRadius.circular(12),
               border: Border.all(
-                color: AppColors.primaryGreen.withOpacity(0.3),
+                color: AppColors.primaryGreen.withValues(alpha: 0.3),
               ),
             ),
             child: Text(
@@ -451,11 +451,11 @@ class _CulturalProfileScreenState extends State<CulturalProfileScreen> {
         color: AppColors.cardColor,
         borderRadius: BorderRadius.circular(16),
         border: Border.all(
-          color: AppColors.primaryGreen.withOpacity(0.2),
+          color: AppColors.primaryGreen.withValues(alpha: 0.2),
         ),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.05),
+            color: Colors.black.withValues(alpha: 0.05),
             blurRadius: 10,
             offset: const Offset(0, 2),
           ),
@@ -530,10 +530,10 @@ class _CulturalProfileScreenState extends State<CulturalProfileScreen> {
                       padding: const EdgeInsets.symmetric(
                           horizontal: 12, vertical: 6),
                       decoration: BoxDecoration(
-                        color: AppColors.primaryGreen.withOpacity(0.1),
+                        color: AppColors.primaryGreen.withValues(alpha: 0.1),
                         borderRadius: BorderRadius.circular(16),
                         border: Border.all(
-                          color: AppColors.primaryGreen.withOpacity(0.3),
+                          color: AppColors.primaryGreen.withValues(alpha: 0.3),
                         ),
                       ),
                       child: Text(
@@ -565,11 +565,11 @@ class _CulturalProfileScreenState extends State<CulturalProfileScreen> {
         color: AppColors.cardColor,
         borderRadius: BorderRadius.circular(16),
         border: Border.all(
-          color: AppColors.primaryGreen.withOpacity(0.2),
+          color: AppColors.primaryGreen.withValues(alpha: 0.2),
         ),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.05),
+            color: Colors.black.withValues(alpha: 0.05),
             blurRadius: 10,
             offset: const Offset(0, 2),
           ),
@@ -616,10 +616,10 @@ class _CulturalProfileScreenState extends State<CulturalProfileScreen> {
                       padding: const EdgeInsets.symmetric(
                           horizontal: 12, vertical: 6),
                       decoration: BoxDecoration(
-                        color: AppColors.primaryGreen.withOpacity(0.1),
+                        color: AppColors.primaryGreen.withValues(alpha: 0.1),
                         borderRadius: BorderRadius.circular(16),
                         border: Border.all(
-                          color: AppColors.primaryGreen.withOpacity(0.3),
+                          color: AppColors.primaryGreen.withValues(alpha: 0.3),
                         ),
                       ),
                       child: Text(
@@ -656,10 +656,10 @@ class _CulturalProfileScreenState extends State<CulturalProfileScreen> {
                       padding: const EdgeInsets.symmetric(
                           horizontal: 12, vertical: 6),
                       decoration: BoxDecoration(
-                        color: AppColors.textSecondary.withOpacity(0.1),
+                        color: AppColors.textSecondary.withValues(alpha: 0.1),
                         borderRadius: BorderRadius.circular(16),
                         border: Border.all(
-                          color: AppColors.textSecondary.withOpacity(0.3),
+                          color: AppColors.textSecondary.withValues(alpha: 0.3),
                         ),
                       ),
                       child: Text(
@@ -691,11 +691,11 @@ class _CulturalProfileScreenState extends State<CulturalProfileScreen> {
         color: AppColors.cardColor,
         borderRadius: BorderRadius.circular(16),
         border: Border.all(
-          color: AppColors.primaryGreen.withOpacity(0.2),
+          color: AppColors.primaryGreen.withValues(alpha: 0.2),
         ),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.05),
+            color: Colors.black.withValues(alpha: 0.05),
             blurRadius: 10,
             offset: const Offset(0, 2),
           ),
@@ -757,11 +757,11 @@ class _CulturalProfileScreenState extends State<CulturalProfileScreen> {
         color: AppColors.cardColor,
         borderRadius: BorderRadius.circular(16),
         border: Border.all(
-          color: AppColors.primaryGreen.withOpacity(0.2),
+          color: AppColors.primaryGreen.withValues(alpha: 0.2),
         ),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.05),
+            color: Colors.black.withValues(alpha: 0.05),
             blurRadius: 10,
             offset: const Offset(0, 2),
           ),
@@ -850,10 +850,10 @@ class _CulturalProfileScreenState extends State<CulturalProfileScreen> {
   Widget _buildStatCard(String label, String value, Widget icon) => Container(
         padding: const EdgeInsets.all(16),
         decoration: BoxDecoration(
-          color: AppColors.primaryGreen.withOpacity(0.05),
+          color: AppColors.primaryGreen.withValues(alpha: 0.05),
           borderRadius: BorderRadius.circular(12),
           border: Border.all(
-            color: AppColors.primaryGreen.withOpacity(0.2),
+            color: AppColors.primaryGreen.withValues(alpha: 0.2),
           ),
         ),
         child: Column(
@@ -1022,7 +1022,7 @@ class _CulturalProfileScreenState extends State<CulturalProfileScreen> {
       // Format distance with proper unit based on region
       return RegionDetectionService.formatDistance(distanceKm, locationData);
     } catch (e) {
-      return '50 km'; // Safe fallback
+      return '31 miles'; // Safe fallback
     }
   }
 }

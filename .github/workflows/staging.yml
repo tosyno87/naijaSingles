@@ -74,28 +74,6 @@ jobs:
         run: flutter test --coverage || echo "Some tests failed - continuing with deployment"
         continue-on-error: true
         
-      - name: Authenticate to Google Cloud
-        uses: google-github-actions/auth@c200f3691d83b41bf9bbd8638997a462592937ed
-        with:
-          credentials_json: ${{ secrets.GOOGLE_SERVICE_ACCOUNT_STAGING }}
-          
-      - name: Setup Google Cloud SDK
-        uses: google-github-actions/setup-gcloud@e427ad8a34f8676edf47cf7d7925499adf3eb74f
-        
-      - name: Install Firebase CLI
-        # Note: --ignore-scripts prevents arbitrary script execution during install
-        # firebase-tools may require scripts; if installation fails, remove this flag
-        run: npm install -g firebase-tools --ignore-scripts || npm install -g firebase-tools
-        
-      - name: Configure Firebase (if staging project exists)
-        run: |
-          if [ -n "${{ env.FIREBASE_PROJECT_ID }}" ] && [ "${{ env.FIREBASE_PROJECT_ID }}" != "naijasingles-staging" ]; then
-            echo "Firebase Project ID: ${{ env.FIREBASE_PROJECT_ID }}"
-            firebase use ${{ env.FIREBASE_PROJECT_ID }} --token ${{ env.FIREBASE_TOKEN }}
-          else
-            echo "Staging Firebase project not configured, using dev project"
-          fi
-          
       - name: Build Staging Web
         run: |
           flutter build web \
@@ -105,16 +83,42 @@ jobs:
             --dart-define=FLAVOR=staging \
             --web-renderer html \
             --base-href "/"
-            
-      - name: Deploy to Staging (if Firebase configured)
-        if: env.FIREBASE_PROJECT_ID != 'naijasingles-staging' && env.FIREBASE_TOKEN != ''
+
+      - name: Authenticate to Google Cloud
+        id: gcloud_auth
+        continue-on-error: true
+        uses: google-github-actions/auth@c200f3691d83b41bf9bbd8638997a462592937ed
+        with:
+          credentials_json: ${{ secrets.GOOGLE_SERVICE_ACCOUNT_STAGING }}
+
+      - name: Setup Google Cloud SDK
+        if: steps.gcloud_auth.outcome == 'success'
+        uses: google-github-actions/setup-gcloud@e427ad8a34f8676edf47cf7d7925499adf3eb74f
+
+      - name: Install Firebase CLI
+        if: steps.gcloud_auth.outcome == 'success'
+        run: npm install -g firebase-tools --ignore-scripts || npm install -g firebase-tools
+
+      - name: Configure Firebase (if staging project exists)
+        if: steps.gcloud_auth.outcome == 'success'
+        run: |
+          if [ -n "${{ env.FIREBASE_PROJECT_ID }}" ] && [ "${{ env.FIREBASE_PROJECT_ID }}" != "naijasingles-staging" ]; then
+            echo "Firebase Project ID: ${{ env.FIREBASE_PROJECT_ID }}"
+            firebase use ${{ env.FIREBASE_PROJECT_ID }} --token ${{ env.FIREBASE_TOKEN }}
+          else
+            echo "Staging Firebase project not configured, using dev project"
+          fi
+
+      - name: Deploy to Staging
+        if: steps.gcloud_auth.outcome == 'success' && env.FIREBASE_TOKEN != ''
         run: |
           firebase deploy \
             --project ${{ env.FIREBASE_PROJECT_ID }} \
             --only hosting \
             --token ${{ env.FIREBASE_TOKEN }}
-            
+
       - name: Create Deployment Record
+        if: steps.gcloud_auth.outcome == 'success'
         uses: actions/github-script@f28e40c7f34bde8b3046d885e986cb6290c5673b
         with:
           script: |

@@ -12,6 +12,7 @@ import '../explore/explore_screen.dart'; // Import ExploreScreen directly
 import 'chat_thread_screen.dart';
 import 'message_model.dart';
 import 'services/chat_service.dart';
+import '../../common/constants/app_colors.dart';
 
 class MessagesScreen extends StatefulWidget {
   const MessagesScreen({super.key});
@@ -26,7 +27,6 @@ class _MessagesScreenState extends State<MessagesScreen> {
   final FirebaseAuth _auth = FirebaseAuth.instance;
 
   // Afropeep MVP Color Scheme
-  static const Color backgroundColor = Colors.white; // Clean white
   static const Color primaryColor = Color(0xFF008037); // Deep green
   static const Color cardColor = Color(0xFFFFFFFF); // White for cards
   static const Color errorColor = Color(0xFFFF5A5F); // Red for errors/delete
@@ -37,9 +37,9 @@ class _MessagesScreenState extends State<MessagesScreen> {
 
   @override
   Widget build(BuildContext context) => Scaffold(
-        backgroundColor: backgroundColor,
+        backgroundColor: AppColors.backgroundColor,
         appBar: AppBar(
-          backgroundColor: backgroundColor,
+          backgroundColor: AppColors.backgroundColor,
           elevation: 0,
           systemOverlayStyle: SystemUiOverlayStyle.dark,
           automaticallyImplyLeading: false, // Hide back button on main screen
@@ -105,21 +105,30 @@ class _MessagesScreenState extends State<MessagesScreen> {
 
           if (otherUserId.isEmpty) continue;
 
-          // Get other user's data
-          final otherUserDoc =
-              await _firestore.collection('users').doc(otherUserId).get();
+          // Try to fetch the other user's profile. If the read is denied
+          // (e.g., paused/incognito user blocked by Firestore rules), fall
+          // back to cached data from the chat thread document so threads
+          // remain visible.
           String otherUserName = 'User';
           String? avatarUrl;
+          try {
+            final otherUserDoc =
+                await _firestore.collection('users').doc(otherUserId).get();
 
-          if (otherUserDoc.exists) {
-            final userData = otherUserDoc.data();
-            otherUserName = userData?['name'] ?? 'User';
+            if (otherUserDoc.exists) {
+              final userData = otherUserDoc.data();
+              otherUserName = userData?['name'] ?? 'User';
 
-            // Get first photo as avatar
-            final photos = userData?['photos'] as List<dynamic>?;
-            if (photos != null && photos.isNotEmpty) {
-              avatarUrl = photos.first as String?;
+              final photos = userData?['photos'] as List<dynamic>?;
+              if (photos != null && photos.isNotEmpty) {
+                avatarUrl = photos.first as String?;
+              }
             }
+          } on Exception catch (_) {
+            // Profile read denied (paused/incognito). Use the cached name
+            // stored on the chat thread document at match-creation time.
+            final userNames = data['userNames'] as Map<String, dynamic>?;
+            otherUserName = userNames?[otherUserId] as String? ?? 'User';
           }
 
           // Get unread count for current user
@@ -465,7 +474,7 @@ class _MessagesScreenState extends State<MessagesScreen> {
                                       Icon(
                                         Icons.info_outline,
                                         size: 16,
-                                        color: primaryColor.withOpacity(0.7),
+                                        color: primaryColor.withValues(alpha: 0.7),
                                       ),
                                     ],
                                   ),
@@ -546,7 +555,7 @@ class _MessagesScreenState extends State<MessagesScreen> {
               width: 60,
               height: 60,
               decoration: BoxDecoration(
-                color: errorColor.withOpacity(0.1),
+                color: errorColor.withValues(alpha: 0.1),
                 shape: BoxShape.circle,
               ),
               child: const Icon(
@@ -583,10 +592,10 @@ class _MessagesScreenState extends State<MessagesScreen> {
             Container(
               padding: const EdgeInsets.all(12),
               decoration: BoxDecoration(
-                color: errorColor.withOpacity(0.05),
+                color: errorColor.withValues(alpha: 0.05),
                 borderRadius: BorderRadius.circular(12),
                 border: Border.all(
-                  color: errorColor.withOpacity(0.2),
+                  color: errorColor.withValues(alpha: 0.2),
                 ),
               ),
               child: Row(
@@ -626,7 +635,7 @@ class _MessagesScreenState extends State<MessagesScreen> {
                     padding: const EdgeInsets.symmetric(vertical: 12),
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(12),
-                      side: BorderSide(color: textSecondary.withOpacity(0.3)),
+                      side: BorderSide(color: textSecondary.withValues(alpha: 0.3)),
                     ),
                   ),
                   child: Text(
@@ -696,7 +705,7 @@ class _MessagesScreenState extends State<MessagesScreen> {
               width: 80,
               height: 80,
               decoration: BoxDecoration(
-                color: primaryColor.withOpacity(0.1),
+                color: primaryColor.withValues(alpha: 0.1),
                 shape: BoxShape.circle,
               ),
               child: const Center(
@@ -825,7 +834,7 @@ class _MessagesScreenState extends State<MessagesScreen> {
                 width: 80,
                 height: 80,
                 decoration: BoxDecoration(
-                  color: primaryColor.withOpacity(0.1),
+                  color: primaryColor.withValues(alpha: 0.1),
                   shape: BoxShape.circle,
                 ),
                 child: const Center(

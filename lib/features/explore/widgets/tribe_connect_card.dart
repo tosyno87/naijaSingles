@@ -27,7 +27,7 @@ class TribeConnectCard extends StatelessWidget {
           borderRadius: BorderRadius.circular(20),
           boxShadow: [
             BoxShadow(
-              color: AppColors.shadow.withOpacity(0.1),
+              color: AppColors.shadow.withValues(alpha: 0.1),
               blurRadius: 10,
               offset: const Offset(0, 4),
             ),
@@ -83,7 +83,7 @@ class TribeConnectCard extends StatelessWidget {
         child: user.imageUrl?.isEmpty ?? false
             ? DecoratedBox(
                 decoration: BoxDecoration(
-                  color: AppColors.primaryGreen.withOpacity(0.1),
+                  color: AppColors.primaryGreen.withValues(alpha: 0.1),
                   borderRadius: const BorderRadius.only(
                     topLeft: Radius.circular(20),
                     topRight: Radius.circular(20),
@@ -171,20 +171,20 @@ class TribeConnectCard extends StatelessWidget {
         decoration: BoxDecoration(
           gradient: LinearGradient(
             colors: [
-              AppColors.culture.withOpacity(0.1),
-              AppColors.heritage.withOpacity(0.05),
+              AppColors.culture.withValues(alpha: 0.1),
+              AppColors.heritage.withValues(alpha: 0.05),
             ],
             begin: Alignment.topLeft,
             end: Alignment.bottomRight,
           ),
           borderRadius: BorderRadius.circular(12),
           border: Border.all(
-            color: AppColors.culture.withOpacity(0.3),
+            color: AppColors.culture.withValues(alpha: 0.3),
             width: 1.5,
           ),
           boxShadow: [
             BoxShadow(
-              color: AppColors.culture.withOpacity(0.1),
+              color: AppColors.culture.withValues(alpha: 0.1),
               blurRadius: 4,
               offset: const Offset(0, 2),
             ),
@@ -245,10 +245,10 @@ class TribeConnectCard extends StatelessWidget {
                   padding:
                       const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
                   decoration: BoxDecoration(
-                    color: AppColors.success.withOpacity(0.1),
+                    color: AppColors.success.withValues(alpha: 0.1),
                     borderRadius: BorderRadius.circular(12),
                     border: Border.all(
-                      color: AppColors.success.withOpacity(0.3),
+                      color: AppColors.success.withValues(alpha: 0.3),
                     ),
                   ),
                   child: Row(
@@ -305,10 +305,10 @@ class TribeConnectCard extends StatelessWidget {
       Container(
         padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 6),
         decoration: BoxDecoration(
-          color: color.withOpacity(0.1),
+          color: color.withValues(alpha: 0.1),
           borderRadius: BorderRadius.circular(8),
           border: Border.all(
-            color: color.withOpacity(0.2),
+            color: color.withValues(alpha: 0.2),
           ),
         ),
         child: Row(
@@ -365,15 +365,15 @@ class TribeConnectCard extends StatelessWidget {
       decoration: BoxDecoration(
         gradient: LinearGradient(
           colors: [
-            AppColors.success.withOpacity(0.1),
-            AppColors.primaryGreen.withOpacity(0.05),
+            AppColors.success.withValues(alpha: 0.1),
+            AppColors.primaryGreen.withValues(alpha: 0.05),
           ],
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
         ),
         borderRadius: BorderRadius.circular(12),
         border: Border.all(
-          color: AppColors.success.withOpacity(0.2),
+          color: AppColors.success.withValues(alpha: 0.2),
         ),
       ),
       child: Column(
@@ -411,10 +411,10 @@ class TribeConnectCard extends StatelessWidget {
   Widget _buildInterestTag(String interest) => Container(
         padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
         decoration: BoxDecoration(
-          color: AppColors.primaryGreen.withOpacity(0.1),
+          color: AppColors.primaryGreen.withValues(alpha: 0.1),
           borderRadius: BorderRadius.circular(12),
           border: Border.all(
-            color: AppColors.primaryGreen.withOpacity(0.3),
+            color: AppColors.primaryGreen.withValues(alpha: 0.3),
           ),
         ),
         child: Text(
@@ -430,10 +430,10 @@ class TribeConnectCard extends StatelessWidget {
   Widget _buildMutualInterestTag(String interest) => Container(
         padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
         decoration: BoxDecoration(
-          color: AppColors.success.withOpacity(0.2),
+          color: AppColors.success.withValues(alpha: 0.2),
           borderRadius: BorderRadius.circular(12),
           border: Border.all(
-            color: AppColors.success.withOpacity(0.4),
+            color: AppColors.success.withValues(alpha: 0.4),
           ),
         ),
         child: Row(
@@ -466,7 +466,7 @@ class TribeConnectCard extends StatelessWidget {
         color: AppColors.overlayColor,
         borderRadius: BorderRadius.circular(12),
         border: Border.all(
-          color: AppColors.border.withOpacity(0.3),
+          color: AppColors.border.withValues(alpha: 0.3),
         ),
       ),
       child: Column(
@@ -568,18 +568,18 @@ class TribeConnectCard extends StatelessWidget {
                 ? color
                 : isDestructive
                     ? Colors.transparent
-                    : color.withOpacity(0.1),
+                    : color.withValues(alpha: 0.1),
             borderRadius: BorderRadius.circular(12),
             border: Border.all(
               color: isDestructive
-                  ? color.withOpacity(0.4)
-                  : color.withOpacity(0.3),
+                  ? color.withValues(alpha: 0.4)
+                  : color.withValues(alpha: 0.3),
               width: isDestructive ? 1 : 1.5,
             ),
             boxShadow: isPrimary
                 ? [
                     BoxShadow(
-                      color: color.withOpacity(0.3),
+                      color: color.withValues(alpha: 0.3),
                       blurRadius: 8,
                       offset: const Offset(0, 2),
                     ),
@@ -598,7 +598,7 @@ class TribeConnectCard extends StatelessWidget {
                   color: isPrimary
                       ? Colors.white
                       : isDestructive
-                          ? color.withOpacity(0.8)
+                          ? color.withValues(alpha: 0.8)
                           : color,
                 ),
               ),

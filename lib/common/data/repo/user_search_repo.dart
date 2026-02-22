@@ -222,15 +222,14 @@ class UserSearchRepo {
     String? intentFilter, // Add intent filter parameter
   }) async {
     try {
+      final effectiveIntent = intentFilter ?? currentUser.lookingFor;
       debugPrint('🔍 Getting optimized user list for ${currentUser.name}');
-      if (intentFilter != null) {
-        debugPrint('🎯 Filtering by intent: $intentFilter');
-      }
+      debugPrint('🎯 Effective intent filter: $effectiveIntent');
 
       // Use consolidated discovery service for better performance and consistency
       final users = await DiscoveryService.getUsersForDiscovery(
         currentUser,
-        intentFilter: intentFilter,
+        intentFilter: effectiveIntent,
       );
 
       debugPrint('✅ Retrieved ${users.length} users from unified service');
@@ -331,10 +330,15 @@ class UserSearchRepo {
             continue;
           }
 
-          // Apply intent filter if specified
-          if (intentFilter != null && intentFilter.isNotEmpty) {
-            final userIntent = temp.lookingFor ?? 'Dating';
-            if (userIntent != intentFilter) {
+          // Apply intent filter if specified.
+          // 'Mixed' users appear in every mode; a 'Mixed' filter shows all.
+          if (intentFilter != null &&
+              intentFilter.isNotEmpty &&
+              intentFilter != 'Mixed') {
+            final userIntent = temp.lookingFor;
+            if (userIntent != null &&
+                userIntent != intentFilter &&
+                userIntent != 'Mixed') {
               debugPrint(
                 'Filtered out user: ${temp.name} (intent: $userIntent, looking for: $intentFilter)',
               );

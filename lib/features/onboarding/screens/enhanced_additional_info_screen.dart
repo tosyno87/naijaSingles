@@ -16,7 +16,6 @@ class EnhancedAdditionalInfoScreen extends StatefulWidget {
 class _EnhancedAdditionalInfoScreenState
     extends State<EnhancedAdditionalInfoScreen> {
   // Afropeep theme colors
-  static const Color backgroundColor = Colors.white;
   static const Color afropeepGreen = Color(0xFF008037); // MVP green
   static const Color cardBackground = Color(0xFFF7E8DA);
   static const Color textDarkBrown = Color(0xFF3A1D0F);
@@ -604,10 +603,10 @@ class _EnhancedAdditionalInfoScreenState
           Container(
             padding: EdgeInsets.all(isTablet ? 20 : 16),
             decoration: BoxDecoration(
-              color: afropeepGreen.withOpacity(0.1),
+              color: afropeepGreen.withValues(alpha: 0.1),
               borderRadius: BorderRadius.circular(12),
               border: Border.all(
-                color: afropeepGreen.withOpacity(0.3),
+                color: afropeepGreen.withValues(alpha: 0.3),
                 width: 1.5,
               ),
             ),

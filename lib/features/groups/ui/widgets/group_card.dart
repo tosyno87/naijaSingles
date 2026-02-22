@@ -138,7 +138,7 @@ class GroupCard extends StatelessWidget {
           gradient: _getCategoryGradient(),
           boxShadow: [
             BoxShadow(
-              color: _getCategoryColor().withOpacity(0.3),
+              color: _getCategoryColor().withValues(alpha: 0.3),
               blurRadius: 8,
               offset: const Offset(0, 4),
             ),
@@ -167,10 +167,10 @@ class GroupCard extends StatelessWidget {
   Widget _buildAdminBadge() => Container(
         padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
         decoration: BoxDecoration(
-          color: AppColors.warning.withOpacity(0.1),
+          color: AppColors.warning.withValues(alpha: 0.1),
           borderRadius: BorderRadius.circular(12),
           border: Border.all(
-            color: AppColors.warning.withOpacity(0.3),
+            color: AppColors.warning.withValues(alpha: 0.3),
           ),
         ),
         child: Row(
@@ -223,10 +223,10 @@ class GroupCard extends StatelessWidget {
   Widget _buildCulturalInfo() => Container(
         padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
         decoration: BoxDecoration(
-          color: AppColors.culture.withOpacity(0.1),
+          color: AppColors.culture.withValues(alpha: 0.1),
           borderRadius: BorderRadius.circular(12),
           border: Border.all(
-            color: AppColors.culture.withOpacity(0.3),
+            color: AppColors.culture.withValues(alpha: 0.3),
           ),
         ),
         child: Row(

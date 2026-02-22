@@ -81,7 +81,10 @@ class _ExploreScreenState extends State<ExploreScreen> {
         });
       }
 
-      final users = await UserSearchRepo.getUserList(_currentUser!);
+      final users = await UserSearchRepo.getUserList(
+        _currentUser!,
+        intentFilter: _currentUser!.lookingFor,
+      );
 
       if (mounted && !_disposed) {
         setState(() {
@@ -137,7 +140,7 @@ class _ExploreScreenState extends State<ExploreScreen> {
               Icon(
                 Icons.error_outline,
                 size: 60,
-                color: AppColors.error.withOpacity(0.5),
+                color: AppColors.error.withValues(alpha: 0.5),
               ),
               const SizedBox(height: 16),
               Text(
@@ -174,7 +177,7 @@ class _ExploreScreenState extends State<ExploreScreen> {
               Icon(
                 Icons.person_off,
                 size: 60,
-                color: AppColors.textSecondary.withOpacity(0.5),
+                color: AppColors.textSecondary.withValues(alpha: 0.5),
               ),
               const SizedBox(height: 16),
               Text(
@@ -194,6 +197,7 @@ class _ExploreScreenState extends State<ExploreScreen> {
     return TribeConnectScreen(
       currentUser: _currentUser!,
       users: _users,
+      onFiltersApplied: _loadUsers,
     );
   }
 }

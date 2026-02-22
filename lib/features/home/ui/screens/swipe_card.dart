@@ -19,8 +19,8 @@ import '../../../user/ui/widgets/user_info.dart';
 // import 'MatchedAnimation.dart';
 
 class UsersList extends StatefulWidget {
-  // NOTE: Do not add profile counters (e.g., "1 of 5 profiles") as they are not typical in dating apps
-  // and can create pressure or anxiety for users
+  // NOTE: Do not add profile counters (e.g., "1 of 5 profiles") as they create
+  // pressure or anxiety for users
 
   const UsersList({
     required this.users,
@@ -266,7 +266,7 @@ class UsersListState extends State<UsersList> with WidgetsBindingObserver {
                                       Text(
                                         '${widget.users[itemIndex].distanceBW!.toStringAsFixed(1)} miles away',
                                         style: GoogleFonts.montserrat(
-                                          color: Colors.white.withOpacity(0.9),
+                                          color: Colors.white.withValues(alpha: 0.9),
                                           fontSize: 14,
                                           fontWeight: FontWeight.w400,
                                         ),
@@ -276,7 +276,7 @@ class UsersListState extends State<UsersList> with WidgetsBindingObserver {
                                       Text(
                                         widget.users[itemIndex].address!,
                                         style: GoogleFonts.montserrat(
-                                          color: Colors.white.withOpacity(0.9),
+                                          color: Colors.white.withValues(alpha: 0.9),
                                           fontSize: 14,
                                           fontWeight: FontWeight.w400,
                                         ),

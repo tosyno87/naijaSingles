@@ -18,7 +18,6 @@ class _TribeSelectionScreenState extends State<TribeSelectionScreen> {
   bool _showOtherField = false;
 
   // Afropeep MVP theme colors
-  static const Color backgroundColor = Colors.white;
   static const Color afropeepGreen = Color(0xFF008037); // MVP green
   static const Color cardBackground = Color(0xFFF7E8DA);
   static const Color textDarkBrown = Color(0xFF3A1D0F);

@@ -1,8 +1,8 @@
 import 'dart:io';
 
+import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:intl/intl.dart';
 
 import '../../../../common/constants/app_colors.dart';
 import '../../../../common/utils/app_logger.dart';
@@ -38,7 +38,7 @@ class MyEventCard extends StatelessWidget {
             borderRadius: BorderRadius.circular(16),
             boxShadow: [
               BoxShadow(
-                color: Colors.black.withOpacity(0.08),
+                color: Colors.black.withValues(alpha: 0.08),
                 blurRadius: 12,
                 offset: const Offset(0, 4),
               ),
@@ -134,7 +134,7 @@ class MyEventCard extends StatelessWidget {
                                             valueColor:
                                                 const AlwaysStoppedAnimation<
                                                     Color>(
-                                              Color(0xFF008037),
+                                              AppColors.primaryGreen,
                                             ),
                                             strokeWidth: 3,
                                           ),
@@ -235,7 +235,7 @@ class MyEventCard extends StatelessWidget {
                       begin: Alignment.topLeft,
                       end: Alignment.bottomRight,
                       colors: [
-                        const Color(0xFF008037).withOpacity(0.1),
+                        AppColors.primaryGreen.withValues(alpha: 0.1),
                         AppColors.backgroundColor,
                       ],
                     ),
@@ -251,7 +251,7 @@ class MyEventCard extends StatelessWidget {
                         Icon(
                           Icons.event_outlined,
                           size: 56,
-                          color: const Color(0xFF008037).withOpacity(0.7),
+                          color: AppColors.primaryGreen.withValues(alpha: 0.7),
                         ),
                         const SizedBox(height: 12),
                         Text(
@@ -288,7 +288,7 @@ class MyEventCard extends StatelessWidget {
                     end: Alignment.bottomCenter,
                     colors: [
                       Colors.transparent,
-                      Colors.black.withOpacity(0.3),
+                      Colors.black.withValues(alpha: 0.3),
                     ],
                   ),
                   borderRadius: const BorderRadius.only(
@@ -314,7 +314,7 @@ class MyEventCard extends StatelessWidget {
               child: Container(
                 padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
                 decoration: BoxDecoration(
-                  color: Colors.black.withOpacity(0.7),
+                  color: Colors.black.withValues(alpha: 0.7),
                   borderRadius: BorderRadius.circular(12),
                 ),
                 child: Text(
@@ -340,31 +340,31 @@ class MyEventCard extends StatelessWidget {
 
     switch (event.status) {
       case EventStatus.draft:
-        backgroundColor = Colors.grey.withOpacity(0.9);
+        backgroundColor = Colors.grey.withValues(alpha: 0.9);
         textColor = Colors.white;
         text = 'DRAFT';
         icon = Icons.edit;
         break;
       case EventStatus.underReview:
-        backgroundColor = Colors.orange.withOpacity(0.9);
+        backgroundColor = Colors.orange.withValues(alpha: 0.9);
         textColor = Colors.white;
         text = 'UNDER REVIEW';
         icon = Icons.schedule;
         break;
       case EventStatus.published:
-        backgroundColor = const Color(0xFF008037).withOpacity(0.9);
+        backgroundColor = AppColors.primaryGreen.withValues(alpha: 0.9);
         textColor = Colors.white;
         text = 'PUBLISHED';
         icon = Icons.check_circle;
         break;
       case EventStatus.cancelled:
-        backgroundColor = Colors.red.withOpacity(0.9);
+        backgroundColor = Colors.red.withValues(alpha: 0.9);
         textColor = Colors.white;
         text = 'CANCELLED';
         icon = Icons.cancel;
         break;
       case EventStatus.completed:
-        backgroundColor = Colors.blue.withOpacity(0.9);
+        backgroundColor = Colors.blue.withValues(alpha: 0.9);
         textColor = Colors.white;
         text = 'COMPLETED';
         icon = Icons.event_available;
@@ -407,7 +407,7 @@ class MyEventCard extends StatelessWidget {
               Container(
                 padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
                 decoration: BoxDecoration(
-                  color: const Color(0xFF008037).withOpacity(0.1),
+                  color: AppColors.primaryGreen.withValues(alpha: 0.1),
                   borderRadius: BorderRadius.circular(6),
                 ),
                 child: Text(
@@ -415,7 +415,7 @@ class MyEventCard extends StatelessWidget {
                   style: GoogleFonts.montserrat(
                     fontSize: 12,
                     fontWeight: FontWeight.w600,
-                    color: const Color(0xFF008037),
+                    color: AppColors.primaryGreen,
                   ),
                 ),
               ),
@@ -425,7 +425,7 @@ class MyEventCard extends StatelessWidget {
                   padding:
                       const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
                   decoration: BoxDecoration(
-                    color: Colors.purple.withOpacity(0.1),
+                    color: Colors.purple.withValues(alpha: 0.1),
                     borderRadius: BorderRadius.circular(6),
                   ),
                   child: Row(
@@ -548,7 +548,7 @@ class MyEventCard extends StatelessWidget {
             Expanded(
               child: _buildStatItem(
                 icon: Icons.people,
-                label: 'Attendees',
+                label: 'Attendees'.tr(),
                 value: '${event.attendeeCount}/${event.maxAttendees}',
               ),
             ),
@@ -560,7 +560,7 @@ class MyEventCard extends StatelessWidget {
             Expanded(
               child: _buildStatItem(
                 icon: Icons.visibility,
-                label: 'Views',
+                label: 'Views'.tr(),
                 value: '${event.metadata['views'] ?? 0}',
               ),
             ),
@@ -572,7 +572,7 @@ class MyEventCard extends StatelessWidget {
             Expanded(
               child: _buildStatItem(
                 icon: Icons.favorite,
-                label: 'Interested',
+                label: 'Interested'.tr(),
                 value: '${event.rsvpCount}',
               ),
             ),
@@ -590,7 +590,7 @@ class MyEventCard extends StatelessWidget {
           Icon(
             icon,
             size: 16,
-            color: const Color(0xFF008037),
+            color: AppColors.primaryGreen,
           ),
           const SizedBox(height: 4),
           Text(
@@ -618,7 +618,7 @@ class MyEventCard extends StatelessWidget {
               child: ElevatedButton(
                 onPressed: onPublish,
                 style: ElevatedButton.styleFrom(
-                  backgroundColor: const Color(0xFF008037),
+                  backgroundColor: AppColors.primaryGreen,
                   foregroundColor: Colors.white,
                   padding: const EdgeInsets.symmetric(vertical: 12),
                   shape: RoundedRectangleBorder(
@@ -640,7 +640,7 @@ class MyEventCard extends StatelessWidget {
               child: OutlinedButton(
                 onPressed: onEdit,
                 style: OutlinedButton.styleFrom(
-                  side: const BorderSide(color: Color(0xFF008037)),
+                  side: const BorderSide(color: AppColors.primaryGreen),
                   padding: const EdgeInsets.symmetric(vertical: 12),
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(8),
@@ -651,7 +651,7 @@ class MyEventCard extends StatelessWidget {
                   style: GoogleFonts.montserrat(
                     fontSize: 14,
                     fontWeight: FontWeight.w600,
-                    color: const Color(0xFF008037),
+                    color: AppColors.primaryGreen,
                   ),
                 ),
               ),
@@ -738,7 +738,7 @@ class MyEventCard extends StatelessWidget {
                                     loadingProgress.expectedTotalBytes!
                                 : null,
                             valueColor: const AlwaysStoppedAnimation<Color>(
-                              Color(0xFF008037),
+                              AppColors.primaryGreen,
                             ),
                             strokeWidth: 4,
                           ),

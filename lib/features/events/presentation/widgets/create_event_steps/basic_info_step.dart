@@ -157,11 +157,11 @@ class _BasicInfoStepState extends State<BasicInfoStep> {
               padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
               decoration: BoxDecoration(
                 color: _isNameValid
-                    ? const Color(0xFF008037).withOpacity(0.1)
-                    : Colors.red.withOpacity(0.1),
+                    ? AppColors.primaryGreen.withValues(alpha: 0.1)
+                    : Colors.red.withValues(alpha: 0.1),
                 borderRadius: BorderRadius.circular(12),
                 border: Border.all(
-                  color: _isNameValid ? const Color(0xFF008037) : Colors.red,
+                  color: _isNameValid ? AppColors.primaryGreen : Colors.red,
                 ),
               ),
               child: Text(
@@ -169,7 +169,7 @@ class _BasicInfoStepState extends State<BasicInfoStep> {
                 style: GoogleFonts.montserrat(
                   fontSize: 11,
                   fontWeight: FontWeight.w500,
-                  color: _isNameValid ? const Color(0xFF008037) : Colors.red,
+                  color: _isNameValid ? AppColors.primaryGreen : Colors.red,
                 ),
               ),
             ),
@@ -188,7 +188,7 @@ class _BasicInfoStepState extends State<BasicInfoStep> {
                 'e.g., "Lagos Singles Mixer Night" or "Tech Networking Brunch"',
             hintStyle: GoogleFonts.montserrat(
               fontSize: 14,
-              color: const Color(0xFF008037).withOpacity(0.6),
+              color: AppColors.primaryGreen.withValues(alpha: 0.6),
             ),
             filled: true,
             fillColor: AppColors.backgroundColor,
@@ -196,8 +196,8 @@ class _BasicInfoStepState extends State<BasicInfoStep> {
               borderRadius: BorderRadius.circular(12),
               borderSide: BorderSide(
                 color: _isNameValid
-                    ? const Color(0xFF008037).withOpacity(0.3)
-                    : Colors.red.withOpacity(0.5),
+                    ? AppColors.primaryGreen.withValues(alpha: 0.3)
+                    : Colors.red.withValues(alpha: 0.5),
                 width: 1.5,
               ),
             ),
@@ -205,22 +205,22 @@ class _BasicInfoStepState extends State<BasicInfoStep> {
               borderRadius: BorderRadius.circular(12),
               borderSide: BorderSide(
                 color: _isNameValid
-                    ? const Color(0xFF008037).withOpacity(0.3)
-                    : Colors.red.withOpacity(0.5),
+                    ? AppColors.primaryGreen.withValues(alpha: 0.3)
+                    : Colors.red.withValues(alpha: 0.5),
                 width: 1.5,
               ),
             ),
             focusedBorder: OutlineInputBorder(
               borderRadius: BorderRadius.circular(12),
               borderSide: BorderSide(
-                color: _isNameValid ? const Color(0xFF008037) : Colors.red,
+                color: _isNameValid ? AppColors.primaryGreen : Colors.red,
                 width: 2,
               ),
             ),
             contentPadding: const EdgeInsets.all(16),
             counterStyle: GoogleFonts.montserrat(
               fontSize: 12,
-              color: const Color(0xFF008037).withOpacity(0.7),
+              color: AppColors.primaryGreen.withValues(alpha: 0.7),
             ),
           ),
         ),
@@ -260,12 +260,12 @@ class _BasicInfoStepState extends State<BasicInfoStep> {
               padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
               decoration: BoxDecoration(
                 color: _isDescriptionValid
-                    ? const Color(0xFF008037).withOpacity(0.1)
-                    : Colors.red.withOpacity(0.1),
+                    ? AppColors.primaryGreen.withValues(alpha: 0.1)
+                    : Colors.red.withValues(alpha: 0.1),
                 borderRadius: BorderRadius.circular(12),
                 border: Border.all(
                   color: _isDescriptionValid
-                      ? const Color(0xFF008037)
+                      ? AppColors.primaryGreen
                       : Colors.red,
                 ),
               ),
@@ -275,7 +275,7 @@ class _BasicInfoStepState extends State<BasicInfoStep> {
                   fontSize: 11,
                   fontWeight: FontWeight.w500,
                   color: _isDescriptionValid
-                      ? const Color(0xFF008037)
+                      ? AppColors.primaryGreen
                       : Colors.red,
                 ),
               ),
@@ -296,7 +296,7 @@ class _BasicInfoStepState extends State<BasicInfoStep> {
                 'Describe your event in detail. What can attendees expect?\n\nExample: Join us for an exciting evening of networking and fun! We\'ll have great music, delicious food, and opportunities to meet amazing people.',
             hintStyle: GoogleFonts.montserrat(
               fontSize: 14,
-              color: const Color(0xFF008037).withOpacity(0.6),
+              color: AppColors.primaryGreen.withValues(alpha: 0.6),
             ),
             filled: true,
             fillColor: AppColors.backgroundColor,
@@ -304,8 +304,8 @@ class _BasicInfoStepState extends State<BasicInfoStep> {
               borderRadius: BorderRadius.circular(12),
               borderSide: BorderSide(
                 color: _isDescriptionValid
-                    ? const Color(0xFF008037).withOpacity(0.3)
-                    : Colors.red.withOpacity(0.5),
+                    ? AppColors.primaryGreen.withValues(alpha: 0.3)
+                    : Colors.red.withValues(alpha: 0.5),
                 width: 1.5,
               ),
             ),
@@ -313,8 +313,8 @@ class _BasicInfoStepState extends State<BasicInfoStep> {
               borderRadius: BorderRadius.circular(12),
               borderSide: BorderSide(
                 color: _isDescriptionValid
-                    ? const Color(0xFF008037).withOpacity(0.3)
-                    : Colors.red.withOpacity(0.5),
+                    ? AppColors.primaryGreen.withValues(alpha: 0.3)
+                    : Colors.red.withValues(alpha: 0.5),
                 width: 1.5,
               ),
             ),
@@ -322,14 +322,14 @@ class _BasicInfoStepState extends State<BasicInfoStep> {
               borderRadius: BorderRadius.circular(12),
               borderSide: BorderSide(
                 color:
-                    _isDescriptionValid ? const Color(0xFF008037) : Colors.red,
+                    _isDescriptionValid ? AppColors.primaryGreen : Colors.red,
                 width: 2,
               ),
             ),
             contentPadding: const EdgeInsets.all(16),
             counterStyle: GoogleFonts.montserrat(
               fontSize: 12,
-              color: const Color(0xFF008037).withOpacity(0.7),
+              color: AppColors.primaryGreen.withValues(alpha: 0.7),
             ),
           ),
         ),
@@ -364,11 +364,11 @@ class _BasicInfoStepState extends State<BasicInfoStep> {
             width: double.infinity,
             padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
             decoration: BoxDecoration(
-              color: AppColors.backgroundColor, // NaijaSingles cream background
+              color: AppColors.backgroundColor, // Afropeep cream background
               borderRadius: BorderRadius.circular(12),
               border: Border.all(
-                color: const Color(0xFF008037)
-                    .withOpacity(0.3), // NaijaSingles green border
+                color: AppColors.primaryGreen
+                    .withValues(alpha: 0.3), // Afropeep green border
                 width: 1.5,
               ),
             ),
@@ -381,8 +381,8 @@ class _BasicInfoStepState extends State<BasicInfoStep> {
                   'Select a category',
                   style: GoogleFonts.montserrat(
                     fontSize: 16,
-                    color: const Color(0xFF008037)
-                        .withOpacity(0.7), // NaijaSingles green hint
+                    color: AppColors.primaryGreen
+                        .withValues(alpha: 0.7), // Afropeep green hint
                     fontWeight: FontWeight.w500,
                   ),
                 ),
@@ -393,12 +393,12 @@ class _BasicInfoStepState extends State<BasicInfoStep> {
                 ),
                 icon: const Icon(
                   Icons.keyboard_arrow_down,
-                  color: Color(0xFF008037), // NaijaSingles green icon
+                  color: AppColors.primaryGreen, // Afropeep green icon
                   size: 24,
                 ),
                 isExpanded: true,
                 dropdownColor:
-                    AppColors.backgroundColor, // NaijaSingles cream dropdown
+                    AppColors.backgroundColor, // Afropeep cream dropdown
                 items: _categories
                     .map(
                       (category) => DropdownMenuItem<String>(
@@ -464,32 +464,32 @@ class _BasicInfoStepState extends State<BasicInfoStep> {
                     hintText: 'Enter a tag',
                     hintStyle: GoogleFonts.montserrat(
                       fontSize: 16,
-                      color: const Color(0xFF008037)
-                          .withOpacity(0.7), // NaijaSingles green hint
+                      color: AppColors.primaryGreen
+                          .withValues(alpha: 0.7), // Afropeep green hint
                     ),
                     filled: true,
                     fillColor: AppColors
-                        .backgroundColor, // NaijaSingles cream background
+                        .backgroundColor, // Afropeep cream background
                     border: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(12),
                       borderSide: BorderSide(
-                        color: const Color(0xFF008037)
-                            .withOpacity(0.3), // NaijaSingles green border
+                        color: AppColors.primaryGreen
+                            .withValues(alpha: 0.3), // Afropeep green border
                         width: 1.5,
                       ),
                     ),
                     enabledBorder: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(12),
                       borderSide: BorderSide(
-                        color: const Color(0xFF008037)
-                            .withOpacity(0.3), // NaijaSingles green border
+                        color: AppColors.primaryGreen
+                            .withValues(alpha: 0.3), // Afropeep green border
                         width: 1.5,
                       ),
                     ),
                     focusedBorder: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(12),
                       borderSide:
-                          const BorderSide(color: Color(0xFF008037), width: 2),
+                          const BorderSide(color: AppColors.primaryGreen, width: 2),
                     ),
                     contentPadding: const EdgeInsets.all(16),
                   ),
@@ -501,7 +501,7 @@ class _BasicInfoStepState extends State<BasicInfoStep> {
                 child: ElevatedButton(
                   onPressed: () => _addTag(_tagController.text),
                   style: ElevatedButton.styleFrom(
-                    backgroundColor: const Color(0xFF008037),
+                    backgroundColor: AppColors.primaryGreen,
                     foregroundColor: Colors.white,
                     padding: const EdgeInsets.symmetric(
                         horizontal: 12, vertical: 16),
@@ -535,10 +535,10 @@ class _BasicInfoStepState extends State<BasicInfoStep> {
                       padding: const EdgeInsets.symmetric(
                           horizontal: 12, vertical: 6),
                       decoration: BoxDecoration(
-                        color: const Color(0xFF008037).withOpacity(0.1),
+                        color: AppColors.primaryGreen.withValues(alpha: 0.1),
                         borderRadius: BorderRadius.circular(20),
                         border: Border.all(
-                          color: const Color(0xFF008037).withOpacity(0.3),
+                          color: AppColors.primaryGreen.withValues(alpha: 0.3),
                         ),
                       ),
                       child: Row(
@@ -548,7 +548,7 @@ class _BasicInfoStepState extends State<BasicInfoStep> {
                             tag,
                             style: GoogleFonts.montserrat(
                               fontSize: 14,
-                              color: const Color(0xFF008037),
+                              color: AppColors.primaryGreen,
                               fontWeight: FontWeight.w500,
                             ),
                           ),
@@ -558,7 +558,7 @@ class _BasicInfoStepState extends State<BasicInfoStep> {
                             child: const Icon(
                               Icons.close,
                               size: 16,
-                              color: Color(0xFF008037),
+                              color: AppColors.primaryGreen,
                             ),
                           ),
                         ],

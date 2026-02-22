@@ -38,9 +38,9 @@ class _ShowGenderState extends State<ShowGender> {
     final screenSize = MediaQuery.of(context).size;
 
     return Scaffold(
-      backgroundColor: Colors.white,
+      backgroundColor: AppColors.backgroundColor,
       appBar: AppBar(
-        backgroundColor: Colors.white,
+        backgroundColor: AppColors.backgroundColor,
         elevation: 0,
         leading: IconButton(
           icon: const Icon(
@@ -69,7 +69,7 @@ class _ShowGenderState extends State<ShowGender> {
                       width: screenSize.width *
                           0.90, // 90% of screen width (sixth step)
                       decoration: BoxDecoration(
-                        color: const Color(0xFF27AE60),
+                        color: AppColors.primaryGreen,
                         borderRadius: BorderRadius.circular(10),
                       ),
                     ),
@@ -156,7 +156,7 @@ class _ShowGenderState extends State<ShowGender> {
                           );
                         },
                   style: ElevatedButton.styleFrom(
-                    backgroundColor: const Color(0xFF27AE60),
+                    backgroundColor: AppColors.primaryGreen,
                     foregroundColor: Colors.white,
                     disabledBackgroundColor: Colors.grey[300],
                     disabledForegroundColor: Colors.grey[500],
@@ -195,7 +195,7 @@ class _ShowGenderState extends State<ShowGender> {
         padding: const EdgeInsets.symmetric(vertical: 20, horizontal: 24),
         decoration: BoxDecoration(
           border: Border.all(
-            color: isSelected ? const Color(0xFF27AE60) : Colors.grey[200]!,
+            color: isSelected ? AppColors.primaryGreen : Colors.grey[200]!,
             width: isSelected ? 2 : 1,
           ),
           borderRadius: BorderRadius.circular(16),
@@ -218,7 +218,7 @@ class _ShowGenderState extends State<ShowGender> {
               ),
               child: Icon(
                 icon,
-                color: isSelected ? const Color(0xFF27AE60) : Colors.grey[600],
+                color: isSelected ? AppColors.primaryGreen : Colors.grey[600],
                 size: 28,
               ),
             ),
@@ -228,7 +228,7 @@ class _ShowGenderState extends State<ShowGender> {
               style: TextStyle(
                 fontSize: 18,
                 fontWeight: isSelected ? FontWeight.bold : FontWeight.w500,
-                color: isSelected ? const Color(0xFF27AE60) : Colors.black87,
+                color: isSelected ? AppColors.primaryGreen : Colors.black87,
               ),
             ),
             const Spacer(),
@@ -236,7 +236,7 @@ class _ShowGenderState extends State<ShowGender> {
               Container(
                 padding: const EdgeInsets.all(2),
                 decoration: BoxDecoration(
-                  color: const Color(0xFF27AE60),
+                  color: AppColors.primaryGreen,
                   borderRadius: BorderRadius.circular(12),
                 ),
                 child: const Icon(

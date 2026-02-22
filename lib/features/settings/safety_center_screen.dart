@@ -3,6 +3,8 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 
+import '../../common/constants/app_colors.dart';
+
 class SafetyCenterScreen extends StatefulWidget {
   const SafetyCenterScreen({super.key});
 
@@ -15,7 +17,6 @@ class _SafetyCenterScreenState extends State<SafetyCenterScreen> {
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
 
   // Afropeep MVP Color Scheme
-  static const Color backgroundColor = Colors.white; // Clean white
   static const Color primaryColor = Color(0xFF008037); // Deep green
   static const Color cardColor = Color(0xFFFFFFFF); // White for cards
   static const Color errorColor = Color(0xFFFF5A5F); // Red for errors/danger
@@ -27,9 +28,9 @@ class _SafetyCenterScreenState extends State<SafetyCenterScreen> {
 
   @override
   Widget build(BuildContext context) => Scaffold(
-        backgroundColor: backgroundColor,
+        backgroundColor: AppColors.backgroundColor,
         appBar: AppBar(
-          backgroundColor: backgroundColor,
+          backgroundColor: AppColors.backgroundColor,
           elevation: 0,
           leading: IconButton(
             icon: Icon(Icons.arrow_back_ios, color: textPrimary),
@@ -76,7 +77,7 @@ class _SafetyCenterScreenState extends State<SafetyCenterScreen> {
           borderRadius: BorderRadius.circular(16),
           boxShadow: [
             BoxShadow(
-              color: Colors.black.withOpacity(0.06),
+              color: Colors.black.withValues(alpha: 0.06),
               blurRadius: 10,
               offset: const Offset(0, 3),
             ),
@@ -88,7 +89,7 @@ class _SafetyCenterScreenState extends State<SafetyCenterScreen> {
               width: 80,
               height: 80,
               decoration: BoxDecoration(
-                color: primaryColor.withOpacity(0.1),
+                color: primaryColor.withValues(alpha: 0.1),
                 shape: BoxShape.circle,
               ),
               child: const Icon(
@@ -173,10 +174,10 @@ class _SafetyCenterScreenState extends State<SafetyCenterScreen> {
           decoration: BoxDecoration(
             color: cardColor,
             borderRadius: BorderRadius.circular(12),
-            border: Border.all(color: color.withOpacity(0.2)),
+            border: Border.all(color: color.withValues(alpha: 0.2)),
             boxShadow: [
               BoxShadow(
-                color: Colors.black.withOpacity(0.04),
+                color: Colors.black.withValues(alpha: 0.04),
                 blurRadius: 8,
                 offset: const Offset(0, 2),
               ),
@@ -188,7 +189,7 @@ class _SafetyCenterScreenState extends State<SafetyCenterScreen> {
                 width: 48,
                 height: 48,
                 decoration: BoxDecoration(
-                  color: color.withOpacity(0.1),
+                  color: color.withValues(alpha: 0.1),
                   shape: BoxShape.circle,
                 ),
                 child: Icon(icon, color: color, size: 24),
@@ -276,7 +277,7 @@ class _SafetyCenterScreenState extends State<SafetyCenterScreen> {
           borderRadius: BorderRadius.circular(12),
           boxShadow: [
             BoxShadow(
-              color: Colors.black.withOpacity(0.04),
+              color: Colors.black.withValues(alpha: 0.04),
               blurRadius: 8,
               offset: const Offset(0, 2),
             ),
@@ -288,7 +289,7 @@ class _SafetyCenterScreenState extends State<SafetyCenterScreen> {
               width: 48,
               height: 48,
               decoration: BoxDecoration(
-                color: primaryColor.withOpacity(0.1),
+                color: primaryColor.withValues(alpha: 0.1),
                 shape: BoxShape.circle,
               ),
               child: Icon(
@@ -378,7 +379,7 @@ class _SafetyCenterScreenState extends State<SafetyCenterScreen> {
             borderRadius: BorderRadius.circular(12),
             boxShadow: [
               BoxShadow(
-                color: Colors.black.withOpacity(0.04),
+                color: Colors.black.withValues(alpha: 0.04),
                 blurRadius: 8,
                 offset: const Offset(0, 2),
               ),
@@ -390,7 +391,7 @@ class _SafetyCenterScreenState extends State<SafetyCenterScreen> {
                 width: 48,
                 height: 48,
                 decoration: BoxDecoration(
-                  color: errorColor.withOpacity(0.1),
+                  color: errorColor.withValues(alpha: 0.1),
                   shape: BoxShape.circle,
                 ),
                 child: Icon(icon, color: errorColor, size: 24),
@@ -443,7 +444,7 @@ class _SafetyCenterScreenState extends State<SafetyCenterScreen> {
               width: 60,
               height: 60,
               decoration: BoxDecoration(
-                color: errorColor.withOpacity(0.1),
+                color: errorColor.withValues(alpha: 0.1),
                 shape: BoxShape.circle,
               ),
               child: const Icon(Icons.report, color: errorColor, size: 30),
@@ -512,7 +513,7 @@ class _SafetyCenterScreenState extends State<SafetyCenterScreen> {
               width: 60,
               height: 60,
               decoration: BoxDecoration(
-                color: warningColor.withOpacity(0.1),
+                color: warningColor.withValues(alpha: 0.1),
                 shape: BoxShape.circle,
               ),
               child: const Icon(Icons.block, color: warningColor, size: 30),

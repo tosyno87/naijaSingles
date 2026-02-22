@@ -16,9 +16,13 @@ class SearchUserBloc extends Bloc<SearchUserEvent, SearchUserState> {
       try {
         log('🔍 Loading users with privacy awareness');
 
-        // Use privacy-aware discovery service
+        // Use privacy-aware discovery service, applying the user's onboarding
+        // intent (lookingFor) so results match what they selected.
         final List<UserModel> userList =
-            await DiscoveryService.getUsersForDiscovery(event.currentUser);
+            await DiscoveryService.getUsersForDiscovery(
+          event.currentUser,
+          intentFilter: event.currentUser.lookingFor,
+        );
 
         // Get discovery stats for debugging
         final stats =

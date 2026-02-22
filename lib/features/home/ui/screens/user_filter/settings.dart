@@ -305,6 +305,13 @@ class SettingPageState extends State<SettingPage> {
                     ),
                     Padding(
                       padding: const EdgeInsets.all(15),
+                      child: _ConnectionModeWidget(
+                        currentUser: widget.currentUser,
+                        changeValues: changeValues,
+                      ),
+                    ),
+                    Padding(
+                      padding: const EdgeInsets.all(15),
                       child: DistanceWidget(
                         changeValues: changeValues,
                         currentUser: widget.currentUser,
@@ -337,9 +344,9 @@ class SettingPageState extends State<SettingPage> {
                     TextButtonWidget(
                       text: 'Invite your friends',
                       onTap: () async {
-                        await Share.share(
-                          'check out my website https://deligence.com', //Replace with your dynamic link and msg for invite users
-                        );
+                        await SharePlus.instance.share(ShareParams(
+                          text: 'check out my website https://deligence.com', //Replace with your dynamic link and msg for invite users
+                        ));
                       },
                       icon: Icons.share_outlined,
                     ),
@@ -380,4 +387,71 @@ class SettingPageState extends State<SettingPage> {
       ),
     );
   }
+}
+
+class _ConnectionModeWidget extends StatefulWidget {
+  const _ConnectionModeWidget({
+    required this.currentUser,
+    required this.changeValues,
+  });
+
+  final UserModel currentUser;
+  final Map<String, dynamic> changeValues;
+
+  @override
+  State<_ConnectionModeWidget> createState() => _ConnectionModeWidgetState();
+}
+
+class _ConnectionModeWidgetState extends State<_ConnectionModeWidget> {
+  static const _modes = <String, String>{
+    'Dating': 'Dating & Romance',
+    'Friendship': 'Friendship & Social',
+    'Networking': 'Professional Networking',
+    'Mixed': 'All of the Above',
+  };
+
+  late String _selected;
+
+  @override
+  void initState() {
+    super.initState();
+    _selected = widget.currentUser.lookingFor ?? 'Dating';
+    if (!_modes.containsKey(_selected)) _selected = 'Dating';
+  }
+
+  @override
+  Widget build(BuildContext context) => Card(
+        child: Padding(
+          padding: const EdgeInsets.all(15),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                'I\'m looking for',
+                style: TextStyle(
+                  fontSize: 16,
+                  fontWeight: FontWeight.w500,
+                  color: Theme.of(context).textTheme.bodyLarge?.color,
+                ),
+              ),
+              const SizedBox(height: 8),
+              ...(_modes.entries.map(
+                (entry) => RadioListTile<String>(
+                  title: Text(entry.value),
+                  value: entry.key,
+                  groupValue: _selected,
+                  activeColor: AppColors.primaryGreen,
+                  contentPadding: EdgeInsets.zero,
+                  dense: true,
+                  onChanged: (value) {
+                    if (value == null) return;
+                    setState(() => _selected = value);
+                    widget.changeValues['lookingFor'] = value;
+                  },
+                ),
+              )),
+            ],
+          ),
+        ),
+      );
 }

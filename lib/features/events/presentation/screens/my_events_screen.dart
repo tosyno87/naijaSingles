@@ -85,7 +85,7 @@ class _MyEventsScreenState extends State<MyEventsScreen>
                           'Event deleted successfully',
                           style: GoogleFonts.montserrat(color: Colors.white),
                         ),
-                        backgroundColor: const Color(0xFF008037),
+                        backgroundColor: AppColors.primaryGreen,
                         behavior: SnackBarBehavior.floating,
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(10),
@@ -108,7 +108,7 @@ class _MyEventsScreenState extends State<MyEventsScreen>
                         'Event published successfully! It will be reviewed before going live.',
                         style: GoogleFonts.montserrat(color: Colors.white),
                       ),
-                      backgroundColor: const Color(0xFF008037),
+                      backgroundColor: AppColors.primaryGreen,
                       behavior: SnackBarBehavior.floating,
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(10),
@@ -163,7 +163,7 @@ class _MyEventsScreenState extends State<MyEventsScreen>
             // Loading overlay during delete operations
             if (_isDeleting)
               ColoredBox(
-                color: Colors.black.withOpacity(0.3),
+                color: Colors.black.withValues(alpha: 0.3),
                 child: const Center(
                   child: Card(
                     child: Padding(
@@ -173,7 +173,7 @@ class _MyEventsScreenState extends State<MyEventsScreen>
                         children: [
                           CircularProgressIndicator(
                             valueColor:
-                                AlwaysStoppedAnimation(Color(0xFF008037)),
+                                AlwaysStoppedAnimation(AppColors.primaryGreen),
                           ),
                           SizedBox(height: 16),
                           Text(
@@ -241,7 +241,7 @@ class _MyEventsScreenState extends State<MyEventsScreen>
             },
             icon: const Icon(
               Icons.refresh,
-              color: Color(0xFF008037),
+              color: AppColors.primaryGreen,
             ),
             tooltip: 'Refresh',
           ),
@@ -260,7 +260,7 @@ class _MyEventsScreenState extends State<MyEventsScreen>
           borderRadius: BorderRadius.circular(12),
           boxShadow: [
             BoxShadow(
-              color: Colors.black.withOpacity(0.05),
+              color: Colors.black.withValues(alpha: 0.05),
               blurRadius: 10,
               offset: const Offset(0, 2),
             ),
@@ -269,7 +269,7 @@ class _MyEventsScreenState extends State<MyEventsScreen>
         child: TabBar(
           controller: _tabController,
           indicator: BoxDecoration(
-            color: const Color(0xFF008037),
+            color: AppColors.primaryGreen,
             borderRadius: BorderRadius.circular(10),
           ),
           indicatorSize: TabBarIndicatorSize.tab,
@@ -413,7 +413,7 @@ class _MyEventsScreenState extends State<MyEventsScreen>
           await Future.delayed(const Duration(milliseconds: 500));
         }
       },
-      color: const Color(0xFF008037),
+      color: AppColors.primaryGreen,
       backgroundColor: Colors.white,
       strokeWidth: 3,
       child: ListView.builder(
@@ -465,12 +465,12 @@ class _MyEventsScreenState extends State<MyEventsScreen>
               width: 60,
               height: 60,
               decoration: BoxDecoration(
-                color: const Color(0xFF008037).withOpacity(0.1),
+                color: AppColors.primaryGreen.withValues(alpha: 0.1),
                 borderRadius: BorderRadius.circular(30),
               ),
               child: const Center(
                 child: CircularProgressIndicator(
-                  valueColor: AlwaysStoppedAnimation(Color(0xFF008037)),
+                  valueColor: AlwaysStoppedAnimation(AppColors.primaryGreen),
                   strokeWidth: 3,
                 ),
               ),
@@ -525,7 +525,7 @@ class _MyEventsScreenState extends State<MyEventsScreen>
                       );
                 },
                 style: ElevatedButton.styleFrom(
-                  backgroundColor: const Color(0xFF008037),
+                  backgroundColor: AppColors.primaryGreen,
                   foregroundColor: Colors.white,
                   padding:
                       const EdgeInsets.symmetric(horizontal: 32, vertical: 16),
@@ -567,8 +567,8 @@ class _MyEventsScreenState extends State<MyEventsScreen>
                     begin: Alignment.topLeft,
                     end: Alignment.bottomRight,
                     colors: [
-                      const Color(0xFF008037).withOpacity(0.1),
-                      const Color(0xFF008037).withOpacity(0.05),
+                      AppColors.primaryGreen.withValues(alpha: 0.1),
+                      AppColors.primaryGreen.withValues(alpha: 0.05),
                     ],
                   ),
                   borderRadius: BorderRadius.circular(60),
@@ -576,7 +576,7 @@ class _MyEventsScreenState extends State<MyEventsScreen>
                 child: Icon(
                   icon,
                   size: 60,
-                  color: const Color(0xFF008037),
+                  color: AppColors.primaryGreen,
                 ),
               ),
               const SizedBox(height: 32),
@@ -612,7 +612,7 @@ class _MyEventsScreenState extends State<MyEventsScreen>
                     color: const Color(0xFFF8F9FA),
                     borderRadius: BorderRadius.circular(12),
                     border: Border.all(
-                      color: const Color(0xFF008037).withOpacity(0.1),
+                      color: AppColors.primaryGreen.withValues(alpha: 0.1),
                     ),
                   ),
                   child: Column(
@@ -640,7 +640,7 @@ class _MyEventsScreenState extends State<MyEventsScreen>
                 ElevatedButton.icon(
                   onPressed: _createNewEvent,
                   style: ElevatedButton.styleFrom(
-                    backgroundColor: const Color(0xFF008037),
+                    backgroundColor: AppColors.primaryGreen,
                     foregroundColor: Colors.white,
                     padding: const EdgeInsets.symmetric(
                         horizontal: 32, vertical: 16),
@@ -673,7 +673,7 @@ class _MyEventsScreenState extends State<MyEventsScreen>
           Icon(
             icon,
             size: 16,
-            color: const Color(0xFF008037),
+            color: AppColors.primaryGreen,
           ),
           const SizedBox(width: 12),
           Expanded(
@@ -728,7 +728,7 @@ class _MyEventsScreenState extends State<MyEventsScreen>
   Widget _buildCreateEventFAB() => FloatingActionButton.extended(
         heroTag: 'my_events_screen_fab',
         onPressed: _createNewEvent,
-        backgroundColor: const Color(0xFF008037),
+        backgroundColor: AppColors.primaryGreen,
         foregroundColor: Colors.white,
         icon: const Icon(Icons.add),
         label: Text(
@@ -778,7 +778,7 @@ class _MyEventsScreenState extends State<MyEventsScreen>
             Container(
               padding: const EdgeInsets.all(8),
               decoration: BoxDecoration(
-                color: Colors.red.withOpacity(0.1),
+                color: Colors.red.withValues(alpha: 0.1),
                 borderRadius: BorderRadius.circular(8),
               ),
               child: const Icon(
@@ -900,12 +900,12 @@ class _MyEventsScreenState extends State<MyEventsScreen>
             Container(
               padding: const EdgeInsets.all(8),
               decoration: BoxDecoration(
-                color: const Color(0xFF008037).withOpacity(0.1),
+                color: AppColors.primaryGreen.withValues(alpha: 0.1),
                 borderRadius: BorderRadius.circular(8),
               ),
               child: const Icon(
                 Icons.publish,
-                color: Color(0xFF008037),
+                color: AppColors.primaryGreen,
                 size: 24,
               ),
             ),
@@ -956,7 +956,7 @@ class _MyEventsScreenState extends State<MyEventsScreen>
                   .add(PublishDraftEventEvent(event.id));
             },
             style: ElevatedButton.styleFrom(
-              backgroundColor: const Color(0xFF008037),
+              backgroundColor: AppColors.primaryGreen,
               foregroundColor: Colors.white,
               padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
               shape: RoundedRectangleBorder(
@@ -999,7 +999,7 @@ ${event.description.length > 100 ? '${event.description.substring(0, 100)}...' :
 
 Join me at this amazing event! 🚀
 
-#NaijaSingles #Events #${event.category.replaceAll(' ', '')}
+#Afropeep #Events #${event.category.replaceAll(' ', '')}
     '''
         .trim();
 
@@ -1024,7 +1024,7 @@ Join me at this amazing event! 🚀
             ),
           ],
         ),
-        backgroundColor: const Color(0xFF008037),
+        backgroundColor: AppColors.primaryGreen,
         behavior: SnackBarBehavior.floating,
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(10),
@@ -1069,12 +1069,12 @@ Join me at this amazing event! 🚀
                   Container(
                     padding: const EdgeInsets.all(8),
                     decoration: BoxDecoration(
-                      color: const Color(0xFF008037).withOpacity(0.1),
+                      color: AppColors.primaryGreen.withValues(alpha: 0.1),
                       borderRadius: BorderRadius.circular(8),
                     ),
                     child: const Icon(
                       Icons.analytics,
-                      color: Color(0xFF008037),
+                      color: AppColors.primaryGreen,
                       size: 24,
                     ),
                   ),
@@ -1130,7 +1130,7 @@ Join me at this amazing event! 🚀
                             icon: Icons.people,
                             title: 'Attendees',
                             value: '${event.attendeeCount}',
-                            color: const Color(0xFF008037),
+                            color: AppColors.primaryGreen,
                           ),
                         ),
                       ],
@@ -1224,9 +1224,9 @@ Join me at this amazing event! 🚀
       Container(
         padding: const EdgeInsets.all(16),
         decoration: BoxDecoration(
-          color: color.withOpacity(0.1),
+          color: color.withValues(alpha: 0.1),
           borderRadius: BorderRadius.circular(12),
-          border: Border.all(color: color.withOpacity(0.2)),
+          border: Border.all(color: color.withValues(alpha: 0.2)),
         ),
         child: Column(
           children: [

@@ -151,7 +151,7 @@ class _TicketingStepState extends State<TicketingStep> {
                 color: Colors.white,
                 borderRadius: BorderRadius.circular(12),
                 border: Border.all(
-                  color: const Color(0xFF008037).withOpacity(0.3),
+                  color: AppColors.primaryGreen.withValues(alpha: 0.3),
                   width: 1.5,
                 ),
               ),
@@ -160,7 +160,7 @@ class _TicketingStepState extends State<TicketingStep> {
                   value: widget.eventData.currency,
                   isExpanded: true,
                   dropdownColor: AppColors
-                      .backgroundColor, // NaijaSingles cream background
+                      .backgroundColor, // Afropeep cream background
                   icon: const Icon(
                     Icons.keyboard_arrow_down,
                     color: Color(0xFF666666),
@@ -301,7 +301,7 @@ class _TicketingStepState extends State<TicketingStep> {
                 focusedBorder: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(12),
                   borderSide:
-                      const BorderSide(color: Color(0xFF008037), width: 2),
+                      const BorderSide(color: AppColors.primaryGreen, width: 2),
                 ),
                 contentPadding: const EdgeInsets.all(16),
                 prefixIcon: Container(
@@ -311,7 +311,7 @@ class _TicketingStepState extends State<TicketingStep> {
                     style: GoogleFonts.montserrat(
                       fontSize: 16,
                       fontWeight: FontWeight.w600,
-                      color: const Color(0xFF008037),
+                      color: AppColors.primaryGreen,
                     ),
                   ),
                 ),
@@ -341,12 +341,12 @@ class _TicketingStepState extends State<TicketingStep> {
           padding: const EdgeInsets.all(16),
           decoration: BoxDecoration(
             color: isSelected
-                ? const Color(0xFF008037).withOpacity(0.1)
+                ? AppColors.primaryGreen.withValues(alpha: 0.1)
                 : Colors.white,
             borderRadius: BorderRadius.circular(12),
             border: Border.all(
               color: isSelected
-                  ? const Color(0xFF008037)
+                  ? AppColors.primaryGreen
                   : const Color(0xFFE0E0E0),
               width: isSelected ? 2 : 1,
             ),
@@ -361,7 +361,7 @@ class _TicketingStepState extends State<TicketingStep> {
                         ? Icons.radio_button_checked
                         : Icons.radio_button_unchecked,
                     color: isSelected
-                        ? const Color(0xFF008037)
+                        ? AppColors.primaryGreen
                         : const Color(0xFF999999),
                     size: 20,
                   ),
@@ -373,7 +373,7 @@ class _TicketingStepState extends State<TicketingStep> {
                         fontSize: 16,
                         fontWeight: FontWeight.w600,
                         color: isSelected
-                            ? const Color(0xFF008037)
+                            ? AppColors.primaryGreen
                             : const Color(0xFF333333),
                       ),
                     ),
@@ -445,12 +445,12 @@ class _TicketingStepState extends State<TicketingStep> {
               focusedBorder: OutlineInputBorder(
                 borderRadius: BorderRadius.circular(12),
                 borderSide:
-                    const BorderSide(color: Color(0xFF008037), width: 2),
+                    const BorderSide(color: AppColors.primaryGreen, width: 2),
               ),
               contentPadding: const EdgeInsets.all(16),
               prefixIcon: const Icon(
                 Icons.people,
-                color: Color(0xFF008037),
+                color: AppColors.primaryGreen,
               ),
             ),
           ),
@@ -470,10 +470,10 @@ class _TicketingStepState extends State<TicketingStep> {
       return Container(
         padding: const EdgeInsets.all(16),
         decoration: BoxDecoration(
-          color: const Color(0xFF008037).withOpacity(0.1),
+          color: AppColors.primaryGreen.withValues(alpha: 0.1),
           borderRadius: BorderRadius.circular(12),
           border: Border.all(
-            color: const Color(0xFF008037).withOpacity(0.3),
+            color: AppColors.primaryGreen.withValues(alpha: 0.3),
           ),
         ),
         child: Column(
@@ -483,7 +483,7 @@ class _TicketingStepState extends State<TicketingStep> {
               children: [
                 const Icon(
                   Icons.event_available,
-                  color: Color(0xFF008037),
+                  color: AppColors.primaryGreen,
                   size: 24,
                 ),
                 const SizedBox(width: 12),
@@ -492,7 +492,7 @@ class _TicketingStepState extends State<TicketingStep> {
                   style: GoogleFonts.montserrat(
                     fontSize: 16,
                     fontWeight: FontWeight.w600,
-                    color: const Color(0xFF008037),
+                    color: AppColors.primaryGreen,
                   ),
                 ),
               ],
@@ -516,10 +516,10 @@ class _TicketingStepState extends State<TicketingStep> {
       return Container(
         padding: const EdgeInsets.all(16),
         decoration: BoxDecoration(
-          color: const Color(0xFF008037).withOpacity(0.1),
+          color: AppColors.primaryGreen.withValues(alpha: 0.1),
           borderRadius: BorderRadius.circular(12),
           border: Border.all(
-            color: const Color(0xFF008037).withOpacity(0.3),
+            color: AppColors.primaryGreen.withValues(alpha: 0.3),
           ),
         ),
         child: Column(
@@ -529,7 +529,7 @@ class _TicketingStepState extends State<TicketingStep> {
               children: [
                 const Icon(
                   Icons.monetization_on,
-                  color: Color(0xFF008037),
+                  color: AppColors.primaryGreen,
                   size: 24,
                 ),
                 const SizedBox(width: 12),
@@ -538,7 +538,7 @@ class _TicketingStepState extends State<TicketingStep> {
                   style: GoogleFonts.montserrat(
                     fontSize: 16,
                     fontWeight: FontWeight.w600,
-                    color: const Color(0xFF008037),
+                    color: AppColors.primaryGreen,
                   ),
                 ),
               ],
@@ -560,7 +560,7 @@ class _TicketingStepState extends State<TicketingStep> {
               'Processing Fee',
               '${widget.eventData.currencySymbol}${processingFee.toStringAsFixed(2)}',
             ),
-            const Divider(color: Color(0xFF008037)),
+            const Divider(color: AppColors.primaryGreen),
             _buildSummaryRow(
               'Your Earnings per Ticket',
               '${widget.eventData.currencySymbol}${creatorEarnings.toStringAsFixed(2)}',
@@ -583,7 +583,7 @@ class _TicketingStepState extends State<TicketingStep> {
               style: GoogleFonts.montserrat(
                 fontSize: 14,
                 fontWeight: isTotal ? FontWeight.w600 : FontWeight.w500,
-                color: const Color(0xFF008037),
+                color: AppColors.primaryGreen,
               ),
             ),
             Text(
@@ -591,7 +591,7 @@ class _TicketingStepState extends State<TicketingStep> {
               style: GoogleFonts.montserrat(
                 fontSize: 14,
                 fontWeight: isTotal ? FontWeight.w600 : FontWeight.w500,
-                color: const Color(0xFF008037),
+                color: AppColors.primaryGreen,
               ),
             ),
           ],

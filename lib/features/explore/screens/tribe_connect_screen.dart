@@ -1,3 +1,4 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 
@@ -12,10 +13,12 @@ class TribeConnectScreen extends StatefulWidget {
   const TribeConnectScreen({
     required this.currentUser,
     required this.users,
+    this.onFiltersApplied,
     super.key,
   });
   final UserModel currentUser;
   final List<UserModel> users;
+  final VoidCallback? onFiltersApplied;
 
   @override
   State<TribeConnectScreen> createState() => _TribeConnectScreenState();
@@ -155,79 +158,18 @@ class _TribeConnectScreenState extends State<TribeConnectScreen> {
       shape: const RoundedRectangleBorder(
         borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
       ),
-      builder: (context) => _buildFilterSheet(),
+      builder: (context) => _ConnectFilterSheet(
+        currentUser: widget.currentUser,
+        onApply: () {
+          setState(() {
+            _processedUserIds.clear();
+            _currentProfileIndex = 0;
+          });
+          widget.onFiltersApplied?.call();
+        },
+      ),
     );
   }
-
-  Widget _buildFilterSheet() => Container(
-        padding: const EdgeInsets.all(24),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(
-              'Filter Your Tribe',
-              style: GoogleFonts.montserrat(
-                fontSize: 20,
-                fontWeight: FontWeight.w600,
-                color: AppColors.textPrimary,
-              ),
-            ),
-            const SizedBox(height: 24),
-            _buildFilterOption('Age Range', '18-35'),
-            _buildFilterOption('Heritage', 'Any'),
-            _buildFilterOption('Location', 'Within 50km'),
-            _buildFilterOption('Languages', 'Any'),
-            const SizedBox(height: 24),
-            SizedBox(
-              width: double.infinity,
-              child: ElevatedButton(
-                onPressed: () => Navigator.pop(context),
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: AppColors.primaryGreen,
-                  foregroundColor: Colors.white,
-                  padding: const EdgeInsets.symmetric(vertical: 16),
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(12),
-                  ),
-                ),
-                child: Text(
-                  'Apply Filters',
-                  style: GoogleFonts.montserrat(
-                    fontSize: 16,
-                    fontWeight: FontWeight.w600,
-                  ),
-                ),
-              ),
-            ),
-          ],
-        ),
-      );
-
-  Widget _buildFilterOption(String title, String value) => Padding(
-        padding: const EdgeInsets.only(bottom: 16),
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          children: [
-            Text(
-              title,
-              style: GoogleFonts.montserrat(
-                fontSize: 16,
-                fontWeight: FontWeight.w500,
-                color: AppColors.textPrimary,
-              ),
-            ),
-            Text(
-              value,
-              style: GoogleFonts.montserrat(
-                fontSize: 16,
-                fontWeight: FontWeight.w400,
-                color: AppColors.textSecondary,
-              ),
-            ),
-          ],
-        ),
-      );
 
   Future<void> _handleConnect(UserModel user) async {
     try {
@@ -313,7 +255,7 @@ class _TribeConnectScreenState extends State<TribeConnectScreen> {
   void _showConnectConfirmation(UserModel user) {
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
-        content: Text('Connection request sent to ${user.name}! 💕'),
+        content: Text('Liked ${user.name}! 💕'),
         backgroundColor: AppColors.primaryGreen,
         duration: const Duration(seconds: 3),
         behavior: SnackBarBehavior.floating,
@@ -351,4 +293,178 @@ class _TribeConnectScreenState extends State<TribeConnectScreen> {
       ),
     );
   }
+}
+
+/// Bottom-sheet filter for the Connect screen.
+/// Reads the user's current `lookingFor` and persists changes to Firestore
+/// before triggering a data reload via [onApply].
+class _ConnectFilterSheet extends StatefulWidget {
+  const _ConnectFilterSheet({
+    required this.currentUser,
+    required this.onApply,
+  });
+
+  final UserModel currentUser;
+  final VoidCallback onApply;
+
+  @override
+  State<_ConnectFilterSheet> createState() => _ConnectFilterSheetState();
+}
+
+class _ConnectFilterSheetState extends State<_ConnectFilterSheet> {
+  static const _modes = <String, _ModeOption>{
+    'Dating': _ModeOption('Dating & Romance', Icons.favorite_outline),
+    'Friendship': _ModeOption('Friendship & Social', Icons.people_outline),
+    'Networking': _ModeOption('Professional Networking', Icons.work_outline),
+    'Mixed': _ModeOption('All of the Above', Icons.explore_outlined),
+  };
+
+  late String _selected;
+  bool _saving = false;
+
+  @override
+  void initState() {
+    super.initState();
+    _selected = widget.currentUser.lookingFor ?? 'Dating';
+    if (!_modes.containsKey(_selected)) _selected = 'Dating';
+  }
+
+  Future<void> _applyFilters() async {
+    final changed = _selected != (widget.currentUser.lookingFor ?? 'Dating');
+
+    if (changed) {
+      setState(() => _saving = true);
+
+      widget.currentUser.lookingFor = _selected;
+      await FirebaseFirestore.instance
+          .collection('users')
+          .doc(widget.currentUser.id)
+          .set({'lookingFor': _selected}, SetOptions(merge: true));
+
+      if (!mounted) return;
+      setState(() => _saving = false);
+    }
+
+    if (!mounted) return;
+    Navigator.pop(context);
+    widget.onApply();
+  }
+
+  @override
+  Widget build(BuildContext context) => Padding(
+        padding: const EdgeInsets.fromLTRB(24, 24, 24, 32),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              'Filter Your Tribe',
+              style: GoogleFonts.montserrat(
+                fontSize: 20,
+                fontWeight: FontWeight.w600,
+                color: AppColors.textPrimary,
+              ),
+            ),
+            const SizedBox(height: 8),
+            Text(
+              'Show me people looking for:',
+              style: GoogleFonts.montserrat(
+                fontSize: 14,
+                color: AppColors.textSecondary,
+              ),
+            ),
+            const SizedBox(height: 16),
+            ..._modes.entries.map(
+              (e) => _buildModeOption(e.key, e.value),
+            ),
+            const SizedBox(height: 20),
+            SizedBox(
+              width: double.infinity,
+              child: ElevatedButton(
+                onPressed: _saving ? null : _applyFilters,
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: AppColors.primaryGreen,
+                  foregroundColor: Colors.white,
+                  disabledBackgroundColor: AppColors.primaryGreen.withAlpha(120),
+                  padding: const EdgeInsets.symmetric(vertical: 16),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                ),
+                child: _saving
+                    ? const SizedBox(
+                        height: 20,
+                        width: 20,
+                        child: CircularProgressIndicator(
+                          strokeWidth: 2,
+                          color: Colors.white,
+                        ),
+                      )
+                    : Text(
+                        'Apply Filters',
+                        style: GoogleFonts.montserrat(
+                          fontSize: 16,
+                          fontWeight: FontWeight.w600,
+                        ),
+                      ),
+              ),
+            ),
+          ],
+        ),
+      );
+
+  Widget _buildModeOption(String key, _ModeOption option) {
+    final isSelected = _selected == key;
+    return GestureDetector(
+      onTap: () => setState(() => _selected = key),
+      child: Container(
+        margin: const EdgeInsets.only(bottom: 10),
+        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+        decoration: BoxDecoration(
+          color: isSelected
+              ? AppColors.primaryGreen.withAlpha(25)
+              : Colors.transparent,
+          borderRadius: BorderRadius.circular(12),
+          border: Border.all(
+            color: isSelected ? AppColors.primaryGreen : Colors.grey.shade300,
+            width: isSelected ? 2 : 1,
+          ),
+        ),
+        child: Row(
+          children: [
+            Icon(
+              option.icon,
+              color: isSelected ? AppColors.primaryGreen : AppColors.textSecondary,
+              size: 22,
+            ),
+            const SizedBox(width: 12),
+            Expanded(
+              child: Text(
+                option.label,
+                style: GoogleFonts.montserrat(
+                  fontSize: 15,
+                  fontWeight: isSelected ? FontWeight.w600 : FontWeight.w400,
+                  color: isSelected
+                      ? AppColors.primaryGreen
+                      : AppColors.textPrimary,
+                ),
+              ),
+            ),
+            if (isSelected)
+              const Icon(
+                Icons.check_circle,
+                color: AppColors.primaryGreen,
+                size: 22,
+              ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+class _ModeOption {
+  const _ModeOption(this.label, this.icon);
+  final String label;
+  final IconData icon;
 }

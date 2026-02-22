@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'dart:developer';
 
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:equatable/equatable.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
@@ -355,14 +356,24 @@ class RSVPBloc extends Bloc<RSVPEvent, RSVPState> {
   }
 
   Future<Map<String, dynamic>?> _getUserProfile() async {
-    // TODO: Implement user profile fetching from your user service
-    // This should return basic user info for the attendee list
-    return {
-      'name': 'Current User', // Replace with actual user name
-      'avatar': null, // Replace with actual user avatar
-      'age': null, // Replace with actual user age
-      'location': null, // Replace with actual user location
-    };
+    try {
+      final doc = await FirebaseFirestore.instance
+          .collection('users')
+          .doc(_currentUserId)
+          .get();
+      if (!doc.exists) return null;
+      final data = doc.data()!;
+      final photos = data['photos'];
+      return {
+        'name': data['name']?.toString() ?? 'Unknown',
+        'avatar': (photos is List && photos.isNotEmpty) ? photos[0] : null,
+        'age': data['age'],
+        'location': data['address']?.toString(),
+      };
+    } catch (e) {
+      log('Error fetching user profile: $e', name: 'RSVPBloc');
+      return null;
+    }
   }
 
   String _getSuccessMessage(RSVPStatus status) {

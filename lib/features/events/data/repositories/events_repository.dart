@@ -1,5 +1,6 @@
 import 'dart:developer';
 
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:geolocator/geolocator.dart';
 
 import '../models/event_model.dart';
@@ -91,12 +92,7 @@ class EventsRepositoryImpl implements EventsRepository {
               name: 'EventsRepository',
             );
 
-            // Update cache
             _updateCache(cacheKey, events);
-
-            // Fetch fresh data in background
-            _fetchAndCacheInBackground(page, limit);
-
             return events;
           }
         } catch (e) {
@@ -195,10 +191,6 @@ class EventsRepositoryImpl implements EventsRepository {
       // If we have enough cached events, return them and fetch fresh data in background
       if (firestoreEvents.length >= 10) {
         _updateCache(cacheKey, firestoreEvents);
-
-        // Fetch fresh data in background
-        _fetchCategoryInBackground(category);
-
         return firestoreEvents;
       }
 
@@ -323,34 +315,26 @@ class EventsRepositoryImpl implements EventsRepository {
     _cacheTimestamps[cacheKey] = DateTime.now();
   }
 
-  Future<void> _fetchAndCacheInBackground(int page, int limit) async {
-    try {
-      // Background refresh removed - only user-generated events supported
-    } catch (e) {
-      log('Background cache update failed: $e', name: 'EventsRepository');
-    }
-  }
-
-  Future<void> _fetchCategoryInBackground(String category) async {
-    try {
-      // Background category refresh removed - only user-generated events supported
-    } catch (e) {
-      log(
-        'Background category cache update failed: $e',
-        name: 'EventsRepository',
-      );
-    }
-  }
-
   Future<Map<String, dynamic>?> _getUserProfile(String userId) async {
-    // TODO: Implement user profile fetching from your user service
-    // This should return basic user info for the attendee list
-    return {
-      'name': 'Current User', // Replace with actual user name
-      'avatar': null, // Replace with actual user avatar
-      'age': null, // Replace with actual user age
-      'location': null, // Replace with actual user location
-    };
+    try {
+      final doc = await FirebaseFirestore.instance
+          .collection('users')
+          .doc(userId)
+          .get();
+      if (!doc.exists) return null;
+      final data = doc.data()!;
+      final photos = data['photos'];
+      return {
+        'name': data['name']?.toString() ?? 'Unknown',
+        'avatar': (photos is List && photos.isNotEmpty) ? photos[0] : null,
+        'age': data['age'],
+        'location': data['address']?.toString(),
+      };
+    } catch (e) {
+      log('Error fetching user profile $userId: $e',
+          name: 'EventsRepository');
+      return null;
+    }
   }
 
   // Cache cleanup method (call periodically)

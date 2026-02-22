@@ -164,7 +164,7 @@ class _EventsScreenState extends State<EventsScreen> {
         elevation: 0,
         leading: Semantics(
           button: true,
-          label: 'Go back',
+          label: 'Go back'.tr(),
           child: IconButton(
             onPressed: () => Navigator.pop(context),
             icon: const Icon(
@@ -311,7 +311,7 @@ class _EventsScreenState extends State<EventsScreen> {
             child: Semantics(
               button: true,
               selected: isSelected,
-              label: '${category.tr()} category filter',
+              label: '{} category filter'.tr(args: [category.tr()]),
               child: Material(
                 color: Colors.transparent,
                 child: InkWell(

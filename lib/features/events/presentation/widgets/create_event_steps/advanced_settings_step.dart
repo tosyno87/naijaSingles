@@ -1,5 +1,6 @@
 import 'dart:io';
 
+import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -123,7 +124,7 @@ class _AdvancedSettingsStepState extends State<AdvancedSettingsStep> {
               Expanded(
                 child: _buildImageUploadButton(
                   icon: Icons.camera_alt,
-                  label: 'Take Photo',
+                  label: 'Take Photo'.tr(),
                   onTap: () => _pickImage(ImageSource.camera),
                 ),
               ),
@@ -131,7 +132,7 @@ class _AdvancedSettingsStepState extends State<AdvancedSettingsStep> {
               Expanded(
                 child: _buildImageUploadButton(
                   icon: Icons.photo_library,
-                  label: 'Choose from Gallery',
+                  label: 'Choose from Gallery'.tr(),
                   onTap: () => _pickImage(ImageSource.gallery),
                 ),
               ),

@@ -1,7 +1,7 @@
+import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:intl/intl.dart';
 import 'package:share_plus/share_plus.dart';
 
 import '../../../../common/constants/app_colors.dart';
@@ -274,25 +274,25 @@ class EventSharingWidget extends StatelessWidget {
               _buildSocialButton(
                 icon: Icons.facebook,
                 color: const Color(0xFF1877F2),
-                label: 'Facebook',
+                label: 'Facebook'.tr(),
                 onTap: () => _shareToFacebook(context),
               ),
               _buildSocialButton(
                 icon: Icons.alternate_email,
                 color: const Color(0xFF1DA1F2),
-                label: 'Twitter',
+                label: 'Twitter'.tr(),
                 onTap: () => _shareToTwitter(context),
               ),
               _buildSocialButton(
                 icon: Icons.camera_alt,
                 color: const Color(0xFFE4405F),
-                label: 'Instagram',
+                label: 'Instagram'.tr(),
                 onTap: () => _shareToInstagram(context),
               ),
               _buildSocialButton(
                 icon: Icons.chat,
                 color: const Color(0xFF25D366),
-                label: 'WhatsApp',
+                label: 'WhatsApp'.tr(),
                 onTap: () => _shareToWhatsApp(context),
               ),
             ],

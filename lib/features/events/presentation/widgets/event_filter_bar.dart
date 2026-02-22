@@ -1,3 +1,4 @@
+import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import '../../../../common/constants/app_colors.dart';
@@ -497,7 +498,7 @@ class _AdvancedFilterDialogState extends State<AdvancedFilterDialog> {
             children: [
               Expanded(
                 child: _buildDateButton(
-                  label: 'Start Date',
+                  label: 'Start Date'.tr(),
                   date: _tempFilter.startDate,
                   onTap: _selectStartDate,
                 ),
@@ -505,7 +506,7 @@ class _AdvancedFilterDialogState extends State<AdvancedFilterDialog> {
               const SizedBox(width: 12),
               Expanded(
                 child: _buildDateButton(
-                  label: 'End Date',
+                  label: 'End Date'.tr(),
                   date: _tempFilter.endDate,
                   onTap: _selectEndDate,
                 ),

@@ -24,7 +24,7 @@ class EventDetailsSliverAppBar extends StatelessWidget {
         elevation: 0,
         leading: Semantics(
           button: true,
-          label: 'Go back',
+          label: 'Go back'.tr(),
           child: Container(
             margin: const EdgeInsets.all(8),
             decoration: BoxDecoration(
@@ -40,7 +40,7 @@ class EventDetailsSliverAppBar extends StatelessWidget {
         actions: [
           Semantics(
             button: true,
-            label: 'Share event',
+            label: 'Share event'.tr(),
             child: Container(
               margin: const EdgeInsets.all(8),
               decoration: BoxDecoration(

@@ -1,7 +1,7 @@
 import 'package:cached_network_image/cached_network_image.dart';
+import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:intl/intl.dart';
 
 import '../../data/models/enhanced_event_model.dart';
 import '../../data/models/event_model.dart';
@@ -379,7 +379,7 @@ class EnhancedEventCard extends StatelessWidget {
             Expanded(
               child: _buildStatItem(
                 icon: Icons.people,
-                label: 'Attending',
+                label: 'Attending'.tr(),
                 value: attendeeCount.toString(),
               ),
             ),
@@ -391,7 +391,7 @@ class EnhancedEventCard extends StatelessWidget {
             Expanded(
               child: _buildStatItem(
                 icon: Icons.favorite,
-                label: 'Interested',
+                label: 'Interested'.tr(),
                 value: rsvpCount.toString(),
               ),
             ),
@@ -402,10 +402,10 @@ class EnhancedEventCard extends StatelessWidget {
                 color: const Color(0xFFE0E0E0),
               ),
               Expanded(
-                child: _buildStatItem(
-                  icon: Icons.event_seat,
-                  label: 'Capacity',
-                  value: event.maxAttendees.toString(),
+              child: _buildStatItem(
+                icon: Icons.event_seat,
+                label: 'Capacity'.tr(),
+                value: event.maxAttendees.toString(),
                 ),
               ),
             ],

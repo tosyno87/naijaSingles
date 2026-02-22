@@ -1,3 +1,4 @@
+import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import '../../../../common/constants/app_colors.dart';
@@ -338,7 +339,7 @@ class _AdvancedSearchDialogState extends State<AdvancedSearchDialog> {
             children: [
               Expanded(
                 child: _buildDateField(
-                  label: 'Start date',
+                  label: 'Start date'.tr(),
                   date: _startDate,
                   onDateSelected: (date) {
                     setState(() {
@@ -357,7 +358,7 @@ class _AdvancedSearchDialogState extends State<AdvancedSearchDialog> {
               ),
               Expanded(
                 child: _buildDateField(
-                  label: 'End date',
+                  label: 'End date'.tr(),
                   date: _endDate,
                   onDateSelected: (date) {
                     setState(() {
@@ -522,21 +523,21 @@ class _AdvancedSearchDialogState extends State<AdvancedSearchDialog> {
             children: [
               Expanded(
                 child: _buildEventTypeChip(
-                  label: 'Free',
+                  label: 'Free'.tr(),
                   value: 'free',
                 ),
               ),
               const SizedBox(width: 8),
               Expanded(
                 child: _buildEventTypeChip(
-                  label: 'Paid',
+                  label: 'Paid'.tr(),
                   value: 'paid',
                 ),
               ),
               const SizedBox(width: 8),
               Expanded(
                 child: _buildEventTypeChip(
-                  label: 'Any',
+                  label: 'Any'.tr(),
                   value: null,
                 ),
               ),

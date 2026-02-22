@@ -1,8 +1,8 @@
 import 'dart:io';
 
+import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:intl/intl.dart';
 
 import '../../../../common/constants/app_colors.dart';
 import '../../../../common/utils/app_logger.dart';
@@ -548,7 +548,7 @@ class MyEventCard extends StatelessWidget {
             Expanded(
               child: _buildStatItem(
                 icon: Icons.people,
-                label: 'Attendees',
+                label: 'Attendees'.tr(),
                 value: '${event.attendeeCount}/${event.maxAttendees}',
               ),
             ),
@@ -560,7 +560,7 @@ class MyEventCard extends StatelessWidget {
             Expanded(
               child: _buildStatItem(
                 icon: Icons.visibility,
-                label: 'Views',
+                label: 'Views'.tr(),
                 value: '${event.metadata['views'] ?? 0}',
               ),
             ),
@@ -572,7 +572,7 @@ class MyEventCard extends StatelessWidget {
             Expanded(
               child: _buildStatItem(
                 icon: Icons.favorite,
-                label: 'Interested',
+                label: 'Interested'.tr(),
                 value: '${event.rsvpCount}',
               ),
             ),

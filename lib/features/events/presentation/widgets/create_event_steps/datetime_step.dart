@@ -1,6 +1,6 @@
+import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:intl/intl.dart';
 
 import '../../../../../common/constants/app_colors.dart';
 import '../../../data/models/enhanced_event_model.dart';
@@ -72,7 +72,7 @@ class _DateTimeStepState extends State<DateTimeStep> {
               Expanded(
                 flex: 2,
                 child: _buildDateSelector(
-                  label: 'Date',
+                  label: 'Date'.tr(),
                   selectedDate: widget.eventData.startDate,
                   onDateSelected: (date) {
                     setState(() {
@@ -107,7 +107,7 @@ class _DateTimeStepState extends State<DateTimeStep> {
               const SizedBox(width: 16),
               Expanded(
                 child: _buildTimeSelector(
-                  label: 'Time',
+                  label: 'Time'.tr(),
                   selectedTime: widget.eventData.startDate != null
                       ? TimeOfDay.fromDateTime(widget.eventData.startDate!)
                       : null,
@@ -158,7 +158,7 @@ class _DateTimeStepState extends State<DateTimeStep> {
               Expanded(
                 flex: 2,
                 child: _buildDateSelector(
-                  label: 'Date',
+                  label: 'Date'.tr(),
                   selectedDate: widget.eventData.endDate,
                   onDateSelected: (date) {
                     setState(() {
@@ -184,7 +184,7 @@ class _DateTimeStepState extends State<DateTimeStep> {
               const SizedBox(width: 16),
               Expanded(
                 child: _buildTimeSelector(
-                  label: 'Time',
+                  label: 'Time'.tr(),
                   selectedTime: widget.eventData.endDate != null
                       ? TimeOfDay.fromDateTime(widget.eventData.endDate!)
                       : null,

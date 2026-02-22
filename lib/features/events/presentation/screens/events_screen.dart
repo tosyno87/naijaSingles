@@ -14,6 +14,7 @@ import '../bloc/rsvp_bloc.dart';
 import '../widgets/advanced_search_dialog.dart';
 import '../widgets/event_card.dart';
 import '../widgets/events_loading_shimmer.dart';
+import '../../../../common/constants/app_colors.dart';
 
 class EventsScreen extends StatefulWidget {
   const EventsScreen({super.key});
@@ -145,7 +146,7 @@ class _EventsScreenState extends State<EventsScreen> {
               onPressed: () {
                 Navigator.pushNamed(context, RouteName.eventTemplateSelection);
               },
-              backgroundColor: const Color(0xFF008037), // Deep green
+              backgroundColor: AppColors.primaryGreen, // Deep green
               foregroundColor: Colors.white,
               child: const Icon(Icons.add),
             ),
@@ -180,7 +181,7 @@ class _EventsScreenState extends State<EventsScreen> {
             },
             icon: const Icon(
               Icons.calendar_today,
-              color: Color(0xFF008037), // Deep green
+              color: AppColors.primaryGreen, // Deep green
               size: 24,
             ),
             tooltip: 'My Events',
@@ -190,7 +191,7 @@ class _EventsScreenState extends State<EventsScreen> {
             onPressed: _toggleSearch,
             icon: Icon(
               _isSearching ? Icons.close : Icons.search,
-              color: const Color(0xFF008037), // Deep green
+              color: AppColors.primaryGreen, // Deep green
               size: 24,
             ),
             tooltip: _isSearching ? 'Close Search' : 'Search Events',
@@ -266,7 +267,7 @@ class _EventsScreenState extends State<EventsScreen> {
             ),
             prefixIcon: const Icon(
               Icons.search,
-              color: Color(0xFF008037),
+              color: AppColors.primaryGreen,
             ),
             border: InputBorder.none,
             contentPadding: const EdgeInsets.all(16),
@@ -314,11 +315,11 @@ class _EventsScreenState extends State<EventsScreen> {
                   padding:
                       const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
                   decoration: BoxDecoration(
-                    color: isSelected ? const Color(0xFF008037) : Colors.white,
+                    color: isSelected ? AppColors.primaryGreen : Colors.white,
                     borderRadius: BorderRadius.circular(20),
                     border: Border.all(
                       color: isSelected
-                          ? const Color(0xFF008037)
+                          ? AppColors.primaryGreen
                           : const Color(0xFFE0E0E0),
                     ),
                     boxShadow: isSelected
@@ -338,7 +339,7 @@ class _EventsScreenState extends State<EventsScreen> {
                       fontWeight:
                           isSelected ? FontWeight.w600 : FontWeight.w500,
                       color:
-                          isSelected ? Colors.white : const Color(0xFF008037),
+                          isSelected ? Colors.white : AppColors.primaryGreen,
                     ),
                   ),
                 ),
@@ -395,7 +396,7 @@ class _EventsScreenState extends State<EventsScreen> {
         underline: const SizedBox.shrink(),
         icon: const Icon(
           Icons.arrow_drop_down,
-          color: Color(0xFF008037),
+          color: AppColors.primaryGreen,
         ),
         style: GoogleFonts.montserrat(
           fontSize: 14,
@@ -503,7 +504,7 @@ class _EventsScreenState extends State<EventsScreen> {
               children: [
                 const Icon(
                   Icons.tune,
-                  color: Color(0xFF008037),
+                  color: AppColors.primaryGreen,
                   size: 18,
                 ),
                 const SizedBox(width: 4),
@@ -512,7 +513,7 @@ class _EventsScreenState extends State<EventsScreen> {
                   style: GoogleFonts.montserrat(
                     fontSize: 14,
                     fontWeight: FontWeight.w600,
-                    color: const Color(0xFF008037),
+                    color: AppColors.primaryGreen,
                   ),
                 ),
               ],
@@ -561,7 +562,7 @@ class _EventsScreenState extends State<EventsScreen> {
               ElevatedButton(
                 onPressed: onRetry,
                 style: ElevatedButton.styleFrom(
-                  backgroundColor: const Color(0xFF008037),
+                  backgroundColor: AppColors.primaryGreen,
                   foregroundColor: Colors.white,
                   padding:
                       const EdgeInsets.symmetric(horizontal: 32, vertical: 16),
@@ -654,7 +655,7 @@ class _EventsScreenState extends State<EventsScreen> {
                           vertical: 10,
                         ),
                         decoration: BoxDecoration(
-                          color: const Color(0xFF008037), // Deep green
+                          color: AppColors.primaryGreen, // Deep green
                           borderRadius: BorderRadius.circular(20),
                           boxShadow: [
                             BoxShadow(
@@ -692,7 +693,7 @@ class _EventsScreenState extends State<EventsScreen> {
                           vertical: 10,
                         ),
                         decoration: BoxDecoration(
-                          color: const Color(0xFF008037), // Deep green
+                          color: AppColors.primaryGreen, // Deep green
                           borderRadius: BorderRadius.circular(20),
                           boxShadow: [
                             BoxShadow(
@@ -737,7 +738,7 @@ class _EventsScreenState extends State<EventsScreen> {
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
               const CircularProgressIndicator(
-                valueColor: AlwaysStoppedAnimation(Color(0xFF008037)),
+                valueColor: AlwaysStoppedAnimation(AppColors.primaryGreen),
               ),
               const SizedBox(height: 24),
               Text(
@@ -844,7 +845,7 @@ class _EventsScreenState extends State<EventsScreen> {
               onRefresh: _onRefresh,
               onLoading: _onLoading,
               header: const WaterDropMaterialHeader(
-                backgroundColor: Color(0xFF008037),
+                backgroundColor: AppColors.primaryGreen,
               ),
               footer: CustomFooter(
                 builder: (context, mode) {
@@ -857,7 +858,7 @@ class _EventsScreenState extends State<EventsScreen> {
                     );
                   } else if (mode == LoadStatus.loading) {
                     body = const CircularProgressIndicator(
-                      valueColor: AlwaysStoppedAnimation(Color(0xFF008037)),
+                      valueColor: AlwaysStoppedAnimation(AppColors.primaryGreen),
                     );
                   } else if (mode == LoadStatus.failed) {
                     body = Text(
@@ -898,7 +899,7 @@ class _EventsScreenState extends State<EventsScreen> {
                       child: Padding(
                         padding: EdgeInsets.all(16),
                         child: CircularProgressIndicator(
-                          valueColor: AlwaysStoppedAnimation(Color(0xFF008037)),
+                          valueColor: AlwaysStoppedAnimation(AppColors.primaryGreen),
                         ),
                       ),
                     );

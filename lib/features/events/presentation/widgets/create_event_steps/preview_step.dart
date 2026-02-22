@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:intl/intl.dart';
 import '../../../data/models/enhanced_event_model.dart';
+import '../../../../../common/constants/app_colors.dart';
 
 class PreviewStep extends StatelessWidget {
   const PreviewStep({
@@ -189,7 +190,7 @@ class PreviewStep extends StatelessWidget {
               Container(
                 padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
                 decoration: BoxDecoration(
-                  color: const Color(0xFF008037).withValues(alpha: 0.1),
+                  color: AppColors.primaryGreen.withValues(alpha: 0.1),
                   borderRadius: BorderRadius.circular(6),
                 ),
                 child: Text(
@@ -197,7 +198,7 @@ class PreviewStep extends StatelessWidget {
                   style: GoogleFonts.montserrat(
                     fontSize: 12,
                     fontWeight: FontWeight.w600,
-                    color: const Color(0xFF008037),
+                    color: AppColors.primaryGreen,
                   ),
                 ),
               ),
@@ -368,17 +369,17 @@ class PreviewStep extends StatelessWidget {
                   padding:
                       const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
                   decoration: BoxDecoration(
-                    color: const Color(0xFF008037).withValues(alpha: 0.1),
+                    color: AppColors.primaryGreen.withValues(alpha: 0.1),
                     borderRadius: BorderRadius.circular(20),
                     border: Border.all(
-                      color: const Color(0xFF008037).withValues(alpha: 0.3),
+                      color: AppColors.primaryGreen.withValues(alpha: 0.3),
                     ),
                   ),
                   child: Text(
                     tag,
                     style: GoogleFonts.montserrat(
                       fontSize: 12,
-                      color: const Color(0xFF008037),
+                      color: AppColors.primaryGreen,
                       fontWeight: FontWeight.w500,
                     ),
                   ),
@@ -401,7 +402,7 @@ class PreviewStep extends StatelessWidget {
           children: [
             Icon(
               eventData.isFree ? Icons.event_available : Icons.monetization_on,
-              color: const Color(0xFF008037),
+              color: AppColors.primaryGreen,
               size: 24,
             ),
             const SizedBox(width: 12),

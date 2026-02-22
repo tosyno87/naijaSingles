@@ -71,7 +71,7 @@ class EventSharingWidget extends StatelessWidget {
           color: AppColors.backgroundColor,
           borderRadius: BorderRadius.circular(12),
           border: Border.all(
-            color: const Color(0xFF008037).withValues(alpha: 0.2),
+            color: AppColors.primaryGreen.withValues(alpha: 0.2),
           ),
         ),
         child: Column(
@@ -223,12 +223,12 @@ class EventSharingWidget extends StatelessWidget {
               Container(
                 padding: const EdgeInsets.all(12),
                 decoration: BoxDecoration(
-                  color: const Color(0xFF008037).withValues(alpha: 0.1),
+                  color: AppColors.primaryGreen.withValues(alpha: 0.1),
                   borderRadius: BorderRadius.circular(12),
                 ),
                 child: Icon(
                   icon,
-                  color: const Color(0xFF008037),
+                  color: AppColors.primaryGreen,
                   size: 24,
                 ),
               ),
@@ -352,7 +352,7 @@ class EventSharingWidget extends StatelessWidget {
           'Event link copied to clipboard!',
           style: GoogleFonts.montserrat(color: Colors.white),
         ),
-        backgroundColor: const Color(0xFF008037),
+        backgroundColor: AppColors.primaryGreen,
         behavior: SnackBarBehavior.floating,
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(10),
@@ -562,7 +562,7 @@ Get more details: ${event.ticketUrl ?? 'Afropeep app'}
               style: GoogleFonts.montserrat(
                 fontSize: 16,
                 fontWeight: FontWeight.w600,
-                color: const Color(0xFF008037),
+                color: AppColors.primaryGreen,
               ),
             ),
           ),

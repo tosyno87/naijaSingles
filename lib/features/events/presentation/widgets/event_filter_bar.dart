@@ -122,18 +122,18 @@ class _EventFilterBarState extends State<EventFilterBar> {
           duration: const Duration(milliseconds: 200),
           padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
           decoration: BoxDecoration(
-            color: isSelected ? const Color(0xFF008037) : Colors.white,
+            color: isSelected ? AppColors.primaryGreen : Colors.white,
             borderRadius: BorderRadius.circular(20),
             border: Border.all(
               color: isSelected
-                  ? const Color(0xFF008037)
+                  ? AppColors.primaryGreen
                   : const Color(0xFFE0E0E0),
               width: 1.5,
             ),
             boxShadow: isSelected
                 ? [
                     BoxShadow(
-                      color: const Color(0xFF008037).withValues(alpha: 0.3),
+                      color: AppColors.primaryGreen.withValues(alpha: 0.3),
                       blurRadius: 8,
                       offset: const Offset(0, 2),
                     ),
@@ -163,12 +163,12 @@ class _EventFilterBarState extends State<EventFilterBar> {
           padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
           decoration: BoxDecoration(
             color: isSelected
-                ? const Color(0xFF008037).withValues(alpha: 0.1)
+                ? AppColors.primaryGreen.withValues(alpha: 0.1)
                 : Colors.transparent,
             borderRadius: BorderRadius.circular(18),
             border: Border.all(
               color: isSelected
-                  ? const Color(0xFF008037)
+                  ? AppColors.primaryGreen
                   : const Color(0xFFE0E0E0),
             ),
           ),
@@ -180,7 +180,7 @@ class _EventFilterBarState extends State<EventFilterBar> {
                   Icons.money_off,
                   size: 16,
                   color: isSelected
-                      ? const Color(0xFF008037)
+                      ? AppColors.primaryGreen
                       : const Color(0xFF666666),
                 ),
               if (label == 'Free Only') const SizedBox(width: 4),
@@ -190,7 +190,7 @@ class _EventFilterBarState extends State<EventFilterBar> {
                   fontSize: 12,
                   fontWeight: FontWeight.w500,
                   color: isSelected
-                      ? const Color(0xFF008037)
+                      ? AppColors.primaryGreen
                       : const Color(0xFF666666),
                 ),
               ),
@@ -310,9 +310,9 @@ class _EventFilterBarState extends State<EventFilterBar> {
                   padding:
                       const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
                   decoration: BoxDecoration(
-                    color: const Color(0xFF008037).withValues(alpha: 0.1),
+                    color: AppColors.primaryGreen.withValues(alpha: 0.1),
                     borderRadius: BorderRadius.circular(16),
-                    border: Border.all(color: const Color(0xFF008037)),
+                    border: Border.all(color: AppColors.primaryGreen),
                   ),
                   child: Row(
                     mainAxisSize: MainAxisSize.min,
@@ -320,7 +320,7 @@ class _EventFilterBarState extends State<EventFilterBar> {
                       const Icon(
                         Icons.clear,
                         size: 14,
-                        color: Color(0xFF008037),
+                        color: AppColors.primaryGreen,
                       ),
                       const SizedBox(width: 4),
                       Text(
@@ -328,7 +328,7 @@ class _EventFilterBarState extends State<EventFilterBar> {
                         style: GoogleFonts.montserrat(
                           fontSize: 12,
                           fontWeight: FontWeight.w500,
-                          color: const Color(0xFF008037),
+                          color: AppColors.primaryGreen,
                         ),
                       ),
                     ],
@@ -351,7 +351,7 @@ class _EventFilterBarState extends State<EventFilterBar> {
                 padding:
                     const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
                 decoration: BoxDecoration(
-                  color: const Color(0xFF008037),
+                  color: AppColors.primaryGreen,
                   borderRadius: BorderRadius.circular(16),
                 ),
                 child: Row(
@@ -468,7 +468,7 @@ class _AdvancedFilterDialogState extends State<AdvancedFilterDialog> {
               ),
               focusedBorder: OutlineInputBorder(
                 borderRadius: BorderRadius.circular(12),
-                borderSide: const BorderSide(color: Color(0xFF008037)),
+                borderSide: const BorderSide(color: AppColors.primaryGreen),
               ),
               contentPadding: const EdgeInsets.all(16),
             ),
@@ -564,7 +564,7 @@ class _AdvancedFilterDialogState extends State<AdvancedFilterDialog> {
                 _tempFilter = _tempFilter.copyWith(freeOnly: value ?? false);
               });
             },
-            activeColor: const Color(0xFF008037),
+            activeColor: AppColors.primaryGreen,
           ),
           Text(
             'Free events only',
@@ -604,7 +604,7 @@ class _AdvancedFilterDialogState extends State<AdvancedFilterDialog> {
                 Navigator.pop(context);
               },
               style: ElevatedButton.styleFrom(
-                backgroundColor: const Color(0xFF008037),
+                backgroundColor: AppColors.primaryGreen,
                 foregroundColor: Colors.white,
                 padding: const EdgeInsets.symmetric(vertical: 16),
                 shape: RoundedRectangleBorder(

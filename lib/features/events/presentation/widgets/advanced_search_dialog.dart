@@ -212,7 +212,7 @@ class _AdvancedSearchDialogState extends State<AdvancedSearchDialog> {
               ),
               focusedBorder: OutlineInputBorder(
                 borderRadius: BorderRadius.circular(8),
-                borderSide: const BorderSide(color: Color(0xFF008037), width: 1.5),
+                borderSide: const BorderSide(color: AppColors.primaryGreen, width: 1.5),
               ),
               contentPadding: const EdgeInsets.symmetric(
                 horizontal: 12,
@@ -295,14 +295,14 @@ class _AdvancedSearchDialogState extends State<AdvancedSearchDialog> {
                     icon: const Icon(
                       Icons.my_location,
                       size: 16,
-                      color: Color(0xFF008037),
+                      color: AppColors.primaryGreen,
                     ),
                     label: Text(
                       'Use current location',
                       style: GoogleFonts.montserrat(
                         fontSize: 14,
                         fontWeight: FontWeight.w500,
-                        color: const Color(0xFF008037),
+                        color: AppColors.primaryGreen,
                       ),
                     ),
                     style: TextButton.styleFrom(
@@ -469,7 +469,7 @@ class _AdvancedSearchDialogState extends State<AdvancedSearchDialog> {
               ),
               focusedBorder: OutlineInputBorder(
                 borderRadius: BorderRadius.circular(8),
-                borderSide: const BorderSide(color: Color(0xFF008037), width: 1.5),
+                borderSide: const BorderSide(color: AppColors.primaryGreen, width: 1.5),
               ),
               contentPadding: const EdgeInsets.symmetric(
                 horizontal: 12,
@@ -561,12 +561,12 @@ class _AdvancedSearchDialogState extends State<AdvancedSearchDialog> {
         padding: const EdgeInsets.symmetric(vertical: 12),
         decoration: BoxDecoration(
           color: isSelected
-              ? const Color(0xFF008037).withValues(alpha: 0.1)
+              ? AppColors.primaryGreen.withValues(alpha: 0.1)
               : Colors.transparent,
           borderRadius: BorderRadius.circular(8),
           border: Border.all(
             color: isSelected
-                ? const Color(0xFF008037)
+                ? AppColors.primaryGreen
                 : const Color(0xFFE0E0E0),
             width: 1,
           ),
@@ -578,7 +578,7 @@ class _AdvancedSearchDialogState extends State<AdvancedSearchDialog> {
               const Icon(
                 Icons.check,
                 size: 16,
-                color: Color(0xFF008037),
+                color: AppColors.primaryGreen,
               ),
               const SizedBox(width: 6),
             ],
@@ -588,7 +588,7 @@ class _AdvancedSearchDialogState extends State<AdvancedSearchDialog> {
                 fontSize: 14,
                 fontWeight: isSelected ? FontWeight.w600 : FontWeight.w500,
                 color: isSelected
-                    ? const Color(0xFF008037)
+                    ? AppColors.primaryGreen
                     : const Color(0xFF666666),
               ),
             ),
@@ -643,7 +643,7 @@ class _AdvancedSearchDialogState extends State<AdvancedSearchDialog> {
               ElevatedButton(
                 onPressed: _applyFilters,
                 style: ElevatedButton.styleFrom(
-                  backgroundColor: const Color(0xFF008037),
+                  backgroundColor: AppColors.primaryGreen,
                   foregroundColor: Colors.white,
                   padding: const EdgeInsets.symmetric(
                     horizontal: 32,
@@ -695,7 +695,7 @@ class _AdvancedSearchDialogState extends State<AdvancedSearchDialog> {
           ScaffoldMessenger.of(context).showSnackBar(
             const SnackBar(
               content: Text('Location set to current position'),
-              backgroundColor: Color(0xFF008037),
+              backgroundColor: AppColors.primaryGreen,
               duration: Duration(seconds: 2),
             ),
           );

@@ -304,7 +304,31 @@ abstract class AppRouter {
 
       // Handle both EventModel and EnhancedEventModel
       if (arguments is EnhancedEventModel) {
-        return EventDetailsScreen(event: arguments.toEventModel());
+        return EventDetailsScreen(
+          event: EventModel(
+            id: arguments.id,
+            externalId: arguments.externalId,
+            name: arguments.name,
+            description: arguments.description,
+            startDate: arguments.startDate,
+            endDate: arguments.endDate,
+            imageUrl: arguments.primaryImageUrl.isNotEmpty
+                ? arguments.primaryImageUrl
+                : null,
+            location: arguments.location,
+            ticketUrl: arguments.ticketUrl,
+            isFree: arguments.isFree,
+            ticketPrice: arguments.ticketPrice,
+            category: arguments.category,
+            tags: arguments.tags,
+            attendeeCount: arguments.attendeeCount,
+            rsvpCount: arguments.rsvpCount,
+            createdAt: arguments.createdAt,
+            updatedAt: arguments.updatedAt,
+            status: arguments.status,
+            createdByUserId: arguments.createdByUserId ?? 'unknown',
+          ),
+        );
       } else if (arguments is EventModel) {
         return EventDetailsScreen(event: arguments);
       } else {

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:shimmer/shimmer.dart';
+import '../../../../common/constants/app_colors.dart';
 
 class EventsLoadingShimmer extends StatelessWidget {
   const EventsLoadingShimmer({
@@ -335,7 +336,7 @@ class SearchResultsShimmer extends StatelessWidget {
             child: Row(
               children: [
                 const CircularProgressIndicator(
-                  valueColor: AlwaysStoppedAnimation(Color(0xFF008037)),
+                  valueColor: AlwaysStoppedAnimation(AppColors.primaryGreen),
                 ),
                 const SizedBox(width: 16),
                 Expanded(

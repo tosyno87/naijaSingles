@@ -7,6 +7,7 @@ import 'package:image_cropper/image_cropper.dart';
 import 'package:image_picker/image_picker.dart';
 
 import '../../../data/models/enhanced_event_model.dart';
+import '../../../../../common/constants/app_colors.dart';
 
 class AdvancedSettingsStep extends StatefulWidget {
   const AdvancedSettingsStep({
@@ -161,7 +162,7 @@ class _AdvancedSettingsStepState extends State<AdvancedSettingsStep> {
             children: [
               Icon(
                 icon,
-                color: const Color(0xFF008037),
+                color: AppColors.primaryGreen,
                 size: 24,
               ),
               const SizedBox(height: 8),
@@ -283,7 +284,7 @@ class _AdvancedSettingsStepState extends State<AdvancedSettingsStep> {
                       }
                     });
                   },
-                  activeThumbColor: const Color(0xFF008037),
+                  activeThumbColor: AppColors.primaryGreen,
                 ),
               ],
             ),
@@ -401,12 +402,12 @@ class _AdvancedSettingsStepState extends State<AdvancedSettingsStep> {
           uiSettings: [
             AndroidUiSettings(
               toolbarTitle: 'Crop Event Photo',
-              toolbarColor: const Color(0xFF008037),
+              toolbarColor: AppColors.primaryGreen,
               toolbarWidgetColor: Colors.white,
               initAspectRatio: CropAspectRatioPreset.ratio16x9,
               lockAspectRatio: true,
               backgroundColor: Colors.black,
-              activeControlsWidgetColor: const Color(0xFF008037),
+              activeControlsWidgetColor: AppColors.primaryGreen,
               statusBarColor: Colors.black,
               hideBottomControls: false,
               showCropGrid: true,

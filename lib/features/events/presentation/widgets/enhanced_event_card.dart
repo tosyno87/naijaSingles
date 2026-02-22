@@ -6,6 +6,7 @@ import 'package:intl/intl.dart';
 import '../../data/models/enhanced_event_model.dart';
 import '../../data/models/event_model.dart';
 import 'rsvp_button.dart';
+import '../../../../common/constants/app_colors.dart';
 
 class EnhancedEventCard extends StatelessWidget {
   const EnhancedEventCard({
@@ -132,7 +133,7 @@ class EnhancedEventCard extends StatelessWidget {
                     color: Color(0xFFF0F0F0),
                     child: Center(
                       child: CircularProgressIndicator(
-                        valueColor: AlwaysStoppedAnimation(Color(0xFF008037)),
+                        valueColor: AlwaysStoppedAnimation(AppColors.primaryGreen),
                       ),
                     ),
                   ),
@@ -278,7 +279,7 @@ class EnhancedEventCard extends StatelessWidget {
               Container(
                 padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
                 decoration: BoxDecoration(
-                  color: const Color(0xFF008037).withValues(alpha: 0.1),
+                  color: AppColors.primaryGreen.withValues(alpha: 0.1),
                   borderRadius: BorderRadius.circular(6),
                 ),
                 child: Text(
@@ -286,7 +287,7 @@ class EnhancedEventCard extends StatelessWidget {
                   style: GoogleFonts.montserrat(
                     fontSize: 12,
                     fontWeight: FontWeight.w600,
-                    color: const Color(0xFF008037),
+                    color: AppColors.primaryGreen,
                   ),
                 ),
               ),
@@ -295,7 +296,7 @@ class EnhancedEventCard extends StatelessWidget {
                 const Icon(
                   Icons.verified_user,
                   size: 16,
-                  color: Color(0xFF008037),
+                  color: AppColors.primaryGreen,
                 ),
             ],
           ),
@@ -422,7 +423,7 @@ class EnhancedEventCard extends StatelessWidget {
           Icon(
             icon,
             size: 16,
-            color: const Color(0xFF008037),
+            color: AppColors.primaryGreen,
           ),
           const SizedBox(height: 4),
           Text(
@@ -454,7 +455,7 @@ class EnhancedEventCard extends StatelessWidget {
         child: ElevatedButton(
           onPressed: onTap,
           style: ElevatedButton.styleFrom(
-            backgroundColor: const Color(0xFF008037),
+            backgroundColor: AppColors.primaryGreen,
             foregroundColor: Colors.white,
             padding: const EdgeInsets.symmetric(vertical: 12),
             shape: RoundedRectangleBorder(

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import '../../data/models/event_model.dart';
+import '../../../../common/constants/app_colors.dart';
 
 class WeekendEventsSection extends StatelessWidget {
   const WeekendEventsSection({
@@ -41,7 +42,7 @@ class WeekendEventsSection extends StatelessWidget {
               children: [
                 const Icon(
                   Icons.weekend,
-                  color: Color(0xFF008037),
+                  color: AppColors.primaryGreen,
                   size: 20,
                 ),
                 const SizedBox(width: 8),
@@ -63,7 +64,7 @@ class WeekendEventsSection extends StatelessWidget {
                   style: GoogleFonts.montserrat(
                     fontSize: 14,
                     fontWeight: FontWeight.w600,
-                    color: const Color(0xFF008037),
+                    color: AppColors.primaryGreen,
                   ),
                 ),
               ),
@@ -210,7 +211,7 @@ class WeekendEventsSection extends StatelessWidget {
             Container(
               padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
               decoration: BoxDecoration(
-                color: const Color(0xFF008037).withValues(alpha: 0.1),
+                color: AppColors.primaryGreen.withValues(alpha: 0.1),
                 borderRadius: BorderRadius.circular(6),
               ),
               child: Text(
@@ -218,7 +219,7 @@ class WeekendEventsSection extends StatelessWidget {
                 style: GoogleFonts.montserrat(
                   fontSize: 9,
                   fontWeight: FontWeight.bold,
-                  color: const Color(0xFF008037),
+                  color: AppColors.primaryGreen,
                 ),
               ),
             )
@@ -228,7 +229,7 @@ class WeekendEventsSection extends StatelessWidget {
               style: GoogleFonts.montserrat(
                 fontSize: 12,
                 fontWeight: FontWeight.w600,
-                color: const Color(0xFF008037),
+                color: AppColors.primaryGreen,
               ),
             )
           else

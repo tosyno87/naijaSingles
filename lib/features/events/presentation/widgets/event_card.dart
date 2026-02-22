@@ -7,6 +7,7 @@ import '../../data/models/event_model.dart';
 import '../../data/services/location_service.dart';
 import '../utils/location_formatter.dart';
 import 'rsvp_button.dart';
+import '../../../../common/constants/app_colors.dart';
 
 class EventCard extends StatelessWidget {
   const EventCard({
@@ -74,7 +75,7 @@ class EventCard extends StatelessWidget {
                     color: Color(0xFFF5F5F5),
                     child: Center(
                       child: CircularProgressIndicator(
-                        valueColor: AlwaysStoppedAnimation(Color(0xFF008037)),
+                        valueColor: AlwaysStoppedAnimation(AppColors.primaryGreen),
                       ),
                     ),
                   ),
@@ -93,7 +94,7 @@ class EventCard extends StatelessWidget {
             Icon(
               _getCategoryIcon(),
               size: 48,
-              color: const Color(0xFF008037),
+              color: AppColors.primaryGreen,
             ),
             const SizedBox(height: 8),
             Text(
@@ -101,7 +102,7 @@ class EventCard extends StatelessWidget {
               style: GoogleFonts.montserrat(
                 fontSize: 14,
                 fontWeight: FontWeight.w600,
-                color: const Color(0xFF008037),
+                color: AppColors.primaryGreen,
               ),
             ),
           ],
@@ -147,7 +148,7 @@ class EventCard extends StatelessWidget {
   Widget _buildCategoryChip() => Container(
         padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
         decoration: BoxDecoration(
-          color: const Color(0xFF008037).withValues(alpha: 0.1),
+          color: AppColors.primaryGreen.withValues(alpha: 0.1),
           borderRadius: BorderRadius.circular(12),
         ),
         child: Text(
@@ -155,7 +156,7 @@ class EventCard extends StatelessWidget {
           style: GoogleFonts.montserrat(
             fontSize: 12,
             fontWeight: FontWeight.w600,
-            color: const Color(0xFF008037),
+            color: AppColors.primaryGreen,
           ),
         ),
       );
@@ -285,7 +286,7 @@ class EventCard extends StatelessWidget {
           const Icon(
             Icons.people,
             size: 16,
-            color: Color(0xFF008037),
+            color: AppColors.primaryGreen,
           ),
           const SizedBox(width: 4),
           Text(
@@ -293,7 +294,7 @@ class EventCard extends StatelessWidget {
             style: GoogleFonts.montserrat(
               fontSize: 14,
               fontWeight: FontWeight.w600,
-              color: const Color(0xFF008037),
+              color: AppColors.primaryGreen,
             ),
           ),
         ],
@@ -411,7 +412,7 @@ class CompactEventCard extends StatelessWidget {
                             color: Color(0xFFF5F5F5),
                             child: Icon(
                               Icons.event,
-                              color: Color(0xFF008037),
+                              color: AppColors.primaryGreen,
                             ),
                           ),
                           errorWidget: (context, url, error) =>
@@ -419,7 +420,7 @@ class CompactEventCard extends StatelessWidget {
                             color: Color(0xFFF5F5F5),
                             child: Icon(
                               Icons.event,
-                              color: Color(0xFF008037),
+                              color: AppColors.primaryGreen,
                             ),
                           ),
                         )
@@ -427,7 +428,7 @@ class CompactEventCard extends StatelessWidget {
                           color: Color(0xFFF5F5F5),
                           child: Icon(
                             Icons.event,
-                            color: Color(0xFF008037),
+                            color: AppColors.primaryGreen,
                           ),
                         ),
                 ),

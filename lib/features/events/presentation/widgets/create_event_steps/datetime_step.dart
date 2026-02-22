@@ -238,7 +238,7 @@ class _DateTimeStepState extends State<DateTimeStep> {
                     AppColors.backgroundColor, // Afropeep cream background
                 borderRadius: BorderRadius.circular(12),
                 border: Border.all(
-                  color: const Color(0xFF008037)
+                  color: AppColors.primaryGreen
                       .withValues(alpha: 0.3), // Afropeep green border
                   width: 1.5,
                 ),
@@ -247,7 +247,7 @@ class _DateTimeStepState extends State<DateTimeStep> {
                 children: [
                   const Icon(
                     Icons.calendar_today,
-                    color: Color(0xFF008037),
+                    color: AppColors.primaryGreen,
                     size: 20,
                   ),
                   const SizedBox(width: 12),
@@ -260,7 +260,7 @@ class _DateTimeStepState extends State<DateTimeStep> {
                         fontSize: 16,
                         color: selectedDate != null
                             ? const Color(0xFF333333)
-                            : const Color(0xFF008037)
+                            : AppColors.primaryGreen
                                 .withValues(alpha: 0.7), // Afropeep green hint
                       ),
                     ),
@@ -299,7 +299,7 @@ class _DateTimeStepState extends State<DateTimeStep> {
                     AppColors.backgroundColor, // Afropeep cream background
                 borderRadius: BorderRadius.circular(12),
                 border: Border.all(
-                  color: const Color(0xFF008037)
+                  color: AppColors.primaryGreen
                       .withValues(alpha: 0.3), // Afropeep green border
                   width: 1.5,
                 ),
@@ -308,7 +308,7 @@ class _DateTimeStepState extends State<DateTimeStep> {
                 children: [
                   const Icon(
                     Icons.access_time,
-                    color: Color(0xFF008037),
+                    color: AppColors.primaryGreen,
                     size: 20,
                   ),
                   const SizedBox(width: 12),
@@ -321,7 +321,7 @@ class _DateTimeStepState extends State<DateTimeStep> {
                         fontSize: 16,
                         color: selectedTime != null
                             ? const Color(0xFF333333)
-                            : const Color(0xFF008037)
+                            : AppColors.primaryGreen
                                 .withValues(alpha: 0.7), // Afropeep green hint
                       ),
                     ),
@@ -356,17 +356,17 @@ class _DateTimeStepState extends State<DateTimeStep> {
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: const Color(0xFF008037).withValues(alpha: 0.1),
+        color: AppColors.primaryGreen.withValues(alpha: 0.1),
         borderRadius: BorderRadius.circular(12),
         border: Border.all(
-          color: const Color(0xFF008037).withValues(alpha: 0.3),
+          color: AppColors.primaryGreen.withValues(alpha: 0.3),
         ),
       ),
       child: Row(
         children: [
           const Icon(
             Icons.schedule,
-            color: Color(0xFF008037),
+            color: AppColors.primaryGreen,
             size: 24,
           ),
           const SizedBox(width: 12),
@@ -379,7 +379,7 @@ class _DateTimeStepState extends State<DateTimeStep> {
                   style: GoogleFonts.montserrat(
                     fontSize: 14,
                     fontWeight: FontWeight.w600,
-                    color: const Color(0xFF008037),
+                    color: AppColors.primaryGreen,
                   ),
                 ),
                 Text(
@@ -387,7 +387,7 @@ class _DateTimeStepState extends State<DateTimeStep> {
                   style: GoogleFonts.montserrat(
                     fontSize: 16,
                     fontWeight: FontWeight.w500,
-                    color: const Color(0xFF008037),
+                    color: AppColors.primaryGreen,
                   ),
                 ),
               ],

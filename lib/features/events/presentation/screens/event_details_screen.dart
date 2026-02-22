@@ -12,6 +12,7 @@ import '../widgets/event_attendees_list.dart';
 import '../../data/models/event_model.dart';
 import '../../data/models/rsvp_model.dart';
 import '../../data/services/events_firestore_service.dart';
+import '../../../../common/constants/app_colors.dart';
 
 class EventDetailsScreen extends StatefulWidget {
   const EventDetailsScreen({
@@ -41,31 +42,22 @@ class _EventDetailsScreenState extends State<EventDetailsScreen> {
   }
 
   @override
-  Widget build(BuildContext context) => BlocProvider(
+  Widget build(BuildContext context) {
+    final userId = FirebaseAuth.instance.currentUser?.uid ?? '';
+    return BlocProvider(
         create: (context) => RSVPBloc(
           firestoreService: EventsFirestoreService(),
-          currentUserId: FirebaseAuth.instance.currentUser?.uid ?? '',
-        ),
+          currentUserId: userId,
+        )
+          ..add(LoadEventRSVPStatusEvent(
+            userId: userId,
+            eventId: widget.event.id,
+          ))
+          ..add(LoadEventAttendeesEvent(
+            eventId: widget.event.id,
+          )),
         child: BlocBuilder<RSVPBloc, RSVPState>(
           builder: (context, state) {
-            // Load event RSVP status and attendees when the bloc is first created
-            if (state is RSVPInitial) {
-              WidgetsBinding.instance.addPostFrameCallback((_) {
-                final userId = FirebaseAuth.instance.currentUser?.uid ?? '';
-                context.read<RSVPBloc>().add(
-                      LoadEventRSVPStatusEvent(
-                        userId: userId,
-                        eventId: widget.event.id,
-                      ),
-                    );
-                context.read<RSVPBloc>().add(
-                      LoadEventAttendeesEvent(
-                        eventId: widget.event.id,
-                      ),
-                    );
-              });
-            }
-
             return Scaffold(
               backgroundColor: Colors.white,
               body: CustomScrollView(
@@ -82,6 +74,7 @@ class _EventDetailsScreenState extends State<EventDetailsScreen> {
           },
         ),
       );
+  }
 
   Widget _buildSliverAppBar() => SliverAppBar(
         expandedHeight: 350,
@@ -158,7 +151,7 @@ class _EventDetailsScreenState extends State<EventDetailsScreen> {
                             vertical: 6,
                           ),
                           decoration: BoxDecoration(
-                            color: const Color(0xFF008037),
+                            color: AppColors.primaryGreen,
                             borderRadius: BorderRadius.circular(16),
                           ),
                           child: Text(
@@ -232,7 +225,7 @@ class _EventDetailsScreenState extends State<EventDetailsScreen> {
           color: Color(0xFFF5F5F5),
           child: Center(
             child: CircularProgressIndicator(
-              valueColor: AlwaysStoppedAnimation(Color(0xFF008037)),
+              valueColor: AlwaysStoppedAnimation(AppColors.primaryGreen),
             ),
           ),
         ),
@@ -244,7 +237,7 @@ class _EventDetailsScreenState extends State<EventDetailsScreen> {
   }
 
   Widget _buildPlaceholderImage() => ColoredBox(
-        color: const Color(0xFF008037),
+        color: AppColors.primaryGreen,
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
@@ -358,12 +351,12 @@ class _EventDetailsScreenState extends State<EventDetailsScreen> {
             Container(
               padding: const EdgeInsets.all(12),
               decoration: BoxDecoration(
-                color: const Color(0xFF008037).withValues(alpha: 0.1),
+                color: AppColors.primaryGreen.withValues(alpha: 0.1),
                 borderRadius: BorderRadius.circular(12),
               ),
               child: const Icon(
                 Icons.calendar_today,
-                color: Color(0xFF008037),
+                color: AppColors.primaryGreen,
                 size: 24,
               ),
             ),
@@ -420,12 +413,12 @@ class _EventDetailsScreenState extends State<EventDetailsScreen> {
                   Container(
                     padding: const EdgeInsets.all(12),
                     decoration: BoxDecoration(
-                      color: const Color(0xFF008037).withValues(alpha: 0.1),
+                      color: AppColors.primaryGreen.withValues(alpha: 0.1),
                       borderRadius: BorderRadius.circular(12),
                     ),
                     child: const Icon(
                       Icons.location_on,
-                      color: Color(0xFF008037),
+                      color: AppColors.primaryGreen,
                       size: 24,
                     ),
                   ),
@@ -529,7 +522,7 @@ class _EventDetailsScreenState extends State<EventDetailsScreen> {
                           style: GoogleFonts.montserrat(
                             fontSize: 14,
                             fontWeight: FontWeight.w600,
-                            color: const Color(0xFF008037),
+                            color: AppColors.primaryGreen,
                           ),
                         ),
                       ),
@@ -567,7 +560,7 @@ class _EventDetailsScreenState extends State<EventDetailsScreen> {
                     style: GoogleFonts.montserrat(
                       fontSize: 14,
                       fontWeight: FontWeight.w600,
-                      color: const Color(0xFF008037),
+                      color: AppColors.primaryGreen,
                     ),
                   ),
                 ),
@@ -607,7 +600,7 @@ class _EventDetailsScreenState extends State<EventDetailsScreen> {
                 height: 56,
                 child: DecoratedBox(
                   decoration: BoxDecoration(
-                    color: const Color(0xFF008037),
+                    color: AppColors.primaryGreen,
                     borderRadius: BorderRadius.circular(20),
                     boxShadow: [
                       BoxShadow(

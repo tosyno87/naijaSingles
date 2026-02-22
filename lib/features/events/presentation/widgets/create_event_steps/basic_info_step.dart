@@ -364,11 +364,11 @@ class _BasicInfoStepState extends State<BasicInfoStep> {
             width: double.infinity,
             padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
             decoration: BoxDecoration(
-              color: AppColors.backgroundColor, // NaijaSingles cream background
+              color: AppColors.backgroundColor, // Afropeep cream background
               borderRadius: BorderRadius.circular(12),
               border: Border.all(
                 color: const Color(0xFF008037)
-                    .withOpacity(0.3), // NaijaSingles green border
+                    .withOpacity(0.3), // Afropeep green border
                 width: 1.5,
               ),
             ),
@@ -382,7 +382,7 @@ class _BasicInfoStepState extends State<BasicInfoStep> {
                   style: GoogleFonts.montserrat(
                     fontSize: 16,
                     color: const Color(0xFF008037)
-                        .withOpacity(0.7), // NaijaSingles green hint
+                        .withOpacity(0.7), // Afropeep green hint
                     fontWeight: FontWeight.w500,
                   ),
                 ),
@@ -393,12 +393,12 @@ class _BasicInfoStepState extends State<BasicInfoStep> {
                 ),
                 icon: const Icon(
                   Icons.keyboard_arrow_down,
-                  color: Color(0xFF008037), // NaijaSingles green icon
+                  color: Color(0xFF008037), // Afropeep green icon
                   size: 24,
                 ),
                 isExpanded: true,
                 dropdownColor:
-                    AppColors.backgroundColor, // NaijaSingles cream dropdown
+                    AppColors.backgroundColor, // Afropeep cream dropdown
                 items: _categories
                     .map(
                       (category) => DropdownMenuItem<String>(
@@ -465,16 +465,16 @@ class _BasicInfoStepState extends State<BasicInfoStep> {
                     hintStyle: GoogleFonts.montserrat(
                       fontSize: 16,
                       color: const Color(0xFF008037)
-                          .withOpacity(0.7), // NaijaSingles green hint
+                          .withOpacity(0.7), // Afropeep green hint
                     ),
                     filled: true,
                     fillColor: AppColors
-                        .backgroundColor, // NaijaSingles cream background
+                        .backgroundColor, // Afropeep cream background
                     border: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(12),
                       borderSide: BorderSide(
                         color: const Color(0xFF008037)
-                            .withOpacity(0.3), // NaijaSingles green border
+                            .withOpacity(0.3), // Afropeep green border
                         width: 1.5,
                       ),
                     ),
@@ -482,7 +482,7 @@ class _BasicInfoStepState extends State<BasicInfoStep> {
                       borderRadius: BorderRadius.circular(12),
                       borderSide: BorderSide(
                         color: const Color(0xFF008037)
-                            .withOpacity(0.3), // NaijaSingles green border
+                            .withOpacity(0.3), // Afropeep green border
                         width: 1.5,
                       ),
                     ),

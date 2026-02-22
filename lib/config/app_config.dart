@@ -3,7 +3,7 @@ import 'secure_config.dart';
 // App Configuration Constants
 class AppConfig {
   // App Information
-  static const String appName = 'NaijaSingles';
+  static const String appName = 'Afropeep';
   static const String appVersion = '1.0.0';
 
   // API Configuration

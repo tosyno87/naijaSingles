@@ -219,7 +219,7 @@ class _UserDOBState extends State<UserDOB> {
 
               // Age requirement note
               const Text(
-                'You must be 18+ to join NaijaSingles',
+                'You must be 18+ to join Afropeep',
                 style: TextStyle(
                   fontSize: 14,
                   color: Color(0xFF9E9E9E),

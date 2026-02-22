@@ -7,7 +7,7 @@ import '../../../../common/routes/route_name.dart';
 import '../../../onboarding/bloc/onboarding_bloc.dart';
 import '../../../onboarding/bloc/onboarding_data.dart';
 
-/// A multi-step onboarding flow with cultural focus for NaijaSingles app.
+/// A multi-step onboarding flow with cultural focus for the Afropeep app.
 ///
 /// This widget provides a 3-screen onboarding experience using PageView
 /// with OnboardingBloc to maintain state across screens.

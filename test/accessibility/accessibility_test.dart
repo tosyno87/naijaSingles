@@ -16,7 +16,7 @@ void main() {
         home: Scaffold(
           body: Column(
             children: [
-              const Text('Welcome to NaijaSingles'),
+              const Text('Welcome to Afropeep'),
               ElevatedButton(
                 onPressed: () {},
                 child: const Text('Get Started'),
@@ -35,7 +35,7 @@ void main() {
       await tester.pumpAndSettle();
 
       // Test semantic labels
-      expect(find.text('Welcome to NaijaSingles'), findsOneWidget);
+      expect(find.text('Welcome to Afropeep'), findsOneWidget);
       expect(find.text('Get Started'), findsOneWidget);
       expect(find.text('Enter your phone number'), findsOneWidget);
       expect(find.text('+1 404 555 0123'), findsOneWidget);
@@ -53,7 +53,7 @@ void main() {
       // Test that navigation is accessible via voice-over
       await tester.pumpWidget(MaterialApp(
         home: Scaffold(
-          appBar: AppBar(title: const Text('NaijaSingles')),
+          appBar: AppBar(title: const Text('Afropeep')),
           body: Column(
             children: [
               ListTile(
@@ -149,7 +149,7 @@ void main() {
           body: Column(
             children: [
               Text(
-                'Welcome to NaijaSingles',
+                'Welcome to Afropeep',
                 style: TextStyle(fontSize: 24),
               ),
               Text(
@@ -168,12 +168,12 @@ void main() {
       await tester.pumpAndSettle();
 
       // Test different font sizes
-      expect(find.text('Welcome to NaijaSingles'), findsOneWidget);
+      expect(find.text('Welcome to Afropeep'), findsOneWidget);
       expect(find.text('Connect with African diaspora'), findsOneWidget);
       expect(find.text('Find meaningful relationships'), findsOneWidget);
 
       // Test that text is readable at different sizes
-      final welcomeText = find.text('Welcome to NaijaSingles');
+      final welcomeText = find.text('Welcome to Afropeep');
       expect(welcomeText, findsOneWidget);
     });
 

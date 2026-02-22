@@ -999,7 +999,7 @@ ${event.description.length > 100 ? '${event.description.substring(0, 100)}...' :
 
 Join me at this amazing event! 🚀
 
-#NaijaSingles #Events #${event.category.replaceAll(' ', '')}
+#Afropeep #Events #${event.category.replaceAll(' ', '')}
     '''
         .trim();
 

@@ -712,9 +712,9 @@ ${widget.event.name}
 📍 ${widget.event.location.displayAddress}
 ${widget.event.isFree ? '🆓 FREE' : '🎫 Paid Event'}
 
-${widget.event.ticketUrl ?? 'More details in NaijaSingles app!'}
+${widget.event.ticketUrl ?? 'More details in the Afropeep app!'}
 
-#NaijaSingles #AfrocentricEvents #${widget.event.category.replaceAll(' ', '')}
+#Afropeep #AfrocentricEvents #${widget.event.category.replaceAll(' ', '')}
 ''';
 
     Share.share(text);

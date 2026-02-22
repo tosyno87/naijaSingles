@@ -125,7 +125,7 @@ class _OnboardingAdditionalPreferencesScreenState
           // Looking For Section
           const SectionHeader(
             title: 'I\'m looking for',
-            subtitle: 'What brings you to NaijaSingles?',
+            subtitle: 'What brings you to Afropeep?',
           ),
           SizedBox(height: isTablet ? 20 : 16),
           ..._buildLookingForOptions(),

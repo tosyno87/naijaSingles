@@ -235,11 +235,11 @@ class _DateTimeStepState extends State<DateTimeStep> {
               padding: const EdgeInsets.all(16),
               decoration: BoxDecoration(
                 color:
-                    AppColors.backgroundColor, // NaijaSingles cream background
+                    AppColors.backgroundColor, // Afropeep cream background
                 borderRadius: BorderRadius.circular(12),
                 border: Border.all(
                   color: const Color(0xFF008037)
-                      .withOpacity(0.3), // NaijaSingles green border
+                      .withOpacity(0.3), // Afropeep green border
                   width: 1.5,
                 ),
               ),
@@ -261,7 +261,7 @@ class _DateTimeStepState extends State<DateTimeStep> {
                         color: selectedDate != null
                             ? const Color(0xFF333333)
                             : const Color(0xFF008037)
-                                .withOpacity(0.7), // NaijaSingles green hint
+                                .withOpacity(0.7), // Afropeep green hint
                       ),
                     ),
                   ),
@@ -296,11 +296,11 @@ class _DateTimeStepState extends State<DateTimeStep> {
               padding: const EdgeInsets.all(16),
               decoration: BoxDecoration(
                 color:
-                    AppColors.backgroundColor, // NaijaSingles cream background
+                    AppColors.backgroundColor, // Afropeep cream background
                 borderRadius: BorderRadius.circular(12),
                 border: Border.all(
                   color: const Color(0xFF008037)
-                      .withOpacity(0.3), // NaijaSingles green border
+                      .withOpacity(0.3), // Afropeep green border
                   width: 1.5,
                 ),
               ),
@@ -322,7 +322,7 @@ class _DateTimeStepState extends State<DateTimeStep> {
                         color: selectedTime != null
                             ? const Color(0xFF333333)
                             : const Color(0xFF008037)
-                                .withOpacity(0.7), // NaijaSingles green hint
+                                .withOpacity(0.7), // Afropeep green hint
                       ),
                     ),
                   ),

@@ -420,9 +420,9 @@ class EventSharingWidget extends StatelessWidget {
 📍 ${event.location.displayAddress.isNotEmpty ? event.location.displayAddress : 'Location TBA'}
 ${event.isFree ? '🆓 FREE EVENT' : '🎫 Paid Event'}
 
-${event.ticketUrl ?? 'Check out NaijaSingles app for more details!'}
+${event.ticketUrl ?? 'Check out the Afropeep app for more details!'}
 
-#NaijaSingles #AfrocentricEvents
+#Afropeep #AfrocentricEvents
 ''';
 
   String _buildDetailedShareText() => '''
@@ -439,9 +439,9 @@ ${event.description.isNotEmpty ? '📝 About:\n${event.description.length > 200 
 
 ${event.rsvpCount > 0 ? '👥 ${event.rsvpCount} people are already going!\n\n' : ''}
 
-Get tickets: ${event.ticketUrl ?? 'Check NaijaSingles app'}
+Get tickets: ${event.ticketUrl ?? 'Check the Afropeep app'}
 
-#NaijaSingles #AfrocentricEvents #${event.category.replaceAll(' ', '')}
+#Afropeep #AfrocentricEvents #${event.category.replaceAll(' ', '')}
 ''';
 
   String _buildSocialShareText() => '''
@@ -451,7 +451,7 @@ Get tickets: ${event.ticketUrl ?? 'Check NaijaSingles app'}
 📍 ${event.location.city ?? 'TBA'}
 ${event.isFree ? '🆓 FREE' : '🎫 Paid'}
 
-#NaijaSingles #AfrocentricEvents #${event.category.replaceAll(' ', '')}
+#Afropeep #AfrocentricEvents #${event.category.replaceAll(' ', '')}
 
 ${event.ticketUrl ?? ''}
 ''';
@@ -464,7 +464,7 @@ ${event.ticketUrl ?? ''}
 📍 ${event.location.city ?? 'TBA'}
 ${event.isFree ? '🆓 FREE' : '🎫 Paid'}
 
-#NaijaSingles #AfrocentricEvents #${event.category.replaceAll(' ', '')}
+#Afropeep #AfrocentricEvents #${event.category.replaceAll(' ', '')}
 ''';
 
     // Twitter has character limit, so truncate if necessary
@@ -475,7 +475,7 @@ ${event.isFree ? '🆓 FREE' : '🎫 Paid'}
 📅 ${DateFormat('MMM d').format(event.startDate)}
 ${event.isFree ? '🆓 FREE' : '🎫 Paid'}
 
-#NaijaSingles #AfrocentricEvents
+#Afropeep #AfrocentricEvents
 ''';
     }
 
@@ -489,7 +489,7 @@ ${event.isFree ? '🆓 FREE' : '🎫 Paid'}
 📍 ${event.location.displayAddress}
 ${event.isFree ? '🆓 FREE EVENT' : '🎫 Paid Event'}
 
-#NaijaSingles #AfrocentricEvents #${event.category.replaceAll(' ', '')} #Event #Culture #Community
+#Afropeep #AfrocentricEvents #${event.category.replaceAll(' ', '')} #Event #Culture #Community
 ''';
 
   String _buildWhatsAppShareText() => '''
@@ -504,9 +504,9 @@ ${event.description.isNotEmpty ? '\n📝 *About:*\n${event.description.length > 
 
 ${event.rsvpCount > 0 ? '👥 *${event.rsvpCount} people are going!*\n' : ''}
 
-Get more details: ${event.ticketUrl ?? 'NaijaSingles app'}
+Get more details: ${event.ticketUrl ?? 'Afropeep app'}
 
-#NaijaSingles #AfrocentricEvents
+#Afropeep #AfrocentricEvents
 ''';
 
   void _showInstagramInstructions(BuildContext context) {

@@ -132,7 +132,7 @@ class _AdditionalInfoOnboardingScreenState
           // Looking For Section
           _buildSectionHeader(
             'I\'m looking for',
-            'What brings you to NaijaSingles?',
+            'What brings you to Afropeep?',
           ),
           SizedBox(height: isTablet ? 20 : 16),
           ..._buildLookingForOptions(),

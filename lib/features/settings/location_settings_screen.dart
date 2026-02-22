@@ -273,7 +273,7 @@ class _LocationSettingsScreenState extends State<LocationSettingsScreen> {
           borderRadius: BorderRadius.circular(16),
           boxShadow: [
             BoxShadow(
-              color: Colors.black.withOpacity(0.06),
+              color: Colors.black.withValues(alpha: 0.06),
               blurRadius: 10,
               offset: const Offset(0, 3),
             ),
@@ -285,7 +285,7 @@ class _LocationSettingsScreenState extends State<LocationSettingsScreen> {
               width: 80,
               height: 80,
               decoration: BoxDecoration(
-                color: primaryColor.withOpacity(0.1),
+                color: primaryColor.withValues(alpha: 0.1),
                 shape: BoxShape.circle,
               ),
               child: const Icon(
@@ -325,7 +325,7 @@ class _LocationSettingsScreenState extends State<LocationSettingsScreen> {
           borderRadius: BorderRadius.circular(16),
           boxShadow: [
             BoxShadow(
-              color: Colors.black.withOpacity(0.06),
+              color: Colors.black.withValues(alpha: 0.06),
               blurRadius: 10,
               offset: const Offset(0, 3),
             ),
@@ -416,7 +416,7 @@ class _LocationSettingsScreenState extends State<LocationSettingsScreen> {
           borderRadius: BorderRadius.circular(16),
           boxShadow: [
             BoxShadow(
-              color: Colors.black.withOpacity(0.06),
+              color: Colors.black.withValues(alpha: 0.06),
               blurRadius: 10,
               offset: const Offset(0, 3),
             ),
@@ -454,7 +454,7 @@ class _LocationSettingsScreenState extends State<LocationSettingsScreen> {
           borderRadius: BorderRadius.circular(16),
           boxShadow: [
             BoxShadow(
-              color: Colors.black.withOpacity(0.06),
+              color: Colors.black.withValues(alpha: 0.06),
               blurRadius: 10,
               offset: const Offset(0, 3),
             ),
@@ -500,7 +500,7 @@ class _LocationSettingsScreenState extends State<LocationSettingsScreen> {
                     max: 62, // 100km = 62 miles
                     divisions: 99,
                     activeColor: primaryColor,
-                    inactiveColor: primaryColor.withOpacity(0.3),
+                    inactiveColor: primaryColor.withValues(alpha: 0.3),
                     onChanged: _allowLocationBasedMatching
                         ? (value) {
                             setState(() => _maxDistance = value);
@@ -512,7 +512,7 @@ class _LocationSettingsScreenState extends State<LocationSettingsScreen> {
                   padding:
                       const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
                   decoration: BoxDecoration(
-                    color: primaryColor.withOpacity(0.1),
+                    color: primaryColor.withValues(alpha: 0.1),
                     borderRadius: BorderRadius.circular(8),
                   ),
                   child: Text(
@@ -544,7 +544,7 @@ class _LocationSettingsScreenState extends State<LocationSettingsScreen> {
           borderRadius: BorderRadius.circular(16),
           boxShadow: [
             BoxShadow(
-              color: Colors.black.withOpacity(0.06),
+              color: Colors.black.withValues(alpha: 0.06),
               blurRadius: 10,
               offset: const Offset(0, 3),
             ),
@@ -588,7 +588,7 @@ class _LocationSettingsScreenState extends State<LocationSettingsScreen> {
             width: 48,
             height: 48,
             decoration: BoxDecoration(
-              color: primaryColor.withOpacity(0.1),
+              color: primaryColor.withValues(alpha: 0.1),
               shape: BoxShape.circle,
             ),
             child: Icon(icon, color: primaryColor, size: 24),
@@ -621,7 +621,7 @@ class _LocationSettingsScreenState extends State<LocationSettingsScreen> {
             value: value,
             onChanged: onChanged,
             activeThumbColor: primaryColor,
-            activeTrackColor: primaryColor.withOpacity(0.3),
+            activeTrackColor: primaryColor.withValues(alpha: 0.3),
           ),
         ],
       );
@@ -629,9 +629,9 @@ class _LocationSettingsScreenState extends State<LocationSettingsScreen> {
   Widget _buildLocationInfoSection() => Container(
         padding: const EdgeInsets.all(16),
         decoration: BoxDecoration(
-          color: primaryColor.withOpacity(0.05),
+          color: primaryColor.withValues(alpha: 0.05),
           borderRadius: BorderRadius.circular(12),
-          border: Border.all(color: primaryColor.withOpacity(0.2)),
+          border: Border.all(color: primaryColor.withValues(alpha: 0.2)),
         ),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,

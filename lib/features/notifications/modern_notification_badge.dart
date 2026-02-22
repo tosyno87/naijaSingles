@@ -174,7 +174,7 @@ class _ModernNotificationBadgeState extends State<ModernNotificationBadge>
           ),
           boxShadow: [
             BoxShadow(
-              color: widget.badgeColor.withOpacity(0.3),
+              color: widget.badgeColor.withValues(alpha: 0.3),
               blurRadius: 4,
               offset: const Offset(0, 2),
             ),
@@ -270,7 +270,7 @@ class _FloatingNotificationBadgeState extends State<FloatingNotificationBadge> {
                   ),
                   boxShadow: [
                     BoxShadow(
-                      color: widget.badgeColor.withOpacity(0.3),
+                      color: widget.badgeColor.withValues(alpha: 0.3),
                       blurRadius: 6,
                       offset: const Offset(0, 2),
                     ),

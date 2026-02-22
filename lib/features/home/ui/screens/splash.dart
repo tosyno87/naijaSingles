@@ -151,7 +151,7 @@ class SplashState extends State<Splash> {
                       end: Alignment.bottomCenter,
                       colors: [
                         backgroundColor,
-                        const Color(0xFF27A957).withOpacity(
+                        const Color(0xFF27A957).withValues(alpha: 
                             0.1), // Very subtle green tint at bottom
                       ],
                       stops: const [0.7, 1.0],
@@ -200,7 +200,7 @@ class SplashState extends State<Splash> {
                     strokeWidth: 2.5,
                     valueColor: AlwaysStoppedAnimation<Color>(
                       primaryGreen
-                          .withOpacity(0.6), // Soft green, not too prominent
+                          .withValues(alpha: 0.6), // Soft green, not too prominent
                     ),
                   ),
                 ),

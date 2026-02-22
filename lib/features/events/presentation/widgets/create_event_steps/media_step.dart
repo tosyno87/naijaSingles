@@ -64,7 +64,7 @@ class _MediaStepState extends State<MediaStep> {
           color: AppColors.backgroundColor,
           borderRadius: BorderRadius.circular(12),
           border: Border.all(
-            color: const Color(0xFF008037).withOpacity(0.3),
+            color: const Color(0xFF008037).withValues(alpha: 0.3),
             width: 1.5,
           ),
         ),
@@ -98,7 +98,7 @@ class _MediaStepState extends State<MediaStep> {
               onPressed: _isProcessingImage ? null : _selectImages,
               style: ElevatedButton.styleFrom(
                 backgroundColor: _isProcessingImage
-                    ? const Color(0xFF008037).withOpacity(0.6)
+                    ? const Color(0xFF008037).withValues(alpha: 0.6)
                     : const Color(0xFF008037),
                 foregroundColor: Colors.white,
                 padding:
@@ -211,7 +211,7 @@ class _MediaStepState extends State<MediaStep> {
         borderRadius: BorderRadius.circular(16),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.08),
+            color: Colors.black.withValues(alpha: 0.08),
             blurRadius: 12,
             offset: const Offset(0, 4),
           ),
@@ -288,7 +288,7 @@ class _MediaStepState extends State<MediaStep> {
                     padding:
                         const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
                     decoration: BoxDecoration(
-                      color: Colors.black.withOpacity(0.7),
+                      color: Colors.black.withValues(alpha: 0.7),
                       borderRadius: BorderRadius.circular(12),
                     ),
                     child: Row(
@@ -366,7 +366,7 @@ class _MediaStepState extends State<MediaStep> {
         decoration: BoxDecoration(
           borderRadius: BorderRadius.circular(8),
           border: Border.all(
-            color: const Color(0xFF008037).withOpacity(0.3),
+            color: const Color(0xFF008037).withValues(alpha: 0.3),
             width: 1.5,
           ),
         ),
@@ -419,7 +419,7 @@ class _MediaStepState extends State<MediaStep> {
                       height: 24,
                       decoration: BoxDecoration(
                         color: _isProcessingImage
-                            ? const Color(0xFF008037).withOpacity(0.6)
+                            ? const Color(0xFF008037).withValues(alpha: 0.6)
                             : const Color(0xFF008037),
                         borderRadius: BorderRadius.circular(12),
                       ),

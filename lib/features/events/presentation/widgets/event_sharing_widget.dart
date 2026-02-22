@@ -71,7 +71,7 @@ class EventSharingWidget extends StatelessWidget {
           color: AppColors.backgroundColor,
           borderRadius: BorderRadius.circular(12),
           border: Border.all(
-            color: const Color(0xFF008037).withOpacity(0.2),
+            color: const Color(0xFF008037).withValues(alpha: 0.2),
           ),
         ),
         child: Column(
@@ -134,7 +134,7 @@ class EventSharingWidget extends StatelessWidget {
               Container(
                 padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
                 decoration: BoxDecoration(
-                  color: const Color(0xFF4CAF50).withOpacity(0.1),
+                  color: const Color(0xFF4CAF50).withValues(alpha: 0.1),
                   borderRadius: BorderRadius.circular(12),
                 ),
                 child: Text(
@@ -223,7 +223,7 @@ class EventSharingWidget extends StatelessWidget {
               Container(
                 padding: const EdgeInsets.all(12),
                 decoration: BoxDecoration(
-                  color: const Color(0xFF008037).withOpacity(0.1),
+                  color: const Color(0xFF008037).withValues(alpha: 0.1),
                   borderRadius: BorderRadius.circular(12),
                 ),
                 child: Icon(
@@ -313,7 +313,7 @@ class EventSharingWidget extends StatelessWidget {
             Container(
               padding: const EdgeInsets.all(12),
               decoration: BoxDecoration(
-                color: color.withOpacity(0.1),
+                color: color.withValues(alpha: 0.1),
                 borderRadius: BorderRadius.circular(12),
               ),
               child: Icon(
@@ -336,7 +336,7 @@ class EventSharingWidget extends StatelessWidget {
 
   void _shareGeneral(BuildContext context) {
     final shareText = _buildShareText();
-    Share.share(shareText);
+    SharePlus.instance.share(ShareParams(text: shareText));
     Navigator.pop(context);
   }
 
@@ -363,22 +363,22 @@ class EventSharingWidget extends StatelessWidget {
 
   void _shareText(BuildContext context) {
     final shareText = _buildDetailedShareText();
-    Share.share(shareText);
+    SharePlus.instance.share(ShareParams(text: shareText));
     Navigator.pop(context);
   }
 
   void _shareWithImage(BuildContext context) {
     if (event.imageUrl != null && event.imageUrl!.isNotEmpty) {
-      Share.shareXFiles(
-        [
+      SharePlus.instance.share(ShareParams(
+        text: _buildShareText(),
+        files: [
           XFile.fromData(
             Uint8List(0), // Placeholder - would need to download image
             name: 'event_image.jpg',
             mimeType: 'image/jpeg',
           ),
         ],
-        text: _buildShareText(),
-      );
+      ));
     } else {
       _shareText(context);
     }
@@ -387,13 +387,13 @@ class EventSharingWidget extends StatelessWidget {
 
   void _shareToFacebook(BuildContext context) {
     final shareText = _buildSocialShareText();
-    Share.share(shareText);
+    SharePlus.instance.share(ShareParams(text: shareText));
     Navigator.pop(context);
   }
 
   void _shareToTwitter(BuildContext context) {
     final shareText = _buildTwitterShareText();
-    Share.share(shareText);
+    SharePlus.instance.share(ShareParams(text: shareText));
     Navigator.pop(context);
   }
 
@@ -409,7 +409,7 @@ class EventSharingWidget extends StatelessWidget {
 
   void _shareToWhatsApp(BuildContext context) {
     final shareText = _buildWhatsAppShareText();
-    Share.share(shareText);
+    SharePlus.instance.share(ShareParams(text: shareText));
     Navigator.pop(context);
   }
 

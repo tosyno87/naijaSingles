@@ -454,9 +454,9 @@ class _CreateGroupScreenState extends State<CreateGroupScreen> {
                           color: AppColors.primaryGreen,
                         ),
                       ),
-                      backgroundColor: AppColors.primaryGreen.withOpacity(0.1),
+                      backgroundColor: AppColors.primaryGreen.withValues(alpha: 0.1),
                       side: BorderSide(
-                        color: AppColors.primaryGreen.withOpacity(0.3),
+                        color: AppColors.primaryGreen.withValues(alpha: 0.3),
                       ),
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(16),
@@ -690,7 +690,7 @@ class _CreateGroupScreenState extends State<CreateGroupScreen> {
           color: Colors.white,
           boxShadow: [
             BoxShadow(
-              color: Colors.black.withOpacity(0.1),
+              color: Colors.black.withValues(alpha: 0.1),
               blurRadius: 10,
               offset: const Offset(0, -2),
             ),

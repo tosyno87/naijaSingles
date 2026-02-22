@@ -151,7 +151,7 @@ class _GroupListScreenState extends State<GroupListScreen> {
           borderRadius: BorderRadius.circular(12),
           boxShadow: [
             BoxShadow(
-              color: Colors.grey.withOpacity(0.1),
+              color: Colors.grey.withValues(alpha: 0.1),
               blurRadius: 4,
               offset: const Offset(0, 2),
             ),
@@ -226,7 +226,7 @@ class _GroupListScreenState extends State<GroupListScreen> {
   Widget _buildGroupTypeChip(GroupType type) => Container(
         padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
         decoration: BoxDecoration(
-          color: _getGroupTypeColor(type).withOpacity(0.1),
+          color: _getGroupTypeColor(type).withValues(alpha: 0.1),
           borderRadius: BorderRadius.circular(8),
         ),
         child: Text(

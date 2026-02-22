@@ -48,7 +48,7 @@ class _HingeProfileCardState extends State<HingeProfileCard> {
         borderRadius: BorderRadius.circular(20),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.08),
+            color: Colors.black.withValues(alpha: 0.08),
             blurRadius: 20,
             offset: const Offset(0, 4),
           ),
@@ -246,7 +246,7 @@ class _HingeProfileCardState extends State<HingeProfileCard> {
                           decoration: BoxDecoration(
                             color: dotIndex == _currentPhotoIndex
                                 ? Colors.white
-                                : Colors.white.withOpacity(0.5),
+                                : Colors.white.withValues(alpha: 0.5),
                             shape: BoxShape.circle,
                           ),
                         ),
@@ -480,10 +480,10 @@ class _HingeProfileCardState extends State<HingeProfileCard> {
                       padding: const EdgeInsets.symmetric(
                           horizontal: 16, vertical: 10),
                       decoration: BoxDecoration(
-                        color: AppColors.primaryGreen.withOpacity(0.1),
+                        color: AppColors.primaryGreen.withValues(alpha: 0.1),
                         borderRadius: BorderRadius.circular(20),
                         border: Border.all(
-                          color: AppColors.primaryGreen.withOpacity(0.3),
+                          color: AppColors.primaryGreen.withValues(alpha: 0.3),
                         ),
                       ),
                       child: Text(

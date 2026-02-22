@@ -410,7 +410,7 @@ class _AdvancedSettingsStepState extends State<AdvancedSettingsStep> {
               statusBarColor: Colors.black,
               hideBottomControls: false,
               showCropGrid: true,
-              cropGridColor: Colors.white.withOpacity(0.5),
+              cropGridColor: Colors.white.withValues(alpha: 0.5),
               cropFrameColor: Colors.white,
               cropFrameStrokeWidth: 2,
               cropGridStrokeWidth: 1,

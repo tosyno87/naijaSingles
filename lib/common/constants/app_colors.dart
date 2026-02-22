@@ -147,7 +147,7 @@ class AppColors {
 
   static List<BoxShadow> get buttonShadow => [
         BoxShadow(
-          color: primaryGreen.withOpacity(0.3),
+          color: primaryGreen.withValues(alpha: 0.3),
           blurRadius: 15,
           offset: const Offset(0, 6),
         ),

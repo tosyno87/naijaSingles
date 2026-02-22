@@ -391,7 +391,7 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
               child: FloatingActionButton(
                 heroTag: 'analysis_fab',
                 mini: true,
-                backgroundColor: Colors.blue.withOpacity(0.8),
+                backgroundColor: Colors.blue.withValues(alpha: 0.8),
                 child:
                     const Icon(Icons.analytics, color: Colors.white, size: 16),
                 onPressed: () => _runUserAnalysis(context),

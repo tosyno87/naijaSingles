@@ -157,8 +157,8 @@ class _BasicInfoStepState extends State<BasicInfoStep> {
               padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
               decoration: BoxDecoration(
                 color: _isNameValid
-                    ? const Color(0xFF008037).withOpacity(0.1)
-                    : Colors.red.withOpacity(0.1),
+                    ? const Color(0xFF008037).withValues(alpha: 0.1)
+                    : Colors.red.withValues(alpha: 0.1),
                 borderRadius: BorderRadius.circular(12),
                 border: Border.all(
                   color: _isNameValid ? const Color(0xFF008037) : Colors.red,
@@ -188,7 +188,7 @@ class _BasicInfoStepState extends State<BasicInfoStep> {
                 'e.g., "Lagos Singles Mixer Night" or "Tech Networking Brunch"',
             hintStyle: GoogleFonts.montserrat(
               fontSize: 14,
-              color: const Color(0xFF008037).withOpacity(0.6),
+              color: const Color(0xFF008037).withValues(alpha: 0.6),
             ),
             filled: true,
             fillColor: AppColors.backgroundColor,
@@ -196,8 +196,8 @@ class _BasicInfoStepState extends State<BasicInfoStep> {
               borderRadius: BorderRadius.circular(12),
               borderSide: BorderSide(
                 color: _isNameValid
-                    ? const Color(0xFF008037).withOpacity(0.3)
-                    : Colors.red.withOpacity(0.5),
+                    ? const Color(0xFF008037).withValues(alpha: 0.3)
+                    : Colors.red.withValues(alpha: 0.5),
                 width: 1.5,
               ),
             ),
@@ -205,8 +205,8 @@ class _BasicInfoStepState extends State<BasicInfoStep> {
               borderRadius: BorderRadius.circular(12),
               borderSide: BorderSide(
                 color: _isNameValid
-                    ? const Color(0xFF008037).withOpacity(0.3)
-                    : Colors.red.withOpacity(0.5),
+                    ? const Color(0xFF008037).withValues(alpha: 0.3)
+                    : Colors.red.withValues(alpha: 0.5),
                 width: 1.5,
               ),
             ),
@@ -220,7 +220,7 @@ class _BasicInfoStepState extends State<BasicInfoStep> {
             contentPadding: const EdgeInsets.all(16),
             counterStyle: GoogleFonts.montserrat(
               fontSize: 12,
-              color: const Color(0xFF008037).withOpacity(0.7),
+              color: const Color(0xFF008037).withValues(alpha: 0.7),
             ),
           ),
         ),
@@ -260,8 +260,8 @@ class _BasicInfoStepState extends State<BasicInfoStep> {
               padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
               decoration: BoxDecoration(
                 color: _isDescriptionValid
-                    ? const Color(0xFF008037).withOpacity(0.1)
-                    : Colors.red.withOpacity(0.1),
+                    ? const Color(0xFF008037).withValues(alpha: 0.1)
+                    : Colors.red.withValues(alpha: 0.1),
                 borderRadius: BorderRadius.circular(12),
                 border: Border.all(
                   color: _isDescriptionValid
@@ -296,7 +296,7 @@ class _BasicInfoStepState extends State<BasicInfoStep> {
                 'Describe your event in detail. What can attendees expect?\n\nExample: Join us for an exciting evening of networking and fun! We\'ll have great music, delicious food, and opportunities to meet amazing people.',
             hintStyle: GoogleFonts.montserrat(
               fontSize: 14,
-              color: const Color(0xFF008037).withOpacity(0.6),
+              color: const Color(0xFF008037).withValues(alpha: 0.6),
             ),
             filled: true,
             fillColor: AppColors.backgroundColor,
@@ -304,8 +304,8 @@ class _BasicInfoStepState extends State<BasicInfoStep> {
               borderRadius: BorderRadius.circular(12),
               borderSide: BorderSide(
                 color: _isDescriptionValid
-                    ? const Color(0xFF008037).withOpacity(0.3)
-                    : Colors.red.withOpacity(0.5),
+                    ? const Color(0xFF008037).withValues(alpha: 0.3)
+                    : Colors.red.withValues(alpha: 0.5),
                 width: 1.5,
               ),
             ),
@@ -313,8 +313,8 @@ class _BasicInfoStepState extends State<BasicInfoStep> {
               borderRadius: BorderRadius.circular(12),
               borderSide: BorderSide(
                 color: _isDescriptionValid
-                    ? const Color(0xFF008037).withOpacity(0.3)
-                    : Colors.red.withOpacity(0.5),
+                    ? const Color(0xFF008037).withValues(alpha: 0.3)
+                    : Colors.red.withValues(alpha: 0.5),
                 width: 1.5,
               ),
             ),
@@ -329,7 +329,7 @@ class _BasicInfoStepState extends State<BasicInfoStep> {
             contentPadding: const EdgeInsets.all(16),
             counterStyle: GoogleFonts.montserrat(
               fontSize: 12,
-              color: const Color(0xFF008037).withOpacity(0.7),
+              color: const Color(0xFF008037).withValues(alpha: 0.7),
             ),
           ),
         ),
@@ -368,7 +368,7 @@ class _BasicInfoStepState extends State<BasicInfoStep> {
               borderRadius: BorderRadius.circular(12),
               border: Border.all(
                 color: const Color(0xFF008037)
-                    .withOpacity(0.3), // Afropeep green border
+                    .withValues(alpha: 0.3), // Afropeep green border
                 width: 1.5,
               ),
             ),
@@ -382,7 +382,7 @@ class _BasicInfoStepState extends State<BasicInfoStep> {
                   style: GoogleFonts.montserrat(
                     fontSize: 16,
                     color: const Color(0xFF008037)
-                        .withOpacity(0.7), // Afropeep green hint
+                        .withValues(alpha: 0.7), // Afropeep green hint
                     fontWeight: FontWeight.w500,
                   ),
                 ),
@@ -465,7 +465,7 @@ class _BasicInfoStepState extends State<BasicInfoStep> {
                     hintStyle: GoogleFonts.montserrat(
                       fontSize: 16,
                       color: const Color(0xFF008037)
-                          .withOpacity(0.7), // Afropeep green hint
+                          .withValues(alpha: 0.7), // Afropeep green hint
                     ),
                     filled: true,
                     fillColor: AppColors
@@ -474,7 +474,7 @@ class _BasicInfoStepState extends State<BasicInfoStep> {
                       borderRadius: BorderRadius.circular(12),
                       borderSide: BorderSide(
                         color: const Color(0xFF008037)
-                            .withOpacity(0.3), // Afropeep green border
+                            .withValues(alpha: 0.3), // Afropeep green border
                         width: 1.5,
                       ),
                     ),
@@ -482,7 +482,7 @@ class _BasicInfoStepState extends State<BasicInfoStep> {
                       borderRadius: BorderRadius.circular(12),
                       borderSide: BorderSide(
                         color: const Color(0xFF008037)
-                            .withOpacity(0.3), // Afropeep green border
+                            .withValues(alpha: 0.3), // Afropeep green border
                         width: 1.5,
                       ),
                     ),
@@ -535,10 +535,10 @@ class _BasicInfoStepState extends State<BasicInfoStep> {
                       padding: const EdgeInsets.symmetric(
                           horizontal: 12, vertical: 6),
                       decoration: BoxDecoration(
-                        color: const Color(0xFF008037).withOpacity(0.1),
+                        color: const Color(0xFF008037).withValues(alpha: 0.1),
                         borderRadius: BorderRadius.circular(20),
                         border: Border.all(
-                          color: const Color(0xFF008037).withOpacity(0.3),
+                          color: const Color(0xFF008037).withValues(alpha: 0.3),
                         ),
                       ),
                       child: Row(

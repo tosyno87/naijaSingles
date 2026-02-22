@@ -70,7 +70,7 @@ class EnhancedEventCard extends StatelessWidget {
             borderRadius: BorderRadius.circular(16),
             boxShadow: [
               BoxShadow(
-                color: Colors.black.withOpacity(0.08),
+                color: Colors.black.withValues(alpha: 0.08),
                 blurRadius: 12,
                 offset: const Offset(0, 4),
               ),
@@ -166,7 +166,7 @@ class EnhancedEventCard extends StatelessWidget {
                       padding: const EdgeInsets.symmetric(
                           horizontal: 8, vertical: 4),
                       decoration: BoxDecoration(
-                        color: Colors.blue.withOpacity(0.9),
+                        color: Colors.blue.withValues(alpha: 0.9),
                         borderRadius: BorderRadius.circular(12),
                       ),
                       child: Row(
@@ -195,7 +195,7 @@ class EnhancedEventCard extends StatelessWidget {
                       padding: const EdgeInsets.symmetric(
                           horizontal: 8, vertical: 4),
                       decoration: BoxDecoration(
-                        color: Colors.purple.withOpacity(0.9),
+                        color: Colors.purple.withValues(alpha: 0.9),
                         borderRadius: BorderRadius.circular(12),
                       ),
                       child: Row(
@@ -232,7 +232,7 @@ class EnhancedEventCard extends StatelessWidget {
                   padding:
                       const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
                   decoration: BoxDecoration(
-                    color: Colors.orange.withOpacity(0.9),
+                    color: Colors.orange.withValues(alpha: 0.9),
                     borderRadius: BorderRadius.circular(12),
                   ),
                   child: Text(
@@ -253,7 +253,7 @@ class EnhancedEventCard extends StatelessWidget {
                   padding:
                       const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
                   decoration: BoxDecoration(
-                    color: Colors.green.withOpacity(0.9),
+                    color: Colors.green.withValues(alpha: 0.9),
                     borderRadius: BorderRadius.circular(12),
                   ),
                   child: Text(
@@ -278,7 +278,7 @@ class EnhancedEventCard extends StatelessWidget {
               Container(
                 padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
                 decoration: BoxDecoration(
-                  color: const Color(0xFF008037).withOpacity(0.1),
+                  color: const Color(0xFF008037).withValues(alpha: 0.1),
                   borderRadius: BorderRadius.circular(6),
                 ),
                 child: Text(

@@ -163,7 +163,7 @@ class _MyEventsScreenState extends State<MyEventsScreen>
             // Loading overlay during delete operations
             if (_isDeleting)
               ColoredBox(
-                color: Colors.black.withOpacity(0.3),
+                color: Colors.black.withValues(alpha: 0.3),
                 child: const Center(
                   child: Card(
                     child: Padding(
@@ -260,7 +260,7 @@ class _MyEventsScreenState extends State<MyEventsScreen>
           borderRadius: BorderRadius.circular(12),
           boxShadow: [
             BoxShadow(
-              color: Colors.black.withOpacity(0.05),
+              color: Colors.black.withValues(alpha: 0.05),
               blurRadius: 10,
               offset: const Offset(0, 2),
             ),
@@ -465,7 +465,7 @@ class _MyEventsScreenState extends State<MyEventsScreen>
               width: 60,
               height: 60,
               decoration: BoxDecoration(
-                color: const Color(0xFF008037).withOpacity(0.1),
+                color: const Color(0xFF008037).withValues(alpha: 0.1),
                 borderRadius: BorderRadius.circular(30),
               ),
               child: const Center(
@@ -567,8 +567,8 @@ class _MyEventsScreenState extends State<MyEventsScreen>
                     begin: Alignment.topLeft,
                     end: Alignment.bottomRight,
                     colors: [
-                      const Color(0xFF008037).withOpacity(0.1),
-                      const Color(0xFF008037).withOpacity(0.05),
+                      const Color(0xFF008037).withValues(alpha: 0.1),
+                      const Color(0xFF008037).withValues(alpha: 0.05),
                     ],
                   ),
                   borderRadius: BorderRadius.circular(60),
@@ -612,7 +612,7 @@ class _MyEventsScreenState extends State<MyEventsScreen>
                     color: const Color(0xFFF8F9FA),
                     borderRadius: BorderRadius.circular(12),
                     border: Border.all(
-                      color: const Color(0xFF008037).withOpacity(0.1),
+                      color: const Color(0xFF008037).withValues(alpha: 0.1),
                     ),
                   ),
                   child: Column(
@@ -778,7 +778,7 @@ class _MyEventsScreenState extends State<MyEventsScreen>
             Container(
               padding: const EdgeInsets.all(8),
               decoration: BoxDecoration(
-                color: Colors.red.withOpacity(0.1),
+                color: Colors.red.withValues(alpha: 0.1),
                 borderRadius: BorderRadius.circular(8),
               ),
               child: const Icon(
@@ -900,7 +900,7 @@ class _MyEventsScreenState extends State<MyEventsScreen>
             Container(
               padding: const EdgeInsets.all(8),
               decoration: BoxDecoration(
-                color: const Color(0xFF008037).withOpacity(0.1),
+                color: const Color(0xFF008037).withValues(alpha: 0.1),
                 borderRadius: BorderRadius.circular(8),
               ),
               child: const Icon(
@@ -1069,7 +1069,7 @@ Join me at this amazing event! 🚀
                   Container(
                     padding: const EdgeInsets.all(8),
                     decoration: BoxDecoration(
-                      color: const Color(0xFF008037).withOpacity(0.1),
+                      color: const Color(0xFF008037).withValues(alpha: 0.1),
                       borderRadius: BorderRadius.circular(8),
                     ),
                     child: const Icon(
@@ -1224,9 +1224,9 @@ Join me at this amazing event! 🚀
       Container(
         padding: const EdgeInsets.all(16),
         decoration: BoxDecoration(
-          color: color.withOpacity(0.1),
+          color: color.withValues(alpha: 0.1),
           borderRadius: BorderRadius.circular(12),
-          border: Border.all(color: color.withOpacity(0.2)),
+          border: Border.all(color: color.withValues(alpha: 0.2)),
         ),
         child: Column(
           children: [

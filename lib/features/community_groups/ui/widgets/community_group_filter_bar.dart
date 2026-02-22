@@ -123,7 +123,7 @@ class CommunityGroupFilterBar extends StatelessWidget {
           boxShadow: isSelected
               ? [
                   BoxShadow(
-                    color: const Color(0xFF008037).withOpacity(0.2),
+                    color: const Color(0xFF008037).withValues(alpha: 0.2),
                     blurRadius: 4,
                     offset: const Offset(0, 2),
                   ),

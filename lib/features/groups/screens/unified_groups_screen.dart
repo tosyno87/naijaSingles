@@ -566,7 +566,7 @@ class _UnifiedGroupsScreenState extends State<UnifiedGroupsScreen>
           borderRadius: BorderRadius.circular(12),
           boxShadow: [
             BoxShadow(
-              color: Colors.grey.withOpacity(0.1),
+              color: Colors.grey.withValues(alpha: 0.1),
               blurRadius: 4,
               offset: const Offset(0, 2),
             ),
@@ -674,7 +674,7 @@ class _UnifiedGroupsScreenState extends State<UnifiedGroupsScreen>
   Widget _buildTypeChip(GroupType type) => Container(
         padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
         decoration: BoxDecoration(
-          color: _getTypeColor(type).withOpacity(0.1),
+          color: _getTypeColor(type).withValues(alpha: 0.1),
           borderRadius: BorderRadius.circular(8),
         ),
         child: Text(
@@ -730,7 +730,7 @@ class _UnifiedGroupsScreenState extends State<UnifiedGroupsScreen>
                   shape: BoxShape.circle,
                   boxShadow: [
                     BoxShadow(
-                      color: Colors.black.withOpacity(0.05),
+                      color: Colors.black.withValues(alpha: 0.05),
                       blurRadius: 10,
                       offset: const Offset(0, 2),
                     ),

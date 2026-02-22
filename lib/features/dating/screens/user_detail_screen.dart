@@ -49,11 +49,11 @@ class _UserDetailScreenState extends State<UserDetailScreen> {
         leading: Container(
           margin: const EdgeInsets.all(8),
           decoration: BoxDecoration(
-            color: Colors.black.withOpacity(0.7),
+            color: Colors.black.withValues(alpha: 0.7),
             shape: BoxShape.circle,
             boxShadow: [
               BoxShadow(
-                color: Colors.black.withOpacity(0.3),
+                color: Colors.black.withValues(alpha: 0.3),
                 blurRadius: 8,
                 offset: const Offset(0, 2),
               ),
@@ -67,11 +67,11 @@ class _UserDetailScreenState extends State<UserDetailScreen> {
         title: Container(
           padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
           decoration: BoxDecoration(
-            color: Colors.black.withOpacity(0.7),
+            color: Colors.black.withValues(alpha: 0.7),
             borderRadius: BorderRadius.circular(20),
             boxShadow: [
               BoxShadow(
-                color: Colors.black.withOpacity(0.3),
+                color: Colors.black.withValues(alpha: 0.3),
                 blurRadius: 8,
                 offset: const Offset(0, 2),
               ),
@@ -108,7 +108,7 @@ class _UserDetailScreenState extends State<UserDetailScreen> {
                 ),
                 boxShadow: [
                   BoxShadow(
-                    color: Colors.black.withOpacity(0.1),
+                    color: Colors.black.withValues(alpha: 0.1),
                     blurRadius: 10,
                     offset: const Offset(0, -5),
                   ),
@@ -259,11 +259,11 @@ class _UserDetailScreenState extends State<UserDetailScreen> {
                   decoration: BoxDecoration(
                     color: index == _currentPhotoIndex
                         ? Colors.white
-                        : Colors.white.withOpacity(0.6),
+                        : Colors.white.withValues(alpha: 0.6),
                     borderRadius: BorderRadius.circular(2),
                     boxShadow: [
                       BoxShadow(
-                        color: Colors.black.withOpacity(0.3),
+                        color: Colors.black.withValues(alpha: 0.3),
                         blurRadius: 4,
                         offset: const Offset(0, 1),
                       ),
@@ -282,14 +282,14 @@ class _UserDetailScreenState extends State<UserDetailScreen> {
             child: Container(
               padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
               decoration: BoxDecoration(
-                color: Colors.black.withOpacity(0.8), // Increased opacity
+                color: Colors.black.withValues(alpha: 0.8), // Increased opacity
                 borderRadius: BorderRadius.circular(20),
                 border: Border.all(
-                  color: Colors.white.withOpacity(0.2),
+                  color: Colors.white.withValues(alpha: 0.2),
                 ),
                 boxShadow: [
                   BoxShadow(
-                    color: Colors.black.withOpacity(0.3),
+                    color: Colors.black.withValues(alpha: 0.3),
                     blurRadius: 8,
                     offset: const Offset(0, 2),
                   ),
@@ -305,7 +305,7 @@ class _UserDetailScreenState extends State<UserDetailScreen> {
                     Shadow(
                       offset: const Offset(0, 1),
                       blurRadius: 2,
-                      color: Colors.black.withOpacity(0.8),
+                      color: Colors.black.withValues(alpha: 0.8),
                     ),
                   ],
                 ),
@@ -340,9 +340,9 @@ class _UserDetailScreenState extends State<UserDetailScreen> {
                     padding:
                         const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
                     decoration: BoxDecoration(
-                      color: afropeepGreen.withOpacity(0.1),
+                      color: afropeepGreen.withValues(alpha: 0.1),
                       borderRadius: BorderRadius.circular(16),
-                      border: Border.all(color: afropeepGreen.withOpacity(0.3)),
+                      border: Border.all(color: afropeepGreen.withValues(alpha: 0.3)),
                     ),
                     child: Text(
                       '🇳🇬 ${widget.user.nationality}',
@@ -360,9 +360,9 @@ class _UserDetailScreenState extends State<UserDetailScreen> {
                     padding:
                         const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
                     decoration: BoxDecoration(
-                      color: afropeepGreen.withOpacity(0.1),
+                      color: afropeepGreen.withValues(alpha: 0.1),
                       borderRadius: BorderRadius.circular(16),
-                      border: Border.all(color: afropeepGreen.withOpacity(0.3)),
+                      border: Border.all(color: afropeepGreen.withValues(alpha: 0.3)),
                     ),
                     child: Text(
                       '🏛️ ${widget.user.tribe}',
@@ -406,9 +406,9 @@ class _UserDetailScreenState extends State<UserDetailScreen> {
                   padding:
                       const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
                   decoration: BoxDecoration(
-                    color: afropeepGreen.withOpacity(0.1),
+                    color: afropeepGreen.withValues(alpha: 0.1),
                     borderRadius: BorderRadius.circular(16),
-                    border: Border.all(color: afropeepGreen.withOpacity(0.3)),
+                    border: Border.all(color: afropeepGreen.withValues(alpha: 0.3)),
                   ),
                   child: Text(
                     '${widget.user.distanceBW} miles away',
@@ -532,9 +532,9 @@ class _UserDetailScreenState extends State<UserDetailScreen> {
                   padding:
                       const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
                   decoration: BoxDecoration(
-                    color: afropeepGreen.withOpacity(0.1),
+                    color: afropeepGreen.withValues(alpha: 0.1),
                     borderRadius: BorderRadius.circular(20),
-                    border: Border.all(color: afropeepGreen.withOpacity(0.3)),
+                    border: Border.all(color: afropeepGreen.withValues(alpha: 0.3)),
                   ),
                   child: Text(
                     interest,
@@ -615,7 +615,7 @@ class _UserDetailScreenState extends State<UserDetailScreen> {
             Container(
               padding: const EdgeInsets.all(8),
               decoration: BoxDecoration(
-                color: afropeepGreen.withOpacity(0.1),
+                color: afropeepGreen.withValues(alpha: 0.1),
                 shape: BoxShape.circle,
               ),
               child: Icon(
@@ -816,7 +816,7 @@ class _FullScreenPhotoViewerState extends State<_FullScreenPhotoViewer> {
                       decoration: BoxDecoration(
                         color: index == _currentIndex
                             ? Colors.white
-                            : Colors.white.withOpacity(0.5),
+                            : Colors.white.withValues(alpha: 0.5),
                         borderRadius: BorderRadius.circular(4),
                       ),
                     ),

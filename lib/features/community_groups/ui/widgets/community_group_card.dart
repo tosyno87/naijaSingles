@@ -19,7 +19,7 @@ class CommunityGroupCard extends StatelessWidget {
           borderRadius: BorderRadius.circular(16),
           boxShadow: [
             BoxShadow(
-              color: Colors.black.withOpacity(0.05),
+              color: Colors.black.withValues(alpha: 0.05),
               blurRadius: 10,
               offset: const Offset(0, 4),
             ),
@@ -38,8 +38,8 @@ class CommunityGroupCard extends StatelessWidget {
                 ),
                 gradient: LinearGradient(
                   colors: [
-                    const Color(0xFF008037).withOpacity(0.8),
-                    const Color(0xFF4CAF50).withOpacity(0.6),
+                    const Color(0xFF008037).withValues(alpha: 0.8),
+                    const Color(0xFF4CAF50).withValues(alpha: 0.6),
                   ],
                   begin: Alignment.topLeft,
                   end: Alignment.bottomRight,
@@ -71,7 +71,7 @@ class CommunityGroupCard extends StatelessWidget {
                               vertical: 4,
                             ),
                             decoration: BoxDecoration(
-                              color: Colors.white.withOpacity(0.2),
+                              color: Colors.white.withValues(alpha: 0.2),
                               borderRadius: BorderRadius.circular(12),
                             ),
                             child: Row(
@@ -134,7 +134,7 @@ class CommunityGroupCard extends StatelessWidget {
                               vertical: 4,
                             ),
                             decoration: BoxDecoration(
-                              color: const Color(0xFF008037).withOpacity(0.1),
+                              color: const Color(0xFF008037).withValues(alpha: 0.1),
                               borderRadius: BorderRadius.circular(12),
                             ),
                             child: Text(

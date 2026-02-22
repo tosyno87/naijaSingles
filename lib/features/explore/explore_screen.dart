@@ -140,7 +140,7 @@ class _ExploreScreenState extends State<ExploreScreen> {
               Icon(
                 Icons.error_outline,
                 size: 60,
-                color: AppColors.error.withOpacity(0.5),
+                color: AppColors.error.withValues(alpha: 0.5),
               ),
               const SizedBox(height: 16),
               Text(
@@ -177,7 +177,7 @@ class _ExploreScreenState extends State<ExploreScreen> {
               Icon(
                 Icons.person_off,
                 size: 60,
-                color: AppColors.textSecondary.withOpacity(0.5),
+                color: AppColors.textSecondary.withValues(alpha: 0.5),
               ),
               const SizedBox(height: 16),
               Text(

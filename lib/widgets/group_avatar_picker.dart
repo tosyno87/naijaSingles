@@ -43,7 +43,7 @@ class _GroupAvatarPickerState extends State<GroupAvatarPicker> {
                 ),
                 boxShadow: [
                   BoxShadow(
-                    color: Colors.grey.withOpacity(0.2),
+                    color: Colors.grey.withValues(alpha: 0.2),
                     blurRadius: 8,
                     offset: const Offset(0, 4),
                   ),
@@ -129,7 +129,7 @@ class _GroupAvatarPickerState extends State<GroupAvatarPicker> {
         width: widget.size,
         height: widget.size,
         decoration: BoxDecoration(
-          color: AppColors.primaryGreen.withOpacity(0.1),
+          color: AppColors.primaryGreen.withValues(alpha: 0.1),
           shape: BoxShape.circle,
         ),
         child: Icon(
@@ -164,7 +164,7 @@ class _GroupAvatarPickerState extends State<GroupAvatarPicker> {
               leading: Container(
                 padding: const EdgeInsets.all(8),
                 decoration: BoxDecoration(
-                  color: AppColors.primaryGreen.withOpacity(0.1),
+                  color: AppColors.primaryGreen.withValues(alpha: 0.1),
                   borderRadius: BorderRadius.circular(8),
                 ),
                 child: const Icon(
@@ -197,7 +197,7 @@ class _GroupAvatarPickerState extends State<GroupAvatarPicker> {
               leading: Container(
                 padding: const EdgeInsets.all(8),
                 decoration: BoxDecoration(
-                  color: AppColors.primaryGreen.withOpacity(0.1),
+                  color: AppColors.primaryGreen.withValues(alpha: 0.1),
                   borderRadius: BorderRadius.circular(8),
                 ),
                 child: const Icon(
@@ -231,7 +231,7 @@ class _GroupAvatarPickerState extends State<GroupAvatarPicker> {
               leading: Container(
                 padding: const EdgeInsets.all(8),
                 decoration: BoxDecoration(
-                  color: Colors.grey.withOpacity(0.1),
+                  color: Colors.grey.withValues(alpha: 0.1),
                   borderRadius: BorderRadius.circular(8),
                 ),
                 child: Icon(

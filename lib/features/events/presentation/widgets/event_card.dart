@@ -30,7 +30,7 @@ class EventCard extends StatelessWidget {
             borderRadius: BorderRadius.circular(16),
             boxShadow: [
               BoxShadow(
-                color: Colors.black.withOpacity(0.08),
+                color: Colors.black.withValues(alpha: 0.08),
                 blurRadius: 12,
                 offset: const Offset(0, 4),
               ),
@@ -147,7 +147,7 @@ class EventCard extends StatelessWidget {
   Widget _buildCategoryChip() => Container(
         padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
         decoration: BoxDecoration(
-          color: const Color(0xFF008037).withOpacity(0.1),
+          color: const Color(0xFF008037).withValues(alpha: 0.1),
           borderRadius: BorderRadius.circular(12),
         ),
         child: Text(
@@ -163,7 +163,7 @@ class EventCard extends StatelessWidget {
   Widget _buildDistanceChip() => Container(
         padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
         decoration: BoxDecoration(
-          color: const Color(0xFF666666).withOpacity(0.1),
+          color: const Color(0xFF666666).withValues(alpha: 0.1),
           borderRadius: BorderRadius.circular(12),
         ),
         child: Row(
@@ -191,8 +191,8 @@ class EventCard extends StatelessWidget {
         padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
         decoration: BoxDecoration(
           color: event.isFree
-              ? const Color(0xFF4CAF50).withOpacity(0.1)
-              : const Color(0xFFFF9800).withOpacity(0.1),
+              ? const Color(0xFF4CAF50).withValues(alpha: 0.1)
+              : const Color(0xFFFF9800).withValues(alpha: 0.1),
           borderRadius: BorderRadius.circular(20),
           border: Border.all(
             color: event.isFree
@@ -390,7 +390,7 @@ class CompactEventCard extends StatelessWidget {
             borderRadius: BorderRadius.circular(12),
             boxShadow: [
               BoxShadow(
-                color: Colors.black.withOpacity(0.05),
+                color: Colors.black.withValues(alpha: 0.05),
                 blurRadius: 8,
                 offset: const Offset(0, 2),
               ),

@@ -194,15 +194,15 @@ class _ModernNotificationSettingsState extends State<ModernNotificationSettings>
         decoration: BoxDecoration(
           gradient: LinearGradient(
             colors: [
-              AppColors.primaryGreen.withOpacity(0.1),
-              AppColors.primaryGreen.withOpacity(0.05),
+              AppColors.primaryGreen.withValues(alpha: 0.1),
+              AppColors.primaryGreen.withValues(alpha: 0.05),
             ],
             begin: Alignment.topLeft,
             end: Alignment.bottomRight,
           ),
           borderRadius: BorderRadius.circular(16),
           border: Border.all(
-            color: AppColors.primaryGreen.withOpacity(0.2),
+            color: AppColors.primaryGreen.withValues(alpha: 0.2),
           ),
         ),
         child: Row(
@@ -210,7 +210,7 @@ class _ModernNotificationSettingsState extends State<ModernNotificationSettings>
             Container(
               padding: const EdgeInsets.all(12),
               decoration: BoxDecoration(
-                color: AppColors.primaryGreen.withOpacity(0.1),
+                color: AppColors.primaryGreen.withValues(alpha: 0.1),
                 borderRadius: BorderRadius.circular(12),
               ),
               child: const Icon(
@@ -403,10 +403,10 @@ class _ModernNotificationSettingsState extends State<ModernNotificationSettings>
   Widget _buildFrequencyOption(String title, String subtitle) => Container(
         padding: const EdgeInsets.all(12),
         decoration: BoxDecoration(
-          color: AppColors.primaryGreen.withOpacity(0.1),
+          color: AppColors.primaryGreen.withValues(alpha: 0.1),
           borderRadius: BorderRadius.circular(8),
           border: Border.all(
-            color: AppColors.primaryGreen.withOpacity(0.3),
+            color: AppColors.primaryGreen.withValues(alpha: 0.3),
           ),
         ),
         child: Column(
@@ -503,7 +503,7 @@ class _ModernNotificationSettingsState extends State<ModernNotificationSettings>
           border: Border.all(color: Colors.grey.shade200),
           boxShadow: [
             BoxShadow(
-              color: Colors.black.withOpacity(0.02),
+              color: Colors.black.withValues(alpha: 0.02),
               blurRadius: 4,
               offset: const Offset(0, 1),
             ),
@@ -528,7 +528,7 @@ class _ModernNotificationSettingsState extends State<ModernNotificationSettings>
           secondary: Container(
             padding: const EdgeInsets.all(8),
             decoration: BoxDecoration(
-              color: AppColors.primaryGreen.withOpacity(0.1),
+              color: AppColors.primaryGreen.withValues(alpha: 0.1),
               borderRadius: BorderRadius.circular(8),
             ),
             child: Icon(

@@ -193,14 +193,14 @@ async function main() {
           .doc(record.eventId)
           .collection("attendees")
           .doc(record.userId);
-        batch.update(attendeeRef, { userProfile: profile });
+        batch.set(attendeeRef, { userProfile: profile }, { merge: true });
 
         const userRsvpRef = db
           .collection("user_rsvps")
           .doc(record.userId)
           .collection("events")
           .doc(record.eventId);
-        batch.update(userRsvpRef, { userProfile: profile });
+        batch.set(userRsvpRef, { userProfile: profile }, { merge: true });
 
         batchWrites += 2;
       }

@@ -3,7 +3,9 @@
     "test:rules": "npx firebase-tools emulators:exec --only firestore,storage \"node scripts/test_firebase_rules.mjs\""
   },
   "dependencies": {
-    "firebase-admin": "^13.4.0"
+    "@google-cloud/firestore": "^7.11.0",
+    "firebase-admin": "^13.4.0",
+    "google-auth-library": "^9.15.0"
   },
   "devDependencies": {
     "@firebase/rules-unit-testing": "^5.0.0",

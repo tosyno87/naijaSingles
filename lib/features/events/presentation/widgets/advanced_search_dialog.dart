@@ -1,3 +1,4 @@
+import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import '../../../../common/constants/app_colors.dart';
@@ -212,7 +213,7 @@ class _AdvancedSearchDialogState extends State<AdvancedSearchDialog> {
               ),
               focusedBorder: OutlineInputBorder(
                 borderRadius: BorderRadius.circular(8),
-                borderSide: const BorderSide(color: Color(0xFF008037), width: 1.5),
+                borderSide: const BorderSide(color: AppColors.primaryGreen, width: 1.5),
               ),
               contentPadding: const EdgeInsets.symmetric(
                 horizontal: 12,
@@ -295,14 +296,14 @@ class _AdvancedSearchDialogState extends State<AdvancedSearchDialog> {
                     icon: const Icon(
                       Icons.my_location,
                       size: 16,
-                      color: Color(0xFF008037),
+                      color: AppColors.primaryGreen,
                     ),
                     label: Text(
                       'Use current location',
                       style: GoogleFonts.montserrat(
                         fontSize: 14,
                         fontWeight: FontWeight.w500,
-                        color: const Color(0xFF008037),
+                        color: AppColors.primaryGreen,
                       ),
                     ),
                     style: TextButton.styleFrom(
@@ -338,7 +339,7 @@ class _AdvancedSearchDialogState extends State<AdvancedSearchDialog> {
             children: [
               Expanded(
                 child: _buildDateField(
-                  label: 'Start date',
+                  label: 'Start date'.tr(),
                   date: _startDate,
                   onDateSelected: (date) {
                     setState(() {
@@ -357,7 +358,7 @@ class _AdvancedSearchDialogState extends State<AdvancedSearchDialog> {
               ),
               Expanded(
                 child: _buildDateField(
-                  label: 'End date',
+                  label: 'End date'.tr(),
                   date: _endDate,
                   onDateSelected: (date) {
                     setState(() {
@@ -469,7 +470,7 @@ class _AdvancedSearchDialogState extends State<AdvancedSearchDialog> {
               ),
               focusedBorder: OutlineInputBorder(
                 borderRadius: BorderRadius.circular(8),
-                borderSide: const BorderSide(color: Color(0xFF008037), width: 1.5),
+                borderSide: const BorderSide(color: AppColors.primaryGreen, width: 1.5),
               ),
               contentPadding: const EdgeInsets.symmetric(
                 horizontal: 12,
@@ -522,21 +523,21 @@ class _AdvancedSearchDialogState extends State<AdvancedSearchDialog> {
             children: [
               Expanded(
                 child: _buildEventTypeChip(
-                  label: 'Free',
+                  label: 'Free'.tr(),
                   value: 'free',
                 ),
               ),
               const SizedBox(width: 8),
               Expanded(
                 child: _buildEventTypeChip(
-                  label: 'Paid',
+                  label: 'Paid'.tr(),
                   value: 'paid',
                 ),
               ),
               const SizedBox(width: 8),
               Expanded(
                 child: _buildEventTypeChip(
-                  label: 'Any',
+                  label: 'Any'.tr(),
                   value: null,
                 ),
               ),
@@ -561,12 +562,12 @@ class _AdvancedSearchDialogState extends State<AdvancedSearchDialog> {
         padding: const EdgeInsets.symmetric(vertical: 12),
         decoration: BoxDecoration(
           color: isSelected
-              ? const Color(0xFF008037).withValues(alpha: 0.1)
+              ? AppColors.primaryGreen.withValues(alpha: 0.1)
               : Colors.transparent,
           borderRadius: BorderRadius.circular(8),
           border: Border.all(
             color: isSelected
-                ? const Color(0xFF008037)
+                ? AppColors.primaryGreen
                 : const Color(0xFFE0E0E0),
             width: 1,
           ),
@@ -578,7 +579,7 @@ class _AdvancedSearchDialogState extends State<AdvancedSearchDialog> {
               const Icon(
                 Icons.check,
                 size: 16,
-                color: Color(0xFF008037),
+                color: AppColors.primaryGreen,
               ),
               const SizedBox(width: 6),
             ],
@@ -588,7 +589,7 @@ class _AdvancedSearchDialogState extends State<AdvancedSearchDialog> {
                 fontSize: 14,
                 fontWeight: isSelected ? FontWeight.w600 : FontWeight.w500,
                 color: isSelected
-                    ? const Color(0xFF008037)
+                    ? AppColors.primaryGreen
                     : const Color(0xFF666666),
               ),
             ),
@@ -643,7 +644,7 @@ class _AdvancedSearchDialogState extends State<AdvancedSearchDialog> {
               ElevatedButton(
                 onPressed: _applyFilters,
                 style: ElevatedButton.styleFrom(
-                  backgroundColor: const Color(0xFF008037),
+                  backgroundColor: AppColors.primaryGreen,
                   foregroundColor: Colors.white,
                   padding: const EdgeInsets.symmetric(
                     horizontal: 32,
@@ -695,7 +696,7 @@ class _AdvancedSearchDialogState extends State<AdvancedSearchDialog> {
           ScaffoldMessenger.of(context).showSnackBar(
             const SnackBar(
               content: Text('Location set to current position'),
-              backgroundColor: Color(0xFF008037),
+              backgroundColor: AppColors.primaryGreen,
               duration: Duration(seconds: 2),
             ),
           );

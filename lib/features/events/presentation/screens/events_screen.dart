@@ -1,9 +1,11 @@
+import 'package:easy_localization/easy_localization.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:pull_to_refresh/pull_to_refresh.dart';
 
+import '../../../../common/constants/app_colors.dart';
 import '../../../../common/routes/route_name.dart';
 import '../../data/models/event_model.dart';
 import '../../data/repositories/events_repository.dart';
@@ -13,6 +15,8 @@ import '../bloc/events_bloc.dart';
 import '../bloc/rsvp_bloc.dart';
 import '../widgets/advanced_search_dialog.dart';
 import '../widgets/event_card.dart';
+import '../widgets/events_empty_state.dart';
+import '../widgets/events_error_state.dart';
 import '../widgets/events_loading_shimmer.dart';
 
 class EventsScreen extends StatefulWidget {
@@ -30,7 +34,7 @@ class _EventsScreenState extends State<EventsScreen> {
   bool _isSearching = false;
   EventFilter _currentFilter = const EventFilter();
   EventsBloc? _eventsBloc;
-  bool _isLoadingMore = false; // Add loading state to prevent multiple calls
+  bool _isLoadingMore = false;
 
   @override
   void initState() {
@@ -57,7 +61,6 @@ class _EventsScreenState extends State<EventsScreen> {
     if (!_scrollController.hasClients) return false;
     final maxScroll = _scrollController.position.maxScrollExtent;
     final currentScroll = _scrollController.offset;
-    // Only trigger when we're very close to the bottom (95% instead of 90%)
     return currentScroll >= (maxScroll * 0.95);
   }
 
@@ -134,20 +137,22 @@ class _EventsScreenState extends State<EventsScreen> {
                 children: [
                   _buildSubtitle(),
                   _buildFilters(),
-                  Expanded(
-                    child: _buildEventsListWithLocation(),
-                  ),
+                  Expanded(child: _buildEventsList()),
                 ],
               ),
             ),
-            floatingActionButton: FloatingActionButton(
-              heroTag: 'events_screen_fab',
-              onPressed: () {
-                Navigator.pushNamed(context, RouteName.eventTemplateSelection);
-              },
-              backgroundColor: const Color(0xFF008037), // Deep green
-              foregroundColor: Colors.white,
-              child: const Icon(Icons.add),
+            floatingActionButton: Semantics(
+              button: true,
+              label: 'Create Event'.tr(),
+              child: FloatingActionButton(
+                heroTag: 'events_screen_fab',
+                onPressed: () {
+                  Navigator.pushNamed(context, RouteName.eventTemplateSelection);
+                },
+                backgroundColor: AppColors.primaryGreen,
+                foregroundColor: Colors.white,
+                child: const Icon(Icons.add),
+              ),
             ),
             floatingActionButtonLocation: FloatingActionButtonLocation.endFloat,
           ),
@@ -157,43 +162,56 @@ class _EventsScreenState extends State<EventsScreen> {
   PreferredSizeWidget _buildAppBar() => AppBar(
         backgroundColor: Colors.white,
         elevation: 0,
-        leading: IconButton(
-          onPressed: () => Navigator.pop(context),
-          icon: const Icon(
-            Icons.arrow_back,
-            color: Color(0xFF3E1F0D), // Deep brown
+        leading: Semantics(
+          button: true,
+          label: 'Go back'.tr(),
+          child: IconButton(
+            onPressed: () => Navigator.pop(context),
+            icon: const Icon(
+              Icons.arrow_back,
+              color: Color(0xFF3E1F0D),
+            ),
           ),
         ),
-        title: Text(
-          'Events',
-          style: GoogleFonts.montserrat(
-            fontSize: 24,
-            fontWeight: FontWeight.bold,
-            color: const Color(0xFF3E1F0D), // Deep brown
+        title: Semantics(
+          header: true,
+          child: Text(
+            'Events'.tr(),
+            style: GoogleFonts.montserrat(
+              fontSize: 24,
+              fontWeight: FontWeight.bold,
+              color: const Color(0xFF3E1F0D),
+            ),
           ),
         ),
         actions: [
-          // Calendar icon
-          IconButton(
-            onPressed: () {
-              Navigator.pushNamed(context, RouteName.myEvents);
-            },
-            icon: const Icon(
-              Icons.calendar_today,
-              color: Color(0xFF008037), // Deep green
-              size: 24,
+          Semantics(
+            button: true,
+            label: 'My Events'.tr(),
+            child: IconButton(
+              onPressed: () {
+                Navigator.pushNamed(context, RouteName.myEvents);
+              },
+              icon: const Icon(
+                Icons.calendar_today,
+                color: AppColors.primaryGreen,
+                size: 24,
+              ),
+              tooltip: 'My Events'.tr(),
             ),
-            tooltip: 'My Events',
           ),
-          // Search icon
-          IconButton(
-            onPressed: _toggleSearch,
-            icon: Icon(
-              _isSearching ? Icons.close : Icons.search,
-              color: const Color(0xFF008037), // Deep green
-              size: 24,
+          Semantics(
+            button: true,
+            label: _isSearching ? 'Close Search'.tr() : 'Search Events'.tr(),
+            child: IconButton(
+              onPressed: _toggleSearch,
+              icon: Icon(
+                _isSearching ? Icons.close : Icons.search,
+                color: AppColors.primaryGreen,
+                size: 24,
+              ),
+              tooltip: _isSearching ? 'Close Search'.tr() : 'Search Events'.tr(),
             ),
-            tooltip: _isSearching ? 'Close Search' : 'Search Events',
           ),
         ],
         bottom: PreferredSize(
@@ -217,23 +235,18 @@ class _EventsScreenState extends State<EventsScreen> {
   Widget _buildSubtitle() => Container(
         padding: const EdgeInsets.fromLTRB(20, 8, 20, 16),
         child: Text(
-          'Discover upcoming events, parties, and community gatherings',
+          'Discover upcoming events, parties, and community gatherings'.tr(),
           style: GoogleFonts.montserrat(
             fontSize: 16,
-            color: const Color(0xFF666666), // Medium gray
+            color: const Color(0xFF666666),
           ),
         ),
       );
 
   Widget _buildFilters() => Column(
         children: [
-          // Search Bar (when searching)
           if (_isSearching) _buildSearchBar(),
-
-          // Category Filters
           _buildCategoryFilters(),
-
-          // Date Range Dropdown and Advanced Filter (in same row)
           _buildDateAndAdvancedFilters(),
         ],
       );
@@ -251,38 +264,35 @@ class _EventsScreenState extends State<EventsScreen> {
             ),
           ],
         ),
-        child: TextField(
-          controller: _searchController,
-          onChanged: _onSearchChanged,
-          style: GoogleFonts.montserrat(
-            fontSize: 16,
-            color: const Color(0xFF333333),
-          ),
-          decoration: InputDecoration(
-            hintText: 'Search events, categories, locations...',
-            hintStyle: GoogleFonts.montserrat(
+        child: Semantics(
+          textField: true,
+          label: 'Search events, categories, locations...'.tr(),
+          child: TextField(
+            controller: _searchController,
+            onChanged: _onSearchChanged,
+            style: GoogleFonts.montserrat(
               fontSize: 16,
-              color: const Color(0xFF999999),
+              color: const Color(0xFF333333),
             ),
-            prefixIcon: const Icon(
-              Icons.search,
-              color: Color(0xFF008037),
+            decoration: InputDecoration(
+              hintText: 'Search events, categories, locations...'.tr(),
+              hintStyle: GoogleFonts.montserrat(
+                fontSize: 16,
+                color: const Color(0xFF999999),
+              ),
+              prefixIcon: const Icon(
+                Icons.search,
+                color: AppColors.primaryGreen,
+              ),
+              border: InputBorder.none,
+              contentPadding: const EdgeInsets.all(16),
             ),
-            border: InputBorder.none,
-            contentPadding: const EdgeInsets.all(16),
           ),
         ),
       );
 
   Widget _buildCategoryFilters() {
-    final categories = [
-      'All',
-      'Music',
-      'Business',
-      'Community',
-      'Social',
-      'Cultural',
-    ];
+    final categories = ['All', 'Music', 'Business', 'Community', 'Social', 'Cultural'];
 
     return Container(
       height: 40,
@@ -292,53 +302,58 @@ class _EventsScreenState extends State<EventsScreen> {
         itemCount: categories.length,
         itemBuilder: (context, index) {
           final category = categories[index];
-          // Mutually exclusive: selecting a category deselects "All"
           final isSelected = category == 'All'
               ? _currentFilter.category == null
               : _currentFilter.category == category;
 
           return Container(
             margin: const EdgeInsets.only(right: 8),
-            child: Material(
-              color: Colors.transparent,
-              child: InkWell(
-                onTap: () {
-                  // Mutually exclusive selection
-                  final newFilter = _currentFilter.copyWith(
-                    category: category == 'All' ? null : category,
-                  );
-                  _onFilterChanged(newFilter);
-                },
-                borderRadius: BorderRadius.circular(20),
-                child: Container(
-                  padding:
-                      const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-                  decoration: BoxDecoration(
-                    color: isSelected ? const Color(0xFF008037) : Colors.white,
-                    borderRadius: BorderRadius.circular(20),
-                    border: Border.all(
-                      color: isSelected
-                          ? const Color(0xFF008037)
-                          : const Color(0xFFE0E0E0),
+            child: Semantics(
+              button: true,
+              selected: isSelected,
+              label: '{} category filter'.tr(args: [category.tr()]),
+              child: Material(
+                color: Colors.transparent,
+                child: InkWell(
+                  onTap: () {
+                    final newFilter = _currentFilter.copyWith(
+                      category: category == 'All' ? null : category,
+                    );
+                    _onFilterChanged(newFilter);
+                  },
+                  borderRadius: BorderRadius.circular(20),
+                  child: Container(
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 16,
+                      vertical: 8,
                     ),
-                    boxShadow: isSelected
-                        ? [
-                            BoxShadow(
-                              color: Colors.black.withValues(alpha: 0.1),
-                              blurRadius: 4,
-                              offset: const Offset(0, 2),
-                            ),
-                          ]
-                        : null,
-                  ),
-                  child: Text(
-                    category,
-                    style: GoogleFonts.montserrat(
-                      fontSize: 14,
-                      fontWeight:
-                          isSelected ? FontWeight.w600 : FontWeight.w500,
-                      color:
-                          isSelected ? Colors.white : const Color(0xFF008037),
+                    decoration: BoxDecoration(
+                      color: isSelected ? AppColors.primaryGreen : Colors.white,
+                      borderRadius: BorderRadius.circular(20),
+                      border: Border.all(
+                        color: isSelected
+                            ? AppColors.primaryGreen
+                            : const Color(0xFFE0E0E0),
+                      ),
+                      boxShadow: isSelected
+                          ? [
+                              BoxShadow(
+                                color: Colors.black.withValues(alpha: 0.1),
+                                blurRadius: 4,
+                                offset: const Offset(0, 2),
+                              ),
+                            ]
+                          : null,
+                    ),
+                    child: Text(
+                      category.tr(),
+                      style: GoogleFonts.montserrat(
+                        fontSize: 14,
+                        fontWeight:
+                            isSelected ? FontWeight.w600 : FontWeight.w500,
+                        color:
+                            isSelected ? Colors.white : AppColors.primaryGreen,
+                      ),
                     ),
                   ),
                 ),
@@ -354,12 +369,8 @@ class _EventsScreenState extends State<EventsScreen> {
         margin: const EdgeInsets.fromLTRB(20, 0, 20, 12),
         child: Row(
           children: [
-            // Date Range Dropdown
-            Expanded(
-              child: _buildDateRangeDropdown(),
-            ),
+            Expanded(child: _buildDateRangeDropdown()),
             const SizedBox(width: 12),
-            // Advanced Filter Link
             _buildAdvancedFilterLink(),
           ],
         ),
@@ -369,7 +380,6 @@ class _EventsScreenState extends State<EventsScreen> {
     final dateRanges = ['All Time', 'Today', 'This Week', 'This Month'];
     String selectedDateRange = 'All Time';
 
-    // Determine current selection
     if (_currentFilter.startDate != null || _currentFilter.endDate != null) {
       if (_isDateRangeSelected('Today')) {
         selectedDateRange = 'Today';
@@ -385,9 +395,7 @@ class _EventsScreenState extends State<EventsScreen> {
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(12),
-        border: Border.all(
-          color: const Color(0xFFE0E0E0),
-        ),
+        border: Border.all(color: const Color(0xFFE0E0E0)),
       ),
       child: DropdownButton<String>(
         value: selectedDateRange,
@@ -395,7 +403,7 @@ class _EventsScreenState extends State<EventsScreen> {
         underline: const SizedBox.shrink(),
         icon: const Icon(
           Icons.arrow_drop_down,
-          color: Color(0xFF008037),
+          color: AppColors.primaryGreen,
         ),
         style: GoogleFonts.montserrat(
           fontSize: 14,
@@ -405,7 +413,7 @@ class _EventsScreenState extends State<EventsScreen> {
         items: dateRanges.map((String range) {
           return DropdownMenuItem<String>(
             value: range,
-            child: Text(range),
+            child: Text(range.tr()),
           );
         }).toList(),
         onChanged: (String? newValue) {
@@ -420,7 +428,8 @@ class _EventsScreenState extends State<EventsScreen> {
 
   bool _isDateRangeSelected(String dateRange) {
     if (dateRange == 'All Time') {
-      return _currentFilter.startDate == null && _currentFilter.endDate == null;
+      return _currentFilter.startDate == null &&
+          _currentFilter.endDate == null;
     }
 
     final now = DateTime.now();
@@ -447,10 +456,7 @@ class _EventsScreenState extends State<EventsScreen> {
 
   EventFilter _getDateRangeFilter(String dateRange, bool selected) {
     if (!selected || dateRange == 'All Time') {
-      return _currentFilter.copyWith(
-        startDate: null,
-        endDate: null,
-      );
+      return _currentFilter.copyWith(startDate: null, endDate: null);
     }
 
     final now = DateTime.now();
@@ -464,8 +470,9 @@ class _EventsScreenState extends State<EventsScreen> {
         break;
       case 'This Week':
         startDate = now.subtract(Duration(days: now.weekday - 1));
-        endDate = startDate
-            .add(const Duration(days: 6, hours: 23, minutes: 59, seconds: 59));
+        endDate = startDate.add(
+          const Duration(days: 6, hours: 23, minutes: 59, seconds: 59),
+        );
         break;
       case 'This Month':
         startDate = DateTime(now.year, now.month);
@@ -476,312 +483,65 @@ class _EventsScreenState extends State<EventsScreen> {
     return _currentFilter.copyWith(startDate: startDate, endDate: endDate);
   }
 
-  Widget _buildAdvancedFilterLink() => Material(
-        color: Colors.transparent,
-        child: InkWell(
-          onTap: () async {
-            final newFilter = await showDialog<EventFilter>(
-              context: context,
-              builder: (context) => AdvancedSearchDialog(
-                currentFilter: _currentFilter,
-                onFilterApplied: (filter) {
-                  _onFilterChanged(filter);
-                },
-              ),
-            );
-            // Note: The dialog handles filter application via onFilterApplied callback
-            // This return value is just for potential future use
-            if (newFilter != null) {
-              _onFilterChanged(newFilter);
-            }
-          },
-          borderRadius: BorderRadius.circular(8),
-          child: Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 8),
-            child: Row(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                const Icon(
-                  Icons.tune,
-                  color: Color(0xFF008037),
-                  size: 18,
+  Widget _buildAdvancedFilterLink() => Semantics(
+        button: true,
+        label: 'Advanced Filters'.tr(),
+        child: Material(
+          color: Colors.transparent,
+          child: InkWell(
+            onTap: () async {
+              final newFilter = await showDialog<EventFilter>(
+                context: context,
+                builder: (context) => AdvancedSearchDialog(
+                  currentFilter: _currentFilter,
+                  onFilterApplied: _onFilterChanged,
                 ),
-                const SizedBox(width: 4),
-                Text(
-                  'Advanced Filters',
-                  style: GoogleFonts.montserrat(
-                    fontSize: 14,
-                    fontWeight: FontWeight.w600,
-                    color: const Color(0xFF008037),
+              );
+              if (newFilter != null) {
+                _onFilterChanged(newFilter);
+              }
+            },
+            borderRadius: BorderRadius.circular(8),
+            child: Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 8),
+              child: Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  const Icon(
+                    Icons.tune,
+                    color: AppColors.primaryGreen,
+                    size: 18,
                   ),
-                ),
-              ],
-            ),
-          ),
-        ),
-      );
-
-  Widget _buildErrorState({
-    required String title,
-    required String message,
-    required IconData icon,
-    required VoidCallback onRetry,
-  }) =>
-      Center(
-        child: Padding(
-          padding: const EdgeInsets.all(32),
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              Icon(
-                icon,
-                size: 80,
-                color: const Color(0xFF999999),
-              ),
-              const SizedBox(height: 24),
-              Text(
-                title,
-                style: GoogleFonts.montserrat(
-                  fontSize: 24,
-                  fontWeight: FontWeight.bold,
-                  color: const Color(0xFF333333),
-                ),
-                textAlign: TextAlign.center,
-              ),
-              const SizedBox(height: 12),
-              Text(
-                message,
-                style: GoogleFonts.montserrat(
-                  fontSize: 16,
-                  color: const Color(0xFF666666),
-                ),
-                textAlign: TextAlign.center,
-              ),
-              const SizedBox(height: 32),
-              ElevatedButton(
-                onPressed: onRetry,
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: const Color(0xFF008037),
-                  foregroundColor: Colors.white,
-                  padding:
-                      const EdgeInsets.symmetric(horizontal: 32, vertical: 16),
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(12),
-                  ),
-                ),
-                child: Text(
-                  'Try Again',
-                  style: GoogleFonts.montserrat(
-                    fontSize: 16,
-                    fontWeight: FontWeight.w600,
-                  ),
-                ),
-              ),
-            ],
-          ),
-        ),
-      );
-
-  Widget _buildEmptyState() => SingleChildScrollView(
-        child: Center(
-          child: Padding(
-            padding: const EdgeInsets.all(32),
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                Container(
-                  width: 100,
-                  height: 100,
-                  decoration: BoxDecoration(
-                    color: Colors.grey.withValues(alpha: 0.1),
-                    shape: BoxShape.circle,
-                    boxShadow: [
-                      BoxShadow(
-                        color: Colors.black.withValues(alpha: 0.05),
-                        blurRadius: 8,
-                        offset: const Offset(0, 2),
-                      ),
-                    ],
-                  ),
-                  child: const Icon(
-                    Icons.event_available,
-                    size: 50,
-                    color: Color(0xFF999999),
-                  ),
-                ),
-                const SizedBox(height: 24),
-                Text(
-                  'No Events Found',
-                  style: GoogleFonts.montserrat(
-                    fontSize: 22,
-                    fontWeight: FontWeight.bold,
-                    color: const Color(0xFF3E1F0D), // Deep brown
-                  ),
-                ),
-                const SizedBox(height: 12),
-                Text(
-                  _currentFilter.hasActiveFilters ||
-                          _searchController.text.isNotEmpty
-                      ? 'Try adjusting your search or filters to find more events'
-                      : 'Be the first to create an event and start bringing people together!',
-                  style: GoogleFonts.montserrat(
-                    fontSize: 16,
-                    color: const Color(0xFF666666),
-                    height: 1.4,
-                  ),
-                  textAlign: TextAlign.center,
-                ),
-                const SizedBox(height: 24),
-                if (_currentFilter.hasActiveFilters ||
-                    _searchController.text.isNotEmpty)
-                  Material(
-                    color: Colors.transparent,
-                    child: InkWell(
-                      onTap: () {
-                        setState(() {
-                          _currentFilter = const EventFilter();
-                          _searchController.clear();
-                        });
-                        if (_eventsBloc != null) {
-                          _eventsBloc!.add(ClearSearchEvent());
-                        }
-                      },
-                      borderRadius: BorderRadius.circular(20),
-                      child: Container(
-                        padding: const EdgeInsets.symmetric(
-                          horizontal: 20,
-                          vertical: 10,
-                        ),
-                        decoration: BoxDecoration(
-                          color: const Color(0xFF008037), // Deep green
-                          borderRadius: BorderRadius.circular(20),
-                          boxShadow: [
-                            BoxShadow(
-                              color: Colors.black.withValues(alpha: 0.1),
-                              blurRadius: 4,
-                              offset: const Offset(0, 2),
-                            ),
-                          ],
-                        ),
-                        child: Text(
-                          'Clear Filters',
-                          style: GoogleFonts.montserrat(
-                            fontSize: 14,
-                            fontWeight: FontWeight.w600,
-                            color: Colors.white,
-                          ),
-                        ),
-                      ),
-                    ),
-                  )
-                else
-                  Material(
-                    color: Colors.transparent,
-                    child: InkWell(
-                      onTap: () {
-                        Navigator.pushNamed(
-                          context,
-                          RouteName.eventTemplateSelection,
-                        );
-                      },
-                      borderRadius: BorderRadius.circular(20),
-                      child: Container(
-                        padding: const EdgeInsets.symmetric(
-                          horizontal: 20,
-                          vertical: 10,
-                        ),
-                        decoration: BoxDecoration(
-                          color: const Color(0xFF008037), // Deep green
-                          borderRadius: BorderRadius.circular(20),
-                          boxShadow: [
-                            BoxShadow(
-                              color: Colors.black.withValues(alpha: 0.1),
-                              blurRadius: 4,
-                              offset: const Offset(0, 2),
-                            ),
-                          ],
-                        ),
-                        child: Row(
-                          mainAxisSize: MainAxisSize.min,
-                          children: [
-                            const Icon(
-                              Icons.add,
-                              color: Colors.white,
-                              size: 16,
-                            ),
-                            const SizedBox(width: 6),
-                            Text(
-                              'Create Event',
-                              style: GoogleFonts.montserrat(
-                                fontSize: 14,
-                                fontWeight: FontWeight.w600,
-                                color: Colors.white,
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
+                  const SizedBox(width: 4),
+                  Text(
+                    'Advanced Filters'.tr(),
+                    style: GoogleFonts.montserrat(
+                      fontSize: 14,
+                      fontWeight: FontWeight.w600,
+                      color: AppColors.primaryGreen,
                     ),
                   ),
-              ],
+                ],
+              ),
             ),
-          ),
-        ),
-      );
-
-  Widget _buildSearchingState(String query) => Center(
-        child: Padding(
-          padding: const EdgeInsets.all(32),
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              const CircularProgressIndicator(
-                valueColor: AlwaysStoppedAnimation(Color(0xFF008037)),
-              ),
-              const SizedBox(height: 24),
-              Text(
-                'Searching for "$query"',
-                style: GoogleFonts.montserrat(
-                  fontSize: 18,
-                  fontWeight: FontWeight.w600,
-                  color: const Color(0xFF333333),
-                ),
-                textAlign: TextAlign.center,
-              ),
-              const SizedBox(height: 8),
-              Text(
-                'Finding the best Afrocentric events for you...',
-                style: GoogleFonts.montserrat(
-                  fontSize: 14,
-                  color: const Color(0xFF666666),
-                ),
-                textAlign: TextAlign.center,
-              ),
-            ],
           ),
         ),
       );
 
   void _navigateToEventDetails(EventModel event) {
-    Navigator.pushNamed(
-      context,
-      RouteName.eventDetails,
-      arguments: event,
-    );
+    Navigator.pushNamed(context, RouteName.eventDetails, arguments: event);
   }
 
-  Widget _buildEventsListWithLocation() =>
-      BlocConsumer<EventsBloc, EventsState>(
+  Widget _buildEventsList() => BlocConsumer<EventsBloc, EventsState>(
         listener: (context, state) {
           if (state is EventsLoaded) {
             _refreshController.refreshCompleted();
             _refreshController.loadComplete();
-            _isLoadingMore = false; // Reset loading state
+            _isLoadingMore = false;
           } else if (state is EventsError) {
             _refreshController.refreshFailed();
             _refreshController.loadFailed();
-            _isLoadingMore = false; // Reset loading state on error
+            _isLoadingMore = false;
 
             ScaffoldMessenger.of(context).showSnackBar(
               SnackBar(
@@ -804,27 +564,23 @@ class _EventsScreenState extends State<EventsScreen> {
           }
 
           if (state is EventsError && state.isNetworkError) {
-            return _buildErrorState(
-              title: 'Connection Error',
+            return EventsErrorState(
+              title: 'Connection Error'.tr(),
               message: state.message,
               icon: Icons.wifi_off,
               onRetry: () {
-                if (_eventsBloc != null) {
-                  _eventsBloc!.add(const LoadEventsEvent(forceRefresh: true));
-                }
+                _eventsBloc?.add(const LoadEventsEvent(forceRefresh: true));
               },
             );
           }
 
           if (state is EventsError) {
-            return _buildErrorState(
-              title: 'Something went wrong',
+            return EventsErrorState(
+              title: 'Something went wrong'.tr(),
               message: state.message,
               icon: Icons.error_outline,
               onRetry: () {
-                if (_eventsBloc != null) {
-                  _eventsBloc!.add(const LoadEventsEvent(forceRefresh: true));
-                }
+                _eventsBloc?.add(const LoadEventsEvent(forceRefresh: true));
               },
             );
           }
@@ -835,7 +591,23 @@ class _EventsScreenState extends State<EventsScreen> {
 
           if (state is EventsLoaded) {
             if (state.events.isEmpty) {
-              return _buildEmptyState();
+              return EventsEmptyState(
+                hasActiveFilters: _currentFilter.hasActiveFilters ||
+                    _searchController.text.isNotEmpty,
+                onClearFilters: () {
+                  setState(() {
+                    _currentFilter = const EventFilter();
+                    _searchController.clear();
+                  });
+                  _eventsBloc?.add(ClearSearchEvent());
+                },
+                onCreateEvent: () {
+                  Navigator.pushNamed(
+                    context,
+                    RouteName.eventTemplateSelection,
+                  );
+                },
+              );
             }
 
             return SmartRefresher(
@@ -844,37 +616,41 @@ class _EventsScreenState extends State<EventsScreen> {
               onRefresh: _onRefresh,
               onLoading: _onLoading,
               header: const WaterDropMaterialHeader(
-                backgroundColor: Color(0xFF008037),
+                backgroundColor: AppColors.primaryGreen,
               ),
               footer: CustomFooter(
                 builder: (context, mode) {
                   Widget body;
                   if (mode == LoadStatus.idle) {
                     body = Text(
-                      'Pull up to load more',
+                      'Pull up to load more'.tr(),
                       style: GoogleFonts.montserrat(
-                          color: const Color(0xFF666666)),
+                        color: const Color(0xFF666666),
+                      ),
                     );
                   } else if (mode == LoadStatus.loading) {
                     body = const CircularProgressIndicator(
-                      valueColor: AlwaysStoppedAnimation(Color(0xFF008037)),
+                      valueColor:
+                          AlwaysStoppedAnimation(AppColors.primaryGreen),
                     );
                   } else if (mode == LoadStatus.failed) {
                     body = Text(
-                      'Load Failed! Click retry!',
+                      'Load Failed! Click retry!'.tr(),
                       style: GoogleFonts.montserrat(color: Colors.red),
                     );
                   } else if (mode == LoadStatus.canLoading) {
                     body = Text(
-                      'Release to load more',
+                      'Release to load more'.tr(),
                       style: GoogleFonts.montserrat(
-                          color: const Color(0xFF666666)),
+                        color: const Color(0xFF666666),
+                      ),
                     );
                   } else {
                     body = Text(
-                      'No more events',
+                      'No more events'.tr(),
                       style: GoogleFonts.montserrat(
-                          color: const Color(0xFF666666)),
+                        color: const Color(0xFF666666),
+                      ),
                     );
                   }
                   return SizedBox(
@@ -885,12 +661,7 @@ class _EventsScreenState extends State<EventsScreen> {
               ),
               child: ListView.builder(
                 controller: _scrollController,
-                padding: const EdgeInsets.fromLTRB(
-                  20,
-                  0,
-                  20,
-                  100,
-                ), // Increased bottom padding to prevent FAB overlap with RSVP buttons
+                padding: const EdgeInsets.fromLTRB(20, 0, 20, 100),
                 itemCount: state.events.length + (state.isLoadingMore ? 1 : 0),
                 itemBuilder: (context, index) {
                   if (index >= state.events.length) {
@@ -898,7 +669,8 @@ class _EventsScreenState extends State<EventsScreen> {
                       child: Padding(
                         padding: EdgeInsets.all(16),
                         child: CircularProgressIndicator(
-                          valueColor: AlwaysStoppedAnimation(Color(0xFF008037)),
+                          valueColor:
+                              AlwaysStoppedAnimation(AppColors.primaryGreen),
                         ),
                       ),
                     );
@@ -908,7 +680,8 @@ class _EventsScreenState extends State<EventsScreen> {
                     padding: const EdgeInsets.only(bottom: 16),
                     child: EventCard(
                       event: state.events[index],
-                      onTap: () => _navigateToEventDetails(state.events[index]),
+                      onTap: () =>
+                          _navigateToEventDetails(state.events[index]),
                     ),
                   );
                 },
@@ -918,5 +691,38 @@ class _EventsScreenState extends State<EventsScreen> {
 
           return const SizedBox.shrink();
         },
+      );
+
+  Widget _buildSearchingState(String query) => Center(
+        child: Padding(
+          padding: const EdgeInsets.all(32),
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              const CircularProgressIndicator(
+                valueColor: AlwaysStoppedAnimation(AppColors.primaryGreen),
+              ),
+              const SizedBox(height: 24),
+              Text(
+                'Searching for "{}"'.tr(args: [query]),
+                style: GoogleFonts.montserrat(
+                  fontSize: 18,
+                  fontWeight: FontWeight.w600,
+                  color: const Color(0xFF333333),
+                ),
+                textAlign: TextAlign.center,
+              ),
+              const SizedBox(height: 8),
+              Text(
+                'Finding the best Afrocentric events for you...'.tr(),
+                style: GoogleFonts.montserrat(
+                  fontSize: 14,
+                  color: const Color(0xFF666666),
+                ),
+                textAlign: TextAlign.center,
+              ),
+            ],
+          ),
+        ),
       );
 }

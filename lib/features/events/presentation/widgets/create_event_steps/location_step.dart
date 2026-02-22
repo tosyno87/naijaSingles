@@ -135,7 +135,7 @@ class _LocationStepState extends State<LocationStep> {
               hintText: 'e.g., Lagos Continental Hotel',
               hintStyle: GoogleFonts.montserrat(
                 fontSize: 16,
-                color: const Color(0xFF008037)
+                color: AppColors.primaryGreen
                     .withValues(alpha: 0.7), // Afropeep green hint
               ),
               filled: true,
@@ -144,7 +144,7 @@ class _LocationStepState extends State<LocationStep> {
               border: OutlineInputBorder(
                 borderRadius: BorderRadius.circular(12),
                 borderSide: BorderSide(
-                  color: const Color(0xFF008037)
+                  color: AppColors.primaryGreen
                       .withValues(alpha: 0.3), // Afropeep green border
                   width: 1.5,
                 ),
@@ -152,7 +152,7 @@ class _LocationStepState extends State<LocationStep> {
               enabledBorder: OutlineInputBorder(
                 borderRadius: BorderRadius.circular(12),
                 borderSide: BorderSide(
-                  color: const Color(0xFF008037)
+                  color: AppColors.primaryGreen
                       .withValues(alpha: 0.3), // Afropeep green border
                   width: 1.5,
                 ),
@@ -160,12 +160,12 @@ class _LocationStepState extends State<LocationStep> {
               focusedBorder: OutlineInputBorder(
                 borderRadius: BorderRadius.circular(12),
                 borderSide:
-                    const BorderSide(color: Color(0xFF008037), width: 2),
+                    const BorderSide(color: AppColors.primaryGreen, width: 2),
               ),
               contentPadding: const EdgeInsets.all(16),
               prefixIcon: const Icon(
                 Icons.location_on,
-                color: Color(0xFF008037),
+                color: AppColors.primaryGreen,
               ),
             ),
           ),
@@ -194,7 +194,7 @@ class _LocationStepState extends State<LocationStep> {
               hintText: 'e.g., 52A Kofo Abayomi Street',
               hintStyle: GoogleFonts.montserrat(
                 fontSize: 16,
-                color: const Color(0xFF008037)
+                color: AppColors.primaryGreen
                     .withValues(alpha: 0.7), // Afropeep green hint
               ),
               filled: true,
@@ -203,7 +203,7 @@ class _LocationStepState extends State<LocationStep> {
               border: OutlineInputBorder(
                 borderRadius: BorderRadius.circular(12),
                 borderSide: BorderSide(
-                  color: const Color(0xFF008037)
+                  color: AppColors.primaryGreen
                       .withValues(alpha: 0.3), // Afropeep green border
                   width: 1.5,
                 ),
@@ -211,7 +211,7 @@ class _LocationStepState extends State<LocationStep> {
               enabledBorder: OutlineInputBorder(
                 borderRadius: BorderRadius.circular(12),
                 borderSide: BorderSide(
-                  color: const Color(0xFF008037)
+                  color: AppColors.primaryGreen
                       .withValues(alpha: 0.3), // Afropeep green border
                   width: 1.5,
                 ),
@@ -219,12 +219,12 @@ class _LocationStepState extends State<LocationStep> {
               focusedBorder: OutlineInputBorder(
                 borderRadius: BorderRadius.circular(12),
                 borderSide:
-                    const BorderSide(color: Color(0xFF008037), width: 2),
+                    const BorderSide(color: AppColors.primaryGreen, width: 2),
               ),
               contentPadding: const EdgeInsets.all(16),
               prefixIcon: const Icon(
                 Icons.home,
-                color: Color(0xFF008037),
+                color: AppColors.primaryGreen,
               ),
             ),
           ),
@@ -253,7 +253,7 @@ class _LocationStepState extends State<LocationStep> {
               hintText: 'e.g., Lagos',
               hintStyle: GoogleFonts.montserrat(
                 fontSize: 16,
-                color: const Color(0xFF008037)
+                color: AppColors.primaryGreen
                     .withValues(alpha: 0.7), // Afropeep green hint
               ),
               filled: true,
@@ -262,7 +262,7 @@ class _LocationStepState extends State<LocationStep> {
               border: OutlineInputBorder(
                 borderRadius: BorderRadius.circular(12),
                 borderSide: BorderSide(
-                  color: const Color(0xFF008037)
+                  color: AppColors.primaryGreen
                       .withValues(alpha: 0.3), // Afropeep green border
                   width: 1.5,
                 ),
@@ -270,7 +270,7 @@ class _LocationStepState extends State<LocationStep> {
               enabledBorder: OutlineInputBorder(
                 borderRadius: BorderRadius.circular(12),
                 borderSide: BorderSide(
-                  color: const Color(0xFF008037)
+                  color: AppColors.primaryGreen
                       .withValues(alpha: 0.3), // Afropeep green border
                   width: 1.5,
                 ),
@@ -278,12 +278,12 @@ class _LocationStepState extends State<LocationStep> {
               focusedBorder: OutlineInputBorder(
                 borderRadius: BorderRadius.circular(12),
                 borderSide:
-                    const BorderSide(color: Color(0xFF008037), width: 2),
+                    const BorderSide(color: AppColors.primaryGreen, width: 2),
               ),
               contentPadding: const EdgeInsets.all(16),
               prefixIcon: const Icon(
                 Icons.location_city,
-                color: Color(0xFF008037),
+                color: AppColors.primaryGreen,
               ),
             ),
           ),
@@ -312,7 +312,7 @@ class _LocationStepState extends State<LocationStep> {
               hintText: 'Enter state (e.g., Lagos, Abuja, Kano)',
               hintStyle: GoogleFonts.montserrat(
                 fontSize: 16,
-                color: const Color(0xFF008037)
+                color: AppColors.primaryGreen
                     .withValues(alpha: 0.7), // Afropeep green hint
               ),
               filled: true,
@@ -321,7 +321,7 @@ class _LocationStepState extends State<LocationStep> {
               border: OutlineInputBorder(
                 borderRadius: BorderRadius.circular(12),
                 borderSide: BorderSide(
-                  color: const Color(0xFF008037)
+                  color: AppColors.primaryGreen
                       .withValues(alpha: 0.3), // Afropeep green border
                   width: 1.5,
                 ),
@@ -329,7 +329,7 @@ class _LocationStepState extends State<LocationStep> {
               enabledBorder: OutlineInputBorder(
                 borderRadius: BorderRadius.circular(12),
                 borderSide: BorderSide(
-                  color: const Color(0xFF008037)
+                  color: AppColors.primaryGreen
                       .withValues(alpha: 0.3), // Afropeep green border
                   width: 1.5,
                 ),
@@ -337,7 +337,7 @@ class _LocationStepState extends State<LocationStep> {
               focusedBorder: OutlineInputBorder(
                 borderRadius: BorderRadius.circular(12),
                 borderSide:
-                    const BorderSide(color: Color(0xFF008037), width: 2),
+                    const BorderSide(color: AppColors.primaryGreen, width: 2),
               ),
               contentPadding: const EdgeInsets.all(16),
             ),
@@ -365,7 +365,7 @@ class _LocationStepState extends State<LocationStep> {
               hintText: 'Enter country (e.g., United States, Nigeria, Canada)',
               hintStyle: GoogleFonts.montserrat(
                 fontSize: 16,
-                color: const Color(0xFF008037)
+                color: AppColors.primaryGreen
                     .withValues(alpha: 0.7), // Afropeep green hint
               ),
               filled: true,
@@ -374,7 +374,7 @@ class _LocationStepState extends State<LocationStep> {
               border: OutlineInputBorder(
                 borderRadius: BorderRadius.circular(12),
                 borderSide: BorderSide(
-                  color: const Color(0xFF008037)
+                  color: AppColors.primaryGreen
                       .withValues(alpha: 0.3), // Afropeep green border
                   width: 1.5,
                 ),
@@ -382,7 +382,7 @@ class _LocationStepState extends State<LocationStep> {
               enabledBorder: OutlineInputBorder(
                 borderRadius: BorderRadius.circular(12),
                 borderSide: BorderSide(
-                  color: const Color(0xFF008037)
+                  color: AppColors.primaryGreen
                       .withValues(alpha: 0.3), // Afropeep green border
                   width: 1.5,
                 ),
@@ -390,7 +390,7 @@ class _LocationStepState extends State<LocationStep> {
               focusedBorder: OutlineInputBorder(
                 borderRadius: BorderRadius.circular(12),
                 borderSide:
-                    const BorderSide(color: Color(0xFF008037), width: 2),
+                    const BorderSide(color: AppColors.primaryGreen, width: 2),
               ),
               contentPadding: const EdgeInsets.all(16),
             ),
@@ -408,10 +408,10 @@ class _LocationStepState extends State<LocationStep> {
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: const Color(0xFF008037).withValues(alpha: 0.1),
+        color: AppColors.primaryGreen.withValues(alpha: 0.1),
         borderRadius: BorderRadius.circular(12),
         border: Border.all(
-          color: const Color(0xFF008037).withValues(alpha: 0.3),
+          color: AppColors.primaryGreen.withValues(alpha: 0.3),
         ),
       ),
       child: Column(
@@ -421,7 +421,7 @@ class _LocationStepState extends State<LocationStep> {
             children: [
               const Icon(
                 Icons.location_on,
-                color: Color(0xFF008037),
+                color: AppColors.primaryGreen,
                 size: 24,
               ),
               const SizedBox(width: 8),
@@ -430,7 +430,7 @@ class _LocationStepState extends State<LocationStep> {
                 style: GoogleFonts.montserrat(
                   fontSize: 16,
                   fontWeight: FontWeight.w600,
-                  color: const Color(0xFF008037),
+                  color: AppColors.primaryGreen,
                 ),
               ),
             ],
@@ -440,7 +440,7 @@ class _LocationStepState extends State<LocationStep> {
             widget.eventData.location!.displayAddress,
             style: GoogleFonts.montserrat(
               fontSize: 14,
-              color: const Color(0xFF008037),
+              color: AppColors.primaryGreen,
             ),
           ),
         ],

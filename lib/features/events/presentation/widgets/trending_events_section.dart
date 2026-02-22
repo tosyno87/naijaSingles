@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import '../../data/models/event_model.dart';
+import '../../../../common/constants/app_colors.dart';
 
 class TrendingEventsSection extends StatelessWidget {
   const TrendingEventsSection({
@@ -41,7 +42,7 @@ class TrendingEventsSection extends StatelessWidget {
               children: [
                 const Icon(
                   Icons.trending_up,
-                  color: Color(0xFF008037),
+                  color: AppColors.primaryGreen,
                   size: 20,
                 ),
                 const SizedBox(width: 8),
@@ -63,7 +64,7 @@ class TrendingEventsSection extends StatelessWidget {
                   style: GoogleFonts.montserrat(
                     fontSize: 14,
                     fontWeight: FontWeight.w600,
-                    color: const Color(0xFF008037),
+                    color: AppColors.primaryGreen,
                   ),
                 ),
               ),
@@ -211,7 +212,7 @@ class TrendingEventsSection extends StatelessWidget {
               const Icon(
                 Icons.people,
                 size: 12,
-                color: Color(0xFF008037),
+                color: AppColors.primaryGreen,
               ),
               const SizedBox(width: 4),
               Text(
@@ -219,7 +220,7 @@ class TrendingEventsSection extends StatelessWidget {
                 style: GoogleFonts.montserrat(
                   fontSize: 12,
                   fontWeight: FontWeight.w500,
-                  color: const Color(0xFF008037),
+                  color: AppColors.primaryGreen,
                 ),
               ),
             ],
@@ -228,7 +229,7 @@ class TrendingEventsSection extends StatelessWidget {
             Container(
               padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
               decoration: BoxDecoration(
-                color: const Color(0xFF008037).withValues(alpha: 0.1),
+                color: AppColors.primaryGreen.withValues(alpha: 0.1),
                 borderRadius: BorderRadius.circular(8),
               ),
               child: Text(
@@ -236,7 +237,7 @@ class TrendingEventsSection extends StatelessWidget {
                 style: GoogleFonts.montserrat(
                   fontSize: 10,
                   fontWeight: FontWeight.bold,
-                  color: const Color(0xFF008037),
+                  color: AppColors.primaryGreen,
                 ),
               ),
             )
@@ -246,7 +247,7 @@ class TrendingEventsSection extends StatelessWidget {
               style: GoogleFonts.montserrat(
                 fontSize: 12,
                 fontWeight: FontWeight.w600,
-                color: const Color(0xFF008037),
+                color: AppColors.primaryGreen,
               ),
             ),
         ],

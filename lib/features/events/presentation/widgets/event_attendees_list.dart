@@ -1,10 +1,12 @@
 import 'package:cached_network_image/cached_network_image.dart';
+import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:google_fonts/google_fonts.dart';
 
 import '../../data/models/rsvp_model.dart';
 import '../bloc/rsvp_bloc.dart';
+import '../../../../common/constants/app_colors.dart';
 
 class EventAttendeesList extends StatefulWidget {
   const EventAttendeesList({
@@ -194,14 +196,14 @@ class _EventAttendeesListState extends State<EventAttendeesList> {
           _buildStatusCount(
             icon: Icons.check_circle,
             count: statusCounts[RSVPStatus.going] ?? 0,
-            label: 'Going',
+            label: 'Going'.tr(),
             color: const Color(0xFF4CAF50),
           ),
           const SizedBox(width: 20),
           _buildStatusCount(
             icon: Icons.star,
             count: statusCounts[RSVPStatus.interested] ?? 0,
-            label: 'Interested',
+            label: 'Interested'.tr(),
             color: const Color(0xFFFF9800),
           ),
         ],
@@ -242,7 +244,7 @@ class _EventAttendeesListState extends State<EventAttendeesList> {
         decoration: BoxDecoration(
           shape: BoxShape.circle,
           border: Border.all(
-            color: const Color(0xFF008037),
+            color: AppColors.primaryGreen,
             width: 2,
           ),
         ),
@@ -268,14 +270,14 @@ class _EventAttendeesListState extends State<EventAttendeesList> {
         .join();
 
     return ColoredBox(
-      color: const Color(0xFF008037).withValues(alpha: 0.1),
+      color: AppColors.primaryGreen.withValues(alpha: 0.1),
       child: Center(
         child: Text(
           initials,
           style: GoogleFonts.montserrat(
             fontSize: 16,
             fontWeight: FontWeight.bold,
-            color: const Color(0xFF008037),
+            color: AppColors.primaryGreen,
           ),
         ),
       ),
@@ -287,9 +289,9 @@ class _EventAttendeesListState extends State<EventAttendeesList> {
         height: 48,
         decoration: BoxDecoration(
           shape: BoxShape.circle,
-          color: const Color(0xFF008037).withValues(alpha: 0.1),
+          color: AppColors.primaryGreen.withValues(alpha: 0.1),
           border: Border.all(
-            color: const Color(0xFF008037),
+            color: AppColors.primaryGreen,
             width: 2,
           ),
         ),
@@ -299,7 +301,7 @@ class _EventAttendeesListState extends State<EventAttendeesList> {
             style: GoogleFonts.montserrat(
               fontSize: 14,
               fontWeight: FontWeight.bold,
-              color: const Color(0xFF008037),
+              color: AppColors.primaryGreen,
             ),
           ),
         ),

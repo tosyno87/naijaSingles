@@ -5,6 +5,7 @@ import 'package:google_fonts/google_fonts.dart';
 
 import '../../data/models/rsvp_model.dart';
 import '../bloc/rsvp_bloc.dart';
+import '../../../../common/constants/app_colors.dart';
 
 class RSVPButton extends StatefulWidget {
   const RSVPButton({
@@ -118,7 +119,7 @@ class _RSVPButtonState extends State<RSVPButton>
                   state.message,
                   style: GoogleFonts.montserrat(color: Colors.white),
                 ),
-                backgroundColor: const Color(0xFF008037),
+                backgroundColor: AppColors.primaryGreen,
                 behavior: SnackBarBehavior.floating,
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(10),
@@ -395,7 +396,7 @@ class _RSVPButtonState extends State<RSVPButton>
       case RSVPStatus.notGoing:
         return const Color(0xFFF44336).withValues(alpha: 0.1);
       case RSVPStatus.none:
-        return const Color(0xFF008037);
+        return AppColors.primaryGreen;
     }
   }
 
@@ -408,7 +409,7 @@ class _RSVPButtonState extends State<RSVPButton>
       case RSVPStatus.notGoing:
         return const Color(0xFFF44336);
       case RSVPStatus.none:
-        return const Color(0xFF008037);
+        return AppColors.primaryGreen;
     }
   }
 

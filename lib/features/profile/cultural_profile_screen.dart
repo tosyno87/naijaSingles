@@ -1022,7 +1022,7 @@ class _CulturalProfileScreenState extends State<CulturalProfileScreen> {
       // Format distance with proper unit based on region
       return RegionDetectionService.formatDistance(distanceKm, locationData);
     } catch (e) {
-      return '50 km'; // Safe fallback
+      return '31 miles'; // Safe fallback
     }
   }
 }

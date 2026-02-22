@@ -1,7 +1,7 @@
+import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:intl/intl.dart';
 import 'package:share_plus/share_plus.dart';
 
 import '../../../../common/constants/app_colors.dart';
@@ -71,7 +71,7 @@ class EventSharingWidget extends StatelessWidget {
           color: AppColors.backgroundColor,
           borderRadius: BorderRadius.circular(12),
           border: Border.all(
-            color: const Color(0xFF008037).withValues(alpha: 0.2),
+            color: AppColors.primaryGreen.withValues(alpha: 0.2),
           ),
         ),
         child: Column(
@@ -223,12 +223,12 @@ class EventSharingWidget extends StatelessWidget {
               Container(
                 padding: const EdgeInsets.all(12),
                 decoration: BoxDecoration(
-                  color: const Color(0xFF008037).withValues(alpha: 0.1),
+                  color: AppColors.primaryGreen.withValues(alpha: 0.1),
                   borderRadius: BorderRadius.circular(12),
                 ),
                 child: Icon(
                   icon,
-                  color: const Color(0xFF008037),
+                  color: AppColors.primaryGreen,
                   size: 24,
                 ),
               ),
@@ -274,25 +274,25 @@ class EventSharingWidget extends StatelessWidget {
               _buildSocialButton(
                 icon: Icons.facebook,
                 color: const Color(0xFF1877F2),
-                label: 'Facebook',
+                label: 'Facebook'.tr(),
                 onTap: () => _shareToFacebook(context),
               ),
               _buildSocialButton(
                 icon: Icons.alternate_email,
                 color: const Color(0xFF1DA1F2),
-                label: 'Twitter',
+                label: 'Twitter'.tr(),
                 onTap: () => _shareToTwitter(context),
               ),
               _buildSocialButton(
                 icon: Icons.camera_alt,
                 color: const Color(0xFFE4405F),
-                label: 'Instagram',
+                label: 'Instagram'.tr(),
                 onTap: () => _shareToInstagram(context),
               ),
               _buildSocialButton(
                 icon: Icons.chat,
                 color: const Color(0xFF25D366),
-                label: 'WhatsApp',
+                label: 'WhatsApp'.tr(),
                 onTap: () => _shareToWhatsApp(context),
               ),
             ],
@@ -352,7 +352,7 @@ class EventSharingWidget extends StatelessWidget {
           'Event link copied to clipboard!',
           style: GoogleFonts.montserrat(color: Colors.white),
         ),
-        backgroundColor: const Color(0xFF008037),
+        backgroundColor: AppColors.primaryGreen,
         behavior: SnackBarBehavior.floating,
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(10),
@@ -562,7 +562,7 @@ Get more details: ${event.ticketUrl ?? 'Afropeep app'}
               style: GoogleFonts.montserrat(
                 fontSize: 16,
                 fontWeight: FontWeight.w600,
-                color: const Color(0xFF008037),
+                color: AppColors.primaryGreen,
               ),
             ),
           ),

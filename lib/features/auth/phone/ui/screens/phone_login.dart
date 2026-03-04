@@ -49,8 +49,6 @@ class _PhoneNumberState extends State<PhoneNumber> {
       _isLoading = true;
     });
 
-    final phoneNumber = _selectedCountryCode + _phoneController.text.trim();
-
     // For now, just navigate to the existing phone number screen
     // This is a temporary solution until we implement the proper phone login flow
     Navigator.pushNamed(

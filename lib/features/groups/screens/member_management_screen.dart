@@ -29,7 +29,6 @@ class _MemberManagementScreenState extends State<MemberManagementScreen>
   List<Map<String, dynamic>> _searchResults = [];
   bool _isSearching = false;
   bool _isLoading = false;
-  String? _error;
 
   @override
   void initState() {
@@ -82,12 +81,25 @@ class _MemberManagementScreenState extends State<MemberManagementScreen>
             ],
           ),
         ),
-        body: TabBarView(
-          controller: _tabController,
+        body: Stack(
           children: [
-            _buildMembersTab(),
-            _buildAdminsTab(),
-            _buildInviteTab(),
+            TabBarView(
+              controller: _tabController,
+              children: [
+                _buildMembersTab(),
+                _buildAdminsTab(),
+                _buildInviteTab(),
+              ],
+            ),
+            if (_isLoading)
+              Container(
+                color: Colors.black.withValues(alpha: 0.2),
+                child: const Center(
+                  child: CircularProgressIndicator(
+                    color: AppColors.primaryGreen,
+                  ),
+                ),
+              ),
           ],
         ),
       );
@@ -519,7 +531,6 @@ class _MemberManagementScreenState extends State<MemberManagementScreen>
     }).catchError((error) {
       if (mounted) {
         setState(() {
-          _error = error.toString();
           _isSearching = false;
         });
       }

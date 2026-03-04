@@ -32,7 +32,6 @@ class _EnhancedAdditionalInfoScreenState
   String _religion = '';
   String _primaryLanguage = ''; // Changed from List<String> _languages
   String _customLanguage = ''; // For when user selects "Other"
-  String _occupation = '';
   String _drinkingPreference = '';
   String _smokingPreference = '';
 
@@ -494,7 +493,6 @@ class _EnhancedAdditionalInfoScreenState
       }
     }
 
-    _occupation = data.occupation ?? '';
     _drinkingPreference = data.drinkingPreference;
     _smokingPreference = data.smokingPreference;
   }
@@ -668,8 +666,8 @@ class _EnhancedAdditionalInfoScreenState
                 _heightCm = heightCm;
               });
               context.read<OnboardingBloc>().add(
-                OnboardingHeightFromDropdownUpdated(heightFtIn, heightCm),
-              );
+                    OnboardingHeightFromDropdownUpdated(heightFtIn, heightCm),
+                  );
             },
           ),
 
@@ -702,8 +700,8 @@ class _EnhancedAdditionalInfoScreenState
                   _relationshipIntent = value;
                 });
                 context.read<OnboardingBloc>().add(
-                  OnboardingRelationshipIntentUpdated(value),
-                );
+                      OnboardingRelationshipIntentUpdated(value),
+                    );
               },
             ),
           ],
@@ -768,8 +766,8 @@ class _EnhancedAdditionalInfoScreenState
                 _education = value;
               });
               context.read<OnboardingBloc>().add(
-                OnboardingEducationUpdated(value),
-              );
+                    OnboardingEducationUpdated(value),
+                  );
             },
           ),
 
@@ -791,8 +789,8 @@ class _EnhancedAdditionalInfoScreenState
                   _religion = value;
                 });
                 context.read<OnboardingBloc>().add(
-                  OnboardingReligionUpdated(value),
-                );
+                      OnboardingReligionUpdated(value),
+                    );
               },
             ),
             SizedBox(height: isTablet ? 32 : 24),
@@ -828,8 +826,8 @@ class _EnhancedAdditionalInfoScreenState
               final languageToSave = value == 'Other' ? _customLanguage : value;
               if (languageToSave.isNotEmpty) {
                 context.read<OnboardingBloc>().add(
-                  OnboardingLanguagesUpdated([languageToSave]),
-                );
+                      OnboardingLanguagesUpdated([languageToSave]),
+                    );
               }
             },
           ),
@@ -884,8 +882,8 @@ class _EnhancedAdditionalInfoScreenState
                   });
                   if (value.isNotEmpty) {
                     context.read<OnboardingBloc>().add(
-                      OnboardingLanguagesUpdated([value]),
-                    );
+                          OnboardingLanguagesUpdated([value]),
+                        );
                   }
                 },
               ),
@@ -921,8 +919,8 @@ class _EnhancedAdditionalInfoScreenState
                   _drinkingPreference = value;
                 });
                 context.read<OnboardingBloc>().add(
-                  OnboardingDrinkingPreferenceUpdated(value),
-                );
+                      OnboardingDrinkingPreferenceUpdated(value),
+                    );
               },
             ),
 
@@ -947,8 +945,8 @@ class _EnhancedAdditionalInfoScreenState
                   _smokingPreference = value;
                 });
                 context.read<OnboardingBloc>().add(
-                  OnboardingSmokingPreferenceUpdated(value),
-                );
+                      OnboardingSmokingPreferenceUpdated(value),
+                    );
               },
             ),
 
@@ -1100,6 +1098,8 @@ class _EnhancedAdditionalInfoScreenState
         ),
       );
 
+  // Legacy option builders kept for potential design variants.
+  // ignore: unused_element
   List<Widget> _buildEnhancedOptions(
     List<Map<String, dynamic>> options,
     String selectedValue,
@@ -1433,8 +1433,8 @@ class _EnhancedAdditionalInfoScreenState
                   controllerValue = 'Dating';
               }
               context.read<OnboardingBloc>().add(
-                OnboardingLookingForUpdated(controllerValue),
-              );
+                    OnboardingLookingForUpdated(controllerValue),
+                  );
             }
           },
         ),
@@ -1442,6 +1442,7 @@ class _EnhancedAdditionalInfoScreenState
     );
   }
 
+  // ignore: unused_element
   List<Widget> _buildStandardOptions(
     List<Map<String, dynamic>> options,
     String selectedValue,
@@ -1506,6 +1507,7 @@ class _EnhancedAdditionalInfoScreenState
     }).toList();
   }
 
+  // ignore: unused_element
   List<Widget> _buildCompactOptions(
     List<Map<String, dynamic>> options,
     String selectedValue,

@@ -12,7 +12,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'common/bloc/language/language_bloc.dart';
-import 'common/bloc/streetview/streetview_bloc.dart';
 import 'common/bloc/theme/theme_bloc.dart';
 import 'common/bloc/user/user_bloc.dart';
 import 'common/constants/theme.dart';

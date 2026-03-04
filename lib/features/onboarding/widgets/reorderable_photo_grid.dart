@@ -36,7 +36,6 @@ class _ReorderablePhotoGridState extends State<ReorderablePhotoGrid> {
   static const Color warningOrange = Color(0xFFFF8C00);
 
   int? _draggedIndex;
-  int? _hoveredIndex;
 
   @override
   Widget build(BuildContext context) => Column(

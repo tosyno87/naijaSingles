@@ -459,28 +459,6 @@ class ContentModerationService {
       moderatedAt: DateTime.now(),
     );
   }
-
-  /// Save moderation result
-  Future<void> _saveModerationResult(
-    String userId,
-    String contentType,
-    String contentId,
-    ModerationResult result,
-  ) async {
-    try {
-      await _firestore.collection('moderation_history').add({
-        'userId': userId,
-        'contentType': contentType,
-        'contentId': contentId,
-        'action': result.action.name,
-        'issues': result.issues.map((issue) => issue.toMap()).toList(),
-        'confidence': result.confidence,
-        'moderatedAt': result.moderatedAt,
-      });
-    } catch (e) {
-      log('❌ Error saving moderation result: $e');
-    }
-  }
 }
 
 /// Moderation issue types

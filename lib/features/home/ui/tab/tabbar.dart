@@ -21,6 +21,7 @@ import '../../../profile/profile_screen.dart';
 import '../screens/home_page.dart';
 
 // Background message handler
+// ignore: unused_element
 Future<void> _firebaseMessagingBackgroundHandler(RemoteMessage message) async {
   await Firebase.initializeApp();
 

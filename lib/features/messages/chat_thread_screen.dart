@@ -748,6 +748,7 @@ class _ChatThreadScreenState extends State<ChatThreadScreen> {
   }
 
   // Build quick action button
+  // ignore: unused_element
   Widget _buildQuickActionButton({
     required IconData icon,
     required String label,

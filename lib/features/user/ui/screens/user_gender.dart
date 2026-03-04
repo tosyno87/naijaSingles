@@ -24,7 +24,6 @@ class GenderState extends State<Gender> with SingleTickerProviderStateMixin {
 
   // Use nullable types instead of late initialization
   AnimationController? _animationController;
-  Animation<double>? _fadeAnimation;
 
   @override
   void initState() {
@@ -34,12 +33,6 @@ class GenderState extends State<Gender> with SingleTickerProviderStateMixin {
     _animationController = AnimationController(
       duration: const Duration(milliseconds: 800),
       vsync: this,
-    );
-
-    // Initialize animation
-    _fadeAnimation = CurvedAnimation(
-      parent: _animationController!,
-      curve: Curves.easeInOut,
     );
 
     // Start animation after frame is built

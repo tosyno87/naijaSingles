@@ -15,9 +15,6 @@ class SettingsService {
   static CollectionReference get _feedbackCollection =>
       _firestore.collection('feedback');
 
-  /// Get current user ID
-  static String? get _currentUserId => _auth.currentUser?.uid;
-
   // BLOCKED USERS MANAGEMENT
 
   /// Get list of blocked user IDs for current user

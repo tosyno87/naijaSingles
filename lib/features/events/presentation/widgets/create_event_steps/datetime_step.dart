@@ -18,7 +18,6 @@ class DateTimeStep extends StatefulWidget {
 
 class _DateTimeStepState extends State<DateTimeStep> {
   final DateFormat _dateFormat = DateFormat('MMM dd, yyyy');
-  final DateFormat _timeFormat = DateFormat('hh:mm a');
 
   @override
   Widget build(BuildContext context) => SingleChildScrollView(

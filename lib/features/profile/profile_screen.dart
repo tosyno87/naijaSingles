@@ -224,6 +224,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
               ),
       );
 
+  // Legacy simplified layout retained as fallback.
+  // ignore: unused_element
   Widget _buildSimplifiedPhotoSection() {
     // Try multiple field names for compatibility
     final photos = _userData?['photos'] as List<dynamic>? ??
@@ -400,6 +402,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
     );
   }
 
+  // ignore: unused_element
   Widget _buildSimplifiedBasicInfo() {
     final name = _userData?['name'] ?? 'Your Name';
     final age = _userData?['age'] ?? _calculateAge(_userData?['dateOfBirth']);
@@ -442,6 +445,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
     );
   }
 
+  // ignore: unused_element
   Widget _buildSimplifiedAbout() {
     final bio = _userData?['bio'] ?? '';
 
@@ -477,6 +481,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
     );
   }
 
+  // ignore: unused_element
   Widget _buildSimplifiedInterests() {
     final interests = _userData?['interests'] as List<dynamic>? ?? [];
 
@@ -530,8 +535,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
                         decoration: BoxDecoration(
                           color: primaryColor.withValues(alpha: 0.1),
                           borderRadius: BorderRadius.circular(20),
-                          border:
-                              Border.all(color: primaryColor.withValues(alpha: 0.3)),
+                          border: Border.all(
+                              color: primaryColor.withValues(alpha: 0.3)),
                         ),
                         child: Text(
                           interest.toString(),
@@ -563,6 +568,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
     );
   }
 
+  // ignore: unused_element
   Widget _buildSimplifiedLocation() {
     // Handle both String and Map types for location and nationality
     String location = '';

@@ -25,7 +25,6 @@ class EnhancedHeightInput extends StatefulWidget {
 class _EnhancedHeightInputState extends State<EnhancedHeightInput> {
   late double _height;
   late String _heightUnit;
-  final bool _showPicker = false;
 
   @override
   void initState() {
@@ -138,9 +137,6 @@ class _EnhancedHeightInputState extends State<EnhancedHeightInput> {
 
   @override
   Widget build(BuildContext context) {
-    final screenWidth = MediaQuery.of(context).size.width;
-    final isTablet = screenWidth > 600;
-
     if (widget.useIOSPicker) {
       return _buildPickerButton();
     } else {

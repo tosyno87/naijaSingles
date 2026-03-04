@@ -7,7 +7,6 @@ import '../../../common/constants/app_colors.dart';
 
 import 'bloc/onboarding_bloc.dart';
 import 'bloc/onboarding_data.dart';
-import 'shared_styles.dart';
 
 /// Third step of onboarding focusing on personal values.
 ///

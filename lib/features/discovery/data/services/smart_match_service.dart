@@ -5,8 +5,8 @@ import 'package:flutter/foundation.dart';
 import '../../../../models/user_model.dart';
 import '../../../../services/cached_user_service.dart';
 import '../../../../services/mode_specific_compatibility_engine.dart';
+import '../../../../services/paginated_user_service.dart' show PaginatedResult;
 import '../../../match/data/services/compatibility_engine.dart';
-import '../../../../services/paginated_user_service.dart';
 import '../../../../services/performance_monitor.dart';
 
 /// Smart match service that provides intelligent user ordering and discovery
@@ -17,7 +17,6 @@ class SmartMatchService {
   static const double MEDIUM_COMPATIBILITY_THRESHOLD = 0.5;
   static const int MAX_CONSECUTIVE_HIGH_MATCHES = 3;
 
-  final PaginatedUserService _paginatedUserService = PaginatedUserService();
   final CachedUserService _cachedUserService = CachedUserService();
 
   /// Get optimized user list with compatibility scoring and smart ordering

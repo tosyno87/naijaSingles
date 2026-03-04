@@ -367,22 +367,6 @@ class UserPrivacyService {
     return false;
   }
 
-  /// Check if user has liked another user (placeholder)
-  Future<bool> _checkIfLiked(String fromUserId, String toUserId) async {
-    try {
-      final likeDoc = await _firestore
-          .collection('likes')
-          .where('from', isEqualTo: fromUserId)
-          .where('to', isEqualTo: toUserId)
-          .get();
-
-      return likeDoc.docs.isNotEmpty;
-    } catch (e) {
-      debugPrint('Error checking like status: $e');
-      return false;
-    }
-  }
-
   /// Get privacy summary for display
   String getPrivacySummary(UserPrivacySettings settings) {
     final List<String> activeSettings = [];

@@ -737,46 +737,4 @@ class _CreateGroupScreenState extends State<CreateGroupScreen> {
         ),
       );
 
-  LinearGradient _getCategoryGradient() {
-    switch (_selectedCategory.toLowerCase()) {
-      case 'cultural':
-        return const LinearGradient(
-          colors: [AppColors.culture, AppColors.heritage],
-          begin: Alignment.topLeft,
-          end: Alignment.bottomRight,
-        );
-      case 'professional':
-        return const LinearGradient(
-          colors: [AppColors.business, AppColors.success],
-          begin: Alignment.topLeft,
-          end: Alignment.bottomRight,
-        );
-      case 'social':
-        return const LinearGradient(
-          colors: [AppColors.community, AppColors.info],
-          begin: Alignment.topLeft,
-          end: Alignment.bottomRight,
-        );
-      case 'educational':
-        return const LinearGradient(
-          colors: [AppColors.primaryGreen, AppColors.primaryGreenLight],
-          begin: Alignment.topLeft,
-          end: Alignment.bottomRight,
-        );
-      case 'religious':
-        return const LinearGradient(
-          colors: [AppColors.warning, AppColors.error],
-          begin: Alignment.topLeft,
-          end: Alignment.bottomRight,
-        );
-      case 'regional':
-        return const LinearGradient(
-          colors: [AppColors.textPrimary, AppColors.textSecondary],
-          begin: Alignment.topLeft,
-          end: Alignment.bottomRight,
-        );
-      default:
-        return AppColors.primaryGradient;
-    }
-  }
 }

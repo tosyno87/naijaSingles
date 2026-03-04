@@ -6,8 +6,6 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import '../../../common/constants/app_colors.dart';
 
 import 'bloc/onboarding_bloc.dart';
-import 'bloc/onboarding_data.dart';
-import 'shared_styles.dart';
 
 /// Bio Info step of onboarding focusing on personal details.
 ///
@@ -29,7 +27,6 @@ class OnboardingStepBio extends StatefulWidget {
 class _OnboardingStepBioState extends State<OnboardingStepBio> {
   // Keys for accessibility and testing
   final GlobalKey _nameKey = GlobalKey();
-  final GlobalKey _ageKey = GlobalKey();
   final GlobalKey _locationKey = GlobalKey();
   final GlobalKey _bioKey = GlobalKey();
   final GlobalKey _continueButtonKey = GlobalKey();
@@ -87,8 +84,6 @@ class _OnboardingStepBioState extends State<OnboardingStepBio> {
 
   // Show age picker modal
   void _showAgePickerModal(BuildContext context) {
-    // Define the cream background color for consistency
-    const Color backgroundColor = Colors.white;
     const Color deepGreen = Color(0xFF008037);
 
     showModalBottomSheet(
@@ -236,8 +231,6 @@ class _OnboardingStepBioState extends State<OnboardingStepBio> {
   Widget build(BuildContext context) {
     return BlocBuilder<OnboardingBloc, OnboardingState>(
       builder: (context, state) {
-        final data = state.data ?? OnboardingData();
-
     // Deep green color for accents
     const Color deepGreen = Color(0xFF008037);
 

@@ -548,31 +548,6 @@ class UserEventService {
     });
   }
 
-  /// Validate event data
-  void _validateEventData(EventCreationData data) {
-    if (!data.isValid) {
-      throw Exception('Invalid event data');
-    }
-
-    // Additional validations
-    if (data.startDate!
-        .isBefore(DateTime.now().add(const Duration(hours: 1)))) {
-      throw Exception('Event must start at least 1 hour from now');
-    }
-
-    if (data.endDate!.difference(data.startDate!).inHours > 168) {
-      // 7 days
-      throw Exception('Event duration cannot exceed 7 days');
-    }
-
-    if (data.maxAttendees < 1 || data.maxAttendees > 10000) {
-      throw Exception('Max attendees must be between 1 and 10,000');
-    }
-
-    if (!data.isFree && (data.ticketPrice == null || data.ticketPrice! <= 0)) {
-      throw Exception('Paid events must have a valid ticket price');
-    }
-  }
 }
 
 // Exception classes

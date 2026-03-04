@@ -150,10 +150,6 @@ class ImageOptimizationService {
     }
   }
 
-  /// Generate thumbnail with specific settings
-  Future<File> _generateThumbnail(File imageFile) async =>
-      generateThumbnail(imageFile);
-
   /// Get compression settings based on image type and size
   CompressionSettings _getCompressionSettings({
     required ImageType imageType,

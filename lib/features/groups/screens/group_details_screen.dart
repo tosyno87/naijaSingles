@@ -6,7 +6,6 @@ import 'package:google_fonts/google_fonts.dart';
 
 import '../../../common/constants/app_colors.dart';
 import '../../../models/group_join_exception.dart';
-import '../../../services/group_notification_service.dart';
 import '../../../services/group_unread_service.dart';
 import '../data/services/unified_group_service.dart';
 import '../../../services/user_service.dart';
@@ -38,8 +37,6 @@ class GroupDetailsScreen extends StatefulWidget {
 class _GroupDetailsScreenState extends State<GroupDetailsScreen> {
   final UnifiedGroupService _groupService = UnifiedGroupService();
   final UserService _userService = UserService();
-  final GroupNotificationService _notificationService =
-      GroupNotificationService();
   final GroupUnreadService _unreadService = GroupUnreadService();
   final ScrollController _scrollController = ScrollController();
   final TextEditingController _messageController = TextEditingController();

@@ -2,7 +2,6 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 
-import '../../../features/match/data/services/likes_service.dart';
 import '../../../models/user_model.dart';
 import '../../../services/location_privacy_service.dart';
 import '../../../services/user_privacy_service.dart';
@@ -15,7 +14,6 @@ class PrivacyAwareUserSearchRepo {
   static CollectionReference get docRef => db.collection('users');
 
   static FirebaseAuth firebaseAuth = firebaseAuthInstance;
-  static final LikesService _likesService = LikesService();
   static final UserPrivacyService _privacyService = UserPrivacyService();
 
   static Map items = {};

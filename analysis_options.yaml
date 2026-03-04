@@ -16,6 +16,12 @@ analyzer:
     - "**/*.gr.dart"
     - "**/*.generated.dart"
     - "**/*_old.dart"  # Exclude old/backup files
+    - "test/**"
+    - "integration_test/**"
+    - "scripts/**"
+    - "analyze_users.dart"
+    - "fix_user_fields.dart"
+    - "fix_user_fields_simple.dart"
   errors:
     # Critical errors that should always fail the build
     missing_required_param: error

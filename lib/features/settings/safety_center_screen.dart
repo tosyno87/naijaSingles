@@ -1,5 +1,3 @@
-import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 
@@ -13,15 +11,11 @@ class SafetyCenterScreen extends StatefulWidget {
 }
 
 class _SafetyCenterScreenState extends State<SafetyCenterScreen> {
-  final FirebaseAuth _auth = FirebaseAuth.instance;
-  final FirebaseFirestore _firestore = FirebaseFirestore.instance;
-
   // Afropeep MVP Color Scheme
   static const Color primaryColor = Color(0xFF008037); // Deep green
   static const Color cardColor = Color(0xFFFFFFFF); // White for cards
   static const Color errorColor = Color(0xFFFF5A5F); // Red for errors/danger
   static const Color warningColor = Color(0xFFFF9500); // Orange for warnings
-  static const Color successColor = Color(0xFF4CAF50); // Green for success
   static final Color textPrimary = Colors.brown.shade800;
   static final Color textSecondary = Colors.brown.shade600;
   static final Color textLight = Colors.grey.shade600;

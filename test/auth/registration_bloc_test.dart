@@ -20,7 +20,7 @@ void main() {
       bloc = RegistrationBloc(phoneAuthRepository: repo);
     });
 
-    final userModel = UserModel(id: '1', name: 'test');
+    final userModel = UserModel(id: '1', name: 'test', userGender: 'Male');
     final firebaseUser = MockFirebaseUser();
 
     blocTest<RegistrationBloc, RegistrationStates>(

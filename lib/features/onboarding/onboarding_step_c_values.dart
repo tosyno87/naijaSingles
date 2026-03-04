@@ -181,13 +181,13 @@ class _OnboardingStepCValuesState extends State<OnboardingStepCValues>
                         runSpacing: 12,
                         children: _partnerValues.map((value) {
                           final isSelected =
-                              controller.values.contains(value['id']);
+                              data.values.contains(value['id']);
                           return _buildValueCheckbox(
                             label: value['label'],
                             isSelected: isSelected,
                             onChanged: (selected) {
                               final List<String> updatedValues = [
-                                ...controller.values,
+                                ...data.values,
                               ];
                               if (selected) {
                                 updatedValues.add(value['id']);

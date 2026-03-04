@@ -1,3 +1,4 @@
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
@@ -170,10 +171,13 @@ class _CulturalProfileScreenState extends State<CulturalProfileScreen> {
             ),
             child: ClipOval(
               child: mainPhoto != null
-                  ? Image.network(
-                      mainPhoto,
+                  ? CachedNetworkImage(
+                      imageUrl: mainPhoto,
                       fit: BoxFit.cover,
-                      errorBuilder: (context, error, stackTrace) => ColoredBox(
+                      placeholder: (context, url) => const Center(
+                        child: CircularProgressIndicator(strokeWidth: 2),
+                      ),
+                      errorWidget: (context, url, error) => ColoredBox(
                         color: Colors.white.withValues(alpha: 0.2),
                         child: Custom3DIcons.profile(size: 60),
                       ),

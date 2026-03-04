@@ -1,5 +1,6 @@
 import 'dart:io';
 
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -100,64 +101,26 @@ class MyEventCard extends StatelessWidget {
                       color: Colors
                           .grey.shade100, // Background for contained images
                       child: event.primaryImageUrl.startsWith('http')
-                          ? Image.network(
-                              event.primaryImageUrl,
+                          ? CachedNetworkImage(
+                              imageUrl: event.primaryImageUrl,
                               width: double.infinity,
                               height: double.infinity,
                               fit: BoxFit.contain,
                               filterQuality: FilterQuality.high,
-                              isAntiAlias: true,
-                              loadingBuilder:
-                                  (context, child, loadingProgress) {
-                                if (loadingProgress == null) return child;
-                                return Container(
-                                  width: double.infinity,
-                                  height: double.infinity,
-                                  color: const Color(0xFFF8F8F8),
-                                  child: Center(
-                                    child: Column(
-                                      mainAxisAlignment:
-                                          MainAxisAlignment.center,
-                                      children: [
-                                        SizedBox(
-                                          width: 40,
-                                          height: 40,
-                                          child: CircularProgressIndicator(
-                                            value: loadingProgress
-                                                        .expectedTotalBytes !=
-                                                    null
-                                                ? loadingProgress
-                                                        .cumulativeBytesLoaded /
-                                                    loadingProgress
-                                                        .expectedTotalBytes!
-                                                : null,
-                                            valueColor:
-                                                const AlwaysStoppedAnimation<
-                                                    Color>(
-                                              AppColors.primaryGreen,
-                                            ),
-                                            strokeWidth: 3,
-                                          ),
-                                        ),
-                                        const SizedBox(height: 12),
-                                        Text(
-                                          'Loading poster...',
-                                          style: GoogleFonts.montserrat(
-                                            fontSize: 12,
-                                            color: const Color(0xFF666666),
-                                            fontWeight: FontWeight.w500,
-                                          ),
-                                        ),
-                                      ],
-                                    ),
+                              placeholder: (context, url) => Container(
+                                width: double.infinity,
+                                height: double.infinity,
+                                color: const Color(0xFFF8F8F8),
+                                child: const Center(
+                                  child: CircularProgressIndicator(
+                                    strokeWidth: 2,
                                   ),
-                                );
-                              },
-                              errorBuilder: (context, error, stackTrace) {
+                                ),
+                              ),
+                              errorWidget: (context, url, error) {
                                 AppLogger.error(
                                   '❌ Error loading image for event ${event.id}',
                                   error: error,
-                                  stackTrace: stackTrace,
                                 );
                                 AppLogger.debug(
                                     '❌ Image URL: ${event.primaryImageUrl}');
@@ -718,45 +681,19 @@ class MyEventCard extends StatelessWidget {
               boundaryMargin: const EdgeInsets.all(20),
               minScale: 0.5,
               maxScale: 4,
-              child: Image.network(
-                event.primaryImageUrl,
+              child: CachedNetworkImage(
+                imageUrl: event.primaryImageUrl,
                 fit: BoxFit.contain,
                 filterQuality: FilterQuality.high,
-                isAntiAlias: true,
-                loadingBuilder: (context, child, loadingProgress) {
-                  if (loadingProgress == null) return child;
-                  return Center(
-                    child: Column(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        SizedBox(
-                          width: 60,
-                          height: 60,
-                          child: CircularProgressIndicator(
-                            value: loadingProgress.expectedTotalBytes != null
-                                ? loadingProgress.cumulativeBytesLoaded /
-                                    loadingProgress.expectedTotalBytes!
-                                : null,
-                            valueColor: const AlwaysStoppedAnimation<Color>(
-                              AppColors.primaryGreen,
-                            ),
-                            strokeWidth: 4,
-                          ),
-                        ),
-                        const SizedBox(height: 20),
-                        Text(
-                          'Loading full poster...',
-                          style: GoogleFonts.montserrat(
-                            fontSize: 16,
-                            color: Colors.white,
-                            fontWeight: FontWeight.w500,
-                          ),
-                        ),
-                      ],
+                placeholder: (context, url) => const Center(
+                  child: CircularProgressIndicator(
+                    strokeWidth: 2,
+                    valueColor: AlwaysStoppedAnimation<Color>(
+                      AppColors.primaryGreen,
                     ),
-                  );
-                },
-                errorBuilder: (context, error, stackTrace) => Center(
+                  ),
+                ),
+                errorWidget: (context, url, error) => Center(
                   child: Column(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [

@@ -1,5 +1,6 @@
 import 'dart:ui';
 
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 
@@ -266,10 +267,13 @@ class _MatchConfirmationModalState extends State<MatchConfirmationModal>
         ),
         child: ClipRRect(
           borderRadius: BorderRadius.circular(50),
-          child: Image.network(
-            imageUrl,
+          child: CachedNetworkImage(
+            imageUrl: imageUrl,
             fit: BoxFit.cover,
-            errorBuilder: (context, error, stackTrace) => Container(
+            placeholder: (context, url) => const Center(
+              child: CircularProgressIndicator(strokeWidth: 2),
+            ),
+            errorWidget: (context, url, error) => Container(
               color: Colors.grey[300],
               child: const Icon(
                 Icons.person,

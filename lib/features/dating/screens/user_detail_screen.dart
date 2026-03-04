@@ -1,3 +1,4 @@
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import '../../../common/constants/app_colors.dart';
@@ -199,10 +200,19 @@ class _UserDetailScreenState extends State<UserDetailScreen> {
           },
           itemBuilder: (context, index) => GestureDetector(
             onTap: () => _showFullScreenPhoto(photos, index),
-            child: Image.network(
-              photos[index],
+            child: CachedNetworkImage(
+              imageUrl: photos[index],
               fit: BoxFit.cover,
-              errorBuilder: (context, error, stackTrace) => ColoredBox(
+              placeholder: (context, url) => ColoredBox(
+                color: Colors.grey.shade100,
+                child: const Center(
+                  child: CircularProgressIndicator(
+                    color: afropeepGreen,
+                    strokeWidth: 2,
+                  ),
+                ),
+              ),
+              errorWidget: (context, url, error) => ColoredBox(
                 color: Colors.grey.shade200,
                 child: Column(
                   mainAxisAlignment: MainAxisAlignment.center,
@@ -223,21 +233,6 @@ class _UserDetailScreenState extends State<UserDetailScreen> {
                   ],
                 ),
               ),
-              loadingBuilder: (context, child, loadingProgress) {
-                if (loadingProgress == null) return child;
-                return ColoredBox(
-                  color: Colors.grey.shade100,
-                  child: Center(
-                    child: CircularProgressIndicator(
-                      color: afropeepGreen,
-                      value: loadingProgress.expectedTotalBytes != null
-                          ? loadingProgress.cumulativeBytesLoaded /
-                              loadingProgress.expectedTotalBytes!
-                          : null,
-                    ),
-                  ),
-                );
-              },
             ),
           ),
         ),
@@ -772,10 +767,13 @@ class _FullScreenPhotoViewerState extends State<_FullScreenPhotoViewer> {
                 minScale: 0.5,
                 maxScale: 3,
                 child: Center(
-                  child: Image.network(
-                    widget.photos[index],
+                  child: CachedNetworkImage(
+                    imageUrl: widget.photos[index],
                     fit: BoxFit.contain,
-                    errorBuilder: (context, error, stackTrace) => ColoredBox(
+                    placeholder: (context, url) => const Center(
+                      child: CircularProgressIndicator(strokeWidth: 2),
+                    ),
+                    errorWidget: (context, url, error) => ColoredBox(
                       color: Colors.grey.shade800,
                       child: Column(
                         mainAxisAlignment: MainAxisAlignment.center,

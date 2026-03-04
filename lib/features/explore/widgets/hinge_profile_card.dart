@@ -1,3 +1,4 @@
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -199,29 +200,23 @@ class _HingeProfileCardState extends State<HingeProfileCard> {
                 if (usePlaceholder)
                   _buildSinglePhotoPlaceholder(screenHeight * 0.5)
                 else
-                  Image.network(
-                    photoUrl,
+                  CachedNetworkImage(
+                    imageUrl: photoUrl,
                     fit: BoxFit.cover,
                     width: double.infinity,
                     height: double.infinity,
-                    loadingBuilder: (context, child, loadingProgress) {
-                      if (loadingProgress == null) return child;
-                      return Container(
-                        color: Colors.grey[200],
-                        child: Center(
-                          child: CircularProgressIndicator(
-                            value: loadingProgress.expectedTotalBytes != null
-                                ? loadingProgress.cumulativeBytesLoaded /
-                                    loadingProgress.expectedTotalBytes!
-                                : null,
-                            valueColor: const AlwaysStoppedAnimation<Color>(
-                              Color(0xFF008037),
-                            ),
+                    placeholder: (context, url) => Container(
+                      color: Colors.grey[200],
+                      child: const Center(
+                        child: CircularProgressIndicator(
+                          valueColor: AlwaysStoppedAnimation<Color>(
+                            Color(0xFF008037),
                           ),
+                          strokeWidth: 2,
                         ),
-                      );
-                    },
-                    errorBuilder: (context, error, stackTrace) {
+                      ),
+                    ),
+                    errorWidget: (context, url, error) {
                       if (kDebugMode) {
                         debugPrint(
                             '❌ Error loading photo $index ($photoUrl): $error');

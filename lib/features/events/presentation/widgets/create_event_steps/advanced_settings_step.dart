@@ -1,5 +1,6 @@
 import 'dart:io';
 
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -209,7 +210,17 @@ class _AdvancedSettingsStepState extends State<AdvancedSettingsStep> {
               // Image
               Positioned.fill(
                 child: imagePath.startsWith('http')
-                    ? Image.network(imagePath, fit: BoxFit.cover)
+                    ? CachedNetworkImage(
+                        imageUrl: imagePath,
+                        fit: BoxFit.cover,
+                        placeholder: (context, url) => const Center(
+                            child:
+                                CircularProgressIndicator(strokeWidth: 2)),
+                        errorWidget: (context, url, error) => const Icon(
+                            Icons.event,
+                            size: 40,
+                            color: Colors.grey),
+                      )
                     : Image.file(File(imagePath), fit: BoxFit.cover),
               ),
               // Remove button

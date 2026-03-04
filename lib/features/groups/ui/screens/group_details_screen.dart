@@ -5,6 +5,7 @@
 // reporting, member invites, etc.).
 // TODO: Migrate callers (groups_screen.dart) to the canonical version,
 // then delete this file.
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import '../../../../common/constants/app_colors.dart';
@@ -159,10 +160,12 @@ class _GroupDetailsScreenState extends State<GroupDetailsScreen>
                 // Group Image
                 if (widget.group.imageUrl != null)
                   Positioned.fill(
-                    child: Image.network(
-                      widget.group.imageUrl!,
+                    child: CachedNetworkImage(
+                      imageUrl: widget.group.imageUrl!,
                       fit: BoxFit.cover,
-                      errorBuilder: (context, error, stackTrace) =>
+                      placeholder: (context, url) => const Center(
+                          child: CircularProgressIndicator(strokeWidth: 2)),
+                      errorWidget: (context, url, error) =>
                           _buildDefaultBackground(),
                     ),
                   )

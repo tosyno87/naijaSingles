@@ -1,4 +1,5 @@
 import 'dart:io';
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:image_picker/image_picker.dart';
@@ -58,12 +59,15 @@ class _GroupAvatarPickerState extends State<GroupAvatarPicker> {
                         height: widget.size,
                       )
                     : widget.defaultImageUrl != null
-                        ? Image.network(
-                            widget.defaultImageUrl!,
+                        ? CachedNetworkImage(
+                            imageUrl: widget.defaultImageUrl!,
                             fit: BoxFit.cover,
                             width: widget.size,
                             height: widget.size,
-                            errorBuilder: (context, error, stackTrace) =>
+                            placeholder: (context, url) => const Center(
+                                child: CircularProgressIndicator(
+                                    strokeWidth: 2)),
+                            errorWidget: (context, url, error) =>
                                 _buildDefaultAvatar(),
                           )
                         : _buildDefaultAvatar(),

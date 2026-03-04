@@ -1,5 +1,6 @@
 import 'dart:io';
 
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:image_cropper/image_cropper.dart';
@@ -379,10 +380,13 @@ class _MediaStepState extends State<MediaStep> {
                 height: double.infinity,
                 color: AppColors.backgroundColor,
                 child: widget.eventData.imageUrls[index].startsWith('http')
-                    ? Image.network(
-                        widget.eventData.imageUrls[index],
+                    ? CachedNetworkImage(
+                        imageUrl: widget.eventData.imageUrls[index],
                         fit: BoxFit.contain,
-                        errorBuilder: (context, error, stackTrace) =>
+                        placeholder: (context, url) => const Center(
+                            child:
+                                CircularProgressIndicator(strokeWidth: 2)),
+                        errorWidget: (context, url, error) =>
                             const Center(
                           child: Icon(
                             Icons.broken_image,

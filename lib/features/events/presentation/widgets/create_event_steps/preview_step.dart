@@ -1,4 +1,5 @@
 import 'dart:io';
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:intl/intl.dart';
@@ -108,10 +109,13 @@ class PreviewStep extends StatelessWidget {
                       height: double.infinity,
                       color: const Color(0xFFF0F0F0),
                       child: eventData.imageUrls.first.startsWith('http')
-                          ? Image.network(
-                              eventData.imageUrls.first,
+                          ? CachedNetworkImage(
+                              imageUrl: eventData.imageUrls.first,
                               fit: BoxFit.cover,
-                              errorBuilder: (context, error, stackTrace) =>
+                              placeholder: (context, url) => const Center(
+                                  child: CircularProgressIndicator(
+                                      strokeWidth: 2)),
+                              errorWidget: (context, url, error) =>
                                   const Center(
                                 child: Icon(
                                   Icons.broken_image,

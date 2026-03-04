@@ -1,6 +1,7 @@
 import 'dart:developer';
 import 'dart:io';
 
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_storage/firebase_storage.dart';
@@ -1208,31 +1209,19 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                                   photo,
                                   fit: BoxFit.cover,
                                 )
-                              : Image.network(
-                                  photo,
+                              : CachedNetworkImage(
+                                  imageUrl: photo,
                                   fit: BoxFit.cover,
-                                  loadingBuilder:
-                                      (context, child, loadingProgress) {
-                                    if (loadingProgress == null) return child;
-                                    return ColoredBox(
-                                      color: Colors.grey.shade100,
-                                      child: Center(
-                                        child: CircularProgressIndicator(
-                                          value: loadingProgress
-                                                      .expectedTotalBytes !=
-                                                  null
-                                              ? loadingProgress
-                                                      .cumulativeBytesLoaded /
-                                                  loadingProgress
-                                                      .expectedTotalBytes!
-                                              : null,
-                                          color: AppColors.primaryGreen,
-                                          strokeWidth: 2,
-                                        ),
+                                  placeholder: (context, url) => ColoredBox(
+                                    color: Colors.grey.shade100,
+                                    child: const Center(
+                                      child: CircularProgressIndicator(
+                                        color: AppColors.primaryGreen,
+                                        strokeWidth: 2,
                                       ),
-                                    );
-                                  },
-                                  errorBuilder: (context, error, stackTrace) {
+                                    ),
+                                  ),
+                                  errorWidget: (context, url, error) {
                                     log('Error loading image: $error');
                                     return ColoredBox(
                                       color: Colors.grey.shade200,

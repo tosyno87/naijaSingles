@@ -1,3 +1,4 @@
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
@@ -114,11 +115,13 @@ class _GroupDetailsScreenState extends State<GroupDetailsScreen> {
               child: widget.group.imageUrl != null
                   ? ClipRRect(
                       borderRadius: BorderRadius.circular(20),
-                      child: Image.network(
-                        widget.group.imageUrl!,
+                      child: CachedNetworkImage(
+                        imageUrl: widget.group.imageUrl!,
                         fit: BoxFit.cover,
-                        errorBuilder: (context, error, stackTrace) =>
-                            const Icon(
+                        placeholder: (context, url) => const Center(
+                            child:
+                                CircularProgressIndicator(strokeWidth: 2)),
+                        errorWidget: (context, url, error) => const Icon(
                           Icons.group,
                           color: AppColors.primaryGreen,
                           size: 20,
@@ -472,10 +475,12 @@ class _GroupDetailsScreenState extends State<GroupDetailsScreen> {
           child: widget.group.imageUrl != null
               ? ClipRRect(
                   borderRadius: BorderRadius.circular(18),
-                  child: Image.network(
-                    widget.group.imageUrl!,
+                  child: CachedNetworkImage(
+                    imageUrl: widget.group.imageUrl!,
                     fit: BoxFit.cover,
-                    errorBuilder: (context, error, stackTrace) =>
+                    placeholder: (context, url) => const Center(
+                        child: CircularProgressIndicator(strokeWidth: 2)),
+                    errorWidget: (context, url, error) =>
                         _buildDefaultAvatar(),
                   ),
                 )

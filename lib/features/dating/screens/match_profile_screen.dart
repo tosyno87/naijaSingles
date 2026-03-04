@@ -1,3 +1,4 @@
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -192,11 +193,14 @@ class _MatchProfileScreenState extends State<MatchProfileScreen>
                     borderRadius: BorderRadius.circular(75),
                     child: widget.user.imageUrl != null &&
                             widget.user.imageUrl!.isNotEmpty
-                        ? Image.network(
-                            widget.user.imageUrl![0],
+                        ? CachedNetworkImage(
+                            imageUrl: widget.user.imageUrl![0],
                             fit: BoxFit.cover,
-                            errorBuilder: (context, error, stackTrace) =>
-                                Container(
+                            placeholder: (context, url) => const Center(
+                              child:
+                                  CircularProgressIndicator(strokeWidth: 2),
+                            ),
+                            errorWidget: (context, url, error) => Container(
                               color: Colors.grey[300],
                               child: const Icon(
                                 Icons.person,

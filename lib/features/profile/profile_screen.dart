@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'dart:developer';
 
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
@@ -290,10 +291,13 @@ class _ProfileScreenState extends State<ProfileScreen> {
                 ),
                 child: ClipRRect(
                   borderRadius: BorderRadius.circular(16),
-                  child: Image.network(
-                    photos[index],
-                    fit: BoxFit.contain, // Show full image without cropping
-                    errorBuilder: (context, error, stackTrace) => ColoredBox(
+                  child: CachedNetworkImage(
+                    imageUrl: photos[index],
+                    fit: BoxFit.contain,
+                    placeholder: (context, url) => const Center(
+                      child: CircularProgressIndicator(strokeWidth: 2),
+                    ),
+                    errorWidget: (context, url, error) => ColoredBox(
                       color: Colors.grey.shade200,
                       child: Icon(
                         Icons.broken_image_outlined,
@@ -779,10 +783,13 @@ class _ProfileScreenState extends State<ProfileScreen> {
           child: Stack(
             fit: StackFit.expand,
             children: [
-              Image.network(
-                photos[index].toString(),
+              CachedNetworkImage(
+                imageUrl: photos[index].toString(),
                 fit: BoxFit.cover,
-                errorBuilder: (context, error, stackTrace) => ColoredBox(
+                placeholder: (context, url) => const Center(
+                  child: CircularProgressIndicator(strokeWidth: 2),
+                ),
+                errorWidget: (context, url, error) => ColoredBox(
                   color: Colors.grey.shade300,
                   child: const Icon(Icons.broken_image_outlined, size: 60),
                 ),
@@ -1172,10 +1179,13 @@ class _FullScreenPhotoViewerState extends State<_FullScreenPhotoViewer> {
             minScale: 0.5,
             maxScale: 3,
             child: Center(
-              child: Image.network(
-                widget.photos[index],
+              child: CachedNetworkImage(
+                imageUrl: widget.photos[index].toString(),
                 fit: BoxFit.contain,
-                errorBuilder: (context, error, stackTrace) => ColoredBox(
+                placeholder: (context, url) => const Center(
+                  child: CircularProgressIndicator(strokeWidth: 2),
+                ),
+                errorWidget: (context, url, error) => ColoredBox(
                   color: Colors.grey.shade800,
                   child: Column(
                     mainAxisAlignment: MainAxisAlignment.center,

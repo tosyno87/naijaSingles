@@ -243,7 +243,13 @@ color: AppColors.primaryGreen,
                           },
                         ),
                       )
-                      .catchError(log);
+                      .catchError((Object error, StackTrace stackTrace) {
+                        log(
+                          'Failed to update user location',
+                          error: error,
+                          stackTrace: stackTrace,
+                        );
+                      });
                 },
               ),
             ],

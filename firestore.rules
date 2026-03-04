@@ -40,7 +40,11 @@ service cloud.firestore {
       // handles privacy for discovery results.
       allow list: if request.auth != null
                       && resource.data.isDeleted != true
-                      && resource.data.get('accountStatus', 'active') != 'banned';
+                      && resource.data.isProfilePrivate != true
+                      && resource.data.get('accountStatus', 'active') != 'deleted'
+                      && resource.data.get('accountStatus', 'active') != 'banned'
+                      && resource.data.get('accountStatus', 'active') != 'paused'
+                      && resource.data.get('accountStatus', 'active') != 'incognito';
       
       // Allow users to update their own profile with data validation
       allow update: if request.auth != null && 

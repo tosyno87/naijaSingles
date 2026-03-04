@@ -1,5 +1,3 @@
-// ignore_for_file: use_build_context_synchronously
-
 import 'dart:developer';
 import 'dart:io';
 
@@ -356,6 +354,7 @@ class _SearchLocationState extends State<SearchLocation>
                                                 auth.currentUser!.uid,
                                             file: profilePic,
                                           );
+                                          if (!context.mounted) return;
                                           context.read<RegistrationBloc>().add(
                                                 RegistrationRequest(
                                                   userdata: userData,

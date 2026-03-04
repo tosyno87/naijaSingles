@@ -1,4 +1,4 @@
-// ignore_for_file: use_build_context_synchronously, depend_on_referenced_packages
+// ignore_for_file: depend_on_referenced_packages
 
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
@@ -82,7 +82,7 @@ class UpdateLocationState extends State<UpdateLocation> {
               if (latitude != null && longitude != null) {
                 final a =
                     await showLocationDialog(context, latitude, longitude);
-
+                if (!context.mounted) return;
                 Navigator.pop(context, a);
               }
             },
@@ -213,6 +213,7 @@ class UpdateLocationState extends State<UpdateLocation> {
                         GoogleMapsPlaces(apiKey: kGoogleApiKey);
                     final PlacesDetailsResponse response =
                         await places.getDetailsByPlaceId(prediction.placeId!);
+                    if (!context.mounted) return;
 
                     final lat = response.result.geometry?.location.lat;
                     final lng = response.result.geometry?.location.lng;
@@ -232,6 +233,7 @@ class UpdateLocationState extends State<UpdateLocation> {
                     });
                   }
                 } catch (e) {
+                  if (!context.mounted) return;
                   ScaffoldMessenger.of(context).showSnackBar(
                     SnackBar(
                       content: Text(e.toString()),

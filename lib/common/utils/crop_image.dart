@@ -283,11 +283,11 @@ class CropMediaState extends State<CropMedia>
       // Compress the final image for optimal size
       final compressedFile = await _compressImage(file);
 
-      // ignore: use_build_context_synchronously
+      if (!mounted) return;
       Navigator.pop(context, compressedFile);
     } catch (e) {
       debugPrint('Error in _finished: $e');
-      // ignore: use_build_context_synchronously
+      if (!mounted) return;
       Navigator.pop(context);
     }
   }

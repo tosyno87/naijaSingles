@@ -1,4 +1,4 @@
-// ignore_for_file: unnecessary_string_interpolations, use_build_context_synchronously, avoid_function_literals_in_foreach_calls
+// ignore_for_file: unnecessary_string_interpolations, avoid_function_literals_in_foreach_calls
 
 import 'dart:async';
 import 'dart:io';
@@ -176,7 +176,7 @@ class TabbarState extends State<Tabbar> with WidgetsBindingObserver {
       shownNotificationForegroundIds.add(notificationId);
       // Handle non-call notifications only
       if (message.data['type'] != 'Call') {
-        // Navigate to appropriate screen based on notification type
+        if (!context.mounted) return;
         if (message.data['type'] == 'message') {
           Navigator.pushNamed(
             context,

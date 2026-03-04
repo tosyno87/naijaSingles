@@ -1,4 +1,4 @@
-// ignore_for_file: unnecessary_string_interpolations, sort_child_properties_last, use_build_context_synchronously
+// ignore_for_file: unnecessary_string_interpolations, sort_child_properties_last
 
 import 'dart:async';
 
@@ -121,13 +121,17 @@ class ChatPageState extends State<ChatPage> {
               PopupMenuItem(
                 value: 'value1',
                 child: InkWell(
-                  onTap: () => showDialog(
-                    context: context,
-                    builder: (context) => ReportUser(
-                      reported: widget.second,
-                      reportedBy: widget.sender,
-                    ),
-                  ).then((value) => Navigator.pop(ct)),
+                  onTap: () async {
+                    await showDialog(
+                      context: context,
+                      builder: (context) => ReportUser(
+                        reported: widget.second,
+                        reportedBy: widget.sender,
+                      ),
+                    );
+                    if (!context.mounted) return;
+                    Navigator.pop(ct);
+                  },
                   child: SizedBox(
                     width: 100,
                     height: 30,
@@ -311,6 +315,7 @@ class ChatPageState extends State<ChatPage> {
                                 widget.sender,
                                 widget.second.id!,
                               );
+                              if (!context.mounted) return;
                               context.read<SearchUserBloc>().add(
                                     LoadUserEvent(
                                       currentUser: widget.sender,
@@ -343,7 +348,10 @@ class ChatPageState extends State<ChatPage> {
                         ],
                       ),
                     ),
-                  ).then((value) => Navigator.pop(ct)),
+                  ).then((value) {
+                    if (!context.mounted) return;
+                    Navigator.pop(ct);
+                  }),
                   child: Row(
                     children: [
                       Icon(

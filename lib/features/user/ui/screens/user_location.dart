@@ -1,5 +1,3 @@
-// ignore_for_file: use_build_context_synchronously
-
 import 'dart:developer';
 import 'dart:io';
 
@@ -71,12 +69,13 @@ class AllowLocation extends StatelessWidget {
           );
 
           if (task != null) {
-            // Complete registration
+            if (!context.mounted) return;
             context
                 .read<RegistrationBloc>()
                 .add(RegistrationRequest(userdata: userData));
           } else {
             isProcessing.value = false;
+            if (!context.mounted) return;
             CustomSnackbar.showSnackBarSimple(
               'Failed to upload image. Please try again.',
               context,
@@ -85,6 +84,7 @@ class AllowLocation extends StatelessWidget {
         } catch (e) {
           isProcessing.value = false;
           log('Error uploading profile: ${e.toString()}');
+          if (!context.mounted) return;
           CustomSnackbar.showSnackBarSimple(
             'Error uploading profile: ${e.toString()}',
             context,
@@ -93,6 +93,7 @@ class AllowLocation extends StatelessWidget {
       } catch (e) {
         isProcessing.value = false;
         log('Error in proceedWithoutLocation: ${e.toString()}');
+        if (!context.mounted) return;
         CustomSnackbar.showSnackBarSimple(
           'Error completing registration: ${e.toString()}',
           context,
@@ -250,6 +251,7 @@ class AllowLocation extends StatelessWidget {
                                   );
 
                                   if (task != null) {
+                                    if (!context.mounted) return;
                                     context.read<RegistrationBloc>().add(
                                           RegistrationRequest(
                                             userdata: userData,
@@ -257,6 +259,7 @@ class AllowLocation extends StatelessWidget {
                                         );
                                   } else {
                                     isProcessing.value = false;
+                                    if (!context.mounted) return;
                                     CustomSnackbar.showSnackBarSimple(
                                       'Failed to upload image. Please try again.',
                                       context,
@@ -265,6 +268,7 @@ class AllowLocation extends StatelessWidget {
                                 } catch (e) {
                                   isProcessing.value = false;
                                   log('Error uploading profile: ${e.toString()}');
+                                  if (!context.mounted) return;
                                   CustomSnackbar.showSnackBarSimple(
                                     'Error uploading profile: ${e.toString()}',
                                     context,

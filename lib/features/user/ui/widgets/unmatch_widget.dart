@@ -1,5 +1,3 @@
-// ignore_for_file: use_build_context_synchronously
-
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -50,6 +48,7 @@ class UnMatcheWidget extends StatelessWidget {
                   onPressed: () async {
                     Navigator.pop(ctx);
                     await UserRepo.unmatchUser(currentUser, user.id!);
+                    if (!context.mounted) return;
                     context
                         .read<SearchUserBloc>()
                         .add(LoadUserEvent(currentUser: currentUser));

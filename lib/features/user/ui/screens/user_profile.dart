@@ -141,7 +141,7 @@ class _ProfilePageState extends State<ProfilePage> {
                                       checktype: 'profile',
                                     );
                                     log('file after edit is $file');
-                                    // ignore: use_build_context_synchronously
+                                    if (!context.mounted) return;
                                     BlocProvider.of<UserBloc>(context).add(
                                       UpdateUserProfilePictures(
                                         checktype: 'profile',
@@ -231,7 +231,7 @@ class _ProfilePageState extends State<ProfilePage> {
                                         context: context,
                                         checktype: 'addMedia',
                                       );
-                                      // ignore: use_build_context_synchronously
+                                      if (!context.mounted) return;
                                       BlocProvider.of<UserBloc>(context).add(
                                         UpdateUserProfilePictures(
                                           checktype: 'addMedia',

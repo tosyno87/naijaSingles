@@ -196,7 +196,7 @@ class _AccountStatusScreenState extends State<AccountStatusScreen> {
                     child: Row(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        Icon(
+                        const Icon(
                           Icons.info_outline,
                           color: AppColors.primaryGreen,
                           size: 20,

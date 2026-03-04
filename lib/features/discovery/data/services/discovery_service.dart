@@ -404,7 +404,7 @@ class DiscoveryService {
         DiscoveryFiltering.normalizeGender(currentUser.showGender);
     if (DiscoveryFiltering.isEveryonePreference(normalizedPreference)) {
       debugPrint(
-          '🔍 Gender preference is everyone - skipping gender query filter');
+          '🔍 Gender preference is everyone - skipping gender query filter',);
     } else {
       debugPrint(
         '🔍 Applying gender filter in-memory for compatibility: $normalizedPreference',
@@ -592,7 +592,7 @@ class DiscoveryService {
             final user = UserModel.fromDocument(doc);
 
             if (!DiscoveryFiltering.matchesGenderPreference(
-                user, currentUser)) {
+                user, currentUser,)) {
               continue;
             }
 
@@ -678,7 +678,7 @@ class DiscoveryService {
             final user = UserModel.fromDocument(doc);
 
             if (!DiscoveryFiltering.matchesGenderPreference(
-                user, currentUser)) {
+                user, currentUser,)) {
               continue;
             }
 
@@ -756,7 +756,7 @@ class DiscoveryService {
             final user = UserModel.fromDocument(doc);
 
             if (!DiscoveryFiltering.matchesGenderPreference(
-                user, currentUser)) {
+                user, currentUser,)) {
               continue;
             }
 

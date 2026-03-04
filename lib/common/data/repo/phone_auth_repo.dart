@@ -162,9 +162,7 @@ class PhoneAuthRepository {
   }
 
   /// Normalizes phone to digits-only so "+2348012345678" and "2348012345678" match.
-  static String _normalizePhoneToDigits(String phoneNumber) {
-    return phoneNumber.replaceAll(RegExp(r'[^\d]'), '');
-  }
+  static String _normalizePhoneToDigits(String phoneNumber) => phoneNumber.replaceAll(RegExp(r'[^\d]'), '');
 
   Future<UserModel> registration({
     required Map<String, dynamic> userData,

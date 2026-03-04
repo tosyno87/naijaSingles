@@ -408,13 +408,13 @@ abstract class AppRouter {
     // The route name includes the full path with query parameters
     if (routeName.startsWith('/link')) {
       debugPrint(
-          '✅ Router: Handling Firebase auth callback deep link: $routeName');
+          '✅ Router: Handling Firebase auth callback deep link: $routeName',);
 
       // Simplified check: if route starts with /link and contains deep_link_id, treat as Firebase callback
       // This prevents "Page Not Found" errors - Firebase will handle the callback automatically
       if (routeName.contains('deep_link_id')) {
         debugPrint(
-            '✅ Router: Firebase auth callback detected, processing silently');
+            '✅ Router: Firebase auth callback detected, processing silently',);
 
         // Return a completely transparent route that immediately pops
         // This prevents any visible flash while Firebase processes the callback
@@ -442,11 +442,11 @@ abstract class AppRouter {
             debugPrint('🏗️ Router: Building widget for route "$routeName"');
             final widget = builder(context);
             debugPrint(
-                '✅ Router: Widget built successfully for route "$routeName"');
+                '✅ Router: Widget built successfully for route "$routeName"',);
             return widget;
           } catch (e, stackTrace) {
             debugPrint(
-                '❌ Router: Error building widget for route "$routeName": $e');
+                '❌ Router: Error building widget for route "$routeName": $e',);
             debugPrint('Stack trace: $stackTrace');
             // Return error widget instead of crashing
             return Scaffold(

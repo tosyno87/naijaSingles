@@ -15,9 +15,9 @@ class ThemeInitial extends ThemeState {
 
 /// Theme loaded with current mode
 class ThemeLoaded extends ThemeState {
-  final ThemeMode themeMode;
 
   const ThemeLoaded(this.themeMode);
+  final ThemeMode themeMode;
 
   @override
   List<Object?> get props => [themeMode];
@@ -36,9 +36,9 @@ class ThemeLoaded extends ThemeState {
 
 /// Error loading theme
 class ThemeError extends ThemeState {
-  final String message;
 
   const ThemeError(this.message);
+  final String message;
 
   @override
   List<Object?> get props => [message];

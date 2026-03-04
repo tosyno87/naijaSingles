@@ -332,7 +332,7 @@ class EventsRepositoryImpl implements EventsRepository {
       };
     } catch (e) {
       log('Error fetching user profile $userId: $e',
-          name: 'EventsRepository');
+          name: 'EventsRepository',);
       return null;
     }
   }

@@ -273,7 +273,7 @@ class _ModernNotificationSettingsState extends State<ModernNotificationSettings>
             icon: Icons.chat_bubble_outline,
             value: _settings!.messageNotifications,
             onChanged: (value) => _updateSetting(
-                _settings!.copyWith(messageNotifications: value)),
+                _settings!.copyWith(messageNotifications: value),),
           ),
           _buildSettingTile(
             title: 'Profile Likes',

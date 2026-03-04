@@ -53,10 +53,10 @@ class _EventDetailsScreenState extends State<EventDetailsScreen> {
         ..add(LoadEventRSVPStatusEvent(
           userId: userId,
           eventId: widget.event.id,
-        ))
+        ),)
         ..add(LoadEventAttendeesEvent(
           eventId: widget.event.id,
-        )),
+        ),),
       child: Scaffold(
         backgroundColor: Colors.white,
         body: CustomScrollView(

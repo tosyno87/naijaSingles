@@ -189,7 +189,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
         ),
         body: _isLoading
             ? const Center(
-                child: CircularProgressIndicator(color: primaryColor))
+                child: CircularProgressIndicator(color: primaryColor),)
             : SafeArea(
                 child: SingleChildScrollView(
                   // Remove padding for seamless Hinge-style layout
@@ -531,12 +531,12 @@ class _ProfileScreenState extends State<ProfileScreen> {
                     .map(
                       (interest) => Container(
                         padding: const EdgeInsets.symmetric(
-                            horizontal: 12, vertical: 6),
+                            horizontal: 12, vertical: 6,),
                         decoration: BoxDecoration(
                           color: primaryColor.withValues(alpha: 0.1),
                           borderRadius: BorderRadius.circular(20),
                           border: Border.all(
-                              color: primaryColor.withValues(alpha: 0.3)),
+                              color: primaryColor.withValues(alpha: 0.3),),
                         ),
                         child: Text(
                           interest.toString(),
@@ -910,7 +910,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                       mainAxisSize: MainAxisSize.min,
                       children: [
                         const Icon(Icons.location_on,
-                            size: 16, color: primaryColor),
+                            size: 16, color: primaryColor,),
                         const SizedBox(width: 6),
                         Text(
                           location,
@@ -994,7 +994,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
         getValue('occupation');
     if (workTitle != null) {
       details.add(
-          {'icon': Icons.business_center, 'label': '', 'value': workTitle});
+          {'icon': Icons.business_center, 'label': '', 'value': workTitle},);
     }
 
     // Religion - book icon (like Hinge)
@@ -1008,7 +1008,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
         _userData?['preferences']?['relationshipIntent']?.toString();
     if (relationshipIntent != null && relationshipIntent.isNotEmpty) {
       details.add(
-          {'icon': Icons.search, 'label': '', 'value': relationshipIntent});
+          {'icon': Icons.search, 'label': '', 'value': relationshipIntent},);
     }
 
     // Tribe - group icon
@@ -1056,7 +1056,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                     ),
                   ],
                 ),
-              )),
+              ),),
           const SizedBox(height: 24),
         ],
       ),
@@ -1088,7 +1088,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
             children: interests
                 .map((interest) => Container(
                       padding: const EdgeInsets.symmetric(
-                          horizontal: 16, vertical: 10),
+                          horizontal: 16, vertical: 10,),
                       decoration: BoxDecoration(
                         color: primaryColor.withValues(alpha: 0.1),
                         borderRadius: BorderRadius.circular(20),
@@ -1104,7 +1104,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                           color: primaryColor,
                         ),
                       ),
-                    ))
+                    ),)
                 .toList(),
           ),
           const SizedBox(height: 24),

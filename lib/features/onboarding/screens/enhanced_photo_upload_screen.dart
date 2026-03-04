@@ -46,18 +46,15 @@ class _EnhancedPhotoUploadScreenState extends State<EnhancedPhotoUploadScreen> {
   static const Color dividerColor = Color(0xFFE5E5E5);
 
   @override
-  Widget build(BuildContext context) {
-    return BlocBuilder<OnboardingBloc, OnboardingState>(
+  Widget build(BuildContext context) => BlocBuilder<OnboardingBloc, OnboardingState>(
       builder: (context, state) {
         final uploadedPhotos =
             state.data?.profilePhotos ?? List<File?>.filled(9, null);
         return _buildContent(context, uploadedPhotos);
       },
     );
-  }
 
-  Widget _buildContent(BuildContext context, List<File?> uploadedPhotos) {
-    return Scaffold(
+  Widget _buildContent(BuildContext context, List<File?> uploadedPhotos) => Scaffold(
       backgroundColor: AppColors.backgroundColor,
       appBar: AppBar(
         backgroundColor: AppColors.backgroundColor,
@@ -102,7 +99,7 @@ class _EnhancedPhotoUploadScreenState extends State<EnhancedPhotoUploadScreen> {
                       width: (MediaQuery.of(context).size.width - 72) /
                           3, // 3 columns
                       child: AspectRatio(
-                        aspectRatio: 1.0,
+                        aspectRatio: 1,
                         child: _buildPhotoGridItem(
                           photo: photo,
                           index: index,
@@ -120,18 +117,16 @@ class _EnhancedPhotoUploadScreenState extends State<EnhancedPhotoUploadScreen> {
         ),
       ),
     );
-  }
 
   // Tinder-style photo grid item - Minimal, clean, edge-to-edge
   Widget _buildPhotoGridItem({
     required File? photo,
     required int index,
     required bool isMainPhoto,
-  }) {
-    return GestureDetector(
+  }) => GestureDetector(
       onTap: () => _showAddPhotoOptions(index),
       child: AspectRatio(
-        aspectRatio: 1.0, // Square - Industry standard (Tinder, Bumble, Hinge)
+        aspectRatio: 1, // Square - Industry standard (Tinder, Bumble, Hinge)
         child: Container(
           decoration: BoxDecoration(
             color: photo == null ? Colors.grey.shade100 : Colors.white,
@@ -139,7 +134,7 @@ class _EnhancedPhotoUploadScreenState extends State<EnhancedPhotoUploadScreen> {
             // Subtle border only for main photo
             border: isMainPhoto && photo != null
                 ? Border.all(color: primaryGreen, width: 3)
-                : Border.all(color: Colors.grey.shade200, width: 1),
+                : Border.all(color: Colors.grey.shade200),
           ),
           clipBehavior: Clip.antiAlias,
           child: Stack(
@@ -222,7 +217,6 @@ class _EnhancedPhotoUploadScreenState extends State<EnhancedPhotoUploadScreen> {
         ),
       ),
     );
-  }
 
   Future<void> _showAddPhotoOptions(int index) async {
     final bloc = context.read<OnboardingBloc>();
@@ -377,7 +371,7 @@ class _EnhancedPhotoUploadScreenState extends State<EnhancedPhotoUploadScreen> {
                         ),
                         ListTile(
                           leading: const Icon(Icons.photo_library,
-                              color: primaryGreen),
+                              color: primaryGreen,),
                           title: Text(
                             'Choose from Gallery',
                             style: GoogleFonts.montserrat(

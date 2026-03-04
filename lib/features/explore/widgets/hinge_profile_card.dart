@@ -2,8 +2,9 @@ import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
-import '../../../models/user_model.dart';
+
 import '../../../common/constants/app_colors.dart';
+import '../../../models/user_model.dart';
 
 /// Hinge-style profile card that displays all information in a vertical scrollable format
 /// Users can scroll down to see photos, bio, prompts, and details without tapping
@@ -86,7 +87,7 @@ class _HingeProfileCardState extends State<HingeProfileCard> {
     );
   }
 
-  List<String> _extractPhotos(dynamic imageUrl) {
+  List<String> _extractPhotos(imageUrl) {
     if (imageUrl == null) return [];
     if (imageUrl is! List) return [];
     if (imageUrl.isEmpty) return [];
@@ -100,11 +101,10 @@ class _HingeProfileCardState extends State<HingeProfileCard> {
     return photos;
   }
 
-  Widget _buildSinglePhotoPlaceholder(double height) {
-    return SizedBox(
+  Widget _buildSinglePhotoPlaceholder(double height) => SizedBox(
       height: height,
       width: double.infinity,
-      child: Container(
+      child: DecoratedBox(
         decoration: BoxDecoration(
           color: Colors.grey[200],
           borderRadius: const BorderRadius.vertical(
@@ -129,13 +129,12 @@ class _HingeProfileCardState extends State<HingeProfileCard> {
         ),
       ),
     );
-  }
 
   Widget _buildPhotoPlaceholder() {
     final screenHeight = MediaQuery.of(context).size.height;
     return SizedBox(
       height: screenHeight * 0.5,
-      child: Container(
+      child: DecoratedBox(
         decoration: BoxDecoration(
           color: Colors.grey[200],
           borderRadius: const BorderRadius.vertical(
@@ -219,7 +218,7 @@ class _HingeProfileCardState extends State<HingeProfileCard> {
                     errorWidget: (context, url, error) {
                       if (kDebugMode) {
                         debugPrint(
-                            '❌ Error loading photo $index ($photoUrl): $error');
+                            '❌ Error loading photo $index ($photoUrl): $error',);
                       }
                       return _buildSinglePhotoPlaceholder(screenHeight * 0.5);
                     },
@@ -312,8 +311,7 @@ class _HingeProfileCardState extends State<HingeProfileCard> {
     );
   }
 
-  Widget _buildBasicInfoItem(IconData icon, String text) {
-    return Row(
+  Widget _buildBasicInfoItem(IconData icon, String text) => Row(
       mainAxisSize: MainAxisSize.min,
       children: [
         Icon(icon, size: 18, color: AppColors.textSecondary),
@@ -328,10 +326,8 @@ class _HingeProfileCardState extends State<HingeProfileCard> {
         ),
       ],
     );
-  }
 
-  Widget _buildBioSection(String bio) {
-    return Padding(
+  Widget _buildBioSection(String bio) => Padding(
       padding: const EdgeInsets.symmetric(horizontal: 20),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -358,7 +354,6 @@ class _HingeProfileCardState extends State<HingeProfileCard> {
         ],
       ),
     );
-  }
 
   Widget _buildPromptsSection() {
     // Placeholder for prompts - can be expanded later
@@ -377,14 +372,14 @@ class _HingeProfileCardState extends State<HingeProfileCard> {
       details.add({
         'icon': Icons.business_center,
         'label': '',
-        'value': workTitle.toString()
+        'value': workTitle.toString(),
       });
     }
 
     // Education - graduation cap icon (like Hinge)
     if (widget.user.education != null && widget.user.education!.isNotEmpty) {
       details.add(
-          {'icon': Icons.school, 'label': '', 'value': widget.user.education!});
+          {'icon': Icons.school, 'label': '', 'value': widget.user.education},);
     }
 
     // Religion - book icon (like Hinge)
@@ -392,7 +387,7 @@ class _HingeProfileCardState extends State<HingeProfileCard> {
       details.add({
         'icon': Icons.menu_book,
         'label': '',
-        'value': widget.user.religion!
+        'value': widget.user.religion,
       });
     }
 
@@ -404,14 +399,14 @@ class _HingeProfileCardState extends State<HingeProfileCard> {
       details.add({
         'icon': Icons.search,
         'label': '',
-        'value': relationshipIntent.toString()
+        'value': relationshipIntent.toString(),
       });
     }
 
     // Tribe - group icon
     if (widget.user.tribe != null && widget.user.tribe!.isNotEmpty) {
       details
-          .add({'icon': Icons.group, 'label': '', 'value': widget.user.tribe!});
+          .add({'icon': Icons.group, 'label': '', 'value': widget.user.tribe});
     }
 
     if (details.isEmpty) return const SizedBox.shrink();
@@ -445,15 +440,14 @@ class _HingeProfileCardState extends State<HingeProfileCard> {
                     ),
                   ],
                 ),
-              )),
+              ),),
           const SizedBox(height: 24),
         ],
       ),
     );
   }
 
-  Widget _buildInterestsSection(List<String> interests) {
-    return Padding(
+  Widget _buildInterestsSection(List<String> interests) => Padding(
       padding: const EdgeInsets.symmetric(horizontal: 20),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -473,7 +467,7 @@ class _HingeProfileCardState extends State<HingeProfileCard> {
             children: interests
                 .map((interest) => Container(
                       padding: const EdgeInsets.symmetric(
-                          horizontal: 16, vertical: 10),
+                          horizontal: 16, vertical: 10,),
                       decoration: BoxDecoration(
                         color: AppColors.primaryGreen.withValues(alpha: 0.1),
                         borderRadius: BorderRadius.circular(20),
@@ -489,17 +483,15 @@ class _HingeProfileCardState extends State<HingeProfileCard> {
                           color: AppColors.primaryGreen,
                         ),
                       ),
-                    ))
+                    ),)
                 .toList(),
           ),
           const SizedBox(height: 24),
         ],
       ),
     );
-  }
 
-  Widget _buildActionButtons() {
-    return Padding(
+  Widget _buildActionButtons() => Padding(
       padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.center,
@@ -552,7 +544,6 @@ class _HingeProfileCardState extends State<HingeProfileCard> {
         ],
       ),
     );
-  }
 
   List<String> _extractInterests() {
     final interests = <String>[];

@@ -9,9 +9,9 @@ import '../../../../common/routes/route_name.dart';
 import '../../../../common/widgets/custom_3d_icons.dart';
 import '../../../events/data/models/event_model.dart';
 import '../../../events/data/services/events_firestore_service.dart';
+import '../../../groups/data/services/unified_group_service.dart';
 import '../../../groups/screens/group_details_screen.dart';
 import '../../../groups/screens/unified_groups_screen.dart';
-import '../../../groups/data/services/unified_group_service.dart';
 
 /// DiscoverPageV2 - A comprehensive discover screen matching the wireframe
 /// Features:
@@ -162,8 +162,7 @@ class _DiscoverPageV2State extends State<DiscoverPageV2> {
   }
 
   @override
-  Widget build(BuildContext context) {
-    return Scaffold(
+  Widget build(BuildContext context) => Scaffold(
       backgroundColor: AppColors.backgroundColor,
       appBar: AppBar(
         title: Text(
@@ -195,19 +194,19 @@ class _DiscoverPageV2State extends State<DiscoverPageV2> {
               const SizedBox(height: 32),
 
               // Recommended for You Section
-              _buildSectionHeader('Recommended for You', fontSize: 20),
+              _buildSectionHeader('Recommended for You'),
               const SizedBox(height: 16),
               _buildRecommendedList(context),
               const SizedBox(height: 32),
 
               // Happening Near You Section
-              _buildSectionHeader('Happening Near You', fontSize: 20),
+              _buildSectionHeader('Happening Near You'),
               const SizedBox(height: 16),
               _buildHappeningNearYou(context),
               const SizedBox(height: 32),
 
               // Explore More Section
-              _buildSectionHeader('Explore More', fontSize: 20),
+              _buildSectionHeader('Explore More'),
               const SizedBox(height: 16),
               _buildExploreMore(context),
               const SizedBox(height: 20),
@@ -216,10 +215,8 @@ class _DiscoverPageV2State extends State<DiscoverPageV2> {
         ),
       ),
     );
-  }
 
-  Widget _buildSubtitle() {
-    return Column(
+  Widget _buildSubtitle() => Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(
@@ -240,10 +237,8 @@ class _DiscoverPageV2State extends State<DiscoverPageV2> {
         ),
       ],
     );
-  }
 
-  Widget _buildSectionHeader(String title, {double fontSize = 20}) {
-    return Text(
+  Widget _buildSectionHeader(String title, {double fontSize = 20}) => Text(
       title,
       style: GoogleFonts.montserrat(
         fontSize: fontSize,
@@ -251,10 +246,8 @@ class _DiscoverPageV2State extends State<DiscoverPageV2> {
         color: AppColors.textPrimary,
       ),
     );
-  }
 
-  Widget _buildStartHereCards(BuildContext context) {
-    return Row(
+  Widget _buildStartHereCards(BuildContext context) => Row(
       children: [
         Expanded(
           child: _buildActionCard(
@@ -288,7 +281,6 @@ class _DiscoverPageV2State extends State<DiscoverPageV2> {
         ),
       ],
     );
-  }
 
   Widget _buildActionCard({
     required BuildContext context,
@@ -297,8 +289,7 @@ class _DiscoverPageV2State extends State<DiscoverPageV2> {
     required Widget icon,
     required Color color,
     required VoidCallback onTap,
-  }) {
-    return Material(
+  }) => Material(
       color: Colors.transparent,
       child: InkWell(
         onTap: onTap,
@@ -363,7 +354,6 @@ class _DiscoverPageV2State extends State<DiscoverPageV2> {
         ),
       ),
     );
-  }
 
   Widget _buildRecommendedList(BuildContext context) {
     if (_isLoadingRecommendations) {
@@ -420,7 +410,7 @@ class _DiscoverPageV2State extends State<DiscoverPageV2> {
       );
     }
 
-    return Container(
+    return DecoratedBox(
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(20),
@@ -558,8 +548,7 @@ class _DiscoverPageV2State extends State<DiscoverPageV2> {
     );
   }
 
-  Widget _buildHappeningNearYou(BuildContext context) {
-    return Material(
+  Widget _buildHappeningNearYou(BuildContext context) => Material(
       color: Colors.transparent,
       child: InkWell(
         onTap: () {
@@ -636,10 +625,8 @@ class _DiscoverPageV2State extends State<DiscoverPageV2> {
         ),
       ),
     );
-  }
 
-  Widget _buildStatRow(String text) {
-    return Row(
+  Widget _buildStatRow(String text) => Row(
       children: [
         Container(
           width: 6,
@@ -660,10 +647,8 @@ class _DiscoverPageV2State extends State<DiscoverPageV2> {
         ),
       ],
     );
-  }
 
-  Widget _buildExploreMore(BuildContext context) {
-    return Column(
+  Widget _buildExploreMore(BuildContext context) => Column(
       children: [
         _buildExploreRow(
           context: context,
@@ -687,14 +672,12 @@ class _DiscoverPageV2State extends State<DiscoverPageV2> {
         ),
       ],
     );
-  }
 
   Widget _buildExploreRow({
     required BuildContext context,
     required String title,
     required VoidCallback onTap,
-  }) {
-    return Material(
+  }) => Material(
       color: Colors.transparent,
       child: InkWell(
         onTap: onTap,
@@ -730,7 +713,6 @@ class _DiscoverPageV2State extends State<DiscoverPageV2> {
         ),
       ),
     );
-  }
 
 }
 
@@ -742,10 +724,6 @@ enum RecommendationType {
 
 /// Helper class to represent recommendation items with their type
 class _RecommendationItem {
-  final String title;
-  final RecommendationType type;
-  final EventModel? event;
-  final UnifiedGroup? group;
 
   _RecommendationItem({
     required this.title,
@@ -753,5 +731,9 @@ class _RecommendationItem {
     this.event,
     this.group,
   });
+  final String title;
+  final RecommendationType type;
+  final EventModel? event;
+  final UnifiedGroup? group;
 }
 

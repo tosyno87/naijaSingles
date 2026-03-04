@@ -111,7 +111,7 @@ class GroupInfoModal extends StatelessWidget {
                       imageUrl: group.imageUrl!,
                       fit: BoxFit.cover,
                       placeholder: (context, url) => const Center(
-                          child: CircularProgressIndicator(strokeWidth: 2)),
+                          child: CircularProgressIndicator(strokeWidth: 2),),
                       errorWidget: (context, url, error) =>
                           _buildDefaultAvatar(),
                     ),

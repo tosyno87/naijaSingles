@@ -3,8 +3,8 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:google_fonts/google_fonts.dart';
 
 import '../../common/bloc/theme/theme_bloc.dart';
-import '../../common/constants/app_colors.dart';
 import '../../common/bloc/user/user_bloc.dart';
+import '../../common/constants/app_colors.dart';
 import '../../services/settings_service.dart';
 
 class NotificationSettingsScreen extends StatefulWidget {
@@ -267,7 +267,7 @@ class _NotificationSettingsScreenState
               icon: Icons.favorite,
               value: _settings!.matchNotifications,
               onChanged: (value) => _updateSetting(
-                  _settings!.copyWith(matchNotifications: value)),
+                  _settings!.copyWith(matchNotifications: value),),
               isDarkMode: isDarkMode,
             ),
 

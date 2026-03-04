@@ -86,7 +86,7 @@ class _AccountDeletionScreenState extends State<AccountDeletionScreen> {
       final isGoogle =
           providerData.any((info) => info.providerId == 'google.com');
       log(
-          '📱 User auth provider check: providerData=${providerData.map((p) => p.providerId).toList()}, isPhone=$isPhone, isEmail=$isEmail, isGoogle=$isGoogle');
+          '📱 User auth provider check: providerData=${providerData.map((p) => p.providerId).toList()}, isPhone=$isPhone, isEmail=$isEmail, isGoogle=$isGoogle',);
 
       if (_isPhoneUser != isPhone ||
           _isEmailUser != isEmail ||
@@ -97,7 +97,7 @@ class _AccountDeletionScreenState extends State<AccountDeletionScreen> {
           _isGoogleUser = isGoogle;
         });
         log(
-            '📱 Updated _isPhoneUser: $_isPhoneUser, _isEmailUser: $_isEmailUser, _isGoogleUser: $_isGoogleUser');
+            '📱 Updated _isPhoneUser: $_isPhoneUser, _isEmailUser: $_isEmailUser, _isGoogleUser: $_isGoogleUser',);
       } else {
         _isPhoneUser = isPhone;
         _isEmailUser = isEmail;
@@ -493,7 +493,7 @@ class _AccountDeletionScreenState extends State<AccountDeletionScreen> {
             Row(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Icon(Icons.login, color: primaryColor, size: 22),
+                const Icon(Icons.login, color: primaryColor, size: 22),
                 const SizedBox(width: 8),
                 Expanded(
                   child: Text(
@@ -543,7 +543,7 @@ class _AccountDeletionScreenState extends State<AccountDeletionScreen> {
                 ),
                 style: OutlinedButton.styleFrom(
                   foregroundColor: primaryColor,
-                  side: BorderSide(color: primaryColor),
+                  side: const BorderSide(color: primaryColor),
                   padding: const EdgeInsets.symmetric(vertical: 12),
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(12),
@@ -776,7 +776,7 @@ class _AccountDeletionScreenState extends State<AccountDeletionScreen> {
           providerData.any((info) => info.providerId == 'google.com');
 
       log(
-          '📱 Delete account: isPhoneUser=$isPhoneUser, isEmailUser=$isEmailUser, isGoogleUser=$isGoogleUser');
+          '📱 Delete account: isPhoneUser=$isPhoneUser, isEmailUser=$isEmailUser, isGoogleUser=$isGoogleUser',);
 
       // Re-authenticate based on auth provider. Order is critical: cleanup Firestore/Storage
       // while user is still authenticated, then delete Auth user, then sign out and show success.
@@ -1146,7 +1146,6 @@ class _AccountDeletionScreenState extends State<AccountDeletionScreen> {
         backgroundColor: errorColor,
         behavior: SnackBarBehavior.floating,
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
-        duration: const Duration(seconds: 4),
       ),
     );
   }

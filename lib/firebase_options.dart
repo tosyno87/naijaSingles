@@ -53,7 +53,7 @@ class DefaultFirebaseOptions {
       );
     } catch (e) {
       // Fallback to production values
-      return FirebaseOptions(
+      return const FirebaseOptions(
         apiKey: 'AIzaSyAwsU8j3acGo_cKOECbgsXHd3-qvvLn_Fw',
         appId: '1:888697307756:web:95ea92b8c7288e31704e49',
         messagingSenderId: '888697307756',
@@ -77,7 +77,7 @@ class DefaultFirebaseOptions {
       );
     } catch (e) {
       // Fallback to production values
-      return FirebaseOptions(
+      return const FirebaseOptions(
         apiKey: 'AIzaSyAwsU8j3acGo_cKOECbgsXHd3-qvvLn_Fw',
         appId: '1:888697307756:android:a62a339c4079bebc704e49',
         messagingSenderId: '888697307756',
@@ -106,7 +106,7 @@ class DefaultFirebaseOptions {
     } catch (e) {
       // Fallback to hardcoded production values from GoogleService-Info.plist
       // These values are safe to include in the app bundle
-      return FirebaseOptions(
+      return const FirebaseOptions(
         apiKey: 'AIzaSyAwsU8j3acGo_cKOECbgsXHd3-qvvLn_Fw',
         appId: '1:888697307756:ios:95ea92b8c7288e31704e49',
         messagingSenderId: '888697307756',
@@ -134,7 +134,7 @@ class DefaultFirebaseOptions {
       );
     } catch (e) {
       // Fallback to production values (same as iOS)
-      return FirebaseOptions(
+      return const FirebaseOptions(
         apiKey: 'AIzaSyAwsU8j3acGo_cKOECbgsXHd3-qvvLn_Fw',
         appId: '1:888697307756:ios:95ea92b8c7288e31704e49',
         messagingSenderId: '888697307756',

@@ -3,10 +3,10 @@ import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 
+import '../../../../common/constants/app_colors.dart';
 import '../../data/models/enhanced_event_model.dart';
 import '../../data/models/event_model.dart';
 import 'rsvp_button.dart';
-import '../../../../common/constants/app_colors.dart';
 
 class EnhancedEventCard extends StatelessWidget {
   const EnhancedEventCard({
@@ -165,7 +165,7 @@ class EnhancedEventCard extends StatelessWidget {
                   if (isUserGenerated)
                     Container(
                       padding: const EdgeInsets.symmetric(
-                          horizontal: 8, vertical: 4),
+                          horizontal: 8, vertical: 4,),
                       decoration: BoxDecoration(
                         color: Colors.blue.withValues(alpha: 0.9),
                         borderRadius: BorderRadius.circular(12),
@@ -194,7 +194,7 @@ class EnhancedEventCard extends StatelessWidget {
                     if (isUserGenerated) const SizedBox(width: 8),
                     Container(
                       padding: const EdgeInsets.symmetric(
-                          horizontal: 8, vertical: 4),
+                          horizontal: 8, vertical: 4,),
                       decoration: BoxDecoration(
                         color: Colors.purple.withValues(alpha: 0.9),
                         borderRadius: BorderRadius.circular(12),

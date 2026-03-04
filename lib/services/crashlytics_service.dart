@@ -16,10 +16,10 @@ import '../env.dart';
 /// - Custom keys for debugging
 /// - Non-fatal error tracking
 class CrashlyticsService {
+  factory CrashlyticsService() => _instance;
   CrashlyticsService._internal();
   
   static final CrashlyticsService _instance = CrashlyticsService._internal();
-  factory CrashlyticsService() => _instance;
 
   bool _initialized = false;
 
@@ -109,7 +109,7 @@ class CrashlyticsService {
   /// Log a non-fatal error
   /// Use this for errors that don't crash the app but should be tracked
   Future<void> logError(
-    dynamic exception,
+    exception,
     StackTrace? stackTrace, {
     String? reason,
     bool fatal = false,
@@ -147,7 +147,7 @@ class CrashlyticsService {
   }
 
   /// Set additional custom key-value pairs for debugging
-  Future<void> setCustomKey(String key, dynamic value) async {
+  Future<void> setCustomKey(String key, value) async {
     if (!_initialized || !Environment.enableCrashlytics) return;
 
     try {

@@ -4,14 +4,14 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 
+import '../../../../common/bloc/theme/theme_bloc.dart';
 import '../../../../common/constants/app_colors.dart';
 import '../../../../common/constants/constants.dart';
 // Calling functionality temporarily disabled
 // // Calling functionality removed
 import '../../../../common/data/repo/user_repo.dart';
-import '../../../../common/bloc/theme/theme_bloc.dart';
-import 'package:flutter_bloc/flutter_bloc.dart';
 import '../../../../common/utils/custom_toast.dart';
 import '../../../../common/widgets/custom_snackbar.dart';
 import '../../../../models/user_model.dart';
@@ -172,7 +172,7 @@ class ChatPageState extends State<ChatPage> {
                           content: Text(
                             'Do you want to'.tr(
                               args: [
-                                isBlocked ? 'Unblock'.tr().toString() : 'Block'.tr().toString(),
+                                if (isBlocked) 'Unblock'.tr().toString() else 'Block'.tr().toString(),
                                 widget.second.name ?? '',
                               ],
                             ),

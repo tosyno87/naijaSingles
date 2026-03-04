@@ -1,15 +1,14 @@
 import 'dart:developer';
 import 'dart:io';
 
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:equatable/equatable.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+
 import '../../../../../../common/data/repo/phone_auth_repo.dart';
 import '../../../../../../common/utils/profile_completion_guard.dart';
-import '../../../../../../services/secure_storage_service.dart';
-
 import '../../../../../../models/user_model.dart';
+import '../../../../../../services/secure_storage_service.dart';
 
 part 'registration_event.dart';
 part 'registration_state.dart';
@@ -96,7 +95,7 @@ class RegistrationBloc extends Bloc<RegistrationEvents, RegistrationStates> {
                     emit(const RegistrationFailed(
                       message:
                           'This phone number is already registered. Please sign in instead.',
-                    ));
+                    ),);
                     return;
                   }
                 } on FirebaseException catch (e) {
@@ -110,33 +109,33 @@ class RegistrationBloc extends Bloc<RegistrationEvents, RegistrationStates> {
                     log('❌ Firestore error during phone dedup: ${e.code}');
                     emit(const RegistrationFailed(
                       message: 'Unable to verify phone. Please try again.',
-                    ));
+                    ),);
                     return;
                   }
                 } on SocketException {
                   log('❌ Network error during phone dedup — blocking registration');
                   emit(const RegistrationFailed(
                     message: 'No internet connection. Please try again.',
-                  ));
+                  ),);
                   return;
                 } catch (e) {
                   log('❌ Unexpected error during phone dedup: $e');
                   emit(const RegistrationFailed(
                     message: 'Unable to verify phone. Please try again.',
-                  ));
+                  ),);
                   return;
                 }
               }
               emit(NewRegistration(token: event.token, user: user));
             } else {
               emit(const RegistrationFailed(
-                  message: 'Error: No user identifier found'));
+                  message: 'Error: No user identifier found',),);
             }
           }
         } else {
           log('❌ User has no displayName or phoneNumber');
           emit(const RegistrationFailed(
-              message: 'Error: No user identifier found'));
+              message: 'Error: No user identifier found',),);
         }
       } on SocketException {
         log('❌ Network error during registration check');

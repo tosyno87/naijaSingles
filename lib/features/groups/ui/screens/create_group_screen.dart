@@ -416,10 +416,10 @@ class _CreateGroupScreenState extends State<CreateGroupScreen> {
                 setState(() => _selectedCategory = value!);
               },
               icon: const Icon(Icons.arrow_drop_down,
-                  color: AppColors.primaryGreen),
+                  color: AppColors.primaryGreen,),
               dropdownColor: Colors.white,
               style: GoogleFonts.montserrat(
-                  color: AppColors.textPrimary, fontSize: 14),
+                  color: AppColors.textPrimary, fontSize: 14,),
             ),
           ),
         ],
@@ -509,7 +509,7 @@ class _CreateGroupScreenState extends State<CreateGroupScreen> {
                         focusedBorder: OutlineInputBorder(
                           borderRadius: BorderRadius.circular(12),
                           borderSide: const BorderSide(
-                              color: AppColors.primaryGreen, width: 2),
+                              color: AppColors.primaryGreen, width: 2,),
                         ),
                         filled: true,
                         fillColor: Colors.white,

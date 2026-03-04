@@ -20,6 +20,7 @@ final class OnboardingInitial extends OnboardingState {
 final class OnboardingLoaded extends OnboardingState {
   const OnboardingLoaded(this.data);
 
+  @override
   final OnboardingData data;
 
   @override
@@ -29,6 +30,7 @@ final class OnboardingLoaded extends OnboardingState {
 final class OnboardingLoading extends OnboardingState {
   const OnboardingLoading(this.data);
 
+  @override
   final OnboardingData data;
 
   @override

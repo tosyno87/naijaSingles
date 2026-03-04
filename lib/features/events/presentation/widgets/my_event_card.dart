@@ -74,7 +74,7 @@ class MyEventCard extends StatelessWidget {
     AppLogger.debug('🖼️ Event ${event.id} - hasImages: ${event.hasImages}');
     AppLogger.debug('🖼️ Event ${event.id} - imageUrls: ${event.imageUrls}');
     AppLogger.debug(
-        '🖼️ Event ${event.id} - primaryImageUrl: ${event.primaryImageUrl}');
+        '🖼️ Event ${event.id} - primaryImageUrl: ${event.primaryImageUrl}',);
 
     return Container(
       height: 200, // Increased height for better poster visibility
@@ -89,15 +89,14 @@ class MyEventCard extends StatelessWidget {
       child: Stack(
         children: [
           // Image or placeholder
-          event.hasImages
-              ? GestureDetector(
+          if (event.hasImages) GestureDetector(
                   onTap: () => _showFullScreenPoster(context),
                   child: ClipRRect(
                     borderRadius: const BorderRadius.only(
                       topLeft: Radius.circular(16),
                       topRight: Radius.circular(16),
                     ),
-                    child: Container(
+                    child: ColoredBox(
                       color: Colors
                           .grey.shade100, // Background for contained images
                       child: event.primaryImageUrl.startsWith('http')
@@ -123,7 +122,7 @@ class MyEventCard extends StatelessWidget {
                                   error: error,
                                 );
                                 AppLogger.debug(
-                                    '❌ Image URL: ${event.primaryImageUrl}');
+                                    '❌ Image URL: ${event.primaryImageUrl}',);
                                 return Container(
                                   width: double.infinity,
                                   height: double.infinity,
@@ -189,8 +188,7 @@ class MyEventCard extends StatelessWidget {
                             ),
                     ),
                   ),
-                )
-              : Container(
+                ) else Container(
                   width: double.infinity,
                   height: double.infinity,
                   decoration: BoxDecoration(

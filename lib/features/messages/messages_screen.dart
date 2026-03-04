@@ -6,13 +6,13 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:google_fonts/google_fonts.dart';
 
+import '../../common/constants/app_colors.dart';
 import '../../models/user_model.dart'; // Import UserModel
 import '../dating/screens/user_detail_screen.dart'; // Import for profile viewing
 import '../explore/explore_screen.dart'; // Import ExploreScreen directly
 import 'chat_thread_screen.dart';
 import 'message_model.dart';
 import 'services/chat_service.dart';
-import '../../common/constants/app_colors.dart';
 
 class MessagesScreen extends StatefulWidget {
   const MessagesScreen({super.key});

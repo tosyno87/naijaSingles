@@ -106,7 +106,7 @@ class _ChatThreadScreenState extends State<ChatThreadScreen> {
   Widget build(BuildContext context) {
     final colorScheme = Theme.of(context).colorScheme;
     return Scaffold(
-      backgroundColor: colorScheme.background, // Use MVP background color
+      backgroundColor: colorScheme.surface, // Use MVP background color
       appBar: AppBar(
         backgroundColor: AppColors.cardColor, // Use MVP card color
         elevation: 1,

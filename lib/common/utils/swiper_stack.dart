@@ -179,7 +179,7 @@ class SwipeStackState extends State<SwipeStack>
                 children: widget.children
                     .asMap()
                     .map((int index, _) =>
-                        MapEntry(index, _item(constraints, index)))
+                        MapEntry(index, _item(constraints, index)),)
                     .values
                     .toList(),
               ),

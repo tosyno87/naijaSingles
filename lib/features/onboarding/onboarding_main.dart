@@ -198,10 +198,7 @@ class _OnboardingMainState extends State<OnboardingMain> {
           // Optional screens: 4 (Bio), 5 (Interests), 7 (Additional Info)
           if (_currentPage == 4 || _currentPage == 5 || _currentPage == 7)
             TextButton(
-              onPressed: () {
-                // Skip onboarding - complete it immediately
-                _completeOnboarding();
-              },
+              onPressed: _completeOnboarding,
               child: Text(
                 'Skip',
                 style: GoogleFonts.montserrat(

@@ -351,7 +351,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
             color: AppColors.backgroundColor,
             borderRadius: BorderRadius.circular(12),
             border: Border.all(
-                color: AppColors.primaryGreen.withValues(alpha: 0.3)),
+                color: AppColors.primaryGreen.withValues(alpha: 0.3),),
           ),
           child: Column(
             mainAxisSize: MainAxisSize.min,
@@ -920,7 +920,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
                     const CircularProgressIndicator(
-                        color: AppColors.primaryGreen),
+                        color: AppColors.primaryGreen,),
                     const SizedBox(height: 16),
                     Text(
                       'Updating profile...',
@@ -1351,7 +1351,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                       child: Text(
                         tribe,
                         style: GoogleFonts.montserrat(
-                            color: AppColors.textPrimary),
+                            color: AppColors.textPrimary,),
                       ),
                     ),
                   )
@@ -1367,10 +1367,10 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                 return null;
               },
               icon: const Icon(Icons.arrow_drop_down,
-                  color: AppColors.primaryGreen),
+                  color: AppColors.primaryGreen,),
               dropdownColor: Colors.white,
               style: GoogleFonts.montserrat(
-                  fontSize: 16, color: AppColors.textPrimary),
+                  fontSize: 16, color: AppColors.textPrimary,),
             ),
           ),
           if (_selectedTribe == 'Other') ...[

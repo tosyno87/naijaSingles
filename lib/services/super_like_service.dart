@@ -219,7 +219,7 @@ class SuperLikeService {
       PerformanceMonitor.measure('respond_to_super_like', () async {
         try {
           debugPrint(
-              '💫 Responding to super like: $superLikeId (like: $isLike)');
+              '💫 Responding to super like: $superLikeId (like: $isLike)',);
 
           final superLikeDoc =
               await _superLikesCollection.doc(superLikeId).get();

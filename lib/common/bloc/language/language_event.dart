@@ -10,10 +10,10 @@ abstract class LanguageEvent extends Equatable {
 
 /// Event to set locale
 class LanguageLocaleChanged extends LanguageEvent {
-  final Locale locale;
-  final BuildContext context;
 
   const LanguageLocaleChanged(this.locale, this.context);
+  final Locale locale;
+  final BuildContext context;
 
   @override
   List<Object?> get props => [locale];

@@ -15,9 +15,9 @@ class ThemeInitialized extends ThemeEvent {
 
 /// Event to toggle theme mode
 class ThemeModeChanged extends ThemeEvent {
-  final ThemeMode themeMode;
 
   const ThemeModeChanged(this.themeMode);
+  final ThemeMode themeMode;
 
   @override
   List<Object?> get props => [themeMode];

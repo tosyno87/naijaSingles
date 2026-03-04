@@ -48,7 +48,7 @@ class BlocUserListBloc extends Bloc<BlocUserListEvent, BlocUserListState> {
 
           final List<BlockUserModel> updatedList = [
             ...currentList,
-            ...moreBlockList
+            ...moreBlockList,
           ];
 
           emit(BlockUserLoadedState(updatedList));

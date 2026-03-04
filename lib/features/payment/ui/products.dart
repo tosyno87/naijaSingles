@@ -15,11 +15,11 @@ import 'package:in_app_purchase_storekit/in_app_purchase_storekit.dart';
 import 'package:in_app_purchase_storekit/store_kit_wrappers.dart';
 import 'package:rflutter_alert/rflutter_alert.dart';
 
+import '../../../common/bloc/theme/theme_bloc.dart';
 import '../../../common/constants/adds.dart';
 import '../../../common/constants/app_colors.dart';
 import '../../../common/constants/constants.dart';
 import '../../../common/data/repo/in_app_purchase_repo.dart';
-import '../../../common/bloc/theme/theme_bloc.dart';
 import '../../../common/utils/crousle_slider.dart';
 import '../../../common/utils/privacy_page.dart';
 import '../../../common/widgets/custom_button.dart';

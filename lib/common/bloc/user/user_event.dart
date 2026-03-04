@@ -25,9 +25,9 @@ class UserRefreshUserDetails extends UserEvent {
 
 /// Event when user data is updated
 class UserDataUpdated extends UserEvent {
-  final UserModel? user;
 
   const UserDataUpdated(this.user);
+  final UserModel? user;
 
   @override
   List<Object?> get props => [user];
@@ -35,9 +35,9 @@ class UserDataUpdated extends UserEvent {
 
 /// Event when authentication state changes
 class UserAuthStateChanged extends UserEvent {
-  final bool isAuthenticated;
 
   const UserAuthStateChanged(this.isAuthenticated);
+  final bool isAuthenticated;
 
   @override
   List<Object?> get props => [isAuthenticated];

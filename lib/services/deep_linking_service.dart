@@ -92,7 +92,7 @@ class DeepLinkingService {
       await SharePlus.instance.share(ShareParams(
         text: text,
         subject: 'Profile from Afropeep',
-      ));
+      ),);
 
       log('🔗 Profile shared successfully');
     } catch (e) {
@@ -120,7 +120,7 @@ class DeepLinkingService {
       await SharePlus.instance.share(ShareParams(
         text: text,
         subject: 'New Match on Afropeep',
-      ));
+      ),);
 
       log('🔗 Match shared successfully');
     } catch (e) {
@@ -149,7 +149,7 @@ class DeepLinkingService {
       await SharePlus.instance.share(ShareParams(
         text: text,
         subject: 'Event on Afropeep',
-      ));
+      ),);
 
       log('🔗 Event shared successfully');
     } catch (e) {

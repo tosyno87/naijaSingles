@@ -164,7 +164,7 @@ class _GroupDetailsScreenState extends State<GroupDetailsScreen>
                       imageUrl: widget.group.imageUrl!,
                       fit: BoxFit.cover,
                       placeholder: (context, url) => const Center(
-                          child: CircularProgressIndicator(strokeWidth: 2)),
+                          child: CircularProgressIndicator(strokeWidth: 2),),
                       errorWidget: (context, url, error) =>
                           _buildDefaultBackground(),
                     ),
@@ -252,7 +252,7 @@ class _GroupDetailsScreenState extends State<GroupDetailsScreen>
                         Icon(Icons.delete, color: Colors.red),
                         SizedBox(width: 8),
                         Text('Delete Group',
-                            style: TextStyle(color: Colors.red)),
+                            style: TextStyle(color: Colors.red),),
                       ],
                     ),
                   ),

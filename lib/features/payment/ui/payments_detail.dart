@@ -13,8 +13,7 @@ class PaymentDetails extends StatelessWidget {
   final List<PurchaseDetails> purchases;
 
   @override
-  Widget build(BuildContext context) {
-    return Scaffold(
+  Widget build(BuildContext context) => Scaffold(
       appBar: AppBar(
         backgroundColor: Theme.of(context).scaffoldBackgroundColor,
         centerTitle: true,
@@ -232,5 +231,4 @@ class PaymentDetails extends StatelessWidget {
         ),
       ),
     );
-  }
 }

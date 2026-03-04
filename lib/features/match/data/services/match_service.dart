@@ -171,7 +171,5 @@ class MatchService {
   }
 
   /// Get match by ID
-  Future<MatchModel?> getMatchById(String matchId) async {
-    return await _likesService.getMatchById(matchId);
-  }
+  Future<MatchModel?> getMatchById(String matchId) async => _likesService.getMatchById(matchId);
 }

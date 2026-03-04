@@ -2,9 +2,9 @@ import 'package:equatable/equatable.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
-import '../models/match_model.dart';
 import '../data/services/likes_service.dart';
 import '../data/services/match_service.dart';
+import '../models/match_model.dart';
 
 part 'match_event.dart';
 part 'match_state.dart';

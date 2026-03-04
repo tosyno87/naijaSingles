@@ -385,7 +385,7 @@ class _MediaStepState extends State<MediaStep> {
                         fit: BoxFit.contain,
                         placeholder: (context, url) => const Center(
                             child:
-                                CircularProgressIndicator(strokeWidth: 2)),
+                                CircularProgressIndicator(strokeWidth: 2),),
                         errorWidget: (context, url, error) =>
                             const Center(
                           child: Icon(

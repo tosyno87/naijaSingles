@@ -6,8 +6,8 @@ import '../../../common/constants/app_colors.dart';
 import '../../../common/data/repo/user_search_repo.dart';
 import '../../../common/widgets/custom_3d_icons.dart';
 import '../../../models/user_model.dart';
-import '../widgets/match_confirmation_modal.dart';
 import '../widgets/hinge_profile_card.dart';
+import '../widgets/match_confirmation_modal.dart';
 
 class TribeConnectScreen extends StatefulWidget {
   const TribeConnectScreen({
@@ -41,11 +41,9 @@ class _TribeConnectScreenState extends State<TribeConnectScreen> {
   }
 
   // Get all available (not yet processed) users
-  List<UserModel> get _availableUsers {
-    return widget.users
+  List<UserModel> get _availableUsers => widget.users
         .where((user) => !_processedUserIds.contains(user.id))
         .toList();
-  }
 
   @override
   Widget build(BuildContext context) => Scaffold(

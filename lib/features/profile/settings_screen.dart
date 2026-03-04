@@ -2,14 +2,14 @@ import 'dart:developer';
 
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:google_fonts/google_fonts.dart';
 
 import '../../common/bloc/user/user_bloc.dart';
 import '../../common/constants/app_colors.dart';
-import 'package:flutter_bloc/flutter_bloc.dart';
 import '../../common/routes/route_name.dart';
-import '../account_status/presentation/screens/account_status_screen.dart';
 import '../account_status/presentation/bloc/account_status_bloc.dart';
+import '../account_status/presentation/screens/account_status_screen.dart';
 import '../settings/account_deletion_screen.dart';
 import '../settings/help_center_screen.dart';
 import '../settings/language_settings_screen.dart';

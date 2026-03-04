@@ -1,10 +1,12 @@
 import 'dart:io';
+
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:intl/intl.dart';
-import '../../../data/models/enhanced_event_model.dart';
+
 import '../../../../../common/constants/app_colors.dart';
+import '../../../data/models/enhanced_event_model.dart';
 
 class PreviewStep extends StatelessWidget {
   const PreviewStep({
@@ -114,7 +116,7 @@ class PreviewStep extends StatelessWidget {
                               fit: BoxFit.cover,
                               placeholder: (context, url) => const Center(
                                   child: CircularProgressIndicator(
-                                      strokeWidth: 2)),
+                                      strokeWidth: 2,),),
                               errorWidget: (context, url, error) =>
                                   const Center(
                                 child: Icon(

@@ -532,7 +532,7 @@ class _CulturalProfileScreenState extends State<CulturalProfileScreen> {
                   .map(
                     (skill) => Container(
                       padding: const EdgeInsets.symmetric(
-                          horizontal: 12, vertical: 6),
+                          horizontal: 12, vertical: 6,),
                       decoration: BoxDecoration(
                         color: AppColors.primaryGreen.withValues(alpha: 0.1),
                         borderRadius: BorderRadius.circular(16),
@@ -618,7 +618,7 @@ class _CulturalProfileScreenState extends State<CulturalProfileScreen> {
                   .map(
                     (interest) => Container(
                       padding: const EdgeInsets.symmetric(
-                          horizontal: 12, vertical: 6),
+                          horizontal: 12, vertical: 6,),
                       decoration: BoxDecoration(
                         color: AppColors.primaryGreen.withValues(alpha: 0.1),
                         borderRadius: BorderRadius.circular(16),
@@ -658,7 +658,7 @@ class _CulturalProfileScreenState extends State<CulturalProfileScreen> {
                   .map(
                     (interest) => Container(
                       padding: const EdgeInsets.symmetric(
-                          horizontal: 12, vertical: 6),
+                          horizontal: 12, vertical: 6,),
                       decoration: BoxDecoration(
                         color: AppColors.textSecondary.withValues(alpha: 0.1),
                         borderRadius: BorderRadius.circular(16),

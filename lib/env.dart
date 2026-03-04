@@ -1,5 +1,5 @@
-import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart' show FirebaseOptions;
+import 'package:flutter/material.dart';
 
 import 'env/development.dart';
 import 'env/production.dart';

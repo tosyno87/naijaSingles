@@ -149,8 +149,7 @@ class _OnboardingStepARootsState extends State<OnboardingStepARoots> {
   }
 
   @override
-  Widget build(BuildContext context) {
-    return BlocBuilder<OnboardingBloc, OnboardingState>(
+  Widget build(BuildContext context) => BlocBuilder<OnboardingBloc, OnboardingState>(
       builder: (context, state) {
         final data = state.data ?? OnboardingData();
 
@@ -665,7 +664,6 @@ class _OnboardingStepARootsState extends State<OnboardingStepARoots> {
     );
       },
     );
-  }
 
   /// Builds a section title with consistent styling
   Widget _buildSectionTitle(String title) => Text(

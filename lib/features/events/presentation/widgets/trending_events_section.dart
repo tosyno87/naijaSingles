@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
-import '../../data/models/event_model.dart';
+
 import '../../../../common/constants/app_colors.dart';
+import '../../data/models/event_model.dart';
 
 class TrendingEventsSection extends StatelessWidget {
   const TrendingEventsSection({

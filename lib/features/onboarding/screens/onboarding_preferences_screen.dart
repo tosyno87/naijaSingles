@@ -176,7 +176,7 @@ class _OnboardingPreferencesScreenState
       ..add(OnboardingInterestedInUpdated(_selectedInterestedIn))
       ..add(OnboardingAgeRangeUpdated(
         [_ageRange.start.round(), _ageRange.end.round()],
-      ));
+      ),);
 
     if (widget.onNext != null) {
       widget.onNext!();

@@ -4,7 +4,6 @@ import 'package:easy_localization/easy_localization.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
-import '../../../../common/widgets/custom_snackbar.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
 import '../../../../common/bloc/user/user_bloc.dart';
@@ -13,6 +12,7 @@ import '../../../../common/constants/constants.dart';
 import '../../../../common/data/repo/facebooklogin_repo.dart';
 import '../../../../common/data/repo/phone_auth_repo.dart';
 import '../../../../common/routes/route_name.dart';
+import '../../../../common/widgets/custom_snackbar.dart';
 import '../../../../common/widgets/text_button.dart';
 
 class DeleteAccountWidget extends StatefulWidget {

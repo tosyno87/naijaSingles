@@ -1,9 +1,10 @@
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+
 import '../../../../common/constants/app_colors.dart';
-import '../bloc/events_bloc.dart';
 import '../../data/services/location_service.dart';
+import '../bloc/events_bloc.dart';
 
 class AdvancedSearchDialog extends StatefulWidget {
   const AdvancedSearchDialog({
@@ -73,7 +74,7 @@ class _AdvancedSearchDialogState extends State<AdvancedSearchDialog> {
     // Initialize event type from filter
     if (_filter.freeOnly) {
       _eventType = 'free';
-    } else if (_filter.paidOnly == true) {
+    } else if (_filter.paidOnly ?? false) {
       _eventType = 'paid';
     } else {
       _eventType = null; // Any
@@ -136,7 +137,6 @@ class _AdvancedSearchDialogState extends State<AdvancedSearchDialog> {
           border: Border(
             bottom: BorderSide(
               color: Color(0xFFE0E0E0),
-              width: 1,
             ),
           ),
         ),
@@ -205,11 +205,11 @@ class _AdvancedSearchDialogState extends State<AdvancedSearchDialog> {
               ),
               border: OutlineInputBorder(
                 borderRadius: BorderRadius.circular(8),
-                borderSide: const BorderSide(color: Color(0xFFE0E0E0), width: 1),
+                borderSide: const BorderSide(color: Color(0xFFE0E0E0)),
               ),
               enabledBorder: OutlineInputBorder(
                 borderRadius: BorderRadius.circular(8),
-                borderSide: const BorderSide(color: Color(0xFFE0E0E0), width: 1),
+                borderSide: const BorderSide(color: Color(0xFFE0E0E0)),
               ),
               focusedBorder: OutlineInputBorder(
                 borderRadius: BorderRadius.circular(8),
@@ -237,7 +237,6 @@ class _AdvancedSearchDialogState extends State<AdvancedSearchDialog> {
               borderRadius: BorderRadius.circular(8),
               border: Border.all(
                 color: const Color(0xFFE0E0E0).withValues(alpha: 0.5),
-                width: 1,
               ),
             ),
             child: Column(
@@ -262,7 +261,6 @@ class _AdvancedSearchDialogState extends State<AdvancedSearchDialog> {
                         color: const Color(0xFF333333),
                       ),
                       underline: Container(),
-                      isExpanded: false,
                       items: _radiusOptionsInCurrentUnit
                           .map(
                             (radius) => DropdownMenuItem(
@@ -412,7 +410,6 @@ class _AdvancedSearchDialogState extends State<AdvancedSearchDialog> {
               decoration: BoxDecoration(
                 border: Border.all(
                   color: const Color(0xFFE0E0E0),
-                  width: 1,
                 ),
                 borderRadius: BorderRadius.circular(8),
                 color: Colors.white,
@@ -458,15 +455,15 @@ class _AdvancedSearchDialogState extends State<AdvancedSearchDialog> {
           ),
           const SizedBox(height: 8),
           DropdownButtonFormField<String>(
-            value: _selectedCategory,
+            initialValue: _selectedCategory,
             decoration: InputDecoration(
               border: OutlineInputBorder(
                 borderRadius: BorderRadius.circular(8),
-                borderSide: const BorderSide(color: Color(0xFFE0E0E0), width: 1),
+                borderSide: const BorderSide(color: Color(0xFFE0E0E0)),
               ),
               enabledBorder: OutlineInputBorder(
                 borderRadius: BorderRadius.circular(8),
-                borderSide: const BorderSide(color: Color(0xFFE0E0E0), width: 1),
+                borderSide: const BorderSide(color: Color(0xFFE0E0E0)),
               ),
               focusedBorder: OutlineInputBorder(
                 borderRadius: BorderRadius.circular(8),
@@ -569,7 +566,6 @@ class _AdvancedSearchDialogState extends State<AdvancedSearchDialog> {
             color: isSelected
                 ? AppColors.primaryGreen
                 : const Color(0xFFE0E0E0),
-            width: 1,
           ),
         ),
         child: Row(
@@ -606,7 +602,6 @@ class _AdvancedSearchDialogState extends State<AdvancedSearchDialog> {
           border: Border(
             top: BorderSide(
               color: const Color(0xFFE0E0E0).withValues(alpha: 0.5),
-              width: 1,
             ),
           ),
           boxShadow: [

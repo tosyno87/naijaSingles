@@ -15,9 +15,9 @@ class StreetViewInitial extends StreetViewState {
 
 /// Street view loaded with current mode
 class StreetViewLoaded extends StreetViewState {
-  final String streetMode;
 
   const StreetViewLoaded(this.streetMode);
+  final String streetMode;
 
   @override
   List<Object?> get props => [streetMode];
@@ -25,9 +25,9 @@ class StreetViewLoaded extends StreetViewState {
 
 /// Error loading street view
 class StreetViewError extends StreetViewState {
-  final String message;
 
   const StreetViewError(this.message);
+  final String message;
 
   @override
   List<Object?> get props => [message];

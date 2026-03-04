@@ -6,8 +6,8 @@ import '../../../../models/user_model.dart';
 import '../../../../services/cached_user_service.dart';
 import '../../../../services/mode_specific_compatibility_engine.dart';
 import '../../../../services/paginated_user_service.dart' show PaginatedResult;
-import '../../../match/data/services/compatibility_engine.dart';
 import '../../../../services/performance_monitor.dart';
+import '../../../match/data/services/compatibility_engine.dart';
 
 /// Smart match service that provides intelligent user ordering and discovery
 /// Implements Priority 2: Enhanced Matching Algorithm

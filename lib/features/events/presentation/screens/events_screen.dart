@@ -410,12 +410,10 @@ class _EventsScreenState extends State<EventsScreen> {
           fontWeight: FontWeight.w500,
           color: const Color(0xFF333333),
         ),
-        items: dateRanges.map((String range) {
-          return DropdownMenuItem<String>(
+        items: dateRanges.map((String range) => DropdownMenuItem<String>(
             value: range,
             child: Text(range.tr()),
-          );
-        }).toList(),
+          ),).toList(),
         onChanged: (String? newValue) {
           if (newValue != null) {
             final newFilter = _getDateRangeFilter(newValue, true);
@@ -456,7 +454,7 @@ class _EventsScreenState extends State<EventsScreen> {
 
   EventFilter _getDateRangeFilter(String dateRange, bool selected) {
     if (!selected || dateRange == 'All Time') {
-      return _currentFilter.copyWith(startDate: null, endDate: null);
+      return _currentFilter.copyWith();
     }
 
     final now = DateTime.now();

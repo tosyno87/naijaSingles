@@ -8,7 +8,7 @@ part 'language_state.dart';
 
 /// BLoC for managing app language/locale (delegates to EasyLocalization).
 class LanguageBloc extends Bloc<LanguageEvent, LanguageState> {
-  LanguageBloc() : super(LanguageInitial(const Locale('en', 'US'))) {
+  LanguageBloc() : super(const LanguageInitial(Locale('en', 'US'))) {
     on<LanguageLocaleChanged>(_onLanguageLocaleChanged);
   }
 
@@ -21,7 +21,5 @@ class LanguageBloc extends Bloc<LanguageEvent, LanguageState> {
   }
 
   /// Get current locale from state
-  Locale get currentLocale {
-    return state.locale;
-  }
+  Locale get currentLocale => state.locale;
 }

@@ -1,8 +1,8 @@
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_swiper_null_safety/flutter_swiper_null_safety.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter_swiper_null_safety/flutter_swiper_null_safety.dart';
 import 'package:swipable_stack/swipable_stack.dart';
 
 import '../../../../common/bloc/theme/theme_bloc.dart';
@@ -76,8 +76,7 @@ class _InfoState extends State<Info> {
                         Swiper(
                           key: UniqueKey(),
                           physics: const ScrollPhysics(),
-                          itemBuilder: (BuildContext context, int index2) {
-                              return widget.user.imageUrl != null &&
+                          itemBuilder: (BuildContext context, int index2) => widget.user.imageUrl != null &&
                                     widget.user.imageUrl!.isNotEmpty
                                 ? Hero(
                                     tag: 'abc',
@@ -86,8 +85,7 @@ class _InfoState extends State<Info> {
                                       fit: BoxFit.cover,
                                     ),
                                   )
-                                : Container();
-                          },
+                                : Container(),
                           itemCount: widget.user.imageUrl?.length ?? 0,
                           pagination: const SwiperPagination(
                             alignment: Alignment.bottomCenter,

@@ -68,11 +68,11 @@ class _MyEventsScreenState extends State<MyEventsScreen>
             BlocListener<EventCreationBloc, EventCreationState>(
               listener: (context, state) {
                 AppLogger.debug(
-                    '🔄 EventCreationBloc State: ${state.runtimeType}');
+                    '🔄 EventCreationBloc State: ${state.runtimeType}',);
 
                 if (state is EventDeleted) {
                   AppLogger.info(
-                      '✅ Event deleted successfully: ${state.eventId}');
+                      '✅ Event deleted successfully: ${state.eventId}',);
                   // Only clear loading if this is the event we're deleting
                   if (_deletingEventId == state.eventId) {
                     setState(() {
@@ -334,7 +334,6 @@ class _MyEventsScreenState extends State<MyEventsScreen>
                 message:
                     'You haven\'t published any events yet.\nCreate your first event to get started!',
                 icon: Icons.event_busy,
-                showCreateButton: false,
               );
             }
 
@@ -346,7 +345,6 @@ class _MyEventsScreenState extends State<MyEventsScreen>
             message:
                 'You haven\'t published any events yet.\nCreate your first event to get started!',
             icon: Icons.event_busy,
-            showCreateButton: false,
           );
         },
       );
@@ -377,7 +375,6 @@ class _MyEventsScreenState extends State<MyEventsScreen>
                 message:
                     'You don\'t have any draft events.\nSave an event as draft while creating it.',
                 icon: Icons.drafts,
-                showCreateButton: false,
               );
             }
 
@@ -389,7 +386,6 @@ class _MyEventsScreenState extends State<MyEventsScreen>
             message:
                 'You don\'t have any draft events.\nSave an event as draft while creating it.',
             icon: Icons.drafts,
-            showCreateButton: false,
           );
         },
       );
@@ -643,7 +639,7 @@ class _MyEventsScreenState extends State<MyEventsScreen>
                     backgroundColor: AppColors.primaryGreen,
                     foregroundColor: Colors.white,
                     padding: const EdgeInsets.symmetric(
-                        horizontal: 32, vertical: 16),
+                        horizontal: 32, vertical: 16,),
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(12),
                     ),
@@ -826,7 +822,7 @@ class _MyEventsScreenState extends State<MyEventsScreen>
           ElevatedButton(
             onPressed: () {
               AppLogger.debug(
-                  '🗑️ Delete button pressed for event: ${event.id}');
+                  '🗑️ Delete button pressed for event: ${event.id}',);
               Navigator.of(dialogContext).pop();
 
               // Track which event is being deleted
@@ -860,7 +856,7 @@ class _MyEventsScreenState extends State<MyEventsScreen>
 
               // Use the passed screen context that has access to EventCreationBloc
               AppLogger.debug(
-                  '📤 Dispatching DeleteEventEvent for: ${event.id}');
+                  '📤 Dispatching DeleteEventEvent for: ${event.id}',);
               screenContext
                   .read<EventCreationBloc>()
                   .add(DeleteEventEvent(event.id));

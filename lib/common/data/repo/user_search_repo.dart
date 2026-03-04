@@ -2,11 +2,11 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 
+import '../../../features/discovery/data/services/discovery_service.dart';
+import '../../../features/match/data/services/match_service.dart';
 import '../../../models/user_model.dart';
 import '../../../services/cached_user_service.dart';
-import '../../../features/match/data/services/match_service.dart';
 import '../../../services/paginated_user_service.dart';
-import '../../../features/discovery/data/services/discovery_service.dart';
 import '../../constants/constants.dart';
 import '../../utils/distance.dart' as distance;
 

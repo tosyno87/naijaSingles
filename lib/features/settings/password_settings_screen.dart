@@ -281,7 +281,7 @@ class _PasswordSettingsScreenState extends State<PasswordSettingsScreen> {
                     color: textLight,
                   ),
                   onPressed: () => setState(
-                      () => _newPasswordVisible = !_newPasswordVisible),
+                      () => _newPasswordVisible = !_newPasswordVisible,),
                 ),
               ),
               style: GoogleFonts.montserrat(fontSize: 16, color: textPrimary),
@@ -475,7 +475,7 @@ class _PasswordSettingsScreenState extends State<PasswordSettingsScreen> {
               child: Row(
                 children: [
                   const Icon(Icons.tips_and_updates,
-                      color: successColor, size: 16),
+                      color: successColor, size: 16,),
                   const SizedBox(width: 8),
                   Expanded(
                     child: Text(
@@ -549,7 +549,7 @@ class _PasswordSettingsScreenState extends State<PasswordSettingsScreen> {
                     shape: BoxShape.circle,
                   ),
                   child: const Icon(Icons.check_circle,
-                      color: successColor, size: 30),
+                      color: successColor, size: 30,),
                 ),
                 const SizedBox(height: 16),
                 Text(
@@ -587,7 +587,7 @@ class _PasswordSettingsScreenState extends State<PasswordSettingsScreen> {
                   child: Row(
                     children: [
                       const Icon(Icons.info_outline,
-                          color: primaryColor, size: 20),
+                          color: primaryColor, size: 20,),
                       const SizedBox(width: 8),
                       Expanded(
                         child: Text(

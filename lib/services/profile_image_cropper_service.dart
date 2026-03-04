@@ -150,7 +150,7 @@ class ProfileImageCropperService {
         // For iOS, permissions are handled automatically by the system
         // when accessing photo library. We can return true here.
         developer.log(
-            '📁 iOS detected - photo library permission handled by system');
+            '📁 iOS detected - photo library permission handled by system',);
         return true; // iOS will show permission dialog automatically
       }
 

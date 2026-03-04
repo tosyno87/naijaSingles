@@ -427,7 +427,7 @@ class EventsBloc extends Bloc<EventsEvent, EventsState> {
         return false;
       }
 
-      if (filter.paidOnly == true && event.isFree) {
+      if (filter.paidOnly ?? false && event.isFree) {
         return false;
       }
 

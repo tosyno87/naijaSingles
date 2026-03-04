@@ -66,7 +66,7 @@ class _GroupAvatarPickerState extends State<GroupAvatarPicker> {
                             height: widget.size,
                             placeholder: (context, url) => const Center(
                                 child: CircularProgressIndicator(
-                                    strokeWidth: 2)),
+                                    strokeWidth: 2,),),
                             errorWidget: (context, url, error) =>
                                 _buildDefaultAvatar(),
                           )

@@ -12,7 +12,7 @@ class SecureConfig {
     if (_initialized) return;
 
     try {
-      await dotenv.load(fileName: '.env');
+      await dotenv.load();
       _initialized = true;
       if (kDebugMode) {
         AppLogger.info('✅ Secure configuration loaded successfully');

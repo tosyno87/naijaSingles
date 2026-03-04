@@ -448,7 +448,7 @@ class UnifiedGroupService {
       // Filter and sort in memory to avoid complex index requirements
       final groups = snapshot.docs
           .map((doc) =>
-              UnifiedGroup.fromMap(doc.id, doc.data() as Map<String, dynamic>))
+              UnifiedGroup.fromMap(doc.id, doc.data() as Map<String, dynamic>),)
           .toList();
 
       // Filter active groups and sort by last activity

@@ -15,10 +15,10 @@ class StreetViewInitialized extends StreetViewEvent {
 
 /// Event to toggle street view mode
 class StreetViewModeChanged extends StreetViewEvent {
-  final String value;
-  final List<String> userIds;
 
   const StreetViewModeChanged(this.value, this.userIds);
+  final String value;
+  final List<String> userIds;
 
   @override
   List<Object?> get props => [value, userIds];

@@ -11,8 +11,8 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:otp_autofill/otp_autofill.dart';
 import 'package:pin_code_fields/pin_code_fields.dart';
 
-import '../../../../../common/data/repo/phone_auth_repo.dart';
 import '../../../../../common/bloc/user/user_bloc.dart';
+import '../../../../../common/data/repo/phone_auth_repo.dart';
 import '../../../../../common/routes/route_name.dart';
 import '../../../../../common/utils/profile_completion_guard.dart';
 import '../../../../../common/widgets/custom_snackbar.dart';
@@ -337,7 +337,7 @@ class _OtpPageState extends State<OtpPage> {
 
                           // Double-check that user actually has a complete profile
                           if (!ProfileCompletionGuard.isUserComplete(
-                              state.user)) {
+                              state.user,)) {
                             log('⚠️ User marked as registered but profile is incomplete - treating as new registration');
                             if (!_hasNavigated && mounted) {
                               _hasNavigated = true;

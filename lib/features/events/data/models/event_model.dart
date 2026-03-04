@@ -79,7 +79,7 @@ class EventModel extends Equatable {
       );
     } catch (e, stackTrace) {
       AppLogger.error('❌ Error parsing EventModel from Firestore',
-          error: e, stackTrace: stackTrace);
+          error: e, stackTrace: stackTrace,);
       rethrow;
     }
   }

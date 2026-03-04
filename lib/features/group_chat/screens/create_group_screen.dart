@@ -6,11 +6,11 @@ import 'package:google_fonts/google_fonts.dart';
 import '../../../common/constants/app_colors.dart';
 import '../../../common/utils/app_logger.dart';
 import '../../../services/image_upload_service.dart';
-import '../../groups/data/services/unified_group_service.dart';
 import '../../../services/validation_service.dart';
 import '../../../widgets/group_avatar_picker.dart';
 import '../../../widgets/success_dialog.dart';
 import '../../../widgets/tag_input_widget.dart';
+import '../../groups/data/services/unified_group_service.dart';
 import '../../groups/widgets/contact_picker_widget.dart';
 import 'group_chat_screen.dart';
 
@@ -344,7 +344,7 @@ class _CreateGroupScreenState extends State<CreateGroupScreen> {
                     const SizedBox(height: 12),
                     Container(
                       padding: const EdgeInsets.symmetric(
-                          horizontal: 16, vertical: 8),
+                          horizontal: 16, vertical: 8,),
                       decoration: BoxDecoration(
                         color: AppColors.primaryGreen,
                         borderRadius: BorderRadius.circular(20),
@@ -369,7 +369,7 @@ class _CreateGroupScreenState extends State<CreateGroupScreen> {
                   .map(
                     (memberId) => Container(
                       padding: const EdgeInsets.symmetric(
-                          horizontal: 12, vertical: 6),
+                          horizontal: 12, vertical: 6,),
                       decoration: BoxDecoration(
                         color: AppColors.primaryGreen.withValues(alpha: 0.1),
                         borderRadius: BorderRadius.circular(16),

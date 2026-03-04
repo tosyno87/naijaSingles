@@ -131,7 +131,7 @@ class SplashState extends State<Splash> {
             if (mounted) {
               ScaffoldMessenger.of(context).showSnackBar(
                 SnackBar(
-                    content: Text('Authentication error: ${state.message}')),
+                    content: Text('Authentication error: ${state.message}'),),
               );
               Navigator.pushReplacementNamed(context, RouteName.welcomeScreen);
             }
@@ -152,7 +152,7 @@ class SplashState extends State<Splash> {
                       colors: [
                         backgroundColor,
                         const Color(0xFF27A957).withValues(alpha: 
-                            0.1), // Very subtle green tint at bottom
+                            0.1,), // Very subtle green tint at bottom
                       ],
                       stops: const [0.7, 1.0],
                     ),

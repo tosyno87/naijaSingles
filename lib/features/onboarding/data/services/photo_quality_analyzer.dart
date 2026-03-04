@@ -95,12 +95,10 @@ class PhotoQualityAnalyzer {
     return totalPixels > 0 && (skinTonePixels / totalPixels) > 0.15;
   }
 
-  static bool _isSkinTone(int r, int g, int b) {
-    return (r > 95 && g > 40 && b > 20) &&
+  static bool _isSkinTone(int r, int g, int b) => (r > 95 && g > 40 && b > 20) &&
         (r > g && r > b) &&
         (r - g > 15) &&
         (r - b > 15);
-  }
 
   static bool _checkLighting(img.Image image) {
     int totalBrightness = 0;

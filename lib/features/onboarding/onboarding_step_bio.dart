@@ -1,10 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:google_fonts/google_fonts.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:google_fonts/google_fonts.dart';
 
 import '../../../common/constants/app_colors.dart';
-
 import 'bloc/onboarding_bloc.dart';
 
 /// Bio Info step of onboarding focusing on personal details.
@@ -228,8 +227,7 @@ class _OnboardingStepBioState extends State<OnboardingStepBio> {
   }
 
   @override
-  Widget build(BuildContext context) {
-    return BlocBuilder<OnboardingBloc, OnboardingState>(
+  Widget build(BuildContext context) => BlocBuilder<OnboardingBloc, OnboardingState>(
       builder: (context, state) {
     // Deep green color for accents
     const Color deepGreen = Color(0xFF008037);
@@ -737,7 +735,7 @@ class _OnboardingStepBioState extends State<OnboardingStepBio> {
                             0,
                             0,
                             _locationController.text.trim(),
-                          ));
+                          ),);
 
                           bloc.add(OnboardingBioUpdated(_bioController.text.trim()));
 
@@ -782,5 +780,4 @@ class _OnboardingStepBioState extends State<OnboardingStepBio> {
     );
       },
     );
-  }
 }

@@ -1,8 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+
+import '../../../../common/constants/app_colors.dart';
 import '../../../../common/routes/route_name.dart';
 import '../../data/services/event_templates_service.dart';
-import '../../../../common/constants/app_colors.dart';
 
 class EventTemplateSelectionScreen extends StatelessWidget {
   const EventTemplateSelectionScreen({super.key});

@@ -6,11 +6,11 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
 import '../../common/bloc/theme/theme_bloc.dart';
+import '../../common/bloc/user/user_bloc.dart';
 import '../../common/constants/app_colors.dart';
 import '../../common/constants/constants.dart';
 import '../../common/data/repo/pagination_repo.dart';
 import '../../common/data/repo/user_search_repo.dart';
-import '../../common/bloc/user/user_bloc.dart';
 import '../../common/widgets/custom_snackbar.dart';
 import '../../common/widgets/hookup_circularbar.dart';
 import '../../common/widgets/image_widget.dart';

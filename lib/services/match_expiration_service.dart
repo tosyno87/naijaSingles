@@ -209,7 +209,7 @@ class MatchExpirationService {
 
   /// Extend match expiration (premium feature)
   Future<bool> extendMatchExpiration(
-          String matchId, Duration extension) async =>
+          String matchId, Duration extension,) async =>
       PerformanceMonitor.measure('extend_match_expiration', () async {
         try {
           final matchDoc = await _matchesCollection.doc(matchId).get();

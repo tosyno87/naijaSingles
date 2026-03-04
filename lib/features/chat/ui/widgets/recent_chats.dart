@@ -6,11 +6,11 @@ import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
+import '../../../../common/bloc/theme/theme_bloc.dart';
 import '../../../../common/constants/app_colors.dart';
 import '../../../../common/constants/constants.dart';
 import '../../../../common/data/repo/pagination_repo.dart';
 import '../../../../common/data/repo/user_messaging_repo.dart';
-import '../../../../common/bloc/theme/theme_bloc.dart';
 import '../../../../common/widgets/hookup_circularbar.dart';
 import '../../../../config/app_config.dart';
 import '../../../../models/chat_model.dart';
@@ -253,7 +253,7 @@ class _RecentChatsState extends State<RecentChats> {
             child: Text(
               'No recent chat found'.tr().toString(),
               style: const TextStyle(
-                  color: AppColors.secondaryColor, fontSize: 16),
+                  color: AppColors.secondaryColor, fontSize: 16,),
             ),
           ),
         );

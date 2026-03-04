@@ -2,19 +2,19 @@ import 'dart:math';
 
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:swipable_stack/swipable_stack.dart';
 
-import '../../../../common/constants/app_colors.dart';
 import '../../../../common/bloc/theme/theme_bloc.dart';
+import '../../../../common/constants/app_colors.dart';
 import '../../../../common/widgets/image_widget.dart';
-import 'package:flutter_bloc/flutter_bloc.dart';
 import '../../../../models/user_model.dart';
-import '../../bloc/searchuser_bloc.dart';
 import '../../../dating/screens/user_detail_screen.dart';
 import '../../../user/ui/widgets/card_level.dart';
 import '../../../user/ui/widgets/gender_sign.dart';
 import '../../../user/ui/widgets/user_info.dart';
+import '../../bloc/searchuser_bloc.dart';
 
 // import 'MatchedAnimation.dart';
 
@@ -130,7 +130,7 @@ class UsersListState extends State<UsersList> with WidgetsBindingObserver {
             horizontalSwipeThreshold: 0.8,
             verticalSwipeThreshold: 0.8,
             overlayBuilder: (context, properties) {
-              final opacity = min(properties.swipeProgress, 1.0).toDouble();
+              final opacity = min(properties.swipeProgress, 1).toDouble();
               if (properties.direction == SwipeDirection.right) {
                 return Padding(
                   padding: const EdgeInsets.only(top: 25, left: 25),

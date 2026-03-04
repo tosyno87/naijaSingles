@@ -60,7 +60,7 @@ class RSVPModel extends Equatable {
   });
 
   factory RSVPModel.fromFirestoreJson(
-          Map<String, dynamic> json, String docId) =>
+          Map<String, dynamic> json, String docId,) =>
       RSVPModel(
         id: docId,
         userId: json['userId'] ?? '',

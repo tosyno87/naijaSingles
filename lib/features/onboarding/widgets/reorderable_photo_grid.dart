@@ -1,8 +1,10 @@
 import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
-import '../screens/enhanced_photo_upload_screen.dart';
+
 import '../data/services/photo_quality_analyzer.dart';
+import '../screens/enhanced_photo_upload_screen.dart';
 import 'photo_type_indicator.dart';
 
 class ReorderablePhotoGrid extends StatefulWidget {

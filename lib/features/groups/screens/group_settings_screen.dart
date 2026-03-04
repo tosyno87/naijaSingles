@@ -7,13 +7,13 @@ import 'package:google_fonts/google_fonts.dart';
 
 import '../../../common/constants/app_colors.dart';
 import '../../../common/utils/app_logger.dart';
-import '../data/services/unified_group_service.dart'
-    show UnifiedGroupService, UnifiedGroup, GroupType;
 import '../../../services/image_upload_service.dart';
 import '../../../services/validation_service.dart';
 import '../../../widgets/group_avatar_picker.dart';
 import '../../../widgets/success_dialog.dart';
 import '../../../widgets/tag_input_widget.dart';
+import '../data/services/unified_group_service.dart'
+    show UnifiedGroupService, UnifiedGroup, GroupType;
 
 /// Screen for editing group settings (creator/admin only)
 class GroupSettingsScreen extends StatefulWidget {

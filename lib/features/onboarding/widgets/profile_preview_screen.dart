@@ -55,7 +55,7 @@ class _ProfilePreviewScreenState extends State<ProfilePreviewScreen> {
             TextButton.icon(
               onPressed: _showImprovementSuggestions,
               icon: const Icon(Icons.tips_and_updates,
-                  color: afropeepGreen, size: 18),
+                  color: afropeepGreen, size: 18,),
               label: Text(
                 'Tips',
                 style: GoogleFonts.montserrat(
@@ -333,7 +333,7 @@ class _ProfilePreviewScreenState extends State<ProfilePreviewScreen> {
                     .map(
                       (interest) => Container(
                         padding: const EdgeInsets.symmetric(
-                            horizontal: 12, vertical: 6),
+                            horizontal: 12, vertical: 6,),
                         decoration: BoxDecoration(
                           color: cardBackground,
                           borderRadius: BorderRadius.circular(20),

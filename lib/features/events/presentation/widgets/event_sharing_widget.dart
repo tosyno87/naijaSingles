@@ -378,7 +378,7 @@ class EventSharingWidget extends StatelessWidget {
             mimeType: 'image/jpeg',
           ),
         ],
-      ));
+      ),);
     } else {
       _shareText(context);
     }

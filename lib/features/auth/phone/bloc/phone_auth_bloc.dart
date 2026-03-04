@@ -144,7 +144,7 @@ class PhoneAuthBloc extends Bloc<PhoneAuthEvent, PhoneAuthState> {
               log('⚠️ Quota exceeded - too many requests');
             }
             add(OnPhoneAuthErrorEvent(
-                error: '${e.code}: ${e.message ?? e.toString()}'));
+                error: '${e.code}: ${e.message ?? e.toString()}',),);
           },
           codeAutoRetrievalTimeout: (String verificationId) {
             log('⏱️ Code auto-retrieval timeout: $verificationId');
@@ -171,7 +171,7 @@ class PhoneAuthBloc extends Bloc<PhoneAuthEvent, PhoneAuthState> {
           verificationFailed: (FirebaseAuthException e) {
             log('❌ Phone verification failed: ${e.code} - ${e.message}');
             add(OnPhoneAuthErrorEvent(
-                error: '${e.code}: ${e.message ?? e.toString()}'));
+                error: '${e.code}: ${e.message ?? e.toString()}',),);
           },
           codeAutoRetrievalTimeout: (String verificationId) {
             log('⏱️ Code auto-retrieval timeout: $verificationId');

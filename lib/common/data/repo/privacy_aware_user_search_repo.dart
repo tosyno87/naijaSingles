@@ -322,11 +322,11 @@ class PrivacyAwareUserSearchRepo {
       imageUrl: data['photos'] is List
           ? List<String>.from((data['photos'] as List)
               .map((e) => e?.toString() ?? '')
-              .where((url) => url.toString().isNotEmpty))
+              .where((url) => url.toString().isNotEmpty),)
           : data['Pictures'] is List
               ? List<String>.from((data['Pictures'] as List)
                   .map((e) => e?.toString() ?? '')
-                  .where((url) => url.toString().isNotEmpty))
+                  .where((url) => url.toString().isNotEmpty),)
               : [],
       isBlocked: data['isBlocked'] ?? false,
       lookingFor: data['lookingFor']?.toString() ?? 'Dating',

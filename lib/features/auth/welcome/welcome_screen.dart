@@ -1,11 +1,13 @@
 import 'dart:developer';
+
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:google_fonts/google_fonts.dart';
+
+import '../../../common/constants/app_colors.dart';
 import '../../../common/routes/route_name.dart';
 import '../../../common/widgets/afropeep_logo.dart';
-import '../../../common/constants/app_colors.dart';
 import '../auth_method/sign_in_method_selection_screen.dart';
 import '../phone/ui/screens/phone_number.dart';
 import 'widgets/rotating_greeting_widget.dart';
@@ -199,7 +201,7 @@ class _WelcomeScreenState extends State<WelcomeScreen>
                         ),
 
                         const SizedBox(
-                            height: 32), // Increased spacing for massive logo
+                            height: 32,), // Increased spacing for massive logo
 
                         // Animated progress bar instead of decorative line
                         AnimatedBuilder(
@@ -263,7 +265,7 @@ class _WelcomeScreenState extends State<WelcomeScreen>
                         ),
 
                         const SizedBox(
-                            height: 40), // Fixed spacing instead of Spacer
+                            height: 40,), // Fixed spacing instead of Spacer
 
                         // Show loading indicator while checking auth status
                         if (_isLoading)
@@ -309,7 +311,7 @@ class _WelcomeScreenState extends State<WelcomeScreen>
                             ),
 
                             const SizedBox(
-                                height: 16), // Modern spacing between buttons
+                                height: 16,), // Modern spacing between buttons
 
                             // Login Button - Secondary style
                             SlideTransition(

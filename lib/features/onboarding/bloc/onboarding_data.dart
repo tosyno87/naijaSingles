@@ -114,7 +114,7 @@ class OnboardingData extends Equatable {
   bool get areInterestsSelected => interests.length >= 5;
 
   bool get isPhotoUploaded =>
-      profilePhotos.where((p) => p != null).length >= 1;
+      profilePhotos.where((p) => p != null).isNotEmpty;
 
   OnboardingData copyWithPhotoAt(int index, File? file) {
     final updated = List<File?>.from(profilePhotos);

@@ -1,10 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:google_fonts/google_fonts.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:google_fonts/google_fonts.dart';
 
 import '../../../common/constants/app_colors.dart';
-
 import 'bloc/onboarding_bloc.dart';
 import 'bloc/onboarding_data.dart';
 
@@ -83,8 +82,7 @@ class _OnboardingStepCValuesState extends State<OnboardingStepCValues>
   }
 
   @override
-  Widget build(BuildContext context) {
-    return BlocBuilder<OnboardingBloc, OnboardingState>(
+  Widget build(BuildContext context) => BlocBuilder<OnboardingBloc, OnboardingState>(
       builder: (context, state) {
         final data = state.data ?? OnboardingData();
 
@@ -396,7 +394,6 @@ class _OnboardingStepCValuesState extends State<OnboardingStepCValues>
     );
       },
     );
-  }
 
   /// Builds a section title with consistent styling
   Widget _buildSectionTitle(String title) => Text(
@@ -487,7 +484,5 @@ class _OnboardingStepCValuesState extends State<OnboardingStepCValues>
       );
 
   /// Validates if all required fields are filled
-  bool _isStepValid(OnboardingData data) {
-    return data.values.length >= 3;
-  }
+  bool _isStepValid(OnboardingData data) => data.values.length >= 3;
 }

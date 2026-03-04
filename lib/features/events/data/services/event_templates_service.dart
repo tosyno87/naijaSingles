@@ -194,7 +194,7 @@ class EventTemplatesService {
               'food',
               'learning',
               'african cuisine',
-              'hands-on'
+              'hands-on',
             ],
             ticketPrice: 35, // $35 for cooking class
             maxAttendees: 20,

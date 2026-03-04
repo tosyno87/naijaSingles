@@ -152,7 +152,7 @@ class EventLocation extends Equatable {
       );
     } catch (e, stackTrace) {
       AppLogger.error('❌ Error parsing EventLocation',
-          error: e, stackTrace: stackTrace);
+          error: e, stackTrace: stackTrace,);
       rethrow;
     }
   }

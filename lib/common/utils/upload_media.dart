@@ -3,10 +3,10 @@ import 'dart:io';
 
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_image_compress/flutter_image_compress.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:image_picker/image_picker.dart';
-import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:path_provider/path_provider.dart' as path_provider;
 
 import '../bloc/theme/theme_bloc.dart';
@@ -96,7 +96,7 @@ class _SelectMedia extends StatelessWidget {
   }
 
   Future<void> getContentFromSource(
-      BuildContext context, ImageSource source) async {
+      BuildContext context, ImageSource source,) async {
     final result = await getContentHandler(source: source, context: context);
     if (!context.mounted) return;
     if (result != null) {

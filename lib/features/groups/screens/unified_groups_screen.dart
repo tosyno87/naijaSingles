@@ -3,8 +3,8 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 
 import '../../../common/constants/app_colors.dart';
-import '../data/services/unified_group_service.dart';
 import '../../group_chat/screens/create_group_screen.dart';
+import '../data/services/unified_group_service.dart';
 import 'group_details_screen.dart';
 
 /// Unified Groups Screen that combines Cultural Groups and Group Chats
@@ -520,7 +520,7 @@ class _UnifiedGroupsScreenState extends State<UnifiedGroupsScreen>
     // Filter groups created by current user
     final createdGroups = _userGroups
         .where((group) =>
-            group.isCreator(FirebaseAuth.instance.currentUser?.uid ?? ''))
+            group.isCreator(FirebaseAuth.instance.currentUser?.uid ?? ''),)
         .toList();
 
     if (createdGroups.isEmpty) {
@@ -814,7 +814,7 @@ class _UnifiedGroupsScreenState extends State<UnifiedGroupsScreen>
                   ),
                   if (group.location != null)
                     _buildInfoRow(
-                        Icons.location_on, 'Location', group.location!),
+                        Icons.location_on, 'Location', group.location!,),
                   if (group.tags.isNotEmpty)
                     _buildInfoRow(Icons.tag, 'Tags', group.tags.join(', ')),
                   _buildInfoRow(

@@ -1,9 +1,10 @@
 import 'dart:developer';
 import 'dart:io';
+
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_storage/firebase_storage.dart';
-import 'package:firebase_core/firebase_core.dart';
+
 import '../models/enhanced_event_model.dart';
 
 class UserEventService {
@@ -350,7 +351,7 @@ class UserEventService {
   /// Upload event images to Firebase Storage
   Future<List<String>> _uploadEventImages(List<String> imagePaths) async {
     log('🖼️ _uploadEventImages called with ${imagePaths.length} image(s)',
-        name: 'UserEventService');
+        name: 'UserEventService',);
 
     final uploadedUrls = <String>[];
 
@@ -362,13 +363,13 @@ class UserEventService {
     for (int i = 0; i < imagePaths.length; i++) {
       final imagePath = imagePaths[i];
       log('🖼️ Processing image ${i + 1}/${imagePaths.length}: $imagePath',
-          name: 'UserEventService');
+          name: 'UserEventService',);
 
       try {
         // Skip if it's already a URL (existing image)
         if (imagePath.startsWith('http')) {
           log('✅ Image ${i + 1} is already a URL, skipping upload',
-              name: 'UserEventService');
+              name: 'UserEventService',);
           uploadedUrls.add(imagePath);
           continue;
         }
@@ -380,21 +381,21 @@ class UserEventService {
         }
 
         log('📤 Uploading image ${i + 1} to Firebase Storage...',
-            name: 'UserEventService');
+            name: 'UserEventService',);
         log('📦 Storage instance: ${_storage.app.name}',
-            name: 'UserEventService');
+            name: 'UserEventService',);
         log('📦 Storage bucket: ${_storage.app.options.storageBucket}',
-            name: 'UserEventService');
+            name: 'UserEventService',);
 
         // Verify user is authenticated
         final currentUser = _auth.currentUser;
         if (currentUser == null) {
           log('❌ User is not authenticated - cannot upload',
-              name: 'UserEventService');
+              name: 'UserEventService',);
           throw Exception('User must be authenticated to upload images');
         }
         log('✅ User authenticated: ${currentUser.uid}',
-            name: 'UserEventService');
+            name: 'UserEventService',);
 
         // Use owner-scoped path to enforce least-privilege storage rules.
         final fileName =
@@ -404,14 +405,14 @@ class UserEventService {
 
         // Upload file
         log('📤 Starting upload task for image ${i + 1}...',
-            name: 'UserEventService');
+            name: 'UserEventService',);
         log('📤 File size: ${await file.length()} bytes',
-            name: 'UserEventService');
+            name: 'UserEventService',);
 
         // Read file as bytes - sometimes putFile fails on iOS Simulator
         final fileBytes = await file.readAsBytes();
         log('📤 File bytes read: ${fileBytes.length} bytes',
-            name: 'UserEventService');
+            name: 'UserEventService',);
 
         // Try using putData instead of putFile (more reliable on iOS Simulator)
         final metadata = SettableMetadata(
@@ -431,61 +432,61 @@ class UserEventService {
             final progress =
                 (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
             log('📊 Upload progress for image ${i + 1}: ${progress.toStringAsFixed(1)}%',
-                name: 'UserEventService');
+                name: 'UserEventService',);
           } else {
             log('📊 Upload progress: ${snapshot.bytesTransferred} bytes transferred (total unknown)',
-                name: 'UserEventService');
+                name: 'UserEventService',);
           }
         }, onError: (error) {
           log('❌ Upload progress error for image ${i + 1}: $error',
-              name: 'UserEventService');
-        });
+              name: 'UserEventService',);
+        },);
 
         log('⏳ Waiting for upload to complete...', name: 'UserEventService');
         final snapshot = await uploadTask.whenComplete(() {
           log('✅ Upload task completed for image ${i + 1}',
-              name: 'UserEventService');
+              name: 'UserEventService',);
         }).catchError((error) {
           log('❌ Upload task failed for image ${i + 1}: $error',
-              name: 'UserEventService');
+              name: 'UserEventService',);
           throw error;
         });
         log('✅ Upload completed, getting download URL...',
-            name: 'UserEventService');
+            name: 'UserEventService',);
 
         final downloadUrl = await snapshot.ref.getDownloadURL();
 
         uploadedUrls.add(downloadUrl);
         log('✅ Successfully uploaded image ${i + 1}: $downloadUrl',
-            name: 'UserEventService');
+            name: 'UserEventService',);
       } catch (e, stackTrace) {
         log('❌ Error uploading image ${i + 1} ($imagePath)',
-            name: 'UserEventService');
+            name: 'UserEventService',);
         log('❌ Error type: ${e.runtimeType}', name: 'UserEventService');
         log('❌ Error toString: ${e.toString()}', name: 'UserEventService');
 
         // Handle FirebaseException specifically
         if (e is FirebaseException) {
           log('❌ FirebaseException - Code: ${e.code}, Message: ${e.message}',
-              name: 'UserEventService');
+              name: 'UserEventService',);
           log('❌ Plugin: ${e.plugin}', name: 'UserEventService');
 
           if (e.code == 'permission-denied') {
             log('❌ PERMISSION DENIED - Storage rules may be blocking upload',
-                name: 'UserEventService');
+                name: 'UserEventService',);
           } else if (e.code == 'unknown') {
             log('❌ UNKNOWN ERROR - This could indicate:',
-                name: 'UserEventService');
+                name: 'UserEventService',);
             log('   - Storage bucket not configured correctly',
-                name: 'UserEventService');
+                name: 'UserEventService',);
             log('   - Network connectivity issue', name: 'UserEventService');
             log('   - Firebase Storage not initialized properly',
-                name: 'UserEventService');
+                name: 'UserEventService',);
             log('   - Storage rules still propagating (wait a few minutes)',
-                name: 'UserEventService');
+                name: 'UserEventService',);
           } else if (e.code == 'unauthorized') {
             log('❌ UNAUTHORIZED - User may not be authenticated',
-                name: 'UserEventService');
+                name: 'UserEventService',);
           }
         } else {
           log('❌ Non-Firebase exception: $e', name: 'UserEventService');
@@ -497,7 +498,7 @@ class UserEventService {
     }
 
     log('✅ _uploadEventImages completed: ${uploadedUrls.length}/${imagePaths.length} images uploaded',
-        name: 'UserEventService');
+        name: 'UserEventService',);
     return uploadedUrls;
   }
 

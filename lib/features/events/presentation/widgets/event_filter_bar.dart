@@ -78,7 +78,7 @@ class _EventFilterBarState extends State<EventFilterBar> {
 
             return Padding(
               padding: EdgeInsets.only(
-                  right: index == categories.length - 1 ? 0 : 12),
+                  right: index == categories.length - 1 ? 0 : 12,),
               child: _buildFilterChip(
                 label: category,
                 isSelected: isSelected,
@@ -101,7 +101,7 @@ class _EventFilterBarState extends State<EventFilterBar> {
 
             return Padding(
               padding: EdgeInsets.only(
-                  right: index == timeFilters.length - 1 ? 0 : 8),
+                  right: index == timeFilters.length - 1 ? 0 : 8,),
               child: _buildTimeFilterChip(
                 label: timeFilter,
                 isSelected: isSelected,

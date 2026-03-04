@@ -7,16 +7,16 @@ import 'package:google_fonts/google_fonts.dart';
 import '../../../common/constants/app_colors.dart';
 import '../../../models/group_join_exception.dart';
 import '../../../services/group_unread_service.dart';
-import '../data/services/unified_group_service.dart';
 import '../../../services/user_service.dart';
 import '../../../widgets/full_screen_image_viewer.dart';
 import '../../../widgets/group_info_modal.dart';
 import '../../../widgets/group_notification_toggle.dart';
 import '../../../widgets/group_report_modal.dart';
 import '../../group_chat/screens/group_chat_screen.dart';
+import '../data/services/unified_group_service.dart';
+import '../widgets/invite_members_modal.dart';
 import '../widgets/message_bubble.dart';
 import '../widgets/message_shimmer.dart';
-import '../widgets/invite_members_modal.dart';
 import 'group_settings_screen.dart';
 
 /// Enhanced Group Details Screen for members
@@ -117,7 +117,7 @@ class _GroupDetailsScreenState extends State<GroupDetailsScreen> {
                         fit: BoxFit.cover,
                         placeholder: (context, url) => const Center(
                             child:
-                                CircularProgressIndicator(strokeWidth: 2)),
+                                CircularProgressIndicator(strokeWidth: 2),),
                         errorWidget: (context, url, error) => const Icon(
                           Icons.group,
                           color: AppColors.primaryGreen,
@@ -476,7 +476,7 @@ class _GroupDetailsScreenState extends State<GroupDetailsScreen> {
                     imageUrl: widget.group.imageUrl!,
                     fit: BoxFit.cover,
                     placeholder: (context, url) => const Center(
-                        child: CircularProgressIndicator(strokeWidth: 2)),
+                        child: CircularProgressIndicator(strokeWidth: 2),),
                     errorWidget: (context, url, error) =>
                         _buildDefaultAvatar(),
                   ),
@@ -1318,14 +1318,14 @@ class _GroupDetailsScreenState extends State<GroupDetailsScreen> {
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
         content: Text(
-            'Viewing ${memberId == FirebaseAuth.instance.currentUser?.uid ? "your" : "member"} profile'),
+            'Viewing ${memberId == FirebaseAuth.instance.currentUser?.uid ? "your" : "member"} profile',),
         backgroundColor: AppColors.primaryGreen,
       ),
     );
   }
 
   Future<void> _showRemoveMemberConfirmation(
-      String memberId, String memberName) async {
+      String memberId, String memberName,) async {
     final confirmed = await showDialog<bool>(
       context: context,
       builder: (context) => AlertDialog(
@@ -1363,7 +1363,7 @@ class _GroupDetailsScreenState extends State<GroupDetailsScreen> {
       ),
     );
 
-    if (confirmed == true) {
+    if (confirmed ?? false) {
       await _removeMember(memberId, memberName);
     }
   }

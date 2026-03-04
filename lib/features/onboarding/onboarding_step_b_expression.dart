@@ -1,10 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:google_fonts/google_fonts.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:google_fonts/google_fonts.dart';
 
 import '../../../common/constants/app_colors.dart';
-
 import 'bloc/onboarding_bloc.dart';
 import 'bloc/onboarding_data.dart';
 
@@ -93,8 +92,7 @@ class _OnboardingStepBExpressionState extends State<OnboardingStepBExpression>
   }
 
   @override
-  Widget build(BuildContext context) {
-    return BlocBuilder<OnboardingBloc, OnboardingState>(
+  Widget build(BuildContext context) => BlocBuilder<OnboardingBloc, OnboardingState>(
       builder: (context, state) {
         final data = state.data ?? OnboardingData();
 
@@ -524,7 +522,6 @@ class _OnboardingStepBExpressionState extends State<OnboardingStepBExpression>
     );
       },
     );
-  }
 
   /// Builds a section title with consistent styling
   Widget _buildSectionTitle(String title) => Text(

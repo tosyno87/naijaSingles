@@ -425,7 +425,7 @@ class _PrivacySettingsScreenState extends State<PrivacySettingsScreen> {
             Row(
               children: [
                 const Icon(Icons.privacy_tip,
-                    color: AppColors.primaryGreen, size: 20),
+                    color: AppColors.primaryGreen, size: 20,),
                 const SizedBox(width: 8),
                 Text(
                   'Privacy Summary',

@@ -223,12 +223,11 @@ class _PhotoUploadScreenState extends State<PhotoUploadScreen> {
   }
 
   @override
-  Widget build(BuildContext context) {
-    return BlocBuilder<OnboardingBloc, OnboardingState>(
+  Widget build(BuildContext context) => BlocBuilder<OnboardingBloc, OnboardingState>(
       builder: (context, state) {
         final data = state.data;
         final int uploadedCount =
-            (data?.profilePhotos.where((photo) => photo != null).length ?? 0);
+            data?.profilePhotos.where((photo) => photo != null).length ?? 0;
         final bool hasMinimumPhotos = uploadedCount >= 3;
 
         return SingleChildScrollView(
@@ -350,7 +349,6 @@ class _PhotoUploadScreenState extends State<PhotoUploadScreen> {
     );
       },
     );
-  }
 
   Widget _buildTipItem(String text) => Padding(
         padding: const EdgeInsets.only(bottom: 8),

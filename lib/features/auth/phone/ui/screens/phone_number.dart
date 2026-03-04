@@ -451,7 +451,7 @@ class _PhoneNumberState extends State<PhoneNumber> {
 
                                     // Use builderContext which is inside the BlocProvider tree
                                     final bloc = BlocProvider.of<PhoneAuthBloc>(
-                                        builderContext);
+                                        builderContext,);
                                     log('📤 Adding SendOtpToPhoneEvent to bloc...');
                                     bloc.add(
                                       SendOtpToPhoneEvent(

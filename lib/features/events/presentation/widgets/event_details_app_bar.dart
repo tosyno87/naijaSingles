@@ -49,7 +49,7 @@ class EventDetailsSliverAppBar extends StatelessWidget {
               ),
               child: IconButton(
                 icon: const Icon(Icons.share_outlined,
-                    color: Colors.white, size: 20),
+                    color: Colors.white, size: 20,),
                 onPressed: onShare,
               ),
             ),

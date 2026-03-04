@@ -92,7 +92,7 @@ class _MemberManagementScreenState extends State<MemberManagementScreen>
               ],
             ),
             if (_isLoading)
-              Container(
+              ColoredBox(
                 color: Colors.black.withValues(alpha: 0.2),
                 child: const Center(
                   child: CircularProgressIndicator(
@@ -619,7 +619,7 @@ class _MemberManagementScreenState extends State<MemberManagementScreen>
       builder: (context) => AlertDialog(
         title: const Text('Remove Member'),
         content: const Text(
-            'Are you sure you want to remove this member from the group?'),
+            'Are you sure you want to remove this member from the group?',),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context, false),

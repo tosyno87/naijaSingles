@@ -3,8 +3,8 @@ import 'dart:developer' as developer;
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-import 'package:google_fonts/google_fonts.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:google_fonts/google_fonts.dart';
 
 import '../../common/bloc/user/user_bloc.dart';
 import '../../common/constants/app_colors.dart';
@@ -174,7 +174,7 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
     _hasCheckedRegistration = true;
     if (AccountDeletionScope.inProgress) {
       developer.log(
-          '⚠️ Account deletion in progress - redirecting to welcome (not onboarding)');
+          '⚠️ Account deletion in progress - redirecting to welcome (not onboarding)',);
       AccountDeletionScope.inProgress = false;
       if (mounted) {
         Navigator.of(context).pushNamedAndRemoveUntil(
@@ -184,7 +184,7 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
       }
     } else {
       developer.log(
-          '⚠️ Authenticated user has incomplete profile - redirecting to onboarding');
+          '⚠️ Authenticated user has incomplete profile - redirecting to onboarding',);
       if (mounted) {
         Navigator.of(context).pushNamedAndRemoveUntil(
           RouteName.onboarding,
@@ -242,7 +242,7 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
       final currentUser = FirebaseAuth.instance.currentUser;
       if (currentUser == null) {
         developer.log(
-            '⚠️ User not authenticated in build - redirecting to welcome screen');
+            '⚠️ User not authenticated in build - redirecting to welcome screen',);
         Future.microtask(() {
           if (mounted) {
             Navigator.of(context).pushNamedAndRemoveUntil(
@@ -277,7 +277,7 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
       // Authenticated but no user data - redirect to onboarding or welcome (if deletion in progress)
       if (AccountDeletionScope.inProgress) {
         developer.log(
-            '⚠️ Account deletion in progress - redirecting to welcome (not onboarding)');
+            '⚠️ Account deletion in progress - redirecting to welcome (not onboarding)',);
         AccountDeletionScope.inProgress = false;
         Future.microtask(() {
           if (mounted) {
@@ -289,7 +289,7 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
         });
       } else {
         developer.log(
-            '⚠️ Authenticated user has incomplete profile - redirecting to onboarding');
+            '⚠️ Authenticated user has incomplete profile - redirecting to onboarding',);
         Future.microtask(() {
           if (mounted) {
             Navigator.of(context).pushNamedAndRemoveUntil(

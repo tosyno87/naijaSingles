@@ -4,8 +4,8 @@ import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
-import '../../../../common/constants/app_colors.dart';
 import '../../../../common/bloc/theme/theme_bloc.dart';
+import '../../../../common/constants/app_colors.dart';
 import '../../../../common/widgets/hookup_circularbar.dart';
 import '../../../../common/widgets/image_widget.dart';
 import '../../../../models/user_model.dart';
@@ -175,7 +175,7 @@ class _MatchesState extends State<Matches> {
                   child: Text(
                     'No match found'.tr().toString(),
                     style: const TextStyle(
-                        color: AppColors.secondaryColor, fontSize: 16),
+                        color: AppColors.secondaryColor, fontSize: 16,),
                   ),
                 ),
               );

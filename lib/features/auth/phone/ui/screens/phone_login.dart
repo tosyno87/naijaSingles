@@ -192,7 +192,7 @@ class _PhoneNumberState extends State<PhoneNumber> {
                                       DropdownMenuItem<String>(
                                     value: value['code'],
                                     child: Text(
-                                        "${value['code']} (${value['name']})"),
+                                        "${value['code']} (${value['name']})",),
                                   ),
                                 )
                                 .toList(),

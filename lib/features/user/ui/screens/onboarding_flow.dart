@@ -46,17 +46,14 @@ class _OnboardingFlowState extends State<OnboardingFlow> {
   }
 
   @override
-  Widget build(BuildContext context) {
-    return BlocBuilder<OnboardingBloc, OnboardingState>(
+  Widget build(BuildContext context) => BlocBuilder<OnboardingBloc, OnboardingState>(
       builder: (context, state) {
         final data = state.data ?? OnboardingData();
         return _buildContent(context, data);
       },
     );
-  }
 
-  Widget _buildContent(BuildContext context, OnboardingData data) {
-    return Scaffold(
+  Widget _buildContent(BuildContext context, OnboardingData data) => Scaffold(
       backgroundColor: AppColors.backgroundColor,
       body: SafeArea(
         child: Column(
@@ -160,7 +157,6 @@ class _OnboardingFlowState extends State<OnboardingFlow> {
         ),
       ),
     );
-  }
 
   /// Check if the current page has valid data to proceed
   bool _isCurrentPageValid(OnboardingData data) {

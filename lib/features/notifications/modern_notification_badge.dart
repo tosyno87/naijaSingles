@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import '../../common/constants/app_colors.dart';
@@ -39,6 +41,7 @@ class _ModernNotificationBadgeState extends State<ModernNotificationBadge>
 
   int _unreadCount = 0;
   bool _hasNewNotifications = false;
+  StreamSubscription<int>? _unreadCountSubscription;
 
   late AnimationController _pulseController;
   late AnimationController _scaleController;
@@ -87,7 +90,7 @@ class _ModernNotificationBadgeState extends State<ModernNotificationBadge>
   }
 
   void _startListening() {
-    _notificationService.unreadCountStream.listen((count) {
+    _unreadCountSubscription = _notificationService.unreadCountStream.listen((count) {
       if (mounted) {
         final previousCount = _unreadCount;
         setState(() {
@@ -113,6 +116,7 @@ class _ModernNotificationBadgeState extends State<ModernNotificationBadge>
 
   @override
   void dispose() {
+    _unreadCountSubscription?.cancel();
     _pulseController.dispose();
     _scaleController.dispose();
     super.dispose();
@@ -237,17 +241,24 @@ class FloatingNotificationBadge extends StatefulWidget {
 class _FloatingNotificationBadgeState extends State<FloatingNotificationBadge> {
   final NotificationService _notificationService = NotificationService();
   int _unreadCount = 0;
+  StreamSubscription<int>? _unreadCountSubscription;
 
   @override
   void initState() {
     super.initState();
-    _notificationService.unreadCountStream.listen((count) {
+    _unreadCountSubscription = _notificationService.unreadCountStream.listen((count) {
       if (mounted) {
         setState(() {
           _unreadCount = count;
         });
       }
     });
+  }
+
+  @override
+  void dispose() {
+    _unreadCountSubscription?.cancel();
+    super.dispose();
   }
 
   @override

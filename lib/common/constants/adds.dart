@@ -23,7 +23,7 @@ final List<Map<String, dynamic>> adds = [
     'icon': Icons.location_on,
     'color': Colors.purple,
     'title': 'Swipe around the world',
-    'subtitle': 'Passport to anywhere with hookup4u',
+    'subtitle': 'Passport to anywhere with AfroPeep',
   },
   {
     'icon': Icons.vpn_key,

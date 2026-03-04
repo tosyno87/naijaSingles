@@ -77,8 +77,8 @@ class _InfoState extends State<Info> {
                           key: UniqueKey(),
                           physics: const ScrollPhysics(),
                           itemBuilder: (BuildContext context, int index2) {
-                            // ignore: unnecessary_null_comparison
-                            return widget.user.imageUrl!.length != null
+                              return widget.user.imageUrl != null &&
+                                    widget.user.imageUrl!.isNotEmpty
                                 ? Hero(
                                     tag: 'abc',
                                     child: CustomCNImage(
@@ -88,7 +88,7 @@ class _InfoState extends State<Info> {
                                   )
                                 : Container();
                           },
-                          itemCount: widget.user.imageUrl!.length,
+                          itemCount: widget.user.imageUrl?.length ?? 0,
                           pagination: const SwiperPagination(
                             alignment: Alignment.bottomCenter,
                             builder: DotSwiperPaginationBuilder(

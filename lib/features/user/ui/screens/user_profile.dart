@@ -25,13 +25,12 @@ import '../widgets/user_info.dart';
 
 class ProfilePage extends StatefulWidget {
   const ProfilePage({
-    required this.isPuchased,
+    required this.isPurchased,
     required this.items,
     required this.purchases,
     super.key,
   });
-  // final bool isPuchased;
-  final bool isPuchased;
+  final bool isPurchased;
   final Map items;
   final List<PurchaseDetails> purchases;
 
@@ -285,7 +284,7 @@ class _ProfilePageState extends State<ProfilePage> {
                                     RouteName.settingPage,
                                     arguments: {
                                       'currentUser': currentUser,
-                                      'isPurchased': widget.isPuchased,
+                                      'isPurchased': widget.isPurchased,
                                       'items': widget.items,
                                     },
                                   );
@@ -363,11 +362,11 @@ class _ProfilePageState extends State<ProfilePage> {
                 ),
                 SizedBox(height: MediaQuery.of(context).size.height * 0.02),
                 CustomButton(
-                  text: widget.isPuchased
+                  text: widget.isPurchased
                       ? 'Check Payment Details'.tr().toString()
                       : 'Subscribe Plan'.tr().toString(),
                   onTap: () async {
-                    if (widget.isPuchased) {
+                    if (widget.isPurchased) {
                       Navigator.push(
                         context,
                         CupertinoPageRoute(

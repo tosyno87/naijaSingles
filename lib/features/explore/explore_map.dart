@@ -18,11 +18,11 @@ import 'bloc/explore_map_bloc.dart';
 class ExploreMapWidget extends StatefulWidget {
   const ExploreMapWidget({
     required this.currentUser,
-    required this.isPuchased,
+    required this.isPurchased,
     super.key,
   });
   final UserModel currentUser;
-  final bool isPuchased;
+  final bool isPurchased;
 
   @override
   State<ExploreMapWidget> createState() => _ExploreMapWidgetState();
@@ -87,7 +87,7 @@ class _ExploreMapWidgetState extends State<ExploreMapWidget>
         width: MediaQuery.of(context).size.width,
         child:
 
-            //  widget.isPuchased ?
+            //  widget.isPurchased ?
 
             BlocBuilder<SearchUserForMapBloc, SearchUserForMapState>(
           builder: (context, state) {

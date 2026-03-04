@@ -118,13 +118,17 @@ abstract class AppRouter {
     RouteName.emailSignup: (context) => const EmailSignupScreen(),
     RouteName.emailLogin: (context) => const EmailLoginScreen(),
     RouteName.emailPasswordReset: (context) => const EmailPasswordResetScreen(),
-    RouteName.profileScreen: (context) => ProfilePage(
-          isPuchased:
-              (ModalRoute.of(context)!.settings.arguments as Map)['isPuchased'],
-          items: (ModalRoute.of(context)!.settings.arguments as Map)['items'],
-          purchases:
-              (ModalRoute.of(context)!.settings.arguments as Map)['purchases'],
-        ),
+    RouteName.profileScreen: (context) {
+      final args = ModalRoute.of(context)?.settings.arguments;
+      if (args == null || args is! Map) {
+        return const Scaffold(body: Center(child: Text('Invalid route')));
+      }
+      return ProfilePage(
+        isPurchased: args['isPurchased'] ?? false,
+        items: args['items'] ?? {},
+        purchases: args['purchases'] ?? [],
+      );
+    },
     RouteName.phoneNumberScreen: (context) {
       // Get isSignIn from route arguments, default to false (sign-up)
       final args = ModalRoute.of(context)?.settings.arguments as Map?;
@@ -135,32 +139,53 @@ abstract class AppRouter {
       );
     },
     RouteName.searchLocationpage: (context) => const SearchLocation(),
-    RouteName.updateLocationScreen: (context) => UpdateLocation(
-          selectedLocation: ModalRoute.of(context)!.settings.arguments
-              as Map<dynamic, dynamic>,
-        ),
-    RouteName.chatPageScreen: (context) => ChatPage(
-          sender: (ModalRoute.of(context)!.settings.arguments as Map)['sender'],
-          chatId: (ModalRoute.of(context)!.settings.arguments as Map)['chatID']
-              .toString(),
-          second: (ModalRoute.of(context)!.settings.arguments as Map)['second'],
-        ),
+    RouteName.updateLocationScreen: (context) {
+      final args = ModalRoute.of(context)?.settings.arguments;
+      if (args == null || args is! Map<dynamic, dynamic>) {
+        return const Scaffold(body: Center(child: Text('Invalid route')));
+      }
+      return UpdateLocation(selectedLocation: args);
+    },
+    RouteName.chatPageScreen: (context) {
+      final args = ModalRoute.of(context)?.settings.arguments;
+      if (args == null || args is! Map) {
+        return const Scaffold(body: Center(child: Text('Invalid route')));
+      }
+      return ChatPage(
+        sender: args['sender'],
+        chatId: args['chatID'].toString(),
+        second: args['second'],
+      );
+    },
     RouteName.editProfileScreen: (context) => const EditProfileScreen(),
-    RouteName.largeImageScreen: (context) => LargeImage(
-          largeImage: ModalRoute.of(context)!.settings.arguments as String,
-        ),
+    RouteName.largeImageScreen: (context) {
+      final args = ModalRoute.of(context)?.settings.arguments;
+      if (args == null || args is! String) {
+        return const Scaffold(body: Center(child: Text('Invalid route')));
+      }
+      return LargeImage(largeImage: args);
+    },
     RouteName.onboarding: (context) => const OnboardingMain(),
     RouteName.mainNavigation: (context) => const MainNavigationScreen(),
-    RouteName.updatePhoneScreen: (context) =>
-        UpdateNumber(ModalRoute.of(context)!.settings.arguments as UserModel),
+    RouteName.updatePhoneScreen: (context) {
+      final args = ModalRoute.of(context)?.settings.arguments;
+      if (args == null || args is! UserModel) {
+        return const Scaffold(body: Center(child: Text('Invalid route')));
+      }
+      return UpdateNumber(args);
+    },
     RouteName.genderScreen: (context) => const Gender(),
-    RouteName.settingPage: (context) => SettingPage(
-          currentUser: (ModalRoute.of(context)!.settings.arguments
-              as Map)['currentUser'] as UserModel,
-          isPurchased: (ModalRoute.of(context)!.settings.arguments
-              as Map)['isPurchased'],
-          items: (ModalRoute.of(context)!.settings.arguments as Map)['items'],
-        ),
+    RouteName.settingPage: (context) {
+      final args = ModalRoute.of(context)?.settings.arguments;
+      if (args == null || args is! Map) {
+        return const Scaffold(body: Center(child: Text('Invalid route')));
+      }
+      return SettingPage(
+        currentUser: args['currentUser'] as UserModel,
+        isPurchased: args['isPurchased'] ?? false,
+        items: args['items'] ?? {},
+      );
+    },
     RouteName.showGenderScreen: (context) => const ShowGender(),
     RouteName.matchPage: (context) => const MatchScreen(),
     RouteName.sexualorientationScreen: (context) => const SexualOrientation(),
@@ -254,13 +279,21 @@ abstract class AppRouter {
         isLogin: argsMap['isLogin'] ?? false,
       );
     },
-    RouteName.userDobScreen: (context) => UserDOB(
-          ModalRoute.of(context)!.settings.arguments as Map<String, dynamic>,
-        ),
+    RouteName.userDobScreen: (context) {
+      final args = ModalRoute.of(context)?.settings.arguments;
+      if (args == null || args is! Map<String, dynamic>) {
+        return const Scaffold(body: Center(child: Text('Invalid route')));
+      }
+      return UserDOB(args);
+    },
     RouteName.userNameScreen: (context) => const UserName(),
-    RouteName.nationalityScreen: (context) => UserNationality(
-          ModalRoute.of(context)!.settings.arguments as Map<String, dynamic>,
-        ),
+    RouteName.nationalityScreen: (context) {
+      final args = ModalRoute.of(context)?.settings.arguments;
+      if (args == null || args is! Map<String, dynamic>) {
+        return const Scaffold(body: Center(child: Text('Invalid route')));
+      }
+      return UserNationality(args);
+    },
     // Keep legacy route alias for backward compatibility, but route all users
     // through the same canonical onboarding experience.
     RouteName.onboardingFlow: (context) => const OnboardingMain(),
@@ -300,7 +333,10 @@ abstract class AppRouter {
     },
     RouteName.myEvents: (context) => const MyEventsScreen(),
     RouteName.eventDetails: (context) {
-      final arguments = ModalRoute.of(context)!.settings.arguments;
+      final arguments = ModalRoute.of(context)?.settings.arguments;
+      if (arguments == null) {
+        return const Scaffold(body: Center(child: Text('Invalid route')));
+      }
 
       // Handle both EventModel and EnhancedEventModel
       if (arguments is EnhancedEventModel) {
@@ -341,7 +377,10 @@ abstract class AppRouter {
 
     // User detail route
     RouteName.userDetailScreen: (context) {
-      final arguments = ModalRoute.of(context)!.settings.arguments;
+      final arguments = ModalRoute.of(context)?.settings.arguments;
+      if (arguments == null) {
+        return const Scaffold(body: Center(child: Text('Invalid route')));
+      }
       if (arguments is UserModel) {
         return UserDetailScreen(user: arguments);
       } else if (arguments is Map && arguments['user'] is UserModel) {

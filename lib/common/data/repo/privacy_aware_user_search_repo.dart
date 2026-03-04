@@ -29,11 +29,10 @@ class PrivacyAwareUserSearchRepo {
   static Map disLikedMap = {};
 
   static Future<void> getAccessItems() async {
-    db.collection('Item_access').snapshots().listen((doc) {
-      if (doc.docs.isNotEmpty) {
-        items = doc.docs[0].data();
-      }
-    });
+    final doc = await db.collection('Item_access').get();
+    if (doc.docs.isNotEmpty) {
+      items = doc.docs[0].data();
+    }
   }
 
   static Future<int> getSwipedCount(UserModel currentUser) async {

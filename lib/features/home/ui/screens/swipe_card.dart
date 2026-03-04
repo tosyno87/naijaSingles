@@ -87,7 +87,7 @@ class UsersListState extends State<UsersList> with WidgetsBindingObserver {
                     child: Padding(
                       padding: const EdgeInsets.all(10),
                       child: Image.asset(
-                        'asset/hookup4u-Logo-BP.png',
+                        'asset/images/logo.png',
                         fit: BoxFit.contain,
                         color: AppColors.primaryGreen,
                       ),

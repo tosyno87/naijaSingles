@@ -89,7 +89,7 @@ class _SwipeCardListState extends State<SwipeCardList> {
                               child: Padding(
                                 padding: const EdgeInsets.all(10),
                                 child: Image.asset(
-                                  'asset/hookup4u-Logo-BP.png',
+                                  'asset/images/logo.png',
                                   fit: BoxFit.contain,
                                   color: AppColors.primaryGreen,
                                 ),

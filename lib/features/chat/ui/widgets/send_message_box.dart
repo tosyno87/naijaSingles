@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:io';
 import 'dart:math';
 import 'package:cloud_firestore/cloud_firestore.dart';
@@ -43,6 +44,8 @@ class _MessageBoxState extends State<MessageBox> {
   final List<String> prompts = chatPrompts;
   late CollectionReference chatReference;
   final TextEditingController _textController = TextEditingController();
+  StreamSubscription<DocumentSnapshot>? _blockSubscription;
+  StreamSubscription<QuerySnapshot>? _messageSubscription;
   bool _isWritting = false;
   bool _isLoadingMore = false;
   bool _hasMoreMessages = true;
@@ -92,7 +95,7 @@ class _MessageBoxState extends State<MessageBox> {
 
   String? blockedBy;
   void checkBlock() {
-    chatReference.doc('blocked').snapshots().listen((onData) {
+    _blockSubscription = chatReference.doc('blocked').snapshots().listen((onData) {
       if (true) {
         // (onData.data != null) {
         blockedBy = onData.get('blockedBy');
@@ -109,6 +112,8 @@ class _MessageBoxState extends State<MessageBox> {
 
   @override
   void dispose() {
+    _blockSubscription?.cancel();
+    _messageSubscription?.cancel();
     _scrollController.removeListener(_scrollListener);
     _scrollController.dispose();
     super.dispose();
@@ -127,7 +132,7 @@ class _MessageBoxState extends State<MessageBox> {
   void _loadInitialMessages() {
     final Stream<QuerySnapshot> snapshotStream =
         PaginationRepo.listenForMessages(perpage, chatReference);
-    snapshotStream.listen((snapshot) {
+    _messageSubscription = snapshotStream.listen((snapshot) {
       if (mounted) {
         setState(() {
           messages = snapshot.docs;

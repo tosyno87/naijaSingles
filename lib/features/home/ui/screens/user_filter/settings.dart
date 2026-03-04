@@ -365,7 +365,7 @@ class SettingPageState extends State<SettingPage> {
                           height: 50,
                           width: 100,
                           child: Image.asset(
-                            'asset/hookup4u-Logo-BP.png',
+                            'asset/images/logo.png',
                             fit: BoxFit.contain,
                             color: isDarkMode
                                 ? Colors.white

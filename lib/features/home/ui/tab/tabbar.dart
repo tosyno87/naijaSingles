@@ -52,6 +52,8 @@ class TabbarState extends State<Tabbar> with WidgetsBindingObserver {
   int swipedcount = 0;
   int currentIndex = 0;
   late StreamSubscription<List<PurchaseDetails>> _subscription;
+  StreamSubscription<RemoteMessage>? _onMessageSubscription;
+  StreamSubscription<RemoteMessage>? _onMessageOpenedAppSubscription;
   final InAppPurchase iap = InAppPurchase.instance;
   Set<String> shownNotificationForegroundIds = <String>{};
 
@@ -120,6 +122,8 @@ class TabbarState extends State<Tabbar> with WidgetsBindingObserver {
   void dispose() {
     WidgetsBinding.instance.removeObserver(this);
     _subscription.cancel();
+    _onMessageSubscription?.cancel();
+    _onMessageOpenedAppSubscription?.cancel();
     super.dispose();
   }
 
@@ -146,7 +150,7 @@ class TabbarState extends State<Tabbar> with WidgetsBindingObserver {
   }
 
   void initFirebase(BuildContext context) {
-    FirebaseMessaging.onMessage.listen((RemoteMessage message) async {
+    _onMessageSubscription = FirebaseMessaging.onMessage.listen((RemoteMessage message) async {
       final String notificationId = message.data['notificationId'] ?? '';
 
       if (shownNotificationForegroundIds.contains(notificationId)) {
@@ -161,7 +165,7 @@ class TabbarState extends State<Tabbar> with WidgetsBindingObserver {
       }
     });
 
-    FirebaseMessaging.onMessageOpenedApp.listen((RemoteMessage message) async {
+    _onMessageOpenedAppSubscription = FirebaseMessaging.onMessageOpenedApp.listen((RemoteMessage message) async {
       final String notificationId = message.data['notificationId'] ?? '';
 
       if (shownNotificationForegroundIds.contains(notificationId)) {

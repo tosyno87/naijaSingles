@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:developer';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
@@ -34,6 +35,7 @@ class RecentChats extends StatefulWidget {
 class _RecentChatsState extends State<RecentChats> {
   final db = firebaseFireStoreInstance;
   String sortBy = 'time';
+  StreamSubscription<QuerySnapshot>? _chatSubscription;
   bool _isLoadingMore = false;
   bool _hasMoreMessages = true;
   int perPage = perPageData;
@@ -59,7 +61,7 @@ class _RecentChatsState extends State<RecentChats> {
   }
 
   void _loadInitialChats() {
-    UserMessagingRepo.query(widget.currentUser, perPage).listen((snapshot) {
+    _chatSubscription = UserMessagingRepo.query(widget.currentUser, perPage).listen((snapshot) {
       if (mounted) {
         setState(() {
           chats = snapshot.docs;
@@ -88,6 +90,12 @@ class _RecentChatsState extends State<RecentChats> {
       lastVisibleDocument =
           snapshot.docs.isNotEmpty ? snapshot.docs.last : null;
     });
+  }
+
+  @override
+  void dispose() {
+    _chatSubscription?.cancel();
+    super.dispose();
   }
 
   @override

@@ -44,6 +44,7 @@ class ChatPageState extends State<ChatPage> {
   late CollectionReference chatReference;
   User currentUser = firebaseAuthInstance.currentUser!;
   final _scaffoldKey = GlobalKey<ScaffoldState>();
+  StreamSubscription<DocumentSnapshot>? _blockSubscription;
 
   @override
   void initState() {
@@ -57,6 +58,7 @@ class ChatPageState extends State<ChatPage> {
   @override
   void dispose() {
     debouncer?.cancel();
+    _blockSubscription?.cancel();
     super.dispose();
   }
 
@@ -81,7 +83,7 @@ class ChatPageState extends State<ChatPage> {
 
   String? blockedBy;
   void checkBlock() {
-    chatReference.doc('blocked').snapshots().listen((onData) {
+    _blockSubscription = chatReference.doc('blocked').snapshots().listen((onData) {
       if (true) {
         // (onData.data != null) {
         blockedBy = onData.get('blockedBy');

@@ -70,15 +70,13 @@
 		<key>FirebaseAppDelegateProxyEnabled</key>
 		<true/>
 		<key>FacebookAdvertiserIDCollectionEnabled</key>
-		<true/>
+		<false/>
 		<key>FacebookAppID</key>
 		<string>499452678798092</string>
 		<key>FacebookClientToken</key>
 		<string>499452678798092</string>
 		<key>NSLocationWhenInUseUsageDescription</key>
 		<string>This app needs location access to find nearby singles and matches in your area.</string>
-	<key>NSLocationAlwaysAndWhenInUseUsageDescription</key>
-	<string>This app needs location access to find nearby singles and matches in your area.</string>
 	<key>NSCameraUsageDescription</key>
 	<string>This app needs camera access to take photos for your profile pictures.</string>
 	<key>NSPhotoLibraryUsageDescription</key>

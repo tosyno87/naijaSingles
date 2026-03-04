@@ -1,4 +1,4 @@
-// ignore_for_file: sort_child_properties_last, depend_on_referenced_packages, prefer_typing_uninitialized_variables, avoid_function_literals_in_foreach_calls
+// ignore_for_file: sort_child_properties_last, depend_on_referenced_packages
 
 import 'dart:async';
 import 'dart:io';
@@ -316,7 +316,7 @@ class ProductsState extends State<Products> {
                                                 },
                                                 children:
                                                     state.result.map((product) {
-                                                  var iosP;
+                                                  AppStoreProductDetails? iosP;
                                                   product
                                                       as GooglePlayProductDetails;
                                                   if (Platform.isIOS) {
@@ -343,7 +343,7 @@ class ProductsState extends State<Products> {
                                                                   ),
                                                             intervalCount: Platform
                                                                     .isIOS
-                                                                ? iosP
+                                                                ? iosP!
                                                                     .skProduct
                                                                     .subscriptionPeriod!
                                                                     .numberOfUnits

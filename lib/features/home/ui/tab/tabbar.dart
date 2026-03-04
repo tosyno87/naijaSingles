@@ -1,5 +1,3 @@
-// ignore_for_file: unnecessary_string_interpolations, avoid_function_literals_in_foreach_calls
-
 import 'dart:async';
 import 'dart:io';
 

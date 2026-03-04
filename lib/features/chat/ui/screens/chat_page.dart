@@ -1,5 +1,3 @@
-// ignore_for_file: unnecessary_string_interpolations, sort_child_properties_last
-
 import 'dart:async';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
@@ -159,25 +157,6 @@ class ChatPageState extends State<ChatPage> {
                 height: 30,
                 value: 'value2',
                 child: InkWell(
-                  child: Row(
-                    children: [
-                      Icon(
-                        Icons.block_outlined,
-                        color: isDarkMode
-                            ? Colors.white
-                            : AppColors.primaryGreen,
-                        size: 20,
-                      ),
-                      const SizedBox(
-                        width: 5,
-                      ),
-                      Text(
-                        isBlocked
-                            ? 'Unblock user'.tr().toString()
-                            : 'Block user'.tr().toString(),
-                      ),
-                    ],
-                  ),
                   onTap: () {
                     Navigator.pop(ct);
                     showDialog(
@@ -193,8 +172,8 @@ class ChatPageState extends State<ChatPage> {
                           content: Text(
                             'Do you want to'.tr(
                               args: [
-                                "${isBlocked ? 'Unblock'.tr().toString() : 'Block'.tr().toString()}",
-                                '${widget.second.name}',
+                                isBlocked ? 'Unblock'.tr().toString() : 'Block'.tr().toString(),
+                                widget.second.name ?? '',
                               ],
                             ),
                           ),
@@ -275,6 +254,25 @@ class ChatPageState extends State<ChatPage> {
                       ),
                     );
                   },
+                  child: Row(
+                    children: [
+                      Icon(
+                        Icons.block_outlined,
+                        color: isDarkMode
+                            ? Colors.white
+                            : AppColors.primaryGreen,
+                        size: 20,
+                      ),
+                      const SizedBox(
+                        width: 5,
+                      ),
+                      Text(
+                        isBlocked
+                            ? 'Unblock user'.tr().toString()
+                            : 'Block user'.tr().toString(),
+                      ),
+                    ],
+                  ),
                 ),
               ),
               PopupMenuItem(
@@ -295,7 +293,7 @@ class ChatPageState extends State<ChatPage> {
                         content: Text(
                           'Do you want to unmatch with'.tr(
                             args: [
-                              '${widget.second.name}'.toString(),
+                              widget.second.name ?? '',
                             ],
                           ).toString(),
                           style: const TextStyle(fontSize: 16),
@@ -327,10 +325,10 @@ class ChatPageState extends State<ChatPage> {
                                     ),
                                   );
                               CustomSnackbar.showSnackBarSimple(
-                                'unmatched'.tr(
-                                  args: [
-                                    '${widget.second.name}'.toString(),
-                                  ],
+                              'unmatched'.tr(
+                                args: [
+                                  widget.second.name ?? '',
+                                ],
                                 ).toString(),
                                 context,
                               );

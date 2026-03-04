@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:developer';
 import 'dart:io';
 
@@ -212,7 +213,7 @@ class AllowLocation extends StatelessWidget {
                           log('userregistrationsuccess');
                           context.read<UserBloc>().add(UserDataUpdated(state.user));
                           isProcessing.value = false;
-                          showWelcomDialog(context);
+                          unawaited(showWelcomDialog(context));
                         }
                       },
                       builder: (context, state) {
@@ -310,7 +311,7 @@ class AllowLocation extends StatelessWidget {
                                     TextButton(
                                       onPressed: () {
                                         Navigator.of(context).pop();
-                                        proceedWithoutLocation();
+                                        unawaited(proceedWithoutLocation());
                                       },
                                       child: const Text('Continue'),
                                     ),
@@ -376,7 +377,7 @@ class AllowLocation extends StatelessWidget {
                     TextButton(
                       onPressed: () {
                         if (!isProcessing.value) {
-                          proceedWithoutLocation();
+                          unawaited(proceedWithoutLocation());
                         }
                       },
                       child: const Text(

@@ -100,7 +100,7 @@ class _ModernNotificationBadgeState extends State<ModernNotificationBadge>
 
         // Start pulse animation for new notifications
         if (_hasNewNotifications && count > 0) {
-          _pulseController.repeat(reverse: true);
+          unawaited(_pulseController.repeat(reverse: true));
 
           // Stop pulsing after 3 seconds
           Future.delayed(const Duration(seconds: 3), () {
@@ -116,7 +116,7 @@ class _ModernNotificationBadgeState extends State<ModernNotificationBadge>
 
   @override
   void dispose() {
-    _unreadCountSubscription?.cancel();
+    unawaited(_unreadCountSubscription?.cancel() ?? Future<void>.value());
     _pulseController.dispose();
     _scaleController.dispose();
     super.dispose();
@@ -129,10 +129,10 @@ class _ModernNotificationBadgeState extends State<ModernNotificationBadge>
             // Haptic feedback for tap
             // HapticFeedback.lightImpact();
           }
-          _scaleController.forward();
+          unawaited(_scaleController.forward());
         },
-        onTapUp: (_) => _scaleController.reverse(),
-        onTapCancel: () => _scaleController.reverse(),
+        onTapUp: (_) => unawaited(_scaleController.reverse()),
+        onTapCancel: () => unawaited(_scaleController.reverse()),
         onTap: _handleTap,
         child: AnimatedBuilder(
           animation: Listenable.merge([_pulseAnimation, _scaleAnimation]),
@@ -204,7 +204,7 @@ class _ModernNotificationBadgeState extends State<ModernNotificationBadge>
     if (widget.onTap != null) {
       widget.onTap!();
     } else {
-      _navigateToNotifications();
+      unawaited(_navigateToNotifications());
     }
   }
 
@@ -257,7 +257,7 @@ class _FloatingNotificationBadgeState extends State<FloatingNotificationBadge> {
 
   @override
   void dispose() {
-    _unreadCountSubscription?.cancel();
+    unawaited(_unreadCountSubscription?.cancel() ?? Future<void>.value());
     super.dispose();
   }
 

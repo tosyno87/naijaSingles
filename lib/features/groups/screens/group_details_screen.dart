@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -257,11 +259,11 @@ class _GroupDetailsScreenState extends State<GroupDetailsScreen> {
           if (messages.isNotEmpty) {
             WidgetsBinding.instance.addPostFrameCallback((_) {
               if (_scrollController.hasClients) {
-                _scrollController.animateTo(
+                unawaited(_scrollController.animateTo(
                   _scrollController.position.maxScrollExtent,
                   duration: const Duration(milliseconds: 300),
                   curve: Curves.easeOut,
-                );
+                ));
               }
             });
           }
@@ -978,12 +980,12 @@ class _GroupDetailsScreenState extends State<GroupDetailsScreen> {
 
   // Action methods
   void _openGroupChat() {
-    Navigator.push(
+    unawaited(Navigator.push(
       context,
       MaterialPageRoute(
         builder: (context) => GroupChatScreen(groupId: widget.group.id),
       ),
-    );
+    ));
   }
 
   Future<void> _inviteMembers() async {
@@ -1096,7 +1098,7 @@ class _GroupDetailsScreenState extends State<GroupDetailsScreen> {
       false;
 
   void _showGroupOptions() {
-    showModalBottomSheet(
+    unawaited(showModalBottomSheet(
       context: context,
       builder: (context) => Container(
         padding: const EdgeInsets.all(20),
@@ -1108,13 +1110,13 @@ class _GroupDetailsScreenState extends State<GroupDetailsScreen> {
               title: const Text('Group Settings'),
               onTap: () {
                 Navigator.pop(context);
-                Navigator.push(
+                unawaited(Navigator.push(
                   context,
                   MaterialPageRoute(
                     builder: (context) =>
                         GroupSettingsScreen(group: widget.group),
                   ),
-                );
+                ));
               },
             ),
             ListTile(
@@ -1122,7 +1124,7 @@ class _GroupDetailsScreenState extends State<GroupDetailsScreen> {
               title: const Text('Notification Settings'),
               onTap: () {
                 Navigator.pop(context);
-                showModalBottomSheet(
+                unawaited(showModalBottomSheet(
                   context: context,
                   isScrollControlled: true,
                   backgroundColor: Colors.transparent,
@@ -1130,7 +1132,7 @@ class _GroupDetailsScreenState extends State<GroupDetailsScreen> {
                     groupId: widget.group.id,
                     groupName: widget.group.name,
                   ),
-                );
+                ));
               },
             ),
             ListTile(
@@ -1138,7 +1140,7 @@ class _GroupDetailsScreenState extends State<GroupDetailsScreen> {
               title: const Text('Report Group'),
               onTap: () {
                 Navigator.pop(context);
-                showModalBottomSheet(
+                unawaited(showModalBottomSheet(
                   context: context,
                   isScrollControlled: true,
                   backgroundColor: Colors.transparent,
@@ -1146,17 +1148,17 @@ class _GroupDetailsScreenState extends State<GroupDetailsScreen> {
                     groupId: widget.group.id,
                     groupName: widget.group.name,
                   ),
-                );
+                ));
               },
             ),
           ],
         ),
       ),
-    );
+    ));
   }
 
   void _showAllMembers() {
-    showModalBottomSheet(
+    unawaited(showModalBottomSheet(
       context: context,
       isScrollControlled: true,
       builder: (context) => Container(
@@ -1185,20 +1187,20 @@ class _GroupDetailsScreenState extends State<GroupDetailsScreen> {
           ],
         ),
       ),
-    );
+    ));
   }
 
   void _showGroupInfoModal() {
-    showModalBottomSheet(
+    unawaited(showModalBottomSheet(
       context: context,
       isScrollControlled: true,
       backgroundColor: Colors.transparent,
       builder: (context) => GroupInfoModal(group: widget.group),
-    );
+    ));
   }
 
   void _showGroupImageOptions() {
-    showModalBottomSheet(
+    unawaited(showModalBottomSheet(
       context: context,
       builder: (context) => Container(
         padding: const EdgeInsets.all(20),
@@ -1228,11 +1230,11 @@ class _GroupDetailsScreenState extends State<GroupDetailsScreen> {
                 ),
                 onTap: () {
                   Navigator.pop(context);
-                  FullScreenImageViewer.show(
+                  unawaited(FullScreenImageViewer.show(
                     context: context,
                     imageUrl: widget.group.imageUrl!,
                     title: widget.group.name,
-                  );
+                  ));
                 },
               ),
             ],
@@ -1261,7 +1263,7 @@ class _GroupDetailsScreenState extends State<GroupDetailsScreen> {
                 ),
                 onTap: () {
                   Navigator.pop(context);
-                  _editGroupPhoto();
+                  unawaited(_editGroupPhoto());
                 },
               ),
             ],
@@ -1291,7 +1293,7 @@ class _GroupDetailsScreenState extends State<GroupDetailsScreen> {
           ],
         ),
       ),
-    );
+    ));
   }
 
   bool _canEditGroup() {

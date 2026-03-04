@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -633,7 +635,7 @@ class _OnboardingStepARootsState extends State<OnboardingStepARoots> {
                     key: _continueButtonKey,
                     onPressed: _isStepValid(data)
                         ? () {
-                            HapticFeedback.mediumImpact();
+                            unawaited(HapticFeedback.mediumImpact());
                             widget.onNext();
                           }
                         : null,
@@ -692,7 +694,7 @@ class _OnboardingStepARootsState extends State<OnboardingStepARoots> {
           child: InkWell(
             onTap: () {
               onTap();
-              HapticFeedback.selectionClick();
+              unawaited(HapticFeedback.selectionClick());
             },
             borderRadius: BorderRadius.circular(12),
             splashColor: deepGreen.withValues(alpha: 0.1),

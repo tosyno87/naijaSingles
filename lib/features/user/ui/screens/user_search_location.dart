@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:developer';
 import 'dart:io';
 
@@ -51,7 +52,7 @@ class _SearchLocationState extends State<SearchLocation>
       curve: Curves.easeOut,
     );
 
-    _animationController!.forward();
+    unawaited(_animationController!.forward());
 
     _focusNode.addListener(() {
       if (mounted) {
@@ -295,7 +296,7 @@ class _SearchLocationState extends State<SearchLocation>
                               if (registrationState is RegistrationSuccess) {
                                 log('userregistrationsuccess');
                                 context.read<UserBloc>().add(UserDataUpdated(registrationState.user));
-                                showWelcomDialog(context);
+                                unawaited(showWelcomDialog(context));
                               }
                             },
                             builder: (context, registrationState) {

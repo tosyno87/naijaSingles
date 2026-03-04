@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -192,7 +194,7 @@ class _OnboardingStepCValuesState extends State<OnboardingStepCValues>
                                 updatedValues.remove(value['id']);
                               }
                               context.read<OnboardingBloc>().add(OnboardingValuesUpdated(updatedValues));
-                              HapticFeedback.selectionClick();
+                              unawaited(HapticFeedback.selectionClick());
                             },
                             deepGreen: deepGreen,
                           );
@@ -258,7 +260,7 @@ class _OnboardingStepCValuesState extends State<OnboardingStepCValues>
                               context.read<OnboardingBloc>().add(
                                 OnboardingDealbreakersUpdated(updatedDealbreakers),
                               );
-                              HapticFeedback.selectionClick();
+                              unawaited(HapticFeedback.selectionClick());
                             },
                             deepGreen: deepGreen,
                           );
@@ -317,7 +319,7 @@ class _OnboardingStepCValuesState extends State<OnboardingStepCValues>
                   // Back labelLarge
                   TextButton.icon(
                     onPressed: () {
-                      HapticFeedback.lightImpact();
+                      unawaited(HapticFeedback.lightImpact());
                       widget.onBack();
                     },
                     icon: const Icon(Icons.arrow_back, size: 16),
@@ -345,12 +347,11 @@ class _OnboardingStepCValuesState extends State<OnboardingStepCValues>
                       key: _finishButtonKey,
                       onPressed: _isStepValid(data)
                           ? () {
-                              HapticFeedback.mediumImpact();
-                              // Navigate to Dating Homepage instead of calling finishOnboarding
-                              Navigator.pushReplacementNamed(
+                              unawaited(HapticFeedback.mediumImpact());
+                              unawaited(Navigator.pushReplacementNamed(
                                 context,
                                 '/dating',
-                              );
+                              ));
                             }
                           : () {
                               setState(() {
@@ -364,7 +365,7 @@ class _OnboardingStepCValuesState extends State<OnboardingStepCValues>
                                   }
                                 });
                               });
-                              HapticFeedback.vibrate();
+                              unawaited(HapticFeedback.vibrate());
                             },
                       style: ElevatedButton.styleFrom(
                         backgroundColor: deepGreen,
@@ -422,7 +423,7 @@ class _OnboardingStepCValuesState extends State<OnboardingStepCValues>
               onTap: () {
                 onChanged(!isSelected);
                 _animationController.reset();
-                _animationController.forward();
+                unawaited(_animationController.forward());
               },
               borderRadius: BorderRadius.circular(8),
               splashColor: deepGreen.withValues(alpha: 0.1),

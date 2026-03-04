@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:developer';
 
 import 'package:flutter/material.dart';
@@ -74,7 +75,7 @@ class _LanguageSettingsScreenState extends State<LanguageSettingsScreen> {
   @override
   void initState() {
     super.initState();
-    _loadCurrentLanguage();
+    unawaited(_loadCurrentLanguage());
   }
 
   Future<void> _loadCurrentLanguage() async {
@@ -156,7 +157,7 @@ class _LanguageSettingsScreenState extends State<LanguageSettingsScreen> {
   }
 
   void _showRestartDialog() {
-    showDialog(
+    unawaited(showDialog(
       context: context,
       barrierDismissible: false,
       builder: (context) => AlertDialog(
@@ -253,7 +254,7 @@ class _LanguageSettingsScreenState extends State<LanguageSettingsScreen> {
         ],
         actionsPadding: const EdgeInsets.fromLTRB(24, 0, 24, 24),
       ),
-    );
+    ));
   }
 
   @override

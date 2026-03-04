@@ -55,7 +55,7 @@ class _RecentChatsState extends State<RecentChats> {
         !widget.scrollController.position.outOfRange) {
       if (_hasMoreMessages && !_isLoadingMore) {
         log('load more called');
-        _loadMoreChats();
+        unawaited(_loadMoreChats());
       }
     }
   }
@@ -94,7 +94,7 @@ class _RecentChatsState extends State<RecentChats> {
 
   @override
   void dispose() {
-    _chatSubscription?.cancel();
+    unawaited(_chatSubscription?.cancel());
     super.dispose();
   }
 

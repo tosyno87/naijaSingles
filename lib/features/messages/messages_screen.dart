@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:developer';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
@@ -280,13 +281,12 @@ class _MessagesScreenState extends State<MessagesScreen> {
               const SizedBox(height: 32),
               ElevatedButton(
                 onPressed: () {
-                  // Navigate directly to ExploreScreen with back labelLarge
-                  Navigator.of(context).push(
+                  unawaited(Navigator.of(context).push(
                     MaterialPageRoute(
                       builder: (context) =>
                           const ExploreScreen(showBackButton: true),
                     ),
-                  );
+                  ));
                 },
                 style: ElevatedButton.styleFrom(
                   backgroundColor: primaryColor,
@@ -520,11 +520,9 @@ class _MessagesScreenState extends State<MessagesScreen> {
       );
 
   void _openChatThread(MessageThreadInfo thread) {
-    // Mark as read when tapped
-    _chatService.markThreadAsRead(thread.threadId);
+    unawaited(_chatService.markThreadAsRead(thread.threadId));
 
-    // Navigate to chat thread screen
-    Navigator.push(
+    unawaited(Navigator.push(
       context,
       MaterialPageRoute(
         builder: (_) => ChatThreadScreen(
@@ -534,7 +532,7 @@ class _MessagesScreenState extends State<MessagesScreen> {
           otherUserId: thread.otherUserId,
         ),
       ),
-    );
+    ));
   }
 
   // Show delete confirmation dialog
@@ -690,7 +688,7 @@ class _MessagesScreenState extends State<MessagesScreen> {
     if (!mounted) return;
 
     // Show MVP compliant loading indicator
-    showDialog(
+    unawaited(showDialog(
       context: context,
       barrierDismissible: false,
       builder: (context) => AlertDialog(
@@ -742,7 +740,7 @@ class _MessagesScreenState extends State<MessagesScreen> {
           ],
         ),
       ),
-    );
+    ));
 
     try {
       final success = await _chatService.deleteChatThread(thread.threadId);
@@ -787,13 +785,33 @@ class _MessagesScreenState extends State<MessagesScreen> {
           );
         }
       }
-    } catch (e) {
+    } on FirebaseException catch (_) {
       // Close loading dialog
       if (mounted && Navigator.canPop(context)) {
         Navigator.pop(context);
       }
 
       // Show error message
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(
+              'Error deleting conversation',
+              style: GoogleFonts.montserrat(color: Colors.white),
+            ),
+            backgroundColor: Colors.red,
+            behavior: SnackBarBehavior.floating,
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(8),
+            ),
+          ),
+        );
+      }
+    } catch (e) {
+      // Fallback for non-Firebase errors
+      if (mounted && Navigator.canPop(context)) {
+        Navigator.pop(context);
+      }
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
@@ -818,7 +836,7 @@ class _MessagesScreenState extends State<MessagesScreen> {
 
     try {
       // Show MVP compliant loading indicator
-      showDialog(
+      unawaited(showDialog(
         context: context,
         barrierDismissible: false,
         builder: (context) => AlertDialog(
@@ -871,7 +889,7 @@ class _MessagesScreenState extends State<MessagesScreen> {
             ],
           ),
         ),
-      );
+      ));
 
       // Fetch user data from Firestore
       final userDoc = await _firestore.collection('users').doc(userId).get();
@@ -880,6 +898,8 @@ class _MessagesScreenState extends State<MessagesScreen> {
       if (mounted && Navigator.canPop(context)) {
         Navigator.pop(context);
       }
+
+      if (!mounted) return;
 
       if (userDoc.exists) {
         final userData = userDoc.data() as Map<String, dynamic>;
@@ -898,12 +918,12 @@ class _MessagesScreenState extends State<MessagesScreen> {
         );
 
         // Navigate to profile screen
-        Navigator.push(
+        unawaited(Navigator.push(
           context,
           MaterialPageRoute(
             builder: (context) => UserDetailScreen(user: userModel),
           ),
-        );
+        ));
       } else {
         // Show error if user not found
         ScaffoldMessenger.of(context).showSnackBar(
@@ -927,6 +947,7 @@ class _MessagesScreenState extends State<MessagesScreen> {
       }
 
       log('Error loading user profile: $e');
+      if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Text(

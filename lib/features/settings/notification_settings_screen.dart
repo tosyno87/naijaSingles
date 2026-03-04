@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -31,7 +33,7 @@ class _NotificationSettingsScreenState
   void _initializeData() {
     _currentUserId = context.read<UserBloc>().currentUser?.id;
     if (_currentUserId != null) {
-      _loadNotificationSettings();
+      unawaited(_loadNotificationSettings());
     }
   }
 
@@ -89,7 +91,7 @@ class _NotificationSettingsScreenState
     setState(() {
       _settings = newSettings;
     });
-    _saveSettings();
+    unawaited(_saveSettings());
   }
 
   Future<void> _showTimePickerDialog(bool isStartTime) async {

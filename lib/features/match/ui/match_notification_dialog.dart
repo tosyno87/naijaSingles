@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
@@ -64,11 +66,10 @@ class _MatchNotificationDialogState extends State<MatchNotificationDialog>
       ),
     );
 
-    // Start animations
-    _fadeController.forward();
-    Future.delayed(const Duration(milliseconds: 200), () {
-      _scaleController.forward();
-    });
+    unawaited(_fadeController.forward());
+    unawaited(Future.delayed(const Duration(milliseconds: 200), () {
+      unawaited(_scaleController.forward());
+    }));
   }
 
   @override
@@ -86,8 +87,7 @@ class _MatchNotificationDialogState extends State<MatchNotificationDialog>
   void _goToChat() {
     if (widget.chatThreadId != null) {
       Navigator.of(context).pop();
-      // Navigate to chat screen
-      Navigator.pushNamed(
+      unawaited(Navigator.pushNamed(
         context,
         '/chat',
         arguments: {
@@ -95,7 +95,7 @@ class _MatchNotificationDialogState extends State<MatchNotificationDialog>
           'otherUserId': widget.otherUserId,
           'otherUserName': widget.otherUser?.name ?? 'User',
         },
-      );
+      ));
     }
   }
 
@@ -292,7 +292,7 @@ void showMatchDialog(
   String? chatThreadId,
   UserModel? otherUser,
 }) {
-  showDialog(
+  unawaited(showDialog(
     context: context,
     barrierDismissible: false,
     builder: (context) => MatchNotificationDialog(
@@ -301,5 +301,5 @@ void showMatchDialog(
       chatThreadId: chatThreadId,
       otherUser: otherUser,
     ),
-  );
+  ));
 }

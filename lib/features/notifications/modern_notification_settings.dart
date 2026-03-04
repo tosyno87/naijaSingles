@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -37,7 +39,7 @@ class _ModernNotificationSettingsState extends State<ModernNotificationSettings>
   void initState() {
     super.initState();
     _setupAnimations();
-    _loadSettings();
+    unawaited(_loadSettings());
   }
 
   void _setupAnimations() {
@@ -671,8 +673,7 @@ class _ModernNotificationSettingsState extends State<ModernNotificationSettings>
   }
 
   void _sendTestNotification() {
-    // Send test notification
-    HapticFeedback.lightImpact();
+    unawaited(HapticFeedback.lightImpact());
     _showSnackBar('Test notification sent!', isError: false);
   }
 

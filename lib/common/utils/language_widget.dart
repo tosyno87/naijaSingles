@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:developer';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
@@ -222,5 +223,5 @@ void _refreshPage(BuildContext context, {required String lCode, required String 
   context.read<LanguageBloc>().add(
         LanguageLocaleChanged(Locale(lCode, cCode), context),
       );
-  Navigator.pushReplacementNamed(context, RouteName.welcomeScreen);
+  unawaited(Navigator.pushReplacementNamed(context, RouteName.welcomeScreen));
 }

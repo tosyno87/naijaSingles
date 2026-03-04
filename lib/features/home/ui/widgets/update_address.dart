@@ -125,7 +125,7 @@ class _UpdateAddressWidgetState extends State<UpdateAddressWidget> {
       );
 
   void _updateAddress(Map<dynamic, dynamic> address) {
-    showCupertinoModalPopup(
+    unawaited(showCupertinoModalPopup(
       context: context,
       builder: (ctx) {
         final themeBloc = context.read<ThemeBloc>();
@@ -198,17 +198,20 @@ class _UpdateAddressWidgetState extends State<UpdateAddressWidget> {
                         },
                       })
                       .whenComplete(
-                        () => showDialog(
+                        () {
+                          if (!mounted) return;
+                          unawaited(showDialog(
                           barrierDismissible: false,
                           context: context,
                           builder: (_) {
-                            Future.delayed(const Duration(seconds: 3), () {
+                            unawaited(Future.delayed(const Duration(seconds: 3), () {
+                              if (!mounted) return;
                               setState(() {
                                 widget.currentUser.address = address['address'];
                               });
 
                               Navigator.pop(context);
-                            });
+                            }));
                             return Center(
                               child: Container(
                                 width: 160,
@@ -241,8 +244,8 @@ color: AppColors.primaryGreen,
                               ),
                             );
                           },
-                        ),
-                      )
+                        ));
+                      })
                       .catchError((Object error, StackTrace stackTrace) {
                         log(
                           'Failed to update user location',
@@ -256,6 +259,6 @@ color: AppColors.primaryGreen,
           ),
         );
       },
-    );
+    ));
   }
 }

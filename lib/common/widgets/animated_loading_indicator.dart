@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:math' as math;
 
 import 'package:flutter/material.dart';
@@ -26,7 +27,8 @@ class _AnimatedLoadingIndicatorState extends State<AnimatedLoadingIndicator>
     _controller = AnimationController(
       vsync: this,
       duration: const Duration(seconds: 2),
-    )..repeat();
+    );
+    unawaited(_controller.repeat());
   }
 
   @override

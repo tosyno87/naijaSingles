@@ -34,11 +34,11 @@ class MatchExpirationService {
 
     // Start periodic cleanup
     _cleanupTimer = Timer.periodic(CLEANUP_INTERVAL, (timer) {
-      _performScheduledCleanup();
+      unawaited(_performScheduledCleanup());
     });
 
     // Perform initial cleanup
-    _performScheduledCleanup();
+    unawaited(_performScheduledCleanup());
   }
 
   /// Dispose of the service and cleanup resources

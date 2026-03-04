@@ -73,7 +73,25 @@ class DiscoveryService {
           forceRefresh: forceRefresh,
         );
       }
-    } catch (e) {
+    } on FirebaseException catch (e) {
+      debugPrint(
+        '❌ Firebase error in getUsersForDiscovery: ${e.code} - ${e.message}',
+      );
+      debugPrint('❌ Stack trace: ${StackTrace.current}');
+
+      // Fallback to unified method if privacy-aware fails
+      try {
+        debugPrint('🔄 Falling back to unified discovery');
+        return await _getUsersForDiscoveryUnified(
+          currentUser,
+          intentFilter: intentFilter,
+          forceRefresh: forceRefresh,
+        );
+      } on Object catch (fallbackError) {
+        debugPrint('❌ Fallback also failed: $fallbackError');
+        return [];
+      }
+    } on Object catch (e) {
       debugPrint('❌ Error in getUsersForDiscovery: $e');
       debugPrint('❌ Stack trace: ${StackTrace.current}');
 
@@ -85,7 +103,7 @@ class DiscoveryService {
           intentFilter: intentFilter,
           forceRefresh: forceRefresh,
         );
-      } catch (fallbackError) {
+      } on Object catch (fallbackError) {
         debugPrint('❌ Fallback also failed: $fallbackError');
         return [];
       }
@@ -121,8 +139,13 @@ class DiscoveryService {
             )
             .toList();
       }
-    } catch (e) {
-      debugPrint('❌ Error in getNearbyUsers: $e');
+    } on FirebaseException catch (e) {
+      debugPrint(
+        '❌ Firebase error in getNearbyUsers: ${e.code} - ${e.message}',
+      );
+      return [];
+    } on Object catch (e) {
+      debugPrint('❌ Unexpected error in getNearbyUsers: $e');
       return [];
     }
   }
@@ -146,8 +169,13 @@ class DiscoveryService {
         // Fallback: Load matches from user's Matches subcollection
         return await _getTraditionalMatches(currentUser);
       }
-    } catch (e) {
-      debugPrint('❌ Error in getMatches: $e');
+    } on FirebaseException catch (e) {
+      debugPrint(
+        '❌ Firebase error in getMatches: ${e.code} - ${e.message}',
+      );
+      return [];
+    } on Object catch (e) {
+      debugPrint('❌ Unexpected error in getMatches: $e');
       return [];
     }
   }
@@ -172,14 +200,24 @@ class DiscoveryService {
             final user = UserModel.fromDocument(userDoc);
             matchesList.add(user);
           }
-        } catch (e) {
+        } on FirebaseException catch (e) {
+          debugPrint(
+            '⚠️ Firebase error loading traditional match ${doc.id}: ${e.code} - ${e.message}',
+          );
+          continue;
+        } on Object catch (e) {
           debugPrint('⚠️ Error loading traditional match ${doc.id}: $e');
           continue;
         }
       }
       return matchesList;
-    } catch (e) {
-      debugPrint('❌ Error in _getTraditionalMatches: $e');
+    } on FirebaseException catch (e) {
+      debugPrint(
+        '❌ Firebase error in _getTraditionalMatches: ${e.code} - ${e.message}',
+      );
+      return [];
+    } on Object catch (e) {
+      debugPrint('❌ Unexpected error in _getTraditionalMatches: $e');
       return [];
     }
   }
@@ -189,8 +227,13 @@ class DiscoveryService {
     try {
       final isMigrated = await _migrationService.isUserMigrated(userId);
       return !isMigrated;
-    } catch (e) {
-      debugPrint('❌ Error checking migration status: $e');
+    } on FirebaseException catch (e) {
+      debugPrint(
+        '❌ Firebase error checking migration status: ${e.code} - ${e.message}',
+      );
+      return false;
+    } on Object catch (e) {
+      debugPrint('❌ Unexpected error checking migration status: $e');
       return false;
     }
   }
@@ -212,8 +255,18 @@ class DiscoveryService {
         'privacyEnabled': isMigrated,
         'discoveryMethod': isMigrated ? 'privacy-aware' : 'unified',
       };
-    } catch (e) {
-      debugPrint('❌ Error getting discovery stats: $e');
+    } on FirebaseException catch (e) {
+      debugPrint(
+        '❌ Firebase error getting discovery stats: ${e.code} - ${e.message}',
+      );
+      return {
+        'isMigrated': false,
+        'swipedToday': 0,
+        'privacyEnabled': false,
+        'discoveryMethod': 'unified',
+      };
+    } on Object catch (e) {
+      debugPrint('❌ Unexpected error getting discovery stats: $e');
       return {
         'isMigrated': false,
         'swipedToday': 0,
@@ -238,8 +291,13 @@ class DiscoveryService {
         debugPrint('❌ Migration failed');
         return false;
       }
-    } catch (e) {
-      debugPrint('❌ Error in migrateAndRefreshDiscovery: $e');
+    } on FirebaseException catch (e) {
+      debugPrint(
+        '❌ Firebase error in migrateAndRefreshDiscovery: ${e.code} - ${e.message}',
+      );
+      return false;
+    } on Object catch (e) {
+      debugPrint('❌ Unexpected error in migrateAndRefreshDiscovery: $e');
       return false;
     }
   }
@@ -248,8 +306,13 @@ class DiscoveryService {
   static Future<bool> isUserDataFiltered(String userId) async {
     try {
       return await _migrationService.isUserMigrated(userId);
-    } catch (e) {
-      debugPrint('❌ Error checking if user data is filtered: $e');
+    } on FirebaseException catch (e) {
+      debugPrint(
+        '❌ Firebase error checking if user data is filtered: ${e.code} - ${e.message}',
+      );
+      return false;
+    } on Object catch (e) {
+      debugPrint('❌ Unexpected error checking if user data is filtered: $e');
       return false;
     }
   }
@@ -273,8 +336,13 @@ class DiscoveryService {
       }
 
       return null;
-    } catch (e) {
-      debugPrint('❌ Error getting privacy-aware user data: $e');
+    } on FirebaseException catch (e) {
+      debugPrint(
+        '❌ Firebase error getting privacy-aware user data: ${e.code} - ${e.message}',
+      );
+      return null;
+    } on Object catch (e) {
+      debugPrint('❌ Unexpected error getting privacy-aware user data: $e');
       return null;
     }
   }
@@ -374,7 +442,12 @@ class DiscoveryService {
             '✅ Adding user: ${user.name} (${user.distanceBW ?? 'unknown'} miles away)',
           );
           userList.add(user);
-        } catch (e) {
+        } on FirebaseException catch (e) {
+          debugPrint(
+            '⚠️ Firebase error processing user ${doc.id}: ${e.code} - ${e.message}',
+          );
+          continue;
+        } on Object catch (e) {
           debugPrint('⚠️ Error processing user ${doc.id}: $e');
           continue;
         }
@@ -388,8 +461,13 @@ class DiscoveryService {
 
       debugPrint('🎯 Final result: ${userList.length} discoverable users');
       return userList;
-    } catch (e) {
-      debugPrint('❌ Error in UnifiedDiscoveryService: $e');
+    } on FirebaseException catch (e) {
+      debugPrint(
+        '❌ Firebase error in UnifiedDiscoveryService: ${e.code} - ${e.message}',
+      );
+      return [];
+    } on Object catch (e) {
+      debugPrint('❌ Unexpected error in UnifiedDiscoveryService: $e');
       return [];
     }
   }
@@ -457,8 +535,13 @@ class DiscoveryService {
       }
 
       return checkedIds;
-    } catch (e) {
-      debugPrint('Error getting checked users: $e');
+    } on FirebaseException catch (e) {
+      debugPrint(
+        'Firebase error getting checked users: ${e.code} - ${e.message}',
+      );
+      return [];
+    } on Object catch (e) {
+      debugPrint('Unexpected error getting checked users: $e');
       return [];
     }
   }
@@ -548,8 +631,13 @@ class DiscoveryService {
         debugPrint('⚠️ Smart matching returned empty, keeping original list');
         return userList;
       }
-    } catch (e) {
-      debugPrint('❌ Error in smart matching: $e');
+    } on FirebaseException catch (e) {
+      debugPrint(
+        '❌ Firebase error in smart matching: ${e.code} - ${e.message}',
+      );
+      return userList;
+    } on Object catch (e) {
+      debugPrint('❌ Unexpected error in smart matching: $e');
       return userList;
     }
   }
@@ -624,7 +712,12 @@ class DiscoveryService {
             }
 
             users.add(user);
-          } catch (e) {
+          } on FirebaseException catch (e) {
+            debugPrint(
+              '⚠️ Firebase error processing user ${doc.id}: ${e.code} - ${e.message}',
+            );
+            continue;
+          } on Object catch (e) {
             debugPrint('⚠️ Error processing user ${doc.id}: $e');
             continue;
           }
@@ -633,8 +726,13 @@ class DiscoveryService {
         debugPrint('✅ Real-time stream processed: ${users.length} valid users');
         return users;
       });
-    } catch (e) {
-      debugPrint('❌ Error creating real-time stream: $e');
+    } on FirebaseException catch (e) {
+      debugPrint(
+        '❌ Firebase error creating real-time stream: ${e.code} - ${e.message}',
+      );
+      return Stream.value([]);
+    } on Object catch (e) {
+      debugPrint('❌ Unexpected error creating real-time stream: $e');
       return Stream.value([]);
     }
   }
@@ -709,7 +807,12 @@ class DiscoveryService {
             }
 
             users.add(user);
-          } catch (e) {
+          } on FirebaseException catch (e) {
+            debugPrint(
+              '⚠️ Firebase error processing paginated user ${doc.id}: ${e.code} - ${e.message}',
+            );
+            continue;
+          } on Object catch (e) {
             debugPrint('⚠️ Error processing paginated user ${doc.id}: $e');
             continue;
           }
@@ -718,8 +821,13 @@ class DiscoveryService {
         debugPrint('✅ Paginated stream processed: ${users.length} valid users');
         return users;
       });
-    } catch (e) {
-      debugPrint('❌ Error creating paginated stream: $e');
+    } on FirebaseException catch (e) {
+      debugPrint(
+        '❌ Firebase error creating paginated stream: ${e.code} - ${e.message}',
+      );
+      return Stream.value([]);
+    } on Object catch (e) {
+      debugPrint('❌ Unexpected error creating paginated stream: $e');
       return Stream.value([]);
     }
   }
@@ -778,7 +886,12 @@ class DiscoveryService {
                 users.add(user);
               }
             }
-          } catch (e) {
+          } on FirebaseException catch (e) {
+            debugPrint(
+              '⚠️ Firebase error processing nearby user ${doc.id}: ${e.code} - ${e.message}',
+            );
+            continue;
+          } on Object catch (e) {
             debugPrint('⚠️ Error processing nearby user ${doc.id}: $e');
             continue;
           }
@@ -789,8 +902,13 @@ class DiscoveryService {
         );
         return users;
       });
-    } catch (e) {
-      debugPrint('❌ Error creating nearby stream: $e');
+    } on FirebaseException catch (e) {
+      debugPrint(
+        '❌ Firebase error creating nearby stream: ${e.code} - ${e.message}',
+      );
+      return Stream.value([]);
+    } on Object catch (e) {
+      debugPrint('❌ Unexpected error creating nearby stream: $e');
       return Stream.value([]);
     }
   }
@@ -813,8 +931,17 @@ class DiscoveryService {
           'lastUpdated': DateTime.now().toIso8601String(),
         };
       });
-    } catch (e) {
-      debugPrint('❌ Error creating stats stream: $e');
+    } on FirebaseException catch (e) {
+      debugPrint(
+        '❌ Firebase error creating stats stream: ${e.code} - ${e.message}',
+      );
+      return Stream.value({
+        'swipedToday': 0,
+        'discoveryMethod': 'real-time',
+        'lastUpdated': DateTime.now().toIso8601String(),
+      });
+    } on Object catch (e) {
+      debugPrint('❌ Unexpected error creating stats stream: $e');
       return Stream.value({
         'swipedToday': 0,
         'discoveryMethod': 'real-time',

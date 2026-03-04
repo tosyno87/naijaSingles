@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -120,10 +122,10 @@ class _OnboardingMainState extends State<OnboardingMain> {
 
     if (_currentPage < _totalPages - 1) {
       debugPrint('✅ Moving to next page');
-      _pageController.nextPage(
+      unawaited(_pageController.nextPage(
         duration: const Duration(milliseconds: 300),
         curve: Curves.easeInOut,
-      );
+      ));
     } else {
       // Complete onboarding
       debugPrint('✅ Completing onboarding');
@@ -133,10 +135,10 @@ class _OnboardingMainState extends State<OnboardingMain> {
 
   void _previousPage() {
     if (_currentPage > 0) {
-      _pageController.previousPage(
+      unawaited(_pageController.previousPage(
         duration: const Duration(milliseconds: 300),
         curve: Curves.easeInOut,
-      );
+      ));
     }
   }
 

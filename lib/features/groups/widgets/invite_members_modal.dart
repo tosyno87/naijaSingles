@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -210,7 +212,7 @@ class _InviteMembersModalState extends State<InviteMembersModal> {
                         ? IconButton(
                             onPressed: () {
                               _searchController.clear();
-                              _searchUsers('');
+                              unawaited(_searchUsers(''));
                             },
                             icon: const Icon(Icons.clear),
                           )

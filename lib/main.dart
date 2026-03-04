@@ -122,9 +122,9 @@ Future<void> main() async {
       
       // Update Crashlytics user identifier
       if (user != null) {
-        CrashlyticsService().setUserId(user.uid);
+        unawaited(CrashlyticsService().setUserId(user.uid));
       } else {
-        CrashlyticsService().clearUserId();
+        unawaited(CrashlyticsService().clearUserId());
       }
 
       if (kDebugMode && user != null) {

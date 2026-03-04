@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:easy_localization/easy_localization.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
@@ -37,7 +39,7 @@ void showLogoutDialog(BuildContext context) {
     }
   }
 
-  showDialog(
+  unawaited(showDialog(
     context: context,
     builder: (BuildContext context) => AlertDialog(
       title: Text('Logout'.tr().toString()),
@@ -74,5 +76,5 @@ void showLogoutDialog(BuildContext context) {
         ),
       ],
     ),
-  );
+  ));
 }

@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:math';
 
 import 'package:easy_localization/easy_localization.dart';
@@ -58,12 +59,12 @@ class UsersListState extends State<UsersList> with WidgetsBindingObserver {
 
   // Navigate to user profile when card is tapped
   void _navigateToUserProfile(UserModel user) {
-    Navigator.push(
+    unawaited(Navigator.push(
       context,
       MaterialPageRoute(
         builder: (context) => UserDetailScreen(user: user),
       ),
-    );
+    ));
   }
 
   @override
@@ -286,7 +287,7 @@ class UsersListState extends State<UsersList> with WidgetsBindingObserver {
                               ),
                               trailing: IconButton(
                                 onPressed: () {
-                                  showDialog(
+                                  unawaited(showDialog(
                                     barrierDismissible: false,
                                     context: context,
                                     builder: (context) => Info(
@@ -295,7 +296,7 @@ class UsersListState extends State<UsersList> with WidgetsBindingObserver {
                                       true,
                                       controller: widget.stackController,
                                     ),
-                                  );
+                                  ));
                                 },
                                 icon: const Icon(
                                   Icons.arrow_upward,

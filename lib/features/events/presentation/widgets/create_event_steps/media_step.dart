@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:io';
 
 import 'package:cached_network_image/cached_network_image.dart';
@@ -519,6 +520,7 @@ class _MediaStepState extends State<MediaStep> {
       );
 
       // Hide loading indicator
+      if (!mounted) return;
       ScaffoldMessenger.of(context).hideCurrentSnackBar();
 
       if (croppedFile != null) {
@@ -534,6 +536,7 @@ class _MediaStepState extends State<MediaStep> {
       }
     } catch (e) {
       // Hide loading indicator
+      if (!mounted) return;
       ScaffoldMessenger.of(context).hideCurrentSnackBar();
       _showErrorSnackBar('Failed to crop image: ${e.toString()}');
     }
@@ -546,7 +549,7 @@ class _MediaStepState extends State<MediaStep> {
     }
 
     // Show confirmation dialog
-    showDialog(
+    unawaited(showDialog(
       context: context,
       builder: (context) => AlertDialog(
         title: Text(
@@ -585,7 +588,7 @@ class _MediaStepState extends State<MediaStep> {
           ),
         ],
       ),
-    );
+    ));
   }
 
   Future<void> _selectImages() async {
@@ -619,6 +622,7 @@ class _MediaStepState extends State<MediaStep> {
       );
 
       // Hide loading indicator
+      if (!mounted) return;
       ScaffoldMessenger.of(context).hideCurrentSnackBar();
 
       if (image != null) {
@@ -633,6 +637,7 @@ class _MediaStepState extends State<MediaStep> {
       }
     } catch (e) {
       // Hide loading indicator
+      if (!mounted) return;
       ScaffoldMessenger.of(context).hideCurrentSnackBar();
       _showErrorSnackBar('Failed to select images: ${e.toString()}');
     } finally {
@@ -700,6 +705,7 @@ class _MediaStepState extends State<MediaStep> {
       );
 
       // Hide loading indicator
+      if (!mounted) return;
       ScaffoldMessenger.of(context).hideCurrentSnackBar();
 
       if (croppedFile != null) {
@@ -716,6 +722,7 @@ class _MediaStepState extends State<MediaStep> {
       }
     } catch (e) {
       // Hide loading indicator
+      if (!mounted) return;
       ScaffoldMessenger.of(context).hideCurrentSnackBar();
       _showErrorSnackBar('Failed to crop image: ${e.toString()}');
     }

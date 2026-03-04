@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -95,20 +97,20 @@ class ChatMessageRead {
                         ],
                       ),
                       onTap: () {
-                        Navigator.pushNamed(
+                        unawaited(Navigator.pushNamed(
                           context,
                           RouteName.largeImageScreen,
                           arguments: documentSnapshot.get('image_url'),
-                        );
+                        ));
                       },
                     )
                   : GestureDetector(
                       onLongPress: () {
-                        Clipboard.setData(
+                        unawaited(Clipboard.setData(
                           ClipboardData(
                             text: documentSnapshot.data()!['text'],
                           ),
-                        );
+                        ));
                         CustomToast.showToast('Message Copied'.tr().toString());
                       },
                       child: Container(

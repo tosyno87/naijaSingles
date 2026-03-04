@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -379,7 +381,7 @@ class _MatchProfileScreenState extends State<MatchProfileScreen>
               icon: Icons.close,
               color: Colors.red.shade400,
               onTap: () {
-                HapticFeedback.mediumImpact();
+                unawaited(HapticFeedback.mediumImpact());
                 Navigator.pop(context);
               },
               label: 'Pass',
@@ -390,12 +392,12 @@ class _MatchProfileScreenState extends State<MatchProfileScreen>
               icon: _isLiked ? Icons.favorite : Icons.favorite_border,
               color: const Color(0xFF008037),
               onTap: () {
-                HapticFeedback.mediumImpact();
+                unawaited(HapticFeedback.mediumImpact());
                 setState(() {
                   _isLiked = !_isLiked;
                 });
                 _animationController.reset();
-                _animationController.forward();
+                unawaited(_animationController.forward());
 
                 // Show a snackbar when liked
                 if (_isLiked) {

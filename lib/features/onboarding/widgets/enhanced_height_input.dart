@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'ios_height_picker.dart';
@@ -48,7 +50,7 @@ class _EnhancedHeightInputState extends State<EnhancedHeightInput> {
     final screenWidth = MediaQuery.of(context).size.width;
     final isTablet = screenWidth > 600;
 
-    showModalBottomSheet(
+    unawaited(showModalBottomSheet(
       context: context,
       isScrollControlled: true,
       backgroundColor: Colors.transparent,
@@ -132,7 +134,7 @@ class _EnhancedHeightInputState extends State<EnhancedHeightInput> {
           ],
         ),
       ),
-    );
+    ));
   }
 
   @override

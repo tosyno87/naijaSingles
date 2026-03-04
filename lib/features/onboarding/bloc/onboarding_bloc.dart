@@ -403,6 +403,7 @@ class OnboardingBloc extends Bloc<OnboardingEvent, OnboardingState> {
       final selected =
           await BulkPhotoPickerService.pickMultiplePhotos(context: context);
       if (selected.isEmpty) return;
+      if (!context.mounted) return;
 
       final cropped = await BulkPhotoPickerService.cropSelectedPhotos(
         selectedPhotos: selected,

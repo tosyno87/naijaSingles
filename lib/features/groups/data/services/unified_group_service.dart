@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:developer';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -408,8 +409,7 @@ class UnifiedGroupService {
 
         if (uniqueMembers.length != memberIds.length) {
           log('🧹 Found duplicates in group ${doc.id}, cleaning up...');
-          // Clean up duplicates asynchronously
-          cleanupDuplicateMembers(doc.id);
+          unawaited(cleanupDuplicateMembers(doc.id));
         }
 
         log('📋 getUserGroups: Group ${doc.id} - isActive: ${data['isActive']}, memberIds: $uniqueMembers');

@@ -1,18 +1,21 @@
+import 'dart:async';
+
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 
 import '../constants/app_colors.dart';
 import '../routes/route_name.dart';
 
-Future showWelcomDialog(context) async {
-  showDialog(
+Future<void> showWelcomDialog(BuildContext context) async {
+  unawaited(showDialog(
     barrierDismissible: false,
     context: context,
     builder: (ctx) {
-      Future.delayed(const Duration(seconds: 3), () {
+      unawaited(Future.delayed(const Duration(seconds: 3), () {
+        if (!context.mounted) return;
         Navigator.pop(ctx);
-        Navigator.pushNamed(context, RouteName.mainNavigation);
-      });
+        unawaited(Navigator.pushNamed(context, RouteName.mainNavigation));
+      }));
       return Center(
         child: Container(
           width: 150,
@@ -43,5 +46,5 @@ Future showWelcomDialog(context) async {
         ),
       );
     },
-  );
+  ));
 }

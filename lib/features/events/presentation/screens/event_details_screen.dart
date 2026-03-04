@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:easy_localization/easy_localization.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
@@ -367,7 +369,7 @@ ${widget.event.ticketUrl ?? 'More details in the Afropeep app!'}
 #Afropeep #AfrocentricEvents #${widget.event.category.replaceAll(' ', '')}
 ''';
 
-    SharePlus.instance.share(ShareParams(text: text));
+    unawaited(SharePlus.instance.share(ShareParams(text: text)));
   }
 
   Future<void> _openMaps() async {
@@ -390,7 +392,7 @@ ${widget.event.ticketUrl ?? 'More details in the Afropeep app!'}
   }
 
   void _showAllAttendees() {
-    showModalBottomSheet(
+    unawaited(showModalBottomSheet(
       context: context,
       backgroundColor: Colors.transparent,
       isScrollControlled: true,
@@ -440,6 +442,6 @@ ${widget.event.ticketUrl ?? 'More details in the Afropeep app!'}
           ),
         ),
       ),
-    );
+    ));
   }
 }

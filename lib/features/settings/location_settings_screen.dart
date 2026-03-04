@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:developer';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
@@ -42,7 +43,7 @@ class _LocationSettingsScreenState extends State<LocationSettingsScreen> {
   @override
   void initState() {
     super.initState();
-    _loadLocationSettings();
+    unawaited(_loadLocationSettings());
   }
 
   Future<void> _loadLocationSettings() async {

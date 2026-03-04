@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:developer';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
@@ -52,8 +53,7 @@ class _ChatThreadScreenState extends State<ChatThreadScreen> {
       }
     });
 
-    // Mark thread as read when opening
-    _chatService.markThreadAsRead(widget.threadId);
+    unawaited(_chatService.markThreadAsRead(widget.threadId));
 
     // Scroll to bottom when messages load
     WidgetsBinding.instance.addPostFrameCallback((_) {
@@ -70,11 +70,11 @@ class _ChatThreadScreenState extends State<ChatThreadScreen> {
 
   void _scrollToBottom() {
     if (_scrollController.hasClients) {
-      _scrollController.animateTo(
+      unawaited(_scrollController.animateTo(
         _scrollController.position.maxScrollExtent,
         duration: const Duration(milliseconds: 300),
         curve: Curves.easeOut,
-      );
+      ));
     }
   }
 
@@ -566,7 +566,7 @@ class _ChatThreadScreenState extends State<ChatThreadScreen> {
 
   // Show emoji picker for enhanced messaging
   void _showEmojiPicker() {
-    showModalBottomSheet(
+    unawaited(showModalBottomSheet(
       context: context,
       backgroundColor: Colors.transparent,
       builder: (context) => Container(
@@ -634,7 +634,7 @@ class _ChatThreadScreenState extends State<ChatThreadScreen> {
           ],
         ),
       ),
-    );
+    ));
   }
 
   // Navigate to full user profile screen
@@ -654,7 +654,7 @@ class _ChatThreadScreenState extends State<ChatThreadScreen> {
 
     try {
       // Show loading indicator
-      showDialog(
+      unawaited(showDialog(
         context: context,
         barrierDismissible: false,
         builder: (context) => Center(
@@ -680,7 +680,7 @@ class _ChatThreadScreenState extends State<ChatThreadScreen> {
             ),
           ),
         ),
-      );
+      ));
 
       // Fetch user data from Firestore
       final userDoc = await FirebaseFirestore.instance
@@ -690,6 +690,8 @@ class _ChatThreadScreenState extends State<ChatThreadScreen> {
 
       // Close loading dialog
       if (mounted) Navigator.pop(context);
+
+      if (!mounted) return;
 
       if (userDoc.exists) {
         final userData = userDoc.data() as Map<String, dynamic>;
@@ -708,12 +710,12 @@ class _ChatThreadScreenState extends State<ChatThreadScreen> {
         );
 
         // Navigate to profile screen
-        Navigator.push(
+        unawaited(Navigator.push(
           context,
           MaterialPageRoute(
             builder: (context) => UserDetailScreen(user: userModel),
           ),
-        );
+        ));
       } else {
         // Show error if user not found
         ScaffoldMessenger.of(context).showSnackBar(
@@ -731,6 +733,7 @@ class _ChatThreadScreenState extends State<ChatThreadScreen> {
       if (mounted) Navigator.pop(context);
 
       log('Error loading user profile: $e');
+      if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Text(
@@ -745,7 +748,7 @@ class _ChatThreadScreenState extends State<ChatThreadScreen> {
 
   // Show user profile quick view (keeping for the info button)
   void _showUserProfile() {
-    _viewFullUserProfile(); // Just redirect to full profile
+    unawaited(_viewFullUserProfile());
   }
 
   // Build quick action button
@@ -789,7 +792,7 @@ class _ChatThreadScreenState extends State<ChatThreadScreen> {
   // Show block user dialog
   // Show MVP-styled block user dialog
   void _showBlockUserDialog() {
-    showDialog(
+    unawaited(showDialog(
       context: context,
       barrierDismissible: false,
       builder: (context) => AlertDialog(
@@ -896,7 +899,7 @@ class _ChatThreadScreenState extends State<ChatThreadScreen> {
                     child: TextButton(
                       onPressed: () {
                         Navigator.pop(context);
-                        _blockUser();
+                        unawaited(_blockUser());
                       },
                       style: TextButton.styleFrom(
                         foregroundColor: Colors.white,
@@ -930,12 +933,12 @@ class _ChatThreadScreenState extends State<ChatThreadScreen> {
           ],
         ),
       ),
-    );
+    ));
   }
 
   // Show report user dialog
   void _showReportUserDialog() {
-    showDialog(
+    unawaited(showDialog(
       context: context,
       builder: (context) => AlertDialog(
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
@@ -979,12 +982,12 @@ class _ChatThreadScreenState extends State<ChatThreadScreen> {
           ),
         ],
       ),
-    );
+    ));
   }
 
   // Show clear chat dialog
   void _showClearChatDialog() {
-    showDialog(
+    unawaited(showDialog(
       context: context,
       builder: (context) => AlertDialog(
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
@@ -1028,7 +1031,7 @@ class _ChatThreadScreenState extends State<ChatThreadScreen> {
           ),
         ],
       ),
-    );
+    ));
   }
 
   // Show coming soon snackbar

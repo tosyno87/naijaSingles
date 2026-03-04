@@ -1,4 +1,5 @@
 // ignore_for_file: public_member_api_docs, sort_constructors_first
+import 'dart:async';
 import 'dart:developer';
 import 'dart:io';
 
@@ -117,7 +118,7 @@ class _PhoneNumberState extends State<PhoneNumber> {
 
                   // Use direct MaterialPageRoute instead of named route to avoid router issues
                   // This ensures smooth transition without any "Page Not Found" flash
-                  Navigator.of(context).pushReplacement(
+                  unawaited(Navigator.of(context).pushReplacement(
                     MaterialPageRoute(
                       builder: (context) => OtpPage(
                         phoneNumber: countryCode + phoneNumberController.text,
@@ -127,7 +128,7 @@ class _PhoneNumberState extends State<PhoneNumber> {
                         isLogin: widget.isSignIn,
                       ),
                     ),
-                  );
+                  ));
                 }
               }
 
@@ -494,15 +495,15 @@ class _PhoneNumberState extends State<PhoneNumber> {
                             GestureDetector(
                               onTap: () {
                                 if (widget.isSignIn) {
-                                  Navigator.pushReplacementNamed(
+                                  unawaited(Navigator.pushReplacementNamed(
                                     context,
                                     '/auth_method_selection',
-                                  );
+                                  ));
                                 } else {
-                                  Navigator.pushReplacementNamed(
+                                  unawaited(Navigator.pushReplacementNamed(
                                     context,
                                     '/sign_in_method_selection',
-                                  );
+                                  ));
                                 }
                               },
                               child: Text(

@@ -93,13 +93,12 @@ class _MyEventsScreenState extends State<MyEventsScreen>
                       ),
                     );
                     // Add a small delay before refreshing to ensure delete is processed
-                    Future.delayed(const Duration(milliseconds: 300), () {
-                      if (mounted) {
-                        context.read<EventCreationBloc>().add(
-                              LoadUserEventsEvent(_currentUserId!),
-                            );
-                      }
-                    });
+                    unawaited(Future.delayed(const Duration(milliseconds: 300), () {
+                      if (!context.mounted) return;
+                      context.read<EventCreationBloc>().add(
+                            LoadUserEventsEvent(_currentUserId!),
+                          );
+                    }));
                   }
                 } else if (state is EventPublished) {
                   ScaffoldMessenger.of(context).showSnackBar(
@@ -210,11 +209,11 @@ class _MyEventsScreenState extends State<MyEventsScreen>
               Navigator.of(context).pop();
             } else {
               // If we can't pop, navigate to main navigation
-              Navigator.pushNamedAndRemoveUntil(
+              unawaited(Navigator.pushNamedAndRemoveUntil(
                 context,
                 RouteName.mainNavigation,
                 (route) => false,
-              );
+              ));
             }
           },
           icon: const Icon(
@@ -761,7 +760,7 @@ class _MyEventsScreenState extends State<MyEventsScreen>
   }
 
   void _deleteEvent(BuildContext screenContext, EnhancedEventModel event) {
-    showDialog(
+    unawaited(showDialog(
       context: screenContext,
       builder: (dialogContext) => AlertDialog(
         backgroundColor: Colors.white,
@@ -833,6 +832,7 @@ class _MyEventsScreenState extends State<MyEventsScreen>
 
               // Add timeout mechanism
               Timer(const Duration(seconds: 10), () {
+                if (!mounted) return;
                 if (_isDeleting && _deletingEventId == event.id) {
                   setState(() {
                     _isDeleting = false;
@@ -879,11 +879,11 @@ class _MyEventsScreenState extends State<MyEventsScreen>
           ),
         ],
       ),
-    );
+    ));
   }
 
   void _publishDraft(BuildContext screenContext, EnhancedEventModel event) {
-    showDialog(
+    unawaited(showDialog(
       context: screenContext,
       builder: (dialogContext) => AlertDialog(
         backgroundColor: Colors.white,
@@ -967,15 +967,15 @@ class _MyEventsScreenState extends State<MyEventsScreen>
           ),
         ],
       ),
-    );
+    ));
   }
 
   void _navigateToEventDetails(EnhancedEventModel event) {
-    Navigator.pushNamed(
+    unawaited(Navigator.pushNamed(
       context,
       RouteName.eventDetails,
       arguments: event,
-    );
+    ));
   }
 
   void _shareEvent(EnhancedEventModel event) {
@@ -998,7 +998,7 @@ Join me at this amazing event! 🚀
         .trim();
 
     // For MVP, we'll use the clipboard and show a snackbar
-    Clipboard.setData(ClipboardData(text: shareText));
+    unawaited(Clipboard.setData(ClipboardData(text: shareText)));
 
     // Show confirmation
     ScaffoldMessenger.of(context).showSnackBar(
@@ -1029,7 +1029,7 @@ Join me at this amazing event! 🚀
   }
 
   void _showAnalytics(EnhancedEventModel event) {
-    showModalBottomSheet(
+    unawaited(showModalBottomSheet(
       context: context,
       backgroundColor: Colors.transparent,
       isScrollControlled: true,
@@ -1206,7 +1206,7 @@ Join me at this amazing event! 🚀
           ],
         ),
       ),
-    );
+    ));
   }
 
   Widget _buildAnalyticsCard({

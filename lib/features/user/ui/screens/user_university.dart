@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:developer';
 
 import 'package:flutter/material.dart';
@@ -247,11 +248,11 @@ class _UniversityPage extends State<UniversityPage> {
                           });
 
                           log(userData.toString());
-                          Navigator.pushNamed(
+                          unawaited(Navigator.pushNamed(
                             context,
                             RouteName.profilePicSetScreen,
                             arguments: userData,
-                          );
+                          ));
                         }
                       : null,
                   style: ElevatedButton.styleFrom(

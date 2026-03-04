@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -516,7 +518,7 @@ class _MemberManagementScreenState extends State<MemberManagementScreen>
       _isSearching = true;
     });
 
-    _groupService
+    unawaited(_groupService
         .searchUsersForInvitation(
       query: query,
       groupId: widget.group.id,
@@ -534,19 +536,19 @@ class _MemberManagementScreenState extends State<MemberManagementScreen>
           _isSearching = false;
         });
       }
-    });
+    }));
   }
 
   void _handleMemberAction(String action, String memberId) {
     switch (action) {
       case 'promote':
-        _promoteMember(memberId);
+        unawaited(_promoteMember(memberId));
         break;
       case 'demote':
-        _demoteMember(memberId);
+        unawaited(_demoteMember(memberId));
         break;
       case 'remove':
-        _removeMember(memberId);
+        unawaited(_removeMember(memberId));
         break;
     }
   }
@@ -705,7 +707,7 @@ class _MemberManagementScreenState extends State<MemberManagementScreen>
   }
 
   void _showInviteDialog() {
-    showDialog(
+    unawaited(showDialog(
       context: context,
       builder: (context) => AlertDialog(
         title: const Text('Invite Members'),
@@ -731,13 +733,13 @@ class _MemberManagementScreenState extends State<MemberManagementScreen>
           TextButton(
             onPressed: () {
               Navigator.pop(context);
-              _tabController.animateTo(2); // Switch to invite tab
+              _tabController.animateTo(2);
             },
             child: const Text('Continue'),
           ),
         ],
       ),
-    );
+    ));
   }
 
   bool _canManageMember(String memberId) {

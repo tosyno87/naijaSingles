@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
@@ -137,12 +139,12 @@ class _LanguageWidgetState extends State<LanguageWidget> {
                                             ),
                                           );
 
-                                      Navigator.pushReplacement(
+                                      unawaited(Navigator.pushReplacement(
                                         context,
                                         MaterialPageRoute(
                                           builder: (context) => const Tabbar(),
                                         ),
-                                      );
+                                      ));
                                     },
                                   );
                                   break;
@@ -158,12 +160,12 @@ class _LanguageWidgetState extends State<LanguageWidget> {
                                             ),
                                           );
 
-                                      Navigator.pushReplacement(
+                                      unawaited(Navigator.pushReplacement(
                                         context,
                                         MaterialPageRoute(
                                           builder: (context) => const Tabbar(),
                                         ),
-                                      );
+                                      ));
                                     },
                                   );
                                   break;
@@ -178,12 +180,12 @@ class _LanguageWidgetState extends State<LanguageWidget> {
                                               context,
                                             ),
                                           );
-                                      Navigator.pushReplacement(
+                                      unawaited(Navigator.pushReplacement(
                                         context,
                                         MaterialPageRoute(
                                           builder: (context) => const Tabbar(),
                                         ),
-                                      );
+                                      ));
                                     },
                                   );
                                   break;
@@ -199,14 +201,14 @@ class _LanguageWidgetState extends State<LanguageWidget> {
                                             ),
                                           );
 
-                                      Navigator.pushReplacement(
+                                      unawaited(Navigator.pushReplacement(
                                         context,
                                         MaterialPageRoute(
                                           builder: (context) => const Tabbar(
                                             isPaymentSuccess: false,
                                           ),
                                         ),
-                                      );
+                                      ));
                                     },
                                   );
                                   break;
@@ -222,12 +224,12 @@ class _LanguageWidgetState extends State<LanguageWidget> {
                                             ),
                                           );
 
-                                      Navigator.pushReplacement(
+                                      unawaited(Navigator.pushReplacement(
                                         context,
                                         MaterialPageRoute(
                                           builder: (context) => const Tabbar(),
                                         ),
-                                      );
+                                      ));
                                     },
                                   );
                                   break;
@@ -243,12 +245,12 @@ class _LanguageWidgetState extends State<LanguageWidget> {
                                             ),
                                           );
 
-                                      Navigator.pushReplacement(
+                                      unawaited(Navigator.pushReplacement(
                                         context,
                                         MaterialPageRoute(
                                           builder: (context) => const Tabbar(),
                                         ),
-                                      );
+                                      ));
                                     },
                                   );
                                   break;
@@ -298,7 +300,7 @@ void showChangeDialog(
   String language,
   VoidCallback onTap,
 ) {
-  showDialog(
+  unawaited(showDialog(
     context: context,
     builder: (BuildContext context) => AlertDialog(
       title: Text('Change Language'.tr().toString()),
@@ -322,5 +324,5 @@ void showChangeDialog(
         ),
       ],
     ),
-  );
+  ));
 }

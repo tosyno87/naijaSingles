@@ -32,10 +32,10 @@ class StreetViewBloc extends Bloc<StreetViewEvent, StreetViewState> {
     }
   }
 
-  void _onStreetViewModeChanged(
+  Future<void> _onStreetViewModeChanged(
     StreetViewModeChanged event,
     Emitter<StreetViewState> emit,
-  ) {
+  ) async {
     final value = event.value;
     String streetMode;
 
@@ -56,7 +56,7 @@ class StreetViewBloc extends Bloc<StreetViewEvent, StreetViewState> {
         streetMode = 'None';
     }
 
-    _preferences.setView(value, event.userIds);
+    await _preferences.setView(value, event.userIds);
     emit(StreetViewLoaded(streetMode));
   }
 

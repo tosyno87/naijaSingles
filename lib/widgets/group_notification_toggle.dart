@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import '../common/constants/app_colors.dart';
@@ -27,7 +29,7 @@ class _GroupNotificationToggleState extends State<GroupNotificationToggle> {
   @override
   void initState() {
     super.initState();
-    _loadMuteStatus();
+    unawaited(_loadMuteStatus());
   }
 
   Future<void> _loadMuteStatus() async {

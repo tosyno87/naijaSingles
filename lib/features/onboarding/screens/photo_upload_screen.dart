@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -34,7 +36,7 @@ class _PhotoUploadScreenState extends State<PhotoUploadScreen> {
   }
 
   void _showImageSourceDialog(int index) {
-    showModalBottomSheet(
+    unawaited(showModalBottomSheet(
       context: context,
       backgroundColor: Colors.white,
       shape: const RoundedRectangleBorder(
@@ -61,7 +63,7 @@ class _PhotoUploadScreenState extends State<PhotoUploadScreen> {
               subtitle: 'Use your camera to take a new photo',
               onTap: () {
                 Navigator.pop(context);
-                _pickImage(ImageSource.camera, index);
+                unawaited(_pickImage(ImageSource.camera, index));
               },
             ),
             const Divider(height: 24),
@@ -71,13 +73,13 @@ class _PhotoUploadScreenState extends State<PhotoUploadScreen> {
               subtitle: 'Select a photo from your device',
               onTap: () {
                 Navigator.pop(context);
-                _pickImage(ImageSource.gallery, index);
+                unawaited(_pickImage(ImageSource.gallery, index));
               },
             ),
           ],
         ),
       ),
-    );
+    ));
   }
 
   Widget _buildImageSourceOption({

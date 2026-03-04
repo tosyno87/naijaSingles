@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:developer';
 
 import 'package:firebase_auth/firebase_auth.dart';
@@ -36,7 +37,7 @@ class _WelcomeScreenState extends State<WelcomeScreen>
   @override
   void initState() {
     super.initState();
-    _checkAuthStatus();
+    unawaited(_checkAuthStatus());
     _initializeAnimations();
   }
 
@@ -99,16 +100,16 @@ class _WelcomeScreenState extends State<WelcomeScreen>
 
     // Start animations with delays - check mounted before each call
     if (mounted) {
-      _logoController.forward();
+      unawaited(_logoController.forward());
     }
     Future.delayed(const Duration(milliseconds: 500), () {
       if (mounted) {
-        _textController.forward();
+        unawaited(_textController.forward());
       }
     });
     Future.delayed(const Duration(milliseconds: 1000), () {
       if (mounted) {
-        _buttonController.forward();
+        unawaited(_buttonController.forward());
       }
     });
   }
@@ -282,10 +283,10 @@ class _WelcomeScreenState extends State<WelcomeScreen>
                               child: _buildGradientButton(
                                 text: 'Continue to App',
                                 onPressed: () {
-                                  Navigator.pushReplacementNamed(
+                                  unawaited(Navigator.pushReplacementNamed(
                                     context,
                                     RouteName.mainNavigation,
-                                  );
+                                  ));
                                 },
                               ),
                             ),
@@ -298,14 +299,14 @@ class _WelcomeScreenState extends State<WelcomeScreen>
                               child: _buildGradientButton(
                                 text: 'Create Account',
                                 onPressed: () {
-                                  Navigator.push(
+                                  unawaited(Navigator.push(
                                     context,
                                     MaterialPageRoute(
                                       builder: (context) => PhoneNumber(
                                         updatePhoneNumber: false,
                                       ),
                                     ),
-                                  );
+                                  ));
                                 },
                               ),
                             ),
@@ -319,13 +320,13 @@ class _WelcomeScreenState extends State<WelcomeScreen>
                               child: _buildOutlinedButton(
                                 text: 'Login',
                                 onPressed: () {
-                                  Navigator.push(
+                                  unawaited(Navigator.push(
                                     context,
                                     MaterialPageRoute(
                                       builder: (context) =>
                                           const SignInMethodSelectionScreen(),
                                     ),
-                                  );
+                                  ));
                                 },
                               ),
                             ),
@@ -422,7 +423,7 @@ class _WelcomeScreenState extends State<WelcomeScreen>
         ),
         child: ElevatedButton(
           onPressed: () {
-            HapticFeedback.lightImpact();
+            unawaited(HapticFeedback.lightImpact());
             onPressed();
           },
           style: ElevatedButton.styleFrom(
@@ -463,7 +464,7 @@ class _WelcomeScreenState extends State<WelcomeScreen>
         ),
         child: OutlinedButton(
           onPressed: () {
-            HapticFeedback.lightImpact();
+            unawaited(HapticFeedback.lightImpact());
             onPressed();
           },
           style: OutlinedButton.styleFrom(

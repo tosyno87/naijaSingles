@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -246,7 +248,7 @@ class _OnboardingStepBExpressionState extends State<OnboardingStepBExpression>
                                     updatedGenres.remove(genre);
                                   }
                                   context.read<OnboardingBloc>().add(OnboardingGenresUpdated(updatedGenres));
-                                  HapticFeedback.selectionClick();
+                                  unawaited(HapticFeedback.selectionClick());
                                 },
                                 backgroundColor: Colors.white,
                                 selectedColor: deepGreen,
@@ -462,7 +464,7 @@ class _OnboardingStepBExpressionState extends State<OnboardingStepBExpression>
                     // Back labelLarge at the bottom left
                     TextButton.icon(
                       onPressed: () {
-                        HapticFeedback.lightImpact();
+                        unawaited(HapticFeedback.lightImpact());
                         widget.onBack();
                       },
                       icon: const Icon(Icons.arrow_back, size: 16),
@@ -490,7 +492,7 @@ class _OnboardingStepBExpressionState extends State<OnboardingStepBExpression>
                         key: _continueButtonKey,
                         onPressed: _isStepValid(data)
                             ? () {
-                                HapticFeedback.mediumImpact();
+                                unawaited(HapticFeedback.mediumImpact());
                                 widget.onNext();
                               }
                             : null,

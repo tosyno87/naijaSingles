@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -336,14 +338,14 @@ class EventSharingWidget extends StatelessWidget {
 
   void _shareGeneral(BuildContext context) {
     final shareText = _buildShareText();
-    SharePlus.instance.share(ShareParams(text: shareText));
+    unawaited(SharePlus.instance.share(ShareParams(text: shareText)));
     Navigator.pop(context);
   }
 
   void _copyLink(BuildContext context) {
     final link =
         event.ticketUrl ?? 'https://naijasingles.com/events/${event.id}';
-    Clipboard.setData(ClipboardData(text: link));
+    unawaited(Clipboard.setData(ClipboardData(text: link)));
 
     Navigator.pop(context);
     ScaffoldMessenger.of(context).showSnackBar(
@@ -363,22 +365,22 @@ class EventSharingWidget extends StatelessWidget {
 
   void _shareText(BuildContext context) {
     final shareText = _buildDetailedShareText();
-    SharePlus.instance.share(ShareParams(text: shareText));
+    unawaited(SharePlus.instance.share(ShareParams(text: shareText)));
     Navigator.pop(context);
   }
 
   void _shareWithImage(BuildContext context) {
     if (event.imageUrl != null && event.imageUrl!.isNotEmpty) {
-      SharePlus.instance.share(ShareParams(
+      unawaited(SharePlus.instance.share(ShareParams(
         text: _buildShareText(),
         files: [
           XFile.fromData(
-            Uint8List(0), // Placeholder - would need to download image
+            Uint8List(0),
             name: 'event_image.jpg',
             mimeType: 'image/jpeg',
           ),
         ],
-      ),);
+      ),));
     } else {
       _shareText(context);
     }
@@ -387,21 +389,19 @@ class EventSharingWidget extends StatelessWidget {
 
   void _shareToFacebook(BuildContext context) {
     final shareText = _buildSocialShareText();
-    SharePlus.instance.share(ShareParams(text: shareText));
+    unawaited(SharePlus.instance.share(ShareParams(text: shareText)));
     Navigator.pop(context);
   }
 
   void _shareToTwitter(BuildContext context) {
     final shareText = _buildTwitterShareText();
-    SharePlus.instance.share(ShareParams(text: shareText));
+    unawaited(SharePlus.instance.share(ShareParams(text: shareText)));
     Navigator.pop(context);
   }
 
   void _shareToInstagram(BuildContext context) {
-    // Instagram sharing would typically require Instagram SDK
-    // For now, we'll copy text and show instructions
     final shareText = _buildInstagramShareText();
-    Clipboard.setData(ClipboardData(text: shareText));
+    unawaited(Clipboard.setData(ClipboardData(text: shareText)));
 
     Navigator.pop(context);
     _showInstagramInstructions(context);
@@ -409,7 +409,7 @@ class EventSharingWidget extends StatelessWidget {
 
   void _shareToWhatsApp(BuildContext context) {
     final shareText = _buildWhatsAppShareText();
-    SharePlus.instance.share(ShareParams(text: shareText));
+    unawaited(SharePlus.instance.share(ShareParams(text: shareText)));
     Navigator.pop(context);
   }
 
@@ -510,7 +510,7 @@ Get more details: ${event.ticketUrl ?? 'Afropeep app'}
 ''';
 
   void _showInstagramInstructions(BuildContext context) {
-    showDialog(
+    unawaited(showDialog(
       context: context,
       builder: (context) => AlertDialog(
         shape: RoundedRectangleBorder(
@@ -568,6 +568,6 @@ Get more details: ${event.ticketUrl ?? 'Afropeep app'}
           ),
         ],
       ),
-    );
+    ));
   }
 }

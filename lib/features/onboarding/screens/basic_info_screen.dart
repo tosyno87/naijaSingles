@@ -93,6 +93,7 @@ class _BasicInfoScreenState extends State<BasicInfoScreen> {
     );
 
     if (picked != null && picked != _selectedDate) {
+      if (!mounted) return;
       setState(() {
         _selectedDate = picked;
         _formatDateIntoController();
@@ -105,6 +106,8 @@ class _BasicInfoScreenState extends State<BasicInfoScreen> {
           (today.month == picked.month && today.day < picked.day)) {
         age--;
       }
+
+      if (!context.mounted) return;
 
       // Check if user is at least 18
       if (age < 18) {

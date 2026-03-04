@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:country_code_picker/country_code_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -220,7 +222,7 @@ class _PhoneVerificationScreenState extends State<PhoneVerificationScreen> {
                           context,
                         );
                       } else if (state is PhoneAuthCodeSentSuccess) {
-                        Navigator.push(
+                        unawaited(Navigator.push(
                           context,
                           MaterialPageRoute(
                             builder: (context) => OtpVerificationScreen(
@@ -230,7 +232,7 @@ class _PhoneVerificationScreenState extends State<PhoneVerificationScreen> {
                               updatePhoneNumber: widget.updatePhoneNumber,
                             ),
                           ),
-                        );
+                        ));
                       }
                     },
                     builder: (context, state) => SizedBox(

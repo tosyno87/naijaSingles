@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:io';
 
 import 'package:flutter/material.dart';
@@ -579,16 +580,15 @@ class _CreateGroupScreenState extends State<CreateGroupScreen> {
   }
 
   void _selectMembers() {
-    Navigator.push(
+    unawaited(Navigator.push(
       context,
       MaterialPageRoute(
         builder: (context) => ContactPickerWidget(
           groupName: _nameController.text.isNotEmpty
               ? _nameController.text
               : 'New Group',
-          groupId: '', // Will be set after group creation
+          groupId: '',
           onInvitationsSent: (invitations) {
-            // Handle sent invitations
             ScaffoldMessenger.of(context).showSnackBar(
               SnackBar(
                 content: Text('${invitations.length} invitations sent!'),
@@ -598,7 +598,7 @@ class _CreateGroupScreenState extends State<CreateGroupScreen> {
           },
         ),
       ),
-    );
+    ));
   }
 
   void _removeMember(String memberId) {
@@ -647,6 +647,7 @@ class _CreateGroupScreenState extends State<CreateGroupScreen> {
       );
 
       // Hide loading dialog
+      if (!mounted) return;
       LoadingDialog.hide(context);
 
       // Show success dialog
@@ -658,13 +659,13 @@ class _CreateGroupScreenState extends State<CreateGroupScreen> {
               'Your group "${_nameController.text.trim()}" has been created successfully!',
           actionText: 'Open Group',
           onAction: () {
-            Navigator.pop(context); // Close dialog
-            Navigator.pushReplacement(
+            Navigator.pop(context);
+            unawaited(Navigator.pushReplacement(
               context,
               MaterialPageRoute(
                 builder: (context) => GroupChatScreen(groupId: group.id),
               ),
-            );
+            ));
           },
           onClose: () {
             Navigator.pop(context); // Close dialog
@@ -674,6 +675,7 @@ class _CreateGroupScreenState extends State<CreateGroupScreen> {
       }
     } catch (e) {
       // Hide loading dialog
+      if (!mounted) return;
       LoadingDialog.hide(context);
 
       if (mounted) {

@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:io';
 
 import 'package:flutter/material.dart';
@@ -94,14 +95,14 @@ class AuthMethodSelectionScreen extends StatelessWidget {
                     text: 'Continue with Phone',
                     color: primaryColor,
                     onTap: () {
-                      Navigator.push(
+                      unawaited(Navigator.push(
                         context,
                         MaterialPageRoute(
                           builder: (context) => PhoneNumber(
                             updatePhoneNumber: false,
                           ),
                         ),
-                      );
+                      ));
                     },
                   ),
 
@@ -114,7 +115,7 @@ class AuthMethodSelectionScreen extends StatelessWidget {
                     text: 'Continue with Email',
                     color: accentColor,
                     onTap: () {
-                      Navigator.pushNamed(context, '/email_signup');
+                      unawaited(Navigator.pushNamed(context, '/email_signup'));
                     },
                   ),
 
@@ -126,11 +127,10 @@ class AuthMethodSelectionScreen extends StatelessWidget {
                     child: BlocConsumer<GoogleSignInBloc, GoogleSignInState>(
                       listener: (context, state) {
                         if (state is GoogleSignInSuccess) {
-                          // Navigate to onboarding or home based on user status
-                          Navigator.pushReplacementNamed(
+                          unawaited(Navigator.pushReplacementNamed(
                             context,
                             '/onboarding',
-                          );
+                          ));
                         } else if (state is GoogleSignInFailure) {
                           CustomSnackbar.showSnackBarSimple(
                             state.error,
@@ -186,13 +186,13 @@ class AuthMethodSelectionScreen extends StatelessWidget {
                       ),
                       GestureDetector(
                         onTap: () {
-                          Navigator.push(
+                          unawaited(Navigator.push(
                             context,
                             MaterialPageRoute(
                               builder: (context) =>
                                   const SignInMethodSelectionScreen(),
                             ),
-                          );
+                          ));
                         },
                         child: Text(
                           'Sign in',

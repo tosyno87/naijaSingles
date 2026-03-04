@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'dart:developer';
+
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 
@@ -70,8 +71,11 @@ class EnhancedChatService {
 
       log('💬 Message sent successfully');
       return true;
-    } catch (e) {
-      log('❌ Error sending message: $e');
+    } on FirebaseException catch (e) {
+      log('❌ Firebase error sending message: ${e.code} - ${e.message}');
+      return false;
+    } on Object catch (e) {
+      log('❌ Unexpected error sending message: $e');
       return false;
     }
   }
@@ -93,8 +97,12 @@ class EnhancedChatService {
       });
 
       log('👁️ Message marked as read');
-    } catch (e) {
-      log('❌ Error marking message as read: $e');
+    } on FirebaseException catch (e) {
+      log(
+        '❌ Firebase error marking message as read: ${e.code} - ${e.message}',
+      );
+    } on Object catch (e) {
+      log('❌ Unexpected error marking message as read: $e');
     }
   }
 
@@ -128,8 +136,12 @@ class EnhancedChatService {
       await _updateThreadUnreadCount(threadId);
 
       log('👁️ Thread marked as read');
-    } catch (e) {
-      log('❌ Error marking thread as read: $e');
+    } on FirebaseException catch (e) {
+      log(
+        '❌ Firebase error marking thread as read: ${e.code} - ${e.message}',
+      );
+    } on Object catch (e) {
+      log('❌ Unexpected error marking thread as read: $e');
     }
   }
 
@@ -148,12 +160,16 @@ class EnhancedChatService {
       // Set timer to stop typing after 3 seconds
       _typingTimers[threadId]?.cancel();
       _typingTimers[threadId] = Timer(const Duration(seconds: 3), () {
-        _stopTyping(threadId);
+        unawaited(_stopTyping(threadId));
       });
 
       log('⌨️ Started typing indicator');
-    } catch (e) {
-      log('❌ Error starting typing indicator: $e');
+    } on FirebaseException catch (e) {
+      log(
+        '❌ Firebase error starting typing indicator: ${e.code} - ${e.message}',
+      );
+    } on Object catch (e) {
+      log('❌ Unexpected error starting typing indicator: $e');
     }
   }
 
@@ -174,8 +190,12 @@ class EnhancedChatService {
       });
 
       log('⌨️ Stopped typing indicator');
-    } catch (e) {
-      log('❌ Error stopping typing indicator: $e');
+    } on FirebaseException catch (e) {
+      log(
+        '❌ Firebase error stopping typing indicator: ${e.code} - ${e.message}',
+      );
+    } on Object catch (e) {
+      log('❌ Unexpected error stopping typing indicator: $e');
     }
   }
 
@@ -214,8 +234,12 @@ class EnhancedChatService {
       });
 
       log('😊 Reaction added: $emoji');
-    } catch (e) {
-      log('❌ Error adding reaction: $e');
+    } on FirebaseException catch (e) {
+      log(
+        '❌ Firebase error adding reaction: ${e.code} - ${e.message}',
+      );
+    } on Object catch (e) {
+      log('❌ Unexpected error adding reaction: $e');
     }
   }
 
@@ -239,8 +263,12 @@ class EnhancedChatService {
       });
 
       log('😊 Reaction removed: $emoji');
-    } catch (e) {
-      log('❌ Error removing reaction: $e');
+    } on FirebaseException catch (e) {
+      log(
+        '❌ Firebase error removing reaction: ${e.code} - ${e.message}',
+      );
+    } on Object catch (e) {
+      log('❌ Unexpected error removing reaction: $e');
     }
   }
 
@@ -266,8 +294,10 @@ class EnhancedChatService {
       });
 
       log('✏️ Message edited');
-    } catch (e) {
-      log('❌ Error editing message: $e');
+    } on FirebaseException catch (e) {
+      log('❌ Firebase error editing message: ${e.code} - ${e.message}');
+    } on Object catch (e) {
+      log('❌ Unexpected error editing message: $e');
     }
   }
 
@@ -289,8 +319,10 @@ class EnhancedChatService {
       });
 
       log('🗑️ Message deleted');
-    } catch (e) {
-      log('❌ Error deleting message: $e');
+    } on FirebaseException catch (e) {
+      log('❌ Firebase error deleting message: ${e.code} - ${e.message}');
+    } on Object catch (e) {
+      log('❌ Unexpected error deleting message: $e');
     }
   }
 
@@ -306,8 +338,12 @@ class EnhancedChatService {
       });
 
       log('🟢 Online status updated: $isOnline');
-    } catch (e) {
-      log('❌ Error updating online status: $e');
+    } on FirebaseException catch (e) {
+      log(
+        '❌ Firebase error updating online status: ${e.code} - ${e.message}',
+      );
+    } on Object catch (e) {
+      log('❌ Unexpected error updating online status: $e');
     }
   }
 
@@ -341,8 +377,11 @@ class EnhancedChatService {
 
       final lastSeen = (data['lastSeen'] as Timestamp?)?.toDate();
       return lastSeen;
-    } catch (e) {
-      log('❌ Error getting last seen: $e');
+    } on FirebaseException catch (e) {
+      log('❌ Firebase error getting last seen: ${e.code} - ${e.message}');
+      return null;
+    } on Object catch (e) {
+      log('❌ Unexpected error getting last seen: $e');
       return null;
     }
   }
@@ -359,8 +398,12 @@ class EnhancedChatService {
         'lastMessageSenderId': senderId,
         'lastUpdated': FieldValue.serverTimestamp(),
       });
-    } catch (e) {
-      log('❌ Error updating thread metadata: $e');
+    } on FirebaseException catch (e) {
+      log(
+        '❌ Firebase error updating thread metadata: ${e.code} - ${e.message}',
+      );
+    } on Object catch (e) {
+      log('❌ Unexpected error updating thread metadata: $e');
     }
   }
 
@@ -382,8 +425,12 @@ class EnhancedChatService {
           'unreadCount.$currentUserId': 0,
         });
       }
-    } catch (e) {
-      log('❌ Error updating thread unread count: $e');
+    } on FirebaseException catch (e) {
+      log(
+        '❌ Firebase error updating thread unread count: ${e.code} - ${e.message}',
+      );
+    } on Object catch (e) {
+      log('❌ Unexpected error updating thread unread count: $e');
     }
   }
 
@@ -414,8 +461,12 @@ class EnhancedChatService {
           });
         }
       }
-    } catch (e) {
-      log('❌ Error sending message notification: $e');
+    } on FirebaseException catch (e) {
+      log(
+        '❌ Firebase error sending message notification: ${e.code} - ${e.message}',
+      );
+    } on Object catch (e) {
+      log('❌ Unexpected error sending message notification: $e');
     }
   }
 
@@ -433,8 +484,11 @@ class EnhancedChatService {
 
       final data = doc.data()!;
       return EnhancedMessage.fromMap(doc.id, data);
-    } catch (e) {
-      log('❌ Error getting message: $e');
+    } on FirebaseException catch (e) {
+      log('❌ Firebase error getting message: ${e.code} - ${e.message}');
+      return null;
+    } on Object catch (e) {
+      log('❌ Unexpected error getting message: $e');
       return null;
     }
   }
@@ -462,7 +516,7 @@ class EnhancedChatService {
 
     // Cancel all typing subscriptions
     for (final subscription in _typingSubscriptions.values) {
-      subscription.cancel();
+      unawaited(subscription.cancel());
     }
     _typingSubscriptions.clear();
   }

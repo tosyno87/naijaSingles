@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:developer' as developer;
 
 import 'package:firebase_auth/firebase_auth.dart';
@@ -64,18 +65,17 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
 
     // Check user registration status
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      _checkUserRegistration();
+      unawaited(_checkUserRegistration());
     });
 
     // Auto-hide the background task indicator after 10 seconds
     if (_backgroundTasksRunning) {
-      Future.delayed(const Duration(seconds: 10), () {
-        if (mounted) {
-          setState(() {
-            _backgroundTasksRunning = false;
-          });
-        }
-      });
+      unawaited(Future.delayed(const Duration(seconds: 10), () {
+        if (!context.mounted) return;
+        setState(() {
+          _backgroundTasksRunning = false;
+        });
+      }));
     }
   }
 
@@ -243,14 +243,14 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
       if (currentUser == null) {
         developer.log(
             '⚠️ User not authenticated in build - redirecting to welcome screen',);
-        Future.microtask(() {
-          if (mounted) {
-            Navigator.of(context).pushNamedAndRemoveUntil(
+        unawaited(Future.microtask(() {
+          if (context.mounted) {
+            unawaited(Navigator.of(context).pushNamedAndRemoveUntil(
               RouteName.welcomeScreen,
               (route) => false,
-            );
+            ));
           }
-        });
+        }));
         return Scaffold(
           backgroundColor: AppColors.backgroundColor,
           body: Center(
@@ -279,25 +279,25 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
         developer.log(
             '⚠️ Account deletion in progress - redirecting to welcome (not onboarding)',);
         AccountDeletionScope.inProgress = false;
-        Future.microtask(() {
-          if (mounted) {
-            Navigator.of(context).pushNamedAndRemoveUntil(
+        unawaited(Future.microtask(() {
+          if (context.mounted) {
+            unawaited(Navigator.of(context).pushNamedAndRemoveUntil(
               RouteName.welcomeScreen,
               (route) => false,
-            );
+            ));
           }
-        });
+        }));
       } else {
         developer.log(
             '⚠️ Authenticated user has incomplete profile - redirecting to onboarding',);
-        Future.microtask(() {
-          if (mounted) {
-            Navigator.of(context).pushNamedAndRemoveUntil(
+        unawaited(Future.microtask(() {
+          if (context.mounted) {
+            unawaited(Navigator.of(context).pushNamedAndRemoveUntil(
               RouteName.onboarding,
               (route) => false,
-            );
+            ));
           }
-        });
+        }));
       }
       return Scaffold(
         backgroundColor: AppColors.backgroundColor,
@@ -451,7 +451,7 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
 
   // Temporary analysis method (remove after testing)
   void _runUserAnalysis(BuildContext context) {
-    showModalBottomSheet(
+    unawaited(showModalBottomSheet(
       context: context,
       builder: (context) => Container(
         padding: const EdgeInsets.all(16),
@@ -510,6 +510,6 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
           ],
         ),
       ),
-    );
+    ));
   }
 }

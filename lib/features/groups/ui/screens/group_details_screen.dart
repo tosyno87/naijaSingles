@@ -5,6 +5,8 @@
 // reporting, member invites, etc.).
 // TODO: Migrate callers (groups_screen.dart) to the canonical version,
 // then delete this file.
+import 'dart:async';
+
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -41,7 +43,7 @@ class _GroupDetailsScreenState extends State<GroupDetailsScreen>
     super.initState();
     _tabController = TabController(length: 3, vsync: this);
     _checkUserStatus();
-    _loadMembers();
+    unawaited(_loadMembers());
   }
 
   @override
@@ -598,10 +600,10 @@ class _GroupDetailsScreenState extends State<GroupDetailsScreen>
                 onSelected: (value) {
                   switch (value) {
                     case 'make_admin':
-                      _makeAdmin(member['id']);
+                      unawaited(_makeAdmin(member['id']));
                       break;
                     case 'remove_admin':
-                      _removeAdmin(member['id']);
+                      unawaited(_removeAdmin(member['id']));
                       break;
                     case 'remove_member':
                       _removeMember(member['id']);
@@ -758,7 +760,7 @@ class _GroupDetailsScreenState extends State<GroupDetailsScreen>
   }
 
   void _showDeleteDialog() {
-    showDialog(
+    unawaited(showDialog(
       context: context,
       builder: (context) => AlertDialog(
         title: const Text('Delete Group'),
@@ -772,11 +774,13 @@ class _GroupDetailsScreenState extends State<GroupDetailsScreen>
           ),
           TextButton(
             onPressed: () async {
+              final navigator = Navigator.of(context);
+              final scaffoldMessenger = ScaffoldMessenger.of(context);
               Navigator.pop(context);
               final success = await _groupService.deleteGroup(widget.group.id!);
-              if (success && mounted) {
-                Navigator.pop(context);
-                ScaffoldMessenger.of(context).showSnackBar(
+              if (success) {
+                navigator.pop();
+                scaffoldMessenger.showSnackBar(
                   const SnackBar(
                     content: Text('Group deleted successfully'),
                     backgroundColor: AppColors.success,
@@ -788,7 +792,7 @@ class _GroupDetailsScreenState extends State<GroupDetailsScreen>
           ),
         ],
       ),
-    );
+    ));
   }
 
   String _formatDate(DateTime date) {

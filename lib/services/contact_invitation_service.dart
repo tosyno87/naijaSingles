@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:developer' as dev;
 
 import 'package:contacts_service/contacts_service.dart';
@@ -198,7 +199,7 @@ class ContactInvitationService {
 
   /// Show permission denied dialog
   void showPermissionDeniedDialog(BuildContext context) {
-    showDialog(
+    unawaited(showDialog(
       context: context,
       builder: (context) => AlertDialog(
         title: const Text('Permission Required'),
@@ -213,12 +214,12 @@ class ContactInvitationService {
           TextButton(
             onPressed: () {
               Navigator.pop(context);
-              openAppSettings();
+              unawaited(openAppSettings());
             },
             child: const Text('Open Settings'),
           ),
         ],
       ),
-    );
+    ));
   }
 }

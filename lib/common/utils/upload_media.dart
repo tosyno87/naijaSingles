@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:developer';
 import 'dart:io';
 
@@ -188,7 +189,7 @@ class _SelectMedia extends StatelessWidget {
               children: [
                 TextButton.icon(
                   onPressed: () {
-                    getContentFromSource(context, ImageSource.camera);
+                    unawaited(getContentFromSource(context, ImageSource.camera));
                   },
                   icon: const Icon(
                     FontAwesomeIcons.cameraRetro,

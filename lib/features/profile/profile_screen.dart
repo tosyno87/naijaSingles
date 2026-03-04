@@ -47,7 +47,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
   @override
   void dispose() {
     _photoPageController.dispose();
-    _userDataSubscription?.cancel();
+    unawaited(_userDataSubscription?.cancel());
     super.dispose();
   }
 
@@ -132,23 +132,23 @@ class _ProfileScreenState extends State<ProfileScreen> {
               onSelected: (value) {
                 switch (value) {
                   case 'events':
-                    Navigator.pushNamed(context, RouteName.eventsScreen);
+                    unawaited(Navigator.pushNamed(context, RouteName.eventsScreen));
                     break;
                   case 'privacy':
-                    Navigator.push(
+                    unawaited(Navigator.push(
                       context,
                       MaterialPageRoute(
                         builder: (_) => const PrivacySettingsScreen(),
                       ),
-                    );
+                    ));
                     break;
                   case 'settings':
-                    Navigator.push(
+                    unawaited(Navigator.push(
                       context,
                       MaterialPageRoute(
                         builder: (_) => const SettingsScreen(),
                       ),
-                    );
+                    ));
                     break;
                 }
               },
@@ -346,10 +346,10 @@ class _ProfileScreenState extends State<ProfileScreen> {
                 child: GestureDetector(
                   onTap: () {
                     if (_currentPhotoIndex > 0) {
-                      _photoPageController.previousPage(
+                      unawaited(_photoPageController.previousPage(
                         duration: const Duration(milliseconds: 300),
                         curve: Curves.easeInOut,
-                      );
+                      ));
                     }
                   },
                   child: Container(
@@ -375,10 +375,10 @@ class _ProfileScreenState extends State<ProfileScreen> {
                 child: GestureDetector(
                   onTap: () {
                     if (_currentPhotoIndex < photos.length - 1) {
-                      _photoPageController.nextPage(
+                      unawaited(_photoPageController.nextPage(
                         duration: const Duration(milliseconds: 300),
                         curve: Curves.easeInOut,
-                      );
+                      ));
                     }
                   },
                   child: Container(
@@ -1115,14 +1115,14 @@ class _ProfileScreenState extends State<ProfileScreen> {
 
   // Full screen photo viewer
   void _showFullScreenPhoto(List<dynamic> photos, int initialIndex) {
-    Navigator.of(context).push(
+    unawaited(Navigator.of(context).push(
       MaterialPageRoute(
         builder: (context) => _FullScreenPhotoViewer(
           photos: photos,
           initialIndex: initialIndex,
         ),
       ),
-    );
+    ));
   }
 }
 

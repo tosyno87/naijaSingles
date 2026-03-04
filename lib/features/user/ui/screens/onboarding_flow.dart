@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -31,17 +33,15 @@ class _OnboardingFlowState extends State<OnboardingFlow> {
   /// Navigate to the next page or finish onboarding if on the last page
   void onNext() {
     if (_currentPage < 2) {
-      _pageController.nextPage(
+      unawaited(_pageController.nextPage(
         duration: const Duration(milliseconds: 300),
         curve: Curves.easeInOut,
-      );
+      ));
     } else {
-      // On the last page, complete onboarding - navigate to next screen
-      // Save data and navigate to the next screen in the app flow
-      Navigator.pushReplacementNamed(
+      unawaited(Navigator.pushReplacementNamed(
         context,
         RouteName.userNameScreen,
-      );
+      ));
     }
   }
 
@@ -113,10 +113,10 @@ class _OnboardingFlowState extends State<OnboardingFlow> {
                   if (_currentPage > 0)
                     TextButton(
                       onPressed: () {
-                        _pageController.previousPage(
+                        unawaited(_pageController.previousPage(
                           duration: const Duration(milliseconds: 300),
                           curve: Curves.easeInOut,
-                        );
+                        ));
                       },
                       child: Text(
                         'Back',

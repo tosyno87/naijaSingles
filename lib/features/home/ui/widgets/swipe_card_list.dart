@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -35,13 +37,13 @@ class _SwipeCardListState extends State<SwipeCardList> {
     return BlocListener<SwipeBloc, SwipeblocState>(
       listener: (context, swipeState) {
         if (swipeState is SwipeMatchCreatedState) {
-          showDialog(
+          unawaited(showDialog(
             context: context,
             builder: (ctx) => MatchDialogPage(
               matchedUser: swipeState.matchedUser,
               currentUser: widget.controller.currentUser,
             ),
-          );
+          ));
         }
       },
       child: BlocBuilder<SearchUserBloc, SearchUserState>(

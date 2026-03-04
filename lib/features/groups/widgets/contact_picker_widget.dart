@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:contacts_service/contacts_service.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -44,7 +46,7 @@ class _ContactPickerWidgetState extends State<ContactPickerWidget> {
   @override
   void initState() {
     super.initState();
-    _loadContacts();
+    unawaited(_loadContacts());
     _messageController.text =
         'You are invited to join "${widget.groupName}" group!';
   }

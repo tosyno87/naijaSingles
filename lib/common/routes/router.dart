@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
@@ -524,12 +526,11 @@ abstract class AppRouter {
                 const SizedBox(height: 32),
                 ElevatedButton.icon(
                   onPressed: () {
-                    // Clear navigation stack and go to welcome
-                    Navigator.pushNamedAndRemoveUntil(
+                    unawaited(Navigator.pushNamedAndRemoveUntil(
                       context,
                       RouteName.welcomeScreen,
                       (route) => false,
-                    );
+                    ));
                   },
                   icon: const Icon(Icons.home),
                   label: const Text('Go to Home'),
@@ -545,12 +546,11 @@ abstract class AppRouter {
                 const SizedBox(height: 16),
                 TextButton(
                   onPressed: () {
-                    // Clear navigation stack and go to main app
-                    Navigator.pushNamedAndRemoveUntil(
+                    unawaited(Navigator.pushNamedAndRemoveUntil(
                       context,
                       RouteName.mainNavigation,
                       (route) => false,
-                    );
+                    ));
                   },
                   child: const Text('Go to Main App'),
                 ),

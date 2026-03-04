@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
@@ -82,18 +84,18 @@ class Layout extends StatelessWidget {
                     ],
                   ),
                   onTap: () {
-                    Navigator.pushNamed(
+                    unawaited(Navigator.pushNamed(
                       context,
                       RouteName.largeImageScreen,
                       arguments: documentSnapshot.get('image_url'),
-                    );
+                    ));
                   },
                 )
               : GestureDetector(
                   onLongPress: () {
-                    Clipboard.setData(
+                    unawaited(Clipboard.setData(
                       ClipboardData(text: documentSnapshot.get('text')),
-                    );
+                    ));
                     CustomToast.showToast('Message Copied'.tr().toString());
                   },
                   child: Container(

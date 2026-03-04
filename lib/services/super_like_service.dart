@@ -102,8 +102,13 @@ class SuperLikeService {
             isInstantMatch: instantMatch != null,
             matchId: instantMatch,
           );
-        } catch (e) {
-          debugPrint('❌ Error sending super like: $e');
+        } on FirebaseException catch (e) {
+          debugPrint(
+            '❌ Firebase error sending super like: ${e.code} - ${e.message}',
+          );
+          return SuperLikeResult.failed('Error: ${e.toString()}');
+        } on Object catch (e) {
+          debugPrint('❌ Unexpected error sending super like: $e');
           return SuperLikeResult.failed('Error: ${e.toString()}');
         }
       });
@@ -131,8 +136,18 @@ class SuperLikeService {
         remainingCount: dailyLimit - dailyCount,
         nextResetTime: _getNextResetTime(),
       );
-    } catch (e) {
-      debugPrint('❌ Error checking super like eligibility: $e');
+    } on FirebaseException catch (e) {
+      debugPrint(
+        '❌ Firebase error checking super like eligibility: ${e.code} - ${e.message}',
+      );
+      return SuperLikeEligibility(
+        canSend: false,
+        reason: 'Error checking eligibility',
+        remainingCount: 0,
+        nextResetTime: _getNextResetTime(),
+      );
+    } on Object catch (e) {
+      debugPrint('❌ Unexpected error checking super like eligibility: $e');
       return SuperLikeEligibility(
         canSend: false,
         reason: 'Error checking eligibility',
@@ -157,8 +172,13 @@ class SuperLikeService {
           .get();
 
       return querySnapshot.docs.length;
-    } catch (e) {
-      debugPrint('❌ Error getting daily super like count: $e');
+    } on FirebaseException catch (e) {
+      debugPrint(
+        '❌ Firebase error getting daily super like count: ${e.code} - ${e.message}',
+      );
+      return 0;
+    } on Object catch (e) {
+      debugPrint('❌ Unexpected error getting daily super like count: $e');
       return 0;
     }
   }
@@ -181,8 +201,13 @@ class SuperLikeService {
             '📬 Found ${superLikes.length} super likes for user $userId',
           );
           return superLikes;
-        } catch (e) {
-          debugPrint('❌ Error getting received super likes: $e');
+        } on FirebaseException catch (e) {
+          debugPrint(
+            '❌ Firebase error getting received super likes: ${e.code} - ${e.message}',
+          );
+          return [];
+        } on Object catch (e) {
+          debugPrint('❌ Unexpected error getting received super likes: $e');
           return [];
         }
       });
@@ -204,8 +229,13 @@ class SuperLikeService {
             '📤 Found ${superLikes.length} sent super likes for user $userId',
           );
           return superLikes;
-        } catch (e) {
-          debugPrint('❌ Error getting sent super likes: $e');
+        } on FirebaseException catch (e) {
+          debugPrint(
+            '❌ Firebase error getting sent super likes: ${e.code} - ${e.message}',
+          );
+          return [];
+        } on Object catch (e) {
+          debugPrint('❌ Unexpected error getting sent super likes: $e');
           return [];
         }
       });
@@ -275,8 +305,13 @@ class SuperLikeService {
             debugPrint('👎 User passed on super like: $superLikeId');
             return SuperLikeResponse.success();
           }
-        } catch (e) {
-          debugPrint('❌ Error responding to super like: $e');
+        } on FirebaseException catch (e) {
+          debugPrint(
+            '❌ Firebase error responding to super like: ${e.code} - ${e.message}',
+          );
+          return SuperLikeResponse.failed('Error: ${e.toString()}');
+        } on Object catch (e) {
+          debugPrint('❌ Unexpected error responding to super like: $e');
           return SuperLikeResponse.failed('Error: ${e.toString()}');
         }
       });
@@ -309,8 +344,13 @@ class SuperLikeService {
       });
 
       return superLikeRef.id;
-    } catch (e) {
-      debugPrint('❌ Error creating super like: $e');
+    } on FirebaseException catch (e) {
+      debugPrint(
+        '❌ Firebase error creating super like: ${e.code} - ${e.message}',
+      );
+      return null;
+    } on Object catch (e) {
+      debugPrint('❌ Unexpected error creating super like: $e');
       return null;
     }
   }
@@ -328,8 +368,12 @@ class SuperLikeService {
         'timestamp': FieldValue.serverTimestamp(),
         'dailyCount': await getDailySuperLikeCount(userId),
       });
-    } catch (e) {
-      debugPrint('❌ Error updating super like usage: $e');
+    } on FirebaseException catch (e) {
+      debugPrint(
+        '❌ Firebase error updating super like usage: ${e.code} - ${e.message}',
+      );
+    } on Object catch (e) {
+      debugPrint('❌ Unexpected error updating super like usage: $e');
     }
   }
 
@@ -356,8 +400,12 @@ class SuperLikeService {
       // TODO: Send push notification
       // This would integrate with your push notification service
       debugPrint('📱 Super like notification sent to $toUserId');
-    } catch (e) {
-      debugPrint('❌ Error sending super like notification: $e');
+    } on FirebaseException catch (e) {
+      debugPrint(
+        '❌ Firebase error sending super like notification: ${e.code} - ${e.message}',
+      );
+    } on Object catch (e) {
+      debugPrint('❌ Unexpected error sending super like notification: $e');
     }
   }
 
@@ -378,8 +426,13 @@ class SuperLikeService {
       }
 
       return null;
-    } catch (e) {
-      debugPrint('❌ Error checking for instant match: $e');
+    } on FirebaseException catch (e) {
+      debugPrint(
+        '❌ Firebase error checking for instant match: ${e.code} - ${e.message}',
+      );
+      return null;
+    } on Object catch (e) {
+      debugPrint('❌ Unexpected error checking for instant match: $e');
       return null;
     }
   }
@@ -401,8 +454,13 @@ class SuperLikeService {
       }
 
       return null;
-    } catch (e) {
-      debugPrint('❌ Error getting existing super like: $e');
+    } on FirebaseException catch (e) {
+      debugPrint(
+        '❌ Firebase error getting existing super like: ${e.code} - ${e.message}',
+      );
+      return null;
+    } on Object catch (e) {
+      debugPrint('❌ Unexpected error getting existing super like: $e');
       return null;
     }
   }
@@ -413,8 +471,13 @@ class SuperLikeService {
       final likeDoc =
           await _likesCollection.doc('${fromUserId}_likes_$toUserId').get();
       return likeDoc.exists;
-    } catch (e) {
-      debugPrint('❌ Error checking existing like: $e');
+    } on FirebaseException catch (e) {
+      debugPrint(
+        '❌ Firebase error checking existing like: ${e.code} - ${e.message}',
+      );
+      return false;
+    } on Object catch (e) {
+      debugPrint('❌ Unexpected error checking existing like: $e');
       return false;
     }
   }
@@ -428,8 +491,13 @@ class SuperLikeService {
         return userData['isPremium'] == true;
       }
       return false;
-    } catch (e) {
-      debugPrint('❌ Error checking premium status: $e');
+    } on FirebaseException catch (e) {
+      debugPrint(
+        '❌ Firebase error checking premium status: ${e.code} - ${e.message}',
+      );
+      return false;
+    } on Object catch (e) {
+      debugPrint('❌ Unexpected error checking premium status: $e');
       return false;
     }
   }
@@ -467,8 +535,13 @@ class SuperLikeService {
         isPremium: isPremium,
         nextResetTime: _getNextResetTime(),
       );
-    } catch (e) {
-      debugPrint('❌ Error getting super like stats: $e');
+    } on FirebaseException catch (e) {
+      debugPrint(
+        '❌ Firebase error getting super like stats: ${e.code} - ${e.message}',
+      );
+      return SuperLikeStats.empty();
+    } on Object catch (e) {
+      debugPrint('❌ Unexpected error getting super like stats: $e');
       return SuperLikeStats.empty();
     }
   }
@@ -493,8 +566,12 @@ class SuperLikeService {
           '🧹 Cleaned up ${expiredQuery.docs.length} expired super like highlights',
         );
       }
-    } catch (e) {
-      debugPrint('❌ Error cleaning up expired highlights: $e');
+    } on FirebaseException catch (e) {
+      debugPrint(
+        '❌ Firebase error cleaning up expired highlights: ${e.code} - ${e.message}',
+      );
+    } on Object catch (e) {
+      debugPrint('❌ Unexpected error cleaning up expired highlights: $e');
     }
   }
 }

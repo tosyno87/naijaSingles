@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:io';
 
 import 'package:cached_network_image/cached_network_image.dart';
@@ -650,7 +651,7 @@ class MyEventCard extends StatelessWidget {
   void _showFullScreenPoster(BuildContext context) {
     if (!event.hasImages) return;
 
-    Navigator.of(context).push(
+    unawaited(Navigator.of(context).push(
       MaterialPageRoute(
         builder: (context) => Scaffold(
           backgroundColor: Colors.black,
@@ -725,6 +726,6 @@ class MyEventCard extends StatelessWidget {
           ),
         ),
       ),
-    );
+    ));
   }
 }

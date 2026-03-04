@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:developer';
 import 'dart:io';
 
@@ -38,7 +39,7 @@ class _ExploreMapWidgetState extends State<ExploreMapWidget>
   bool get wantKeepAlive => true;
   @override
   void initState() {
-    getCurrentAdddressName();
+    unawaited(getCurrentAdddressName());
     super.initState();
   }
 
@@ -52,13 +53,13 @@ class _ExploreMapWidgetState extends State<ExploreMapWidget>
     currentAddressName = await getAddress(
       currentCoordinates?.latitude,
       currentCoordinates?.longitude,
-    ).whenComplete(() {
-      context.read<SearchUserForMapBloc>().add(
-            LoadUserForMapEvent(
-              currentUser: widget.currentUser,
-            ),
-          );
-    });
+    );
+    if (!mounted) return;
+    context.read<SearchUserForMapBloc>().add(
+          LoadUserForMapEvent(
+            currentUser: widget.currentUser,
+          ),
+        );
     log('name is $currentAddressName');
     setState(() {});
   }

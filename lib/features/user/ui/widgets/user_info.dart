@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -338,10 +340,10 @@ class _InfoState extends State<Info> {
               isMe
                   ? FloatingButton(
                       onTap: () {
-                        Navigator.pushReplacementNamed(
+                        unawaited(Navigator.pushReplacementNamed(
                           context,
                           RouteName.editProfileScreen,
-                        );
+                        ));
                       },
                       icon: const Icon(
                         Icons.edit,
@@ -350,7 +352,7 @@ class _InfoState extends State<Info> {
                     )
                   : FloatingButton(
                       onTap: () {
-                        Navigator.push(
+                        unawaited(Navigator.push(
                           context,
                           CupertinoPageRoute(
                             builder: (context) => ChatPage(
@@ -362,7 +364,7 @@ class _InfoState extends State<Info> {
                               ),
                             ),
                           ),
-                        );
+                        ));
                       },
                       icon: const Icon(
                         Icons.message,

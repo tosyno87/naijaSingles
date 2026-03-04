@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -28,7 +30,7 @@ class _BlockedUsersScreenState extends State<BlockedUsersScreen> {
   void _initializeData() {
     _currentUserId = context.read<UserBloc>().currentUser?.id;
     if (_currentUserId != null) {
-      _loadBlockedUsers();
+      unawaited(_loadBlockedUsers());
     }
   }
 
@@ -40,17 +42,15 @@ class _BlockedUsersScreenState extends State<BlockedUsersScreen> {
     try {
       final blockedUsers =
           await SettingsService.getBlockedUsers(_currentUserId!);
-      if (mounted) {
-        setState(() {
-          _blockedUsers = blockedUsers;
-          _isLoading = false;
-        });
-      }
+      if (!context.mounted) return;
+      setState(() {
+        _blockedUsers = blockedUsers;
+        _isLoading = false;
+      });
     } catch (e) {
-      if (mounted) {
-        setState(() => _isLoading = false);
-        _showSnackBar('Error loading blocked users', isError: true);
-      }
+      if (!context.mounted) return;
+      setState(() => _isLoading = false);
+      _showSnackBar('Error loading blocked users', isError: true);
     }
   }
 
@@ -60,39 +60,38 @@ class _BlockedUsersScreenState extends State<BlockedUsersScreen> {
     // Show confirmation dialog
     final shouldUnblock = await _showUnblockConfirmation(user.name);
     if (!shouldUnblock) return;
+    if (!mounted) return;
 
     // Show loading
-    showDialog(
+    unawaited(showDialog(
       context: context,
       barrierDismissible: false,
       builder: (context) => const Center(
         child: CircularProgressIndicator(),
       ),
-    );
+    ));
 
     try {
       final success =
           await SettingsService.unblockUser(_currentUserId!, user.id);
 
-      if (mounted) {
-        Navigator.pop(context); // Close loading dialog
+      if (!mounted) return;
+      Navigator.pop(context); // Close loading dialog
 
-        if (success) {
-          // Remove from local list
-          setState(() {
-            _blockedUsers.removeWhere((u) => u.id == user.id);
-          });
+      if (success) {
+        // Remove from local list
+        setState(() {
+          _blockedUsers.removeWhere((u) => u.id == user.id);
+        });
 
-          _showSnackBar('${user.name} has been unblocked', isError: false);
-        } else {
-          _showSnackBar('Failed to unblock ${user.name}', isError: true);
-        }
+        _showSnackBar('${user.name} has been unblocked', isError: false);
+      } else {
+        _showSnackBar('Failed to unblock ${user.name}', isError: true);
       }
     } catch (e) {
-      if (mounted) {
-        Navigator.pop(context); // Close loading dialog
-        _showSnackBar('Error unblocking user', isError: true);
-      }
+      if (!mounted) return;
+      Navigator.pop(context); // Close loading dialog
+      _showSnackBar('Error unblocking user', isError: true);
     }
   }
 

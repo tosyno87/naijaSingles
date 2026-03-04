@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:developer';
 
 import 'package:easy_localization/easy_localization.dart';
@@ -245,11 +246,11 @@ class SettingPageState extends State<SettingPage> {
                               ],
                             ),
                             onTap: () {
-                              Navigator.pushNamed(
+                              unawaited(Navigator.pushNamed(
                                 context,
                                 RouteName.updatePhoneScreen,
                                 arguments: widget.currentUser,
-                              );
+                              ));
                             },
                           ),
                         ),

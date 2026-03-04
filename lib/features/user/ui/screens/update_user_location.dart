@@ -1,5 +1,7 @@
 // ignore_for_file: depend_on_referenced_packages
 
+import 'dart:async';
+
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -42,7 +44,7 @@ class UpdateLocationState extends State<UpdateLocation> {
 
   @override
   void initState() {
-    updateLoc();
+    unawaited(updateLoc());
 
     super.initState();
   }
@@ -94,7 +96,7 @@ class UpdateLocationState extends State<UpdateLocation> {
           backgroundColor: Theme.of(context).scaffoldBackgroundColor,
           title: ListTile(
             onTap: () {
-              showDialog(
+              unawaited(showDialog(
                 context: context,
                 builder: (BuildContext context) => Dialog(
                   shape: RoundedRectangleBorder(
@@ -148,7 +150,7 @@ class UpdateLocationState extends State<UpdateLocation> {
                             ),
                             TextButton(
                               onPressed: () {
-                                googleMapController?.animateCamera(
+                                unawaited(googleMapController?.animateCamera(
                                   CameraUpdate.newCameraPosition(
                                     CameraPosition(
                                       target: LatLng(
@@ -158,7 +160,7 @@ class UpdateLocationState extends State<UpdateLocation> {
                                       zoom: 16,
                                     ),
                                   ),
-                                );
+                                ));
                                 setState(() {
                                   latitude = _newAddress?['latitude'];
                                   longitude = _newAddress?['longitude'];
@@ -176,7 +178,7 @@ class UpdateLocationState extends State<UpdateLocation> {
                     ),
                   ),
                 ),
-              );
+              ));
             },
             title: Text(
               'Choose location'.tr().toString(),
@@ -274,7 +276,7 @@ class UpdateLocationState extends State<UpdateLocation> {
                                                   'position']['coordinates'][0],
                                             ),
                                       onTap: () {
-                                        showDialog(
+                                        unawaited(showDialog(
                                           barrierColor: Colors.transparent,
                                           context: context,
                                           builder: (BuildContext context) {
@@ -333,7 +335,7 @@ class UpdateLocationState extends State<UpdateLocation> {
                                               ).tr(),
                                             );
                                           },
-                                        );
+                                        ));
                                       },
                                     ),
                                   }
@@ -345,7 +347,7 @@ class UpdateLocationState extends State<UpdateLocation> {
                                           longitude = loc.longitude;
                                         });
 
-                                        googleMapController?.animateCamera(
+                                        unawaited(googleMapController?.animateCamera(
                                           CameraUpdate.newCameraPosition(
                                             CameraPosition(
                                               target: LatLng(
@@ -355,7 +357,7 @@ class UpdateLocationState extends State<UpdateLocation> {
                                               zoom: 16,
                                             ),
                                           ),
-                                        );
+                                        ));
                                       },
                                       consumeTapEvents: true,
                                       onTap: () async {
@@ -403,7 +405,7 @@ class UpdateLocationState extends State<UpdateLocation> {
                                 latitude = position.latitude;
                                 longitude = position.longitude;
                               });
-                              googleMapController?.animateCamera(
+                              unawaited(googleMapController?.animateCamera(
                                 CameraUpdate.newCameraPosition(
                                   CameraPosition(
                                     target: LatLng(
@@ -413,7 +415,7 @@ class UpdateLocationState extends State<UpdateLocation> {
                                     zoom: 16,
                                   ),
                                 ),
-                              );
+                              ));
                             },
                           ),
                         ],

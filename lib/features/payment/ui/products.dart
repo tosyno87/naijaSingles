@@ -70,7 +70,7 @@ class ProductsState extends State<Products> {
   void initState() {
     super.initState();
     context.read<GetInAppProductsBloc>().add(RequestInAppProducts());
-    _initialize();
+    unawaited(_initialize());
     // Show payment failure alert.
     if (widget.isPaymentSuccess != null && !widget.isPaymentSuccess!) {
       WidgetsBinding.instance.addPostFrameCallback((_) async {
@@ -96,7 +96,7 @@ class ProductsState extends State<Products> {
 
   @override
   void dispose() {
-    _streamSubscription?.cancel();
+    unawaited(_streamSubscription?.cancel());
     super.dispose();
   }
 
@@ -119,6 +119,7 @@ class ProductsState extends State<Products> {
       }
 
       _streamSubscription = _iap.purchaseStream.listen((data) async {
+        if (!mounted) return;
         setState(() {
           purchases.addAll(data);
         });
@@ -143,6 +144,7 @@ class ProductsState extends State<Products> {
       });
       _streamSubscription!.onError(
         (error) {
+          if (!mounted) return;
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
               content: error != null

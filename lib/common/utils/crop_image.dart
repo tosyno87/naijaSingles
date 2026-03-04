@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:io';
 import 'dart:math';
 
@@ -62,7 +63,7 @@ class CropMediaState extends State<CropMedia>
     // Start animation after frame is built
     WidgetsBinding.instance.addPostFrameCallback((_) {
       if (mounted && _animationController != null) {
-        _animationController!.forward();
+        unawaited(_animationController!.forward());
       }
     });
   }
@@ -119,11 +120,11 @@ class CropMediaState extends State<CropMedia>
                 setState(() {
                   isFinished = false;
                 });
-                _finished().then((value) {
+                unawaited(_finished().then((value) {
                   setState(() {
                     isFinished = true;
                   });
-                });
+                }));
               },
             )
           else

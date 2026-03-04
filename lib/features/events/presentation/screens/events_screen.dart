@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:easy_localization/easy_localization.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
@@ -147,7 +149,7 @@ class _EventsScreenState extends State<EventsScreen> {
               child: FloatingActionButton(
                 heroTag: 'events_screen_fab',
                 onPressed: () {
-                  Navigator.pushNamed(context, RouteName.eventTemplateSelection);
+                  unawaited(Navigator.pushNamed(context, RouteName.eventTemplateSelection));
                 },
                 backgroundColor: AppColors.primaryGreen,
                 foregroundColor: Colors.white,
@@ -190,7 +192,7 @@ class _EventsScreenState extends State<EventsScreen> {
             label: 'My Events'.tr(),
             child: IconButton(
               onPressed: () {
-                Navigator.pushNamed(context, RouteName.myEvents);
+                unawaited(Navigator.pushNamed(context, RouteName.myEvents));
               },
               icon: const Icon(
                 Icons.calendar_today,
@@ -527,7 +529,7 @@ class _EventsScreenState extends State<EventsScreen> {
       );
 
   void _navigateToEventDetails(EventModel event) {
-    Navigator.pushNamed(context, RouteName.eventDetails, arguments: event);
+    unawaited(Navigator.pushNamed(context, RouteName.eventDetails, arguments: event));
   }
 
   Widget _buildEventsList() => BlocConsumer<EventsBloc, EventsState>(
@@ -600,10 +602,10 @@ class _EventsScreenState extends State<EventsScreen> {
                   _eventsBloc?.add(ClearSearchEvent());
                 },
                 onCreateEvent: () {
-                  Navigator.pushNamed(
+                  unawaited(Navigator.pushNamed(
                     context,
                     RouteName.eventTemplateSelection,
-                  );
+                  ));
                 },
               );
             }

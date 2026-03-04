@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:developer';
 
 import 'package:firebase_auth/firebase_auth.dart';
@@ -40,7 +41,7 @@ class _DiscoverPageV2State extends State<DiscoverPageV2> {
   @override
   void initState() {
     super.initState();
-    _loadRecommendations();
+    unawaited(_loadRecommendations());
   }
 
   Future<void> _loadRecommendations() async {
@@ -257,7 +258,7 @@ class _DiscoverPageV2State extends State<DiscoverPageV2> {
             icon: Custom3DIcons.events(),
             color: const Color(0xFFFF9800), // Orange for events
             onTap: () {
-              Navigator.pushNamed(context, RouteName.eventsScreen);
+              unawaited(Navigator.pushNamed(context, RouteName.eventsScreen));
             },
           ),
         ),
@@ -270,12 +271,12 @@ class _DiscoverPageV2State extends State<DiscoverPageV2> {
             icon: Custom3DIcons.groups(),
             color: const Color(0xFF6B46C1), // Purple for communities
             onTap: () {
-              Navigator.push(
+              unawaited(Navigator.push(
                 context,
                 MaterialPageRoute(
                   builder: (context) => const UnifiedGroupsScreen(),
                 ),
-              );
+              ));
             },
           ),
         ),
@@ -457,17 +458,15 @@ class _DiscoverPageV2State extends State<DiscoverPageV2> {
 
   void _handleRecommendationTap(BuildContext context, _RecommendationItem item) {
     if (item.type == RecommendationType.event && item.event != null) {
-      // Navigate to event details
-      Navigator.pushNamed(
+      unawaited(Navigator.pushNamed(
         context,
         RouteName.eventDetails,
         arguments: item.event,
-      );
+      ));
     } else if (item.type == RecommendationType.community && item.group != null) {
-      // Navigate to group details
       final currentUserId = FirebaseAuth.instance.currentUser?.uid ?? '';
       final isMember = item.group!.isMember(currentUserId);
-      Navigator.push(
+      unawaited(Navigator.push(
         context,
         MaterialPageRoute(
           builder: (context) => GroupDetailsScreen(
@@ -475,18 +474,17 @@ class _DiscoverPageV2State extends State<DiscoverPageV2> {
             isMember: isMember,
           ),
         ),
-      );
+      ));
     } else {
-      // Fallback: navigate to the respective list screen
       if (item.type == RecommendationType.event) {
-        Navigator.pushNamed(context, RouteName.eventsScreen);
+        unawaited(Navigator.pushNamed(context, RouteName.eventsScreen));
       } else {
-        Navigator.push(
+        unawaited(Navigator.push(
           context,
           MaterialPageRoute(
             builder: (context) => const UnifiedGroupsScreen(),
           ),
-        );
+        ));
       }
     }
   }
@@ -552,8 +550,7 @@ class _DiscoverPageV2State extends State<DiscoverPageV2> {
       color: Colors.transparent,
       child: InkWell(
         onTap: () {
-          // Navigate to Events screen (can be filtered by location later)
-          Navigator.pushNamed(context, RouteName.eventsScreen);
+          unawaited(Navigator.pushNamed(context, RouteName.eventsScreen));
         },
         borderRadius: BorderRadius.circular(20),
         child: Container(
@@ -654,7 +651,7 @@ class _DiscoverPageV2State extends State<DiscoverPageV2> {
           context: context,
           title: 'Browse all Events',
           onTap: () {
-            Navigator.pushNamed(context, RouteName.eventsScreen);
+            unawaited(Navigator.pushNamed(context, RouteName.eventsScreen));
           },
         ),
         const SizedBox(height: 12),
@@ -662,12 +659,12 @@ class _DiscoverPageV2State extends State<DiscoverPageV2> {
           context: context,
           title: 'Browse all Communities',
           onTap: () {
-            Navigator.push(
+            unawaited(Navigator.push(
               context,
               MaterialPageRoute(
                 builder: (context) => const UnifiedGroupsScreen(),
               ),
-            );
+            ));
           },
         ),
       ],

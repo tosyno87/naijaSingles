@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:developer';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
@@ -52,7 +53,7 @@ class NotificationsState extends State<Notifications> {
         !_scrollController.position.outOfRange) {
       if (_hasMoreMessages && !_isLoadingMore) {
         log('load more called');
-        _loadMoreNotifications();
+        unawaited(_loadMoreNotifications());
       }
     }
   }
@@ -264,10 +265,10 @@ class NotificationsState extends State<Notifications> {
                                   context: context,
                                   builder: (context) {
                                     if (!doc.get('isRead')) {
-                                      PaginationRepo.updateNotification(
+                                      unawaited(PaginationRepo.updateNotification(
                                         currentUser!,
                                         doc,
-                                      );
+                                      ));
                                     }
                                     return Info(
                                       tempuser,

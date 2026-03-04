@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -51,10 +53,10 @@ class _PhoneNumberState extends State<PhoneNumber> {
 
     // For now, just navigate to the existing phone number screen
     // This is a temporary solution until we implement the proper phone login flow
-    Navigator.pushNamed(
+    unawaited(Navigator.pushNamed(
       context,
       RouteName.phoneNumberScreen,
-    );
+    ));
   }
 
   @override
@@ -280,7 +282,7 @@ class _PhoneNumberState extends State<PhoneNumber> {
                       ),
                       GestureDetector(
                         onTap: () {
-                          Navigator.pushReplacementNamed(context, '/welcome');
+                          unawaited(Navigator.pushReplacementNamed(context, '/welcome'));
                         },
                         child: Text(
                           'Sign Up',

@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:io';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
@@ -144,7 +145,7 @@ class _GroupAvatarPickerState extends State<GroupAvatarPicker> {
       );
 
   void _showImagePickerDialog() {
-    showModalBottomSheet(
+    unawaited(showModalBottomSheet(
       context: context,
       builder: (BuildContext context) => SafeArea(
         child: Column(
@@ -259,7 +260,7 @@ class _GroupAvatarPickerState extends State<GroupAvatarPicker> {
           ],
         ),
       ),
-    );
+    ));
   }
 
   Future<void> _pickImage(ImageSource source) async {

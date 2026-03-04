@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -33,7 +35,7 @@ class _UnifiedGroupsScreenState extends State<UnifiedGroupsScreen>
   void initState() {
     super.initState();
     _tabController = TabController(length: 3, vsync: this);
-    _loadGroups();
+    unawaited(_loadGroups());
   }
 
   @override
@@ -208,12 +210,12 @@ class _UnifiedGroupsScreenState extends State<UnifiedGroupsScreen>
   }
 
   void _showGroupInfo(UnifiedGroup group) {
-    showModalBottomSheet(
+    unawaited(showModalBottomSheet(
       context: context,
       isScrollControlled: true,
       backgroundColor: Colors.transparent,
       builder: (context) => _buildGroupInfoSheet(group),
-    );
+    ));
   }
 
   @override
@@ -296,7 +298,7 @@ class _UnifiedGroupsScreenState extends State<UnifiedGroupsScreen>
           controller: _searchController,
           onChanged: (value) {
             if (value.isEmpty) {
-              _loadGroups();
+              unawaited(_loadGroups());
             }
           },
           onSubmitted: (_) => _searchGroups(),
@@ -315,7 +317,7 @@ class _UnifiedGroupsScreenState extends State<UnifiedGroupsScreen>
                 ? IconButton(
                     onPressed: () {
                       _searchController.clear();
-                      _loadGroups();
+                      unawaited(_loadGroups());
                     },
                     icon: const Icon(
                       Icons.clear,
@@ -358,7 +360,7 @@ class _UnifiedGroupsScreenState extends State<UnifiedGroupsScreen>
                 selected: isSelected,
                 onSelected: (selected) {
                   setState(() => _selectedType = type);
-                  _loadGroups();
+                  unawaited(_loadGroups());
                 },
                 backgroundColor: Colors.white,
                 selectedColor: AppColors.primaryGreen,

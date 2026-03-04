@@ -63,12 +63,12 @@ class _MessageBoxState extends State<MessageBox> {
 
   List<Widget> generateReceiverLayout(DocumentSnapshot documentSnapshot) {
     if (!documentSnapshot.get('isRead')) {
-      chatReference.doc(documentSnapshot.id).update({
+      unawaited(chatReference.doc(documentSnapshot.id).update({
         'isRead': true,
-      });
-      db.collection('chats').doc(chatId(widget.second, widget.sender)).update({
+      }));
+      unawaited(db.collection('chats').doc(chatId(widget.second, widget.sender)).update({
         'isRead': true,
-      });
+      }));
       return ChatMessageRead.messagesIsRead(
         documentSnapshot,
         widget.second,
@@ -114,8 +114,8 @@ class _MessageBoxState extends State<MessageBox> {
 
   @override
   void dispose() {
-    _blockSubscription?.cancel();
-    _messageSubscription?.cancel();
+    unawaited(_blockSubscription?.cancel());
+    unawaited(_messageSubscription?.cancel());
     _scrollController.removeListener(_scrollListener);
     _scrollController.dispose();
     super.dispose();
@@ -126,7 +126,7 @@ class _MessageBoxState extends State<MessageBox> {
             _scrollController.position.maxScrollExtent * 0.9 &&
         !_scrollController.position.outOfRange) {
       if (_hasMoreMessages && !_isLoadingMore) {
-        _loadMoreMessages();
+        unawaited(_loadMoreMessages());
       }
     }
   }
@@ -270,7 +270,7 @@ class _MessageBoxState extends State<MessageBox> {
                     child: ActionChip(
                       label: Text(p),
                       onPressed: () {
-                        _sendText(p);
+                        unawaited(_sendText(p));
                       },
                     ),
                   ),

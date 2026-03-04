@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:io';
 
 import 'package:flutter/material.dart';
@@ -482,7 +483,7 @@ class _ReorderablePhotoGridState extends State<ReorderablePhotoGrid> {
   }
 
   void _showSetPrimaryDialog(int index) {
-    showDialog(
+    unawaited(showDialog(
       context: context,
       builder: (context) => AlertDialog(
         title: Text(
@@ -529,7 +530,7 @@ class _ReorderablePhotoGridState extends State<ReorderablePhotoGrid> {
           ),
         ],
       ),
-    );
+    ));
   }
 }
 

@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:io';
 
 import 'package:flutter/material.dart';
@@ -101,6 +102,7 @@ class _EnhancedPhotoUploadScreenState extends State<EnhancedPhotoUploadScreen> {
                       child: AspectRatio(
                         aspectRatio: 1,
                         child: _buildPhotoGridItem(
+                          context: context,
                           photo: photo,
                           index: index,
                           isMainPhoto: index == 0,
@@ -120,11 +122,12 @@ class _EnhancedPhotoUploadScreenState extends State<EnhancedPhotoUploadScreen> {
 
   // Tinder-style photo grid item - Minimal, clean, edge-to-edge
   Widget _buildPhotoGridItem({
+    required BuildContext context,
     required File? photo,
     required int index,
     required bool isMainPhoto,
   }) => GestureDetector(
-      onTap: () => _showAddPhotoOptions(index),
+      onTap: () => _showAddPhotoOptions(context, index),
       child: AspectRatio(
         aspectRatio: 1, // Square - Industry standard (Tinder, Bumble, Hinge)
         child: Container(
@@ -218,7 +221,7 @@ class _EnhancedPhotoUploadScreenState extends State<EnhancedPhotoUploadScreen> {
       ),
     );
 
-  Future<void> _showAddPhotoOptions(int index) async {
+  Future<void> _showAddPhotoOptions(BuildContext context, int index) async {
     final bloc = context.read<OnboardingBloc>();
     final photos =
         bloc.state.data?.profilePhotos ?? List<File?>.filled(9, null);
@@ -226,7 +229,7 @@ class _EnhancedPhotoUploadScreenState extends State<EnhancedPhotoUploadScreen> {
 
     // If clicking on existing photo, show options
     if (index < photos.length && photos[index] != null) {
-      _showPhotoOptionsBottomSheet(index);
+      _showPhotoOptionsBottomSheet(context, index);
       return;
     }
 
@@ -278,7 +281,10 @@ class _EnhancedPhotoUploadScreenState extends State<EnhancedPhotoUploadScreen> {
                   fontWeight: FontWeight.w500,
                 ),
               ),
-              onTap: () => Navigator.pop(context, ImageSource.gallery),
+              onTap: () {
+                if (!context.mounted) return;
+                Navigator.pop(context, ImageSource.gallery);
+              },
             ),
             const SizedBox(height: 8),
           ],
@@ -286,14 +292,14 @@ class _EnhancedPhotoUploadScreenState extends State<EnhancedPhotoUploadScreen> {
       ),
     );
 
-    if (source != null) {
+    if (source != null && context.mounted) {
       bloc.add(OnboardingProfilePhotoPicked(source, index, context));
     }
   }
 
-  void _showPhotoOptionsBottomSheet(int index) {
-    showModalBottomSheet(
-      context: context,
+  void _showPhotoOptionsBottomSheet(BuildContext parentContext, int index) {
+    unawaited(showModalBottomSheet(
+      context: parentContext,
       backgroundColor: Colors.white,
       shape: const RoundedRectangleBorder(
         borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
@@ -335,10 +341,9 @@ class _EnhancedPhotoUploadScreenState extends State<EnhancedPhotoUploadScreen> {
               ),
               onTap: () async {
                 Navigator.pop(context);
-                final bloc = context.read<OnboardingBloc>();
-                final currentContext = context;
+                final bloc = parentContext.read<OnboardingBloc>();
                 final source = await showModalBottomSheet<ImageSource>(
-                  context: context,
+                  context: parentContext,
                   backgroundColor: Colors.white,
                   shape: const RoundedRectangleBorder(
                     borderRadius:
@@ -386,12 +391,12 @@ class _EnhancedPhotoUploadScreenState extends State<EnhancedPhotoUploadScreen> {
                     ),
                   ),
                 );
-                if (source != null && currentContext.mounted) {
+                if (source != null && parentContext.mounted) {
                   bloc.add(
                     OnboardingProfilePhotoPicked(
                       source,
                       index,
-                      currentContext,
+                      parentContext,
                     ),
                   );
                 }
@@ -415,7 +420,7 @@ class _EnhancedPhotoUploadScreenState extends State<EnhancedPhotoUploadScreen> {
           ],
         ),
       ),
-    );
+    ));
   }
 
   void _removePhoto(int index) {

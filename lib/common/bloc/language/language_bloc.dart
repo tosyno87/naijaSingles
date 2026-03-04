@@ -12,11 +12,11 @@ class LanguageBloc extends Bloc<LanguageEvent, LanguageState> {
     on<LanguageLocaleChanged>(_onLanguageLocaleChanged);
   }
 
-  void _onLanguageLocaleChanged(
+  Future<void> _onLanguageLocaleChanged(
     LanguageLocaleChanged event,
     Emitter<LanguageState> emit,
-  ) {
-    EasyLocalization.of(event.context)?.setLocale(event.locale);
+  ) async {
+    await EasyLocalization.of(event.context)?.setLocale(event.locale);
     emit(LanguageChanged(event.locale));
   }
 

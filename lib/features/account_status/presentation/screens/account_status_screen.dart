@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -233,7 +235,7 @@ class _AccountStatusScreenState extends State<AccountStatusScreen> {
     required String description,
     required VoidCallback onConfirm,
   }) {
-    showDialog(
+    unawaited(showDialog(
       context: context,
       builder: (ctx) => AlertDialog(
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
@@ -278,7 +280,7 @@ class _AccountStatusScreenState extends State<AccountStatusScreen> {
           ),
         ],
       ),
-    );
+    ));
   }
 }
 

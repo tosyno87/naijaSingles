@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:developer';
 
 import 'package:flutter/material.dart';
@@ -145,11 +146,11 @@ class _ShowGenderState extends State<ShowGender> {
                       : () {
                           userData.addAll({'showGender': selectedPreference});
                           log(userData.toString());
-                          Navigator.pushNamed(
+                          unawaited(Navigator.pushNamed(
                             context,
                             RouteName.universityScreen,
                             arguments: userData,
-                          );
+                          ));
                         },
                   style: ElevatedButton.styleFrom(
                     backgroundColor: AppColors.primaryGreen,

@@ -120,9 +120,9 @@ class TabbarState extends State<Tabbar> with WidgetsBindingObserver {
   @override
   void dispose() {
     WidgetsBinding.instance.removeObserver(this);
-    _subscription.cancel();
-    _onMessageSubscription?.cancel();
-    _onMessageOpenedAppSubscription?.cancel();
+    unawaited(_subscription.cancel());
+    unawaited(_onMessageSubscription?.cancel() ?? Future<void>.value());
+    unawaited(_onMessageOpenedAppSubscription?.cancel() ?? Future<void>.value());
     super.dispose();
   }
 
@@ -191,7 +191,7 @@ class TabbarState extends State<Tabbar> with WidgetsBindingObserver {
       }
     });
 
-    FirebaseMessaging.instance
+    unawaited(FirebaseMessaging.instance
         .getInitialMessage()
         .then((RemoteMessage? message) async {
       if (message != null) {
@@ -208,7 +208,7 @@ class TabbarState extends State<Tabbar> with WidgetsBindingObserver {
           debugPrint('App launched from notification: ${message.data}');
         }
       }
-    });
+    }));
   }
 
   @override

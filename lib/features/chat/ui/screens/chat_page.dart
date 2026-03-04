@@ -56,7 +56,7 @@ class ChatPageState extends State<ChatPage> {
   @override
   void dispose() {
     debouncer?.cancel();
-    _blockSubscription?.cancel();
+    unawaited(_blockSubscription?.cancel());
     super.dispose();
   }
 
@@ -159,7 +159,7 @@ class ChatPageState extends State<ChatPage> {
                 child: InkWell(
                   onTap: () {
                     Navigator.pop(ct);
-                    showDialog(
+                    unawaited(showDialog(
                       context: context,
                       builder: (BuildContext ctx) => ClipRRect(
                         borderRadius: BorderRadius.circular(10),
@@ -252,7 +252,7 @@ class ChatPageState extends State<ChatPage> {
                           ],
                         ),
                       ),
-                    );
+                    ));
                   },
                   child: Row(
                     children: [

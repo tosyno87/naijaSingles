@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -150,7 +152,7 @@ class _TribeConnectScreenState extends State<TribeConnectScreen> {
   }
 
   void _showFilters() {
-    showModalBottomSheet(
+    unawaited(showModalBottomSheet(
       context: context,
       backgroundColor: AppColors.backgroundColor,
       shape: const RoundedRectangleBorder(
@@ -166,7 +168,7 @@ class _TribeConnectScreenState extends State<TribeConnectScreen> {
           widget.onFiltersApplied?.call();
         },
       ),
-    );
+    ));
   }
 
   Future<void> _handleConnect(UserModel user) async {
@@ -236,7 +238,7 @@ class _TribeConnectScreenState extends State<TribeConnectScreen> {
   }
 
   void _showMatchConfirmation(UserModel user) {
-    showDialog(
+    unawaited(showDialog(
       context: context,
       builder: (context) => MatchConfirmationModal(
         currentUserImageUrl: widget.currentUser.imageUrl?.isNotEmpty ?? false
@@ -247,7 +249,7 @@ class _TribeConnectScreenState extends State<TribeConnectScreen> {
         matchedUserName: user.name ?? 'Unknown',
         matchedUserId: user.id ?? '',
       ),
-    );
+    ));
   }
 
   void _showConnectConfirmation(UserModel user) {

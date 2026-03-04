@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:swipable_stack/swipable_stack.dart';
@@ -38,7 +40,7 @@ class _HomepageState extends State<Homepage>
   void initState() {
     super.initState();
     stackController = SwipableStackController();
-    _initializeController();
+    unawaited(_initializeController());
   }
 
   Future<void> _initializeController() async {

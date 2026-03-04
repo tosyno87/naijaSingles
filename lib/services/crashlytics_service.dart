@@ -36,7 +36,9 @@ class CrashlyticsService {
       if (Environment.enableCrashlytics) {
         // Pass all uncaught errors to Crashlytics
         FlutterError.onError = (errorDetails) {
-          FirebaseCrashlytics.instance.recordFlutterFatalError(errorDetails);
+          unawaited(
+            FirebaseCrashlytics.instance.recordFlutterFatalError(errorDetails),
+          );
         };
 
         // Pass all uncaught asynchronous errors to Crashlytics

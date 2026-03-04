@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 
@@ -20,7 +22,7 @@ class _PrivacySettingsScreenState extends State<PrivacySettingsScreen> {
   @override
   void initState() {
     super.initState();
-    _loadPrivacySettings();
+    unawaited(_loadPrivacySettings());
   }
 
   Future<void> _loadPrivacySettings() async {

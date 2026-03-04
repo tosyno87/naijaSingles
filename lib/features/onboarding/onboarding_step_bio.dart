@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -85,7 +87,7 @@ class _OnboardingStepBioState extends State<OnboardingStepBio> {
   void _showAgePickerModal(BuildContext context) {
     const Color deepGreen = Color(0xFF008037);
 
-    showModalBottomSheet(
+    unawaited(showModalBottomSheet(
       context: context,
       useRootNavigator: true,
       isScrollControlled: true,
@@ -205,7 +207,7 @@ class _OnboardingStepBioState extends State<OnboardingStepBio> {
           ),
         ),
       ),
-    );
+    ));
   }
 
   // Validate all fields
@@ -740,16 +742,14 @@ class _OnboardingStepBioState extends State<OnboardingStepBio> {
                           bloc.add(OnboardingBioUpdated(_bioController.text.trim()));
 
                           // Proceed to next step
-                          HapticFeedback.mediumImpact();
+                          unawaited(HapticFeedback.mediumImpact());
                           widget.onNext();
                         } else {
-                          // Show validation errors
                           setState(() {
                             _autoValidate = true;
                           });
 
-                          // Provide feedback
-                          HapticFeedback.vibrate();
+                          unawaited(HapticFeedback.vibrate());
                         }
                       },
                       style: ElevatedButton.styleFrom(

@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:developer' as developer;
 import 'dart:io';
 
@@ -330,7 +331,7 @@ class ProfileImageCropperService {
     String message,
     Permission permission,
   ) {
-    showDialog(
+    unawaited(showDialog(
       context: context,
       builder: (context) => AlertDialog(
         title: const Text('Permission Required'),
@@ -343,13 +344,13 @@ class ProfileImageCropperService {
           TextButton(
             onPressed: () {
               Navigator.pop(context);
-              openAppSettings();
+              unawaited(openAppSettings());
             },
             child: const Text('Open Settings'),
           ),
         ],
       ),
-    );
+    ));
   }
 
   /// Show image source selection dialog with cropping

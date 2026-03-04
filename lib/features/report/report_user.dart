@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -248,10 +250,11 @@ class ReportUserState extends State<ReportUser> {
                             barrierDismissible: false,
                             context: context,
                             builder: (_) {
-                              Future.delayed(const Duration(seconds: 2), () {
+                              unawaited(Future.delayed(const Duration(seconds: 2), () {
+                                if (!context.mounted) return;
                                 Navigator.pop(context);
                                 Navigator.pop(context);
-                              });
+                              }));
                               return Center(
                                 child: Container(
                                   width: 150,

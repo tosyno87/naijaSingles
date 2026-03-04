@@ -340,18 +340,18 @@ class _CreateEventScreenState extends State<CreateEventScreen> {
       _currentStep++;
     });
 
-    _pageController.nextPage(
+    unawaited(_pageController.nextPage(
       duration: const Duration(milliseconds: 300),
       curve: Curves.easeInOut,
-    );
+    ));
   }
 
   void _previousStep() {
     setState(() => _currentStep--);
-    _pageController.previousPage(
+    unawaited(_pageController.previousPage(
       duration: const Duration(milliseconds: 300),
       curve: Curves.easeInOut,
-    );
+    ));
   }
 
   bool _validateCurrentStep({bool showErrors = true}) {
@@ -539,10 +539,10 @@ class _CreateEventScreenState extends State<CreateEventScreen> {
   }
 
   void _showSuccessDialog(String message, [String? eventId]) {
-    showDialog(
+    unawaited(showDialog(
       context: context,
       barrierDismissible: false,
-      barrierColor: Colors.black54, // Fix dark screen issue
+      barrierColor: Colors.black54,
       builder: (context) => AlertDialog(
         backgroundColor: Colors.white, // Ensure white background
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
@@ -608,8 +608,7 @@ class _CreateEventScreenState extends State<CreateEventScreen> {
                       AppLogger.debug(
                           '[DEBUG] Dialog closed, navigating to My Events',);
 
-                      // Navigate to My Events page
-                      _navigateToMyEvents();
+                      unawaited(_navigateToMyEvents());
                     },
                     style: ElevatedButton.styleFrom(
                       backgroundColor: AppColors.primaryGreen,
@@ -651,7 +650,7 @@ class _CreateEventScreenState extends State<CreateEventScreen> {
             ),
         ],
       ),
-    );
+    ));
   }
 
   Future<void> _navigateToMyEvents() async {
@@ -715,7 +714,7 @@ class _CreateEventScreenState extends State<CreateEventScreen> {
 
   void _handleBackPress() {
     if (_hasUnsavedChanges) {
-      showDialog(
+      unawaited(showDialog(
         context: context,
         builder: (context) => AlertDialog(
           backgroundColor: Colors.white,
@@ -802,7 +801,7 @@ class _CreateEventScreenState extends State<CreateEventScreen> {
             ),
           ],
         ),
-      );
+      ));
     } else {
       Navigator.of(context).pop();
     }

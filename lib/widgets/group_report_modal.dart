@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import '../common/constants/app_colors.dart';
@@ -28,7 +30,7 @@ class _GroupReportModalState extends State<GroupReportModal> {
   @override
   void initState() {
     super.initState();
-    _checkIfUserReported();
+    unawaited(_checkIfUserReported());
   }
 
   @override

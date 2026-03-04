@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 
@@ -352,7 +354,7 @@ class _SafetyCenterScreenState extends State<SafetyCenterScreen> {
             title: 'View Blocked Users',
             subtitle: 'Manage your blocked users list',
             onTap: () {
-              Navigator.pushNamed(context, '/blocked_users');
+              unawaited(Navigator.pushNamed(context, '/blocked_users'));
             },
           ),
         ],
@@ -425,7 +427,7 @@ class _SafetyCenterScreenState extends State<SafetyCenterScreen> {
       );
 
   void _showReportDialog() {
-    showDialog(
+    unawaited(showDialog(
       context: context,
       builder: (context) => AlertDialog(
         backgroundColor: cardColor,
@@ -490,11 +492,11 @@ class _SafetyCenterScreenState extends State<SafetyCenterScreen> {
         ],
         actionsPadding: const EdgeInsets.fromLTRB(24, 0, 24, 24),
       ),
-    );
+    ));
   }
 
   void _showBlockDialog() {
-    showDialog(
+    unawaited(showDialog(
       context: context,
       builder: (context) => AlertDialog(
         backgroundColor: cardColor,
@@ -559,6 +561,6 @@ class _SafetyCenterScreenState extends State<SafetyCenterScreen> {
         ],
         actionsPadding: const EdgeInsets.fromLTRB(24, 0, 24, 24),
       ),
-    );
+    ));
   }
 }

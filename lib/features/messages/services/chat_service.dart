@@ -35,8 +35,13 @@ class ChatService {
 
       // No thread found
       return null;
-    } catch (e) {
-      debugPrint('Error checking for chat thread: $e');
+    } on FirebaseException catch (e) {
+      debugPrint(
+        'Firebase error checking for chat thread: ${e.code} - ${e.message}',
+      );
+      return null;
+    } on Object catch (e) {
+      debugPrint('Unexpected error checking for chat thread: $e');
       return null;
     }
   }
@@ -84,8 +89,13 @@ class ChatService {
             currentUserName = data['name'] as String? ?? 'User';
           }
         }
-      } catch (e) {
-        debugPrint('Error getting current user name: $e');
+      } on FirebaseException catch (e) {
+        debugPrint(
+          'Firebase error getting current user name: ${e.code} - ${e.message}',
+        );
+        // Continue with default name
+      } on Object catch (e) {
+        debugPrint('Unexpected error getting current user name: $e');
         // Continue with default name
       }
 
@@ -119,7 +129,7 @@ class ChatService {
       }
 
       throw Exception('Failed to create chat: ${e.message}');
-    } catch (e) {
+    } on Object catch (e) {
       debugPrint('Error creating chat thread: $e');
       // Re-throw our custom exceptions
       if (e.toString().contains('You can only chat with users') ||
@@ -164,8 +174,13 @@ class ChatService {
             );
           }
         }
-      } catch (e) {
-        debugPrint('Error getting thread document: $e');
+      } on FirebaseException catch (e) {
+        debugPrint(
+          'Firebase error getting thread document: ${e.code} - ${e.message}',
+        );
+        // Continue with empty otherUserId
+      } on Object catch (e) {
+        debugPrint('Unexpected error getting thread document: $e');
         // Continue with empty otherUserId
       }
 
@@ -214,7 +229,7 @@ class ChatService {
       }
 
       throw Exception('Failed to send message: ${e.message}');
-    } catch (e) {
+    } on Object catch (e) {
       debugPrint('Error sending message: $e');
       return false;
     }
@@ -230,8 +245,13 @@ class ChatService {
         await _chatThreadsCollection
             .doc(threadId)
             .update({'unreadCount.$currentUserId': 0});
-      } catch (e) {
-        debugPrint('Error updating unread count: $e');
+      } on FirebaseException catch (e) {
+        debugPrint(
+          'Firebase error updating unread count: ${e.code} - ${e.message}',
+        );
+        // Continue to try marking messages as read
+      } on Object catch (e) {
+        debugPrint('Unexpected error updating unread count: $e');
         // Continue to try marking messages as read
       }
 
@@ -254,11 +274,19 @@ class ChatService {
 
           await batch.commit();
         }
-      } catch (e) {
-        debugPrint('Error marking messages as read: $e');
+      } on FirebaseException catch (e) {
+        debugPrint(
+          'Firebase error marking messages as read: ${e.code} - ${e.message}',
+        );
+      } on Object catch (e) {
+        debugPrint('Unexpected error marking messages as read: $e');
       }
-    } catch (e) {
-      debugPrint('Error in markThreadAsRead: $e');
+    } on FirebaseException catch (e) {
+      debugPrint(
+        'Firebase error in markThreadAsRead: ${e.code} - ${e.message}',
+      );
+    } on Object catch (e) {
+      debugPrint('Unexpected error in markThreadAsRead: $e');
     }
   }
 
@@ -330,8 +358,21 @@ class ChatService {
                       DateTime.now(),
                   unread: unread,
                 );
-              } catch (e) {
-                debugPrint('Error processing individual thread: $e');
+              } on FirebaseException catch (e) {
+                debugPrint(
+                  'Firebase error processing individual thread: ${e.code} - ${e.message}',
+                );
+                // Return a placeholder thread to avoid breaking the entire list
+                return MessageThreadInfo(
+                  threadId: doc.id,
+                  otherUserId: '',
+                  otherUserName: 'Unknown User',
+                  lastMessage: 'Error loading message',
+                  timestamp: DateTime.now(),
+                  unread: false,
+                );
+              } on Object catch (e) {
+                debugPrint('Unexpected error processing individual thread: $e');
                 // Return a placeholder thread to avoid breaking the entire list
                 return MessageThreadInfo(
                   threadId: doc.id,
@@ -345,8 +386,13 @@ class ChatService {
             })
             .where((thread) => thread.otherUserId.isNotEmpty)
             .toList();
-      } catch (e) {
-        debugPrint('Error mapping chat threads: $e');
+      } on FirebaseException catch (e) {
+        debugPrint(
+          'Firebase error mapping chat threads: ${e.code} - ${e.message}',
+        );
+        return <MessageThreadInfo>[];
+      } on Object catch (e) {
+        debugPrint('Unexpected error mapping chat threads: $e');
         return <MessageThreadInfo>[];
       }
     });
@@ -389,8 +435,13 @@ class ChatService {
       }
 
       return false;
-    } catch (e) {
-      debugPrint('Error checking if users are matched: $e');
+    } on FirebaseException catch (e) {
+      debugPrint(
+        'Firebase error checking if users are matched: ${e.code} - ${e.message}',
+      );
+      return false;
+    } on Object catch (e) {
+      debugPrint('Unexpected error checking if users are matched: $e');
       return false;
     }
   }
@@ -419,8 +470,13 @@ class ChatService {
           .get();
 
       return blockedUserBlockDoc.exists;
-    } catch (e) {
-      debugPrint('Error checking if user is blocked: $e');
+    } on FirebaseException catch (e) {
+      debugPrint(
+        'Firebase error checking if user is blocked: ${e.code} - ${e.message}',
+      );
+      return false;
+    } on Object catch (e) {
+      debugPrint('Unexpected error checking if user is blocked: $e');
       return false;
     }
   }
@@ -475,8 +531,13 @@ class ChatService {
         '✅ Chat deleted and users unmatched: $currentUserId <-> $otherUserId',
       );
       return true;
-    } catch (e) {
-      debugPrint('❌ Error deleting chat thread: $e');
+    } on FirebaseException catch (e) {
+      debugPrint(
+        '❌ Firebase error deleting chat thread: ${e.code} - ${e.message}',
+      );
+      return false;
+    } on Object catch (e) {
+      debugPrint('❌ Unexpected error deleting chat thread: $e');
       return false;
     }
   }
@@ -513,8 +574,13 @@ class ChatService {
       }
 
       debugPrint('✅ All messages deleted from thread $threadId');
-    } catch (e) {
-      debugPrint('❌ Error deleting messages: $e');
+    } on FirebaseException catch (e) {
+      debugPrint(
+        '❌ Firebase error deleting messages: ${e.code} - ${e.message}',
+      );
+      // Don't throw - continue with thread deletion even if message deletion fails
+    } on Object catch (e) {
+      debugPrint('❌ Unexpected error deleting messages: $e');
       // Don't throw - continue with thread deletion even if message deletion fails
     }
   }
@@ -531,8 +597,13 @@ class ChatService {
       await _removeLikesForUnmatch(userId1, userId2);
 
       debugPrint('✅ Users successfully unmatched');
-    } catch (e) {
-      debugPrint('❌ Error unmatching users: $e');
+    } on FirebaseException catch (e) {
+      debugPrint(
+        '❌ Firebase error unmatching users: ${e.code} - ${e.message}',
+      );
+      // Don't throw - unmatching is secondary to chat deletion
+    } on Object catch (e) {
+      debugPrint('❌ Unexpected error unmatching users: $e');
       // Don't throw - unmatching is secondary to chat deletion
     }
   }
@@ -555,8 +626,12 @@ class ChatService {
           debugPrint('🗑️ Deleted match: ${doc.id}');
         }
       }
-    } catch (e) {
-      debugPrint('❌ Error removing from matches collection: $e');
+    } on FirebaseException catch (e) {
+      debugPrint(
+        '❌ Firebase error removing from matches collection: ${e.code} - ${e.message}',
+      );
+    } on Object catch (e) {
+      debugPrint('❌ Unexpected error removing from matches collection: $e');
     }
   }
 
@@ -578,8 +653,12 @@ class ChatService {
           debugPrint('🗑️ Deleted legacy match: ${doc.id}');
         }
       }
-    } catch (e) {
-      debugPrint('❌ Error removing from legacy matches collection: $e');
+    } on FirebaseException catch (e) {
+      debugPrint(
+        '❌ Firebase error removing from legacy matches collection: ${e.code} - ${e.message}',
+      );
+    } on Object catch (e) {
+      debugPrint('❌ Unexpected error removing from legacy matches collection: $e');
     }
   }
 
@@ -598,7 +677,11 @@ class ChatService {
             .doc(userId2)
             .delete();
         debugPrint('🗑️ Removed $userId2 from $userId1 matches subcollection');
-      } catch (e) {
+      } on FirebaseException catch (e) {
+        debugPrint(
+          '⚠️ Firebase error removing from $userId1 matches subcollection: ${e.code} - ${e.message}',
+        );
+      } on Object catch (e) {
         debugPrint(
           '⚠️ Could not remove from $userId1 matches subcollection: $e',
         );
@@ -613,13 +696,21 @@ class ChatService {
             .doc(userId1)
             .delete();
         debugPrint('🗑️ Removed $userId1 from $userId2 matches subcollection');
-      } catch (e) {
+      } on FirebaseException catch (e) {
+        debugPrint(
+          '⚠️ Firebase error removing from $userId2 matches subcollection: ${e.code} - ${e.message}',
+        );
+      } on Object catch (e) {
         debugPrint(
           '⚠️ Could not remove from $userId2 matches subcollection: $e',
         );
       }
-    } catch (e) {
-      debugPrint('❌ Error removing from user subcollections: $e');
+    } on FirebaseException catch (e) {
+      debugPrint(
+        '❌ Firebase error removing from user subcollections: ${e.code} - ${e.message}',
+      );
+    } on Object catch (e) {
+      debugPrint('❌ Unexpected error removing from user subcollections: $e');
     }
   }
 
@@ -635,7 +726,11 @@ class ChatService {
             .doc(userId2)
             .delete();
         debugPrint('🗑️ Removed like: $userId2 -> $userId1');
-      } catch (e) {
+      } on FirebaseException catch (e) {
+        debugPrint(
+          '⚠️ Firebase error removing like $userId2 -> $userId1: ${e.code} - ${e.message}',
+        );
+      } on Object catch (e) {
         debugPrint('⚠️ Could not remove like $userId2 -> $userId1: $e');
       }
 
@@ -648,11 +743,19 @@ class ChatService {
             .doc(userId1)
             .delete();
         debugPrint('🗑️ Removed like: $userId1 -> $userId2');
-      } catch (e) {
+      } on FirebaseException catch (e) {
+        debugPrint(
+          '⚠️ Firebase error removing like $userId1 -> $userId2: ${e.code} - ${e.message}',
+        );
+      } on Object catch (e) {
         debugPrint('⚠️ Could not remove like $userId1 -> $userId2: $e');
       }
-    } catch (e) {
-      debugPrint('❌ Error removing likes: $e');
+    } on FirebaseException catch (e) {
+      debugPrint(
+        '❌ Firebase error removing likes: ${e.code} - ${e.message}',
+      );
+    } on Object catch (e) {
+      debugPrint('❌ Unexpected error removing likes: $e');
     }
   }
 }

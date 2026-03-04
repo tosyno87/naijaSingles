@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:developer';
 
 import 'package:easy_localization/easy_localization.dart';
@@ -85,7 +86,7 @@ class _StreetViewButtonWigdetState extends State<StreetViewButtonWigdet> {
                         ),
                   onTap: () {
                     final streetViewBloc = context.read<StreetViewBloc>();
-                    showDialog(
+                    unawaited(showDialog(
                       context: context,
                       builder: (BuildContext dialogContext) => StatefulBuilder(
                         builder:
@@ -312,11 +313,11 @@ class _StreetViewButtonWigdetState extends State<StreetViewButtonWigdet> {
                                   'Apply'.tr().toString(),
                                   style: const TextStyle(color: AppColors.primaryGreen),
                                 ),
-                              ),
+                                ),
                           ],
                         ),
                       ),
-                    );
+                    ));
                   },
                 ),
               ],

@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -47,7 +49,7 @@ class _EmailSignupScreenState extends State<EmailSignupScreen> {
             listener: (context, state) {
               if (state is EmailAuthSuccess) {
                 // Navigate to onboarding or home based on user status
-                Navigator.pushReplacementNamed(context, '/onboarding');
+                unawaited(Navigator.pushReplacementNamed(context, '/onboarding'));
               } else if (state is EmailAuthError) {
                 CustomSnackbar.showSnackBarSimple(
                   state.error,
@@ -216,10 +218,10 @@ class _EmailSignupScreenState extends State<EmailSignupScreen> {
                               ),
                               GestureDetector(
                                 onTap: () {
-                                  Navigator.pushReplacementNamed(
+                                  unawaited(Navigator.pushReplacementNamed(
                                     context,
                                     '/email_login',
-                                  );
+                                  ));
                                 },
                                 child: Text(
                                   'Log In',

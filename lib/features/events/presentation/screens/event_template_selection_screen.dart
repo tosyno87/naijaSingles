@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 
@@ -209,10 +211,10 @@ class EventTemplateSelectionScreen extends StatelessWidget {
       );
 
   void _navigateToCreateEvent(BuildContext context, EventTemplate? template) {
-    Navigator.pushReplacementNamed(
+    unawaited(Navigator.pushReplacementNamed(
       context,
       RouteName.createEvent,
       arguments: {'template': template},
-    );
+    ));
   }
 }

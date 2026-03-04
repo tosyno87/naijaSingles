@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:io';
 
 import 'package:flutter/material.dart';
@@ -679,7 +680,7 @@ class _ProfilePreviewScreenState extends State<ProfilePreviewScreen> {
       );
 
   void _showImprovementSuggestions() {
-    showModalBottomSheet(
+    unawaited(showModalBottomSheet(
       context: context,
       backgroundColor: Colors.white,
       shape: const RoundedRectangleBorder(
@@ -727,7 +728,7 @@ class _ProfilePreviewScreenState extends State<ProfilePreviewScreen> {
           ],
         ),
       ),
-    );
+    ));
   }
 
   Widget _buildTipItem(

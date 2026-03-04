@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:geocoding/geocoding.dart';
@@ -116,6 +118,8 @@ class _LocationScreenState extends State<LocationScreen> {
           _isLoadingLocation = false;
         });
 
+        if (!mounted) return;
+
         // Save to bloc - CRITICAL FOR DISCOVERY
         context.read<OnboardingBloc>().add(
               OnboardingLocationUpdated(
@@ -140,7 +144,7 @@ class _LocationScreenState extends State<LocationScreen> {
   }
 
   void _showLocationServiceDialog() {
-    showDialog(
+    unawaited(showDialog(
       context: context,
       builder: (context) => AlertDialog(
         shape: RoundedRectangleBorder(
@@ -173,10 +177,11 @@ class _LocationScreenState extends State<LocationScreen> {
           ),
           ElevatedButton(
             onPressed: () async {
+              final scaffoldMessenger = ScaffoldMessenger.of(context);
               Navigator.pop(context);
               final opened = await Geolocator.openLocationSettings();
-              if (!opened && mounted) {
-                ScaffoldMessenger.of(context).showSnackBar(
+              if (!opened) {
+                scaffoldMessenger.showSnackBar(
                   SnackBar(
                     content: Text(
                       'Please enable location services manually in your device settings',
@@ -203,11 +208,11 @@ class _LocationScreenState extends State<LocationScreen> {
           ),
         ],
       ),
-    );
+    ));
   }
 
   void _showPermissionDeniedDialog() {
-    showDialog(
+    unawaited(showDialog(
       context: context,
       builder: (context) => AlertDialog(
         shape: RoundedRectangleBorder(
@@ -240,10 +245,11 @@ class _LocationScreenState extends State<LocationScreen> {
           ),
           ElevatedButton(
             onPressed: () async {
+              final scaffoldMessenger = ScaffoldMessenger.of(context);
               Navigator.pop(context);
               final opened = await Geolocator.openLocationSettings();
-              if (!opened && mounted) {
-                ScaffoldMessenger.of(context).showSnackBar(
+              if (!opened) {
+                scaffoldMessenger.showSnackBar(
                   SnackBar(
                     content: Text(
                       'Please enable location permissions manually in your device settings',
@@ -270,7 +276,7 @@ class _LocationScreenState extends State<LocationScreen> {
           ),
         ],
       ),
-    );
+    ));
   }
 
   @override

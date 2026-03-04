@@ -71,7 +71,7 @@ class NotificationService {
         if (_instance._currentUserId != null) {
           _instance._startNotificationListener();
         } else {
-          _instance._notificationsSubscription?.cancel();
+          unawaited(_instance._notificationsSubscription?.cancel() ?? Future<void>.value());
           _instance._notificationsController.add([]);
           _instance._unreadCountController.add(0);
         }
@@ -341,7 +341,7 @@ class NotificationService {
     try {
       final data = jsonDecode(response.payload!) as Map<String, dynamic>;
       final message = RemoteMessage(data: data);
-      _handleMessageTap(message);
+      unawaited(_handleMessageTap(message));
     } catch (e) {
       debugPrint('Error handling notification tap: $e');
     }
@@ -441,7 +441,7 @@ class NotificationService {
   void _startNotificationListener() {
     if (_currentUserId == null) return;
 
-    _notificationsSubscription?.cancel();
+    unawaited(_notificationsSubscription?.cancel() ?? Future<void>.value());
     _notificationsSubscription = _firestore
         .collection('notifications')
         .where('userId', isEqualTo: _currentUserId)

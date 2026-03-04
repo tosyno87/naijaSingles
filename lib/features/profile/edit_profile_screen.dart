@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:developer';
 import 'dart:io';
 
@@ -101,7 +102,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
 
     // Load existing user data
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      _loadUserData();
+      unawaited(_loadUserData());
     });
 
     // Add listener to bio text field to validate form
@@ -154,6 +155,8 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
       // Get user data from Firestore
       final docSnapshot =
           await _firestore.collection('users').doc(user.uid).get();
+
+      if (!mounted) return;
 
       if (docSnapshot.exists) {
         final userData = docSnapshot.data()!;
@@ -257,6 +260,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
       _validateForm();
     } catch (e) {
       log('Error loading user data: $e');
+      if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text('Error loading profile: $e')),
       );
@@ -281,12 +285,14 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
       );
 
       if (pickedFile != null) {
+        if (!mounted) return;
         setState(() {
           _photos[index] = File(pickedFile.path);
           _validateForm();
         });
       }
     } catch (e) {
+      if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text('Error picking image: $e')),
       );
@@ -516,6 +522,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
       // Update display name in Firebase Auth
       await user.updateDisplayName(_nameController.text.trim());
 
+      if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
           content: Text('Profile updated successfully'),
@@ -527,6 +534,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
       Navigator.pop(context, true);
     } catch (e) {
       log('Error saving profile: $e');
+      if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Text('Error updating profile: $e'),

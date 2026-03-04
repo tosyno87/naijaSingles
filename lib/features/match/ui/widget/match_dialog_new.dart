@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
@@ -137,7 +139,7 @@ class _MatchDialogPageState extends State<MatchDialogPage> {
             InkWell(
               onTap: () {
                 Navigator.pop(context);
-                Navigator.push(
+                unawaited(Navigator.push(
                   context,
                   MaterialPageRoute(
                     builder: (_) => ChatPage(
@@ -149,7 +151,7 @@ class _MatchDialogPageState extends State<MatchDialogPage> {
                       second: widget.matchedUser,
                     ),
                   ),
-                );
+                ));
               },
               child: Container(
                 width: 241,

@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -72,9 +74,9 @@ class _RSVPButtonState extends State<RSVPButton>
   void _handleRSVPTap() {
     if (_isLoading) return;
 
-    _animationController.forward().then((_) {
-      _animationController.reverse();
-    });
+    unawaited(_animationController.forward().then((_) {
+      unawaited(_animationController.reverse());
+    }));
 
     if (_currentStatus == RSVPStatus.going) {
       _showRSVPOptions();
@@ -97,11 +99,11 @@ class _RSVPButtonState extends State<RSVPButton>
   }
 
   void _showRSVPOptions() {
-    showModalBottomSheet(
+    unawaited(showModalBottomSheet(
       context: context,
       backgroundColor: Colors.transparent,
       builder: (context) => _buildRSVPOptionsSheet(),
-    );
+    ));
   }
 
   @override

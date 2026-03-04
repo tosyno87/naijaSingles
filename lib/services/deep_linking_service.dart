@@ -194,7 +194,7 @@ class DeepLinkingService {
 
   /// Dispose resources
   void dispose() {
-    _linkStreamController.close();
+    unawaited(_linkStreamController.close());
   }
 }
 

@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:developer';
 import 'dart:io';
 
@@ -285,11 +286,11 @@ class ImageProperties {
     ImageSource source,
   ) {
     Navigator.pop(context);
-    showDialog(
+    unawaited(showDialog(
       barrierDismissible: source != ImageSource.gallery,
       context: context,
       builder: (context) {
-        getImage(source, context, currentUser, isProfilePicture);
+        unawaited(getImage(source, context, currentUser, isProfilePicture));
         return const Center(
           child: CircularProgressIndicator(
             strokeWidth: 2,
@@ -297,7 +298,7 @@ class ImageProperties {
           ),
         );
       },
-    );
+    ));
   }
 
   /// Validates if user can upload more images

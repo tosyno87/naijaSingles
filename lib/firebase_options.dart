@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart' show FirebaseOptions;
@@ -163,9 +165,9 @@ class FirebaseEmulators {
           persistenceEnabled: false,
         );
 
-        FirebaseAuth.instance.useAuthEmulator('localhost', 9099);
+        unawaited(FirebaseAuth.instance.useAuthEmulator('localhost', 9099));
 
-        FirebaseStorage.instance.useStorageEmulator('localhost', 9199);
+        unawaited(FirebaseStorage.instance.useStorageEmulator('localhost', 9199));
 
         debugPrint('🔥 Connected to Firebase emulators');
       } catch (e) {

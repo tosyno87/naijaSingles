@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -23,12 +25,13 @@ class MAtchState extends State<MatchedPage> {
     image = const AssetImage('asset/connected3.gif');
     super.initState();
 
-    Future.delayed(const Duration(milliseconds: 2000), () {
+    unawaited(Future.delayed(const Duration(milliseconds: 2000), () {
+      if (!mounted) return;
       context
           .read<SearchUserBloc>()
           .add(LoadUserEvent(currentUser: widget.currentUser));
       Navigator.pop(context);
-    });
+    }));
   }
 
   @override

@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:developer';
 
 import 'package:easy_localization/easy_localization.dart';
@@ -45,7 +46,7 @@ class ChangeThemeButtonWidget extends StatelessWidget {
                         color: AppColors.primaryGreen,
                       ),
                 onTap: () {
-                  showDialog(
+                  unawaited(showDialog(
                     context: context,
                     builder: (BuildContext dialogContext) => AlertDialog(
                       title: Text('Select Theme Mode'.tr().toString()),
@@ -119,7 +120,7 @@ class ChangeThemeButtonWidget extends StatelessWidget {
                         ),
                       ],
                     ),
-                  );
+                  ));
                 },
               ),
             ],

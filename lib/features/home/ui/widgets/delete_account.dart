@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:developer';
 
 import 'package:easy_localization/easy_localization.dart';
@@ -95,7 +96,7 @@ class _DeleteAccountWidgetState extends State<DeleteAccountWidget> {
       );
 
   void _showFinalConfirmationDialog() {
-    showDialog(
+    unawaited(showDialog(
       context: context,
       builder: (BuildContext context) => Theme(
         data: Theme.of(context).copyWith(
@@ -167,7 +168,7 @@ class _DeleteAccountWidgetState extends State<DeleteAccountWidget> {
                       ? () {
                           Navigator.of(context).pop();
                           _confirmationController.clear();
-                          _performAccountDeletion();
+                          unawaited(_performAccountDeletion());
                         }
                       : null,
               child: Text(
@@ -184,7 +185,7 @@ class _DeleteAccountWidgetState extends State<DeleteAccountWidget> {
           ],
         ),
       ),
-    );
+    ));
   }
 
   Future<void> _performAccountDeletion() async {
@@ -216,12 +217,11 @@ class _DeleteAccountWidgetState extends State<DeleteAccountWidget> {
       }
     } catch (e) {
       log('Error in account deletion: ${e.toString()}');
-      if (context.mounted) {
-        CustomSnackbar.showSnackBarSimple(
-          'Failed to delete account. Please try again.'.tr().toString(),
-          context,
-        );
-      }
+      if (!mounted) return;
+      CustomSnackbar.showSnackBarSimple(
+        'Failed to delete account. Please try again.'.tr().toString(),
+        context,
+      );
     }
   }
 
@@ -307,7 +307,7 @@ class _DeleteAccountWidgetState extends State<DeleteAccountWidget> {
   }
 
   void _showGoogleReauthDialog() {
-    showDialog(
+    unawaited(showDialog(
       context: context,
       builder: (BuildContext context) => AlertDialog(
         backgroundColor: Colors.white,
@@ -322,23 +322,27 @@ class _DeleteAccountWidgetState extends State<DeleteAccountWidget> {
           ),
           TextButton(
             onPressed: () async {
+              final scaffoldMessenger = ScaffoldMessenger.of(context);
               Navigator.pop(context);
-              // Implement Google re-auth here
-              // This would require Google Sign-In re-authentication
-              CustomSnackbar.showSnackBarSimple(
-                'Google re-authentication not yet implemented',
-                context,
+              scaffoldMessenger.showSnackBar(
+                SnackBar(
+                  content: Text(
+                    'Google re-authentication not yet implemented',
+                    style: const TextStyle(color: Colors.white),
+                  ),
+                  backgroundColor: AppColors.primaryGreen,
+                ),
               );
             },
             child: const Text('Continue'),
           ),
         ],
       ),
-    );
+    ));
   }
 
   void _showFacebookReauthDialog() {
-    showDialog(
+    unawaited(showDialog(
       context: context,
       builder: (BuildContext context) => AlertDialog(
         backgroundColor: Colors.white,
@@ -353,6 +357,7 @@ class _DeleteAccountWidgetState extends State<DeleteAccountWidget> {
           ),
           TextButton(
             onPressed: () async {
+              final scaffoldMessenger = ScaffoldMessenger.of(context);
               Navigator.pop(context);
               try {
                 final User? fbUser =
@@ -363,9 +368,14 @@ class _DeleteAccountWidgetState extends State<DeleteAccountWidget> {
                   await _showSuccessAndNavigate();
                 }
               } catch (e) {
-                CustomSnackbar.showSnackBarSimple(
-                  'Facebook re-authentication failed',
-                  context,
+                scaffoldMessenger.showSnackBar(
+                  SnackBar(
+                    content: Text(
+                      'Facebook re-authentication failed',
+                      style: const TextStyle(color: Colors.white),
+                    ),
+                    backgroundColor: Colors.red,
+                  ),
                 );
               }
             },
@@ -373,11 +383,11 @@ class _DeleteAccountWidgetState extends State<DeleteAccountWidget> {
           ),
         ],
       ),
-    );
+    ));
   }
 
   void _showPhoneReauthDialog() {
-    showDialog(
+    unawaited(showDialog(
       context: context,
       builder: (BuildContext context) => AlertDialog(
         backgroundColor: Colors.white,
@@ -392,22 +402,27 @@ class _DeleteAccountWidgetState extends State<DeleteAccountWidget> {
           ),
           TextButton(
             onPressed: () async {
+              final scaffoldMessenger = ScaffoldMessenger.of(context);
               Navigator.pop(context);
-              // Implement phone re-auth here
-              CustomSnackbar.showSnackBarSimple(
-                'Phone re-authentication not yet implemented',
-                context,
+              scaffoldMessenger.showSnackBar(
+                SnackBar(
+                  content: Text(
+                    'Phone re-authentication not yet implemented',
+                    style: const TextStyle(color: Colors.white),
+                  ),
+                  backgroundColor: AppColors.primaryGreen,
+                ),
               );
             },
             child: const Text('Continue'),
           ),
         ],
       ),
-    );
+    ));
   }
 
   void _showGenericReauthDialog() {
-    showDialog(
+    unawaited(showDialog(
       context: context,
       builder: (BuildContext context) => AlertDialog(
         backgroundColor: Colors.white,
@@ -425,6 +440,6 @@ class _DeleteAccountWidgetState extends State<DeleteAccountWidget> {
           ),
         ],
       ),
-    );
+    ));
   }
 }

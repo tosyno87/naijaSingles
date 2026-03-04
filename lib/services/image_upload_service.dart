@@ -152,8 +152,8 @@ class ImageUploadService {
                 leading: const Icon(Icons.photo_library),
                 title: const Text('Gallery'),
                 onTap: () async {
-                  Navigator.pop(context);
                   final File? image = await pickImage();
+                  if (!context.mounted) return;
                   if (image != null && validateImage(image)) {
                     Navigator.pop(context, image);
                   } else if (image != null) {
@@ -172,9 +172,9 @@ class ImageUploadService {
                 leading: const Icon(Icons.camera_alt),
                 title: const Text('Camera'),
                 onTap: () async {
-                  Navigator.pop(context);
                   final File? image =
                       await pickImage(source: ImageSource.camera);
+                  if (!context.mounted) return;
                   if (image != null && validateImage(image)) {
                     Navigator.pop(context, image);
                   } else if (image != null) {

@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
@@ -47,7 +49,7 @@ class _OnboardingDataVerificationScreenState
   @override
   void initState() {
     super.initState();
-    _loadAndVerifyUserData();
+    unawaited(_loadAndVerifyUserData());
   }
 
   Future<void> _loadAndVerifyUserData() async {
@@ -158,7 +160,7 @@ class _OnboardingDataVerificationScreenState
                       child: ElevatedButton(
                         onPressed: () {
                           setState(() => _isLoading = true);
-                          _loadAndVerifyUserData();
+                          unawaited(_loadAndVerifyUserData());
                         },
                         style: ElevatedButton.styleFrom(
                           backgroundColor: const Color(0xFF008037),

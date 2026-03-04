@@ -72,7 +72,7 @@ class _ModernNotificationsScreenState extends State<ModernNotificationsScreen>
           _notifications = notifications;
           _isLoading = false;
         });
-        _animationController.forward();
+        unawaited(_animationController.forward());
       }
     });
 
@@ -104,8 +104,8 @@ class _ModernNotificationsScreenState extends State<ModernNotificationsScreen>
 
   @override
   void dispose() {
-    _notificationsSubscription?.cancel();
-    _unreadCountSubscription?.cancel();
+    unawaited(_notificationsSubscription?.cancel() ?? Future<void>.value());
+    unawaited(_unreadCountSubscription?.cancel() ?? Future<void>.value());
     _animationController.dispose();
     super.dispose();
   }
@@ -716,15 +716,15 @@ class _ModernNotificationsScreenState extends State<ModernNotificationsScreen>
   }
 
   void _markAsRead(AppNotification notification) {
-    _notificationService.markAsRead(notification.id);
+    unawaited(_notificationService.markAsRead(notification.id));
   }
 
   void _markAllAsRead() {
-    _notificationService.markAllAsRead();
+    unawaited(_notificationService.markAllAsRead());
   }
 
   void _deleteNotification(AppNotification notification) {
-    _notificationService.deleteNotification(notification.id);
+    unawaited(_notificationService.deleteNotification(notification.id));
 
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(

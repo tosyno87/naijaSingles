@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:developer';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
@@ -925,7 +926,7 @@ class _AccountDeletionScreenState extends State<AccountDeletionScreen> {
   /// Shows dialog to re-authenticate phone user (send OTP then verify).
   void _showPhoneReauthDialog(User user) {
     final phone = user.phoneNumber ?? '';
-    showDialog(
+    unawaited(showDialog(
       context: context,
       barrierDismissible: false,
       builder: (ctx) => AlertDialog(
@@ -965,7 +966,7 @@ class _AccountDeletionScreenState extends State<AccountDeletionScreen> {
           ),
         ],
       ),
-    );
+    ));
   }
 
   Future<void> _sendReauthCode(User user) async {
@@ -1017,7 +1018,7 @@ class _AccountDeletionScreenState extends State<AccountDeletionScreen> {
 
   void _showReauthOtpDialog(User user) {
     _reauthOtpController.clear();
-    showDialog(
+    unawaited(showDialog(
       context: context,
       barrierDismissible: false,
       builder: (ctx) => AlertDialog(
@@ -1086,7 +1087,7 @@ class _AccountDeletionScreenState extends State<AccountDeletionScreen> {
           ),
         ],
       ),
-    );
+    ));
   }
 
   /// After re-auth: cleanup Firestore/Storage, log, delete Auth user, sign out, show success.
@@ -1152,7 +1153,7 @@ class _AccountDeletionScreenState extends State<AccountDeletionScreen> {
 
   void _logDeletionAndSignOut(User user, {String? authProvider}) {
     try {
-      _firestore.collection('accountDeletions').add({
+      unawaited(_firestore.collection('accountDeletions').add({
         'userId': user.uid,
         'email': user.email,
         'phoneNumber': user.phoneNumber,
@@ -1162,14 +1163,14 @@ class _AccountDeletionScreenState extends State<AccountDeletionScreen> {
         'requestedAt': FieldValue.serverTimestamp(),
         'status': 'completed',
         'deletedAt': FieldValue.serverTimestamp(),
-      });
+      }));
     } catch (e) {
       log('⚠️ Could not log deletion request: $e');
     }
   }
 
   void _showDeletionSuccessDialog() {
-    showDialog(
+    unawaited(showDialog(
       context: context,
       barrierDismissible: false,
       builder: (context) => AlertDialog(
@@ -1244,10 +1245,10 @@ class _AccountDeletionScreenState extends State<AccountDeletionScreen> {
             child: ElevatedButton(
               onPressed: () {
                 AccountDeletionScope.inProgress = false;
-                Navigator.of(context).pushNamedAndRemoveUntil(
+                unawaited(Navigator.of(context).pushNamedAndRemoveUntil(
                   RouteName.welcomeScreen,
                   (route) => false,
-                );
+                ));
               },
               style: ElevatedButton.styleFrom(
                 backgroundColor: primaryColor,
@@ -1265,7 +1266,7 @@ class _AccountDeletionScreenState extends State<AccountDeletionScreen> {
         ],
         actionsPadding: const EdgeInsets.fromLTRB(24, 0, 24, 24),
       ),
-    );
+    ));
   }
 
   Future<void> _cleanupUserData(User user) async {

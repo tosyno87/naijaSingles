@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:developer';
 
 import 'package:flutter/cupertino.dart';
@@ -35,7 +36,7 @@ class _UserDOBState extends State<UserDOB> {
   }
 
   void _showDatePicker() {
-    showModalBottomSheet(
+    unawaited(showModalBottomSheet(
       context: context,
       backgroundColor: Colors.white,
       shape: const RoundedRectangleBorder(
@@ -108,7 +109,7 @@ class _UserDOBState extends State<UserDOB> {
           ],
         ),
       ),
-    );
+    ));
   }
 
   @override
@@ -243,11 +244,11 @@ class _UserDOBState extends State<UserDOB> {
                           .truncate(),
                     });
                     log(widget.userData.toString());
-                    Navigator.pushNamed(
+                    unawaited(Navigator.pushNamed(
                       context,
                       RouteName.genderScreen,
                       arguments: widget.userData,
-                    );
+                    ));
                   },
                   text: 'CONTINUE',
                 ),

@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:developer';
 
 import 'package:firebase_auth/firebase_auth.dart';
@@ -69,7 +70,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                   title: 'Edit Profile',
                   subtitle: 'Update your photos and info',
                   onTap: () {
-                    Navigator.pushNamed(context, RouteName.editProfileScreen);
+                    unawaited(Navigator.pushNamed(context, RouteName.editProfileScreen));
                   },
                 ),
                 _buildDivider(),
@@ -93,12 +94,12 @@ class _SettingsScreenState extends State<SettingsScreen> {
                   title: 'Privacy Settings',
                   subtitle: 'Control who can see your profile',
                   onTap: () {
-                    Navigator.push(
+                    unawaited(Navigator.push(
                       context,
                       MaterialPageRoute(
                         builder: (_) => const PrivacySettingsScreen(),
                       ),
-                    );
+                    ));
                   },
                 ),
                 _buildDivider(),
@@ -115,12 +116,12 @@ class _SettingsScreenState extends State<SettingsScreen> {
                   title: 'Safety Center',
                   subtitle: 'Report issues and get help',
                   onTap: () {
-                    Navigator.push(
+                    unawaited(Navigator.push(
                       context,
                       MaterialPageRoute(
                         builder: (_) => const SafetyCenterScreen(),
                       ),
-                    );
+                    ));
                   },
                 ),
               ]),
@@ -147,12 +148,12 @@ class _SettingsScreenState extends State<SettingsScreen> {
                   title: 'Location',
                   subtitle: 'Update your location settings',
                   onTap: () {
-                    Navigator.push(
+                    unawaited(Navigator.push(
                       context,
                       MaterialPageRoute(
                         builder: (_) => const LocationSettingsScreen(),
                       ),
-                    );
+                    ));
                   },
                 ),
                 _buildDivider(),
@@ -161,12 +162,12 @@ class _SettingsScreenState extends State<SettingsScreen> {
                   title: 'Language',
                   subtitle: 'English (US)',
                   onTap: () {
-                    Navigator.push(
+                    unawaited(Navigator.push(
                       context,
                       MaterialPageRoute(
                         builder: (_) => const LanguageSettingsScreen(),
                       ),
-                    );
+                    ));
                   },
                 ),
               ]),
@@ -183,12 +184,12 @@ class _SettingsScreenState extends State<SettingsScreen> {
                   title: 'Help Center',
                   subtitle: 'Get help and support',
                   onTap: () {
-                    Navigator.push(
+                    unawaited(Navigator.push(
                       context,
                       MaterialPageRoute(
                         builder: (_) => const HelpCenterScreen(),
                       ),
-                    );
+                    ));
                   },
                 ),
                 _buildDivider(),
@@ -249,7 +250,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                   height: 56,
                   child: ElevatedButton.icon(
                     onPressed: () {
-                      Navigator.push(
+                      unawaited(Navigator.push(
                         context,
                         MaterialPageRoute(
                           builder: (_) => BlocProvider(
@@ -257,7 +258,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                             child: const AccountStatusScreen(),
                           ),
                         ),
-                      );
+                      ));
                     },
                     icon: const Icon(Icons.pause_circle_outline, size: 22),
                     label: Text(
@@ -421,7 +422,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
       );
 
   void _showSignOutDialog() {
-    showDialog(
+    unawaited(showDialog(
       context: context,
       builder: (context) => AlertDialog(
         backgroundColor: Colors.white,
@@ -518,11 +519,11 @@ class _SettingsScreenState extends State<SettingsScreen> {
           ),
         ],
       ),
-    );
+    ));
   }
 
   void _showDeleteAccountDialog() {
-    showDialog(
+    unawaited(showDialog(
       context: context,
       builder: (context) => AlertDialog(
         backgroundColor: Colors.white,
@@ -628,13 +629,13 @@ class _SettingsScreenState extends State<SettingsScreen> {
           ),
         ],
       ),
-    );
+    ));
   }
 
   void _showDeleteConfirmation() {
     Navigator.pop(context); // Close first dialog
 
-    showDialog(
+    unawaited(showDialog(
       context: context,
       builder: (context) => AlertDialog(
         shape: RoundedRectangleBorder(
@@ -685,12 +686,12 @@ class _SettingsScreenState extends State<SettingsScreen> {
             child: ElevatedButton(
               onPressed: () {
                 Navigator.pop(context);
-                Navigator.push(
+                unawaited(Navigator.push(
                   context,
                   MaterialPageRoute(
                     builder: (_) => const AccountDeletionScreen(),
                   ),
-                );
+                ));
               },
               style: ElevatedButton.styleFrom(
                 backgroundColor: Colors.red.shade600,
@@ -716,7 +717,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
           ),
         ],
       ),
-    );
+    ));
   }
 
   Future<void> _performSignOut() async {
@@ -780,7 +781,8 @@ class _SettingsScreenState extends State<SettingsScreen> {
       await Future.delayed(const Duration(milliseconds: 100));
 
       // Close loading dialog
-      if (mounted) Navigator.pop(context);
+      if (!mounted) return;
+      Navigator.pop(context);
 
       // Navigate to welcome screen to show all sign-in options (phone, Google, Apple)
       if (mounted) {
@@ -790,10 +792,9 @@ class _SettingsScreenState extends State<SettingsScreen> {
         );
       }
     } catch (e) {
-      // Close loading dialog
-      if (mounted) Navigator.pop(context);
-
       log('Error signing out: $e');
+      if (!mounted) return;
+      Navigator.pop(context);
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Text(
@@ -815,20 +816,20 @@ class _SettingsScreenState extends State<SettingsScreen> {
   }
 
   void _showChangePasswordDialog() {
-    Navigator.push(
+    unawaited(Navigator.push(
       context,
       MaterialPageRoute(
         builder: (_) => const PasswordSettingsScreen(),
       ),
-    );
+    ));
   }
 
   void _showFeedbackDialog() {
-    Navigator.pushNamed(context, RouteName.feedbackScreen);
+    unawaited(Navigator.pushNamed(context, RouteName.feedbackScreen));
   }
 
   void _showAboutDialog() {
-    showDialog(
+    unawaited(showDialog(
       context: context,
       builder: (context) => AlertDialog(
         shape: RoundedRectangleBorder(
@@ -889,6 +890,6 @@ class _SettingsScreenState extends State<SettingsScreen> {
           ),
         ],
       ),
-    );
+    ));
   }
 }

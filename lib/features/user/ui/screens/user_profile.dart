@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:developer';
 
 import 'package:easy_localization/easy_localization.dart';
@@ -279,7 +280,7 @@ class _ProfilePageState extends State<ProfilePage> {
                                   size: 28,
                                 ),
                                 onPressed: () {
-                                  Navigator.pushNamed(
+                                  unawaited(Navigator.pushNamed(
                                     context,
                                     RouteName.settingPage,
                                     arguments: {
@@ -287,7 +288,7 @@ class _ProfilePageState extends State<ProfilePage> {
                                       'isPurchased': widget.isPurchased,
                                       'items': widget.items,
                                     },
-                                  );
+                                  ));
                                 },
                               ),
                               Padding(
@@ -322,10 +323,10 @@ class _ProfilePageState extends State<ProfilePage> {
                                   size: 28,
                                 ),
                                 onPressed: () {
-                                  Navigator.pushNamed(
+                                  unawaited(Navigator.pushNamed(
                                     context,
                                     RouteName.editProfileScreen,
-                                  );
+                                  ));
                                 },
                               ),
                               Padding(

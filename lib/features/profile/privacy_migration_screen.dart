@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 
@@ -22,7 +24,7 @@ class _PrivacyMigrationScreenState extends State<PrivacyMigrationScreen> {
   @override
   void initState() {
     super.initState();
-    _checkMigrationStatus();
+    unawaited(_checkMigrationStatus());
   }
 
   Future<void> _checkMigrationStatus() async {
@@ -335,12 +337,12 @@ class _PrivacyMigrationScreenState extends State<PrivacyMigrationScreen> {
               height: 56,
               child: ElevatedButton(
                 onPressed: () {
-                  Navigator.pushReplacement(
+                  unawaited(Navigator.pushReplacement(
                     context,
                     MaterialPageRoute(
                       builder: (_) => const PrivacySettingsScreen(),
                     ),
-                  );
+                  ));
                 },
                 style: ElevatedButton.styleFrom(
                   backgroundColor: AppColors.primaryGreen,

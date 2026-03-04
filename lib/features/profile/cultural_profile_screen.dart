@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -28,7 +30,7 @@ class _CulturalProfileScreenState extends State<CulturalProfileScreen> {
   @override
   void initState() {
     super.initState();
-    _loadUserData();
+    unawaited(_loadUserData());
   }
 
   Future<void> _loadUserData() async {
@@ -83,7 +85,7 @@ class _CulturalProfileScreenState extends State<CulturalProfileScreen> {
               child: IconButton(
                 icon: Custom3DIcons.edit(size: 20),
                 onPressed: () {
-                  Navigator.pushNamed(context, RouteName.settingsScreen);
+                  unawaited(Navigator.pushNamed(context, RouteName.settingsScreen));
                 },
               ),
             ),

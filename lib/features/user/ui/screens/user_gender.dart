@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:developer';
 
 import 'package:flutter/cupertino.dart';
@@ -34,7 +35,7 @@ class GenderState extends State<Gender> with SingleTickerProviderStateMixin {
     // Start animation after frame is built
     WidgetsBinding.instance.addPostFrameCallback((_) {
       if (mounted && _animationController != null) {
-        _animationController!.forward();
+        unawaited(_animationController!.forward());
       }
     });
   }
@@ -184,11 +185,11 @@ class GenderState extends State<Gender> with SingleTickerProviderStateMixin {
                                 'showOnProfile': showOnProfile,
                               };
                               userData.addAll(userGender);
-                              Navigator.pushNamed(
+                              unawaited(Navigator.pushNamed(
                                 context,
                                 RouteName.nationalityScreen,
                                 arguments: userData,
-                              );
+                              ));
                             } else {
                               CustomSnackbar.showSnackBarSimple(
                                 'Please select your gender',

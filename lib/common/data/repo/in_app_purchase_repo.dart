@@ -54,13 +54,11 @@ class InAppPurchaseRepoImpl extends InAppPurchaseRepo {
   Future<List<String>> _fetchPackageIds() async {
     final List<String> packageId = [];
 
-    await firebaseFireStoreInstance
+    final value = await firebaseFireStoreInstance
         .collection('Packages')
         .where('status', isEqualTo: true)
-        .get()
-        .then((value) {
-      packageId.addAll(value.docs.map((e) => e['id']));
-    });
+        .get();
+    packageId.addAll(value.docs.map((e) => e['id']));
 
     return packageId;
   }

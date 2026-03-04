@@ -17,6 +17,7 @@ class LocationScreen extends StatefulWidget {
 class _LocationScreenState extends State<LocationScreen> {
   String? _currentLocation;
   bool _isLoadingLocation = false;
+  bool _locationPermissionDenied = false;
 
   // Afropeep MVP theme colors
   static const Color afropeepGreen = Color(0xFF008037); // MVP green

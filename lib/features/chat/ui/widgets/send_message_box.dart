@@ -320,7 +320,7 @@ class _MessageBoxState extends State<MessageBox> {
                     await uploadTask.then((p0) async {
                       final String fileUrl =
                           await storageReference.getDownloadURL();
-                      UserMessagingRepo.sendImage(
+                      await UserMessagingRepo.sendImage(
                         'photo',
                         fileUrl,
                         chatReference,
@@ -379,7 +379,7 @@ class _MessageBoxState extends State<MessageBox> {
 
   Future _sendText(String text) async {
     _textController.clear();
-    UserMessagingRepo.addTexttoDb(
+    await UserMessagingRepo.addTexttoDb(
       chatReference,
       text,
       widget.chatId,

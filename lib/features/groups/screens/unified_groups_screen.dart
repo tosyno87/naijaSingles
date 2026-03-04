@@ -177,11 +177,11 @@ class _UnifiedGroupsScreenState extends State<UnifiedGroupsScreen>
     );
   }
 
-  void _navigateToGroupDetails(UnifiedGroup group) {
+  Future<void> _navigateToGroupDetails(UnifiedGroup group) async {
     final currentUserId = FirebaseAuth.instance.currentUser?.uid ?? '';
     final isMember = group.isMember(currentUserId);
 
-    Navigator.push(
+    final result = await Navigator.push(
       context,
       MaterialPageRoute(
         builder: (context) => GroupDetailsScreen(
@@ -189,21 +189,22 @@ class _UnifiedGroupsScreenState extends State<UnifiedGroupsScreen>
           isMember: isMember,
         ),
       ),
-    ).then((result) {
-      // Refresh groups if user joined or left a group
-      if (result == true) {
-        _loadGroups();
-      }
-    });
+    );
+    if (!mounted) return;
+    if (result == true) {
+      _loadGroups();
+    }
   }
 
-  void _navigateToCreateGroup() {
-    Navigator.push(
+  Future<void> _navigateToCreateGroup() async {
+    await Navigator.push(
       context,
       MaterialPageRoute(
         builder: (context) => const CreateGroupScreen(),
       ),
-    ).then((_) => _loadGroups()); // Refresh after creating
+    );
+    if (!mounted) return;
+    _loadGroups();
   }
 
   void _showGroupInfo(UnifiedGroup group) {

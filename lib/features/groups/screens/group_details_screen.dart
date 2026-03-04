@@ -986,18 +986,16 @@ class _GroupDetailsScreenState extends State<GroupDetailsScreen> {
     );
   }
 
-  void _inviteMembers() {
-    showModalBottomSheet(
+  Future<void> _inviteMembers() async {
+    final refresh = await showModalBottomSheet(
       context: context,
       isScrollControlled: true,
       backgroundColor: Colors.transparent,
       builder: (context) => InviteMembersModal(group: widget.group),
-    ).then((refresh) {
-      // Refresh the screen if members were added
-      if (refresh == true && mounted) {
-        setState(() {});
-      }
-    });
+    );
+    if (refresh == true && mounted) {
+      setState(() {});
+    }
   }
 
   Future<void> _leaveGroup() async {
@@ -1302,20 +1300,16 @@ class _GroupDetailsScreenState extends State<GroupDetailsScreen> {
         widget.group.adminIds.contains(currentUserId);
   }
 
-  void _editGroupPhoto() {
-    // Navigate to group settings where photo editing is available
-    Navigator.pop(context); // Close the image options modal
-    Navigator.push(
+  Future<void> _editGroupPhoto() async {
+    Navigator.pop(context);
+    await Navigator.push(
       context,
       MaterialPageRoute(
         builder: (context) => GroupSettingsScreen(group: widget.group),
       ),
-    ).then((_) {
-      // Refresh the screen after returning from settings
-      if (mounted) {
-        setState(() {});
-      }
-    });
+    );
+    if (!mounted) return;
+    setState(() {});
   }
 
   void _navigateToMemberProfile(String memberId) {

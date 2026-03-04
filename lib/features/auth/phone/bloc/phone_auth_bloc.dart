@@ -206,11 +206,10 @@ class PhoneAuthBloc extends Bloc<PhoneAuthEvent, PhoneAuthState> {
   ) async {
     // After receiving the credential from the event, we will login with the credential and then will emit the [PhoneAuthVerified] state after successful login
     try {
-      await auth.signInWithCredential(event.credential).then((user) {
-        if (user.user != null) {
-          emit(PhoneAuthVerified(user: user.user));
-        }
-      });
+      final user = await auth.signInWithCredential(event.credential);
+      if (user.user != null) {
+        emit(PhoneAuthVerified(user: user.user));
+      }
     } on FirebaseAuthException catch (e) {
       emit(PhoneAuthError(error: e.code));
     } catch (e) {

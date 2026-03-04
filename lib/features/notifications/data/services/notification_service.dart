@@ -246,19 +246,14 @@ class NotificationService {
   }
 
   /// Setup message handlers for real-time notifications
-  static void _setupMessageHandlers() {
-    // Handle foreground messages
+  static Future<void> _setupMessageHandlers() async {
     FirebaseMessaging.onMessage.listen(_handleForegroundMessage);
-
-    // Handle background message taps
     FirebaseMessaging.onMessageOpenedApp.listen(_handleMessageTap);
 
-    // Handle app launch from terminated state
-    _messaging.getInitialMessage().then((message) {
-      if (message != null) {
-        _handleMessageTap(message);
-      }
-    });
+    final message = await _messaging.getInitialMessage();
+    if (message != null) {
+      _handleMessageTap(message);
+    }
   }
 
   /// Handle foreground messages (show local notification)

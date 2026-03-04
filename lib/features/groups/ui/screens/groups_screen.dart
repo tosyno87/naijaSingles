@@ -130,13 +130,15 @@ class _GroupsScreenState extends State<GroupsScreen>
     );
   }
 
-  void _navigateToCreateGroup() {
-    Navigator.push(
+  Future<void> _navigateToCreateGroup() async {
+    await Navigator.push(
       context,
       MaterialPageRoute(
         builder: (context) => const CreateGroupScreen(),
       ),
-    ).then((_) => _loadGroups()); // Refresh after creating
+    );
+    if (!mounted) return;
+    _loadGroups();
   }
 
   @override

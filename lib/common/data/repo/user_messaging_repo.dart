@@ -160,14 +160,14 @@ class UserMessagingRepo {
     return user!;
   }
 
-  static void addTexttoDb(
+  static Future<void> addTexttoDb(
     CollectionReference chatReference,
     String text,
     String chatId,
     String senderId,
     secondId,
-  ) {
-    chatReference.add({
+  ) async {
+    await chatReference.add({
       'type': 'Msg',
       'text': text,
       'sender_id': senderId,
@@ -177,44 +177,43 @@ class UserMessagingRepo {
       'time': FieldValue.serverTimestamp(),
       'users': [senderId, secondId],
       'unmatched': false,
-    }).then((documentReference) {
-      db.collection('chats').doc(chatId).set(
-        {
-          'text': text,
-          'isRead': false,
-          'sender_id': senderId,
-          'receiver_id': secondId,
-          'type': 'Msg',
-          'time': FieldValue.serverTimestamp(),
-          'users': [secondId, senderId],
-          'unmatched': false,
-        },
-        SetOptions(merge: true),
-      );
     });
-    // Check if the "blocked" document exists in chatReference collection
-    chatReference.doc('blocked').get().then((blockedDocSnapshot) {
+    await db.collection('chats').doc(chatId).set(
+      {
+        'text': text,
+        'isRead': false,
+        'sender_id': senderId,
+        'receiver_id': secondId,
+        'type': 'Msg',
+        'time': FieldValue.serverTimestamp(),
+        'users': [secondId, senderId],
+        'unmatched': false,
+      },
+      SetOptions(merge: true),
+    );
+    try {
+      final blockedDocSnapshot =
+          await chatReference.doc('blocked').get();
       if (!blockedDocSnapshot.exists) {
-        // Add the "blocked" document to chatReference collection
-        chatReference.doc('blocked').set({
+        await chatReference.doc('blocked').set({
           'isBlocked': false,
           'blockedBy': '',
         });
       }
-    }).catchError((error) {
+    } catch (error) {
       debugPrint('Error checking if blocked document exists: $error');
-    });
+    }
   }
 
-  static void sendImage(
+  static Future<void> sendImage(
     String? messageText,
     String? imageUrl,
     CollectionReference chatReference,
     String chatId,
     String? senderId,
     secondId,
-  ) {
-    chatReference.add({
+  ) async {
+    await chatReference.add({
       'type': 'Image',
       'text': messageText,
       'sender_id': senderId,
@@ -224,32 +223,31 @@ class UserMessagingRepo {
       'time': FieldValue.serverTimestamp(),
       'users': [secondId, senderId],
       'unmatched': false,
-    }).then((value) {
-      db.collection('chats').doc(chatId).set(
-        {
-          'text': messageText,
-          'isRead': false,
-          'sender_id': senderId,
-          'receiver_id': secondId,
-          'type': 'Image',
-          'time': FieldValue.serverTimestamp(),
-          'users': [secondId, senderId],
-          'unmatched': false,
-        },
-        SetOptions(merge: true),
-      );
     });
-    // Check if the "blocked" document exists in chatReference collection
-    chatReference.doc('blocked').get().then((blockedDocSnapshot) {
+    await db.collection('chats').doc(chatId).set(
+      {
+        'text': messageText,
+        'isRead': false,
+        'sender_id': senderId,
+        'receiver_id': secondId,
+        'type': 'Image',
+        'time': FieldValue.serverTimestamp(),
+        'users': [secondId, senderId],
+        'unmatched': false,
+      },
+      SetOptions(merge: true),
+    );
+    try {
+      final blockedDocSnapshot =
+          await chatReference.doc('blocked').get();
       if (!blockedDocSnapshot.exists) {
-        // Add the "blocked" document to chatReference collection
-        chatReference.doc('blocked').set({
+        await chatReference.doc('blocked').set({
           'isBlocked': false,
           'blockedBy': '',
         });
       }
-    }).catchError((error) {
+    } catch (error) {
       debugPrint('Error checking if blocked document exists: $error');
-    });
+    }
   }
 }

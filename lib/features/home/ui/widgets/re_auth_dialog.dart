@@ -168,22 +168,19 @@ Future<void> deleteUserAndNavigateToLogin(
     // Delete user data from Firestore collections
     await PhoneAuthRepository().deleteUser(user!);
     await PhoneAuthRepository().signOut();
-    if (context.mounted) {
-      // Show success message
-      CustomSnackbar.showSnackBarSimple(
-        'Account deleted Successfully'.tr().toString(),
-        context,
-      );
-      final userBloc = context.read<UserBloc>();
-      Navigator.pushNamedAndRemoveUntil(
-        context,
-        RouteName.welcomeScreen,
-        (route) => false,
-      ).then((value) {
-        userBloc.add(const UserDataUpdated(null));
-        userBloc.add(const UserListenStopped());
-      });
-    }
+    if (!context.mounted) return;
+    CustomSnackbar.showSnackBarSimple(
+      'Account deleted Successfully'.tr().toString(),
+      context,
+    );
+    final userBloc = context.read<UserBloc>();
+    await Navigator.pushNamedAndRemoveUntil(
+      context,
+      RouteName.welcomeScreen,
+      (route) => false,
+    );
+    userBloc.add(const UserDataUpdated(null));
+    userBloc.add(const UserListenStopped());
   } catch (e) {
     log('Error deleting user account: $e');
     if (context.mounted) {

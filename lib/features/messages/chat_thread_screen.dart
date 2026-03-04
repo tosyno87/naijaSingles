@@ -78,7 +78,7 @@ class _ChatThreadScreenState extends State<ChatThreadScreen> {
     }
   }
 
-  void _sendMessage() {
+  Future<void> _sendMessage() async {
     final text = _messageController.text.trim();
     if (text.isEmpty) return;
 
@@ -90,15 +90,16 @@ class _ChatThreadScreenState extends State<ChatThreadScreen> {
       return;
     }
 
-    _chatService.sendMessage(widget.threadId, text).then((success) {
+    try {
+      final success =
+          await _chatService.sendMessage(widget.threadId, text);
       if (success) {
         _messageController.clear();
-        // Scroll to bottom after sending message
         Future.delayed(const Duration(milliseconds: 100), _scrollToBottom);
       }
-    }).catchError((error) {
+    } catch (error) {
       _showErrorSnackBar(error.toString().replaceAll('Exception: ', ''));
-    });
+    }
   }
 
   @override

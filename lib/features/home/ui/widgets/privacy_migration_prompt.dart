@@ -124,17 +124,17 @@ class PrivacyMigrationPrompt extends StatelessWidget {
                 Expanded(
                   flex: 2,
                   child: ElevatedButton(
-                    onPressed: () {
-                      Navigator.push(
+                    onPressed: () async {
+                      await Navigator.push(
                         context,
                         MaterialPageRoute(
                           builder: (_) => const PrivacyMigrationScreen(),
                         ),
-                      ).then((_) {
-                        if (onMigrate != null) {
-                          onMigrate!();
-                        }
-                      });
+                      );
+                      if (!context.mounted) return;
+                      if (onMigrate != null) {
+                        onMigrate!();
+                      }
                     },
                     style: ElevatedButton.styleFrom(
                       backgroundColor: AppColors.primaryGreen,

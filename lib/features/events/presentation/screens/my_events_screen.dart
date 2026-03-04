@@ -740,30 +740,28 @@ class _MyEventsScreenState extends State<MyEventsScreen>
         ),
       );
 
-  void _createNewEvent() {
-    Navigator.pushNamed(context, RouteName.createEvent).then((_) {
-      // Refresh events list when returning from create screen
-      if (_currentUserId != null) {
-        context.read<EventCreationBloc>().add(
-              LoadUserEventsEvent(_currentUserId!),
-            );
-      }
-    });
+  Future<void> _createNewEvent() async {
+    await Navigator.pushNamed(context, RouteName.createEvent);
+    if (!mounted) return;
+    if (_currentUserId != null) {
+      context.read<EventCreationBloc>().add(
+            LoadUserEventsEvent(_currentUserId!),
+          );
+    }
   }
 
-  void _editEvent(EnhancedEventModel event) {
-    Navigator.pushNamed(
+  Future<void> _editEvent(EnhancedEventModel event) async {
+    await Navigator.pushNamed(
       context,
       RouteName.createEvent,
       arguments: {'existingEvent': event},
-    ).then((_) {
-      // Refresh events list when returning from edit screen
-      if (_currentUserId != null) {
-        context.read<EventCreationBloc>().add(
-              LoadUserEventsEvent(_currentUserId!),
-            );
-      }
-    });
+    );
+    if (!mounted) return;
+    if (_currentUserId != null) {
+      context.read<EventCreationBloc>().add(
+            LoadUserEventsEvent(_currentUserId!),
+          );
+    }
   }
 
   void _deleteEvent(BuildContext screenContext, EnhancedEventModel event) {

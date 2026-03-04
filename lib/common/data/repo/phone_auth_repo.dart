@@ -78,8 +78,8 @@ class PhoneAuthRepository {
           .doc(user.uid)
           .collection('CheckedUser')
           .doc(element.id)
-          .delete()
-          .then((value) => log('success'));
+          .delete();
+      log('success');
     }
     final likedBySnapshot = await firebaseFireStoreInstance
         .collection('users')
@@ -92,8 +92,8 @@ class PhoneAuthRepository {
           .doc(user.uid)
           .collection('LikedBy')
           .doc(element.id)
-          .delete()
-          .then((value) => log('success'));
+          .delete();
+      log('success');
     }
 
     final matchesSnapshot = await firebaseFireStoreInstance
@@ -107,8 +107,8 @@ class PhoneAuthRepository {
           .doc(user.uid)
           .collection('Matches')
           .doc(element.id)
-          .delete()
-          .then((value) => log('success'));
+          .delete();
+      log('success');
     }
 
     await firebaseFireStoreInstance.collection('users').doc(user.uid).delete();

@@ -38,17 +38,19 @@ class _HomepageState extends State<Homepage>
   void initState() {
     super.initState();
     stackController = SwipableStackController();
-    controller.initialize(context).then((_) {
-      setState(() {});
-      context
-          .read<SearchUserBloc>()
-          .add(LoadUserEvent(currentUser: controller.currentUser));
+    _initializeController();
+  }
 
-      // Check if user needs privacy migration
-      context
-          .read<SearchUserBloc>()
-          .add(CheckMigrationStatusEvent(userId: controller.currentUser.id!));
-    });
+  Future<void> _initializeController() async {
+    await controller.initialize(context);
+    if (!mounted) return;
+    setState(() {});
+    context
+        .read<SearchUserBloc>()
+        .add(LoadUserEvent(currentUser: controller.currentUser));
+    context
+        .read<SearchUserBloc>()
+        .add(CheckMigrationStatusEvent(userId: controller.currentUser.id!));
   }
 
   @override

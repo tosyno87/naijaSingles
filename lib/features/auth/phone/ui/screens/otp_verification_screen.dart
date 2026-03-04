@@ -262,7 +262,7 @@ class _OtpVerificationScreenState extends State<OtpVerificationScreen> {
                   MultiBlocListener(
                     listeners: [
                       BlocListener<PhoneAuthBloc, PhoneAuthState>(
-                        listener: (context, state) {
+                        listener: (context, state) async {
                           if (state is PhoneAuthError) {
                             CustomSnackbar.showSnackBarSimple(
                               state.error,
@@ -278,13 +278,12 @@ class _OtpVerificationScreenState extends State<OtpVerificationScreen> {
                                 context,
                               );
                             } else {
-                              // Check if user is registered
-                              state.user?.getIdToken().then((value) {
-                                if (value != null) {
-                                  BlocProvider.of<RegistrationBloc>(context)
-                                      .add(CheckRegistration(token: value));
-                                }
-                              });
+                              final value =
+                                  await state.user?.getIdToken();
+                              if (value != null) {
+                                BlocProvider.of<RegistrationBloc>(context)
+                                    .add(CheckRegistration(token: value));
+                              }
                             }
                           }
                         },

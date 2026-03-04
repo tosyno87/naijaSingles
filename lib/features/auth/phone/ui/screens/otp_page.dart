@@ -73,15 +73,15 @@ class _OtpPageState extends State<OtpPage> {
     super.initState();
   }
 
-  void _initializeOtpInteractor() {
+  Future<void> _initializeOtpInteractor() async {
     try {
       _otpInteractor = OTPInteractor();
-      _otpInteractor!
-          .getAppSignature()
-          .then((value) => log('signature - $value'))
-          .catchError((error) {
+      try {
+        final signature = await _otpInteractor!.getAppSignature();
+        log('signature - $signature');
+      } catch (error) {
         log('⚠️ Error getting app signature: $error');
-      });
+      }
 
       controller = OTPTextEditController(
         codeLength: 6,
@@ -476,7 +476,7 @@ class _OtpPageState extends State<OtpPage> {
                           ),
                         );
                       },
-                      listener: (context, state) {
+                      listener: (context, state) async {
                         // Prevent navigation if already navigated
                         if (_hasNavigated || !mounted) return;
 
@@ -484,7 +484,9 @@ class _OtpPageState extends State<OtpPage> {
                           try {
                             if (state.user != null) {
                               log('✅ Phone verified, checking registration status...');
-                              state.user!.getIdToken().then((value) async {
+                              try {
+                                final value =
+                                    await state.user!.getIdToken();
                                 if (value != null &&
                                     mounted &&
                                     !_hasNavigated) {
@@ -500,7 +502,7 @@ class _OtpPageState extends State<OtpPage> {
                                     );
                                   }
                                 }
-                              }).catchError((error) {
+                              } catch (error) {
                                 log('Error getting token after phone verification: $error');
                                 if (mounted && !_hasNavigated) {
                                   CustomSnackbar.showSnackBarSimple(
@@ -508,7 +510,7 @@ class _OtpPageState extends State<OtpPage> {
                                     context,
                                   );
                                 }
-                              });
+                              }
                             } else {
                               log('Error: User is null after phone verification');
                               if (mounted && !_hasNavigated) {

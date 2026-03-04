@@ -291,21 +291,19 @@ class _DeleteAccountWidgetState extends State<DeleteAccountWidget> {
   }
 
   Future<void> _showSuccessAndNavigate() async {
-    if (context.mounted) {
-      CustomSnackbar.showSnackBarSimple(
-        'Account deleted successfully'.tr().toString(),
-        context,
-      );
-      final userBloc = context.read<UserBloc>();
-      Navigator.pushNamedAndRemoveUntil(
-        context,
-        RouteName.welcomeScreen,
-        (route) => false,
-      ).then((value) {
-        userBloc.add(const UserDataUpdated(null));
-        userBloc.add(const UserListenStopped());
-      });
-    }
+    if (!context.mounted) return;
+    CustomSnackbar.showSnackBarSimple(
+      'Account deleted successfully'.tr().toString(),
+      context,
+    );
+    final userBloc = context.read<UserBloc>();
+    await Navigator.pushNamedAndRemoveUntil(
+      context,
+      RouteName.welcomeScreen,
+      (route) => false,
+    );
+    userBloc.add(const UserDataUpdated(null));
+    userBloc.add(const UserListenStopped());
   }
 
   void _showGoogleReauthDialog() {

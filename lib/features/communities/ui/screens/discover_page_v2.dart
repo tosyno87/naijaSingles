@@ -566,7 +566,10 @@ class _DiscoverPageV2State extends State<DiscoverPageV2> {
             onAction: _onSeeAllEvents,
           )
         else
-          _buildEventsSection(events: upcomingEvents),
+          _buildEventsSection(
+            events: upcomingEvents,
+            useImageEmpty: false,
+          ),
       ],
     );
   }
@@ -614,7 +617,10 @@ class _DiscoverPageV2State extends State<DiscoverPageV2> {
   // Events section
   // ---------------------------------------------------------------------------
 
-  Widget _buildEventsSection({List<EventModel>? events}) {
+  Widget _buildEventsSection({
+    List<EventModel>? events,
+    bool useImageEmpty = true,
+  }) {
     final sectionEvents = events ?? _events;
 
     if (_eventsLoading) {
@@ -633,15 +639,22 @@ class _DiscoverPageV2State extends State<DiscoverPageV2> {
       return _buildInlineError(_eventsError!, _loadEvents);
     }
     if (sectionEvents.isEmpty) {
-      return Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 24),
-        child: _buildImageEmpty(
-          assetPath:
-              'assets/images/placeholders/discover_event_placeholder.png',
-          message: 'No upcoming events nearby',
-          actionLabel: 'Browse all events',
-          onAction: _onSeeAllEvents,
-        ),
+      if (useImageEmpty) {
+        return Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 24),
+          child: _buildImageEmpty(
+            assetPath: 'assets/images/placeholders/discover_event_placeholder.png',
+            message: 'No upcoming events nearby',
+            actionLabel: 'Browse all events',
+            onAction: _onSeeAllEvents,
+          ),
+        );
+      }
+      return _buildActionableEmpty(
+        icon: Icons.event_busy_outlined,
+        message: 'No upcoming events nearby',
+        actionLabel: 'Browse all events',
+        onAction: _onSeeAllEvents,
       );
     }
 

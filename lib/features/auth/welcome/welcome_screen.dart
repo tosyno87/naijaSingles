@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'dart:developer';
+import 'dart:ui';
 
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
@@ -8,7 +9,6 @@ import 'package:google_fonts/google_fonts.dart';
 
 import '../../../common/constants/app_colors.dart';
 import '../../../common/routes/route_name.dart';
-import '../../../common/widgets/afropeep_logo.dart';
 import '../auth_method/sign_in_method_selection_screen.dart';
 import '../phone/ui/screens/phone_number.dart';
 
@@ -24,13 +24,15 @@ class _WelcomeScreenState extends State<WelcomeScreen>
   bool _isAuthenticated = false;
   bool _isLoading = true;
 
-  late AnimationController _logoController;
-  late AnimationController _contentController;
-  late AnimationController _buttonController;
+  // Ken Burns — perpetual slow zoom + pan
+  late AnimationController _kenBurnsController;
+  late Animation<double> _kenBurnsScale;
+  late Animation<double> _kenBurnsTranslateY;
 
-  late Animation<double> _logoFade;
-  late Animation<double> _logoScale;
-  late Animation<double> _contentFade;
+  // Entrance — fast and snappy
+  late AnimationController _textController;
+  late Animation<double> _textFade;
+  late AnimationController _buttonController;
   late Animation<Offset> _buttonSlide;
   late Animation<double> _buttonFade;
 
@@ -42,33 +44,36 @@ class _WelcomeScreenState extends State<WelcomeScreen>
   }
 
   void _initializeAnimations() {
-    _logoController = AnimationController(
-      duration: const Duration(milliseconds: 1200),
+    // Ken Burns: 12s, reverse loop
+    _kenBurnsController = AnimationController(
+      duration: const Duration(seconds: 12),
+      vsync: this,
+    )..repeat(reverse: true);
+
+    _kenBurnsScale = Tween<double>(begin: 1.0, end: 1.06).animate(
+      CurvedAnimation(parent: _kenBurnsController, curve: Curves.easeInOut),
+    );
+    _kenBurnsTranslateY = Tween<double>(begin: 0, end: -14).animate(
+      CurvedAnimation(parent: _kenBurnsController, curve: Curves.easeInOut),
+    );
+
+    // Text entrance: 250ms
+    _textController = AnimationController(
+      duration: const Duration(milliseconds: 250),
       vsync: this,
     );
-    _logoFade = CurvedAnimation(
-      parent: _logoController,
+    _textFade = CurvedAnimation(
+      parent: _textController,
       curve: Curves.easeOut,
     );
-    _logoScale = Tween<double>(begin: 0.8, end: 1.0).animate(
-      CurvedAnimation(parent: _logoController, curve: Curves.easeOutBack),
-    );
 
-    _contentController = AnimationController(
-      duration: const Duration(milliseconds: 1000),
-      vsync: this,
-    );
-    _contentFade = CurvedAnimation(
-      parent: _contentController,
-      curve: Curves.easeInOut,
-    );
-
+    // Button entrance: 350ms, delayed 120ms after text
     _buttonController = AnimationController(
-      duration: const Duration(milliseconds: 800),
+      duration: const Duration(milliseconds: 350),
       vsync: this,
     );
     _buttonSlide = Tween<Offset>(
-      begin: const Offset(0, 0.4),
+      begin: const Offset(0, 0.25),
       end: Offset.zero,
     ).animate(
       CurvedAnimation(parent: _buttonController, curve: Curves.easeOutCubic),
@@ -78,19 +83,16 @@ class _WelcomeScreenState extends State<WelcomeScreen>
       curve: Curves.easeIn,
     );
 
-    if (mounted) unawaited(_logoController.forward());
-    Future.delayed(const Duration(milliseconds: 500), () {
-      if (mounted) unawaited(_contentController.forward());
-    });
-    Future.delayed(const Duration(milliseconds: 900), () {
+    if (mounted) unawaited(_textController.forward());
+    Future.delayed(const Duration(milliseconds: 120), () {
       if (mounted) unawaited(_buttonController.forward());
     });
   }
 
   @override
   void dispose() {
-    _logoController.dispose();
-    _contentController.dispose();
+    _kenBurnsController.dispose();
+    _textController.dispose();
     _buttonController.dispose();
     super.dispose();
   }
@@ -128,6 +130,7 @@ class _WelcomeScreenState extends State<WelcomeScreen>
       ),
     );
 
+    final screenHeight = MediaQuery.of(context).size.height;
     final screenWidth = MediaQuery.of(context).size.width;
     final bottomPadding = MediaQuery.of(context).padding.bottom;
 
@@ -135,38 +138,96 @@ class _WelcomeScreenState extends State<WelcomeScreen>
       body: Stack(
         fit: StackFit.expand,
         children: [
-          // Full-screen hero photo
-          Image.asset(
-            'assets/images/backgrounds/welcome_couple.png',
-            fit: BoxFit.cover,
-            errorBuilder: (context, error, stackTrace) => Container(
-              decoration: const BoxDecoration(
-                gradient: LinearGradient(
-                  begin: Alignment.topCenter,
-                  end: Alignment.bottomCenter,
-                  colors: [Color(0xFF1A3D2B), Color(0xFF006B2E)],
+          // 1. Full-screen hero with Ken Burns + cinematic color grade
+          AnimatedBuilder(
+            animation: _kenBurnsController,
+            builder: (context, child) => Transform(
+              alignment: Alignment.center,
+              transform: Matrix4.identity()
+                ..scale(_kenBurnsScale.value, _kenBurnsScale.value)
+                ..translate(0.0, _kenBurnsTranslateY.value),
+              child: child,
+            ),
+            child: ColorFiltered(
+              colorFilter: const ColorFilter.matrix(<double>[
+                1.10, 0, 0, 0, -13, // R: +10% contrast
+                0, 1.08, 0, 0, -10, // G: slightly warm
+                0, 0, 1.04, 0, -5, // B: warmest channel
+                0, 0, 0, 1, 0,
+              ]),
+              child: Image.asset(
+                'assets/images/backgrounds/welcome_couple.png',
+                fit: BoxFit.cover,
+                width: double.infinity,
+                height: double.infinity,
+                errorBuilder: (context, error, stackTrace) => Container(
+                  decoration: const BoxDecoration(
+                    gradient: LinearGradient(
+                      begin: Alignment.topCenter,
+                      end: Alignment.bottomCenter,
+                      colors: [Color(0xFF1A3D2B), Color(0xFF006B2E)],
+                    ),
+                  ),
                 ),
               ),
             ),
           ),
 
-          // Dark gradient overlay — heavy at bottom for text readability
-          const DecoratedBox(
-            decoration: BoxDecoration(
-              gradient: LinearGradient(
-                begin: Alignment.topCenter,
-                end: Alignment.bottomCenter,
-                colors: [
-                  Color(0x33000000), // 20% black — logo area
-                  Color(0x00000000), // clear — let photo breathe
-                  Color(0xA8000000), // 66% black — text + buttons
-                ],
-                stops: [0.0, 0.35, 1.0],
+          // 2. Subtle blur behind bottom content (glass effect)
+          Positioned(
+            left: 0,
+            right: 0,
+            bottom: 0,
+            height: screenHeight * 0.42,
+            child: ClipRect(
+              child: BackdropFilter(
+                filter: ImageFilter.blur(sigmaX: 3, sigmaY: 3),
+                child: const ColoredBox(color: Colors.transparent),
               ),
             ),
           ),
 
-          // Content
+          // 3. Top gradient — brand area (45% black -> transparent)
+          Positioned(
+            top: 0,
+            left: 0,
+            right: 0,
+            height: screenHeight * 0.28,
+            child: const DecoratedBox(
+              decoration: BoxDecoration(
+                gradient: LinearGradient(
+                  begin: Alignment.topCenter,
+                  end: Alignment.bottomCenter,
+                  colors: [
+                    Color(0x73000000), // 45% black
+                    Color(0x00000000), // transparent
+                  ],
+                ),
+              ),
+            ),
+          ),
+
+          // 4. Bottom gradient — CTA area (transparent -> 65% black)
+          Positioned(
+            left: 0,
+            right: 0,
+            bottom: 0,
+            height: screenHeight * 0.55,
+            child: const DecoratedBox(
+              decoration: BoxDecoration(
+                gradient: LinearGradient(
+                  begin: Alignment.topCenter,
+                  end: Alignment.bottomCenter,
+                  colors: [
+                    Color(0x00000000), // transparent
+                    Color(0xA6000000), // 65% black
+                  ],
+                ),
+              ),
+            ),
+          ),
+
+          // 5. Content
           SafeArea(
             child: Padding(
               padding: EdgeInsets.fromLTRB(
@@ -177,22 +238,27 @@ class _WelcomeScreenState extends State<WelcomeScreen>
               ),
               child: Column(
                 children: [
-                  const SizedBox(height: 24),
+                  const SizedBox(height: 20),
 
-                  // Logo
+                  // Wordmark
                   FadeTransition(
-                    opacity: _logoFade,
-                    child: ScaleTransition(
-                      scale: _logoScale,
-                      child: const AfropeepLogo(size: 80),
+                    opacity: _textFade,
+                    child: Text(
+                      'Afropeep',
+                      style: GoogleFonts.montserrat(
+                        fontSize: 32,
+                        fontWeight: FontWeight.w600,
+                        color: Colors.white,
+                        letterSpacing: 0.5,
+                      ),
                     ),
                   ),
 
                   const Spacer(),
 
-                  // Headline + subtitle
+                  // Headline + value prop
                   FadeTransition(
-                    opacity: _contentFade,
+                    opacity: _textFade,
                     child: Column(
                       mainAxisSize: MainAxisSize.min,
                       children: [
@@ -213,7 +279,7 @@ class _WelcomeScreenState extends State<WelcomeScreen>
                           style: GoogleFonts.montserrat(
                             fontSize: 14,
                             fontWeight: FontWeight.w400,
-                            color: Color(0xB3FFFFFF), // white 70%
+                            color: Color(0xB3FFFFFF),
                             height: 1.4,
                           ),
                         ),
@@ -284,7 +350,7 @@ class _WelcomeScreenState extends State<WelcomeScreen>
             ),
           ),
         ),
-        const SizedBox(height: 14),
+        const SizedBox(height: 16),
         Center(
           child: SizedBox(
             width: buttonWidth,

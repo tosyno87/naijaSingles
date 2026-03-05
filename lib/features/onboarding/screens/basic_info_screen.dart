@@ -4,6 +4,7 @@ import 'package:google_fonts/google_fonts.dart';
 
 import '../../../common/widgets/custom_snackbar.dart';
 import '../bloc/onboarding_bloc.dart';
+import '../onboarding_theme.dart';
 
 class BasicInfoScreen extends StatefulWidget {
   const BasicInfoScreen({super.key});
@@ -18,7 +19,6 @@ class _BasicInfoScreenState extends State<BasicInfoScreen> {
   DateTime? _selectedDate;
   String _selectedGender = '';
 
-  // Gender options for dropdown
   final List<String> _genderOptions = [
     'Male',
     'Female',
@@ -27,17 +27,10 @@ class _BasicInfoScreenState extends State<BasicInfoScreen> {
     'Other',
   ];
 
-  // Afropeep MVP theme colors
-  static const Color afropeepGreen = Color(0xFF008037); // MVP green
-  static const Color cardBackground = Color(0xFFF7E8DA);
-  static const Color textDarkBrown = Color(0xFF3A1D0F);
-  static const Color textLightBrown = Color(0xFF8B6C59);
-
   @override
   void initState() {
     super.initState();
 
-    // Initialize with existing data if available
     WidgetsBinding.instance.addPostFrameCallback((_) {
       final data = context.read<OnboardingBloc>().state.data;
 
@@ -49,7 +42,9 @@ class _BasicInfoScreenState extends State<BasicInfoScreen> {
           _formatDateIntoController();
         }
 
-        if (data.gender.isNotEmpty) _selectedGender = data.gender;
+        if (data.gender.isNotEmpty) {
+          setState(() => _selectedGender = data.gender);
+        }
       }
     });
   }
@@ -78,13 +73,13 @@ class _BasicInfoScreenState extends State<BasicInfoScreen> {
       builder: (context, child) => Theme(
         data: Theme.of(context).copyWith(
           colorScheme: const ColorScheme.light(
-            primary: afropeepGreen,
-            surface: cardBackground,
-            onSurface: textDarkBrown,
+            primary: OnboardingTheme.primaryGreen,
+            surface: OnboardingTheme.fieldFill,
+            onSurface: OnboardingTheme.sectionLabelColor,
           ),
           textButtonTheme: TextButtonThemeData(
             style: TextButton.styleFrom(
-              foregroundColor: afropeepGreen,
+              foregroundColor: OnboardingTheme.primaryGreen,
             ),
           ),
         ),
@@ -99,7 +94,6 @@ class _BasicInfoScreenState extends State<BasicInfoScreen> {
         _formatDateIntoController();
       });
 
-      // Calculate age
       final today = DateTime.now();
       int age = today.year - picked.year;
       if (today.month < picked.month ||
@@ -109,7 +103,6 @@ class _BasicInfoScreenState extends State<BasicInfoScreen> {
 
       if (!context.mounted) return;
 
-      // Check if user is at least 18
       if (age < 18) {
         CustomSnackbar.showSnackBarSimple(
           'You must be at least 18 years old to use this app',
@@ -127,189 +120,120 @@ class _BasicInfoScreenState extends State<BasicInfoScreen> {
     setState(() {
       _selectedGender = gender;
     });
-
     context.read<OnboardingBloc>().add(OnboardingGenderUpdated(gender));
   }
 
   @override
-  Widget build(BuildContext context) => SingleChildScrollView(
-        padding: const EdgeInsets.all(24),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            // Name section
-            Text(
-              "What's your name?",
-              style: GoogleFonts.montserrat(
-                fontSize: 16,
-                fontWeight: FontWeight.w600,
-                color: textDarkBrown,
+  Widget build(BuildContext context) => OnboardingTheme.constrainedContent(
+        child: SingleChildScrollView(
+          padding: OnboardingTheme.pagePadding,
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text("What's your name?", style: OnboardingTheme.sectionLabelStyle),
+              const SizedBox(height: OnboardingTheme.labelToField),
+              TextField(
+                controller: _nameController,
+                style: OnboardingTheme.fieldTextStyle,
+                decoration: OnboardingTheme.fieldDecoration(
+                  hint: 'Enter your full name',
+                ),
+                onChanged: (value) {
+                  context.read<OnboardingBloc>().add(
+                        OnboardingFullNameUpdated(value),
+                      );
+                },
               ),
-            ),
 
-            const SizedBox(height: 12),
+              const SizedBox(height: OnboardingTheme.fieldToSection),
 
-            TextField(
-              controller: _nameController,
-              style: GoogleFonts.montserrat(
-                fontSize: 16,
-                color: textDarkBrown,
+              Text('When were you born?', style: OnboardingTheme.sectionLabelStyle),
+              const SizedBox(height: OnboardingTheme.labelToField),
+              TextField(
+                controller: _dobController,
+                readOnly: true,
+                style: OnboardingTheme.fieldTextStyle,
+                decoration: OnboardingTheme.fieldDecoration(
+                  hint: 'Select your date of birth',
+                  suffix: const Icon(
+                    Icons.calendar_today,
+                    color: OnboardingTheme.primaryGreen,
+                    size: OnboardingTheme.fieldIconSize,
+                  ),
+                ),
+                onTap: () => _selectDate(context),
               ),
-              decoration: InputDecoration(
-                filled: true,
-                fillColor: cardBackground,
-                hintText: 'Enter your full name',
-                hintStyle: GoogleFonts.montserrat(
-                  color: textLightBrown,
-                ),
-                border: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(12),
-                  borderSide: BorderSide.none,
-                ),
-                focusedBorder: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(12),
-                  borderSide: const BorderSide(color: afropeepGreen, width: 2),
-                ),
-                contentPadding: const EdgeInsets.symmetric(
-                  horizontal: 16,
-                  vertical: 16,
-                ),
-              ),
-              onChanged: (value) {
-                context.read<OnboardingBloc>().add(
-                      OnboardingFullNameUpdated(value),
-                    );
-              },
-            ),
 
-            const SizedBox(height: 32),
-
-            // Date of birth section
-            Text(
-              'When were you born?',
-              style: GoogleFonts.montserrat(
-                fontSize: 16,
-                fontWeight: FontWeight.w600,
-                color: textDarkBrown,
-              ),
-            ),
-
-            const SizedBox(height: 12),
-
-            // Date of birth field - Fixed to be read-only with proper icon
-            TextField(
-              controller: _dobController,
-              readOnly: true, // Make it read-only
-              style: GoogleFonts.montserrat(
-                fontSize: 16,
-                color: textDarkBrown,
-              ),
-              decoration: InputDecoration(
-                filled: true,
-                fillColor: cardBackground,
-                hintText: 'Select your date of birth',
-                hintStyle: GoogleFonts.montserrat(
-                  color: textLightBrown,
-                ),
-                border: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(12),
-                  borderSide: BorderSide.none,
-                ),
-                focusedBorder: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(12),
-                  borderSide: const BorderSide(color: afropeepGreen, width: 2),
-                ),
-                contentPadding: const EdgeInsets.symmetric(
-                  horizontal: 16,
-                  vertical: 16,
-                ),
-                suffixIcon: const Icon(
-                  Icons.calendar_today,
-                  color: afropeepGreen, // Ensure icon is visible
-                  size: 24,
-                ),
-              ),
-              onTap: () => _selectDate(context), // Open date picker on tap
-            ),
-
-            if (_selectedDate != null) ...[
-              const SizedBox(height: 8),
-              Align(
-                alignment: Alignment.centerRight,
-                child: BlocBuilder<OnboardingBloc, OnboardingState>(
-                  builder: (context, state) => Text(
-                    'Age: ${state.data?.age ?? 0}',
-                    style: GoogleFonts.montserrat(
-                      fontSize: 14,
-                      fontWeight: FontWeight.w500,
-                      color: afropeepGreen,
+              if (_selectedDate != null) ...[
+                const SizedBox(height: 8),
+                Align(
+                  alignment: Alignment.centerRight,
+                  child: BlocBuilder<OnboardingBloc, OnboardingState>(
+                    builder: (context, state) => Text(
+                      'Age: ${state.data?.age ?? 0}',
+                      style: OnboardingTheme.helperStyle.copyWith(
+                        color: OnboardingTheme.primaryGreen,
+                        fontWeight: FontWeight.w600,
+                      ),
                     ),
                   ),
                 ),
-              ),
-            ],
+              ],
 
-            const SizedBox(height: 32),
+              const SizedBox(height: OnboardingTheme.fieldToSection),
 
-            // Gender section
-            Text(
-              "What's your gender?",
-              style: GoogleFonts.montserrat(
-                fontSize: 16,
-                fontWeight: FontWeight.w600,
-                color: textDarkBrown,
-              ),
-            ),
-
-            const SizedBox(height: 12),
-
-            // Gender dropdown with MVP styling
-            Container(
-              padding: const EdgeInsets.symmetric(horizontal: 16),
-              decoration: BoxDecoration(
-                color: cardBackground,
-                borderRadius: BorderRadius.circular(12),
-                border: Border.all(color: Colors.grey.shade300),
-              ),
-              child: DropdownButton<String>(
-                value: _selectedGender.isEmpty ? null : _selectedGender,
-                hint: Text(
-                  'Select your gender',
-                  style: GoogleFonts.montserrat(
-                    color: textLightBrown,
-                    fontSize: 16,
+              Text("What's your gender?", style: OnboardingTheme.sectionLabelStyle),
+              const SizedBox(height: OnboardingTheme.labelToField),
+              Container(
+                constraints: const BoxConstraints(
+                  minHeight: OnboardingTheme.fieldHeight,
+                ),
+                padding: const EdgeInsets.symmetric(
+                  horizontal: OnboardingTheme.fieldContentPadding,
+                ),
+                decoration: OnboardingTheme.dropdownDecoration(
+                  hasFocus: _selectedGender.isNotEmpty,
+                ),
+                child: DropdownButton<String>(
+                  value: _selectedGender.isEmpty ? null : _selectedGender,
+                  hint: Text(
+                    'Select your gender',
+                    style: GoogleFonts.montserrat(
+                      color: OnboardingTheme.subtitleColor,
+                      fontSize: 16,
+                    ),
                   ),
-                ),
-                isExpanded: true,
-                underline: const SizedBox(),
-                icon: const Icon(
-                  Icons.arrow_drop_down,
-                  color: afropeepGreen,
-                ),
-                dropdownColor: cardBackground,
-                items: _genderOptions
-                    .map(
-                      (String gender) => DropdownMenuItem<String>(
-                        value: gender,
-                        child: Text(
-                          gender,
-                          style: GoogleFonts.montserrat(
-                            fontSize: 16,
-                            color: textDarkBrown,
-                            fontWeight: FontWeight.w500,
+                  isExpanded: true,
+                  underline: const SizedBox(),
+                  icon: const Icon(
+                    Icons.arrow_drop_down,
+                    color: OnboardingTheme.primaryGreen,
+                    size: OnboardingTheme.fieldIconSize,
+                  ),
+                  dropdownColor: OnboardingTheme.fieldFill,
+                  borderRadius: BorderRadius.circular(OnboardingTheme.fieldRadius),
+                  items: _genderOptions
+                      .map(
+                        (String gender) => DropdownMenuItem<String>(
+                          value: gender,
+                          child: Text(
+                            gender,
+                            style: OnboardingTheme.fieldTextStyle,
                           ),
                         ),
-                      ),
-                    )
-                    .toList(),
-                onChanged: (String? newValue) {
-                  if (newValue != null) {
-                    _selectGender(newValue);
-                  }
-                },
+                      )
+                      .toList(),
+                  onChanged: (String? newValue) {
+                    if (newValue != null) {
+                      _selectGender(newValue);
+                    }
+                  },
+                ),
               ),
-            ),
-          ],
+
+              const SizedBox(height: OnboardingTheme.fieldToBottom),
+            ],
+          ),
         ),
       );
 }

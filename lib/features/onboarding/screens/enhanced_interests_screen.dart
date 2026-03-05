@@ -2,8 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:google_fonts/google_fonts.dart';
 
-import '../../../common/constants/app_colors.dart';
 import '../bloc/onboarding_bloc.dart';
+import '../onboarding_theme.dart';
 
 class EnhancedInterestsScreen extends StatefulWidget {
   const EnhancedInterestsScreen({super.key});
@@ -15,11 +15,8 @@ class EnhancedInterestsScreen extends StatefulWidget {
 
 class _EnhancedInterestsScreenState extends State<EnhancedInterestsScreen> {
   List<String> _selectedInterests = [];
+  static const int _maxSelections = 10;
 
-  // Theme colors - Tinder style
-  static const Color afropeepGreen = Color(0xFF008037); // MVP green
-
-  // Track expanded state for each category (Tinder-style show more/less)
   final Map<String, bool> _categoryExpanded = {
     'creativity': false,
     'entertainment': false,
@@ -30,7 +27,6 @@ class _EnhancedInterestsScreenState extends State<EnhancedInterestsScreen> {
     'travel': false,
   };
 
-  // Categorized interests (Tinder-style organization)
   final Map<String, Map<String, dynamic>> _categories = {
     'creativity': {
       'title': 'Creativity',
@@ -47,7 +43,7 @@ class _EnhancedInterestsScreenState extends State<EnhancedInterestsScreen> {
         'Content Creation',
         'Cosplay',
       ],
-      'initialCount': 7, // Show first 7 by default
+      'initialCount': 7,
     },
     'entertainment': {
       'title': 'Fan favorites',
@@ -151,7 +147,6 @@ class _EnhancedInterestsScreenState extends State<EnhancedInterestsScreen> {
   void initState() {
     super.initState();
 
-    // Initialize with existing data if available
     WidgetsBinding.instance.addPostFrameCallback((_) {
       final data = context.read<OnboardingBloc>().state.data;
 
@@ -169,6 +164,22 @@ class _EnhancedInterestsScreenState extends State<EnhancedInterestsScreen> {
               OnboardingInterestRemoved(interest),
             );
       } else {
+        if (_selectedInterests.length >= _maxSelections) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text(
+                'You can select up to $_maxSelections interests',
+                style: GoogleFonts.montserrat(),
+              ),
+              backgroundColor: OnboardingTheme.primaryGreen,
+              behavior: SnackBarBehavior.floating,
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(10),
+              ),
+            ),
+          );
+          return;
+        }
         _selectedInterests.add(interest);
         context.read<OnboardingBloc>().add(
               OnboardingInterestAdded(interest),
@@ -184,150 +195,156 @@ class _EnhancedInterestsScreenState extends State<EnhancedInterestsScreen> {
   }
 
   @override
-  Widget build(BuildContext context) => SingleChildScrollView(
-        padding: const EdgeInsets.all(24),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            // Header - Tinder style
-            Text(
-              'What are you into?',
-              style: GoogleFonts.montserrat(
-                fontSize: 28,
-                fontWeight: FontWeight.bold,
-                color: AppColors.textPrimary,
+  Widget build(BuildContext context) => OnboardingTheme.constrainedContent(
+        child: SingleChildScrollView(
+          padding: OnboardingTheme.pagePadding,
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text('What are you into?', style: OnboardingTheme.titleStyle),
+              const SizedBox(height: OnboardingTheme.titleToSubtitle),
+              Text(
+                'You like what you like. Now, let everyone know.',
+                style: OnboardingTheme.subtitleStyle,
               ),
-            ),
-            const SizedBox(height: 8),
-            Text(
-              'You like what you like. Now, let everyone know.',
-              style: GoogleFonts.montserrat(
-                fontSize: 16,
-                color: AppColors.textSecondary,
-                height: 1.4,
+              const SizedBox(height: 8),
+              Text(
+                '${_selectedInterests.length} / $_maxSelections selected',
+                style: OnboardingTheme.helperStyle.copyWith(
+                  color: _selectedInterests.length >= _maxSelections
+                      ? Colors.orange
+                      : OnboardingTheme.primaryGreen,
+                  fontWeight: FontWeight.w600,
+                ),
               ),
-            ),
 
-            const SizedBox(height: 32),
+              const SizedBox(height: OnboardingTheme.subtitleToField),
 
-            // Categorized interests - Tinder style
-            ..._categories.entries.map((entry) {
-              final categoryKey = entry.key;
-              final category = entry.value;
-              final title = category['title'] as String;
-              final emoji = category['emoji'] as String;
-              final interests = category['interests'] as List<String>;
-              final initialCount = category['initialCount'] as int;
-              final isExpanded = _categoryExpanded[categoryKey] ?? false;
-              final displayedInterests = isExpanded
-                  ? interests
-                  : interests.take(initialCount).toList();
-              final hasMore = interests.length > initialCount;
+              ..._categories.entries.map((entry) {
+                final categoryKey = entry.key;
+                final category = entry.value;
+                final title = category['title'] as String;
+                final emoji = category['emoji'] as String;
+                final interests = category['interests'] as List<String>;
+                final initialCount = category['initialCount'] as int;
+                final isExpanded = _categoryExpanded[categoryKey] ?? false;
+                final displayedInterests = isExpanded
+                    ? interests
+                    : interests.take(initialCount).toList();
+                final hasMore = interests.length > initialCount;
 
-              return Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  // Category header with emoji
-                  Padding(
-                    padding: const EdgeInsets.only(bottom: 12),
-                    child: Row(
-                      children: [
-                        Text(
-                          emoji,
-                          style: const TextStyle(fontSize: 20),
-                        ),
-                        const SizedBox(width: 8),
-                        Text(
-                          title,
-                          style: GoogleFonts.montserrat(
-                            fontSize: 18,
-                            fontWeight: FontWeight.w600,
-                            color: AppColors.textPrimary,
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-
-                  // Interest tags
-                  Wrap(
-                    spacing: 8,
-                    runSpacing: 8,
-                    children: displayedInterests.map((interest) {
-                      final isSelected = _selectedInterests.contains(interest);
-
-                      return GestureDetector(
-                        onTap: () => _toggleInterest(interest),
-                        child: Container(
-                          padding: const EdgeInsets.symmetric(
-                            horizontal: 16,
-                            vertical: 10,
-                          ),
-                          decoration: BoxDecoration(
-                            color: isSelected ? afropeepGreen : Colors.white,
-                            borderRadius: BorderRadius.circular(20),
-                            border: Border.all(
-                              color: isSelected
-                                  ? afropeepGreen
-                                  : Colors.grey.shade300,
-                              width: isSelected ? 0 : 1,
-                            ),
-                          ),
-                          child: Text(
-                            interest,
-                            style: GoogleFonts.montserrat(
-                              fontSize: 14,
-                              fontWeight: FontWeight.w500,
-                              color: isSelected
-                                  ? Colors.white
-                                  : AppColors.textPrimary,
-                            ),
-                          ),
-                        ),
-                      );
-                    }).toList(),
-                  ),
-
-                  // Show more/less button
-                  if (hasMore)
+                return Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
                     Padding(
-                      padding: const EdgeInsets.only(top: 8, bottom: 24),
-                      child: TextButton(
-                        onPressed: () => _toggleCategoryExpansion(categoryKey),
-                        style: TextButton.styleFrom(
-                          padding: EdgeInsets.zero,
-                          minimumSize: const Size(0, 36),
-                          tapTargetSize: MaterialTapTargetSize.shrinkWrap,
-                        ),
-                        child: Row(
-                          mainAxisSize: MainAxisSize.min,
-                          children: [
-                            Text(
-                              isExpanded ? 'Show less' : 'Show more',
+                      padding: const EdgeInsets.only(bottom: 12),
+                      child: Row(
+                        children: [
+                          Text(emoji, style: const TextStyle(fontSize: 20)),
+                          const SizedBox(width: 8),
+                          Text(
+                            title,
+                            style: OnboardingTheme.sectionLabelStyle,
+                          ),
+                        ],
+                      ),
+                    ),
+
+                    Wrap(
+                      spacing: 8,
+                      runSpacing: 8,
+                      children: displayedInterests.map((interest) {
+                        final isSelected =
+                            _selectedInterests.contains(interest);
+                        final atLimit =
+                            _selectedInterests.length >= _maxSelections;
+
+                        return GestureDetector(
+                          onTap: () => _toggleInterest(interest),
+                          child: Container(
+                            constraints: const BoxConstraints(
+                              minHeight: OnboardingTheme.minTapTarget,
+                            ),
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 16,
+                              vertical: 10,
+                            ),
+                            decoration: BoxDecoration(
+                              color: isSelected
+                                  ? OnboardingTheme.primaryGreen
+                                  : OnboardingTheme.fieldFill,
+                              borderRadius: BorderRadius.circular(20),
+                              border: Border.all(
+                                color: isSelected
+                                    ? OnboardingTheme.primaryGreen
+                                    : OnboardingTheme.fieldBorder,
+                                width: isSelected ? 0 : 1,
+                              ),
+                            ),
+                            child: Text(
+                              interest,
                               style: GoogleFonts.montserrat(
                                 fontSize: 14,
                                 fontWeight: FontWeight.w500,
-                                color: afropeepGreen,
+                                color: isSelected
+                                    ? Colors.white
+                                    : atLimit
+                                        ? OnboardingTheme.subtitleColor
+                                        : OnboardingTheme.sectionLabelColor,
                               ),
                             ),
-                            const SizedBox(width: 4),
-                            Icon(
-                              isExpanded
-                                  ? Icons.keyboard_arrow_up
-                                  : Icons.keyboard_arrow_down,
-                              color: afropeepGreen,
-                              size: 20,
-                            ),
-                          ],
+                          ),
+                        );
+                      }).toList(),
+                    ),
+
+                    if (hasMore)
+                      Padding(
+                        padding: const EdgeInsets.only(
+                          top: 8,
+                          bottom: OnboardingTheme.fieldToSection,
                         ),
-                      ),
-                    )
-                  else
-                    const SizedBox(height: 24),
-                ],
-              );
-            }),
-          ],
+                        child: TextButton(
+                          onPressed: () =>
+                              _toggleCategoryExpansion(categoryKey),
+                          style: TextButton.styleFrom(
+                            padding: EdgeInsets.zero,
+                            minimumSize: const Size(
+                              0,
+                              OnboardingTheme.minTapTarget,
+                            ),
+                            tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                          ),
+                          child: Row(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              Text(
+                                isExpanded ? 'Show less' : 'Show more',
+                                style: GoogleFonts.montserrat(
+                                  fontSize: 14,
+                                  fontWeight: FontWeight.w500,
+                                  color: OnboardingTheme.primaryGreen,
+                                ),
+                              ),
+                              const SizedBox(width: 4),
+                              Icon(
+                                isExpanded
+                                    ? Icons.keyboard_arrow_up
+                                    : Icons.keyboard_arrow_down,
+                                color: OnboardingTheme.primaryGreen,
+                                size: 20,
+                              ),
+                            ],
+                          ),
+                        ),
+                      )
+                    else
+                      const SizedBox(height: OnboardingTheme.fieldToSection),
+                  ],
+                );
+              }),
+            ],
+          ),
         ),
       );
 }

@@ -8,6 +8,7 @@ import 'package:google_fonts/google_fonts.dart';
 
 import '../../../common/utils/app_logger.dart';
 import '../bloc/onboarding_bloc.dart';
+import '../onboarding_theme.dart';
 
 class LocationScreen extends StatefulWidget {
   const LocationScreen({super.key});
@@ -20,16 +21,10 @@ class _LocationScreenState extends State<LocationScreen> {
   String? _currentLocation;
   bool _isLoadingLocation = false;
 
-  // Afropeep MVP theme colors
-  static const Color afropeepGreen = Color(0xFF008037); // MVP green
-  static const Color textDarkBrown = Color(0xFF3A1D0F);
-  static const Color textLightBrown = Color(0xFF8B6C59);
-
   @override
   void initState() {
     super.initState();
 
-    // Initialize with existing data if available
     WidgetsBinding.instance.addPostFrameCallback((_) {
       final data = context.read<OnboardingBloc>().state.data;
 
@@ -41,18 +36,12 @@ class _LocationScreenState extends State<LocationScreen> {
     });
   }
 
-  @override
-  void dispose() {
-    super.dispose();
-  }
-
   Future<void> _getCurrentLocation() async {
     setState(() {
       _isLoadingLocation = true;
     });
 
     try {
-      // Check if location services are enabled
       final bool serviceEnabled = await Geolocator.isLocationServiceEnabled();
       if (!serviceEnabled) {
         setState(() {
@@ -62,7 +51,6 @@ class _LocationScreenState extends State<LocationScreen> {
         return;
       }
 
-      // Check location permissions
       LocationPermission permission = await Geolocator.checkPermission();
       if (permission == LocationPermission.denied) {
         permission = await Geolocator.requestPermission();
@@ -82,14 +70,12 @@ class _LocationScreenState extends State<LocationScreen> {
         return;
       }
 
-      // Get current position
       final Position position = await Geolocator.getCurrentPosition(
         locationSettings: const LocationSettings(
           accuracy: LocationAccuracy.high,
         ),
       );
 
-      // Get address from coordinates
       final List<Placemark> placemarks = await placemarkFromCoordinates(
         position.latitude,
         position.longitude,
@@ -99,13 +85,11 @@ class _LocationScreenState extends State<LocationScreen> {
         final Placemark place = placemarks[0];
         String location = '';
 
-        // Format location based on country
         if (place.country == 'United States') {
           location = '${place.locality}, ${place.administrativeArea}';
         } else if (place.country == 'Canada') {
           location = '${place.locality}, ${place.administrativeArea}';
         } else {
-          // For other countries (Europe, etc.)
           location = '${place.locality}, ${place.country}';
         }
 
@@ -116,7 +100,6 @@ class _LocationScreenState extends State<LocationScreen> {
 
         if (!mounted) return;
 
-        // Save to bloc - CRITICAL FOR DISCOVERY
         context.read<OnboardingBloc>().add(
               OnboardingLocationUpdated(
                 position.latitude,
@@ -125,10 +108,7 @@ class _LocationScreenState extends State<LocationScreen> {
               ),
             );
 
-        AppLogger.info('🔍 LocationScreen: GPS location set to "$location"');
-        AppLogger.info(
-          '🔍 LocationScreen: Coordinates set to ${position.latitude}, ${position.longitude}',
-        );
+        AppLogger.info('LocationScreen: GPS location set to "$location"');
       }
     } on Object catch (e) {
       setState(() {
@@ -144,20 +124,16 @@ class _LocationScreenState extends State<LocationScreen> {
         context: context,
         builder: (context) => AlertDialog(
           shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(16),
+            borderRadius: BorderRadius.circular(OnboardingTheme.fieldRadius),
           ),
           title: Text(
             'Location Services Disabled',
-            style: GoogleFonts.montserrat(
-              fontWeight: FontWeight.w600,
-              fontSize: 18,
-            ),
+            style: OnboardingTheme.sectionLabelStyle,
           ),
           content: Text(
             'Location is required to find matches nearby. Please enable location services in your device settings.',
-            style: GoogleFonts.montserrat(
-              fontSize: 14,
-              color: textDarkBrown,
+            style: OnboardingTheme.subtitleStyle.copyWith(
+              color: OnboardingTheme.sectionLabelColor,
             ),
           ),
           actions: [
@@ -166,7 +142,7 @@ class _LocationScreenState extends State<LocationScreen> {
               child: Text(
                 'Cancel',
                 style: GoogleFonts.montserrat(
-                  color: textLightBrown,
+                  color: OnboardingTheme.subtitleColor,
                   fontWeight: FontWeight.w500,
                 ),
               ),
@@ -183,15 +159,15 @@ class _LocationScreenState extends State<LocationScreen> {
                         'Please enable location services manually in your device settings',
                         style: GoogleFonts.montserrat(),
                       ),
-                      backgroundColor: afropeepGreen,
+                      backgroundColor: OnboardingTheme.primaryGreen,
                     ),
                   );
                 }
               },
               style: ElevatedButton.styleFrom(
-                backgroundColor: afropeepGreen,
+                backgroundColor: OnboardingTheme.primaryGreen,
                 shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(8),
+                  borderRadius: BorderRadius.circular(12),
                 ),
               ),
               child: Text(
@@ -214,20 +190,16 @@ class _LocationScreenState extends State<LocationScreen> {
         context: context,
         builder: (context) => AlertDialog(
           shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(16),
+            borderRadius: BorderRadius.circular(OnboardingTheme.fieldRadius),
           ),
           title: Text(
             'Location Permission Required',
-            style: GoogleFonts.montserrat(
-              fontWeight: FontWeight.w600,
-              fontSize: 18,
-            ),
+            style: OnboardingTheme.sectionLabelStyle,
           ),
           content: Text(
             'Location is required to find matches nearby. Please enable location permissions in your device settings to continue.',
-            style: GoogleFonts.montserrat(
-              fontSize: 14,
-              color: textDarkBrown,
+            style: OnboardingTheme.subtitleStyle.copyWith(
+              color: OnboardingTheme.sectionLabelColor,
             ),
           ),
           actions: [
@@ -236,7 +208,7 @@ class _LocationScreenState extends State<LocationScreen> {
               child: Text(
                 'Cancel',
                 style: GoogleFonts.montserrat(
-                  color: textLightBrown,
+                  color: OnboardingTheme.subtitleColor,
                   fontWeight: FontWeight.w500,
                 ),
               ),
@@ -253,15 +225,15 @@ class _LocationScreenState extends State<LocationScreen> {
                         'Please enable location permissions manually in your device settings',
                         style: GoogleFonts.montserrat(),
                       ),
-                      backgroundColor: afropeepGreen,
+                      backgroundColor: OnboardingTheme.primaryGreen,
                     ),
                   );
                 }
               },
               style: ElevatedButton.styleFrom(
-                backgroundColor: afropeepGreen,
+                backgroundColor: OnboardingTheme.primaryGreen,
                 shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(8),
+                  borderRadius: BorderRadius.circular(12),
                 ),
               ),
               child: Text(
@@ -279,157 +251,154 @@ class _LocationScreenState extends State<LocationScreen> {
   }
 
   @override
-  Widget build(BuildContext context) => SingleChildScrollView(
-        padding: const EdgeInsets.all(24),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            // Header
-            Text(
-              'Where are you located?',
-              style: GoogleFonts.montserrat(
-                fontSize: 24,
-                fontWeight: FontWeight.bold,
-                color: textDarkBrown,
+  Widget build(BuildContext context) => OnboardingTheme.constrainedContent(
+        child: SingleChildScrollView(
+          padding: OnboardingTheme.pagePadding,
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                'Where are you located?',
+                style: OnboardingTheme.titleStyle,
               ),
-            ),
-
-            const SizedBox(height: 8),
-
-            Text(
-              'This helps us connect you with people nearby',
-              style: GoogleFonts.montserrat(
-                fontSize: 16,
-                color: textLightBrown,
+              const SizedBox(height: OnboardingTheme.titleToSubtitle),
+              Text(
+                'This helps us connect you with people nearby',
+                style: OnboardingTheme.subtitleStyle,
               ),
-            ),
 
-            const SizedBox(height: 32),
+              const SizedBox(height: OnboardingTheme.subtitleToField),
 
-            // GPS Location Button
-            SizedBox(
-              width: double.infinity,
-              child: ElevatedButton.icon(
-                onPressed: _isLoadingLocation ? null : _getCurrentLocation,
-                icon: _isLoadingLocation
-                    ? const SizedBox(
-                        width: 20,
-                        height: 20,
-                        child: CircularProgressIndicator(
-                          strokeWidth: 2,
-                          valueColor:
-                              AlwaysStoppedAnimation<Color>(Colors.white),
-                        ),
-                      )
-                    : const Icon(Icons.my_location, color: Colors.white),
-                label: Text(
-                  _isLoadingLocation
-                      ? 'Getting Location...'
-                      : 'Use My Current Location',
-                  style: GoogleFonts.montserrat(
-                    fontSize: 16,
-                    fontWeight: FontWeight.w600,
-                    color: Colors.white,
+              SizedBox(
+                width: double.infinity,
+                height: OnboardingTheme.buttonHeight,
+                child: ElevatedButton.icon(
+                  onPressed: _isLoadingLocation ? null : _getCurrentLocation,
+                  icon: _isLoadingLocation
+                      ? const SizedBox(
+                          width: 20,
+                          height: 20,
+                          child: CircularProgressIndicator(
+                            strokeWidth: 2,
+                            valueColor:
+                                AlwaysStoppedAnimation<Color>(Colors.white),
+                          ),
+                        )
+                      : const Icon(Icons.my_location, color: Colors.white),
+                  label: Text(
+                    _isLoadingLocation
+                        ? 'Getting Location...'
+                        : 'Use My Current Location',
+                    style: GoogleFonts.montserrat(
+                      fontSize: 16,
+                      fontWeight: FontWeight.w600,
+                      color: Colors.white,
+                    ),
                   ),
-                ),
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: afropeepGreen,
-                  padding: const EdgeInsets.symmetric(vertical: 16),
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(12),
-                  ),
-                ),
-              ),
-            ),
-
-            const SizedBox(height: 32),
-
-            // Current location display
-            if (_currentLocation != null) ...[
-              Builder(builder: (context) {
-                final location = _currentLocation;
-                if (location == null) return const SizedBox.shrink();
-                return Container(
-                  width: double.infinity,
-                  padding: const EdgeInsets.all(16),
-                  decoration: BoxDecoration(
-                    color: afropeepGreen.withValues(alpha: 0.1),
-                    borderRadius: BorderRadius.circular(12),
-                    border:
-                        Border.all(color: afropeepGreen.withValues(alpha: 0.3)),
-                  ),
-                  child: Row(
-                    children: [
-                      const Icon(
-                        Icons.location_on,
-                        color: afropeepGreen,
-                        size: 20,
-                      ),
-                      const SizedBox(width: 12),
-                      Expanded(
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text(
-                              'Your Location',
-                              style: GoogleFonts.montserrat(
-                                fontSize: 12,
-                                color: textLightBrown,
-                                fontWeight: FontWeight.w500,
-                              ),
-                            ),
-                            Text(
-                              location,
-                              style: GoogleFonts.montserrat(
-                                fontSize: 16,
-                                color: textDarkBrown,
-                                fontWeight: FontWeight.w600,
-                              ),
-                            ),
-                        ],
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: OnboardingTheme.primaryGreen,
+                    padding: const EdgeInsets.symmetric(vertical: 16),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(
+                        OnboardingTheme.buttonRadius,
                       ),
                     ),
+                  ),
+                ),
+              ),
+
+              const SizedBox(height: OnboardingTheme.fieldToSection),
+
+              if (_currentLocation != null) ...[
+                Builder(builder: (context) {
+                  final location = _currentLocation;
+                  if (location == null) return const SizedBox.shrink();
+                  return Container(
+                    width: double.infinity,
+                    padding: const EdgeInsets.all(
+                      OnboardingTheme.fieldContentPadding,
+                    ),
+                    decoration: BoxDecoration(
+                      color: OnboardingTheme.primaryGreen.withValues(alpha: 0.08),
+                      borderRadius: BorderRadius.circular(
+                        OnboardingTheme.fieldRadius,
+                      ),
+                      border: Border.all(
+                        color:
+                            OnboardingTheme.primaryGreen.withValues(alpha: 0.3),
+                      ),
+                    ),
+                    child: Row(
+                      children: [
+                        const Icon(
+                          Icons.location_on,
+                          color: OnboardingTheme.primaryGreen,
+                          size: OnboardingTheme.fieldIconSize,
+                        ),
+                        const SizedBox(width: 12),
+                        Expanded(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                'Your Location',
+                                style: OnboardingTheme.helperStyle,
+                              ),
+                              Text(
+                                location,
+                                style: OnboardingTheme.fieldTextStyle.copyWith(
+                                  fontWeight: FontWeight.w600,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                        const Icon(
+                          Icons.check_circle,
+                          color: OnboardingTheme.primaryGreen,
+                          size: OnboardingTheme.fieldIconSize,
+                        ),
+                      ],
+                    ),
+                  );
+                }),
+                const SizedBox(height: OnboardingTheme.fieldToSection),
+              ],
+
+              Container(
+                padding: const EdgeInsets.all(
+                  OnboardingTheme.fieldContentPadding,
+                ),
+                decoration: BoxDecoration(
+                  color: OnboardingTheme.primaryGreen.withValues(alpha: 0.08),
+                  borderRadius: BorderRadius.circular(
+                    OnboardingTheme.fieldRadius,
+                  ),
+                  border: Border.all(
+                    color: OnboardingTheme.primaryGreen.withValues(alpha: 0.3),
+                  ),
+                ),
+                child: Row(
+                  children: [
                     const Icon(
-                      Icons.check_circle,
-                      color: afropeepGreen,
-                      size: 20,
+                      Icons.info_outline,
+                      color: OnboardingTheme.primaryGreen,
+                      size: OnboardingTheme.fieldIconSize,
+                    ),
+                    const SizedBox(width: 12),
+                    Expanded(
+                      child: Text(
+                        'Your location helps us show you people nearby. We only show your city, never your exact location.',
+                        style: OnboardingTheme.helperStyle.copyWith(
+                          color: OnboardingTheme.sectionLabelColor,
+                        ),
+                      ),
                     ),
                   ],
                 ),
-                );
-              }),
-              const SizedBox(height: 24),
+              ),
             ],
-
-            // Privacy note
-            Container(
-              padding: const EdgeInsets.all(16),
-              decoration: BoxDecoration(
-                color: afropeepGreen.withValues(alpha: 0.1),
-                borderRadius: BorderRadius.circular(12),
-                border: Border.all(color: afropeepGreen.withValues(alpha: 0.3)),
-              ),
-              child: Row(
-                children: [
-                  const Icon(
-                    Icons.info_outline,
-                    color: afropeepGreen,
-                    size: 20,
-                  ),
-                  const SizedBox(width: 12),
-                  Expanded(
-                    child: Text(
-                      'Your location helps us show you people nearby. We only show your city, never your exact location.',
-                      style: GoogleFonts.montserrat(
-                        fontSize: 14,
-                        color: textDarkBrown,
-                      ),
-                    ),
-                  ),
-                ],
-              ),
-            ),
-          ],
+          ),
         ),
       );
 }

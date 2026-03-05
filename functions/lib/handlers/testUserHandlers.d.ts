@@ -2,7 +2,6 @@
  * Test user creation Cloud Function handlers
  * Used for development and testing purposes
  */
-import * as functions from 'firebase-functions';
 export declare class TestUserHandlers {
     private readonly maleNames;
     private readonly femaleNames;
@@ -14,7 +13,7 @@ export declare class TestUserHandlers {
      * Create test users for development/testing
      * Requires admin secret token in Authorization header for security
      */
-    createTestUsers: functions.HttpsFunction;
+    createTestUsers: import("firebase-functions/v2/https").HttpsFunction;
     /**
      * Create users in parallel batches with error handling
      */

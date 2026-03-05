@@ -37,20 +37,18 @@ var __importStar = (this && this.__importStar) || (function () {
 })();
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.MatchHandlers = void 0;
-const functions = __importStar(require("firebase-functions/v1"));
+const firestore_1 = require("firebase-functions/v2/firestore");
 const admin = __importStar(require("firebase-admin"));
 const userService_1 = require("../services/userService");
 const notificationService_1 = require("../services/notificationService");
 class MatchHandlers {
     constructor() {
-        /**
-         * Handle match creation (Gen 1 - compatible with existing deployments)
-         */
-        this.onMatchCreated = functions.firestore
-            .document('matches/{matchId}')
-            .onCreate(async (snap, context) => {
+        this.onMatchCreated = (0, firestore_1.onDocumentCreated)('matches/{matchId}', async (event) => {
+            const snap = event.data;
+            if (!snap)
+                return;
             const matchData = snap.data();
-            const matchId = context.params.matchId;
+            const matchId = event.params.matchId;
             console.log(`🎉 New match created: ${matchId}`, matchData);
             try {
                 const users = matchData.users || [];

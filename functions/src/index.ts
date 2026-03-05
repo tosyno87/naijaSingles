@@ -6,40 +6,35 @@
  */
 
 import * as admin from 'firebase-admin';
+import {onRequest} from 'firebase-functions/v2/https';
 import {MatchHandlers} from './handlers/matchHandlers';
 import {MessageHandlers} from './handlers/messageHandlers';
 import {LikeHandlers} from './handlers/likeHandlers';
 import {TestUserHandlers} from './handlers/testUserHandlers';
 
-// Initialize Firebase Admin SDK
 admin.initializeApp();
 
-// Initialize handlers
 const matchHandlers = new MatchHandlers();
 const messageHandlers = new MessageHandlers();
 const likeHandlers = new LikeHandlers();
 const testUserHandlers = new TestUserHandlers();
 
-// Export all Cloud Functions
-
-// Match-related functions
 export const onMatchCreated = matchHandlers.onMatchCreated;
-
-// Message-related functions
 export const onMessageSent = messageHandlers.onMessageSent;
-
-// Like-related functions
 export const onSuperLikeCreated = likeHandlers.onSuperLikeCreated;
 export const onLikeCreated = likeHandlers.onLikeCreated;
 
-// Test user creation function (development/testing)
-export const createTestUsers = testUserHandlers.createTestUsers;
+const isTestEnvEnabled = process.env.ENABLE_TEST_ENDPOINTS === 'true';
+export const createTestUsers = isTestEnvEnabled
+  ? testUserHandlers.createTestUsers
+  : onRequest((req, res) => {
+      res.status(404).json({error: 'Not available in production'});
+    });
 
-// Health check function
-export const healthCheck = async (req: any, res: any) => {
+export const healthCheck = onRequest((req, res) => {
   res.status(200).json({
     status: 'healthy',
     timestamp: new Date().toISOString(),
     version: '1.0.0',
   });
-};
+});

@@ -38,7 +38,8 @@ var __importStar = (this && this.__importStar) || (function () {
 })();
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.TestUserHandlers = void 0;
-const functions = __importStar(require("firebase-functions"));
+const https_1 = require("firebase-functions/v2/https");
+const logger = __importStar(require("firebase-functions/logger"));
 const admin = __importStar(require("firebase-admin"));
 const crypto = __importStar(require("crypto"));
 // Maximum users per request (prevent quota exhaustion)
@@ -86,18 +87,18 @@ class TestUserHandlers {
          * Create test users for development/testing
          * Requires admin secret token in Authorization header for security
          */
-        this.createTestUsers = functions.runWith({
-            timeoutSeconds: 540, // Max timeout (9 minutes) for large batches
-        }).https.onRequest(async (req, res) => {
-            var _a;
+        this.createTestUsers = (0, https_1.onRequest)({ timeoutSeconds: 540 }, async (req, res) => {
             try {
-                // 1. Authentication check
                 const authHeader = req.headers.authorization;
-                // Read from Firebase Functions config (set via firebase functions:config:set)
-                // Falls back to environment variable, then default dev secret
-                const adminSecret = ((_a = functions.config().admin) === null || _a === void 0 ? void 0 : _a.secret) ||
-                    process.env.ADMIN_SECRET ||
-                    'dev-secret-change-in-production';
+                const adminSecret = process.env.ADMIN_SECRET;
+                if (!adminSecret) {
+                    logger.error('ADMIN_SECRET is not configured. Set it via: firebase functions:secrets:set ADMIN_SECRET');
+                    res.status(503).json({
+                        success: false,
+                        message: 'Service unavailable. Admin secret is not configured.',
+                    });
+                    return;
+                }
                 if (!authHeader || authHeader !== `Bearer ${adminSecret}`) {
                     res.status(401).json({
                         success: false,

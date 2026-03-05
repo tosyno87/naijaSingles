@@ -7,13 +7,19 @@ import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/foundation.dart'
     show defaultTargetPlatform, kIsWeb, TargetPlatform, debugPrint;
 
-// Note: Using hardcoded values from GoogleService-Info.plist for production
-// SecureConfig is only used in development when .env file is available
 import 'config/secure_config.dart';
+import 'firebase_options_staging.dart';
+
+/// Build with --dart-define=ENV=production for prod, otherwise defaults to staging.
+const String _env = String.fromEnvironment('ENV', defaultValue: 'staging');
+bool get isProduction => _env == 'production';
 
 /// Default Firebase configuration options for the current platform
 class DefaultFirebaseOptions {
   static FirebaseOptions get currentPlatform {
+    if (!isProduction) {
+      return StagingFirebaseOptions.currentPlatform;
+    }
     if (kIsWeb) {
       return web;
     }

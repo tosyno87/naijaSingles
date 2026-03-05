@@ -3,7 +3,7 @@
  */
 
 import {NotificationService} from '../notificationService';
-import {User, NotificationType, NotificationStatus} from '../../types';
+import {User} from '../../types';
 
 // Mock Firebase Admin
 jest.mock('firebase-admin', () => ({

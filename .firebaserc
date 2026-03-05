@@ -1,7 +1,7 @@
 {
   "projects": {
-    "default": "naijasingles-74a75",
-    "staging": "naijasingles-74a75",
+    "default": "naijasingles-staging",
+    "staging": "naijasingles-staging",
     "production": "naijasingles-74a75"
   }
 }

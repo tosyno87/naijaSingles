@@ -1,9 +1,4 @@
 {
-  "projects": {
-    "default": "naijasingles-74a75",
-    "staging": "naijasingles-74a75", 
-    "production": "naijasingles-74a75"
-  },
   "hosting": {
     "public": "build/web",
     "ignore": [
@@ -22,7 +17,8 @@
     "rules": "storage.rules"
   },
   "firestore": {
-    "rules": "firestore.rules"
+    "rules": "firestore.rules",
+    "indexes": "firestore.indexes.json"
   },
   "functions": {
     "source": "functions",

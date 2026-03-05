@@ -267,10 +267,11 @@ jobs:
           echo "✅ Updated Xcode CURRENT_PROJECT_VERSION to: $NEW_BUILD"
           
       - name: Build iOS Release with Fastlane
+        env:
+          SKIP_FLUTTER_CLEAN: "true"
         run: |
-          # Re-run pub get to pick up version changes
           flutter pub get
-          
+          flutter build ios --release --dart-define=ENV=production --no-codesign
           cd ios
           bundle exec fastlane build_app
         
@@ -365,13 +366,14 @@ jobs:
               /usr/libexec/PlistBuddy -c "Set :CFBundleShortVersionString $CURRENT_VERSION" ios/Runner/Info.plist
               echo "✅ Updated Info.plist: CFBundleVersion=$NEW_BUILD, CFBundleShortVersionString=$CURRENT_VERSION"
               
-              # Rebuild with correct version
+              # Rebuild with correct version (must re-apply production dart-define)
               echo "🔨 Rebuilding with correct version..."
               flutter clean
               flutter pub get
+              flutter build ios --release --dart-define=ENV=production --no-codesign
               cd ios
               pod install
-              bundle exec fastlane build_app
+              SKIP_FLUTTER_CLEAN=true bundle exec fastlane build_app
               cd ..
               
               # Find the new IPA

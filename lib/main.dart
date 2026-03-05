@@ -5,6 +5,7 @@ import 'dart:developer';
 import 'dart:io';
 
 import 'package:easy_localization/easy_localization.dart';
+import 'package:firebase_app_check/firebase_app_check.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/foundation.dart';
@@ -66,6 +67,12 @@ Future<void> main() async {
       options: DefaultFirebaseOptions.currentPlatform,
     );
     log('🔥 Firebase initialized successfully');
+
+    await FirebaseAppCheck.instance.activate(
+      appleProvider:
+          kDebugMode ? AppleProvider.debug : AppleProvider.deviceCheck,
+    );
+    log('🛡️ Firebase App Check activated');
 
     // Configure Firebase Auth for iOS Simulator testing
     if (Platform.isIOS && kDebugMode) {

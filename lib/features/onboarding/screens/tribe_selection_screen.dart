@@ -153,7 +153,7 @@ class _TribeSelectionScreenState extends State<TribeSelectionScreen> {
     unawaited(showModalBottomSheet<String>(
       context: context,
       isScrollControlled: true,
-      backgroundColor: Colors.white,
+      backgroundColor: OnboardingTheme.background,
       shape: const RoundedRectangleBorder(
         borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
       ),

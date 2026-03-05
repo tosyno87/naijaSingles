@@ -123,12 +123,16 @@ class _EnhancedPhotoUploadScreenState extends State<EnhancedPhotoUploadScreen> {
           child: Container(
             decoration: BoxDecoration(
               color: photo == null
-                  ? OnboardingTheme.fieldFill
-                  : Colors.white,
+                  ? OnboardingTheme.primaryGreen.withValues(alpha: 0.08)
+                  : OnboardingTheme.background,
               borderRadius: BorderRadius.circular(OnboardingTheme.fieldRadius),
               border: isMainPhoto && photo != null
                   ? Border.all(color: OnboardingTheme.primaryGreen, width: 3)
-                  : Border.all(color: OnboardingTheme.fieldBorder),
+                  : Border.all(
+                      color: photo == null
+                          ? OnboardingTheme.primaryGreen.withValues(alpha: 0.3)
+                          : OnboardingTheme.fieldBorder,
+                    ),
             ),
             clipBehavior: Clip.antiAlias,
             child: Stack(
@@ -145,7 +149,7 @@ class _EnhancedPhotoUploadScreenState extends State<EnhancedPhotoUploadScreen> {
                     child: Icon(
                       Icons.add_photo_alternate,
                       size: 48,
-                      color: OnboardingTheme.subtitleColor.withValues(alpha: 0.5),
+                      color: OnboardingTheme.primaryGreen.withValues(alpha: 0.35),
                     ),
                   ),
 
@@ -231,7 +235,7 @@ class _EnhancedPhotoUploadScreenState extends State<EnhancedPhotoUploadScreen> {
 
     final source = await showModalBottomSheet<ImageSource>(
       context: context,
-      backgroundColor: Colors.white,
+      backgroundColor: OnboardingTheme.background,
       shape: const RoundedRectangleBorder(
         borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
       ),
@@ -288,7 +292,7 @@ class _EnhancedPhotoUploadScreenState extends State<EnhancedPhotoUploadScreen> {
     unawaited(
       showModalBottomSheet(
         context: parentContext,
-        backgroundColor: Colors.white,
+        backgroundColor: OnboardingTheme.background,
         shape: const RoundedRectangleBorder(
           borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
         ),
@@ -334,7 +338,7 @@ class _EnhancedPhotoUploadScreenState extends State<EnhancedPhotoUploadScreen> {
                   final bloc = parentContext.read<OnboardingBloc>();
                   final source = await showModalBottomSheet<ImageSource>(
                     context: parentContext,
-                    backgroundColor: Colors.white,
+                    backgroundColor: OnboardingTheme.background,
                     shape: const RoundedRectangleBorder(
                       borderRadius:
                           BorderRadius.vertical(top: Radius.circular(20)),

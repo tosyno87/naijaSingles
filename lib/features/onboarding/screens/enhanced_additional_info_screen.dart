@@ -308,7 +308,7 @@ class _EnhancedAdditionalInfoScreenState
               size: OnboardingTheme.fieldIconSize,
             ),
           ),
-          dropdownColor: Colors.white,
+          dropdownColor: OnboardingTheme.background,
           borderRadius: BorderRadius.circular(OnboardingTheme.fieldRadius),
           menuMaxHeight: MediaQuery.of(context).size.height * 0.4,
           items: options

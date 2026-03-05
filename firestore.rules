@@ -31,27 +31,21 @@ service cloud.firestore {
       // Paused, incognito, deleted, and banned profiles are hidden.
       allow get: if canReadUserProfile(userId);
 
-      // Collection queries (discovery, search) are allowed for any
-      // authenticated user. Firestore cannot statically verify per-document
-      // privacy checks (accountStatus, isDeleted, etc.) against query
-      // constraints, so list operations would always fail with
-      // permission-denied if gated by canReadUserProfile.
-      // App-side filtering (_passesAdditionalFilters, isDiscoverable)
-      // handles privacy for discovery results.
+      // Collection queries (discovery, search) gate on a stored boolean
+      // `isDiscoverable` that a Cloud Function trigger keeps in sync with
+      // accountStatus, isDeleted, and isProfilePrivate. This gives server-
+      // side enforcement without the per-document inequality checks that
+      // cause permission-denied on compound queries.
+      // Clients must include .where('isDiscoverable', isEqualTo: true).
       allow list: if request.auth != null
-                      && resource.data.isDeleted != true
-                      && resource.data.isProfilePrivate != true
-                      && resource.data.get('accountStatus', 'active') != 'deleted'
-                      && resource.data.get('accountStatus', 'active') != 'banned'
-                      && resource.data.get('accountStatus', 'active') != 'paused'
-                      && resource.data.get('accountStatus', 'active') != 'incognito';
+                      && resource.data.isDiscoverable == true;
       
       // Allow users to update their own profile with data validation
       allow update: if request.auth != null && 
                      request.auth.uid == userId &&
-                     // Prevent users from changing critical fields
+                     // Prevent users from changing critical / server-managed fields
                      !request.resource.data.diff(resource.data).affectedKeys()
-                       .hasAny(['createdAt', 'uid', 'email', 'signInMethod']);
+                       .hasAny(['createdAt', 'uid', 'email', 'signInMethod', 'isDiscoverable']);
       
       // Public profile subcollection (visible to others based on privacy settings)
       match /public/{document=**} {

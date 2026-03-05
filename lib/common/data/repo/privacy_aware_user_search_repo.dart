@@ -244,23 +244,14 @@ class PrivacyAwareUserSearchRepo {
 
   /// Build privacy-aware query
   static Query _buildPrivacyAwareQuery(UserModel currentUser) {
-    Query query = docRef.where('id', isNotEqualTo: currentUser.id);
+    Query query = docRef.where('isDiscoverable', isEqualTo: true);
 
-    // Add basic filters that don't depend on privacy settings
-    if (currentUser.userGender != null) {
-      query = query.where('userGender', isNotEqualTo: currentUser.userGender);
-    }
-
-    return query.limit(50); // Limit for performance
+    return query.limit(50);
   }
 
   /// Build traditional query (fallback)
   static Query _buildTraditionalQuery(UserModel currentUser) {
-    Query query = docRef.where('id', isNotEqualTo: currentUser.id);
-
-    if (currentUser.userGender != null) {
-      query = query.where('userGender', isNotEqualTo: currentUser.userGender);
-    }
+    Query query = docRef.where('isDiscoverable', isEqualTo: true);
 
     if (currentUser.ageRange != null) {
       query = query
@@ -372,13 +363,14 @@ class PrivacyAwareUserSearchRepo {
         try {
           final query = docRef
               .where('geoHash', isEqualTo: geoHash)
-              .where('id', isNotEqualTo: currentUser.id)
+              .where('isDiscoverable', isEqualTo: true)
               .limit(20);
 
           final snapshot = await query.get();
 
           for (var doc in snapshot.docs) {
             try {
+              if (doc.id == currentUser.id) continue;
               final filteredData =
                   await _privacyService.getFilteredUserData(doc.id);
               if (filteredData != null) {

@@ -82,7 +82,7 @@ class ProfileVerificationService {
 
       log('✅ Profile photo verification completed: $status');
       return result;
-    } catch (e) {
+    } on Object catch (e) {
       log('❌ Error verifying profile photo: $e');
       return VerificationResult(
         type: VerificationType.profilePhoto,
@@ -140,7 +140,7 @@ class ProfileVerificationService {
 
       log('✅ Government ID verification completed: $status');
       return result;
-    } catch (e) {
+    } on Object catch (e) {
       log('❌ Error verifying government ID: $e');
       return VerificationResult(
         type: VerificationType.governmentId,
@@ -202,7 +202,7 @@ class ProfileVerificationService {
 
       log('✅ Phone number verification completed: $status');
       return result;
-    } catch (e) {
+    } on Object catch (e) {
       log('❌ Error verifying phone number: $e');
       return VerificationResult(
         type: VerificationType.phoneNumber,
@@ -257,7 +257,7 @@ class ProfileVerificationService {
 
       log('✅ Email verification completed: $status');
       return result;
-    } catch (e) {
+    } on Object catch (e) {
       log('❌ Error verifying email: $e');
       return VerificationResult(
         type: VerificationType.email,
@@ -310,7 +310,7 @@ class ProfileVerificationService {
 
       log('✅ Social media verification completed: $status');
       return result;
-    } catch (e) {
+    } on Object catch (e) {
       log('❌ Error verifying social media: $e');
       return VerificationResult(
         type: VerificationType.socialMedia,
@@ -361,7 +361,7 @@ class ProfileVerificationService {
         overallStatus: _calculateOverallStatus(verifications),
         verificationScore: _calculateVerificationScore(verifications),
       );
-    } catch (e) {
+    } on Object catch (e) {
       log('❌ Error getting verification status: $e');
       return UserVerificationStatus(
         userId: userId,
@@ -440,7 +440,7 @@ class ProfileVerificationService {
           );
       final uploadTask = await ref.putFile(document);
       return await uploadTask.ref.getDownloadURL();
-    } catch (e) {
+    } on Object catch (e) {
       log('❌ Error uploading verification document: $e');
       rethrow;
     }
@@ -469,7 +469,7 @@ class ProfileVerificationService {
         },
         SetOptions(merge: true),
       );
-    } catch (e) {
+    } on Object catch (e) {
       log('❌ Error updating verification status: $e');
       rethrow;
     }
@@ -504,7 +504,7 @@ class ProfileVerificationService {
         platform: data['platform'],
         username: data['username'],
       );
-    } catch (e) {
+    } on Object catch (e) {
       log('❌ Error getting verification status: $e');
       return null;
     }
@@ -532,8 +532,10 @@ class ProfileVerificationService {
   ) {
     if (verifications.isEmpty) return 0;
 
-    final totalScore =
-        verifications.values.fold(0.0, (sum, v) => sum + v.score);
+    final totalScore = verifications.values.fold<double>(
+      0.0,
+      (sum, v) => sum + v.score,
+    );
     return totalScore / verifications.length;
   }
 }

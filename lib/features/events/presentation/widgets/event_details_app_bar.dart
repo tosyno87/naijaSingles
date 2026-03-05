@@ -48,8 +48,11 @@ class EventDetailsSliverAppBar extends StatelessWidget {
                 borderRadius: BorderRadius.circular(20),
               ),
               child: IconButton(
-                icon: const Icon(Icons.share_outlined,
-                    color: Colors.white, size: 20,),
+                icon: const Icon(
+                  Icons.share_outlined,
+                  color: Colors.white,
+                  size: 20,
+                ),
                 onPressed: onShare,
               ),
             ),
@@ -116,8 +119,7 @@ class EventDetailsSliverAppBar extends StatelessWidget {
         ),
       );
 
-  Widget _buildChip({required String label, required Color color}) =>
-      Container(
+  Widget _buildChip({required String label, required Color color}) => Container(
         padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
         decoration: BoxDecoration(
           color: color,

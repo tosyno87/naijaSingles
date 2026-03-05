@@ -49,7 +49,8 @@ class _EmailSignupScreenState extends State<EmailSignupScreen> {
             listener: (context, state) {
               if (state is EmailAuthSuccess) {
                 // Navigate to onboarding or home based on user status
-                unawaited(Navigator.pushReplacementNamed(context, '/onboarding'));
+                unawaited(
+                    Navigator.pushReplacementNamed(context, '/onboarding'));
               } else if (state is EmailAuthError) {
                 CustomSnackbar.showSnackBarSimple(
                   state.error,
@@ -218,10 +219,12 @@ class _EmailSignupScreenState extends State<EmailSignupScreen> {
                               ),
                               GestureDetector(
                                 onTap: () {
-                                  unawaited(Navigator.pushReplacementNamed(
-                                    context,
-                                    '/email_login',
-                                  ));
+                                  unawaited(
+                                    Navigator.pushReplacementNamed(
+                                      context,
+                                      '/email_login',
+                                    ),
+                                  );
                                 },
                                 child: Text(
                                   'Log In',

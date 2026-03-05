@@ -185,11 +185,13 @@ class GenderState extends State<Gender> with SingleTickerProviderStateMixin {
                                 'showOnProfile': showOnProfile,
                               };
                               userData.addAll(userGender);
-                              unawaited(Navigator.pushNamed(
-                                context,
-                                RouteName.nationalityScreen,
-                                arguments: userData,
-                              ));
+                              unawaited(
+                                Navigator.pushNamed(
+                                  context,
+                                  RouteName.nationalityScreen,
+                                  arguments: userData,
+                                ),
+                              );
                             } else {
                               CustomSnackbar.showSnackBarSimple(
                                 'Please select your gender',
@@ -263,8 +265,7 @@ class GenderState extends State<Gender> with SingleTickerProviderStateMixin {
                 ),
                 child: Icon(
                   icon,
-                  color:
-                      isSelected ? AppColors.primaryGreen : Colors.grey[600],
+                  color: isSelected ? AppColors.primaryGreen : Colors.grey[600],
                   size: 28,
                 ),
               ),

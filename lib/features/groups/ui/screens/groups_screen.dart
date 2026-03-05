@@ -58,7 +58,7 @@ class _GroupsScreenState extends State<GroupsScreen>
         _userGroups = userGroups;
         _isLoading = false;
       });
-    } catch (e) {
+    } on Object catch (e) {
       setState(() => _isLoading = false);
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
@@ -89,7 +89,7 @@ class _GroupsScreenState extends State<GroupsScreen>
         _groups = searchResults;
         _isSearching = false;
       });
-    } catch (e) {
+    } on Object catch (e) {
       setState(() => _isSearching = false);
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
@@ -124,12 +124,14 @@ class _GroupsScreenState extends State<GroupsScreen>
   }
 
   void _navigateToGroupDetails(GroupModel group) {
-    unawaited(Navigator.push(
-      context,
-      MaterialPageRoute(
-        builder: (context) => GroupDetailsScreen(group: group),
+    unawaited(
+      Navigator.push(
+        context,
+        MaterialPageRoute(
+          builder: (context) => GroupDetailsScreen(group: group),
+        ),
       ),
-    ));
+    );
   }
 
   Future<void> _navigateToCreateGroup() async {
@@ -140,7 +142,7 @@ class _GroupsScreenState extends State<GroupsScreen>
       ),
     );
     if (!mounted) return;
-    _loadGroups();
+    unawaited(_loadGroups());
   }
 
   @override

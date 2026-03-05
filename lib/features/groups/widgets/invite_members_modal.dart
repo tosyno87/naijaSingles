@@ -58,13 +58,16 @@ class _InviteMembersModalState extends State<InviteMembersModal> {
       final currentUserId = FirebaseAuth.instance.currentUser?.uid;
       final memberIds = widget.group.memberIds;
 
-      final filteredResults = results.where((user) => user.id != currentUserId && !memberIds.contains(user.id)).toList();
+      final filteredResults = results
+          .where((user) =>
+              user.id != currentUserId && !memberIds.contains(user.id))
+          .toList();
 
       setState(() {
         _searchResults = filteredResults;
         _isSearching = false;
       });
-    } catch (e) {
+    } on Object catch (e) {
       AppLogger.error('Error searching users', error: e);
       setState(() {
         _isSearching = false;
@@ -108,7 +111,7 @@ class _InviteMembersModalState extends State<InviteMembersModal> {
             userId: userId,
           );
           successCount++;
-        } catch (e) {
+        } on Object catch (e) {
           AppLogger.error('Error adding member $userId', error: e);
           failCount++;
         }
@@ -128,7 +131,7 @@ class _InviteMembersModalState extends State<InviteMembersModal> {
           ),
         );
       }
-    } catch (e) {
+    } on Object catch (e) {
       AppLogger.error('Error adding members', error: e);
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(

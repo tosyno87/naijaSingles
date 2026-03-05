@@ -204,10 +204,12 @@ class _TribeSelectionScreenState extends State<TribeSelectionScreen> {
                     fontSize: 16,
                   ),
                   items: _nationalities
-                      .map((String nationality) => DropdownMenuItem<String>(
-                            value: nationality,
-                            child: Text(nationality),
-                          ),)
+                      .map(
+                        (String nationality) => DropdownMenuItem<String>(
+                          value: nationality,
+                          child: Text(nationality),
+                        ),
+                      )
                       .toList(),
                   onChanged: _selectNationality,
                 ),

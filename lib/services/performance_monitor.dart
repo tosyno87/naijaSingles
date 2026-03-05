@@ -219,7 +219,7 @@ class PerformanceMonitor {
       final result = await operation();
       stopTimer(operationName);
       return result;
-    } catch (e) {
+    } on Object catch (e) {
       stopTimer(operationName);
       debugPrint('❌ Error in measured operation $operationName: $e');
       rethrow;
@@ -233,7 +233,7 @@ class PerformanceMonitor {
       final result = operation();
       stopTimer(operationName);
       return result;
-    } catch (e) {
+    } on Object catch (e) {
       stopTimer(operationName);
       debugPrint('❌ Error in measured sync operation $operationName: $e');
       rethrow;

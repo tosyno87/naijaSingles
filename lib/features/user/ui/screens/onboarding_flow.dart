@@ -33,130 +33,138 @@ class _OnboardingFlowState extends State<OnboardingFlow> {
   /// Navigate to the next page or finish onboarding if on the last page
   void onNext() {
     if (_currentPage < 2) {
-      unawaited(_pageController.nextPage(
-        duration: const Duration(milliseconds: 300),
-        curve: Curves.easeInOut,
-      ));
+      unawaited(
+        _pageController.nextPage(
+          duration: const Duration(milliseconds: 300),
+          curve: Curves.easeInOut,
+        ),
+      );
     } else {
-      unawaited(Navigator.pushReplacementNamed(
-        context,
-        RouteName.userNameScreen,
-      ));
+      unawaited(
+        Navigator.pushReplacementNamed(
+          context,
+          RouteName.userNameScreen,
+        ),
+      );
     }
   }
 
   @override
-  Widget build(BuildContext context) => BlocBuilder<OnboardingBloc, OnboardingState>(
-      builder: (context, state) {
-        final data = state.data ?? OnboardingData();
-        return _buildContent(context, data);
-      },
-    );
+  Widget build(BuildContext context) =>
+      BlocBuilder<OnboardingBloc, OnboardingState>(
+        builder: (context, state) {
+          final data = state.data ?? OnboardingData();
+          return _buildContent(context, data);
+        },
+      );
 
   Widget _buildContent(BuildContext context, OnboardingData data) => Scaffold(
-      backgroundColor: AppColors.backgroundColor,
-      body: SafeArea(
-        child: Column(
-          children: [
-            // Progress indicator
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
-              child: Row(
-                children: List.generate(
-                  3,
-                  (index) => Expanded(
-                    child: Container(
-                      height: 4,
-                      margin: const EdgeInsets.symmetric(horizontal: 4),
-                      decoration: BoxDecoration(
-                        color: _currentPage >= index
-                            ? AppColors.primaryGreen
-                            : Colors.grey.shade300,
-                        borderRadius: BorderRadius.circular(2),
+        backgroundColor: AppColors.backgroundColor,
+        body: SafeArea(
+          child: Column(
+            children: [
+              // Progress indicator
+              Padding(
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
+                child: Row(
+                  children: List.generate(
+                    3,
+                    (index) => Expanded(
+                      child: Container(
+                        height: 4,
+                        margin: const EdgeInsets.symmetric(horizontal: 4),
+                        decoration: BoxDecoration(
+                          color: _currentPage >= index
+                              ? AppColors.primaryGreen
+                              : Colors.grey.shade300,
+                          borderRadius: BorderRadius.circular(2),
+                        ),
                       ),
                     ),
                   ),
                 ),
               ),
-            ),
 
-            // PageView for onboarding screens
-            Expanded(
-              child: PageView(
-                controller: _pageController,
-                physics: const NeverScrollableScrollPhysics(),
-                onPageChanged: (int page) {
-                  setState(() {
-                    _currentPage = page;
-                  });
-                },
-                children: [
-                  // Screen 1: Cultural Identity
-                  _buildCulturalIdentityScreen(data),
+              // PageView for onboarding screens
+              Expanded(
+                child: PageView(
+                  controller: _pageController,
+                  physics: const NeverScrollableScrollPhysics(),
+                  onPageChanged: (int page) {
+                    setState(() {
+                      _currentPage = page;
+                    });
+                  },
+                  children: [
+                    // Screen 1: Cultural Identity
+                    _buildCulturalIdentityScreen(data),
 
-                  // Screen 2: Relationship Intent
-                  _buildRelationshipIntentScreen(data),
+                    // Screen 2: Relationship Intent
+                    _buildRelationshipIntentScreen(data),
 
-                  // Screen 3: Lifestyle & Values
-                  _buildLifestyleValuesScreen(data),
-                ],
+                    // Screen 3: Lifestyle & Values
+                    _buildLifestyleValuesScreen(data),
+                  ],
+                ),
               ),
-            ),
 
-            // Navigation labelLarges
-            Padding(
-              padding: const EdgeInsets.all(24),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  // Back labelLarge (hidden on first page)
-                  if (_currentPage > 0)
-                    TextButton(
-                      onPressed: () {
-                        unawaited(_pageController.previousPage(
-                          duration: const Duration(milliseconds: 300),
-                          curve: Curves.easeInOut,
-                        ));
-                      },
-                      child: Text(
-                        'Back',
-                        style: TextStyle(
-                          color: Colors.grey.shade700,
-                          fontSize: 16,
+              // Navigation labelLarges
+              Padding(
+                padding: const EdgeInsets.all(24),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    // Back labelLarge (hidden on first page)
+                    if (_currentPage > 0)
+                      TextButton(
+                        onPressed: () {
+                          unawaited(
+                            _pageController.previousPage(
+                              duration: const Duration(milliseconds: 300),
+                              curve: Curves.easeInOut,
+                            ),
+                          );
+                        },
+                        child: Text(
+                          'Back',
+                          style: TextStyle(
+                            color: Colors.grey.shade700,
+                            fontSize: 16,
+                          ),
+                        ),
+                      )
+                    else
+                      const SizedBox(width: 80),
+
+                    // Next/Finish labelLarge
+                    ElevatedButton(
+                      onPressed: _isCurrentPageValid(data) ? onNext : null,
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: AppColors.primaryGreen,
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 32,
+                          vertical: 12,
+                        ),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(30),
                         ),
                       ),
-                    )
-                  else
-                    const SizedBox(width: 80),
-
-                  // Next/Finish labelLarge
-                  ElevatedButton(
-                    onPressed: _isCurrentPageValid(data) ? onNext : null,
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: AppColors.primaryGreen,
-                      padding: const EdgeInsets.symmetric(
-                        horizontal: 32,
-                        vertical: 12,
-                      ),
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(30),
+                      child: Text(
+                        _currentPage < 2 ? 'Next' : 'Finish',
+                        style: const TextStyle(
+                          fontSize: 16,
+                          fontWeight: FontWeight.bold,
+                        ),
                       ),
                     ),
-                    child: Text(
-                      _currentPage < 2 ? 'Next' : 'Finish',
-                      style: const TextStyle(
-                        fontSize: 16,
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                  ),
-                ],
+                  ],
+                ),
               ),
-            ),
-          ],
+            ],
+          ),
         ),
-      ),
-    );
+      );
 
   /// Check if the current page has valid data to proceed
   bool _isCurrentPageValid(OnboardingData data) {
@@ -581,8 +589,9 @@ class _OnboardingFlowState extends State<OnboardingFlow> {
       child: Container(
         padding: const EdgeInsets.all(16),
         decoration: BoxDecoration(
-          color:
-              isSelected ? AppColors.primaryGreen.withValues(alpha: 0.1) : Colors.white,
+          color: isSelected
+              ? AppColors.primaryGreen.withValues(alpha: 0.1)
+              : Colors.white,
           borderRadius: BorderRadius.circular(12),
           border: Border.all(
             color: isSelected ? AppColors.primaryGreen : Colors.grey.shade300,
@@ -594,7 +603,8 @@ class _OnboardingFlowState extends State<OnboardingFlow> {
             Container(
               padding: const EdgeInsets.all(12),
               decoration: BoxDecoration(
-                color: isSelected ? AppColors.primaryGreen : Colors.grey.shade100,
+                color:
+                    isSelected ? AppColors.primaryGreen : Colors.grey.shade100,
                 shape: BoxShape.circle,
               ),
               child: Icon(
@@ -613,7 +623,8 @@ class _OnboardingFlowState extends State<OnboardingFlow> {
                     style: TextStyle(
                       fontSize: 18,
                       fontWeight: FontWeight.bold,
-                      color: isSelected ? AppColors.primaryGreen : Colors.black87,
+                      color:
+                          isSelected ? AppColors.primaryGreen : Colors.black87,
                     ),
                   ),
                   const SizedBox(height: 4),

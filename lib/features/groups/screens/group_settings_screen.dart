@@ -129,7 +129,7 @@ class _GroupSettingsScreenState extends State<GroupSettingsScreen> {
                 '${widget.group.id}_${DateTime.now().millisecondsSinceEpoch}.jpg',
           );
           AppLogger.info('Image uploaded successfully: $imageUrl');
-        } catch (e) {
+        } on Object catch (e) {
           AppLogger.error('Failed to upload image', error: e);
           if (mounted) {
             ScaffoldMessenger.of(context).showSnackBar(
@@ -152,7 +152,7 @@ class _GroupSettingsScreenState extends State<GroupSettingsScreen> {
         groupType = GroupType.values.firstWhere(
           (type) => type.name == _selectedType,
         );
-      } catch (e) {
+      } on Object catch (e) {
         AppLogger.error('Invalid group type: $_selectedType', error: e);
         // Keep existing type if invalid
       }
@@ -185,7 +185,7 @@ class _GroupSettingsScreenState extends State<GroupSettingsScreen> {
           },
         );
       }
-    } catch (e) {
+    } on Object catch (e) {
       AppLogger.error('Failed to save group settings', error: e);
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(

@@ -134,7 +134,7 @@ class UnifiedGroupService {
       log('✅ Unified group created successfully: $groupId');
       log('📊 Group data: memberIds=${groupData['memberIds']}, isActive=${groupData['isActive']}');
       return group;
-    } catch (e) {
+    } on Object catch (e) {
       log('❌ Error creating unified group: $e');
       rethrow;
     }
@@ -209,7 +209,7 @@ class UnifiedGroupService {
 
       log('✅ Successfully joined group: $groupId');
       return GroupJoinResult.success(groupData['name'] ?? 'Unknown Group');
-    } catch (e) {
+    } on Object catch (e) {
       log('❌ Error joining group: $e');
       if (e is GroupJoinException) rethrow;
 
@@ -268,7 +268,7 @@ class UnifiedGroupService {
       }
 
       log('✅ Successfully left group: $groupId');
-    } catch (e) {
+    } on Object catch (e) {
       log('❌ Error leaving group: $e');
       rethrow;
     }
@@ -358,7 +358,7 @@ class UnifiedGroupService {
 
       log('✅ Group message sent successfully: ${docRef.id}');
       return message;
-    } catch (e) {
+    } on Object catch (e) {
       log('❌ Error sending group message: $e');
       rethrow;
     }
@@ -447,8 +447,10 @@ class UnifiedGroupService {
     return query.snapshots().map((snapshot) {
       // Filter and sort in memory to avoid complex index requirements
       final groups = snapshot.docs
-          .map((doc) =>
-              UnifiedGroup.fromMap(doc.id, doc.data() as Map<String, dynamic>),)
+          .map(
+            (doc) => UnifiedGroup.fromMap(
+                doc.id, doc.data() as Map<String, dynamic>),
+          )
           .toList();
 
       // Filter active groups and sort by last activity
@@ -489,7 +491,7 @@ class UnifiedGroupService {
       }).toList();
 
       return results;
-    } catch (e) {
+    } on Object catch (e) {
       log('❌ Error searching groups: $e');
       return [];
     }
@@ -503,7 +505,7 @@ class UnifiedGroupService {
       if (!doc.exists) return null;
 
       return UnifiedGroup.fromMap(doc.id, doc.data()!);
-    } catch (e) {
+    } on Object catch (e) {
       log('❌ Error getting group details: $e');
       return null;
     }
@@ -540,7 +542,7 @@ class UnifiedGroupService {
 
         log('✅ Cleaned up duplicate members: ${uniqueMembers.length} unique members');
       }
-    } catch (e) {
+    } on Object catch (e) {
       log('❌ Error cleaning up duplicate members: $e');
     }
   }
@@ -624,7 +626,7 @@ class UnifiedGroupService {
           .update(updateData);
 
       log('✅ Group settings updated successfully: $groupId');
-    } catch (e) {
+    } on Object catch (e) {
       log('❌ Error updating group settings: $e');
       rethrow;
     }
@@ -662,7 +664,7 @@ class UnifiedGroupService {
       });
 
       log('✅ Group deleted successfully: $groupId');
-    } catch (e) {
+    } on Object catch (e) {
       log('❌ Error deleting group: $e');
       rethrow;
     }
@@ -709,7 +711,7 @@ class UnifiedGroupService {
           .add(messageData);
 
       log('✅ Group message sent successfully: $groupId');
-    } catch (e) {
+    } on Object catch (e) {
       log('❌ Error sending group message: $e');
       rethrow;
     }
@@ -744,7 +746,7 @@ class UnifiedGroupService {
           });
         }
       }
-    } catch (e) {
+    } on Object catch (e) {
       log('❌ Error notifying group members: $e');
     }
   }
@@ -817,7 +819,7 @@ class UnifiedGroupService {
 
       log('✅ Successfully added member to group: $groupId');
       return true;
-    } catch (e) {
+    } on Object catch (e) {
       log('❌ Error adding member to group: $e');
       rethrow;
     }
@@ -889,7 +891,7 @@ class UnifiedGroupService {
 
       log('✅ Successfully removed member from group: $groupId');
       return true;
-    } catch (e) {
+    } on Object catch (e) {
       log('❌ Error removing member from group: $e');
       rethrow;
     }
@@ -960,7 +962,7 @@ class UnifiedGroupService {
 
       log('✅ Successfully promoted member to admin: $groupId');
       return true;
-    } catch (e) {
+    } on Object catch (e) {
       log('❌ Error promoting member to admin: $e');
       rethrow;
     }
@@ -1030,7 +1032,7 @@ class UnifiedGroupService {
 
       log('✅ Successfully demoted admin to member: $groupId');
       return true;
-    } catch (e) {
+    } on Object catch (e) {
       log('❌ Error demoting admin to member: $e');
       rethrow;
     }
@@ -1084,7 +1086,7 @@ class UnifiedGroupService {
 
       log('✅ Found ${users.length} users for invitation');
       return users;
-    } catch (e) {
+    } on Object catch (e) {
       log('❌ Error searching users for invitation: $e');
       rethrow;
     }
@@ -1153,7 +1155,7 @@ class UnifiedGroupService {
 
       log('✅ Successfully sent group invitation');
       return true;
-    } catch (e) {
+    } on Object catch (e) {
       log('❌ Error sending group invitation: $e');
       rethrow;
     }
@@ -1217,7 +1219,7 @@ class UnifiedGroupService {
 
       log('✅ Successfully accepted group invitation');
       return true;
-    } catch (e) {
+    } on Object catch (e) {
       log('❌ Error accepting group invitation: $e');
       rethrow;
     }
@@ -1264,7 +1266,7 @@ class UnifiedGroupService {
 
       log('✅ Successfully declined group invitation');
       return true;
-    } catch (e) {
+    } on Object catch (e) {
       log('❌ Error declining group invitation: $e');
       rethrow;
     }

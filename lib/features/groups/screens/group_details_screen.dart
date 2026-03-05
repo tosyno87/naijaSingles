@@ -118,8 +118,8 @@ class _GroupDetailsScreenState extends State<GroupDetailsScreen> {
                         imageUrl: widget.group.imageUrl!,
                         fit: BoxFit.cover,
                         placeholder: (context, url) => const Center(
-                            child:
-                                CircularProgressIndicator(strokeWidth: 2),),
+                          child: CircularProgressIndicator(strokeWidth: 2),
+                        ),
                         errorWidget: (context, url, error) => const Icon(
                           Icons.group,
                           color: AppColors.primaryGreen,
@@ -259,11 +259,13 @@ class _GroupDetailsScreenState extends State<GroupDetailsScreen> {
           if (messages.isNotEmpty) {
             WidgetsBinding.instance.addPostFrameCallback((_) {
               if (_scrollController.hasClients) {
-                unawaited(_scrollController.animateTo(
-                  _scrollController.position.maxScrollExtent,
-                  duration: const Duration(milliseconds: 300),
-                  curve: Curves.easeOut,
-                ));
+                unawaited(
+                  _scrollController.animateTo(
+                    _scrollController.position.maxScrollExtent,
+                    duration: const Duration(milliseconds: 300),
+                    curve: Curves.easeOut,
+                  ),
+                );
               }
             });
           }
@@ -391,7 +393,7 @@ class _GroupDetailsScreenState extends State<GroupDetailsScreen> {
 
       _messageController.clear();
       setState(() {}); // Update send button state
-    } catch (e) {
+    } on Object catch (e) {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
@@ -478,9 +480,9 @@ class _GroupDetailsScreenState extends State<GroupDetailsScreen> {
                     imageUrl: widget.group.imageUrl!,
                     fit: BoxFit.cover,
                     placeholder: (context, url) => const Center(
-                        child: CircularProgressIndicator(strokeWidth: 2),),
-                    errorWidget: (context, url, error) =>
-                        _buildDefaultAvatar(),
+                      child: CircularProgressIndicator(strokeWidth: 2),
+                    ),
+                    errorWidget: (context, url, error) => _buildDefaultAvatar(),
                   ),
                 )
               : _buildDefaultAvatar(),
@@ -980,12 +982,14 @@ class _GroupDetailsScreenState extends State<GroupDetailsScreen> {
 
   // Action methods
   void _openGroupChat() {
-    unawaited(Navigator.push(
-      context,
-      MaterialPageRoute(
-        builder: (context) => GroupChatScreen(groupId: widget.group.id),
+    unawaited(
+      Navigator.push(
+        context,
+        MaterialPageRoute(
+          builder: (context) => GroupChatScreen(groupId: widget.group.id),
+        ),
       ),
-    ));
+    );
   }
 
   Future<void> _inviteMembers() async {
@@ -1016,7 +1020,7 @@ class _GroupDetailsScreenState extends State<GroupDetailsScreen> {
         );
         Navigator.pop(context, true); // Return true to indicate group was left
       }
-    } catch (e) {
+    } on Object catch (e) {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
@@ -1044,7 +1048,7 @@ class _GroupDetailsScreenState extends State<GroupDetailsScreen> {
           true,
         ); // Return true to indicate group was joined
       }
-    } catch (e) {
+    } on Object catch (e) {
       if (mounted) {
         String message;
         if (e is GroupJoinException) {
@@ -1098,202 +1102,218 @@ class _GroupDetailsScreenState extends State<GroupDetailsScreen> {
       false;
 
   void _showGroupOptions() {
-    unawaited(showModalBottomSheet(
-      context: context,
-      builder: (context) => Container(
-        padding: const EdgeInsets.all(20),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            ListTile(
-              leading: const Icon(Icons.settings),
-              title: const Text('Group Settings'),
-              onTap: () {
-                Navigator.pop(context);
-                unawaited(Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (context) =>
-                        GroupSettingsScreen(group: widget.group),
-                  ),
-                ));
-              },
-            ),
-            ListTile(
-              leading: const Icon(Icons.notifications),
-              title: const Text('Notification Settings'),
-              onTap: () {
-                Navigator.pop(context);
-                unawaited(showModalBottomSheet(
-                  context: context,
-                  isScrollControlled: true,
-                  backgroundColor: Colors.transparent,
-                  builder: (context) => GroupNotificationToggle(
-                    groupId: widget.group.id,
-                    groupName: widget.group.name,
-                  ),
-                ));
-              },
-            ),
-            ListTile(
-              leading: const Icon(Icons.report),
-              title: const Text('Report Group'),
-              onTap: () {
-                Navigator.pop(context);
-                unawaited(showModalBottomSheet(
-                  context: context,
-                  isScrollControlled: true,
-                  backgroundColor: Colors.transparent,
-                  builder: (context) => GroupReportModal(
-                    groupId: widget.group.id,
-                    groupName: widget.group.name,
-                  ),
-                ));
-              },
-            ),
-          ],
+    unawaited(
+      showModalBottomSheet(
+        context: context,
+        builder: (context) => Container(
+          padding: const EdgeInsets.all(20),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              ListTile(
+                leading: const Icon(Icons.settings),
+                title: const Text('Group Settings'),
+                onTap: () {
+                  Navigator.pop(context);
+                  unawaited(
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) =>
+                            GroupSettingsScreen(group: widget.group),
+                      ),
+                    ),
+                  );
+                },
+              ),
+              ListTile(
+                leading: const Icon(Icons.notifications),
+                title: const Text('Notification Settings'),
+                onTap: () {
+                  Navigator.pop(context);
+                  unawaited(
+                    showModalBottomSheet(
+                      context: context,
+                      isScrollControlled: true,
+                      backgroundColor: Colors.transparent,
+                      builder: (context) => GroupNotificationToggle(
+                        groupId: widget.group.id,
+                        groupName: widget.group.name,
+                      ),
+                    ),
+                  );
+                },
+              ),
+              ListTile(
+                leading: const Icon(Icons.report),
+                title: const Text('Report Group'),
+                onTap: () {
+                  Navigator.pop(context);
+                  unawaited(
+                    showModalBottomSheet(
+                      context: context,
+                      isScrollControlled: true,
+                      backgroundColor: Colors.transparent,
+                      builder: (context) => GroupReportModal(
+                        groupId: widget.group.id,
+                        groupName: widget.group.name,
+                      ),
+                    ),
+                  );
+                },
+              ),
+            ],
+          ),
         ),
       ),
-    ));
+    );
   }
 
   void _showAllMembers() {
-    unawaited(showModalBottomSheet(
-      context: context,
-      isScrollControlled: true,
-      builder: (context) => Container(
-        height: MediaQuery.of(context).size.height * 0.7,
-        padding: const EdgeInsets.all(20),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(
-              'All Members (${widget.group.memberIds.length})',
-              style: GoogleFonts.montserrat(
-                fontSize: 20,
-                fontWeight: FontWeight.bold,
+    unawaited(
+      showModalBottomSheet(
+        context: context,
+        isScrollControlled: true,
+        builder: (context) => Container(
+          height: MediaQuery.of(context).size.height * 0.7,
+          padding: const EdgeInsets.all(20),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                'All Members (${widget.group.memberIds.length})',
+                style: GoogleFonts.montserrat(
+                  fontSize: 20,
+                  fontWeight: FontWeight.bold,
+                ),
               ),
-            ),
-            const SizedBox(height: 16),
-            Expanded(
-              child: ListView.builder(
-                itemCount: widget.group.memberIds.length,
-                itemBuilder: (context, index) {
-                  final memberId = widget.group.memberIds[index];
-                  return _buildMemberTile(memberId);
-                },
+              const SizedBox(height: 16),
+              Expanded(
+                child: ListView.builder(
+                  itemCount: widget.group.memberIds.length,
+                  itemBuilder: (context, index) {
+                    final memberId = widget.group.memberIds[index];
+                    return _buildMemberTile(memberId);
+                  },
+                ),
               ),
-            ),
-          ],
+            ],
+          ),
         ),
       ),
-    ));
+    );
   }
 
   void _showGroupInfoModal() {
-    unawaited(showModalBottomSheet(
-      context: context,
-      isScrollControlled: true,
-      backgroundColor: Colors.transparent,
-      builder: (context) => GroupInfoModal(group: widget.group),
-    ));
+    unawaited(
+      showModalBottomSheet(
+        context: context,
+        isScrollControlled: true,
+        backgroundColor: Colors.transparent,
+        builder: (context) => GroupInfoModal(group: widget.group),
+      ),
+    );
   }
 
   void _showGroupImageOptions() {
-    unawaited(showModalBottomSheet(
-      context: context,
-      builder: (context) => Container(
-        padding: const EdgeInsets.all(20),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            if (widget.group.imageUrl != null) ...[
+    unawaited(
+      showModalBottomSheet(
+        context: context,
+        builder: (context) => Container(
+          padding: const EdgeInsets.all(20),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              if (widget.group.imageUrl != null) ...[
+                ListTile(
+                  leading: Container(
+                    padding: const EdgeInsets.all(8),
+                    decoration: BoxDecoration(
+                      color: AppColors.primaryGreen.withValues(alpha: 0.1),
+                      borderRadius: BorderRadius.circular(8),
+                    ),
+                    child: const Icon(
+                      Icons.visibility,
+                      color: AppColors.primaryGreen,
+                      size: 24,
+                    ),
+                  ),
+                  title: Text(
+                    'View Full Image',
+                    style: GoogleFonts.montserrat(
+                      fontSize: 16,
+                      fontWeight: FontWeight.w500,
+                    ),
+                  ),
+                  onTap: () {
+                    Navigator.pop(context);
+                    unawaited(
+                      FullScreenImageViewer.show(
+                        context: context,
+                        imageUrl: widget.group.imageUrl!,
+                        title: widget.group.name,
+                      ),
+                    );
+                  },
+                ),
+              ],
+              if (widget.isMember && _canEditGroup()) ...[
+                ListTile(
+                  leading: Container(
+                    padding: const EdgeInsets.all(8),
+                    decoration: BoxDecoration(
+                      color: AppColors.primaryGreen.withValues(alpha: 0.1),
+                      borderRadius: BorderRadius.circular(8),
+                    ),
+                    child: const Icon(
+                      Icons.edit,
+                      color: AppColors.primaryGreen,
+                      size: 24,
+                    ),
+                  ),
+                  title: Text(
+                    widget.group.imageUrl != null
+                        ? 'Change Group Photo'
+                        : 'Add Group Photo',
+                    style: GoogleFonts.montserrat(
+                      fontSize: 16,
+                      fontWeight: FontWeight.w500,
+                    ),
+                  ),
+                  onTap: () {
+                    Navigator.pop(context);
+                    unawaited(_editGroupPhoto());
+                  },
+                ),
+              ],
               ListTile(
                 leading: Container(
                   padding: const EdgeInsets.all(8),
                   decoration: BoxDecoration(
-                    color: AppColors.primaryGreen.withValues(alpha: 0.1),
+                    color: Colors.grey.withValues(alpha: 0.1),
                     borderRadius: BorderRadius.circular(8),
                   ),
-                  child: const Icon(
-                    Icons.visibility,
-                    color: AppColors.primaryGreen,
+                  child: Icon(
+                    Icons.close,
+                    color: Colors.grey[600],
                     size: 24,
                   ),
                 ),
                 title: Text(
-                  'View Full Image',
+                  'Cancel',
                   style: GoogleFonts.montserrat(
                     fontSize: 16,
                     fontWeight: FontWeight.w500,
+                    color: Colors.grey[600],
                   ),
                 ),
-                onTap: () {
-                  Navigator.pop(context);
-                  unawaited(FullScreenImageViewer.show(
-                    context: context,
-                    imageUrl: widget.group.imageUrl!,
-                    title: widget.group.name,
-                  ));
-                },
+                onTap: () => Navigator.pop(context),
               ),
             ],
-            if (widget.isMember && _canEditGroup()) ...[
-              ListTile(
-                leading: Container(
-                  padding: const EdgeInsets.all(8),
-                  decoration: BoxDecoration(
-                    color: AppColors.primaryGreen.withValues(alpha: 0.1),
-                    borderRadius: BorderRadius.circular(8),
-                  ),
-                  child: const Icon(
-                    Icons.edit,
-                    color: AppColors.primaryGreen,
-                    size: 24,
-                  ),
-                ),
-                title: Text(
-                  widget.group.imageUrl != null
-                      ? 'Change Group Photo'
-                      : 'Add Group Photo',
-                  style: GoogleFonts.montserrat(
-                    fontSize: 16,
-                    fontWeight: FontWeight.w500,
-                  ),
-                ),
-                onTap: () {
-                  Navigator.pop(context);
-                  unawaited(_editGroupPhoto());
-                },
-              ),
-            ],
-            ListTile(
-              leading: Container(
-                padding: const EdgeInsets.all(8),
-                decoration: BoxDecoration(
-                  color: Colors.grey.withValues(alpha: 0.1),
-                  borderRadius: BorderRadius.circular(8),
-                ),
-                child: Icon(
-                  Icons.close,
-                  color: Colors.grey[600],
-                  size: 24,
-                ),
-              ),
-              title: Text(
-                'Cancel',
-                style: GoogleFonts.montserrat(
-                  fontSize: 16,
-                  fontWeight: FontWeight.w500,
-                  color: Colors.grey[600],
-                ),
-              ),
-              onTap: () => Navigator.pop(context),
-            ),
-          ],
+          ),
         ),
       ),
-    ));
+    );
   }
 
   bool _canEditGroup() {
@@ -1320,14 +1340,17 @@ class _GroupDetailsScreenState extends State<GroupDetailsScreen> {
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
         content: Text(
-            'Viewing ${memberId == FirebaseAuth.instance.currentUser?.uid ? "your" : "member"} profile',),
+          'Viewing ${memberId == FirebaseAuth.instance.currentUser?.uid ? "your" : "member"} profile',
+        ),
         backgroundColor: AppColors.primaryGreen,
       ),
     );
   }
 
   Future<void> _showRemoveMemberConfirmation(
-      String memberId, String memberName,) async {
+    String memberId,
+    String memberName,
+  ) async {
     final confirmed = await showDialog<bool>(
       context: context,
       builder: (context) => AlertDialog(
@@ -1388,7 +1411,7 @@ class _GroupDetailsScreenState extends State<GroupDetailsScreen> {
         // Refresh the screen
         setState(() {});
       }
-    } catch (e) {
+    } on Object catch (e) {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(

@@ -264,9 +264,8 @@ class _BasicInfoStepState extends State<BasicInfoStep> {
                     : Colors.red.withValues(alpha: 0.1),
                 borderRadius: BorderRadius.circular(12),
                 border: Border.all(
-                  color: _isDescriptionValid
-                      ? AppColors.primaryGreen
-                      : Colors.red,
+                  color:
+                      _isDescriptionValid ? AppColors.primaryGreen : Colors.red,
                 ),
               ),
               child: Text(
@@ -274,9 +273,8 @@ class _BasicInfoStepState extends State<BasicInfoStep> {
                 style: GoogleFonts.montserrat(
                   fontSize: 11,
                   fontWeight: FontWeight.w500,
-                  color: _isDescriptionValid
-                      ? AppColors.primaryGreen
-                      : Colors.red,
+                  color:
+                      _isDescriptionValid ? AppColors.primaryGreen : Colors.red,
                 ),
               ),
             ),
@@ -468,8 +466,8 @@ class _BasicInfoStepState extends State<BasicInfoStep> {
                           .withValues(alpha: 0.7), // Afropeep green hint
                     ),
                     filled: true,
-                    fillColor: AppColors
-                        .backgroundColor, // Afropeep cream background
+                    fillColor:
+                        AppColors.backgroundColor, // Afropeep cream background
                     border: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(12),
                       borderSide: BorderSide(
@@ -488,8 +486,8 @@ class _BasicInfoStepState extends State<BasicInfoStep> {
                     ),
                     focusedBorder: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(12),
-                      borderSide:
-                          const BorderSide(color: AppColors.primaryGreen, width: 2),
+                      borderSide: const BorderSide(
+                          color: AppColors.primaryGreen, width: 2),
                     ),
                     contentPadding: const EdgeInsets.all(16),
                   ),
@@ -504,7 +502,9 @@ class _BasicInfoStepState extends State<BasicInfoStep> {
                     backgroundColor: AppColors.primaryGreen,
                     foregroundColor: Colors.white,
                     padding: const EdgeInsets.symmetric(
-                        horizontal: 12, vertical: 16,),
+                      horizontal: 12,
+                      vertical: 16,
+                    ),
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(12),
                     ),
@@ -533,7 +533,9 @@ class _BasicInfoStepState extends State<BasicInfoStep> {
                   .map(
                     (tag) => Container(
                       padding: const EdgeInsets.symmetric(
-                          horizontal: 12, vertical: 6,),
+                        horizontal: 12,
+                        vertical: 6,
+                      ),
                       decoration: BoxDecoration(
                         color: AppColors.primaryGreen.withValues(alpha: 0.1),
                         borderRadius: BorderRadius.circular(20),

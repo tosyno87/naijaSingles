@@ -63,12 +63,19 @@ class _MessageBoxState extends State<MessageBox> {
 
   List<Widget> generateReceiverLayout(DocumentSnapshot documentSnapshot) {
     if (!documentSnapshot.get('isRead')) {
-      unawaited(chatReference.doc(documentSnapshot.id).update({
-        'isRead': true,
-      }));
-      unawaited(db.collection('chats').doc(chatId(widget.second, widget.sender)).update({
-        'isRead': true,
-      }));
+      unawaited(
+        chatReference.doc(documentSnapshot.id).update({
+          'isRead': true,
+        }),
+      );
+      unawaited(
+        db
+            .collection('chats')
+            .doc(chatId(widget.second, widget.sender))
+            .update({
+          'isRead': true,
+        }),
+      );
       return ChatMessageRead.messagesIsRead(
         documentSnapshot,
         widget.second,
@@ -97,7 +104,8 @@ class _MessageBoxState extends State<MessageBox> {
 
   String? blockedBy;
   void checkBlock() {
-    _blockSubscription = chatReference.doc('blocked').snapshots().listen((onData) {
+    _blockSubscription =
+        chatReference.doc('blocked').snapshots().listen((onData) {
       if (true) {
         // (onData.data != null) {
         blockedBy = onData.get('blockedBy');
@@ -282,7 +290,8 @@ class _MessageBoxState extends State<MessageBox> {
 
   Widget _buildTextComposer() => IconTheme(
         data: IconThemeData(
-          color: _isWritting ? AppColors.primaryGreen : AppColors.secondaryColor,
+          color:
+              _isWritting ? AppColors.primaryGreen : AppColors.secondaryColor,
         ),
         child: Card(
           elevation: 10,

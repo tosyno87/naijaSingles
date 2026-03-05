@@ -53,7 +53,7 @@ class ProfileImageCropperService {
       );
 
       return croppedFile != null ? File(croppedFile.path) : null;
-    } catch (e) {
+    } on Object catch (e) {
       debugPrint('Error cropping image: $e');
       return null;
     }
@@ -110,7 +110,7 @@ class ProfileImageCropperService {
       }
 
       return false;
-    } catch (e) {
+    } on Object catch (e) {
       developer.log('❌ Error requesting camera permission: $e');
       // On iOS, if permission_handler fails, still allow camera access
       // as iOS handles it natively
@@ -151,12 +151,13 @@ class ProfileImageCropperService {
         // For iOS, permissions are handled automatically by the system
         // when accessing photo library. We can return true here.
         developer.log(
-            '📁 iOS detected - photo library permission handled by system',);
+          '📁 iOS detected - photo library permission handled by system',
+        );
         return true; // iOS will show permission dialog automatically
       }
 
       return false;
-    } catch (e) {
+    } on Object catch (e) {
       developer.log('❌ Error requesting storage permission: $e');
       // On iOS, if permission_handler fails, still allow photo access
       // as iOS handles it natively
@@ -268,7 +269,7 @@ class ProfileImageCropperService {
           );
         }
         return null;
-      } catch (error) {
+      } on Object catch (error) {
         developer.log('❌ Error picking image: $error');
         developer.log('❌ Error type: ${error.runtimeType}');
         if (context != null && context.mounted) {
@@ -306,7 +307,7 @@ class ProfileImageCropperService {
       }
 
       return croppedFile;
-    } catch (e, stackTrace) {
+    } on Object catch (e, stackTrace) {
       developer.log('❌ Error picking and cropping image: $e');
       developer.log('❌ Stack trace: $stackTrace');
 
@@ -331,26 +332,28 @@ class ProfileImageCropperService {
     String message,
     Permission permission,
   ) {
-    unawaited(showDialog(
-      context: context,
-      builder: (context) => AlertDialog(
-        title: const Text('Permission Required'),
-        content: Text(message),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(context),
-            child: const Text('Cancel'),
-          ),
-          TextButton(
-            onPressed: () {
-              Navigator.pop(context);
-              unawaited(openAppSettings());
-            },
-            child: const Text('Open Settings'),
-          ),
-        ],
+    unawaited(
+      showDialog(
+        context: context,
+        builder: (context) => AlertDialog(
+          title: const Text('Permission Required'),
+          content: Text(message),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.pop(context),
+              child: const Text('Cancel'),
+            ),
+            TextButton(
+              onPressed: () {
+                Navigator.pop(context);
+                unawaited(openAppSettings());
+              },
+              child: const Text('Open Settings'),
+            ),
+          ],
+        ),
       ),
-    ));
+    );
   }
 
   /// Show image source selection dialog with cropping

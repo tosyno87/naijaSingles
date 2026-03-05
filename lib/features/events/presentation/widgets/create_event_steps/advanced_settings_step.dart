@@ -214,12 +214,13 @@ class _AdvancedSettingsStepState extends State<AdvancedSettingsStep> {
                         imageUrl: imagePath,
                         fit: BoxFit.cover,
                         placeholder: (context, url) => const Center(
-                            child:
-                                CircularProgressIndicator(strokeWidth: 2),),
+                          child: CircularProgressIndicator(strokeWidth: 2),
+                        ),
                         errorWidget: (context, url, error) => const Icon(
-                            Icons.event,
-                            size: 40,
-                            color: Colors.grey,),
+                          Icons.event,
+                          size: 40,
+                          color: Colors.grey,
+                        ),
                       )
                     : Image.file(File(imagePath), fit: BoxFit.cover),
               ),
@@ -448,7 +449,7 @@ class _AdvancedSettingsStepState extends State<AdvancedSettingsStep> {
           });
         }
       }
-    } catch (e) {
+    } on Object catch (e) {
       if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(

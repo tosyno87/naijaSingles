@@ -12,7 +12,7 @@ Future<void> showSubscriptionDialog({
   required UserModel currentUser,
   required Map items,
 }) async {
-  showDialog(
+  await showDialog(
     context: context,
     builder: (BuildContext context) => Dialog(
       shape: RoundedRectangleBorder(
@@ -26,7 +26,8 @@ Future<void> showSubscriptionDialog({
           children: [
             Text(
               'Subscription Required'.tr().toString(),
-              style: const TextStyle(fontSize: 18, color: AppColors.primaryGreen),
+              style:
+                  const TextStyle(fontSize: 18, color: AppColors.primaryGreen),
             ),
             const SizedBox(height: 10),
             Text(
@@ -51,13 +52,15 @@ Future<void> showSubscriptionDialog({
                 TextButton(
                   onPressed: () {
                     Navigator.of(context).pop();
-                    unawaited(Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder: (context) =>
-                            Products(currentUser, null, items),
+                    unawaited(
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) =>
+                              Products(currentUser, null, items),
+                        ),
                       ),
-                    ));
+                    );
                   },
                   child: Text(
                     'Yes'.tr().toString(),

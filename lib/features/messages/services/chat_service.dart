@@ -658,7 +658,8 @@ class ChatService {
         '❌ Firebase error removing from legacy matches collection: ${e.code} - ${e.message}',
       );
     } on Object catch (e) {
-      debugPrint('❌ Unexpected error removing from legacy matches collection: $e');
+      debugPrint(
+          '❌ Unexpected error removing from legacy matches collection: $e');
     }
   }
 

@@ -1,5 +1,4 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/foundation.dart';
 
 import '../features/match/data/services/likes_service.dart';
@@ -15,7 +14,6 @@ class SuperLikeService {
   static const Duration SUPER_LIKE_HIGHLIGHT_DURATION = Duration(days: 3);
 
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
-  final FirebaseAuth _auth = FirebaseAuth.instance;
   final MatchService _matchService = MatchService();
   final LikesService _likesService = LikesService();
 
@@ -249,7 +247,8 @@ class SuperLikeService {
       PerformanceMonitor.measure('respond_to_super_like', () async {
         try {
           debugPrint(
-              '💫 Responding to super like: $superLikeId (like: $isLike)',);
+            '💫 Responding to super like: $superLikeId (like: $isLike)',
+          );
 
           final superLikeDoc =
               await _superLikesCollection.doc(superLikeId).get();

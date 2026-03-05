@@ -81,7 +81,8 @@ class ChatPageState extends State<ChatPage> {
 
   String? blockedBy;
   void checkBlock() {
-    _blockSubscription = chatReference.doc('blocked').snapshots().listen((onData) {
+    _blockSubscription =
+        chatReference.doc('blocked').snapshots().listen((onData) {
       if (true) {
         // (onData.data != null) {
         blockedBy = onData.get('blockedBy');
@@ -159,108 +160,117 @@ class ChatPageState extends State<ChatPage> {
                 child: InkWell(
                   onTap: () {
                     Navigator.pop(ct);
-                    unawaited(showDialog(
-                      context: context,
-                      builder: (BuildContext ctx) => ClipRRect(
-                        borderRadius: BorderRadius.circular(10),
-                        child: AlertDialog(
-                          title: Text(
-                            isBlocked
-                                ? 'Unblock'.tr().toString()
-                                : 'Block'.tr().toString(),
-                          ),
-                          content: Text(
-                            'Do you want to'.tr(
-                              args: [
-                                if (isBlocked) 'Unblock'.tr().toString() else 'Block'.tr().toString(),
-                                widget.second.name ?? '',
-                              ],
+                    unawaited(
+                      showDialog(
+                        context: context,
+                        builder: (BuildContext ctx) => ClipRRect(
+                          borderRadius: BorderRadius.circular(10),
+                          child: AlertDialog(
+                            title: Text(
+                              isBlocked
+                                  ? 'Unblock'.tr().toString()
+                                  : 'Block'.tr().toString(),
                             ),
-                          ),
-                          actions: <Widget>[
-                            TextButton(
-                              onPressed: () => Navigator.of(context).pop(false),
-                              child: Text(
-                                'No'.tr().toString(),
-                                style: const TextStyle(color: AppColors.primaryGreen),
+                            content: Text(
+                              'Do you want to'.tr(
+                                args: [
+                                  if (isBlocked)
+                                    'Unblock'.tr().toString()
+                                  else
+                                    'Block'.tr().toString(),
+                                  widget.second.name ?? '',
+                                ],
                               ),
                             ),
-                            TextButton(
-                              onPressed: () async {
-                                Navigator.pop(ctx);
-                                if (isBlocked &&
-                                    blockedBy == widget.sender.id) {
-                                  chatReference.doc('blocked').set(
-                                    {
-                                      'isBlocked': !isBlocked,
-                                      'blockedBy': widget.sender.id,
-                                    },
-                                    SetOptions(merge: true),
-                                  );
-                                  // For deleting from   blocklist
-                                  await firebaseFireStoreInstance
-                                      .collection('users')
-                                      .doc(widget.sender.id)
-                                      .collection('blockedlist')
-                                      .doc(
-                                        widget.second.id,
-                                      ) // Assuming widget.second.id represents the blocked user's ID
-                                      .delete();
-
-                                  CustomToast.showToast(
-                                    'User Unblocked Successfully'
-                                        .tr()
-                                        .toString(),
-                                  );
-                                } else if (!isBlocked) {
-                                  chatReference.doc('blocked').set(
-                                    {
-                                      'isBlocked': !isBlocked,
-                                      'blockedBy': widget.sender.id,
-                                    },
-                                    SetOptions(merge: true),
-                                  );
-                                  // For adding in   blocklist
-                                  await firebaseFireStoreInstance
-                                      .collection('users')
-                                      .doc(widget.sender.id)
-                                      .collection('blockedlist')
-                                      .doc(
-                                        widget.second.id,
-                                      ) // Generate a unique document ID for each blocked user
-                                      .set({
-                                    'isBlocked': !isBlocked,
-                                    'blockedID': widget.second.id,
-                                    'timestamp': FieldValue.serverTimestamp(),
-                                  });
-
-                                  CustomToast.showToast(
-                                    'User blocked Successfully'.tr().toString(),
-                                  );
-                                } else {
-                                  CustomSnackbar.showSnackBarSimple(
-                                    "You can't unblock".tr().toString(),
-                                    context,
-                                  );
-                                }
-                              },
-                              child: Text(
-                                'Yes'.tr().toString(),
-                                style: const TextStyle(color: AppColors.primaryGreen),
+                            actions: <Widget>[
+                              TextButton(
+                                onPressed: () =>
+                                    Navigator.of(context).pop(false),
+                                child: Text(
+                                  'No'.tr().toString(),
+                                  style: const TextStyle(
+                                      color: AppColors.primaryGreen),
+                                ),
                               ),
-                            ),
-                          ],
+                              TextButton(
+                                onPressed: () async {
+                                  Navigator.pop(ctx);
+                                  if (isBlocked &&
+                                      blockedBy == widget.sender.id) {
+                                    await chatReference.doc('blocked').set(
+                                      {
+                                        'isBlocked': !isBlocked,
+                                        'blockedBy': widget.sender.id,
+                                      },
+                                      SetOptions(merge: true),
+                                    );
+                                    // For deleting from   blocklist
+                                    await firebaseFireStoreInstance
+                                        .collection('users')
+                                        .doc(widget.sender.id)
+                                        .collection('blockedlist')
+                                        .doc(
+                                          widget.second.id,
+                                        ) // Assuming widget.second.id represents the blocked user's ID
+                                        .delete();
+
+                                    CustomToast.showToast(
+                                      'User Unblocked Successfully'
+                                          .tr()
+                                          .toString(),
+                                    );
+                                  } else if (!isBlocked) {
+                                    await chatReference.doc('blocked').set(
+                                      {
+                                        'isBlocked': !isBlocked,
+                                        'blockedBy': widget.sender.id,
+                                      },
+                                      SetOptions(merge: true),
+                                    );
+                                    // For adding in   blocklist
+                                    await firebaseFireStoreInstance
+                                        .collection('users')
+                                        .doc(widget.sender.id)
+                                        .collection('blockedlist')
+                                        .doc(
+                                          widget.second.id,
+                                        ) // Generate a unique document ID for each blocked user
+                                        .set({
+                                      'isBlocked': !isBlocked,
+                                      'blockedID': widget.second.id,
+                                      'timestamp': FieldValue.serverTimestamp(),
+                                    });
+
+                                    CustomToast.showToast(
+                                      'User blocked Successfully'
+                                          .tr()
+                                          .toString(),
+                                    );
+                                  } else {
+                                    CustomSnackbar.showSnackBarSimple(
+                                      "You can't unblock".tr().toString(),
+                                      context,
+                                    );
+                                  }
+                                },
+                                child: Text(
+                                  'Yes'.tr().toString(),
+                                  style: const TextStyle(
+                                      color: AppColors.primaryGreen),
+                                ),
+                              ),
+                            ],
+                          ),
                         ),
                       ),
-                    ));
+                    );
                   },
                   child: Row(
                     children: [
                       Icon(
                         Icons.block_outlined,
-                        color: isDarkMode
-                            ? Colors.white
-                            : AppColors.primaryGreen,
+                        color:
+                            isDarkMode ? Colors.white : AppColors.primaryGreen,
                         size: 20,
                       ),
                       const SizedBox(
@@ -303,7 +313,8 @@ class ChatPageState extends State<ChatPage> {
                             onPressed: () => Navigator.of(context).pop(false),
                             child: Text(
                               'No'.tr().toString(),
-                              style: const TextStyle(color: AppColors.primaryGreen),
+                              style: const TextStyle(
+                                  color: AppColors.primaryGreen),
                             ),
                           ),
                           TextButton(
@@ -325,10 +336,10 @@ class ChatPageState extends State<ChatPage> {
                                     ),
                                   );
                               CustomSnackbar.showSnackBarSimple(
-                              'unmatched'.tr(
-                                args: [
-                                  widget.second.name ?? '',
-                                ],
+                                'unmatched'.tr(
+                                  args: [
+                                    widget.second.name ?? '',
+                                  ],
                                 ).toString(),
                                 context,
                               );
@@ -340,7 +351,8 @@ class ChatPageState extends State<ChatPage> {
                             },
                             child: Text(
                               'Yes'.tr().toString(),
-                              style: const TextStyle(color: AppColors.primaryGreen),
+                              style: const TextStyle(
+                                  color: AppColors.primaryGreen),
                             ),
                           ),
                         ],
@@ -354,9 +366,8 @@ class ChatPageState extends State<ChatPage> {
                     children: [
                       Icon(
                         Icons.cancel_outlined,
-                        color: isDarkMode
-                            ? Colors.white
-                            : AppColors.primaryGreen,
+                        color:
+                            isDarkMode ? Colors.white : AppColors.primaryGreen,
                         size: 20,
                       ),
                       const SizedBox(

@@ -120,11 +120,13 @@ class CropMediaState extends State<CropMedia>
                 setState(() {
                   isFinished = false;
                 });
-                unawaited(_finished().then((value) {
-                  setState(() {
-                    isFinished = true;
-                  });
-                }));
+                unawaited(
+                  _finished().then((value) {
+                    setState(() {
+                      isFinished = true;
+                    });
+                  }),
+                );
               },
             )
           else
@@ -286,7 +288,7 @@ class CropMediaState extends State<CropMedia>
 
       if (!mounted) return;
       Navigator.pop(context, compressedFile);
-    } catch (e) {
+    } on Object catch (e) {
       debugPrint('Error in _finished: $e');
       if (!mounted) return;
       Navigator.pop(context);
@@ -314,7 +316,7 @@ class CropMediaState extends State<CropMedia>
       } else {
         return imageFile; // Return original if compression fails
       }
-    } catch (e) {
+    } on Object catch (e) {
       debugPrint('Error compressing image: $e');
       return imageFile; // Return original if compression fails
     }

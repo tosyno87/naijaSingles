@@ -345,7 +345,9 @@ class _CreateGroupScreenState extends State<CreateGroupScreen> {
                     const SizedBox(height: 12),
                     Container(
                       padding: const EdgeInsets.symmetric(
-                          horizontal: 16, vertical: 8,),
+                        horizontal: 16,
+                        vertical: 8,
+                      ),
                       decoration: BoxDecoration(
                         color: AppColors.primaryGreen,
                         borderRadius: BorderRadius.circular(20),
@@ -370,7 +372,9 @@ class _CreateGroupScreenState extends State<CreateGroupScreen> {
                   .map(
                     (memberId) => Container(
                       padding: const EdgeInsets.symmetric(
-                          horizontal: 12, vertical: 6,),
+                        horizontal: 12,
+                        vertical: 6,
+                      ),
                       decoration: BoxDecoration(
                         color: AppColors.primaryGreen.withValues(alpha: 0.1),
                         borderRadius: BorderRadius.circular(16),
@@ -580,25 +584,27 @@ class _CreateGroupScreenState extends State<CreateGroupScreen> {
   }
 
   void _selectMembers() {
-    unawaited(Navigator.push(
-      context,
-      MaterialPageRoute(
-        builder: (context) => ContactPickerWidget(
-          groupName: _nameController.text.isNotEmpty
-              ? _nameController.text
-              : 'New Group',
-          groupId: '',
-          onInvitationsSent: (invitations) {
-            ScaffoldMessenger.of(context).showSnackBar(
-              SnackBar(
-                content: Text('${invitations.length} invitations sent!'),
-                backgroundColor: AppColors.primaryGreen,
-              ),
-            );
-          },
+    unawaited(
+      Navigator.push(
+        context,
+        MaterialPageRoute(
+          builder: (context) => ContactPickerWidget(
+            groupName: _nameController.text.isNotEmpty
+                ? _nameController.text
+                : 'New Group',
+            groupId: '',
+            onInvitationsSent: (invitations) {
+              ScaffoldMessenger.of(context).showSnackBar(
+                SnackBar(
+                  content: Text('${invitations.length} invitations sent!'),
+                  backgroundColor: AppColors.primaryGreen,
+                ),
+              );
+            },
+          ),
         ),
       ),
-    ));
+    );
   }
 
   void _removeMember(String memberId) {
@@ -611,9 +617,9 @@ class _CreateGroupScreenState extends State<CreateGroupScreen> {
     if (!_formKey.currentState!.validate()) return;
 
     // Show loading dialog
-    LoadingDialog.show(
+    unawaited(LoadingDialog.show(
       context: context,
-    );
+    ));
 
     setState(() {
       _isCreating = true;
@@ -629,7 +635,7 @@ class _CreateGroupScreenState extends State<CreateGroupScreen> {
             imageFile: _selectedImage!,
             path: 'group_avatars',
           );
-        } catch (e) {
+        } on Object catch (e) {
           // Continue without image if upload fails
           AppLogger.error('Image upload failed', error: e);
         }
@@ -660,12 +666,14 @@ class _CreateGroupScreenState extends State<CreateGroupScreen> {
           actionText: 'Open Group',
           onAction: () {
             Navigator.pop(context);
-            unawaited(Navigator.pushReplacement(
-              context,
-              MaterialPageRoute(
-                builder: (context) => GroupChatScreen(groupId: group.id),
+            unawaited(
+              Navigator.pushReplacement(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => GroupChatScreen(groupId: group.id),
+                ),
               ),
-            ));
+            );
           },
           onClose: () {
             Navigator.pop(context); // Close dialog
@@ -673,7 +681,7 @@ class _CreateGroupScreenState extends State<CreateGroupScreen> {
           },
         );
       }
-    } catch (e) {
+    } on Object catch (e) {
       // Hide loading dialog
       if (!mounted) return;
       LoadingDialog.hide(context);

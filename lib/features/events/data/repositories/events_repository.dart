@@ -95,7 +95,7 @@ class EventsRepositoryImpl implements EventsRepository {
             _updateCache(cacheKey, events);
             return events;
           }
-        } catch (e) {
+        } on Object catch (e) {
           log(
             'Failed to load from Firestore cache: $e',
             name: 'EventsRepository',
@@ -117,7 +117,7 @@ class EventsRepositoryImpl implements EventsRepository {
       }
 
       return events;
-    } catch (e) {
+    } on Object catch (e) {
       log('Error fetching events: $e', name: 'EventsRepository');
 
       // Fallback to Firestore cache even if expired
@@ -131,7 +131,7 @@ class EventsRepositoryImpl implements EventsRepository {
           );
           return fallbackEvents;
         }
-      } catch (fallbackError) {
+      } on Object catch (fallbackError) {
         log(
           'Fallback cache also failed: $fallbackError',
           name: 'EventsRepository',
@@ -168,7 +168,7 @@ class EventsRepositoryImpl implements EventsRepository {
         name: 'EventsRepository',
       );
       return searchResults;
-    } catch (e) {
+    } on Object catch (e) {
       log('Error searching events: $e', name: 'EventsRepository');
       rethrow;
     }
@@ -199,7 +199,7 @@ class EventsRepositoryImpl implements EventsRepository {
       _updateCache(cacheKey, categoryEvents);
 
       return categoryEvents;
-    } catch (e) {
+    } on Object catch (e) {
       log('Error fetching events by category: $e', name: 'EventsRepository');
       rethrow;
     }
@@ -223,7 +223,7 @@ class EventsRepositoryImpl implements EventsRepository {
       }
 
       return event;
-    } catch (e) {
+    } on Object catch (e) {
       log('Error fetching event by ID: $e', name: 'EventsRepository');
       return null;
     }
@@ -261,7 +261,7 @@ class EventsRepositoryImpl implements EventsRepository {
         'RSVP updated for user $userId to event $eventId: ${status.value}',
         name: 'EventsRepository',
       );
-    } catch (e) {
+    } on Object catch (e) {
       log('Error updating RSVP: $e', name: 'EventsRepository');
       rethrow;
     }
@@ -271,7 +271,7 @@ class EventsRepositoryImpl implements EventsRepository {
   Future<RSVPModel?> getUserRSVP(String userId, String eventId) async {
     try {
       return await _firestoreService.getUserRSVP(userId, eventId);
-    } catch (e) {
+    } on Object catch (e) {
       log('Error fetching user RSVP: $e', name: 'EventsRepository');
       return null;
     }
@@ -281,7 +281,7 @@ class EventsRepositoryImpl implements EventsRepository {
   Future<List<RSVPModel>> getUserRSVPs(String userId) async {
     try {
       return await _firestoreService.getUserRSVPs(userId);
-    } catch (e) {
+    } on Object catch (e) {
       log('Error fetching user RSVPs: $e', name: 'EventsRepository');
       return [];
     }
@@ -291,7 +291,7 @@ class EventsRepositoryImpl implements EventsRepository {
   Future<List<EventAttendeeModel>> getEventAttendees(String eventId) async {
     try {
       return await _firestoreService.getEventAttendees(eventId);
-    } catch (e) {
+    } on Object catch (e) {
       log('Error fetching event attendees: $e', name: 'EventsRepository');
       return [];
     }
@@ -330,9 +330,11 @@ class EventsRepositoryImpl implements EventsRepository {
         'age': data['age'],
         'location': data['address']?.toString(),
       };
-    } catch (e) {
-      log('Error fetching user profile $userId: $e',
-          name: 'EventsRepository',);
+    } on Object catch (e) {
+      log(
+        'Error fetching user profile $userId: $e',
+        name: 'EventsRepository',
+      );
       return null;
     }
   }
@@ -458,7 +460,7 @@ class EventsRepositoryImpl implements EventsRepository {
       );
 
       return result;
-    } catch (e) {
+    } on Object catch (e) {
       log('❌ Error getting events near location: $e', name: 'EventsRepository');
       return [];
     }
@@ -526,7 +528,7 @@ class EventsRepositoryImpl implements EventsRepository {
       }
 
       return events;
-    } catch (e) {
+    } on Object catch (e) {
       log('❌ Error getting events with distance: $e', name: 'EventsRepository');
       return getEvents(
         page: page,

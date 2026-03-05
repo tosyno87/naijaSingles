@@ -39,7 +39,7 @@ class PhoneAuthRepository {
     if (user != null) {
       try {
         await user.updatePhoneNumber(verificationCompleted);
-      } catch (e) {
+      } on Object {
         rethrow;
       }
     }
@@ -52,7 +52,7 @@ class PhoneAuthRepository {
       final secureStorage = SecureStorageService();
       await secureStorage.clearAuthData();
       log('✅ Secure storage cleared on sign out');
-    } catch (e) {
+    } on Object catch (e) {
       log('⚠️ Error clearing secure storage on sign out: $e');
       // Continue with sign out even if secure storage clear fails
     }
@@ -136,14 +136,14 @@ class PhoneAuthRepository {
           await secureStorage.storeAuthToken(token);
           await secureStorage.storeUserId(user.uid);
           log('✅ Token stored securely');
-        } catch (e) {
+        } on Object catch (e) {
           log('⚠️ Error storing token securely: $e');
           // Continue even if secure storage fails
         }
       }
 
       return token;
-    } catch (e) {
+    } on Object catch (e) {
       log('Error getting token: $e');
       return null;
     }
@@ -155,14 +155,15 @@ class PhoneAuthRepository {
     try {
       final secureStorage = SecureStorageService();
       return await secureStorage.getAuthToken();
-    } catch (e) {
+    } on Object catch (e) {
       log('Error getting cached token: $e');
       return null;
     }
   }
 
   /// Normalizes phone to digits-only so "+2348012345678" and "2348012345678" match.
-  static String _normalizePhoneToDigits(String phoneNumber) => phoneNumber.replaceAll(RegExp(r'[^\d]'), '');
+  static String _normalizePhoneToDigits(String phoneNumber) =>
+      phoneNumber.replaceAll(RegExp(r'[^\d]'), '');
 
   Future<UserModel> registration({
     required Map<String, dynamic> userData,
@@ -220,7 +221,7 @@ class PhoneAuthRepository {
       final data = doc.data();
       if (data['accountDeleted'] == true) return null;
       return doc.id;
-    } catch (e) {
+    } on Object catch (e) {
       log('❌ Error finding user by phone: $e');
       rethrow;
     }
@@ -259,7 +260,7 @@ class PhoneAuthRepository {
         log('❌ User document does not exist for: $userId');
         return false;
       }
-    } catch (e) {
+    } on Object catch (e) {
       log('❌ Error checking user details: $e');
       // Fallback to query method
       try {
@@ -272,7 +273,7 @@ class PhoneAuthRepository {
           log('✅ User found via query fallback');
           return true;
         }
-      } catch (queryError) {
+      } on Object catch (queryError) {
         log('❌ Query fallback also failed: $queryError');
       }
       return false;
@@ -299,7 +300,7 @@ class PhoneAuthRepository {
         try {
           final registeredUser = UserModel.fromDocument(docSnapshot);
           return registeredUser;
-        } catch (parseError) {
+        } on Object catch (parseError) {
           log('❌ Error parsing user document: $parseError');
           // Fallback to query method
         }
@@ -321,7 +322,7 @@ class PhoneAuthRepository {
       log('✅ User document found via query (${result.docs.length} results)');
       final registeredUser = UserModel.fromDocument(result.docs.first);
       return registeredUser;
-    } catch (e) {
+    } on Object catch (e) {
       log('❌ Error in getRegisterUser: $e');
       rethrow;
     }
@@ -348,7 +349,7 @@ class PhoneAuthRepository {
           try {
             await item.delete();
             log('✅ Deleted file: ${item.fullPath}');
-          } catch (fileError) {
+          } on Object catch (fileError) {
             log('⚠️ Error deleting file ${item.fullPath}: $fileError');
             // Continue with other files even if one fails
           }
@@ -357,12 +358,12 @@ class PhoneAuthRepository {
         // Note: Firebase Storage doesn't have folders - deleting all files is sufficient
         // The "folder" will automatically disappear when empty
         log('✅ Storage cleanup completed for user: $userId');
-      } catch (listError) {
+      } on Object catch (listError) {
         // If listAll fails (e.g., path doesn't exist), that's okay
         log('⚠️ Could not list files (path may not exist): $listError');
         // This is non-fatal - user might not have uploaded files
       }
-    } catch (error) {
+    } on Object catch (error) {
       // Log error but don't throw - storage cleanup failure shouldn't block account deletion
       log('⚠️ Error during storage deletion (non-fatal): $error');
       log('⚠️ Error type: ${error.runtimeType}');

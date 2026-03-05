@@ -149,7 +149,8 @@ class _TagInputWidgetState extends State<TagInputWidget> {
         decoration: BoxDecoration(
           color: AppColors.primaryGreen.withValues(alpha: 0.1),
           borderRadius: BorderRadius.circular(16),
-          border: Border.all(color: AppColors.primaryGreen.withValues(alpha: 0.3)),
+          border:
+              Border.all(color: AppColors.primaryGreen.withValues(alpha: 0.3)),
         ),
         child: Row(
           mainAxisSize: MainAxisSize.min,

@@ -36,8 +36,10 @@ class LocationService {
       // Get current position
       log('📍 Getting current location...', name: 'LocationService');
       _currentPosition = await Geolocator.getCurrentPosition(
-        desiredAccuracy: LocationAccuracy.high,
-        timeLimit: const Duration(seconds: 10),
+        locationSettings: const LocationSettings(
+          accuracy: LocationAccuracy.high,
+          timeLimit: Duration(seconds: 10),
+        ),
       );
 
       _lastLocationUpdate = DateTime.now();
@@ -47,7 +49,7 @@ class LocationService {
         name: 'LocationService',
       );
       return _currentPosition;
-    } catch (e) {
+    } on Object catch (e) {
       log('❌ Error getting location: $e', name: 'LocationService');
       return null;
     }
@@ -84,7 +86,7 @@ class LocationService {
 
       log('✅ Location permission granted', name: 'LocationService');
       return true;
-    } catch (e) {
+    } on Object catch (e) {
       log('❌ Error checking location permissions: $e', name: 'LocationService');
       return false;
     }

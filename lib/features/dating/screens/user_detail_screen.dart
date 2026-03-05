@@ -339,7 +339,8 @@ class _UserDetailScreenState extends State<UserDetailScreen> {
                     decoration: BoxDecoration(
                       color: afropeepGreen.withValues(alpha: 0.1),
                       borderRadius: BorderRadius.circular(16),
-                      border: Border.all(color: afropeepGreen.withValues(alpha: 0.3)),
+                      border: Border.all(
+                          color: afropeepGreen.withValues(alpha: 0.3)),
                     ),
                     child: Text(
                       '🇳🇬 ${widget.user.nationality}',
@@ -359,7 +360,8 @@ class _UserDetailScreenState extends State<UserDetailScreen> {
                     decoration: BoxDecoration(
                       color: afropeepGreen.withValues(alpha: 0.1),
                       borderRadius: BorderRadius.circular(16),
-                      border: Border.all(color: afropeepGreen.withValues(alpha: 0.3)),
+                      border: Border.all(
+                          color: afropeepGreen.withValues(alpha: 0.3)),
                     ),
                     child: Text(
                       '🏛️ ${widget.user.tribe}',
@@ -405,7 +407,8 @@ class _UserDetailScreenState extends State<UserDetailScreen> {
                   decoration: BoxDecoration(
                     color: afropeepGreen.withValues(alpha: 0.1),
                     borderRadius: BorderRadius.circular(16),
-                    border: Border.all(color: afropeepGreen.withValues(alpha: 0.3)),
+                    border:
+                        Border.all(color: afropeepGreen.withValues(alpha: 0.3)),
                   ),
                   child: Text(
                     '${widget.user.distanceBW} miles away',
@@ -531,7 +534,8 @@ class _UserDetailScreenState extends State<UserDetailScreen> {
                   decoration: BoxDecoration(
                     color: afropeepGreen.withValues(alpha: 0.1),
                     borderRadius: BorderRadius.circular(20),
-                    border: Border.all(color: afropeepGreen.withValues(alpha: 0.3)),
+                    border:
+                        Border.all(color: afropeepGreen.withValues(alpha: 0.3)),
                   ),
                   child: Text(
                     interest,
@@ -651,14 +655,16 @@ class _UserDetailScreenState extends State<UserDetailScreen> {
       );
 
   void _showFullScreenPhoto(List<String> photos, int initialIndex) {
-    unawaited(Navigator.of(context).push(
-      MaterialPageRoute(
-        builder: (context) => _FullScreenPhotoViewer(
-          photos: photos,
-          initialIndex: initialIndex,
+    unawaited(
+      Navigator.of(context).push(
+        MaterialPageRoute(
+          builder: (context) => _FullScreenPhotoViewer(
+            photos: photos,
+            initialIndex: initialIndex,
+          ),
         ),
       ),
-    ));
+    );
   }
 
   String _getBio() {

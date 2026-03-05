@@ -109,7 +109,7 @@ class UserSearchRepo {
       );
 
       return null; // No match created
-    } catch (e) {
+    } on Object catch (e) {
       debugPrint('❌ Error in optimized rightSwipe: $e');
       // Fallback to legacy behavior if optimized system fails
       return _legacyRightSwipe(currentUser, selectedUser);
@@ -190,7 +190,7 @@ class UserSearchRepo {
       );
 
       return null; // No match created
-    } catch (e) {
+    } on Object catch (e) {
       debugPrint('Error in legacy rightSwipe: $e');
       return null;
     }
@@ -232,7 +232,7 @@ class UserSearchRepo {
 
       debugPrint('✅ Retrieved ${users.length} users from unified service');
       return users;
-    } catch (e) {
+    } on Object catch (e) {
       debugPrint('❌ Error in unified getUserList: $e');
       // Fallback to legacy method
       return _legacyGetUserList(currentUser, intentFilter: intentFilter);
@@ -259,7 +259,7 @@ class UserSearchRepo {
         debugPrint('❌ Error loading more users: ${result.error}');
         return [];
       }
-    } catch (e) {
+    } on Object catch (e) {
       debugPrint('❌ Error in getMoreUsers: $e');
       return [];
     }
@@ -356,7 +356,7 @@ class UserSearchRepo {
               'Filtered out user: ${temp.name} (distance: $distance, maxDistance: ${currentUser.maxDistance}, blocked: ${temp.isBlocked})',
             );
           }
-        } catch (e) {
+        } on Object catch (e) {
           debugPrint('Error processing document ${doc.id}: $e');
           continue;
         }
@@ -364,7 +364,7 @@ class UserSearchRepo {
 
       debugPrint('Final legacy user list size: ${userList.length}');
       return userList;
-    } catch (e) {
+    } on Object catch (e) {
       debugPrint('Error in legacy getUserList: $e');
       rethrow;
     }
@@ -382,6 +382,16 @@ class UserSearchRepo {
     return likedByList;
   }
 
-  static double calculateDistance(lat1, lon1, lat2, lon2) =>
-      distance.calculateDistance(lat1, lon1, lat2, lon2);
+  static double calculateDistance(
+    double? lat1,
+    double? lon1,
+    double? lat2,
+    double? lon2,
+  ) =>
+      distance.calculateDistance(
+        lat1 ?? 0,
+        lon1 ?? 0,
+        lat2 ?? 0,
+        lon2 ?? 0,
+      );
 }

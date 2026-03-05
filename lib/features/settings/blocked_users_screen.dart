@@ -47,7 +47,7 @@ class _BlockedUsersScreenState extends State<BlockedUsersScreen> {
         _blockedUsers = blockedUsers;
         _isLoading = false;
       });
-    } catch (e) {
+    } on Object {
       if (!context.mounted) return;
       setState(() => _isLoading = false);
       _showSnackBar('Error loading blocked users', isError: true);
@@ -63,13 +63,15 @@ class _BlockedUsersScreenState extends State<BlockedUsersScreen> {
     if (!mounted) return;
 
     // Show loading
-    unawaited(showDialog(
-      context: context,
-      barrierDismissible: false,
-      builder: (context) => const Center(
-        child: CircularProgressIndicator(),
+    unawaited(
+      showDialog(
+        context: context,
+        barrierDismissible: false,
+        builder: (context) => const Center(
+          child: CircularProgressIndicator(),
+        ),
       ),
-    ));
+    );
 
     try {
       final success =
@@ -88,7 +90,7 @@ class _BlockedUsersScreenState extends State<BlockedUsersScreen> {
       } else {
         _showSnackBar('Failed to unblock ${user.name}', isError: true);
       }
-    } catch (e) {
+    } on Object {
       if (!mounted) return;
       Navigator.pop(context); // Close loading dialog
       _showSnackBar('Error unblocking user', isError: true);
@@ -303,7 +305,7 @@ class _BlockedUsersScreenState extends State<BlockedUsersScreen> {
         color: isDarkMode ? Colors.grey[900] : Colors.white,
         borderRadius: BorderRadius.circular(16),
         border: Border.all(
-          color: isDarkMode ? Colors.grey[800]! : Colors.grey[200]!,
+          color: isDarkMode ? Colors.grey.shade800 : Colors.grey.shade200,
         ),
       ),
       child: Padding(

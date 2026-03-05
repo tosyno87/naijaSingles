@@ -139,19 +139,21 @@ class _MatchDialogPageState extends State<MatchDialogPage> {
             InkWell(
               onTap: () {
                 Navigator.pop(context);
-                unawaited(Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (_) => ChatPage(
-                      chatId: chatId(
-                        widget.currentUser,
-                        widget.matchedUser,
+                unawaited(
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (_) => ChatPage(
+                        chatId: chatId(
+                          widget.currentUser,
+                          widget.matchedUser,
+                        ),
+                        sender: widget.currentUser,
+                        second: widget.matchedUser,
                       ),
-                      sender: widget.currentUser,
-                      second: widget.matchedUser,
                     ),
                   ),
-                ));
+                );
               },
               child: Container(
                 width: 241,

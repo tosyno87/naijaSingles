@@ -27,7 +27,8 @@ class PrivacyMigrationPrompt extends StatelessWidget {
             end: Alignment.bottomRight,
           ),
           borderRadius: BorderRadius.circular(16),
-          border: Border.all(color: AppColors.primaryGreen.withValues(alpha: 0.3)),
+          border:
+              Border.all(color: AppColors.primaryGreen.withValues(alpha: 0.3)),
           boxShadow: [
             BoxShadow(
               color: Colors.black.withValues(alpha: 0.1),
@@ -197,7 +198,8 @@ class CompactPrivacyMigrationPrompt extends StatelessWidget {
           decoration: BoxDecoration(
             color: AppColors.primaryGreen.withValues(alpha: 0.1),
             borderRadius: BorderRadius.circular(12),
-            border: Border.all(color: AppColors.primaryGreen.withValues(alpha: 0.3)),
+            border: Border.all(
+                color: AppColors.primaryGreen.withValues(alpha: 0.3)),
           ),
           child: Row(
             children: [

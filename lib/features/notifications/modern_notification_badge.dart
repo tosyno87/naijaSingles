@@ -90,7 +90,8 @@ class _ModernNotificationBadgeState extends State<ModernNotificationBadge>
   }
 
   void _startListening() {
-    _unreadCountSubscription = _notificationService.unreadCountStream.listen((count) {
+    _unreadCountSubscription =
+        _notificationService.unreadCountStream.listen((count) {
       if (mounted) {
         final previousCount = _unreadCount;
         setState(() {
@@ -246,7 +247,8 @@ class _FloatingNotificationBadgeState extends State<FloatingNotificationBadge> {
   @override
   void initState() {
     super.initState();
-    _unreadCountSubscription = _notificationService.unreadCountStream.listen((count) {
+    _unreadCountSubscription =
+        _notificationService.unreadCountStream.listen((count) {
       if (mounted) {
         setState(() {
           _unreadCount = count;

@@ -192,15 +192,14 @@ class UserMessagingRepo {
       SetOptions(merge: true),
     );
     try {
-      final blockedDocSnapshot =
-          await chatReference.doc('blocked').get();
+      final blockedDocSnapshot = await chatReference.doc('blocked').get();
       if (!blockedDocSnapshot.exists) {
         await chatReference.doc('blocked').set({
           'isBlocked': false,
           'blockedBy': '',
         });
       }
-    } catch (error) {
+    } on Object catch (error) {
       debugPrint('Error checking if blocked document exists: $error');
     }
   }
@@ -238,15 +237,14 @@ class UserMessagingRepo {
       SetOptions(merge: true),
     );
     try {
-      final blockedDocSnapshot =
-          await chatReference.doc('blocked').get();
+      final blockedDocSnapshot = await chatReference.doc('blocked').get();
       if (!blockedDocSnapshot.exists) {
         await chatReference.doc('blocked').set({
           'isBlocked': false,
           'blockedBy': '',
         });
       }
-    } catch (error) {
+    } on Object catch (error) {
       debugPrint('Error checking if blocked document exists: $error');
     }
   }

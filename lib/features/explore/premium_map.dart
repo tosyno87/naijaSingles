@@ -100,18 +100,21 @@ class PremiumDialog extends StatelessWidget {
                     ),
                     ElevatedButton(
                       onPressed: () {
-                        unawaited(Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                            builder: (context) =>
-                                Products(currentUser, null, const {}),
+                        unawaited(
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) =>
+                                  Products(currentUser, null, const {}),
+                            ),
                           ),
-                        ));
+                        );
                       },
                       style: ButtonStyle(
                         backgroundColor: WidgetStatePropertyAll(
                           AppColors.primaryGreen.withValues(
-                              alpha: (0.9 * 255).toDouble(),),
+                            alpha: (0.9 * 255).toDouble(),
+                          ),
                         ),
                       ),
                       child: Text(

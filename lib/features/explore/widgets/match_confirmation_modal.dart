@@ -86,7 +86,7 @@ class _MatchConfirmationModalState extends State<MatchConfirmationModal>
         Navigator.pop(context);
 
         // Navigate to chat thread
-        Navigator.push(
+        unawaited(Navigator.push(
           context,
           MaterialPageRoute(
             builder: (_) => ChatThreadScreen(
@@ -96,7 +96,7 @@ class _MatchConfirmationModalState extends State<MatchConfirmationModal>
               otherUserId: widget.matchedUserId,
             ),
           ),
-        );
+        ));
       } else {
         // Show error
         if (!mounted) return;
@@ -110,7 +110,7 @@ class _MatchConfirmationModalState extends State<MatchConfirmationModal>
           _isProcessing = false;
         });
       }
-    } catch (e) {
+    } on Object catch (e) {
       debugPrint('Error in _handleSendMessage: $e');
       // Show error
       if (!mounted) return;

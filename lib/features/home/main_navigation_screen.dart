@@ -70,12 +70,14 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
 
     // Auto-hide the background task indicator after 10 seconds
     if (_backgroundTasksRunning) {
-      unawaited(Future.delayed(const Duration(seconds: 10), () {
-        if (!context.mounted) return;
-        setState(() {
-          _backgroundTasksRunning = false;
-        });
-      }));
+      unawaited(
+        Future.delayed(const Duration(seconds: 10), () {
+          if (!context.mounted) return;
+          setState(() {
+            _backgroundTasksRunning = false;
+          });
+        }),
+      );
     }
   }
 
@@ -90,10 +92,10 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
           .log('⚠️ User not authenticated - redirecting to welcome screen');
       _hasCheckedRegistration = true;
       if (mounted) {
-        Navigator.of(context).pushNamedAndRemoveUntil(
+        unawaited(Navigator.of(context).pushNamedAndRemoveUntil(
           RouteName.welcomeScreen,
           (route) => false,
-        );
+        ));
       }
       return;
     }
@@ -165,7 +167,7 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
           }
         }
       }
-    } catch (e) {
+    } on Object catch (e) {
       developer.log('⚠️ Error checking Firestore: $e');
     }
 
@@ -174,22 +176,24 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
     _hasCheckedRegistration = true;
     if (AccountDeletionScope.inProgress) {
       developer.log(
-          '⚠️ Account deletion in progress - redirecting to welcome (not onboarding)',);
+        '⚠️ Account deletion in progress - redirecting to welcome (not onboarding)',
+      );
       AccountDeletionScope.inProgress = false;
       if (mounted) {
-        Navigator.of(context).pushNamedAndRemoveUntil(
+        unawaited(Navigator.of(context).pushNamedAndRemoveUntil(
           RouteName.welcomeScreen,
           (route) => false,
-        );
+        ));
       }
     } else {
       developer.log(
-          '⚠️ Authenticated user has incomplete profile - redirecting to onboarding',);
+        '⚠️ Authenticated user has incomplete profile - redirecting to onboarding',
+      );
       if (mounted) {
-        Navigator.of(context).pushNamedAndRemoveUntil(
+        unawaited(Navigator.of(context).pushNamedAndRemoveUntil(
           RouteName.onboarding,
           (route) => false,
-        );
+        ));
       }
     }
   }
@@ -242,15 +246,20 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
       final currentUser = FirebaseAuth.instance.currentUser;
       if (currentUser == null) {
         developer.log(
-            '⚠️ User not authenticated in build - redirecting to welcome screen',);
-        unawaited(Future.microtask(() {
-          if (context.mounted) {
-            unawaited(Navigator.of(context).pushNamedAndRemoveUntil(
-              RouteName.welcomeScreen,
-              (route) => false,
-            ));
-          }
-        }));
+          '⚠️ User not authenticated in build - redirecting to welcome screen',
+        );
+        unawaited(
+          Future.microtask(() {
+            if (context.mounted) {
+              unawaited(
+                Navigator.of(context).pushNamedAndRemoveUntil(
+                  RouteName.welcomeScreen,
+                  (route) => false,
+                ),
+              );
+            }
+          }),
+        );
         return Scaffold(
           backgroundColor: AppColors.backgroundColor,
           body: Center(
@@ -277,27 +286,37 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
       // Authenticated but no user data - redirect to onboarding or welcome (if deletion in progress)
       if (AccountDeletionScope.inProgress) {
         developer.log(
-            '⚠️ Account deletion in progress - redirecting to welcome (not onboarding)',);
+          '⚠️ Account deletion in progress - redirecting to welcome (not onboarding)',
+        );
         AccountDeletionScope.inProgress = false;
-        unawaited(Future.microtask(() {
-          if (context.mounted) {
-            unawaited(Navigator.of(context).pushNamedAndRemoveUntil(
-              RouteName.welcomeScreen,
-              (route) => false,
-            ));
-          }
-        }));
+        unawaited(
+          Future.microtask(() {
+            if (context.mounted) {
+              unawaited(
+                Navigator.of(context).pushNamedAndRemoveUntil(
+                  RouteName.welcomeScreen,
+                  (route) => false,
+                ),
+              );
+            }
+          }),
+        );
       } else {
         developer.log(
-            '⚠️ Authenticated user has incomplete profile - redirecting to onboarding',);
-        unawaited(Future.microtask(() {
-          if (context.mounted) {
-            unawaited(Navigator.of(context).pushNamedAndRemoveUntil(
-              RouteName.onboarding,
-              (route) => false,
-            ));
-          }
-        }));
+          '⚠️ Authenticated user has incomplete profile - redirecting to onboarding',
+        );
+        unawaited(
+          Future.microtask(() {
+            if (context.mounted) {
+              unawaited(
+                Navigator.of(context).pushNamedAndRemoveUntil(
+                  RouteName.onboarding,
+                  (route) => false,
+                ),
+              );
+            }
+          }),
+        );
       }
       return Scaffold(
         backgroundColor: AppColors.backgroundColor,
@@ -341,62 +360,62 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
                 ),
 
                 // Background task indicator
-          if (_backgroundTasksRunning)
-            Positioned(
-              top: MediaQuery.of(context).padding.top + 8,
-              right: 16,
-              child: Container(
-                padding:
-                    const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-                decoration: BoxDecoration(
-                  color: AppColors.primaryGreen.withValues(alpha: 0.9),
-                  borderRadius: BorderRadius.circular(20),
-                  boxShadow: [
-                    BoxShadow(
-                      color: Colors.black.withValues(alpha: 0.1),
-                      blurRadius: 4,
-                      offset: const Offset(0, 2),
-                    ),
-                  ],
-                ),
-                child: Row(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    const SizedBox(
-                      width: 12,
-                      height: 12,
-                      child: CircularProgressIndicator(
-                        strokeWidth: 2,
-                        color: Colors.white,
+                if (_backgroundTasksRunning)
+                  Positioned(
+                    top: MediaQuery.of(context).padding.top + 8,
+                    right: 16,
+                    child: Container(
+                      padding: const EdgeInsets.symmetric(
+                          horizontal: 12, vertical: 6),
+                      decoration: BoxDecoration(
+                        color: AppColors.primaryGreen.withValues(alpha: 0.9),
+                        borderRadius: BorderRadius.circular(20),
+                        boxShadow: [
+                          BoxShadow(
+                            color: Colors.black.withValues(alpha: 0.1),
+                            blurRadius: 4,
+                            offset: const Offset(0, 2),
+                          ),
+                        ],
+                      ),
+                      child: Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          const SizedBox(
+                            width: 12,
+                            height: 12,
+                            child: CircularProgressIndicator(
+                              strokeWidth: 2,
+                              color: Colors.white,
+                            ),
+                          ),
+                          const SizedBox(width: 8),
+                          Text(
+                            'Finishing setup...',
+                            style: GoogleFonts.montserrat(
+                              fontSize: 12,
+                              color: Colors.white,
+                            ),
+                          ),
+                        ],
                       ),
                     ),
-                    const SizedBox(width: 8),
-                    Text(
-                      'Finishing setup...',
-                      style: GoogleFonts.montserrat(
-                        fontSize: 12,
-                        color: Colors.white,
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-            ),
+                  ),
 
-          // Temporary analysis button (remove after testing)
-          if (kDebugMode)
-            Positioned(
-              top: MediaQuery.of(context).padding.top + 50,
-              right: 16,
-              child: FloatingActionButton(
-                heroTag: 'analysis_fab',
-                mini: true,
-                backgroundColor: Colors.blue.withValues(alpha: 0.8),
-                child:
-                    const Icon(Icons.analytics, color: Colors.white, size: 16),
-                onPressed: () => _runUserAnalysis(context),
-              ),
-            ),
+                // Temporary analysis button (remove after testing)
+                if (kDebugMode)
+                  Positioned(
+                    top: MediaQuery.of(context).padding.top + 50,
+                    right: 16,
+                    child: FloatingActionButton(
+                      heroTag: 'analysis_fab',
+                      mini: true,
+                      backgroundColor: Colors.blue.withValues(alpha: 0.8),
+                      child: const Icon(Icons.analytics,
+                          color: Colors.white, size: 16),
+                      onPressed: () => _runUserAnalysis(context),
+                    ),
+                  ),
               ],
             ),
           ),
@@ -451,65 +470,67 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
 
   // Temporary analysis method (remove after testing)
   void _runUserAnalysis(BuildContext context) {
-    unawaited(showModalBottomSheet(
-      context: context,
-      builder: (context) => Container(
-        padding: const EdgeInsets.all(16),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          crossAxisAlignment: CrossAxisAlignment.stretch,
-          children: [
-            Text(
-              '📊 User Analysis',
-              style: GoogleFonts.montserrat(
-                fontSize: 20,
-                fontWeight: FontWeight.bold,
+    unawaited(
+      showModalBottomSheet(
+        context: context,
+        builder: (context) => Container(
+          padding: const EdgeInsets.all(16),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              Text(
+                '📊 User Analysis',
+                style: GoogleFonts.montserrat(
+                  fontSize: 20,
+                  fontWeight: FontWeight.bold,
+                ),
+                textAlign: TextAlign.center,
               ),
-              textAlign: TextAlign.center,
-            ),
-            const SizedBox(height: 16),
-            ElevatedButton.icon(
-              onPressed: () async {
-                Navigator.pop(context);
-                await QuickAnalysis.runQuickAnalysis();
-                if (context.mounted) {
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    const SnackBar(
-                      content: Text(
-                        'Analysis complete! Check console for results.',
+              const SizedBox(height: 16),
+              ElevatedButton.icon(
+                onPressed: () async {
+                  Navigator.pop(context);
+                  await QuickAnalysis.runQuickAnalysis();
+                  if (context.mounted) {
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      const SnackBar(
+                        content: Text(
+                          'Analysis complete! Check console for results.',
+                        ),
                       ),
-                    ),
-                  );
-                }
-              },
-              icon: const Icon(Icons.analytics),
-              label: const Text('Run User Analysis'),
-            ),
-            ElevatedButton.icon(
-              onPressed: () async {
-                Navigator.pop(context);
-                await QuickAnalysis.cleanupProfiles();
-                if (context.mounted) {
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    const SnackBar(
-                      content: Text(
-                        'Cleanup complete! Check console for results.',
+                    );
+                  }
+                },
+                icon: const Icon(Icons.analytics),
+                label: const Text('Run User Analysis'),
+              ),
+              ElevatedButton.icon(
+                onPressed: () async {
+                  Navigator.pop(context);
+                  await QuickAnalysis.cleanupProfiles();
+                  if (context.mounted) {
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      const SnackBar(
+                        content: Text(
+                          'Cleanup complete! Check console for results.',
+                        ),
                       ),
-                    ),
-                  );
-                }
-              },
-              icon: const Icon(Icons.cleaning_services),
-              label: const Text('Cleanup Incomplete Profiles'),
-            ),
-            const SizedBox(height: 16),
-            TextButton(
-              onPressed: () => Navigator.pop(context),
-              child: const Text('Close'),
-            ),
-          ],
+                    );
+                  }
+                },
+                icon: const Icon(Icons.cleaning_services),
+                label: const Text('Cleanup Incomplete Profiles'),
+              ),
+              const SizedBox(height: 16),
+              TextButton(
+                onPressed: () => Navigator.pop(context),
+                child: const Text('Close'),
+              ),
+            ],
+          ),
         ),
       ),
-    ));
+    );
   }
 }

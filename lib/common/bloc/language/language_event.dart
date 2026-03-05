@@ -10,7 +10,6 @@ abstract class LanguageEvent extends Equatable {
 
 /// Event to set locale
 class LanguageLocaleChanged extends LanguageEvent {
-
   const LanguageLocaleChanged(this.locale, this.context);
   final Locale locale;
   final BuildContext context;

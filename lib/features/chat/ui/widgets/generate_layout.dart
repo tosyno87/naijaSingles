@@ -84,18 +84,22 @@ class Layout extends StatelessWidget {
                     ],
                   ),
                   onTap: () {
-                    unawaited(Navigator.pushNamed(
-                      context,
-                      RouteName.largeImageScreen,
-                      arguments: documentSnapshot.get('image_url'),
-                    ));
+                    unawaited(
+                      Navigator.pushNamed(
+                        context,
+                        RouteName.largeImageScreen,
+                        arguments: documentSnapshot.get('image_url'),
+                      ),
+                    );
                   },
                 )
               : GestureDetector(
                   onLongPress: () {
-                    unawaited(Clipboard.setData(
-                      ClipboardData(text: documentSnapshot.get('text')),
-                    ));
+                    unawaited(
+                      Clipboard.setData(
+                        ClipboardData(text: documentSnapshot.get('text')),
+                      ),
+                    );
                     CustomToast.showToast('Message Copied'.tr().toString());
                   },
                   child: Container(
@@ -125,9 +129,7 @@ class Layout extends StatelessWidget {
                         Text(
                           documentSnapshot.get('text'),
                           style: TextStyle(
-                            color: isDarkMode
-                                ? Colors.white
-                                : Colors.black87,
+                            color: isDarkMode ? Colors.white : Colors.black87,
                             fontSize: 16,
                             fontWeight: FontWeight.w400,
                           ),

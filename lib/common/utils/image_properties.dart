@@ -38,7 +38,7 @@ class ImageProperties {
             ..writeAsBytesSync(i.encodeJpg(imagefile, quality: 80));
 
       return compressedImagefile;
-    } catch (e) {
+    } on Object catch (e) {
       log('Error compressing image: $e');
       rethrow;
     }
@@ -96,9 +96,7 @@ class ImageProperties {
                               .tr(),
                           style: TextStyle(
                             fontSize: 15,
-                            color: isDarkMode
-                                ? Colors.white
-                                : Colors.black,
+                            color: isDarkMode ? Colors.white : Colors.black,
                             decoration: TextDecoration.none,
                           ),
                         ),
@@ -286,19 +284,21 @@ class ImageProperties {
     ImageSource source,
   ) {
     Navigator.pop(context);
-    unawaited(showDialog(
-      barrierDismissible: source != ImageSource.gallery,
-      context: context,
-      builder: (context) {
-        unawaited(getImage(source, context, currentUser, isProfilePicture));
-        return const Center(
-          child: CircularProgressIndicator(
-            strokeWidth: 2,
-            valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
-          ),
-        );
-      },
-    ));
+    unawaited(
+      showDialog(
+        barrierDismissible: source != ImageSource.gallery,
+        context: context,
+        builder: (context) {
+          unawaited(getImage(source, context, currentUser, isProfilePicture));
+          return const Center(
+            child: CircularProgressIndicator(
+              strokeWidth: 2,
+              valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
+            ),
+          );
+        },
+      ),
+    );
   }
 
   /// Validates if user can upload more images

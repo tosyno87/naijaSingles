@@ -34,7 +34,7 @@ class AuthstatusBloc extends Bloc<AuthstatusEvent, AuthstatusState> {
         final secureStorage = SecureStorageService();
         await secureStorage.clearAuthData();
         log('✅ Secure storage cleared on logout');
-      } catch (e) {
+      } on Object catch (e) {
         log('⚠️ Error clearing secure storage: $e');
         // Continue with logout even if secure storage clear fails
       }
@@ -42,7 +42,7 @@ class AuthstatusBloc extends Bloc<AuthstatusEvent, AuthstatusState> {
       await phoneAuthRepository.signOut();
       log('user singout sucessfully');
       emit(UnauthenticatedState());
-    } catch (e) {
+    } on Object catch (e) {
       emit(AuthFailed(message: e.toString()));
     }
   }
@@ -79,14 +79,14 @@ class AuthstatusBloc extends Bloc<AuthstatusEvent, AuthstatusState> {
                   await secureStorage.storeAuthToken(token);
                   await secureStorage.storeUserId(user.uid);
                   log('✅ Authentication data stored securely');
-                } catch (e) {
+                } on Object catch (e) {
                   log('⚠️ Error storing auth data securely: $e');
                   // Continue even if secure storage fails
                 }
               }
 
               emit(AuthenticatedState(user: user));
-            } catch (tokenError) {
+            } on Object catch (tokenError) {
               log('Error retrieving token: $tokenError');
               // Sign out and treat as unauthenticated if token retrieval fails
               await phoneAuthRepository.signOut();
@@ -100,11 +100,11 @@ class AuthstatusBloc extends Bloc<AuthstatusEvent, AuthstatusState> {
           log('User is not signed in');
           emit(UnauthenticatedState());
         }
-      } catch (authError) {
+      } on Object catch (authError) {
         log('Error checking authentication status: $authError');
         emit(AuthFailed(message: 'Authentication check failed: $authError'));
       }
-    } catch (e) {
+    } on Object catch (e) {
       log('Unexpected error in _isLoggedin: $e');
       emit(AuthFailed(message: e.toString()));
     }

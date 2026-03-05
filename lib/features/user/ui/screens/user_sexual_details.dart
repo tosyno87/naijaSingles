@@ -247,11 +247,13 @@ class _SexualOrientationState extends State<SexualOrientation> {
                             },
                           });
                           log(userData.toString());
-                          unawaited(Navigator.pushNamed(
-                            context,
-                            RouteName.showGenderScreen,
-                            arguments: userData,
-                          ));
+                          unawaited(
+                            Navigator.pushNamed(
+                              context,
+                              RouteName.showGenderScreen,
+                              arguments: userData,
+                            ),
+                          );
                         },
                   style: ElevatedButton.styleFrom(
                     backgroundColor: const Color(0xFF27AE60),

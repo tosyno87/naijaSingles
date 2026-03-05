@@ -19,7 +19,6 @@ class LocationScreen extends StatefulWidget {
 class _LocationScreenState extends State<LocationScreen> {
   String? _currentLocation;
   bool _isLoadingLocation = false;
-  bool _locationPermissionDenied = false;
 
   // Afropeep MVP theme colors
   static const Color afropeepGreen = Color(0xFF008037); // MVP green
@@ -34,10 +33,9 @@ class _LocationScreenState extends State<LocationScreen> {
     WidgetsBinding.instance.addPostFrameCallback((_) {
       final data = context.read<OnboardingBloc>().state.data;
 
-      if (data?.locationName != null &&
-          data!.locationName!.isNotEmpty) {
+      if (data?.locationName?.isNotEmpty ?? false) {
         setState(() {
-          _currentLocation = data.locationName;
+          _currentLocation = data?.locationName;
         });
       }
     });
@@ -51,7 +49,6 @@ class _LocationScreenState extends State<LocationScreen> {
   Future<void> _getCurrentLocation() async {
     setState(() {
       _isLoadingLocation = true;
-      _locationPermissionDenied = false;
     });
 
     try {
@@ -60,7 +57,6 @@ class _LocationScreenState extends State<LocationScreen> {
       if (!serviceEnabled) {
         setState(() {
           _isLoadingLocation = false;
-          _locationPermissionDenied = true;
         });
         _showLocationServiceDialog();
         return;
@@ -73,7 +69,6 @@ class _LocationScreenState extends State<LocationScreen> {
         if (permission == LocationPermission.denied) {
           setState(() {
             _isLoadingLocation = false;
-            _locationPermissionDenied = true;
           });
           return;
         }
@@ -82,7 +77,6 @@ class _LocationScreenState extends State<LocationScreen> {
       if (permission == LocationPermission.deniedForever) {
         setState(() {
           _isLoadingLocation = false;
-          _locationPermissionDenied = true;
         });
         _showPermissionDeniedDialog();
         return;
@@ -90,7 +84,9 @@ class _LocationScreenState extends State<LocationScreen> {
 
       // Get current position
       final Position position = await Geolocator.getCurrentPosition(
-        desiredAccuracy: LocationAccuracy.high,
+        locationSettings: const LocationSettings(
+          accuracy: LocationAccuracy.high,
+        ),
       );
 
       // Get address from coordinates
@@ -134,149 +130,152 @@ class _LocationScreenState extends State<LocationScreen> {
           '🔍 LocationScreen: Coordinates set to ${position.latitude}, ${position.longitude}',
         );
       }
-    } catch (e) {
+    } on Object catch (e) {
       setState(() {
         _isLoadingLocation = false;
-        _locationPermissionDenied = true;
       });
       AppLogger.error('Error getting location', error: e);
     }
   }
 
   void _showLocationServiceDialog() {
-    unawaited(showDialog(
-      context: context,
-      builder: (context) => AlertDialog(
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(16),
-        ),
-        title: Text(
-          'Location Services Disabled',
-          style: GoogleFonts.montserrat(
-            fontWeight: FontWeight.w600,
-            fontSize: 18,
+    unawaited(
+      showDialog(
+        context: context,
+        builder: (context) => AlertDialog(
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(16),
           ),
-        ),
-        content: Text(
-          'Location is required to find matches nearby. Please enable location services in your device settings.',
-          style: GoogleFonts.montserrat(
-            fontSize: 14,
-            color: textDarkBrown,
-          ),
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(context),
-            child: Text(
-              'Cancel',
-              style: GoogleFonts.montserrat(
-                color: textLightBrown,
-                fontWeight: FontWeight.w500,
-              ),
+          title: Text(
+            'Location Services Disabled',
+            style: GoogleFonts.montserrat(
+              fontWeight: FontWeight.w600,
+              fontSize: 18,
             ),
           ),
-          ElevatedButton(
-            onPressed: () async {
-              final scaffoldMessenger = ScaffoldMessenger.of(context);
-              Navigator.pop(context);
-              final opened = await Geolocator.openLocationSettings();
-              if (!opened) {
-                scaffoldMessenger.showSnackBar(
-                  SnackBar(
-                    content: Text(
-                      'Please enable location services manually in your device settings',
-                      style: GoogleFonts.montserrat(),
+          content: Text(
+            'Location is required to find matches nearby. Please enable location services in your device settings.',
+            style: GoogleFonts.montserrat(
+              fontSize: 14,
+              color: textDarkBrown,
+            ),
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.pop(context),
+              child: Text(
+                'Cancel',
+                style: GoogleFonts.montserrat(
+                  color: textLightBrown,
+                  fontWeight: FontWeight.w500,
+                ),
+              ),
+            ),
+            ElevatedButton(
+              onPressed: () async {
+                final scaffoldMessenger = ScaffoldMessenger.of(context);
+                Navigator.pop(context);
+                final opened = await Geolocator.openLocationSettings();
+                if (!opened) {
+                  scaffoldMessenger.showSnackBar(
+                    SnackBar(
+                      content: Text(
+                        'Please enable location services manually in your device settings',
+                        style: GoogleFonts.montserrat(),
+                      ),
+                      backgroundColor: afropeepGreen,
                     ),
-                    backgroundColor: afropeepGreen,
-                  ),
-                );
-              }
-            },
-            style: ElevatedButton.styleFrom(
-              backgroundColor: afropeepGreen,
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(8),
+                  );
+                }
+              },
+              style: ElevatedButton.styleFrom(
+                backgroundColor: afropeepGreen,
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(8),
+                ),
+              ),
+              child: Text(
+                'Open Settings',
+                style: GoogleFonts.montserrat(
+                  color: Colors.white,
+                  fontWeight: FontWeight.w600,
+                ),
               ),
             ),
-            child: Text(
-              'Open Settings',
-              style: GoogleFonts.montserrat(
-                color: Colors.white,
-                fontWeight: FontWeight.w600,
-              ),
-            ),
-          ),
-        ],
+          ],
+        ),
       ),
-    ));
+    );
   }
 
   void _showPermissionDeniedDialog() {
-    unawaited(showDialog(
-      context: context,
-      builder: (context) => AlertDialog(
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(16),
-        ),
-        title: Text(
-          'Location Permission Required',
-          style: GoogleFonts.montserrat(
-            fontWeight: FontWeight.w600,
-            fontSize: 18,
+    unawaited(
+      showDialog(
+        context: context,
+        builder: (context) => AlertDialog(
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(16),
           ),
-        ),
-        content: Text(
-          'Location is required to find matches nearby. Please enable location permissions in your device settings to continue.',
-          style: GoogleFonts.montserrat(
-            fontSize: 14,
-            color: textDarkBrown,
-          ),
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(context),
-            child: Text(
-              'Cancel',
-              style: GoogleFonts.montserrat(
-                color: textLightBrown,
-                fontWeight: FontWeight.w500,
-              ),
+          title: Text(
+            'Location Permission Required',
+            style: GoogleFonts.montserrat(
+              fontWeight: FontWeight.w600,
+              fontSize: 18,
             ),
           ),
-          ElevatedButton(
-            onPressed: () async {
-              final scaffoldMessenger = ScaffoldMessenger.of(context);
-              Navigator.pop(context);
-              final opened = await Geolocator.openLocationSettings();
-              if (!opened) {
-                scaffoldMessenger.showSnackBar(
-                  SnackBar(
-                    content: Text(
-                      'Please enable location permissions manually in your device settings',
-                      style: GoogleFonts.montserrat(),
+          content: Text(
+            'Location is required to find matches nearby. Please enable location permissions in your device settings to continue.',
+            style: GoogleFonts.montserrat(
+              fontSize: 14,
+              color: textDarkBrown,
+            ),
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.pop(context),
+              child: Text(
+                'Cancel',
+                style: GoogleFonts.montserrat(
+                  color: textLightBrown,
+                  fontWeight: FontWeight.w500,
+                ),
+              ),
+            ),
+            ElevatedButton(
+              onPressed: () async {
+                final scaffoldMessenger = ScaffoldMessenger.of(context);
+                Navigator.pop(context);
+                final opened = await Geolocator.openLocationSettings();
+                if (!opened) {
+                  scaffoldMessenger.showSnackBar(
+                    SnackBar(
+                      content: Text(
+                        'Please enable location permissions manually in your device settings',
+                        style: GoogleFonts.montserrat(),
+                      ),
+                      backgroundColor: afropeepGreen,
                     ),
-                    backgroundColor: afropeepGreen,
-                  ),
-                );
-              }
-            },
-            style: ElevatedButton.styleFrom(
-              backgroundColor: afropeepGreen,
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(8),
+                  );
+                }
+              },
+              style: ElevatedButton.styleFrom(
+                backgroundColor: afropeepGreen,
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(8),
+                ),
+              ),
+              child: Text(
+                'Open Settings',
+                style: GoogleFonts.montserrat(
+                  color: Colors.white,
+                  fontWeight: FontWeight.w600,
+                ),
               ),
             ),
-            child: Text(
-              'Open Settings',
-              style: GoogleFonts.montserrat(
-                color: Colors.white,
-                fontWeight: FontWeight.w600,
-              ),
-            ),
-          ),
-        ],
+          ],
+        ),
       ),
-    ));
+    );
   }
 
   @override
@@ -347,42 +346,46 @@ class _LocationScreenState extends State<LocationScreen> {
 
             // Current location display
             if (_currentLocation != null) ...[
-              Container(
-                width: double.infinity,
-                padding: const EdgeInsets.all(16),
-                decoration: BoxDecoration(
-                  color: afropeepGreen.withValues(alpha: 0.1),
-                  borderRadius: BorderRadius.circular(12),
-                  border: Border.all(color: afropeepGreen.withValues(alpha: 0.3)),
-                ),
-                child: Row(
-                  children: [
-                    const Icon(
-                      Icons.location_on,
-                      color: afropeepGreen,
-                      size: 20,
-                    ),
-                    const SizedBox(width: 12),
-                    Expanded(
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(
-                            'Your Location',
-                            style: GoogleFonts.montserrat(
-                              fontSize: 12,
-                              color: textLightBrown,
-                              fontWeight: FontWeight.w500,
+              Builder(builder: (context) {
+                final location = _currentLocation;
+                if (location == null) return const SizedBox.shrink();
+                return Container(
+                  width: double.infinity,
+                  padding: const EdgeInsets.all(16),
+                  decoration: BoxDecoration(
+                    color: afropeepGreen.withValues(alpha: 0.1),
+                    borderRadius: BorderRadius.circular(12),
+                    border:
+                        Border.all(color: afropeepGreen.withValues(alpha: 0.3)),
+                  ),
+                  child: Row(
+                    children: [
+                      const Icon(
+                        Icons.location_on,
+                        color: afropeepGreen,
+                        size: 20,
+                      ),
+                      const SizedBox(width: 12),
+                      Expanded(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              'Your Location',
+                              style: GoogleFonts.montserrat(
+                                fontSize: 12,
+                                color: textLightBrown,
+                                fontWeight: FontWeight.w500,
+                              ),
                             ),
-                          ),
-                          Text(
-                            _currentLocation!,
-                            style: GoogleFonts.montserrat(
-                              fontSize: 16,
-                              color: textDarkBrown,
-                              fontWeight: FontWeight.w600,
+                            Text(
+                              location,
+                              style: GoogleFonts.montserrat(
+                                fontSize: 16,
+                                color: textDarkBrown,
+                                fontWeight: FontWeight.w600,
+                              ),
                             ),
-                          ),
                         ],
                       ),
                     ),
@@ -393,7 +396,8 @@ class _LocationScreenState extends State<LocationScreen> {
                     ),
                   ],
                 ),
-              ),
+                );
+              }),
               const SizedBox(height: 24),
             ],
 

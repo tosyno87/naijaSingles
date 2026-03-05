@@ -69,8 +69,9 @@ class _AdvancedSearchDialogState extends State<AdvancedSearchDialog> {
     _startDate = _filter.startDate;
     _endDate = _filter.endDate;
     _selectedCategory = _filter.category;
-    _radiusKm = _filter.radiusKm ?? defaultRadiusKm; // Always have a default value
-    
+    _radiusKm =
+        _filter.radiusKm ?? defaultRadiusKm; // Always have a default value
+
     // Initialize event type from filter
     if (_filter.freeOnly) {
       _eventType = 'free';
@@ -109,7 +110,8 @@ class _AdvancedSearchDialogState extends State<AdvancedSearchDialog> {
               _buildHeader(),
               Expanded(
                 child: SingleChildScrollView(
-                  padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 20),
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 24, vertical: 20),
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
@@ -213,7 +215,8 @@ class _AdvancedSearchDialogState extends State<AdvancedSearchDialog> {
               ),
               focusedBorder: OutlineInputBorder(
                 borderRadius: BorderRadius.circular(8),
-                borderSide: const BorderSide(color: AppColors.primaryGreen, width: 1.5),
+                borderSide:
+                    const BorderSide(color: AppColors.primaryGreen, width: 1.5),
               ),
               contentPadding: const EdgeInsets.symmetric(
                 horizontal: 12,
@@ -253,7 +256,8 @@ class _AdvancedSearchDialogState extends State<AdvancedSearchDialog> {
                       ),
                     ),
                     DropdownButton<double>(
-                      value: _radiusKm ?? defaultRadiusKm, // Always show a value
+                      value:
+                          _radiusKm ?? defaultRadiusKm, // Always show a value
                       dropdownColor: Colors.white,
                       style: GoogleFonts.montserrat(
                         fontSize: 14,
@@ -397,8 +401,8 @@ class _AdvancedSearchDialogState extends State<AdvancedSearchDialog> {
                 builder: (context, child) => Theme(
                   data: Theme.of(context).copyWith(
                     colorScheme: Theme.of(context).colorScheme.copyWith(
-                      primary: AppColors.primaryGreen,
-                    ),
+                          primary: AppColors.primaryGreen,
+                        ),
                   ),
                   child: child!,
                 ),
@@ -467,7 +471,8 @@ class _AdvancedSearchDialogState extends State<AdvancedSearchDialog> {
               ),
               focusedBorder: OutlineInputBorder(
                 borderRadius: BorderRadius.circular(8),
-                borderSide: const BorderSide(color: AppColors.primaryGreen, width: 1.5),
+                borderSide:
+                    const BorderSide(color: AppColors.primaryGreen, width: 1.5),
               ),
               contentPadding: const EdgeInsets.symmetric(
                 horizontal: 12,
@@ -563,9 +568,8 @@ class _AdvancedSearchDialogState extends State<AdvancedSearchDialog> {
               : Colors.transparent,
           borderRadius: BorderRadius.circular(8),
           border: Border.all(
-            color: isSelected
-                ? AppColors.primaryGreen
-                : const Color(0xFFE0E0E0),
+            color:
+                isSelected ? AppColors.primaryGreen : const Color(0xFFE0E0E0),
           ),
         ),
         child: Row(
@@ -709,7 +713,7 @@ class _AdvancedSearchDialogState extends State<AdvancedSearchDialog> {
           );
         }
       }
-    } catch (e) {
+    } on Object catch (e) {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
@@ -738,7 +742,7 @@ class _AdvancedSearchDialogState extends State<AdvancedSearchDialog> {
             userLongitude = location.longitude;
             radiusKm = radiusKm ?? defaultRadiusKm;
           }
-        } catch (e) {
+        } on Object {
           // If location access fails, show a message but continue with text-based filtering
           if (mounted) {
             ScaffoldMessenger.of(context).showSnackBar(
@@ -784,4 +788,3 @@ class _AdvancedSearchDialogState extends State<AdvancedSearchDialog> {
     }
   }
 }
-

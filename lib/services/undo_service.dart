@@ -83,7 +83,7 @@ class UndoService {
       debugPrint(
         '📝 Recorded swipe: $userId → $targetUserId (${direction.name})',
       );
-    } catch (e) {
+    } on Object catch (e) {
       debugPrint('❌ Error recording swipe action: $e');
     }
   }
@@ -139,7 +139,7 @@ class UndoService {
         '✅ User $userId can undo last pass (${timeSinceSwipe.inSeconds}s ago)',
       );
       return true;
-    } catch (e) {
+    } on Object catch (e) {
       debugPrint('❌ Error checking undo availability: $e');
       return false;
     }
@@ -167,7 +167,7 @@ class UndoService {
 
       final doc = querySnapshot.docs.first;
       return SwipeAction.fromDocument(doc);
-    } catch (e) {
+    } on Object catch (e) {
       debugPrint('❌ Error getting last swipe action: $e');
       return null;
     }
@@ -231,7 +231,7 @@ class UndoService {
           } else {
             return UndoResult.failed('Failed to reverse pass action');
           }
-        } catch (e) {
+        } on Object catch (e) {
           debugPrint('❌ Error undoing last swipe: $e');
           return UndoResult.failed('Error: ${e.toString()}');
         }
@@ -274,7 +274,7 @@ class UndoService {
 
       await batch.commit();
       return true;
-    } catch (e) {
+    } on Object catch (e) {
       debugPrint('❌ Error performing undo: $e');
       return false;
     }
@@ -338,7 +338,7 @@ class UndoService {
           .get();
 
       return querySnapshot.docs.length;
-    } catch (e) {
+    } on Object catch (e) {
       debugPrint('❌ Error getting daily undo count: $e');
       return 0;
     }
@@ -352,7 +352,7 @@ class UndoService {
         'timestamp': FieldValue.serverTimestamp(),
         'dailyCount': await getDailyUndoCount(userId) + 1,
       });
-    } catch (e) {
+    } on Object catch (e) {
       debugPrint('❌ Error recording undo usage: $e');
     }
   }
@@ -366,7 +366,7 @@ class UndoService {
         return userData['isPremium'] == true;
       }
       return false;
-    } catch (e) {
+    } on Object catch (e) {
       debugPrint('❌ Error checking premium status: $e');
       return false;
     }
@@ -375,9 +375,6 @@ class UndoService {
   /// Get undo statistics for a user
   Future<UndoStats> getUndoStats(String userId) async {
     try {
-      final today = DateTime.now();
-      final startOfDay = DateTime(today.year, today.month, today.day);
-
       // Get daily undo count
       final dailyUndos = await getDailyUndoCount(userId);
 
@@ -408,7 +405,7 @@ class UndoService {
         canUndoMore: dailyUndos < dailyLimit,
         isPremium: isPremiun,
       );
-    } catch (e) {
+    } on Object catch (e) {
       debugPrint('❌ Error getting undo stats: $e');
       return UndoStats.empty();
     }
@@ -435,7 +432,7 @@ class UndoService {
           '🗑️ Cleared ${expiredQuery.docs.length} expired swipe history entries',
         );
       }
-    } catch (e) {
+    } on Object catch (e) {
       debugPrint('❌ Error clearing expired history: $e');
     }
   }

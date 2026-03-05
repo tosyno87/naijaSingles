@@ -98,7 +98,7 @@ class CheckUserIdApp extends StatelessWidget {
   Future<void> _signInAnonymously() async {
     try {
       await FirebaseAuth.instance.signInAnonymously();
-    } catch (e) {
+    } on Object catch (e) {
       AppLogger.error('Error signing in', error: e);
     }
   }

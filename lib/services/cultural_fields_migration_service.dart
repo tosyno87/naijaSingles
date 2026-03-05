@@ -28,7 +28,7 @@ class CulturalFieldsMigrationService {
           if (migratedUsers % 10 == 0) {
             debugPrint('✅ Migrated $migratedUsers/$totalUsers users');
           }
-        } catch (e) {
+        } on Object catch (e) {
           errorUsers++;
           errors.add('User ${doc.id}: $e');
           debugPrint('❌ Error migrating user ${doc.id}: $e');
@@ -49,7 +49,7 @@ class CulturalFieldsMigrationService {
       debugPrint('   Errors: $errorUsers');
 
       return result;
-    } catch (e) {
+    } on Object catch (e) {
       debugPrint('❌ Critical error during migration: $e');
       return {
         'totalUsers': 0,
@@ -81,7 +81,7 @@ class CulturalFieldsMigrationService {
 
       debugPrint('✅ Migrated user $userId with cultural fields');
       return true;
-    } catch (e) {
+    } on Object catch (e) {
       debugPrint('❌ Error migrating user $userId: $e');
       return false;
     }
@@ -221,7 +221,7 @@ class CulturalFieldsMigrationService {
       }
 
       return await _migrateUser(user.uid, userDoc.data()!);
-    } catch (e) {
+    } on Object catch (e) {
       debugPrint('❌ Error migrating current user: $e');
       return false;
     }
@@ -237,7 +237,7 @@ class CulturalFieldsMigrationService {
       if (!userDoc.exists) return false;
 
       return !_hasCulturalFields(userDoc.data()!);
-    } catch (e) {
+    } on Object catch (e) {
       debugPrint('❌ Error checking migration status: $e');
       return false;
     }

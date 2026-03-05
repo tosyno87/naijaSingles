@@ -25,7 +25,6 @@ class UserRefreshUserDetails extends UserEvent {
 
 /// Event when user data is updated
 class UserDataUpdated extends UserEvent {
-
   const UserDataUpdated(this.user);
   final UserModel? user;
 
@@ -35,7 +34,6 @@ class UserDataUpdated extends UserEvent {
 
 /// Event when authentication state changes
 class UserAuthStateChanged extends UserEvent {
-
   const UserAuthStateChanged(this.isAuthenticated);
   final bool isAuthenticated;
 

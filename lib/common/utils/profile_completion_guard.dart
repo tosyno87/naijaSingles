@@ -1,12 +1,12 @@
 import '../../models/user_model.dart';
 
 class ProfileCompletionGuard {
-  static bool _isNonEmptyString(value) =>
+  static bool _isNonEmptyString(dynamic value) =>
       value is String && value.trim().isNotEmpty;
 
-  static bool _isTrueFlag(value) => value == true;
+  static bool _isTrueFlag(dynamic value) => value == true;
 
-  static bool _isFalseFlag(value) => value == false;
+  static bool _isFalseFlag(dynamic value) => value == false;
 
   /// Determine profile completeness from raw Firestore document data.
   /// Honors explicit completion flags first, then falls back to basic

@@ -15,7 +15,6 @@ class ThemeInitialized extends ThemeEvent {
 
 /// Event to toggle theme mode
 class ThemeModeChanged extends ThemeEvent {
-
   const ThemeModeChanged(this.themeMode);
   final ThemeMode themeMode;
 

@@ -47,78 +47,80 @@ class _EnhancedPhotoUploadScreenState extends State<EnhancedPhotoUploadScreen> {
   static const Color dividerColor = Color(0xFFE5E5E5);
 
   @override
-  Widget build(BuildContext context) => BlocBuilder<OnboardingBloc, OnboardingState>(
-      builder: (context, state) {
-        final uploadedPhotos =
-            state.data?.profilePhotos ?? List<File?>.filled(9, null);
-        return _buildContent(context, uploadedPhotos);
-      },
-    );
+  Widget build(BuildContext context) =>
+      BlocBuilder<OnboardingBloc, OnboardingState>(
+        builder: (context, state) {
+          final uploadedPhotos =
+              state.data?.profilePhotos ?? List<File?>.filled(9, null);
+          return _buildContent(context, uploadedPhotos);
+        },
+      );
 
-  Widget _buildContent(BuildContext context, List<File?> uploadedPhotos) => Scaffold(
-      backgroundColor: AppColors.backgroundColor,
-      appBar: AppBar(
+  Widget _buildContent(BuildContext context, List<File?> uploadedPhotos) =>
+      Scaffold(
         backgroundColor: AppColors.backgroundColor,
-        elevation: 0,
-        leading: IconButton(
-          icon: const Icon(Icons.arrow_back_ios, color: primaryGreen),
-          onPressed: () => Navigator.of(context).pop(),
-        ),
-        title: Text(
-          'Add Photos',
-          style: GoogleFonts.montserrat(
-            fontSize: 20,
-            fontWeight: FontWeight.w600,
-            color: textPrimary,
+        appBar: AppBar(
+          backgroundColor: AppColors.backgroundColor,
+          elevation: 0,
+          leading: IconButton(
+            icon: const Icon(Icons.arrow_back_ios, color: primaryGreen),
+            onPressed: () => Navigator.of(context).pop(),
+          ),
+          title: Text(
+            'Add Photos',
+            style: GoogleFonts.montserrat(
+              fontSize: 20,
+              fontWeight: FontWeight.w600,
+              color: textPrimary,
+            ),
+          ),
+          centerTitle: true,
+          bottom: PreferredSize(
+            preferredSize: const Size.fromHeight(1),
+            child: Container(
+              height: 1,
+              color: dividerColor,
+            ),
           ),
         ),
-        centerTitle: true,
-        bottom: PreferredSize(
-          preferredSize: const Size.fromHeight(1),
-          child: Container(
-            height: 1,
-            color: dividerColor,
-          ),
-        ),
-      ),
-      body: SafeArea(
-        child: Column(
-          children: [
-            // Photo grid - Tinder-style: Scrollable grid showing up to 9 photos
-            Expanded(
-              child: SingleChildScrollView(
-                padding: const EdgeInsets.all(24),
-                child: Wrap(
-                  spacing: 12,
-                  runSpacing: 12,
-                  alignment: WrapAlignment.center,
-                  children: List.generate(9, (index) {
-                    final photo = index < uploadedPhotos.length
-                        ? uploadedPhotos[index]
-                        : null;
-                    return SizedBox(
-                      width: (MediaQuery.of(context).size.width - 72) /
-                          3, // 3 columns
-                      child: AspectRatio(
-                        aspectRatio: 1,
-                        child: _buildPhotoGridItem(
-                          context: context,
-                          photo: photo,
-                          index: index,
-                          isMainPhoto: index == 0,
+        body: SafeArea(
+          child: Column(
+            children: [
+              // Photo grid - Tinder-style: Scrollable grid showing up to 9 photos
+              Expanded(
+                child: SingleChildScrollView(
+                  padding: const EdgeInsets.all(24),
+                  child: Wrap(
+                    spacing: 12,
+                    runSpacing: 12,
+                    alignment: WrapAlignment.center,
+                    children: List.generate(9, (index) {
+                      final photo = index < uploadedPhotos.length
+                          ? uploadedPhotos[index]
+                          : null;
+                      return SizedBox(
+                        width: (MediaQuery.of(context).size.width - 72) /
+                            3, // 3 columns
+                        child: AspectRatio(
+                          aspectRatio: 1,
+                          child: _buildPhotoGridItem(
+                            context: context,
+                            photo: photo,
+                            index: index,
+                            isMainPhoto: index == 0,
+                          ),
                         ),
-                      ),
-                    );
-                  }),
+                      );
+                    }),
+                  ),
                 ),
               ),
-            ),
 
-            // Bottom section - Minimal like Tinder (no button needed, photos are tappable)
-          ],
+              // Bottom section - Minimal like Tinder (no button needed, photos are tappable)
+            ],
+          ),
         ),
-      ),
-    );
+      );
 
   // Tinder-style photo grid item - Minimal, clean, edge-to-edge
   Widget _buildPhotoGridItem({
@@ -126,100 +128,101 @@ class _EnhancedPhotoUploadScreenState extends State<EnhancedPhotoUploadScreen> {
     required File? photo,
     required int index,
     required bool isMainPhoto,
-  }) => GestureDetector(
-      onTap: () => _showAddPhotoOptions(context, index),
-      child: AspectRatio(
-        aspectRatio: 1, // Square - Industry standard (Tinder, Bumble, Hinge)
-        child: Container(
-          decoration: BoxDecoration(
-            color: photo == null ? Colors.grey.shade100 : Colors.white,
-            borderRadius: BorderRadius.circular(12),
-            // Subtle border only for main photo
-            border: isMainPhoto && photo != null
-                ? Border.all(color: primaryGreen, width: 3)
-                : Border.all(color: Colors.grey.shade200),
-          ),
-          clipBehavior: Clip.antiAlias,
-          child: Stack(
-            children: [
-              // Photo - Tinder style: edge-to-edge fill
-              if (photo != null)
-                Image.file(
-                  photo,
-                  fit: BoxFit.cover,
-                  width: double.infinity,
-                  height: double.infinity,
-                )
-              else
-                // Empty state
-                Center(
-                  child: Icon(
-                    Icons.add_photo_alternate,
-                    size: 48,
-                    color: Colors.grey.shade300,
-                  ),
-                ),
-
-              // Main photo badge (only if photo exists)
-              if (isMainPhoto && photo != null)
-                Positioned(
-                  top: 8,
-                  left: 8,
-                  child: Container(
-                    padding:
-                        const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-                    decoration: BoxDecoration(
-                      color: primaryGreen,
-                      borderRadius: BorderRadius.circular(12),
-                    ),
-                    child: Row(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        const Icon(
-                          Icons.star,
-                          color: Colors.white,
-                          size: 12,
-                        ),
-                        const SizedBox(width: 4),
-                        Text(
-                          'Main',
-                          style: GoogleFonts.montserrat(
-                            fontSize: 11,
-                            fontWeight: FontWeight.w600,
-                            color: Colors.white,
-                          ),
-                        ),
-                      ],
+  }) =>
+      GestureDetector(
+        onTap: () => _showAddPhotoOptions(context, index),
+        child: AspectRatio(
+          aspectRatio: 1, // Square - Industry standard (Tinder, Bumble, Hinge)
+          child: Container(
+            decoration: BoxDecoration(
+              color: photo == null ? Colors.grey.shade100 : Colors.white,
+              borderRadius: BorderRadius.circular(12),
+              // Subtle border only for main photo
+              border: isMainPhoto && photo != null
+                  ? Border.all(color: primaryGreen, width: 3)
+                  : Border.all(color: Colors.grey.shade200),
+            ),
+            clipBehavior: Clip.antiAlias,
+            child: Stack(
+              children: [
+                // Photo - Tinder style: edge-to-edge fill
+                if (photo != null)
+                  Image.file(
+                    photo,
+                    fit: BoxFit.cover,
+                    width: double.infinity,
+                    height: double.infinity,
+                  )
+                else
+                  // Empty state
+                  Center(
+                    child: Icon(
+                      Icons.add_photo_alternate,
+                      size: 48,
+                      color: Colors.grey.shade300,
                     ),
                   ),
-                ),
 
-              // Delete/Replace button (only if photo exists)
-              if (photo != null)
-                Positioned(
-                  top: 8,
-                  right: 8,
-                  child: GestureDetector(
-                    onTap: () => _removePhoto(index),
+                // Main photo badge (only if photo exists)
+                if (isMainPhoto && photo != null)
+                  Positioned(
+                    top: 8,
+                    left: 8,
                     child: Container(
-                      padding: const EdgeInsets.all(6),
+                      padding: const EdgeInsets.symmetric(
+                          horizontal: 8, vertical: 4),
                       decoration: BoxDecoration(
-                        color: Colors.black.withValues(alpha: 0.7),
-                        shape: BoxShape.circle,
+                        color: primaryGreen,
+                        borderRadius: BorderRadius.circular(12),
                       ),
-                      child: const Icon(
-                        Icons.close,
-                        color: Colors.white,
-                        size: 16,
+                      child: Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          const Icon(
+                            Icons.star,
+                            color: Colors.white,
+                            size: 12,
+                          ),
+                          const SizedBox(width: 4),
+                          Text(
+                            'Main',
+                            style: GoogleFonts.montserrat(
+                              fontSize: 11,
+                              fontWeight: FontWeight.w600,
+                              color: Colors.white,
+                            ),
+                          ),
+                        ],
                       ),
                     ),
                   ),
-                ),
-            ],
+
+                // Delete/Replace button (only if photo exists)
+                if (photo != null)
+                  Positioned(
+                    top: 8,
+                    right: 8,
+                    child: GestureDetector(
+                      onTap: () => _removePhoto(index),
+                      child: Container(
+                        padding: const EdgeInsets.all(6),
+                        decoration: BoxDecoration(
+                          color: Colors.black.withValues(alpha: 0.7),
+                          shape: BoxShape.circle,
+                        ),
+                        child: const Icon(
+                          Icons.close,
+                          color: Colors.white,
+                          size: 16,
+                        ),
+                      ),
+                    ),
+                  ),
+              ],
+            ),
           ),
         ),
-      ),
-    );
+      );
 
   Future<void> _showAddPhotoOptions(BuildContext context, int index) async {
     final bloc = context.read<OnboardingBloc>();
@@ -298,129 +301,133 @@ class _EnhancedPhotoUploadScreenState extends State<EnhancedPhotoUploadScreen> {
   }
 
   void _showPhotoOptionsBottomSheet(BuildContext parentContext, int index) {
-    unawaited(showModalBottomSheet(
-      context: parentContext,
-      backgroundColor: Colors.white,
-      shape: const RoundedRectangleBorder(
-        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
-      ),
-      builder: (context) => SafeArea(
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Container(
-              margin: const EdgeInsets.only(top: 12, bottom: 8),
-              width: 40,
-              height: 4,
-              decoration: BoxDecoration(
-                color: Colors.grey.shade300,
-                borderRadius: BorderRadius.circular(2),
+    unawaited(
+      showModalBottomSheet(
+        context: parentContext,
+        backgroundColor: Colors.white,
+        shape: const RoundedRectangleBorder(
+          borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+        ),
+        builder: (context) => SafeArea(
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Container(
+                margin: const EdgeInsets.only(top: 12, bottom: 8),
+                width: 40,
+                height: 4,
+                decoration: BoxDecoration(
+                  color: Colors.grey.shade300,
+                  borderRadius: BorderRadius.circular(2),
+                ),
               ),
-            ),
-            if (index > 0)
+              if (index > 0)
+                ListTile(
+                  leading: const Icon(Icons.star, color: primaryGreen),
+                  title: Text(
+                    'Set as Main Photo',
+                    style: GoogleFonts.montserrat(
+                      fontWeight: FontWeight.w500,
+                    ),
+                  ),
+                  onTap: () {
+                    Navigator.pop(context);
+                    _setAsMainPhoto(index);
+                  },
+                ),
               ListTile(
-                leading: const Icon(Icons.star, color: primaryGreen),
+                leading: const Icon(Icons.camera_alt, color: primaryGreen),
                 title: Text(
-                  'Set as Main Photo',
+                  'Replace Photo',
                   style: GoogleFonts.montserrat(
                     fontWeight: FontWeight.w500,
                   ),
                 ),
-                onTap: () {
+                onTap: () async {
                   Navigator.pop(context);
-                  _setAsMainPhoto(index);
-                },
-              ),
-            ListTile(
-              leading: const Icon(Icons.camera_alt, color: primaryGreen),
-              title: Text(
-                'Replace Photo',
-                style: GoogleFonts.montserrat(
-                  fontWeight: FontWeight.w500,
-                ),
-              ),
-              onTap: () async {
-                Navigator.pop(context);
-                final bloc = parentContext.read<OnboardingBloc>();
-                final source = await showModalBottomSheet<ImageSource>(
-                  context: parentContext,
-                  backgroundColor: Colors.white,
-                  shape: const RoundedRectangleBorder(
-                    borderRadius:
-                        BorderRadius.vertical(top: Radius.circular(20)),
-                  ),
-                  builder: (context) => SafeArea(
-                    child: Column(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        Container(
-                          margin: const EdgeInsets.only(top: 12, bottom: 8),
-                          width: 40,
-                          height: 4,
-                          decoration: BoxDecoration(
-                            color: Colors.grey.shade300,
-                            borderRadius: BorderRadius.circular(2),
-                          ),
-                        ),
-                        ListTile(
-                          leading:
-                              const Icon(Icons.camera_alt, color: primaryGreen),
-                          title: Text(
-                            'Take Photo',
-                            style: GoogleFonts.montserrat(
-                              fontWeight: FontWeight.w500,
-                            ),
-                          ),
-                          onTap: () =>
-                              Navigator.pop(context, ImageSource.camera),
-                        ),
-                        ListTile(
-                          leading: const Icon(Icons.photo_library,
-                              color: primaryGreen,),
-                          title: Text(
-                            'Choose from Gallery',
-                            style: GoogleFonts.montserrat(
-                              fontWeight: FontWeight.w500,
-                            ),
-                          ),
-                          onTap: () =>
-                              Navigator.pop(context, ImageSource.gallery),
-                        ),
-                        const SizedBox(height: 8),
-                      ],
+                  final bloc = parentContext.read<OnboardingBloc>();
+                  final source = await showModalBottomSheet<ImageSource>(
+                    context: parentContext,
+                    backgroundColor: Colors.white,
+                    shape: const RoundedRectangleBorder(
+                      borderRadius:
+                          BorderRadius.vertical(top: Radius.circular(20)),
                     ),
-                  ),
-                );
-                if (source != null && parentContext.mounted) {
-                  bloc.add(
-                    OnboardingProfilePhotoPicked(
-                      source,
-                      index,
-                      parentContext,
+                    builder: (context) => SafeArea(
+                      child: Column(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Container(
+                            margin: const EdgeInsets.only(top: 12, bottom: 8),
+                            width: 40,
+                            height: 4,
+                            decoration: BoxDecoration(
+                              color: Colors.grey.shade300,
+                              borderRadius: BorderRadius.circular(2),
+                            ),
+                          ),
+                          ListTile(
+                            leading: const Icon(Icons.camera_alt,
+                                color: primaryGreen),
+                            title: Text(
+                              'Take Photo',
+                              style: GoogleFonts.montserrat(
+                                fontWeight: FontWeight.w500,
+                              ),
+                            ),
+                            onTap: () =>
+                                Navigator.pop(context, ImageSource.camera),
+                          ),
+                          ListTile(
+                            leading: const Icon(
+                              Icons.photo_library,
+                              color: primaryGreen,
+                            ),
+                            title: Text(
+                              'Choose from Gallery',
+                              style: GoogleFonts.montserrat(
+                                fontWeight: FontWeight.w500,
+                              ),
+                            ),
+                            onTap: () =>
+                                Navigator.pop(context, ImageSource.gallery),
+                          ),
+                          const SizedBox(height: 8),
+                        ],
+                      ),
                     ),
                   );
-                }
-              },
-            ),
-            ListTile(
-              leading: const Icon(Icons.delete, color: Colors.red),
-              title: Text(
-                'Delete Photo',
-                style: GoogleFonts.montserrat(
-                  fontWeight: FontWeight.w500,
-                  color: Colors.red,
-                ),
+                  if (source != null && parentContext.mounted) {
+                    bloc.add(
+                      OnboardingProfilePhotoPicked(
+                        source,
+                        index,
+                        parentContext,
+                      ),
+                    );
+                  }
+                },
               ),
-              onTap: () {
-                Navigator.pop(context);
-                _removePhoto(index);
-              },
-            ),
-            const SizedBox(height: 8),
-          ],
+              ListTile(
+                leading: const Icon(Icons.delete, color: Colors.red),
+                title: Text(
+                  'Delete Photo',
+                  style: GoogleFonts.montserrat(
+                    fontWeight: FontWeight.w500,
+                    color: Colors.red,
+                  ),
+                ),
+                onTap: () {
+                  Navigator.pop(context);
+                  _removePhoto(index);
+                },
+              ),
+              const SizedBox(height: 8),
+            ],
+          ),
         ),
       ),
-    ));
+    );
   }
 
   void _removePhoto(int index) {

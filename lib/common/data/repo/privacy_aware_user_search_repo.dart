@@ -110,7 +110,7 @@ class PrivacyAwareUserSearchRepo {
 
       debugPrint('✅ Final privacy-aware user list size: ${userList.length}');
       return userList;
-    } catch (e) {
+    } on Object catch (e) {
       debugPrint('❌ Error in privacy-aware getUserList: $e');
       rethrow;
     }
@@ -179,7 +179,7 @@ class PrivacyAwareUserSearchRepo {
 
           debugPrint('✅ Adding privacy-aware user: ${user.name}');
           userList.add(user);
-        } catch (e) {
+        } on Object catch (e) {
           debugPrint(
             '⚠️ Error processing privacy-aware document ${doc.id}: $e',
           );
@@ -188,7 +188,7 @@ class PrivacyAwareUserSearchRepo {
       }
 
       return userList;
-    } catch (e) {
+    } on Object catch (e) {
       debugPrint('❌ Error in _getPrivacyAwareUsers: $e');
       return [];
     }
@@ -229,14 +229,14 @@ class PrivacyAwareUserSearchRepo {
             debugPrint('📋 Adding fallback user: ${temp.name}');
             userList.add(temp);
           }
-        } catch (e) {
+        } on Object catch (e) {
           debugPrint('⚠️ Error processing fallback document ${doc.id}: $e');
           continue;
         }
       }
 
       return userList;
-    } catch (e) {
+    } on Object catch (e) {
       debugPrint('❌ Error in _getFallbackUsers: $e');
       return [];
     }
@@ -320,13 +320,17 @@ class PrivacyAwareUserSearchRepo {
       latitude: latitude,
       longitude: longitude,
       imageUrl: data['photos'] is List
-          ? List<String>.from((data['photos'] as List)
-              .map((e) => e?.toString() ?? '')
-              .where((url) => url.toString().isNotEmpty),)
-          : data['Pictures'] is List
-              ? List<String>.from((data['Pictures'] as List)
+          ? List<String>.from(
+              (data['photos'] as List)
                   .map((e) => e?.toString() ?? '')
-                  .where((url) => url.toString().isNotEmpty),)
+                  .where((url) => url.toString().isNotEmpty),
+            )
+          : data['Pictures'] is List
+              ? List<String>.from(
+                  (data['Pictures'] as List)
+                      .map((e) => e?.toString() ?? '')
+                      .where((url) => url.toString().isNotEmpty),
+                )
               : [],
       isBlocked: data['isBlocked'] ?? false,
       lookingFor: data['lookingFor']?.toString() ?? 'Dating',
@@ -398,12 +402,12 @@ class PrivacyAwareUserSearchRepo {
                   }
                 }
               }
-            } catch (e) {
+            } on Object catch (e) {
               debugPrint('⚠️ Error processing nearby user ${doc.id}: $e');
               continue;
             }
           }
-        } catch (e) {
+        } on Object catch (e) {
           debugPrint('⚠️ Error querying GeoHash $geoHash: $e');
           continue;
         }
@@ -411,7 +415,7 @@ class PrivacyAwareUserSearchRepo {
 
       debugPrint('🗺️ Found ${nearbyUsers.length} nearby users');
       return nearbyUsers;
-    } catch (e) {
+    } on Object catch (e) {
       debugPrint('❌ Error in getUsersNearby: $e');
       return [];
     }
@@ -443,7 +447,7 @@ class PrivacyAwareUserSearchRepo {
               await _createUserModelFromFilteredData(filteredData, doc.id);
           matchesList.add(user);
         }
-      } catch (e) {
+      } on Object catch (e) {
         debugPrint('⚠️ Error loading match ${doc.id}: $e');
         continue;
       }

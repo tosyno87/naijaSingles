@@ -101,6 +101,9 @@ class ProductsState extends State<Products> {
   }
 
   Future<void> _initialize() async {
+    final currentUser = widget.currentUser;
+    if (currentUser == null) return;
+
     isAvailable = await _iap.isAvailable();
     debugPrint('available is $isAvailable');
     if (isAvailable) {
@@ -128,13 +131,13 @@ class ProductsState extends State<Products> {
           await InAppPurchaseRepoImpl.verifyPuchase(
             purchase.productID,
             purchases,
-            widget.currentUser!,
+            currentUser,
             widget.items,
             context,
           ).whenComplete(() async {
             await firebaseFireStoreInstance
                 .collection('users')
-                .doc(widget.currentUser!.id)
+                .doc(currentUser.id)
                 .update({
               'isPremium': true,
               'subscriptionDate': FieldValue.serverTimestamp(),
@@ -142,7 +145,7 @@ class ProductsState extends State<Products> {
           });
         }
       });
-      _streamSubscription!.onError(
+      _streamSubscription?.onError(
         (error) {
           if (!mounted) return;
           ScaffoldMessenger.of(context).showSnackBar(
@@ -183,9 +186,8 @@ class ProductsState extends State<Products> {
             backgroundColor: Theme.of(context).primaryColor,
             appBar: AppBar(
               elevation: 0,
-              backgroundColor: isDarkMode
-                  ? const Color(0xff252020)
-                  : Colors.white,
+              backgroundColor:
+                  isDarkMode ? const Color(0xff252020) : Colors.white,
               centerTitle: true,
               title: Text(
                 'Get our premium plans'.tr().toString(),
@@ -344,22 +346,25 @@ class ProductsState extends State<Products> {
                                                                     product,
                                                                   ),
                                                             intervalCount: Platform
-                                                                    .isIOS
-                                                                ? iosP!
-                                                                    .skProduct
-                                                                    .subscriptionPeriod!
-                                                                    .numberOfUnits
-                                                                    .toString()
+                                                                        .isIOS &&
+                                                                    iosP != null
+                                                                ? iosP
+                                                                        .skProduct
+                                                                        .subscriptionPeriod
+                                                                        ?.numberOfUnits
+                                                                        .toString() ??
+                                                                    ''
                                                                 : product
-                                                                    .productDetails
-                                                                    .subscriptionOfferDetails!
-                                                                    .first
-                                                                    .pricingPhases
-                                                                    .first
-                                                                    .billingPeriod
-                                                                    .split(
+                                                                        .productDetails
+                                                                        .subscriptionOfferDetails
+                                                                        ?.first
+                                                                        .pricingPhases
+                                                                        .first
+                                                                        .billingPeriod
+                                                                        .split(
+                                                                        '',
+                                                                      )[1] ??
                                                                     '',
-                                                                  )[1],
                                                             price:
                                                                 product.price,
                                                             onTap: () {
@@ -377,21 +382,27 @@ class ProductsState extends State<Products> {
                                         ),
                                       ),
                                       if (selectedProduct != null)
-                                        Center(
-                                          child: ListTile(
-                                            title: Text(
-                                              selectedProduct!.title,
-                                              textAlign: TextAlign.center,
+                                        Builder(builder: (context) {
+                                          final product = selectedProduct;
+                                          if (product == null) {
+                                            return const SizedBox.shrink();
+                                          }
+                                          return Center(
+                                            child: ListTile(
+                                              title: Text(
+                                                product.title,
+                                                textAlign: TextAlign.center,
+                                              ),
+                                              subtitle: Text(
+                                                product.description,
+                                                textAlign: TextAlign.center,
+                                              ),
+                                              trailing: Text(
+                                                '${state.result.indexOf(product) + 1}/${state.result.length}',
+                                              ),
                                             ),
-                                            subtitle: Text(
-                                              selectedProduct!.description,
-                                              textAlign: TextAlign.center,
-                                            ),
-                                            trailing: Text(
-                                              '${state.result.indexOf(selectedProduct!) + 1}/${state.result.length}',
-                                            ),
-                                          ),
-                                        )
+                                          );
+                                        })
                                       else
                                         Center(
                                           child: ListTile(
@@ -431,11 +442,13 @@ class ProductsState extends State<Products> {
                         ? CustomButton(
                             text: 'CONTINUE'.tr().toString(),
                             onTap: () async {
+                              final product = selectedProduct;
+                              if (product == null) return;
                               BlocProvider.of<BuyConsumableInAppProductsBloc>(
                                 context,
                               ).add(
                                 RequestBuyConsumableProducts(
-                                  productDetails: selectedProduct!,
+                                  productDetails: product,
                                 ),
                               );
                             },

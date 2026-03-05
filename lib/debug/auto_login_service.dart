@@ -1,18 +1,30 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/foundation.dart';
 
-/// Service to automatically log in a test user for development/testing
+/// Service to automatically log in a test user for development/testing.
+///
+/// Credentials are injected via --dart-define at build time.
+/// Only callable in debug mode — [kDebugMode] gate prevents execution in release.
 class AutoLoginService {
   static final FirebaseAuth _auth = FirebaseAuth.instance;
 
-  // Test user credentials - replace with your actual test user
-  static const String _testEmail = 'test@naijasingles.com';
-  static const String _testPassword = 'testpassword123';
+  static const String _testEmail = String.fromEnvironment(
+    'TEST_EMAIL',
+    defaultValue: 'test@naijasingles.com',
+  );
+  static const String _testPassword = String.fromEnvironment(
+    'TEST_PASSWORD',
+    defaultValue: '',
+  );
 
   /// Automatically sign in a test user for development
   static Future<bool> autoLoginForTesting() async {
     if (!kDebugMode) {
       debugPrint('Auto-login only available in debug mode');
+      return false;
+    }
+    if (_testPassword.isEmpty) {
+      debugPrint('Auto-login skipped: pass --dart-define=TEST_PASSWORD=...');
       return false;
     }
 

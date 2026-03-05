@@ -151,362 +151,184 @@ class _OnboardingStepARootsState extends State<OnboardingStepARoots> {
   }
 
   @override
-  Widget build(BuildContext context) => BlocBuilder<OnboardingBloc, OnboardingState>(
-      builder: (context, state) {
-        final data = state.data ?? OnboardingData();
+  Widget build(BuildContext context) =>
+      BlocBuilder<OnboardingBloc, OnboardingState>(
+        builder: (context, state) {
+          final data = state.data ?? OnboardingData();
 
-    // Deep green color for selected elements
-    const Color deepGreen = Color(0xFF008037);
+          // Deep green color for selected elements
+          const Color deepGreen = Color(0xFF008037);
 
-    return Scaffold(
-      backgroundColor: widget.backgroundColor,
-      body: SafeArea(
-        child: SingleChildScrollView(
-          padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 32),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              // Progress indicator
-              Row(
-                children: [
-                  Container(
-                    padding:
-                        const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-                    decoration: BoxDecoration(
-                      color: deepGreen.withValues(alpha: 0.1),
-                      borderRadius: BorderRadius.circular(20),
-                    ),
-                    child: Text(
-                      'Step 1 of 3',
-                      style: GoogleFonts.montserrat(
-                        fontSize: 14,
-                        fontWeight: FontWeight.w500,
-                        color: deepGreen,
-                      ),
-                    ),
-                  ),
-                ],
-              ),
-
-              const SizedBox(height: 20),
-
-              // Header section
-              Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    'Your Cultural Roots',
-                    style: GoogleFonts.montserrat(
-                      fontSize: 22,
-                      fontWeight: FontWeight.bold,
-                      color: Colors.brown.shade800,
-                    ),
-                    semanticsLabel: 'Your Cultural Roots, Step 1 of 3',
-                  ),
-                  const SizedBox(height: 12),
-                  Text(
-                    'Tell us about your cultural background to help us connect you with like-minded people.',
-                    style: GoogleFonts.montserrat(
-                      fontSize: 15,
-                      color: Colors.brown.shade600,
-                    ),
-                  ),
-                ],
-              ),
-
-              const SizedBox(height: 32),
-
-              // White card container for all input fields
-              Container(
-                decoration: BoxDecoration(
-                  color: Colors.white,
-                  borderRadius: BorderRadius.circular(16),
-                  boxShadow: [
-                    BoxShadow(
-                      color: Colors.black.withValues(alpha: 0.05),
-                      blurRadius: 10,
-                      offset: const Offset(0, 4),
-                    ),
-                  ],
-                ),
-                padding: const EdgeInsets.all(20),
+          return Scaffold(
+            backgroundColor: widget.backgroundColor,
+            body: SafeArea(
+              child: SingleChildScrollView(
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 24, vertical: 32),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    // Tribe input
-                    _buildSectionTitle('What is your tribe or ethnic group?'),
-                    const SizedBox(height: 12),
-
-                    // Dropdown for tribe selection
-                    DropdownButtonFormField<String>(
-                      key: _tribeFieldKey,
-                      initialValue: _selectedTribe,
-                      onChanged: (value) {
-                        if (value == 'Other') {
-                          setState(() {
-                            _selectedTribe = value;
-                            _isCustomTribe = true;
-                            // Clear the text field for custom entry
-                            _tribeController.text = '';
-                          });
-                        } else {
-                          setState(() {
-                            _selectedTribe = value;
-                            _isCustomTribe = false;
-                            _tribeController.text = value ?? '';
-                            context.read<OnboardingBloc>().add(OnboardingTribeUpdated(value ?? ''));
-                          });
-                        }
-                      },
-                      items: _africanTribes
-                          .map(
-                            (tribe) => DropdownMenuItem(
-                              value: tribe,
-                              child: Text(
-                                tribe,
-                                style: GoogleFonts.montserrat(
-                                  fontSize: 16,
-                                  fontWeight: FontWeight.w500,
-                                  color: Colors.black87,
-                                ),
-                              ),
+                    // Progress indicator
+                    Row(
+                      children: [
+                        Container(
+                          padding: const EdgeInsets.symmetric(
+                              horizontal: 12, vertical: 6),
+                          decoration: BoxDecoration(
+                            color: deepGreen.withValues(alpha: 0.1),
+                            borderRadius: BorderRadius.circular(20),
+                          ),
+                          child: Text(
+                            'Step 1 of 3',
+                            style: GoogleFonts.montserrat(
+                              fontSize: 14,
+                              fontWeight: FontWeight.w500,
+                              color: deepGreen,
                             ),
-                          )
-                          .toList(),
-                      decoration: InputDecoration(
-                        labelText: 'Tribe or Ethnic Group',
-                        labelStyle: GoogleFonts.montserrat(
-                          color: deepGreen,
-                          fontSize: 16,
+                          ),
                         ),
-                        filled: true,
-                        fillColor: Colors.white,
-                        border: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(12),
-                          borderSide: BorderSide(color: Colors.grey[400]!),
-                        ),
-                        enabledBorder: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(12),
-                          borderSide: BorderSide(color: Colors.grey[400]!),
-                        ),
-                        focusedBorder: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(12),
-                          borderSide:
-                              const BorderSide(color: deepGreen, width: 2),
-                        ),
-                        contentPadding: const EdgeInsets.symmetric(
-                          horizontal: 16,
-                          vertical: 14,
-                        ),
-                      ),
-                      style: GoogleFonts.montserrat(
-                        fontSize: 16,
-                        fontWeight: FontWeight.w500,
-                        color: Colors.black87,
-                      ),
-                      dropdownColor: Colors.white,
-                      icon: const Icon(Icons.arrow_drop_down, color: deepGreen),
-                      isExpanded: true,
+                      ],
                     ),
 
-                    // Manual entry field if "Other" is selected
-                    if (_isCustomTribe) ...[
-                      const SizedBox(height: 16),
-                      TextFormField(
-                        controller: _tribeController,
-                        decoration: InputDecoration(
-                          labelText: 'Enter your tribe',
-                          labelStyle: GoogleFonts.montserrat(
-                            color: deepGreen,
-                            fontSize: 16,
+                    const SizedBox(height: 20),
+
+                    // Header section
+                    Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          'Your Cultural Roots',
+                          style: GoogleFonts.montserrat(
+                            fontSize: 22,
+                            fontWeight: FontWeight.bold,
+                            color: Colors.brown.shade800,
                           ),
-                          hintText: 'Type your tribe or ethnic group',
-                          hintStyle: GoogleFonts.montserrat(
-                            color: Colors.grey[600],
-                            fontSize: 14,
-                          ),
-                          filled: true,
-                          fillColor: Colors.white,
-                          border: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(12),
-                            borderSide: BorderSide(color: Colors.grey[400]!),
-                          ),
-                          enabledBorder: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(12),
-                            borderSide: BorderSide(color: Colors.grey[400]!),
-                          ),
-                          focusedBorder: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(12),
-                            borderSide:
-                                const BorderSide(color: deepGreen, width: 2),
-                          ),
-                          contentPadding: const EdgeInsets.symmetric(
-                            horizontal: 16,
-                            vertical: 14,
+                          semanticsLabel: 'Your Cultural Roots, Step 1 of 3',
+                        ),
+                        const SizedBox(height: 12),
+                        Text(
+                          'Tell us about your cultural background to help us connect you with like-minded people.',
+                          style: GoogleFonts.montserrat(
+                            fontSize: 15,
+                            color: Colors.brown.shade600,
                           ),
                         ),
-                        style: GoogleFonts.montserrat(
-                          fontSize: 16,
-                          fontWeight: FontWeight.w500,
-                          color: Colors.black87,
-                        ),
-                        onChanged: (value) {
-                          context.read<OnboardingBloc>().add(OnboardingTribeUpdated(value.trim()));
-                        },
-                      ),
-                    ],
+                      ],
+                    ),
+
                     const SizedBox(height: 32),
 
-                    // Languages selection
-                    _buildSectionTitle('Which languages do you speak?'),
-                    const SizedBox(height: 8),
-                    Text(
-                      'Select all languages that you speak',
-                      style: GoogleFonts.montserrat(
-                        fontSize: 14,
-                        color: Colors.grey[700],
+                    // White card container for all input fields
+                    Container(
+                      decoration: BoxDecoration(
+                        color: Colors.white,
+                        borderRadius: BorderRadius.circular(16),
+                        boxShadow: [
+                          BoxShadow(
+                            color: Colors.black.withValues(alpha: 0.05),
+                            blurRadius: 10,
+                            offset: const Offset(0, 4),
+                          ),
+                        ],
                       ),
-                    ),
-                    const SizedBox(height: 12),
+                      padding: const EdgeInsets.all(20),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          // Tribe input
+                          _buildSectionTitle(
+                              'What is your tribe or ethnic group?'),
+                          const SizedBox(height: 12),
 
-                    // Display selected languages as chips
-                    if (data.languages.isNotEmpty) ...[
-                      Wrap(
-                        spacing: 8,
-                        runSpacing: 8,
-                        children: data.languages
-                            .map(
-                              (language) => Chip(
-                                label: Text(
-                                  language,
-                                  style: GoogleFonts.montserrat(
-                                    color: Colors.white,
-                                    fontSize: 14,
-                                    fontWeight: FontWeight.w500,
+                          // Dropdown for tribe selection
+                          DropdownButtonFormField<String>(
+                            key: _tribeFieldKey,
+                            initialValue: _selectedTribe,
+                            onChanged: (value) {
+                              if (value == 'Other') {
+                                setState(() {
+                                  _selectedTribe = value;
+                                  _isCustomTribe = true;
+                                  // Clear the text field for custom entry
+                                  _tribeController.text = '';
+                                });
+                              } else {
+                                setState(() {
+                                  _selectedTribe = value;
+                                  _isCustomTribe = false;
+                                  _tribeController.text = value ?? '';
+                                  context
+                                      .read<OnboardingBloc>()
+                                      .add(OnboardingTribeUpdated(value ?? ''));
+                                });
+                              }
+                            },
+                            items: _africanTribes
+                                .map(
+                                  (tribe) => DropdownMenuItem(
+                                    value: tribe,
+                                    child: Text(
+                                      tribe,
+                                      style: GoogleFonts.montserrat(
+                                        fontSize: 16,
+                                        fontWeight: FontWeight.w500,
+                                        color: Colors.black87,
+                                      ),
+                                    ),
                                   ),
-                                ),
-                                backgroundColor: deepGreen,
-                                deleteIconColor: Colors.white,
-                                onDeleted: () {
-                                  setState(() {
-                                    final List<String> updatedLanguages = [
-                                      ...data.languages,
-                                    ];
-                                    updatedLanguages.remove(language);
-                                    context.read<OnboardingBloc>().add(
-                                      OnboardingLanguagesUpdated(updatedLanguages),
-                                    );
-                                  });
-                                },
+                                )
+                                .toList(),
+                            decoration: InputDecoration(
+                              labelText: 'Tribe or Ethnic Group',
+                              labelStyle: GoogleFonts.montserrat(
+                                color: deepGreen,
+                                fontSize: 16,
                               ),
-                            )
-                            .toList(),
-                      ),
-                      const SizedBox(height: 16),
-                    ],
-
-                    // Dropdown for language selection
-                    DropdownButtonFormField<String>(
-                      key: _languagesKey,
-                      initialValue: _selectedLanguage,
-                      hint: Text(
-                        'Select a language',
-                        style: GoogleFonts.montserrat(
-                          color: Colors.grey[600],
-                          fontSize: 14,
-                        ),
-                      ),
-                      onChanged: (value) {
-                        if (value == 'Other') {
-                          setState(() {
-                            _selectedLanguage = value;
-                            _isCustomLanguage = true;
-                          });
-                        } else if (value != null) {
-                          setState(() {
-                            _selectedLanguage = value;
-                            _isCustomLanguage = false;
-
-                            // Add to languages list if not already there
-                            if (!data.languages.contains(value)) {
-                              final List<String> updatedLanguages = [
-                                ...data.languages,
-                              ];
-                              updatedLanguages.add(value);
-                              context.read<OnboardingBloc>().add(OnboardingLanguagesUpdated(updatedLanguages));
-
-                              // Reset dropdown after selection
-                              _selectedLanguage = null;
-                            }
-                          });
-                        }
-                      },
-                      items: _availableLanguages
-                          .map(
-                            (language) => DropdownMenuItem(
-                              value: language,
-                              child: Text(
-                                language,
-                                style: GoogleFonts.montserrat(
-                                  fontSize: 16,
-                                  fontWeight: FontWeight.w500,
-                                  color: Colors.black87,
-                                ),
+                              filled: true,
+                              fillColor: Colors.white,
+                              border: OutlineInputBorder(
+                                borderRadius: BorderRadius.circular(12),
+                                borderSide:
+                                    BorderSide(color: Colors.grey[400]!),
+                              ),
+                              enabledBorder: OutlineInputBorder(
+                                borderRadius: BorderRadius.circular(12),
+                                borderSide:
+                                    BorderSide(color: Colors.grey[400]!),
+                              ),
+                              focusedBorder: OutlineInputBorder(
+                                borderRadius: BorderRadius.circular(12),
+                                borderSide: const BorderSide(
+                                    color: deepGreen, width: 2),
+                              ),
+                              contentPadding: const EdgeInsets.symmetric(
+                                horizontal: 16,
+                                vertical: 14,
                               ),
                             ),
-                          )
-                          .toList(),
-                      decoration: InputDecoration(
-                        labelText: 'Add Language',
-                        labelStyle: GoogleFonts.montserrat(
-                          color: deepGreen,
-                          fontSize: 16,
-                        ),
-                        filled: true,
-                        fillColor: Colors.white,
-                        border: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(12),
-                          borderSide: BorderSide(color: Colors.grey[400]!),
-                        ),
-                        enabledBorder: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(12),
-                          borderSide: BorderSide(color: Colors.grey[400]!),
-                        ),
-                        focusedBorder: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(12),
-                          borderSide:
-                              const BorderSide(color: deepGreen, width: 2),
-                        ),
-                        contentPadding: const EdgeInsets.symmetric(
-                          horizontal: 16,
-                          vertical: 14,
-                        ),
-                      ),
-                      style: GoogleFonts.montserrat(
-                        fontSize: 16,
-                        fontWeight: FontWeight.w500,
-                        color: Colors.black87,
-                      ),
-                      dropdownColor: Colors.white,
-                      icon: const Icon(Icons.arrow_drop_down, color: deepGreen),
-                      isExpanded: true,
-                    ),
+                            style: GoogleFonts.montserrat(
+                              fontSize: 16,
+                              fontWeight: FontWeight.w500,
+                              color: Colors.black87,
+                            ),
+                            dropdownColor: Colors.white,
+                            icon: const Icon(Icons.arrow_drop_down,
+                                color: deepGreen),
+                            isExpanded: true,
+                          ),
 
-                    // Manual entry field if "Other" is selected
-                    if (_isCustomLanguage) ...[
-                      const SizedBox(height: 16),
-                      Row(
-                        children: [
-                          Expanded(
-                            child: TextFormField(
-                              controller: _customLanguageController,
+                          // Manual entry field if "Other" is selected
+                          if (_isCustomTribe) ...[
+                            const SizedBox(height: 16),
+                            TextFormField(
+                              controller: _tribeController,
                               decoration: InputDecoration(
-                                labelText: 'Enter language',
+                                labelText: 'Enter your tribe',
                                 labelStyle: GoogleFonts.montserrat(
                                   color: deepGreen,
                                   fontSize: 16,
                                 ),
-                                hintText: 'Type a language you speak',
+                                hintText: 'Type your tribe or ethnic group',
                                 hintStyle: GoogleFonts.montserrat(
                                   color: Colors.grey[600],
                                   fontSize: 14,
@@ -526,9 +348,7 @@ class _OnboardingStepARootsState extends State<OnboardingStepARoots> {
                                 focusedBorder: OutlineInputBorder(
                                   borderRadius: BorderRadius.circular(12),
                                   borderSide: const BorderSide(
-                                    color: deepGreen,
-                                    width: 2,
-                                  ),
+                                      color: deepGreen, width: 2),
                                 ),
                                 contentPadding: const EdgeInsets.symmetric(
                                   horizontal: 16,
@@ -540,132 +360,336 @@ class _OnboardingStepARootsState extends State<OnboardingStepARoots> {
                                 fontWeight: FontWeight.w500,
                                 color: Colors.black87,
                               ),
+                              onChanged: (value) {
+                                context
+                                    .read<OnboardingBloc>()
+                                    .add(OnboardingTribeUpdated(value.trim()));
+                              },
+                            ),
+                          ],
+                          const SizedBox(height: 32),
+
+                          // Languages selection
+                          _buildSectionTitle('Which languages do you speak?'),
+                          const SizedBox(height: 8),
+                          Text(
+                            'Select all languages that you speak',
+                            style: GoogleFonts.montserrat(
+                              fontSize: 14,
+                              color: Colors.grey[700],
                             ),
                           ),
-                          const SizedBox(width: 12),
-                          ElevatedButton(
-                            onPressed: () {
-                              final customLanguage =
-                                  _customLanguageController.text.trim();
-                              if (customLanguage.isNotEmpty) {
+                          const SizedBox(height: 12),
+
+                          // Display selected languages as chips
+                          if (data.languages.isNotEmpty) ...[
+                            Wrap(
+                              spacing: 8,
+                              runSpacing: 8,
+                              children: data.languages
+                                  .map(
+                                    (language) => Chip(
+                                      label: Text(
+                                        language,
+                                        style: GoogleFonts.montserrat(
+                                          color: Colors.white,
+                                          fontSize: 14,
+                                          fontWeight: FontWeight.w500,
+                                        ),
+                                      ),
+                                      backgroundColor: deepGreen,
+                                      deleteIconColor: Colors.white,
+                                      onDeleted: () {
+                                        setState(() {
+                                          final List<String> updatedLanguages =
+                                              [
+                                            ...data.languages,
+                                          ];
+                                          updatedLanguages.remove(language);
+                                          context.read<OnboardingBloc>().add(
+                                                OnboardingLanguagesUpdated(
+                                                    updatedLanguages),
+                                              );
+                                        });
+                                      },
+                                    ),
+                                  )
+                                  .toList(),
+                            ),
+                            const SizedBox(height: 16),
+                          ],
+
+                          // Dropdown for language selection
+                          DropdownButtonFormField<String>(
+                            key: _languagesKey,
+                            initialValue: _selectedLanguage,
+                            hint: Text(
+                              'Select a language',
+                              style: GoogleFonts.montserrat(
+                                color: Colors.grey[600],
+                                fontSize: 14,
+                              ),
+                            ),
+                            onChanged: (value) {
+                              if (value == 'Other') {
                                 setState(() {
-                                  // Add custom language to the list
-                                  if (!data.languages
-                                      .contains(customLanguage)) {
+                                  _selectedLanguage = value;
+                                  _isCustomLanguage = true;
+                                });
+                              } else if (value != null) {
+                                setState(() {
+                                  _selectedLanguage = value;
+                                  _isCustomLanguage = false;
+
+                                  // Add to languages list if not already there
+                                  if (!data.languages.contains(value)) {
                                     final List<String> updatedLanguages = [
                                       ...data.languages,
                                     ];
-                                    updatedLanguages.add(customLanguage);
+                                    updatedLanguages.add(value);
                                     context.read<OnboardingBloc>().add(
-                                      OnboardingLanguagesUpdated(updatedLanguages),
-                                    );
-                                  }
+                                        OnboardingLanguagesUpdated(
+                                            updatedLanguages));
 
-                                  // Reset custom language state
-                                  _customLanguageController.clear();
-                                  _isCustomLanguage = false;
-                                  _selectedLanguage = null;
+                                    // Reset dropdown after selection
+                                    _selectedLanguage = null;
+                                  }
                                 });
                               }
                             },
-                            style: ElevatedButton.styleFrom(
-                              backgroundColor: deepGreen,
-                              foregroundColor: Colors.white,
-                              shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(12),
-                              ),
-                              padding: const EdgeInsets.symmetric(vertical: 14),
-                            ),
-                            child: Text(
-                              'Add',
-                              style: GoogleFonts.montserrat(
+                            items: _availableLanguages
+                                .map(
+                                  (language) => DropdownMenuItem(
+                                    value: language,
+                                    child: Text(
+                                      language,
+                                      style: GoogleFonts.montserrat(
+                                        fontSize: 16,
+                                        fontWeight: FontWeight.w500,
+                                        color: Colors.black87,
+                                      ),
+                                    ),
+                                  ),
+                                )
+                                .toList(),
+                            decoration: InputDecoration(
+                              labelText: 'Add Language',
+                              labelStyle: GoogleFonts.montserrat(
+                                color: deepGreen,
                                 fontSize: 16,
-                                fontWeight: FontWeight.w500,
                               ),
+                              filled: true,
+                              fillColor: Colors.white,
+                              border: OutlineInputBorder(
+                                borderRadius: BorderRadius.circular(12),
+                                borderSide:
+                                    BorderSide(color: Colors.grey[400]!),
+                              ),
+                              enabledBorder: OutlineInputBorder(
+                                borderRadius: BorderRadius.circular(12),
+                                borderSide:
+                                    BorderSide(color: Colors.grey[400]!),
+                              ),
+                              focusedBorder: OutlineInputBorder(
+                                borderRadius: BorderRadius.circular(12),
+                                borderSide: const BorderSide(
+                                    color: deepGreen, width: 2),
+                              ),
+                              contentPadding: const EdgeInsets.symmetric(
+                                horizontal: 16,
+                                vertical: 14,
+                              ),
+                            ),
+                            style: GoogleFonts.montserrat(
+                              fontSize: 16,
+                              fontWeight: FontWeight.w500,
+                              color: Colors.black87,
+                            ),
+                            dropdownColor: Colors.white,
+                            icon: const Icon(Icons.arrow_drop_down,
+                                color: deepGreen),
+                            isExpanded: true,
+                          ),
+
+                          // Manual entry field if "Other" is selected
+                          if (_isCustomLanguage) ...[
+                            const SizedBox(height: 16),
+                            Row(
+                              children: [
+                                Expanded(
+                                  child: TextFormField(
+                                    controller: _customLanguageController,
+                                    decoration: InputDecoration(
+                                      labelText: 'Enter language',
+                                      labelStyle: GoogleFonts.montserrat(
+                                        color: deepGreen,
+                                        fontSize: 16,
+                                      ),
+                                      hintText: 'Type a language you speak',
+                                      hintStyle: GoogleFonts.montserrat(
+                                        color: Colors.grey[600],
+                                        fontSize: 14,
+                                      ),
+                                      filled: true,
+                                      fillColor: Colors.white,
+                                      border: OutlineInputBorder(
+                                        borderRadius: BorderRadius.circular(12),
+                                        borderSide: BorderSide(
+                                            color: Colors.grey[400]!),
+                                      ),
+                                      enabledBorder: OutlineInputBorder(
+                                        borderRadius: BorderRadius.circular(12),
+                                        borderSide: BorderSide(
+                                            color: Colors.grey[400]!),
+                                      ),
+                                      focusedBorder: OutlineInputBorder(
+                                        borderRadius: BorderRadius.circular(12),
+                                        borderSide: const BorderSide(
+                                          color: deepGreen,
+                                          width: 2,
+                                        ),
+                                      ),
+                                      contentPadding:
+                                          const EdgeInsets.symmetric(
+                                        horizontal: 16,
+                                        vertical: 14,
+                                      ),
+                                    ),
+                                    style: GoogleFonts.montserrat(
+                                      fontSize: 16,
+                                      fontWeight: FontWeight.w500,
+                                      color: Colors.black87,
+                                    ),
+                                  ),
+                                ),
+                                const SizedBox(width: 12),
+                                ElevatedButton(
+                                  onPressed: () {
+                                    final customLanguage =
+                                        _customLanguageController.text.trim();
+                                    if (customLanguage.isNotEmpty) {
+                                      setState(() {
+                                        // Add custom language to the list
+                                        if (!data.languages
+                                            .contains(customLanguage)) {
+                                          final List<String> updatedLanguages =
+                                              [
+                                            ...data.languages,
+                                          ];
+                                          updatedLanguages.add(customLanguage);
+                                          context.read<OnboardingBloc>().add(
+                                                OnboardingLanguagesUpdated(
+                                                    updatedLanguages),
+                                              );
+                                        }
+
+                                        // Reset custom language state
+                                        _customLanguageController.clear();
+                                        _isCustomLanguage = false;
+                                        _selectedLanguage = null;
+                                      });
+                                    }
+                                  },
+                                  style: ElevatedButton.styleFrom(
+                                    backgroundColor: deepGreen,
+                                    foregroundColor: Colors.white,
+                                    shape: RoundedRectangleBorder(
+                                      borderRadius: BorderRadius.circular(12),
+                                    ),
+                                    padding: const EdgeInsets.symmetric(
+                                        vertical: 14),
+                                  ),
+                                  child: Text(
+                                    'Add',
+                                    style: GoogleFonts.montserrat(
+                                      fontSize: 16,
+                                      fontWeight: FontWeight.w500,
+                                    ),
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ],
+                        ],
+                      ),
+                    ),
+
+                    const SizedBox(height: 32),
+
+                    // Intent selection in a separate white card
+                    Container(
+                      decoration: BoxDecoration(
+                        color: Colors.white,
+                        borderRadius: BorderRadius.circular(16),
+                        boxShadow: [
+                          BoxShadow(
+                            color: Colors.black.withValues(alpha: 0.05),
+                            blurRadius: 10,
+                            offset: const Offset(0, 4),
+                          ),
+                        ],
+                      ),
+                      padding: const EdgeInsets.all(20),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          _buildSectionTitle('What are you looking for?'),
+                          const SizedBox(height: 16),
+                          ..._intentOptions.map(
+                            (option) => _buildIntentOption(
+                              option: option,
+                              isSelected: data.intent == option['value'],
+                              onTap: () => context.read<OnboardingBloc>().add(
+                                  OnboardingIntentUpdated(option['value'])),
+                              deepGreen: deepGreen,
                             ),
                           ),
                         ],
                       ),
-                    ],
+                    ),
+
+                    const SizedBox(height: 40),
+
+                    // Continue labelLarge
+                    Center(
+                      child: SizedBox(
+                        width: double.infinity,
+                        height: 56,
+                        child: ElevatedButton(
+                          key: _continueButtonKey,
+                          onPressed: _isStepValid(data)
+                              ? () {
+                                  unawaited(HapticFeedback.mediumImpact());
+                                  widget.onNext();
+                                }
+                              : null,
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: deepGreen,
+                            foregroundColor: Colors.white,
+                            disabledBackgroundColor: Colors.grey[400],
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(12),
+                            ),
+                            elevation: 2,
+                          ),
+                          child: Text(
+                            'Continue',
+                            style: GoogleFonts.montserrat(
+                              fontSize: 16,
+                              fontWeight: FontWeight.w600,
+                            ),
+                          ),
+                        ),
+                      ),
+                    ),
+                    const SizedBox(height: 24),
                   ],
                 ),
               ),
-
-              const SizedBox(height: 32),
-
-              // Intent selection in a separate white card
-              Container(
-                decoration: BoxDecoration(
-                  color: Colors.white,
-                  borderRadius: BorderRadius.circular(16),
-                  boxShadow: [
-                    BoxShadow(
-                      color: Colors.black.withValues(alpha: 0.05),
-                      blurRadius: 10,
-                      offset: const Offset(0, 4),
-                    ),
-                  ],
-                ),
-                padding: const EdgeInsets.all(20),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    _buildSectionTitle('What are you looking for?'),
-                    const SizedBox(height: 16),
-                    ..._intentOptions.map(
-                      (option) => _buildIntentOption(
-                        option: option,
-                        isSelected: data.intent == option['value'],
-                        onTap: () => context.read<OnboardingBloc>().add(OnboardingIntentUpdated(option['value'])),
-                        deepGreen: deepGreen,
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-
-              const SizedBox(height: 40),
-
-              // Continue labelLarge
-              Center(
-                child: SizedBox(
-                  width: double.infinity,
-                  height: 56,
-                  child: ElevatedButton(
-                    key: _continueButtonKey,
-                    onPressed: _isStepValid(data)
-                        ? () {
-                            unawaited(HapticFeedback.mediumImpact());
-                            widget.onNext();
-                          }
-                        : null,
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: deepGreen,
-                      foregroundColor: Colors.white,
-                      disabledBackgroundColor: Colors.grey[400],
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(12),
-                      ),
-                      elevation: 2,
-                    ),
-                    child: Text(
-                      'Continue',
-                      style: GoogleFonts.montserrat(
-                        fontSize: 16,
-                        fontWeight: FontWeight.w600,
-                      ),
-                    ),
-                  ),
-                ),
-              ),
-              const SizedBox(height: 24),
-            ],
-          ),
-        ),
-      ),
-    );
-      },
-    );
+            ),
+          );
+        },
+      );
 
   /// Builds a section title with consistent styling
   Widget _buildSectionTitle(String title) => Text(
@@ -770,8 +794,6 @@ class _OnboardingStepARootsState extends State<OnboardingStepARoots> {
     if (_selectedTribe == 'Other') {
       isTribeValid = _tribeController.text.trim().isNotEmpty;
     }
-    return isTribeValid &&
-        data.languages.isNotEmpty &&
-        data.intent != null;
+    return isTribeValid && data.languages.isNotEmpty && data.intent != null;
   }
 }

@@ -492,11 +492,13 @@ class _UserNationalityState extends State<UserNationality> {
                           'isDiaspora': isDiaspora,
                         });
                         log(widget.userData.toString());
-                        unawaited(Navigator.pushNamed(
-                          context,
-                          RouteName.sexualorientationScreen,
-                          arguments: widget.userData,
-                        ));
+                        unawaited(
+                          Navigator.pushNamed(
+                            context,
+                            RouteName.sexualorientationScreen,
+                            arguments: widget.userData,
+                          ),
+                        );
                       } else {
                         CustomSnackbar.showSnackBarSimple(
                           'Please select your country',

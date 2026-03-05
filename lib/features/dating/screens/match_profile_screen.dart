@@ -52,8 +52,7 @@ class _MatchProfileScreenState extends State<MatchProfileScreen>
     });
 
     try {
-      HapticFeedback.mediumImpact();
-
+      unawaited(HapticFeedback.mediumImpact());
       // Get or create chat thread
       String? threadId = await _chatService.getChatThreadId(widget.user.id!);
 
@@ -64,7 +63,7 @@ class _MatchProfileScreenState extends State<MatchProfileScreen>
 
       if (threadId != null && mounted) {
         // Navigate to chat thread
-        Navigator.push(
+        await Navigator.push(
           context,
           MaterialPageRoute(
             builder: (context) => ChatThreadScreen(
@@ -80,7 +79,7 @@ class _MatchProfileScreenState extends State<MatchProfileScreen>
       } else {
         throw Exception('Failed to create or find chat thread');
       }
-    } catch (e) {
+    } on Object catch (e) {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
@@ -199,8 +198,7 @@ class _MatchProfileScreenState extends State<MatchProfileScreen>
                             imageUrl: widget.user.imageUrl![0],
                             fit: BoxFit.cover,
                             placeholder: (context, url) => const Center(
-                              child:
-                                  CircularProgressIndicator(strokeWidth: 2),
+                              child: CircularProgressIndicator(strokeWidth: 2),
                             ),
                             errorWidget: (context, url, error) => Container(
                               color: Colors.grey[300],

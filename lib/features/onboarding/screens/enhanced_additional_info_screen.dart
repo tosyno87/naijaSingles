@@ -17,7 +17,6 @@ class _EnhancedAdditionalInfoScreenState
     extends State<EnhancedAdditionalInfoScreen> {
   // Afropeep theme colors
   static const Color afropeepGreen = Color(0xFF008037); // MVP green
-  static const Color cardBackground = Color(0xFFF7E8DA);
   static const Color textDarkBrown = Color(0xFF3A1D0F);
   static const Color textLightBrown = Color(0xFF8B6C59);
 
@@ -1349,5 +1348,4 @@ class _EnhancedAdditionalInfoScreenState
       ),
     );
   }
-
 }

@@ -65,7 +65,7 @@ class GroupReportingService {
       );
 
       log('✅ Group report submitted: $groupId');
-    } catch (e) {
+    } on Object catch (e) {
       log('❌ Error reporting group: $e');
       throw Exception('Failed to submit report');
     }
@@ -107,7 +107,7 @@ class GroupReportingService {
             },
           )
           .toList();
-    } catch (e) {
+    } on Object catch (e) {
       log('Error getting group reports: $e');
       return [];
     }
@@ -133,7 +133,7 @@ class GroupReportingService {
             },
           )
           .toList();
-    } catch (e) {
+    } on Object catch (e) {
       log('Error getting user reports: $e');
       return [];
     }
@@ -162,7 +162,7 @@ class GroupReportingService {
       });
 
       log('✅ Report status updated: $reportId -> $status');
-    } catch (e) {
+    } on Object catch (e) {
       log('❌ Error updating report status: $e');
       throw Exception('Failed to update report status');
     }
@@ -183,7 +183,7 @@ class GroupReportingService {
         'timestamp': FieldValue.serverTimestamp(),
         'severity': 'medium',
       });
-    } catch (e) {
+    } on Object catch (e) {
       log('Error logging report event: $e');
     }
   }
@@ -202,7 +202,7 @@ class GroupReportingService {
           .get();
 
       return querySnapshot.docs.isNotEmpty;
-    } catch (e) {
+    } on Object catch (e) {
       log('Error checking if user reported group: $e');
       return false;
     }

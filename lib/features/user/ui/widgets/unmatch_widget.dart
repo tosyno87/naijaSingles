@@ -29,7 +29,8 @@ class UnMatcheWidget extends StatelessWidget {
             child: AlertDialog(
               title: Text(
                 'Unmatch'.tr().toString(),
-                style: const TextStyle(fontSize: 18, color: AppColors.primaryGreen),
+                style: const TextStyle(
+                    fontSize: 18, color: AppColors.primaryGreen),
               ),
               content: Text(
                 'Do you want to unmatch with'

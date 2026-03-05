@@ -295,7 +295,8 @@ class _SearchLocationState extends State<SearchLocation>
                             listener: (context, registrationState) {
                               if (registrationState is RegistrationSuccess) {
                                 log('userregistrationsuccess');
-                                context.read<UserBloc>().add(UserDataUpdated(registrationState.user));
+                                context.read<UserBloc>().add(
+                                    UserDataUpdated(registrationState.user));
                                 unawaited(showWelcomDialog(context));
                               }
                             },

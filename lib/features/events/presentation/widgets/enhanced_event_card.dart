@@ -133,7 +133,8 @@ class EnhancedEventCard extends StatelessWidget {
                     color: Color(0xFFF0F0F0),
                     child: Center(
                       child: CircularProgressIndicator(
-                        valueColor: AlwaysStoppedAnimation(AppColors.primaryGreen),
+                        valueColor:
+                            AlwaysStoppedAnimation(AppColors.primaryGreen),
                       ),
                     ),
                   ),
@@ -165,7 +166,9 @@ class EnhancedEventCard extends StatelessWidget {
                   if (isUserGenerated)
                     Container(
                       padding: const EdgeInsets.symmetric(
-                          horizontal: 8, vertical: 4,),
+                        horizontal: 8,
+                        vertical: 4,
+                      ),
                       decoration: BoxDecoration(
                         color: Colors.blue.withValues(alpha: 0.9),
                         borderRadius: BorderRadius.circular(12),
@@ -194,7 +197,9 @@ class EnhancedEventCard extends StatelessWidget {
                     if (isUserGenerated) const SizedBox(width: 8),
                     Container(
                       padding: const EdgeInsets.symmetric(
-                          horizontal: 8, vertical: 4,),
+                        horizontal: 8,
+                        vertical: 4,
+                      ),
                       decoration: BoxDecoration(
                         color: Colors.purple.withValues(alpha: 0.9),
                         borderRadius: BorderRadius.circular(12),
@@ -402,10 +407,10 @@ class EnhancedEventCard extends StatelessWidget {
                 color: const Color(0xFFE0E0E0),
               ),
               Expanded(
-              child: _buildStatItem(
-                icon: Icons.event_seat,
-                label: 'Capacity'.tr(),
-                value: event.maxAttendees.toString(),
+                child: _buildStatItem(
+                  icon: Icons.event_seat,
+                  label: 'Capacity'.tr(),
+                  value: event.maxAttendees.toString(),
                 ),
               ),
             ],

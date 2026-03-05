@@ -217,7 +217,7 @@ class RSVPBloc extends Bloc<RSVPEvent, RSVPState> {
           message: _getSuccessMessage(event.status),
         ),
       );
-    } catch (e) {
+    } on Object catch (e) {
       log('Error processing RSVP: $e', name: 'RSVPBloc');
       emit(
         RSVPError(
@@ -253,7 +253,7 @@ class RSVPBloc extends Bloc<RSVPEvent, RSVPState> {
         'Loaded ${rsvps.length} RSVPs for user ${event.userId}',
         name: 'RSVPBloc',
       );
-    } catch (e) {
+    } on Object catch (e) {
       log('Error loading user RSVPs: $e', name: 'RSVPBloc');
       emit(
         const RSVPError(
@@ -302,7 +302,7 @@ class RSVPBloc extends Bloc<RSVPEvent, RSVPState> {
           ),
         );
       }
-    } catch (e) {
+    } on Object catch (e) {
       log('Error loading RSVP status: $e', name: 'RSVPBloc');
       // Don't emit error for RSVP status loading - just assume no RSVP
       emit(
@@ -345,7 +345,7 @@ class RSVPBloc extends Bloc<RSVPEvent, RSVPState> {
         'Loaded ${attendees.length} attendees for event ${event.eventId}',
         name: 'RSVPBloc',
       );
-    } catch (e) {
+    } on Object catch (e) {
       log('Error loading event attendees: $e', name: 'RSVPBloc');
       emit(
         const RSVPError(
@@ -370,7 +370,7 @@ class RSVPBloc extends Bloc<RSVPEvent, RSVPState> {
         'age': data['age'],
         'location': data['address']?.toString(),
       };
-    } catch (e) {
+    } on Object catch (e) {
       log('Error fetching user profile: $e', name: 'RSVPBloc');
       return null;
     }

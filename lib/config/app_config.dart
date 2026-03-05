@@ -1,3 +1,5 @@
+import 'package:flutter/foundation.dart';
+
 import 'secure_config.dart';
 
 // App Configuration Constants
@@ -30,7 +32,16 @@ const String termConditionUrl = 'https://naijasingles.com/terms';
 const String privacyUrl = 'https://naijasingles.com/privacy';
 
 // Add google map key for google places search
-String get googleMapsKey => SecureConfig.googleMapsApiKey ?? '';
+String get googleMapsKey {
+  final key = SecureConfig.googleMapsApiKey ?? '';
+  if (key.isEmpty && kDebugMode) {
+    debugPrint(
+      'WARNING: Google Maps API key is empty. '
+      'Set GOOGLE_MAPS_API_KEY in your .env file.',
+    );
+  }
+  return key;
+}
 //for support to user add you mail
 const adminMail = 'support@naijasingles.com';
 // add bucket id from firebase or google-services-json

@@ -25,13 +25,15 @@ class MAtchState extends State<MatchedPage> {
     image = const AssetImage('asset/connected3.gif');
     super.initState();
 
-    unawaited(Future.delayed(const Duration(milliseconds: 2000), () {
-      if (!mounted) return;
-      context
-          .read<SearchUserBloc>()
-          .add(LoadUserEvent(currentUser: widget.currentUser));
-      Navigator.pop(context);
-    }));
+    unawaited(
+      Future.delayed(const Duration(milliseconds: 2000), () {
+        if (!mounted) return;
+        context
+            .read<SearchUserBloc>()
+            .add(LoadUserEvent(currentUser: widget.currentUser));
+        Navigator.pop(context);
+      }),
+    );
   }
 
   @override

@@ -37,13 +37,15 @@ class _SwipeCardListState extends State<SwipeCardList> {
     return BlocListener<SwipeBloc, SwipeblocState>(
       listener: (context, swipeState) {
         if (swipeState is SwipeMatchCreatedState) {
-          unawaited(showDialog(
-            context: context,
-            builder: (ctx) => MatchDialogPage(
-              matchedUser: swipeState.matchedUser,
-              currentUser: widget.controller.currentUser,
+          unawaited(
+            showDialog(
+              context: context,
+              builder: (ctx) => MatchDialogPage(
+                matchedUser: swipeState.matchedUser,
+                currentUser: widget.controller.currentUser,
+              ),
             ),
-          ));
+          );
         }
       },
       child: BlocBuilder<SearchUserBloc, SearchUserState>(

@@ -1,6 +1,5 @@
 import 'dart:async';
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/foundation.dart';
 import '../features/match/models/match_model.dart';
 import 'performance_monitor.dart';
@@ -14,7 +13,6 @@ class MatchExpirationService {
       Duration(days: 5); // Warn 2 days before expiry
 
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
-  final FirebaseAuth _auth = FirebaseAuth.instance;
 
   // Collection references
   CollectionReference get _matchesCollection =>
@@ -91,7 +89,7 @@ class MatchExpirationService {
             '📋 Found ${expiredMatches.length} expired matches for user $userId',
           );
           return expiredMatches;
-        } catch (e) {
+        } on Object catch (e) {
           debugPrint('❌ Error getting expired matches: $e');
           return [];
         }
@@ -126,7 +124,7 @@ class MatchExpirationService {
             '⚠️ Found ${nearExpiryMatches.length} matches near expiry for user $userId',
           );
           return nearExpiryMatches;
-        } catch (e) {
+        } on Object catch (e) {
           debugPrint('❌ Error getting matches near expiry: $e');
           return [];
         }
@@ -201,7 +199,7 @@ class MatchExpirationService {
 
           debugPrint('✅ Successfully archived expired match: $matchId');
           return true;
-        } catch (e) {
+        } on Object catch (e) {
           debugPrint('❌ Error archiving expired match $matchId: $e');
           return false;
         }
@@ -209,7 +207,9 @@ class MatchExpirationService {
 
   /// Extend match expiration (premium feature)
   Future<bool> extendMatchExpiration(
-          String matchId, Duration extension,) async =>
+    String matchId,
+    Duration extension,
+  ) async =>
       PerformanceMonitor.measure('extend_match_expiration', () async {
         try {
           final matchDoc = await _matchesCollection.doc(matchId).get();
@@ -236,7 +236,7 @@ class MatchExpirationService {
             '✅ Extended match $matchId expiration by ${extension.inDays} days',
           );
           return true;
-        } catch (e) {
+        } on Object catch (e) {
           debugPrint('❌ Error extending match expiration: $e');
           return false;
         }
@@ -286,7 +286,7 @@ class MatchExpirationService {
           readCount: expiredQuery.docs.length,
           writeCount: archivedCount * 3,
         ); // Estimate writes per archive
-      } catch (e) {
+      } on Object catch (e) {
         debugPrint('❌ Error in scheduled cleanup: $e');
       }
     });
@@ -331,7 +331,7 @@ class MatchExpirationService {
             matchesWithMessages: matchesWithMessages,
             totalMatches: allMatches.docs.length,
           );
-        } catch (e) {
+        } on Object catch (e) {
           debugPrint('❌ Error getting expiration stats: $e');
           return MatchExpirationStats.empty();
         }
@@ -385,7 +385,7 @@ class MatchExpirationService {
           await batch.commit();
           debugPrint('✅ Sent $warningsSent expiration warnings');
         }
-      } catch (e) {
+      } on Object catch (e) {
         debugPrint('❌ Error sending expiration warnings: $e');
       }
     });
@@ -443,7 +443,7 @@ class MatchExpirationService {
 
           debugPrint('✅ Successfully restored archived match: $matchId');
           return true;
-        } catch (e) {
+        } on Object catch (e) {
           debugPrint('❌ Error restoring archived match: $e');
           return false;
         }

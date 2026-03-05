@@ -96,89 +96,94 @@ class UpdateLocationState extends State<UpdateLocation> {
           backgroundColor: Theme.of(context).scaffoldBackgroundColor,
           title: ListTile(
             onTap: () {
-              unawaited(showDialog(
-                context: context,
-                builder: (BuildContext context) => Dialog(
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(20),
-                  ),
-                  child: Container(
-                    padding: const EdgeInsets.all(16),
-                    child: Column(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        Text(
-                          'Use Current Location?'.tr().toString(),
-                          style: TextStyle(
-                            fontSize: 20,
-                            color: isDarkMode
-                                ? Colors.white70
-                                : Colors.black87,
+              unawaited(
+                showDialog(
+                  context: context,
+                  builder: (BuildContext context) => Dialog(
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(20),
+                    ),
+                    child: Container(
+                      padding: const EdgeInsets.all(16),
+                      child: Column(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Text(
+                            'Use Current Location?'.tr().toString(),
+                            style: TextStyle(
+                              fontSize: 20,
+                              color:
+                                  isDarkMode ? Colors.white70 : Colors.black87,
+                            ),
                           ),
-                        ),
-                        const SizedBox(height: 8),
-                        Column(
-                          children: [
-                            Text(
-                              'Do you want to use your current location?'
-                                  .tr()
-                                  .toString(),
-                              style: const TextStyle(fontSize: 18),
-                            ),
-                            const SizedBox(
-                              height: 16,
-                            ),
-                            Text(
-                              _newAddress != null
-                                  ? _newAddress!['PlaceName'] ??
-                                      'Fetching..'.toString()
-                                  : 'Unable to load...',
-                            ).tr(),
-                          ],
-                        ),
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.end,
-                          children: [
-                            TextButton(
-                              onPressed: () {
-                                Navigator.pop(context); // Close the dialog
-                              },
-                              child: Text(
-                                'No'.tr().toString(),
-                                style: const TextStyle(color: AppColors.primaryGreen),
+                          const SizedBox(height: 8),
+                          Column(
+                            children: [
+                              Text(
+                                'Do you want to use your current location?'
+                                    .tr()
+                                    .toString(),
+                                style: const TextStyle(fontSize: 18),
                               ),
-                            ),
-                            TextButton(
-                              onPressed: () {
-                                unawaited(googleMapController?.animateCamera(
-                                  CameraUpdate.newCameraPosition(
-                                    CameraPosition(
-                                      target: LatLng(
-                                        _newAddress?['latitude'],
-                                        _newAddress?['longitude'],
+                              const SizedBox(
+                                height: 16,
+                              ),
+                              Text(
+                                _newAddress != null
+                                    ? _newAddress!['PlaceName'] ??
+                                        'Fetching..'.toString()
+                                    : 'Unable to load...',
+                              ).tr(),
+                            ],
+                          ),
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.end,
+                            children: [
+                              TextButton(
+                                onPressed: () {
+                                  Navigator.pop(context); // Close the dialog
+                                },
+                                child: Text(
+                                  'No'.tr().toString(),
+                                  style: const TextStyle(
+                                      color: AppColors.primaryGreen),
+                                ),
+                              ),
+                              TextButton(
+                                onPressed: () {
+                                  unawaited(
+                                    googleMapController?.animateCamera(
+                                      CameraUpdate.newCameraPosition(
+                                        CameraPosition(
+                                          target: LatLng(
+                                            _newAddress?['latitude'],
+                                            _newAddress?['longitude'],
+                                          ),
+                                          zoom: 16,
+                                        ),
                                       ),
-                                      zoom: 16,
                                     ),
-                                  ),
-                                ));
-                                setState(() {
-                                  latitude = _newAddress?['latitude'];
-                                  longitude = _newAddress?['longitude'];
-                                });
-                                Navigator.pop(context); // Close the dialog
-                              },
-                              child: Text(
-                                'Yes'.tr().toString(),
-                                style: const TextStyle(color: AppColors.primaryGreen),
+                                  );
+                                  setState(() {
+                                    latitude = _newAddress?['latitude'];
+                                    longitude = _newAddress?['longitude'];
+                                  });
+                                  Navigator.pop(context); // Close the dialog
+                                },
+                                child: Text(
+                                  'Yes'.tr().toString(),
+                                  style: const TextStyle(
+                                      color: AppColors.primaryGreen),
+                                ),
                               ),
-                            ),
-                          ],
-                        ),
-                      ],
+                            ],
+                          ),
+                        ],
+                      ),
                     ),
                   ),
                 ),
-              ));
+              );
             },
             title: Text(
               'Choose location'.tr().toString(),
@@ -220,7 +225,7 @@ class UpdateLocationState extends State<UpdateLocation> {
                     final lat = response.result.geometry?.location.lat;
                     final lng = response.result.geometry?.location.lng;
 
-                    googleMapController?.animateCamera(
+                    await googleMapController?.animateCamera(
                       CameraUpdate.newCameraPosition(
                         CameraPosition(
                           target: LatLng(lat!, lng!),
@@ -234,7 +239,7 @@ class UpdateLocationState extends State<UpdateLocation> {
                       longitude = lng;
                     });
                   }
-                } catch (e) {
+                } on Object catch (e) {
                   if (!context.mounted) return;
                   ScaffoldMessenger.of(context).showSnackBar(
                     SnackBar(
@@ -276,66 +281,70 @@ class UpdateLocationState extends State<UpdateLocation> {
                                                   'position']['coordinates'][0],
                                             ),
                                       onTap: () {
-                                        unawaited(showDialog(
-                                          barrierColor: Colors.transparent,
-                                          context: context,
-                                          builder: (BuildContext context) {
-                                            if (widget.selectedLocation
-                                                    ?.isEmpty ??
-                                                true) {
-                                              latitude =
-                                                  _newAddress?['latitude'];
-                                              longitude =
-                                                  _newAddress?['longitude'];
-                                              return FutureBuilder(
-                                                future: getAddress(
-                                                  latitude,
-                                                  longitude,
-                                                ),
-                                                builder: (
-                                                  BuildContext ctx,
-                                                  AsyncSnapshot snapshot,
-                                                ) {
-                                                  if (snapshot
-                                                          .connectionState ==
-                                                      ConnectionState.waiting) {
-                                                    return AlertDialog(
-                                                      title: const Center(
-                                                        child: Hookup4uBar(),
-                                                      ),
-                                                      content: Text(
-                                                        'loading...'
-                                                            .tr()
-                                                            .toString(),
-                                                        textAlign:
-                                                            TextAlign.center,
-                                                      ),
-                                                    );
-                                                  } else if (snapshot
-                                                      .hasError) {
-                                                    return AlertDialog(
-                                                      title: Text(
-                                                        '${snapshot.error}',
-                                                      ),
-                                                    );
-                                                  } else if (snapshot.hasData) {
-                                                    return AlertDialog(
-                                                      title: Text(
-                                                        '${snapshot.data}',
-                                                      ),
-                                                    );
-                                                  }
-                                                  return Container();
-                                                },
+                                        unawaited(
+                                          showDialog(
+                                            barrierColor: Colors.transparent,
+                                            context: context,
+                                            builder: (BuildContext context) {
+                                              if (widget.selectedLocation
+                                                      ?.isEmpty ??
+                                                  true) {
+                                                latitude =
+                                                    _newAddress?['latitude'];
+                                                longitude =
+                                                    _newAddress?['longitude'];
+                                                return FutureBuilder(
+                                                  future: getAddress(
+                                                    latitude,
+                                                    longitude,
+                                                  ),
+                                                  builder: (
+                                                    BuildContext ctx,
+                                                    AsyncSnapshot snapshot,
+                                                  ) {
+                                                    if (snapshot
+                                                            .connectionState ==
+                                                        ConnectionState
+                                                            .waiting) {
+                                                      return AlertDialog(
+                                                        title: const Center(
+                                                          child: Hookup4uBar(),
+                                                        ),
+                                                        content: Text(
+                                                          'loading...'
+                                                              .tr()
+                                                              .toString(),
+                                                          textAlign:
+                                                              TextAlign.center,
+                                                        ),
+                                                      );
+                                                    } else if (snapshot
+                                                        .hasError) {
+                                                      return AlertDialog(
+                                                        title: Text(
+                                                          '${snapshot.error}',
+                                                        ),
+                                                      );
+                                                    } else if (snapshot
+                                                        .hasData) {
+                                                      return AlertDialog(
+                                                        title: Text(
+                                                          '${snapshot.data}',
+                                                        ),
+                                                      );
+                                                    }
+                                                    return Container();
+                                                  },
+                                                );
+                                              }
+                                              return AlertDialog(
+                                                title: Text(
+                                                  '${widget.selectedLocation?['address'] ?? 'loading...'}',
+                                                ).tr(),
                                               );
-                                            }
-                                            return AlertDialog(
-                                              title: Text(
-                                                '${widget.selectedLocation?['address'] ?? 'loading...'}',
-                                              ).tr(),
-                                            );
-                                          },
-                                        ));
+                                            },
+                                          ),
+                                        );
                                       },
                                     ),
                                   }
@@ -347,21 +356,24 @@ class UpdateLocationState extends State<UpdateLocation> {
                                           longitude = loc.longitude;
                                         });
 
-                                        unawaited(googleMapController?.animateCamera(
-                                          CameraUpdate.newCameraPosition(
-                                            CameraPosition(
-                                              target: LatLng(
-                                                loc.latitude,
-                                                loc.longitude,
+                                        unawaited(
+                                          googleMapController?.animateCamera(
+                                            CameraUpdate.newCameraPosition(
+                                              CameraPosition(
+                                                target: LatLng(
+                                                  loc.latitude,
+                                                  loc.longitude,
+                                                ),
+                                                zoom: 16,
                                               ),
-                                              zoom: 16,
                                             ),
                                           ),
-                                        ));
+                                        );
                                       },
                                       consumeTapEvents: true,
                                       onTap: () async {
-                                        googleMapController?.animateCamera(
+                                        await googleMapController
+                                            ?.animateCamera(
                                           CameraUpdate.newCameraPosition(
                                             CameraPosition(
                                               target:
@@ -370,7 +382,8 @@ class UpdateLocationState extends State<UpdateLocation> {
                                             ),
                                           ),
                                         );
-                                        showAddressDialog(
+                                        if (!context.mounted) return;
+                                        await showAddressDialog(
                                           context,
                                           latitude!,
                                           longitude!,
@@ -405,17 +418,19 @@ class UpdateLocationState extends State<UpdateLocation> {
                                 latitude = position.latitude;
                                 longitude = position.longitude;
                               });
-                              unawaited(googleMapController?.animateCamera(
-                                CameraUpdate.newCameraPosition(
-                                  CameraPosition(
-                                    target: LatLng(
-                                      position.latitude,
-                                      position.longitude,
+                              unawaited(
+                                googleMapController?.animateCamera(
+                                  CameraUpdate.newCameraPosition(
+                                    CameraPosition(
+                                      target: LatLng(
+                                        position.latitude,
+                                        position.longitude,
+                                      ),
+                                      zoom: 16,
                                     ),
-                                    zoom: 16,
                                   ),
                                 ),
-                              ));
+                              );
                             },
                           ),
                         ],

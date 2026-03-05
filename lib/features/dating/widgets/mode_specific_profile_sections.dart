@@ -281,7 +281,8 @@ class ModeSpecificProfileSections extends StatelessWidget {
         decoration: BoxDecoration(
           color: const Color(0xFF008037).withValues(alpha: 0.1),
           borderRadius: BorderRadius.circular(16),
-          border: Border.all(color: const Color(0xFF008037).withValues(alpha: 0.3)),
+          border:
+              Border.all(color: const Color(0xFF008037).withValues(alpha: 0.3)),
         ),
         child: Text(
           tag,

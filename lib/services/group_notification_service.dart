@@ -28,7 +28,7 @@ class GroupNotificationService {
         return doc.data()?['isMuted'] ?? false;
       }
       return false; // Default to not muted
-    } catch (e) {
+    } on Object catch (e) {
       log('Error checking group mute status: $e');
       return false;
     }
@@ -54,7 +54,7 @@ class GroupNotificationService {
       );
 
       log('✅ Group mute status updated: $groupId -> $isMuted');
-    } catch (e) {
+    } on Object catch (e) {
       log('❌ Error updating group mute status: $e');
       throw Exception('Failed to update notification settings');
     }
@@ -75,7 +75,7 @@ class GroupNotificationService {
       return querySnapshot.docs
           .map((doc) => doc.data()['groupId'] as String)
           .toList();
-    } catch (e) {
+    } on Object catch (e) {
       log('Error getting muted groups: $e');
       return [];
     }

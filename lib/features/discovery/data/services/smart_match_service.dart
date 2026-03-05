@@ -66,7 +66,7 @@ class SmartMatchService {
             highCompatibilityCount:
                 orderedUsers.where((uc) => uc.isHighCompatibility).length,
           );
-        } catch (e) {
+        } on Object catch (e) {
           debugPrint('❌ Error in smart matching: $e');
           return SmartMatchResult.error(e.toString());
         }
@@ -289,8 +289,10 @@ class SmartMatchService {
   double _calculateAverageCompatibility(List<UserCompatibility> users) {
     if (users.isEmpty) return 0;
 
-    final totalScore =
-        users.fold(0.0, (sum, user) => sum + user.compatibilityScore);
+    final totalScore = users.fold<double>(
+      0,
+      (sum, user) => sum + user.compatibilityScore,
+    );
     return totalScore / users.length;
   }
 
@@ -347,7 +349,7 @@ class SmartMatchService {
       );
 
       return newSmartResult;
-    } catch (e) {
+    } on Object catch (e) {
       debugPrint('❌ Error getting more optimized users: $e');
       return SmartMatchResult.error(e.toString());
     }
@@ -403,7 +405,7 @@ class SmartMatchService {
             _calculateAverageCompatibility(highCompatibilityUsers),
         highCompatibilityCount: highCompatibilityUsers.length,
       );
-    } catch (e) {
+    } on Object catch (e) {
       debugPrint('❌ Error getting high compatibility users: $e');
       return SmartMatchResult.error(e.toString());
     }
@@ -460,7 +462,7 @@ class SmartMatchService {
         recommendations:
             _generateRecommendations(currentUser, compatibilityResults),
       );
-    } catch (e) {
+    } on Object catch (e) {
       debugPrint('❌ Error analyzing matching patterns: $e');
       return MatchingAnalysis.empty();
     }

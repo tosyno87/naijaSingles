@@ -168,14 +168,16 @@ class _UserProfilePicState extends State<UserProfilePic>
                   onPressed: canContinue
                       ? () {
                           log('userdata is ${userData.toString()}');
-                          unawaited(Navigator.pushNamed(
-                            context,
-                            RouteName.allowLocationScreen,
-                            arguments: {
-                              'userData': userData,
-                              'profilePic': photos[selectedPhotoIndex],
-                            },
-                          ));
+                          unawaited(
+                            Navigator.pushNamed(
+                              context,
+                              RouteName.allowLocationScreen,
+                              arguments: {
+                                'userData': userData,
+                                'profilePic': photos[selectedPhotoIndex],
+                              },
+                            ),
+                          );
                         }
                       : null,
                   style: ElevatedButton.styleFrom(

@@ -24,7 +24,7 @@ class ModeSpecificCompatibilityEngine {
         default:
           return CompatibilityEngine.calculateCompatibility(user1, user2);
       }
-    } catch (e) {
+    } on Object catch (e) {
       debugPrint('❌ Error calculating mode compatibility: $e');
       return 0.5; // Return neutral score on error
     }
@@ -177,7 +177,7 @@ class ModeSpecificCompatibilityEngine {
       } else {
         return 0.2; // Low score for distant users
       }
-    } catch (e) {
+    } on Object catch (e) {
       debugPrint('❌ Error calculating location score: $e');
       return 0.5;
     }
@@ -198,7 +198,7 @@ class ModeSpecificCompatibilityEngine {
       // For now, return a neutral score
       // In a real implementation, you'd compare these fields from user profiles
       return 0.7; // Default good compatibility
-    } catch (e) {
+    } on Object catch (e) {
       debugPrint('❌ Error calculating lifestyle compatibility: $e');
       return 0.5;
     }
@@ -217,7 +217,7 @@ class ModeSpecificCompatibilityEngine {
 
       // For now, return a neutral score
       return 0.7; // Default good compatibility
-    } catch (e) {
+    } on Object catch (e) {
       debugPrint('❌ Error calculating social compatibility: $e');
       return 0.5;
     }
@@ -236,7 +236,7 @@ class ModeSpecificCompatibilityEngine {
 
       // For now, return a neutral score
       return 0.7; // Default good compatibility
-    } catch (e) {
+    } on Object catch (e) {
       debugPrint('❌ Error calculating professional compatibility: $e');
       return 0.5;
     }
@@ -296,7 +296,7 @@ class ModeSpecificCompatibilityEngine {
       } else {
         return 0.6; // Different industries
       }
-    } catch (e) {
+    } on Object catch (e) {
       debugPrint('❌ Error calculating industry compatibility: $e');
       return 0.5;
     }
@@ -307,7 +307,7 @@ class ModeSpecificCompatibilityEngine {
       // This would compare user interests
       // For now, return a neutral score
       return 0.7; // Default good compatibility
-    } catch (e) {
+    } on Object catch (e) {
       debugPrint('❌ Error calculating interest score: $e');
       return 0.5;
     }
@@ -326,7 +326,7 @@ class ModeSpecificCompatibilityEngine {
       } else {
         return 0.3; // Low score for large age differences
       }
-    } catch (e) {
+    } on Object catch (e) {
       debugPrint('❌ Error calculating age compatibility: $e');
       return 0.5;
     }
@@ -353,7 +353,7 @@ class ModeSpecificCompatibilityEngine {
 
       // Return average completeness
       return (user1Score + user2Score) / 10.0;
-    } catch (e) {
+    } on Object catch (e) {
       debugPrint('❌ Error calculating completeness score: $e');
       return 0.5;
     }

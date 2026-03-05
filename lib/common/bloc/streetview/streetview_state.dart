@@ -15,7 +15,6 @@ class StreetViewInitial extends StreetViewState {
 
 /// Street view loaded with current mode
 class StreetViewLoaded extends StreetViewState {
-
   const StreetViewLoaded(this.streetMode);
   final String streetMode;
 
@@ -25,7 +24,6 @@ class StreetViewLoaded extends StreetViewState {
 
 /// Error loading street view
 class StreetViewError extends StreetViewState {
-
   const StreetViewError(this.message);
   final String message;
 

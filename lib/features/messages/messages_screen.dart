@@ -149,7 +149,7 @@ class _MessagesScreenState extends State<MessagesScreen> {
               avatarUrl: avatarUrl,
             ),
           );
-        } catch (e) {
+        } on Object catch (e) {
           log('Error processing thread: $e');
           continue;
         }
@@ -281,12 +281,14 @@ class _MessagesScreenState extends State<MessagesScreen> {
               const SizedBox(height: 32),
               ElevatedButton(
                 onPressed: () {
-                  unawaited(Navigator.of(context).push(
-                    MaterialPageRoute(
-                      builder: (context) =>
-                          const ExploreScreen(showBackButton: true),
+                  unawaited(
+                    Navigator.of(context).push(
+                      MaterialPageRoute(
+                        builder: (context) =>
+                            const ExploreScreen(showBackButton: true),
+                      ),
                     ),
-                  ));
+                  );
                 },
                 style: ElevatedButton.styleFrom(
                   backgroundColor: primaryColor,
@@ -474,7 +476,8 @@ class _MessagesScreenState extends State<MessagesScreen> {
                                       Icon(
                                         Icons.info_outline,
                                         size: 16,
-                                        color: primaryColor.withValues(alpha: 0.7),
+                                        color:
+                                            primaryColor.withValues(alpha: 0.7),
                                       ),
                                     ],
                                   ),
@@ -522,17 +525,19 @@ class _MessagesScreenState extends State<MessagesScreen> {
   void _openChatThread(MessageThreadInfo thread) {
     unawaited(_chatService.markThreadAsRead(thread.threadId));
 
-    unawaited(Navigator.push(
-      context,
-      MaterialPageRoute(
-        builder: (_) => ChatThreadScreen(
-          threadId: thread.threadId,
-          userName: thread.otherUserName,
-          avatarUrl: thread.avatarUrl,
-          otherUserId: thread.otherUserId,
+    unawaited(
+      Navigator.push(
+        context,
+        MaterialPageRoute(
+          builder: (_) => ChatThreadScreen(
+            threadId: thread.threadId,
+            userName: thread.otherUserName,
+            avatarUrl: thread.avatarUrl,
+            otherUserId: thread.otherUserId,
+          ),
         ),
       ),
-    ));
+    );
   }
 
   // Show delete confirmation dialog
@@ -633,7 +638,8 @@ class _MessagesScreenState extends State<MessagesScreen> {
                     padding: const EdgeInsets.symmetric(vertical: 12),
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(12),
-                      side: BorderSide(color: textSecondary.withValues(alpha: 0.3)),
+                      side: BorderSide(
+                          color: textSecondary.withValues(alpha: 0.3)),
                     ),
                   ),
                   child: Text(
@@ -688,59 +694,62 @@ class _MessagesScreenState extends State<MessagesScreen> {
     if (!mounted) return;
 
     // Show MVP compliant loading indicator
-    unawaited(showDialog(
-      context: context,
-      barrierDismissible: false,
-      builder: (context) => AlertDialog(
-        backgroundColor: cardColor,
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
-        elevation: 8,
-        contentPadding: const EdgeInsets.all(32),
-        content: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Container(
-              width: 80,
-              height: 80,
-              decoration: BoxDecoration(
-                color: primaryColor.withValues(alpha: 0.1),
-                shape: BoxShape.circle,
-              ),
-              child: const Center(
-                child: SizedBox(
-                  width: 40,
-                  height: 40,
-                  child: CircularProgressIndicator(
-                    color: primaryColor,
-                    strokeWidth: 3,
+    unawaited(
+      showDialog(
+        context: context,
+        barrierDismissible: false,
+        builder: (context) => AlertDialog(
+          backgroundColor: cardColor,
+          shape:
+              RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+          elevation: 8,
+          contentPadding: const EdgeInsets.all(32),
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Container(
+                width: 80,
+                height: 80,
+                decoration: BoxDecoration(
+                  color: primaryColor.withValues(alpha: 0.1),
+                  shape: BoxShape.circle,
+                ),
+                child: const Center(
+                  child: SizedBox(
+                    width: 40,
+                    height: 40,
+                    child: CircularProgressIndicator(
+                      color: primaryColor,
+                      strokeWidth: 3,
+                    ),
                   ),
                 ),
               ),
-            ),
-            const SizedBox(height: 24),
-            Text(
-              'Deleting Conversation',
-              style: GoogleFonts.montserrat(
-                fontSize: 18,
-                fontWeight: FontWeight.bold,
-                color: textPrimary,
+              const SizedBox(height: 24),
+              Text(
+                'Deleting Conversation',
+                style: GoogleFonts.montserrat(
+                  fontSize: 18,
+                  fontWeight: FontWeight.bold,
+                  color: textPrimary,
+                ),
+                textAlign: TextAlign.center,
               ),
-              textAlign: TextAlign.center,
-            ),
-            const SizedBox(height: 8),
-            Text(
-              'Please wait while we remove your conversation and unmatch you both...',
-              style: GoogleFonts.montserrat(
-                fontSize: 14,
-                color: textSecondary,
-                height: 1.4,
+              const SizedBox(height: 8),
+              Text(
+                'Please wait while we remove your conversation and unmatch you both...',
+                style: GoogleFonts.montserrat(
+                  fontSize: 14,
+                  color: textSecondary,
+                  height: 1.4,
+                ),
+                textAlign: TextAlign.center,
               ),
-              textAlign: TextAlign.center,
-            ),
-          ],
+            ],
+          ),
         ),
       ),
-    ));
+    );
 
     try {
       final success = await _chatService.deleteChatThread(thread.threadId);
@@ -807,7 +816,7 @@ class _MessagesScreenState extends State<MessagesScreen> {
           ),
         );
       }
-    } catch (e) {
+    } on Object {
       // Fallback for non-Firebase errors
       if (mounted && Navigator.canPop(context)) {
         Navigator.pop(context);
@@ -836,60 +845,62 @@ class _MessagesScreenState extends State<MessagesScreen> {
 
     try {
       // Show MVP compliant loading indicator
-      unawaited(showDialog(
-        context: context,
-        barrierDismissible: false,
-        builder: (context) => AlertDialog(
-          backgroundColor: cardColor,
-          shape:
-              RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
-          elevation: 8,
-          contentPadding: const EdgeInsets.all(32),
-          content: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Container(
-                width: 80,
-                height: 80,
-                decoration: BoxDecoration(
-                  color: primaryColor.withValues(alpha: 0.1),
-                  shape: BoxShape.circle,
-                ),
-                child: const Center(
-                  child: SizedBox(
-                    width: 40,
-                    height: 40,
-                    child: CircularProgressIndicator(
-                      color: primaryColor,
-                      strokeWidth: 3,
+      unawaited(
+        showDialog(
+          context: context,
+          barrierDismissible: false,
+          builder: (context) => AlertDialog(
+            backgroundColor: cardColor,
+            shape:
+                RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+            elevation: 8,
+            contentPadding: const EdgeInsets.all(32),
+            content: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Container(
+                  width: 80,
+                  height: 80,
+                  decoration: BoxDecoration(
+                    color: primaryColor.withValues(alpha: 0.1),
+                    shape: BoxShape.circle,
+                  ),
+                  child: const Center(
+                    child: SizedBox(
+                      width: 40,
+                      height: 40,
+                      child: CircularProgressIndicator(
+                        color: primaryColor,
+                        strokeWidth: 3,
+                      ),
                     ),
                   ),
                 ),
-              ),
-              const SizedBox(height: 24),
-              Text(
-                'Loading Profile',
-                style: GoogleFonts.montserrat(
-                  fontSize: 18,
-                  fontWeight: FontWeight.bold,
-                  color: textPrimary,
+                const SizedBox(height: 24),
+                Text(
+                  'Loading Profile',
+                  style: GoogleFonts.montserrat(
+                    fontSize: 18,
+                    fontWeight: FontWeight.bold,
+                    color: textPrimary,
+                  ),
+                  textAlign: TextAlign.center,
                 ),
-                textAlign: TextAlign.center,
-              ),
-              const SizedBox(height: 8),
-              Text(
-                'Please wait while we fetch the user profile...',
-                style: GoogleFonts.montserrat(
-                  fontSize: 14,
-                  color: textSecondary,
-                  height: 1.4,
+                const SizedBox(height: 8),
+                Text(
+                  'Please wait while we fetch the user profile...',
+                  style: GoogleFonts.montserrat(
+                    fontSize: 14,
+                    color: textSecondary,
+                    height: 1.4,
+                  ),
+                  textAlign: TextAlign.center,
                 ),
-                textAlign: TextAlign.center,
-              ),
-            ],
+              ],
+            ),
           ),
         ),
-      ));
+      );
 
       // Fetch user data from Firestore
       final userDoc = await _firestore.collection('users').doc(userId).get();
@@ -918,12 +929,14 @@ class _MessagesScreenState extends State<MessagesScreen> {
         );
 
         // Navigate to profile screen
-        unawaited(Navigator.push(
-          context,
-          MaterialPageRoute(
-            builder: (context) => UserDetailScreen(user: userModel),
+        unawaited(
+          Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (context) => UserDetailScreen(user: userModel),
+            ),
           ),
-        ));
+        );
       } else {
         // Show error if user not found
         ScaffoldMessenger.of(context).showSnackBar(
@@ -940,7 +953,7 @@ class _MessagesScreenState extends State<MessagesScreen> {
           ),
         );
       }
-    } catch (e) {
+    } on Object catch (e) {
       // Close loading dialog if still open
       if (mounted && Navigator.canPop(context)) {
         Navigator.pop(context);

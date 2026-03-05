@@ -45,14 +45,14 @@ class FireStoreClass {
             },
             SetOptions(merge: true),
           );
-        } catch (e) {
+        } on Object catch (e) {
           log('Error updating Firestore with image URL: $e');
         }
-      } catch (e) {
+      } on Object catch (e) {
         log('Error in upload task: $e');
       }
       return uploadTask;
-    } catch (e) {
+    } on Object catch (e) {
       log('Error in uploadprofile: $e');
       return null;
     }
@@ -99,11 +99,11 @@ class FireStoreClass {
 
         log('Verification image uploaded: $downloadUrl');
         return downloadUrl;
-      } catch (e) {
+      } on Object catch (e) {
         log('Error in verification upload task: $e');
         return null;
       }
-    } catch (e) {
+    } on Object catch (e) {
       log('Error in uploadVerification: $e');
       return null;
     }
@@ -169,14 +169,14 @@ class FireStoreClass {
                 .doc(currentUser.id)
                 .update({'Pictures': pictures});
           }
-        } catch (e) {
+        } on Object catch (e) {
           log('Error updating Firestore with image URL: $e');
         }
-      } catch (e) {
+      } on Object catch (e) {
         log('Error in upload task: $e');
       }
       return uploadTask;
-    } catch (e) {
+    } on Object catch (e) {
       log('Error in uploadFile: $e');
       return null;
     }

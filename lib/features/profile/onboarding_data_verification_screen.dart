@@ -107,7 +107,7 @@ class _OnboardingDataVerificationScreenState
           setState(() => _isLoading = false);
         }
       }
-    } catch (e) {
+    } on Object catch (e) {
       AppLogger.error('❌ Error loading user data', error: e);
       setState(() => _isLoading = false);
     }

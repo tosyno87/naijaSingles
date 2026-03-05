@@ -66,7 +66,8 @@ class _ModernNotificationsScreenState extends State<ModernNotificationsScreen>
   }
 
   void _loadNotifications() {
-    _notificationsSubscription = _notificationService.notificationsStream.listen((notifications) {
+    _notificationsSubscription =
+        _notificationService.notificationsStream.listen((notifications) {
       if (mounted) {
         setState(() {
           _notifications = notifications;
@@ -76,7 +77,8 @@ class _ModernNotificationsScreenState extends State<ModernNotificationsScreen>
       }
     });
 
-    _unreadCountSubscription = _notificationService.unreadCountStream.listen((count) {
+    _unreadCountSubscription =
+        _notificationService.unreadCountStream.listen((count) {
       if (mounted) {
         setState(() {
           _unreadCount = count;

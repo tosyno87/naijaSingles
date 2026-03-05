@@ -29,7 +29,7 @@ class EventsFirestoreService {
         'Saved ${events.length} events to Firestore',
         name: 'EventsFirestoreService',
       );
-    } catch (e) {
+    } on Object catch (e) {
       log(
         'Error saving events to Firestore: $e',
         name: 'EventsFirestoreService',
@@ -78,7 +78,7 @@ class EventsFirestoreService {
         name: 'EventsFirestoreService',
       );
       return events;
-    } catch (e) {
+    } on Object catch (e) {
       log(
         'Error fetching events from Firestore: $e',
         name: 'EventsFirestoreService',
@@ -99,7 +99,7 @@ class EventsFirestoreService {
         );
       }
       return null;
-    } catch (e) {
+    } on Object catch (e) {
       log('Error fetching event $eventId: $e', name: 'EventsFirestoreService');
       return null;
     }
@@ -165,7 +165,7 @@ class EventsFirestoreService {
         'RSVP saved for user $userId to event $eventId with status ${status.value}',
         name: 'EventsFirestoreService',
       );
-    } catch (e) {
+    } on Object catch (e) {
       log('Error saving RSVP: $e', name: 'EventsFirestoreService');
       throw FirestoreException('Failed to save RSVP: $e');
     }
@@ -222,7 +222,7 @@ class EventsFirestoreService {
         'RSVP updated for user $userId to event $eventId: ${oldStatus.value} -> ${newStatus.value}',
         name: 'EventsFirestoreService',
       );
-    } catch (e) {
+    } on Object catch (e) {
       log('Error updating RSVP: $e', name: 'EventsFirestoreService');
       throw FirestoreException('Failed to update RSVP: $e');
     }
@@ -244,7 +244,7 @@ class EventsFirestoreService {
         );
       }
       return null;
-    } catch (e) {
+    } on Object catch (e) {
       log('Error fetching user RSVP: $e', name: 'EventsFirestoreService');
       return null;
     }
@@ -267,7 +267,7 @@ class EventsFirestoreService {
             ),
           )
           .toList();
-    } catch (e) {
+    } on Object catch (e) {
       log('Error fetching user RSVPs: $e', name: 'EventsFirestoreService');
       throw FirestoreException('Failed to fetch user RSVPs: $e');
     }
@@ -297,7 +297,7 @@ class EventsFirestoreService {
             ),
           )
           .toList();
-    } catch (e) {
+    } on Object catch (e) {
       log('Error fetching event attendees: $e', name: 'EventsFirestoreService');
       throw FirestoreException('Failed to fetch event attendees: $e');
     }
@@ -322,7 +322,7 @@ class EventsFirestoreService {
             ),
           )
           .toList();
-    } catch (e) {
+    } on Object catch (e) {
       log('Error searching events: $e', name: 'EventsFirestoreService');
       throw FirestoreException('Failed to search events: $e');
     }
@@ -349,7 +349,7 @@ class EventsFirestoreService {
             ),
           )
           .toList();
-    } catch (e) {
+    } on Object catch (e) {
       log(
         'Error fetching events by category: $e',
         name: 'EventsFirestoreService',
@@ -387,7 +387,7 @@ class EventsFirestoreService {
         'Deleted $totalDeleted old events',
         name: 'EventsFirestoreService',
       );
-    } catch (e) {
+    } on Object catch (e) {
       log('Error deleting old events: $e', name: 'EventsFirestoreService');
     }
   }

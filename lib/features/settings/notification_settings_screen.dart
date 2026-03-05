@@ -51,7 +51,7 @@ class _NotificationSettingsScreenState
           _isLoading = false;
         });
       }
-    } catch (e) {
+    } on Object {
       if (mounted) {
         setState(() => _isLoading = false);
         _showSnackBar('Error loading notification settings', isError: true);
@@ -79,7 +79,7 @@ class _NotificationSettingsScreenState
           _showSnackBar('Failed to save settings', isError: true);
         }
       }
-    } catch (e) {
+    } on Object {
       if (mounted) {
         setState(() => _isSaving = false);
         _showSnackBar('Error saving settings', isError: true);
@@ -269,7 +269,8 @@ class _NotificationSettingsScreenState
               icon: Icons.favorite,
               value: _settings!.matchNotifications,
               onChanged: (value) => _updateSetting(
-                  _settings!.copyWith(matchNotifications: value),),
+                _settings!.copyWith(matchNotifications: value),
+              ),
               isDarkMode: isDarkMode,
             ),
 

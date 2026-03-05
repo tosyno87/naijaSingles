@@ -30,7 +30,7 @@ class SearchUserBloc extends Bloc<SearchUserEvent, SearchUserState> {
         log('📊 Discovery stats: $stats');
 
         emit(SearchUserLoadUserState(userList));
-      } catch (e) {
+      } on Object catch (e) {
         emit(SearchUserFailedState());
         log('❌ Error loading users: $e');
       }
@@ -48,7 +48,7 @@ class SearchUserBloc extends Bloc<SearchUserEvent, SearchUserState> {
         );
 
         emit(SearchUserLoadUserState(userList));
-      } catch (e) {
+      } on Object catch (e) {
         emit(SearchUserFailedState());
         log('❌ Error loading nearby users: $e');
       }
@@ -60,7 +60,7 @@ class SearchUserBloc extends Bloc<SearchUserEvent, SearchUserState> {
         final shouldPrompt =
             await DiscoveryService.shouldPromptForMigration(event.userId);
         emit(MigrationStatusState(shouldPromptForMigration: shouldPrompt));
-      } catch (e) {
+      } on Object catch (e) {
         log('❌ Error checking migration status: $e');
         emit(SearchUserFailedState());
       }

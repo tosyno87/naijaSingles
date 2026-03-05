@@ -121,9 +121,7 @@ class _LanguageSelectionDropdownState extends State<LanguageSelectionDropdown> {
                       'Change Language'.tr().toString(),
                       style: TextStyle(
                         fontSize: 16,
-                        color: isDarkMode
-                            ? Colors.white
-                            : Colors.pink,
+                        color: isDarkMode ? Colors.white : Colors.pink,
                         fontWeight: FontWeight.w500,
                       ),
                     ),
@@ -190,9 +188,8 @@ class _LanguageSelectionDropdownState extends State<LanguageSelectionDropdown> {
                               child: Text(
                                 language.tr().toString(),
                                 style: TextStyle(
-                                  color: isDarkMode
-                                      ? Colors.white70
-                                      : Colors.pink,
+                                  color:
+                                      isDarkMode ? Colors.white70 : Colors.pink,
                                   fontSize: 14,
                                   fontWeight: FontWeight.w500,
                                 ),
@@ -204,7 +201,7 @@ class _LanguageSelectionDropdownState extends State<LanguageSelectionDropdown> {
                   ],
                 ),
               );
-            } catch (e) {
+            } on Object {
               return Center(
                 child: Text(
                   'Unable to load'.tr().toString(),
@@ -219,7 +216,8 @@ class _LanguageSelectionDropdownState extends State<LanguageSelectionDropdown> {
   }
 }
 
-void _refreshPage(BuildContext context, {required String lCode, required String cCode}) {
+void _refreshPage(BuildContext context,
+    {required String lCode, required String cCode}) {
   context.read<LanguageBloc>().add(
         LanguageLocaleChanged(Locale(lCode, cCode), context),
       );

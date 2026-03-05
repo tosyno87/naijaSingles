@@ -26,7 +26,7 @@ class InAppPurchaseRepoImpl extends InAppPurchaseRepo {
       final bool isAvailable = await inApp.isAvailable();
 
       if (!isAvailable) {
-        throw 'Not available';
+        throw Exception('Not available');
       }
 
       final Set<String> kIds = Set.from(await _fetchPackageIds());
@@ -34,11 +34,11 @@ class InAppPurchaseRepoImpl extends InAppPurchaseRepo {
           await InAppPurchase.instance.queryProductDetails(kIds);
       if (response.notFoundIDs.isNotEmpty) {
         log('Not found');
-        throw 'No product found';
+        throw Exception('No product found');
       }
       final List<ProductDetails> products = response.productDetails;
       return products;
-    } catch (e) {
+    } on Object {
       rethrow;
     }
   }
@@ -106,7 +106,7 @@ class InAppPurchaseRepoImpl extends InAppPurchaseRepo {
       await inApp.completePurchase(purchase);
       //}
       if (context.mounted) {
-        Navigator.pushReplacement(
+        await Navigator.pushReplacement(
           context,
           CupertinoPageRoute(
             builder: (context) => Tabbar(
@@ -117,7 +117,7 @@ class InAppPurchaseRepoImpl extends InAppPurchaseRepo {
         );
       }
     } else if (purchase.status == PurchaseStatus.error) {
-      Navigator.pushReplacement(
+      await Navigator.pushReplacement(
         context,
         CupertinoPageRoute(
           builder: (context) => Products(currentUser, false, items),

@@ -80,7 +80,8 @@ class _EventFilterBarState extends State<EventFilterBar> {
 
             return Padding(
               padding: EdgeInsets.only(
-                  right: index == categories.length - 1 ? 0 : 12,),
+                right: index == categories.length - 1 ? 0 : 12,
+              ),
               child: _buildFilterChip(
                 label: category,
                 isSelected: isSelected,
@@ -103,7 +104,8 @@ class _EventFilterBarState extends State<EventFilterBar> {
 
             return Padding(
               padding: EdgeInsets.only(
-                  right: index == timeFilters.length - 1 ? 0 : 8,),
+                right: index == timeFilters.length - 1 ? 0 : 8,
+              ),
               child: _buildTimeFilterChip(
                 label: timeFilter,
                 isSelected: isSelected,
@@ -128,9 +130,8 @@ class _EventFilterBarState extends State<EventFilterBar> {
             color: isSelected ? AppColors.primaryGreen : Colors.white,
             borderRadius: BorderRadius.circular(20),
             border: Border.all(
-              color: isSelected
-                  ? AppColors.primaryGreen
-                  : const Color(0xFFE0E0E0),
+              color:
+                  isSelected ? AppColors.primaryGreen : const Color(0xFFE0E0E0),
               width: 1.5,
             ),
             boxShadow: isSelected
@@ -170,9 +171,8 @@ class _EventFilterBarState extends State<EventFilterBar> {
                 : Colors.transparent,
             borderRadius: BorderRadius.circular(18),
             border: Border.all(
-              color: isSelected
-                  ? AppColors.primaryGreen
-                  : const Color(0xFFE0E0E0),
+              color:
+                  isSelected ? AppColors.primaryGreen : const Color(0xFFE0E0E0),
             ),
           ),
           child: Row(
@@ -342,13 +342,15 @@ class _EventFilterBarState extends State<EventFilterBar> {
               const SizedBox.shrink(),
             GestureDetector(
               onTap: () {
-                unawaited(showDialog(
-                  context: context,
-                  builder: (context) => AdvancedSearchDialog(
-                    currentFilter: widget.currentFilter,
-                    onFilterApplied: widget.onFilterChanged,
+                unawaited(
+                  showDialog(
+                    context: context,
+                    builder: (context) => AdvancedSearchDialog(
+                      currentFilter: widget.currentFilter,
+                      onFilterApplied: widget.onFilterChanged,
+                    ),
                   ),
-                ));
+                );
               },
               child: Container(
                 padding:
@@ -635,8 +637,8 @@ class _AdvancedFilterDialogState extends State<AdvancedFilterDialog> {
       builder: (context, child) => Theme(
         data: Theme.of(context).copyWith(
           colorScheme: Theme.of(context).colorScheme.copyWith(
-            primary: AppColors.primaryGreen,
-          ),
+                primary: AppColors.primaryGreen,
+              ),
         ),
         child: child!,
       ),
@@ -659,8 +661,8 @@ class _AdvancedFilterDialogState extends State<AdvancedFilterDialog> {
       builder: (context, child) => Theme(
         data: Theme.of(context).copyWith(
           colorScheme: Theme.of(context).colorScheme.copyWith(
-            primary: AppColors.primaryGreen,
-          ),
+                primary: AppColors.primaryGreen,
+              ),
         ),
         child: child!,
       ),

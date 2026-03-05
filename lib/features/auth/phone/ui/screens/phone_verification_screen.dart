@@ -222,17 +222,19 @@ class _PhoneVerificationScreenState extends State<PhoneVerificationScreen> {
                           context,
                         );
                       } else if (state is PhoneAuthCodeSentSuccess) {
-                        unawaited(Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                            builder: (context) => OtpVerificationScreen(
-                              phoneNumber: countryCode +
-                                  phoneNumberController.text.trim(),
-                              verificationId: state.verificationId,
-                              updatePhoneNumber: widget.updatePhoneNumber,
+                        unawaited(
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) => OtpVerificationScreen(
+                                phoneNumber: countryCode +
+                                    phoneNumberController.text.trim(),
+                                verificationId: state.verificationId,
+                                updatePhoneNumber: widget.updatePhoneNumber,
+                              ),
                             ),
                           ),
-                        ));
+                        );
                       }
                     },
                     builder: (context, state) => SizedBox(

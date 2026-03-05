@@ -152,9 +152,9 @@ class GroupCard extends StatelessWidget {
                   imageUrl: group.imageUrl!,
                   fit: BoxFit.cover,
                   placeholder: (context, url) => const Center(
-                      child: CircularProgressIndicator(strokeWidth: 2),),
-                  errorWidget: (context, url, error) =>
-                      _buildDefaultIcon(),
+                    child: CircularProgressIndicator(strokeWidth: 2),
+                  ),
+                  errorWidget: (context, url, error) => _buildDefaultIcon(),
                 ),
               )
             : _buildDefaultIcon(),

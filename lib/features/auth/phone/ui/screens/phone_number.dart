@@ -118,17 +118,19 @@ class _PhoneNumberState extends State<PhoneNumber> {
 
                   // Use direct MaterialPageRoute instead of named route to avoid router issues
                   // This ensures smooth transition without any "Page Not Found" flash
-                  unawaited(Navigator.of(context).pushReplacement(
-                    MaterialPageRoute(
-                      builder: (context) => OtpPage(
-                        phoneNumber: countryCode + phoneNumberController.text,
-                        verificationId: state.verificationId,
-                        codeController: _codeController.text,
-                        updatePhoneNumber: widget.updatePhoneNumber,
-                        isLogin: widget.isSignIn,
+                  unawaited(
+                    Navigator.of(context).pushReplacement(
+                      MaterialPageRoute(
+                        builder: (context) => OtpPage(
+                          phoneNumber: countryCode + phoneNumberController.text,
+                          verificationId: state.verificationId,
+                          codeController: _codeController.text,
+                          updatePhoneNumber: widget.updatePhoneNumber,
+                          isLogin: widget.isSignIn,
+                        ),
                       ),
                     ),
-                  ));
+                  );
                 }
               }
 
@@ -452,7 +454,8 @@ class _PhoneNumberState extends State<PhoneNumber> {
 
                                     // Use builderContext which is inside the BlocProvider tree
                                     final bloc = BlocProvider.of<PhoneAuthBloc>(
-                                        builderContext,);
+                                      builderContext,
+                                    );
                                     log('📤 Adding SendOtpToPhoneEvent to bloc...');
                                     bloc.add(
                                       SendOtpToPhoneEvent(
@@ -495,15 +498,19 @@ class _PhoneNumberState extends State<PhoneNumber> {
                             GestureDetector(
                               onTap: () {
                                 if (widget.isSignIn) {
-                                  unawaited(Navigator.pushReplacementNamed(
-                                    context,
-                                    '/auth_method_selection',
-                                  ));
+                                  unawaited(
+                                    Navigator.pushReplacementNamed(
+                                      context,
+                                      '/auth_method_selection',
+                                    ),
+                                  );
                                 } else {
-                                  unawaited(Navigator.pushReplacementNamed(
-                                    context,
-                                    '/sign_in_method_selection',
-                                  ));
+                                  unawaited(
+                                    Navigator.pushReplacementNamed(
+                                      context,
+                                      '/sign_in_method_selection',
+                                    ),
+                                  );
                                 }
                               },
                               child: Text(

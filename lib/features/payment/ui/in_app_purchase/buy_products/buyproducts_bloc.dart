@@ -19,7 +19,7 @@ class BuyConsumableInAppProductsBloc
         emit(BuyConsumableSuccessState(result: result));
       } on SocketException {
         emit(BuyConsumableFailedState(msg: 'No Internet Connection'));
-      } catch (e) {
+      } on Object catch (e) {
         emit(BuyConsumableFailedState(msg: e.toString()));
         rethrow;
       }
@@ -40,7 +40,7 @@ class BuyConsumableInAppProductsBloc
         yield BuyConsumableSuccessState(result: result);
       } on SocketException {
         yield BuyConsumableFailedState(msg: 'No Internet Connection');
-      } catch (e) {
+      } on Object catch (e) {
         log(e.toString());
         yield BuyConsumableFailedState(msg: e.toString());
       }

@@ -24,11 +24,13 @@ class SplashState extends State<Splash> {
     super.initState();
 
     // Add a delay to show the splash screen
-    unawaited(Future.delayed(const Duration(seconds: 2), () async {
-      if (mounted && !_hasNavigated) {
-        await _checkAuthAndNavigate();
-      }
-    }));
+    unawaited(
+      Future.delayed(const Duration(seconds: 2), () async {
+        if (mounted && !_hasNavigated) {
+          await _checkAuthAndNavigate();
+        }
+      }),
+    );
   }
 
   Future<void> _checkAuthAndNavigate() async {
@@ -66,12 +68,18 @@ class SplashState extends State<Splash> {
             if (currentState is AuthenticatedState) {
               _hasNavigated = true;
               log('Timeout fallback: User authenticated, navigating to main screen');
-              Navigator.pushReplacementNamed(context, RouteName.mainNavigation);
+              unawaited(
+                Navigator.pushReplacementNamed(
+                    context, RouteName.mainNavigation),
+              );
               return;
             } else {
               _hasNavigated = true;
               log('Timeout fallback: Navigating to welcome screen');
-              Navigator.pushReplacementNamed(context, RouteName.welcomeScreen);
+              unawaited(
+                Navigator.pushReplacementNamed(
+                    context, RouteName.welcomeScreen),
+              );
               return;
             }
           }
@@ -83,12 +91,15 @@ class SplashState extends State<Splash> {
 
       _hasNavigated = true;
       log('Final fallback: Navigating to welcome screen');
-      Navigator.pushReplacementNamed(context, RouteName.welcomeScreen);
-    } catch (e) {
+      unawaited(
+        Navigator.pushReplacementNamed(context, RouteName.welcomeScreen),
+      );
+    } on Object catch (e) {
       log('Error in _checkAuthAndNavigate: $e');
       if (mounted && !_hasNavigated) {
         _hasNavigated = true;
-        Navigator.pushReplacementNamed(context, RouteName.welcomeScreen);
+        unawaited(
+            Navigator.pushReplacementNamed(context, RouteName.welcomeScreen));
       }
     }
   }
@@ -121,20 +132,24 @@ class SplashState extends State<Splash> {
           if (state is AuthenticatedState) {
             _hasNavigated = true;
             log('User authenticated in listener: ${state.user.uid}');
-            unawaited(Navigator.pushReplacementNamed(context, RouteName.mainNavigation));
+            unawaited(Navigator.pushReplacementNamed(
+                context, RouteName.mainNavigation));
           } else if (state is UnauthenticatedState) {
             _hasNavigated = true;
             log('User not authenticated in listener - going to welcome');
-            unawaited(Navigator.pushReplacementNamed(context, RouteName.welcomeScreen));
+            unawaited(Navigator.pushReplacementNamed(
+                context, RouteName.welcomeScreen));
           } else if (state is AuthFailed) {
             _hasNavigated = true;
             log('Authentication failed in listener: ${state.message}');
             if (mounted) {
               ScaffoldMessenger.of(context).showSnackBar(
                 SnackBar(
-                    content: Text('Authentication error: ${state.message}'),),
+                  content: Text('Authentication error: ${state.message}'),
+                ),
               );
-              unawaited(Navigator.pushReplacementNamed(context, RouteName.welcomeScreen));
+              unawaited(Navigator.pushReplacementNamed(
+                  context, RouteName.welcomeScreen));
             }
           }
           // If still loading or initial state, wait for _checkAuthAndNavigate to handle it
@@ -152,8 +167,9 @@ class SplashState extends State<Splash> {
                       end: Alignment.bottomCenter,
                       colors: [
                         backgroundColor,
-                        const Color(0xFF27A957).withValues(alpha: 
-                            0.1,), // Very subtle green tint at bottom
+                        const Color(0xFF27A957).withValues(
+                          alpha: 0.1,
+                        ), // Very subtle green tint at bottom
                       ],
                       stops: const [0.7, 1.0],
                     ),
@@ -200,8 +216,8 @@ class SplashState extends State<Splash> {
                   child: CircularProgressIndicator(
                     strokeWidth: 2.5,
                     valueColor: AlwaysStoppedAnimation<Color>(
-                      primaryGreen
-                          .withValues(alpha: 0.6), // Soft green, not too prominent
+                      primaryGreen.withValues(
+                          alpha: 0.6), // Soft green, not too prominent
                     ),
                   ),
                 ),

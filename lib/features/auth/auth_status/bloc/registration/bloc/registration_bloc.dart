@@ -44,7 +44,7 @@ class RegistrationBloc extends Bloc<RegistrationEvents, RegistrationStates> {
               await secureStorage.storeAuthToken(event.token);
               await secureStorage.storeUserId(user.uid);
               log('✅ Token stored securely after phone verification');
-            } catch (e) {
+            } on Object catch (e) {
               log('⚠️ Error storing token securely: $e');
               // Continue even if secure storage fails
             }
@@ -70,7 +70,7 @@ class RegistrationBloc extends Bloc<RegistrationEvents, RegistrationStates> {
                 log('⚠️ Redirecting to onboarding to complete profile');
                 emit(NewRegistration(token: event.token, user: user));
               }
-            } catch (getUserError) {
+            } on Object catch (getUserError) {
               log('❌ Error getting user data: $getUserError');
               log('❌ Error type: ${getUserError.runtimeType}');
 
@@ -92,10 +92,12 @@ class RegistrationBloc extends Bloc<RegistrationEvents, RegistrationStates> {
                   if (existingUserId != null && existingUserId != user.uid) {
                     log('❌ Phone number already registered to another account: $existingUserId');
                     await phoneAuthRepository.signOut();
-                    emit(const RegistrationFailed(
-                      message:
-                          'This phone number is already registered. Please sign in instead.',
-                    ),);
+                    emit(
+                      const RegistrationFailed(
+                        message:
+                            'This phone number is already registered. Please sign in instead.',
+                      ),
+                    );
                     return;
                   }
                 } on FirebaseException catch (e) {
@@ -107,40 +109,52 @@ class RegistrationBloc extends Bloc<RegistrationEvents, RegistrationStates> {
                     log('⚠️ Phone dedup query denied by rules — proceeding (Firebase Auth is authoritative)');
                   } else {
                     log('❌ Firestore error during phone dedup: ${e.code}');
-                    emit(const RegistrationFailed(
-                      message: 'Unable to verify phone. Please try again.',
-                    ),);
+                    emit(
+                      const RegistrationFailed(
+                        message: 'Unable to verify phone. Please try again.',
+                      ),
+                    );
                     return;
                   }
                 } on SocketException {
                   log('❌ Network error during phone dedup — blocking registration');
-                  emit(const RegistrationFailed(
-                    message: 'No internet connection. Please try again.',
-                  ),);
+                  emit(
+                    const RegistrationFailed(
+                      message: 'No internet connection. Please try again.',
+                    ),
+                  );
                   return;
-                } catch (e) {
+                } on Object catch (e) {
                   log('❌ Unexpected error during phone dedup: $e');
-                  emit(const RegistrationFailed(
-                    message: 'Unable to verify phone. Please try again.',
-                  ),);
+                  emit(
+                    const RegistrationFailed(
+                      message: 'Unable to verify phone. Please try again.',
+                    ),
+                  );
                   return;
                 }
               }
               emit(NewRegistration(token: event.token, user: user));
             } else {
-              emit(const RegistrationFailed(
-                  message: 'Error: No user identifier found',),);
+              emit(
+                const RegistrationFailed(
+                  message: 'Error: No user identifier found',
+                ),
+              );
             }
           }
         } else {
           log('❌ User has no displayName or phoneNumber');
-          emit(const RegistrationFailed(
-              message: 'Error: No user identifier found',),);
+          emit(
+            const RegistrationFailed(
+              message: 'Error: No user identifier found',
+            ),
+          );
         }
       } on SocketException {
         log('❌ Network error during registration check');
         emit(const RegistrationFailed(message: 'No internet'));
-      } catch (e) {
+      } on Object catch (e) {
         log('❌ Unexpected error in CheckRegistration: $e');
         emit(RegistrationFailed(message: 'Error checking registration: $e'));
       }

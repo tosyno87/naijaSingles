@@ -47,7 +47,7 @@ class _GroupChatScreenState extends State<GroupChatScreen> {
           _isLoading = false;
         });
       }
-    } catch (e) {
+    } on Object catch (e) {
       if (mounted) {
         setState(() {
           _isLoading = false;
@@ -67,7 +67,7 @@ class _GroupChatScreenState extends State<GroupChatScreen> {
         groupId: widget.groupId,
         text: text,
       );
-    } catch (e) {
+    } on Object {
       _showErrorSnackBar('Failed to send message');
     }
   }
@@ -388,12 +388,14 @@ class _GroupChatScreenState extends State<GroupChatScreen> {
   }
 
   void _showGroupInfo() {
-    unawaited(showModalBottomSheet(
-      context: context,
-      isScrollControlled: true,
-      backgroundColor: Colors.transparent,
-      builder: (context) => _buildGroupInfoSheet(),
-    ));
+    unawaited(
+      showModalBottomSheet(
+        context: context,
+        isScrollControlled: true,
+        backgroundColor: Colors.transparent,
+        builder: (context) => _buildGroupInfoSheet(),
+      ),
+    );
   }
 
   Widget _buildGroupInfoSheet() => Container(

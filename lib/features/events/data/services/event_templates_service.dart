@@ -248,7 +248,7 @@ class EventTemplatesService {
     try {
       return getAfrocentricTemplates()
           .firstWhere((template) => template.id == id);
-    } catch (e) {
+    } on Object {
       return null;
     }
   }

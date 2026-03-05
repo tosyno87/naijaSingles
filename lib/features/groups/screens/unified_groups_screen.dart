@@ -63,7 +63,7 @@ class _UnifiedGroupsScreenState extends State<UnifiedGroupsScreen>
         _userGroups = userGroups;
         _isLoading = false;
       });
-    } catch (e) {
+    } on Object catch (e) {
       setState(() => _isLoading = false);
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
@@ -94,7 +94,7 @@ class _UnifiedGroupsScreenState extends State<UnifiedGroupsScreen>
         _groups = searchResults;
         _isSearching = false;
       });
-    } catch (e) {
+    } on Object catch (e) {
       setState(() => _isSearching = false);
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
@@ -120,7 +120,7 @@ class _UnifiedGroupsScreenState extends State<UnifiedGroupsScreen>
         );
         await _loadGroups(); // Refresh the list
       }
-    } catch (e) {
+    } on Object catch (e) {
       if (mounted) {
         String message;
         if (e.toString().contains('Already a member')) {
@@ -155,7 +155,7 @@ class _UnifiedGroupsScreenState extends State<UnifiedGroupsScreen>
       onPressed: () async {
         if (isMember) {
           // User is already a member - navigate to chat
-          _navigateToGroupDetails(group);
+          unawaited(_navigateToGroupDetails(group));
         } else {
           // User is not a member - join the group
           await _joinGroup(group);
@@ -194,7 +194,7 @@ class _UnifiedGroupsScreenState extends State<UnifiedGroupsScreen>
     );
     if (!mounted) return;
     if (result == true) {
-      _loadGroups();
+      unawaited(_loadGroups());
     }
   }
 
@@ -206,16 +206,7 @@ class _UnifiedGroupsScreenState extends State<UnifiedGroupsScreen>
       ),
     );
     if (!mounted) return;
-    _loadGroups();
-  }
-
-  void _showGroupInfo(UnifiedGroup group) {
-    unawaited(showModalBottomSheet(
-      context: context,
-      isScrollControlled: true,
-      backgroundColor: Colors.transparent,
-      builder: (context) => _buildGroupInfoSheet(group),
-    ));
+    unawaited(_loadGroups());
   }
 
   @override
@@ -521,8 +512,10 @@ class _UnifiedGroupsScreenState extends State<UnifiedGroupsScreen>
 
     // Filter groups created by current user
     final createdGroups = _userGroups
-        .where((group) =>
-            group.isCreator(FirebaseAuth.instance.currentUser?.uid ?? ''),)
+        .where(
+          (group) =>
+              group.isCreator(FirebaseAuth.instance.currentUser?.uid ?? ''),
+        )
         .toList();
 
     if (createdGroups.isEmpty) {
@@ -768,93 +761,6 @@ class _UnifiedGroupsScreenState extends State<UnifiedGroupsScreen>
               ],
             ],
           ),
-        ),
-      );
-
-  Widget _buildGroupInfoSheet(UnifiedGroup group) => Container(
-        height: MediaQuery.of(context).size.height * 0.7,
-        decoration: const BoxDecoration(
-          color: Colors.white,
-          borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
-        ),
-        child: Column(
-          children: [
-            Container(
-              margin: const EdgeInsets.only(top: 8),
-              width: 40,
-              height: 4,
-              decoration: BoxDecoration(
-                color: Colors.grey[300],
-                borderRadius: BorderRadius.circular(2),
-              ),
-            ),
-            Padding(
-              padding: const EdgeInsets.all(20),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    'Community Info',
-                    style: GoogleFonts.montserrat(
-                      fontSize: 24,
-                      fontWeight: FontWeight.bold,
-                      color: Colors.black87,
-                    ),
-                  ),
-                  const SizedBox(height: 20),
-                  _buildInfoRow(Icons.group, 'Name', group.name),
-                  _buildInfoRow(
-                    Icons.description,
-                    'Description',
-                    group.description,
-                  ),
-                  _buildInfoRow(Icons.category, 'Type', group.typeDisplayName),
-                  _buildInfoRow(
-                    Icons.people,
-                    'Members',
-                    '${group.memberCount}/${group.maxMembers}',
-                  ),
-                  if (group.location != null)
-                    _buildInfoRow(
-                        Icons.location_on, 'Location', group.location!,),
-                  if (group.tags.isNotEmpty)
-                    _buildInfoRow(Icons.tag, 'Tags', group.tags.join(', ')),
-                  _buildInfoRow(
-                    Icons.chat,
-                    'Chat',
-                    group.enableChat ? 'Enabled' : 'Disabled',
-                  ),
-                ],
-              ),
-            ),
-          ],
-        ),
-      );
-
-  Widget _buildInfoRow(IconData icon, String label, String value) => Padding(
-        padding: const EdgeInsets.only(bottom: 12),
-        child: Row(
-          children: [
-            Icon(icon, color: AppColors.primaryGreen, size: 20),
-            const SizedBox(width: 12),
-            Text(
-              '$label: ',
-              style: GoogleFonts.montserrat(
-                fontSize: 14,
-                fontWeight: FontWeight.w500,
-                color: Colors.grey[600],
-              ),
-            ),
-            Expanded(
-              child: Text(
-                value,
-                style: GoogleFonts.montserrat(
-                  fontSize: 14,
-                  color: Colors.black87,
-                ),
-              ),
-            ),
-          ],
         ),
       );
 

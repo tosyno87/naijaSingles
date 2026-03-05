@@ -41,7 +41,10 @@ class FaceBookButton extends StatelessWidget {
                     : const LinearGradient(
                         begin: Alignment.topRight,
                         end: Alignment.bottomLeft,
-                        colors: [AppColors.primaryGreen, AppColors.primaryGreenDark],
+                        colors: [
+                          AppColors.primaryGreen,
+                          AppColors.primaryGreenDark
+                        ],
                       ),
               ),
               height: MediaQuery.of(context).size.height * .065,

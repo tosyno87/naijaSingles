@@ -155,9 +155,8 @@ class _BlockedUserState extends State<BlockedUser> {
                           subtitle: Text(
                             'You blocked this user'.tr().toString(),
                             style: TextStyle(
-                              color: isDarkMode
-                                  ? Colors.white
-                                  : Colors.blueGrey,
+                              color:
+                                  isDarkMode ? Colors.white : Colors.blueGrey,
                               fontSize: 15,
                               fontWeight: FontWeight.w500,
                             ),
@@ -177,7 +176,7 @@ class _BlockedUserState extends State<BlockedUser> {
                             ],
                           ),
                           onTap: () async {
-                            showDialog(
+                            await showDialog(
                               context: context,
                               builder: (BuildContext ctx) => ClipRRect(
                                 borderRadius: BorderRadius.circular(10),
@@ -194,7 +193,8 @@ class _BlockedUserState extends State<BlockedUser> {
                                       child: Text(
                                         'No'.tr().toString(),
                                         style: const TextStyle(
-                                            color: AppColors.primaryGreen,),
+                                          color: AppColors.primaryGreen,
+                                        ),
                                       ),
                                     ),
                                     TextButton(
@@ -206,7 +206,7 @@ class _BlockedUserState extends State<BlockedUser> {
                                               ),
                                             );
                                         Navigator.pop(ctx);
-                                        db
+                                        await db
                                             .collection('chats')
                                             .doc(blockUser.chatID)
                                             .collection('messages')
@@ -237,7 +237,8 @@ class _BlockedUserState extends State<BlockedUser> {
                                       child: Text(
                                         'Yes'.tr().toString(),
                                         style: const TextStyle(
-                                            color: AppColors.primaryGreen,),
+                                          color: AppColors.primaryGreen,
+                                        ),
                                       ),
                                     ),
                                   ],
@@ -267,7 +268,9 @@ class _BlockedUserState extends State<BlockedUser> {
             child: Text(
               'No Block user found'.tr().toString(),
               style: const TextStyle(
-                  color: AppColors.secondaryColor, fontSize: 16,),
+                color: AppColors.secondaryColor,
+                fontSize: 16,
+              ),
             ),
           ),
         );

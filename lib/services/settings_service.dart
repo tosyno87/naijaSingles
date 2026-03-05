@@ -24,7 +24,7 @@ class SettingsService {
           await _usersCollection.doc(userId).collection('blockedlist').get();
 
       return blockedSnapshot.docs.map((doc) => doc.id).toList();
-    } catch (e) {
+    } on Object catch (e) {
       debugPrint('❌ Error getting blocked user IDs: $e');
       return [];
     }
@@ -67,7 +67,7 @@ class SettingsService {
               ),
             );
           }
-        } catch (e) {
+        } on Object catch (e) {
           debugPrint('❌ Error getting blocked user details for $blockedId: $e');
         }
       }
@@ -75,7 +75,7 @@ class SettingsService {
       // Sort by most recently blocked
       blockedUsers.sort((a, b) => b.blockedAt.compareTo(a.blockedAt));
       return blockedUsers;
-    } catch (e) {
+    } on Object catch (e) {
       debugPrint('❌ Error getting blocked users: $e');
       return [];
     }
@@ -130,7 +130,7 @@ class SettingsService {
               .collection('CheckedUser')
               .doc(blockedUserId),
         );
-      } catch (e) {
+      } on Object catch (e) {
         debugPrint('⚠️ Could not remove from liked/checked lists: $e');
         // Continue with blocking even if this fails
       }
@@ -139,7 +139,7 @@ class SettingsService {
 
       debugPrint('✅ Successfully blocked user: $blockedUserId');
       return true;
-    } catch (e) {
+    } on Object catch (e) {
       debugPrint('❌ Error blocking user: $e');
       return false;
     }
@@ -164,7 +164,7 @@ class SettingsService {
 
       debugPrint('✅ Successfully unblocked user: $blockedUserId');
       return true;
-    } catch (e) {
+    } on Object catch (e) {
       debugPrint('❌ Error unblocking user: $e');
       return false;
     }
@@ -180,7 +180,7 @@ class SettingsService {
           .get();
 
       return blockDoc.exists;
-    } catch (e) {
+    } on Object catch (e) {
       debugPrint('❌ Error checking if user is blocked: $e');
       return false;
     }
@@ -202,7 +202,7 @@ class SettingsService {
         // Return default settings
         return NotificationSettings.defaultSettings();
       }
-    } catch (e) {
+    } on Object catch (e) {
       debugPrint('❌ Error getting notification settings: $e');
       return NotificationSettings.defaultSettings();
     }
@@ -221,7 +221,7 @@ class SettingsService {
 
       debugPrint('✅ Notification settings updated for user $userId');
       return true;
-    } catch (e) {
+    } on Object catch (e) {
       debugPrint('❌ Error updating notification settings: $e');
       return false;
     }
@@ -249,7 +249,7 @@ class SettingsService {
 
       debugPrint('✅ Feedback submitted successfully');
       return true;
-    } catch (e) {
+    } on Object catch (e) {
       debugPrint('❌ Error submitting feedback: $e');
       return false;
     }
@@ -275,7 +275,7 @@ class SettingsService {
 
       debugPrint('✅ User report submitted successfully');
       return true;
-    } catch (e) {
+    } on Object catch (e) {
       debugPrint('❌ Error reporting user: $e');
       return false;
     }
@@ -314,7 +314,7 @@ class SettingsService {
         hasActiveSubscription: isPremium,
         hasActiveMatches: hasActiveMatches,
       );
-    } catch (e) {
+    } on Object catch (e) {
       debugPrint('❌ Error getting account deletion info: $e');
       return const AccountDeletionInfo(
         canDelete: false,
@@ -358,7 +358,7 @@ class SettingsService {
 
       debugPrint('✅ User account deleted successfully');
       return true;
-    } catch (e) {
+    } on Object catch (e) {
       debugPrint('❌ Error deleting user account: $e');
       return false;
     }

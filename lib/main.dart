@@ -41,7 +41,7 @@ Future<void> main() async {
     await SecureConfig.initialize();
     SecureConfig.validate();
     log('🔒 Secure configuration loaded successfully');
-  } catch (e) {
+  } on Object catch (e) {
     log('❌ Secure configuration error: $e');
     if (kDebugMode) {
       log('💡 Make sure you have created a .env file with your Firebase configuration');
@@ -55,7 +55,7 @@ Future<void> main() async {
   try {
     await SecureStorageService().initialize();
     log('🔐 Secure storage service initialized successfully');
-  } catch (e) {
+  } on Object catch (e) {
     log('❌ Secure storage initialization error: $e');
     // Continue anyway - secure storage will use defaults
   }
@@ -78,7 +78,7 @@ Future<void> main() async {
         // Instead, we'll handle this in the phone auth repository
         log('📱 iOS Simulator detected - Test phone numbers should be configured in Firebase Console');
         log('💡 Configure test numbers at: Firebase Console > Auth > Sign-in method > Phone > Test phone numbers');
-      } catch (e) {
+      } on Object catch (e) {
         log('⚠️ Could not configure simulator settings: $e');
       }
     }
@@ -87,7 +87,7 @@ Future<void> main() async {
     try {
       await CrashlyticsService().initialize();
       log('📊 Crashlytics initialized successfully');
-    } catch (e) {
+    } on Object catch (e) {
       log('❌ Crashlytics initialization error: $e');
       // Continue anyway - app should work without Crashlytics
     }
@@ -105,11 +105,11 @@ Future<void> main() async {
           await seedService.seedEventsIfEmpty();
           log('🎉 Events seeding completed (debug only)');
         }
-      } catch (e) {
+      } on Object catch (e) {
         log('⚠️ Events seeding error (debug only): $e');
       }
     }
-  } catch (e) {
+  } on Object catch (e) {
     log('❌ Firebase initialization error: $e');
   }
 
@@ -119,7 +119,7 @@ Future<void> main() async {
   FirebaseAuth.instance.authStateChanges().listen(
     (User? user) {
       log("👤 Auth state changed: ${user?.uid ?? 'No user'}");
-      
+
       // Update Crashlytics user identifier
       if (user != null) {
         unawaited(CrashlyticsService().setUserId(user.uid));
@@ -148,7 +148,7 @@ Future<void> main() async {
   /*
   try {
     await AutoLoginService.autoLoginForTesting();
-  } catch (e) {
+  } on Object catch (e) {
     log('⚠️ Auto-login error: $e');
   }
   */
@@ -162,85 +162,84 @@ Future<void> main() async {
       await FirebaseAuth.instance.signOut();
       log('✅ Signed out - app will start with no authenticated user');
     }
-  } catch (e) {
+  } on Object catch (e) {
     log('⚠️ Error signing out existing user: $e');
   }
 
   Bloc.observer = SimpleBlocObserver();
-  SystemChrome.setPreferredOrientations([
+  await SystemChrome.setPreferredOrientations([
     DeviceOrientation.portraitDown,
     DeviceOrientation.portraitUp,
-  ]).then((_) {
-    runApp(
-      EasyLocalization(
-        supportedLocales: const [
-          Locale('en', 'US'),
-          Locale('es', 'ES'),
-          Locale('fr', 'FR'),
-          Locale('pt', 'PT'),
-          Locale('ar', 'SA'),
-          Locale('hi', 'IN'),
-          Locale('zh', 'CN'),
-          Locale('ja', 'JP'),
-          Locale('ko', 'KR'),
-          Locale('de', 'DE'),
-          Locale('it', 'IT'),
-          Locale('ru', 'RU'),
-          Locale('tr', 'TR'),
-          Locale('nl', 'NL'),
-          Locale('sv', 'SE'),
-          Locale('da', 'DK'),
-          Locale('no', 'NO'),
-          Locale('fi', 'FI'),
-          Locale('pl', 'PL'),
-          Locale('cs', 'CZ'),
-          Locale('hu', 'HU'),
-          Locale('ro', 'RO'),
-          Locale('bg', 'BG'),
-          Locale('hr', 'HR'),
-          Locale('sk', 'SK'),
-          Locale('sl', 'SI'),
-          Locale('et', 'EE'),
-          Locale('lv', 'LV'),
-          Locale('lt', 'LT'),
-          Locale('uk', 'UA'),
-          Locale('he', 'IL'),
-          Locale('th', 'TH'),
-          Locale('vi', 'VN'),
-          Locale('id', 'ID'),
-          Locale('ms', 'MY'),
-          Locale('tl', 'PH'),
-        ],
-        path: 'asset/translation',
-        fallbackLocale: const Locale('en', 'US'),
-        child: MultiBlocProvider(
-          providers: [
-            BlocProvider<AuthstatusBloc>(
-              create: (context) => AuthstatusBloc(
-                phoneAuthRepository: PhoneAuthRepository(),
-              ),
+  ]);
+  runApp(
+    EasyLocalization(
+      supportedLocales: const [
+        Locale('en', 'US'),
+        Locale('es', 'ES'),
+        Locale('fr', 'FR'),
+        Locale('pt', 'PT'),
+        Locale('ar', 'SA'),
+        Locale('hi', 'IN'),
+        Locale('zh', 'CN'),
+        Locale('ja', 'JP'),
+        Locale('ko', 'KR'),
+        Locale('de', 'DE'),
+        Locale('it', 'IT'),
+        Locale('ru', 'RU'),
+        Locale('tr', 'TR'),
+        Locale('nl', 'NL'),
+        Locale('sv', 'SE'),
+        Locale('da', 'DK'),
+        Locale('no', 'NO'),
+        Locale('fi', 'FI'),
+        Locale('pl', 'PL'),
+        Locale('cs', 'CZ'),
+        Locale('hu', 'HU'),
+        Locale('ro', 'RO'),
+        Locale('bg', 'BG'),
+        Locale('hr', 'HR'),
+        Locale('sk', 'SK'),
+        Locale('sl', 'SI'),
+        Locale('et', 'EE'),
+        Locale('lv', 'LV'),
+        Locale('lt', 'LT'),
+        Locale('uk', 'UA'),
+        Locale('he', 'IL'),
+        Locale('th', 'TH'),
+        Locale('vi', 'VN'),
+        Locale('id', 'ID'),
+        Locale('ms', 'MY'),
+        Locale('tl', 'PH'),
+      ],
+      path: 'asset/translation',
+      fallbackLocale: const Locale('en', 'US'),
+      child: MultiBlocProvider(
+        providers: [
+          BlocProvider<AuthstatusBloc>(
+            create: (context) => AuthstatusBloc(
+              phoneAuthRepository: PhoneAuthRepository(),
             ),
-            BlocProvider<UserBloc>(
-              create: (context) => UserBloc(),
-            ),
-            BlocProvider<ThemeBloc>(
-              create: (context) => ThemeBloc(),
-            ),
-            BlocProvider<LanguageBloc>(
-              create: (context) => LanguageBloc(),
-            ),
-          ],
-          child: BlocProvider<OnboardingBloc>(
-            create: (context) => OnboardingBloc(
-              repository: OnboardingRepository(),
-              userBloc: context.read<UserBloc>(),
-            ),
-            child: const MyApp(),
           ),
+          BlocProvider<UserBloc>(
+            create: (context) => UserBloc(),
+          ),
+          BlocProvider<ThemeBloc>(
+            create: (context) => ThemeBloc(),
+          ),
+          BlocProvider<LanguageBloc>(
+            create: (context) => LanguageBloc(),
+          ),
+        ],
+        child: BlocProvider<OnboardingBloc>(
+          create: (context) => OnboardingBloc(
+            repository: OnboardingRepository(),
+            userBloc: context.read<UserBloc>(),
+          ),
+          child: const MyApp(),
         ),
       ),
-    );
-  });
+    ),
+  );
 }
 
 class MyApp extends StatelessWidget {

@@ -57,7 +57,8 @@ class _EmailLoginScreenState extends State<EmailLoginScreen> {
           listener: (context, state) {
             if (state is EmailAuthSuccess) {
               // Navigate to home screen
-              unawaited(Navigator.pushReplacementNamed(context, '/main_navigation'));
+              unawaited(
+                  Navigator.pushReplacementNamed(context, '/main_navigation'));
             } else if (state is EmailAuthError) {
               CustomSnackbar.showSnackBarSimple(
                 state.error,
@@ -161,13 +162,15 @@ class _EmailLoginScreenState extends State<EmailLoginScreen> {
                           alignment: Alignment.centerRight,
                           child: TextButton(
                             onPressed: () {
-                              unawaited(Navigator.push(
-                                context,
-                                MaterialPageRoute(
-                                  builder: (context) =>
-                                      const EmailPasswordResetScreen(),
+                              unawaited(
+                                Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                    builder: (context) =>
+                                        const EmailPasswordResetScreen(),
+                                  ),
                                 ),
-                              ));
+                              );
                             },
                             style: TextButton.styleFrom(
                               foregroundColor: AppColors.primaryGreen,
@@ -218,13 +221,15 @@ class _EmailLoginScreenState extends State<EmailLoginScreen> {
                             ),
                             GestureDetector(
                               onTap: () {
-                                unawaited(Navigator.push(
-                                  context,
-                                  MaterialPageRoute(
-                                    builder: (context) =>
-                                        const AuthMethodSelectionScreen(),
+                                unawaited(
+                                  Navigator.push(
+                                    context,
+                                    MaterialPageRoute(
+                                      builder: (context) =>
+                                          const AuthMethodSelectionScreen(),
+                                    ),
                                   ),
-                                ));
+                                );
                               },
                               child: Text(
                                 'Sign Up',

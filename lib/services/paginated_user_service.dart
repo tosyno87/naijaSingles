@@ -84,7 +84,7 @@ class PaginatedUserService {
           debugPrint(
             '✅ Added user to results: ${user.name} (intent: ${user.lookingFor})',
           );
-        } catch (e) {
+        } on Object catch (e) {
           debugPrint('❌ Error processing user ${doc.id}: $e');
           continue;
         }
@@ -103,7 +103,7 @@ class PaginatedUserService {
         hasMore: hasMore,
         totalFetched: users.length,
       );
-    } catch (e) {
+    } on Object catch (e) {
       debugPrint('❌ Error fetching paginated users: $e');
       return PaginatedResult<UserModel>(
         items: [],
@@ -151,7 +151,7 @@ class PaginatedUserService {
       // First try ordering by age (which should exist)
       query = query.orderBy('age', descending: false);
       debugPrint('🔍 Ordering by age');
-    } catch (e) {
+    } on Object catch (e) {
       debugPrint('⚠️ Age ordering failed: $e');
       // If that fails, don't order at all for now
     }
@@ -196,7 +196,7 @@ class PaginatedUserService {
 
       debugPrint('🚫 Excluding ${excludedIds.length} users');
       return excludedIds;
-    } catch (e) {
+    } on Object catch (e) {
       debugPrint('❌ Error getting excluded user IDs: $e');
       return {currentUserId}; // At minimum, exclude current user
     }
@@ -219,7 +219,7 @@ class PaginatedUserService {
       final availableCount = snapshot.docs.length - excludedIds.length;
 
       return availableCount > 0 ? availableCount : 0;
-    } catch (e) {
+    } on Object catch (e) {
       debugPrint('❌ Error getting total user count: $e');
       return 0;
     }
@@ -239,7 +239,7 @@ class PaginatedUserService {
 
       final snapshot = await query.get();
       return snapshot.docs.isNotEmpty;
-    } catch (e) {
+    } on Object catch (e) {
       debugPrint('❌ Error checking for more users: $e');
       return false;
     }

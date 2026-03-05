@@ -53,14 +53,16 @@ class UpdateNumber extends StatelessWidget {
                   onTap: currentUser.phoneNumber!.isNotEmpty
                       ? null
                       : () {
-                          unawaited(Navigator.pushReplacement(
-                            context,
-                            MaterialPageRoute(
-                              builder: (context) => PhoneNumber(
-                                updatePhoneNumber: true,
+                          unawaited(
+                            Navigator.pushReplacement(
+                              context,
+                              MaterialPageRoute(
+                                builder: (context) => PhoneNumber(
+                                  updatePhoneNumber: true,
+                                ),
                               ),
                             ),
-                          ));
+                          );
                         },
                   title: Text(
                     currentUser.phoneNumber!.isNotEmpty

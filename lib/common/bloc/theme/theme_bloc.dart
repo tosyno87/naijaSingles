@@ -27,7 +27,7 @@ class ThemeBloc extends Bloc<ThemeEvent, ThemeState> {
     try {
       final savedTheme = await _preferences.getTheme();
       emit(ThemeLoaded(savedTheme));
-    } catch (e) {
+    } on Object catch (e) {
       emit(ThemeError(e.toString()));
     }
   }

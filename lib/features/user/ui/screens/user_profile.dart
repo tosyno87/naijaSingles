@@ -167,9 +167,7 @@ class _ProfilePageState extends State<ProfilePage> {
                           .toString()
                       : ''.tr().toString(),
                   style: TextStyle(
-                    color: isDarkMode
-                        ? Colors.white
-                        : Colors.black87,
+                    color: isDarkMode ? Colors.white : Colors.black87,
                     fontWeight: FontWeight.w500,
                     fontSize: 30,
                   ),
@@ -182,9 +180,7 @@ class _ProfilePageState extends State<ProfilePage> {
                       : ''.tr().toString(),
                   textAlign: TextAlign.center,
                   style: TextStyle(
-                    color: isDarkMode
-                        ? Colors.white
-                        : Colors.black54,
+                    color: isDarkMode ? Colors.white : Colors.black54,
                     fontWeight: FontWeight.w400,
                     fontSize: 20,
                   ),
@@ -198,9 +194,7 @@ class _ProfilePageState extends State<ProfilePage> {
                       : ''.tr().toString(),
                   textAlign: TextAlign.center,
                   style: TextStyle(
-                    color: isDarkMode
-                        ? Colors.white
-                        : Colors.black54,
+                    color: isDarkMode ? Colors.white : Colors.black54,
                     fontWeight: FontWeight.w400,
                     fontSize: 20,
                   ),
@@ -280,15 +274,17 @@ class _ProfilePageState extends State<ProfilePage> {
                                   size: 28,
                                 ),
                                 onPressed: () {
-                                  unawaited(Navigator.pushNamed(
-                                    context,
-                                    RouteName.settingPage,
-                                    arguments: {
-                                      'currentUser': currentUser,
-                                      'isPurchased': widget.isPurchased,
-                                      'items': widget.items,
-                                    },
-                                  ));
+                                  unawaited(
+                                    Navigator.pushNamed(
+                                      context,
+                                      RouteName.settingPage,
+                                      arguments: {
+                                        'currentUser': currentUser,
+                                        'isPurchased': widget.isPurchased,
+                                        'items': widget.items,
+                                      },
+                                    ),
+                                  );
                                 },
                               ),
                               Padding(
@@ -323,10 +319,12 @@ class _ProfilePageState extends State<ProfilePage> {
                                   size: 28,
                                 ),
                                 onPressed: () {
-                                  unawaited(Navigator.pushNamed(
-                                    context,
-                                    RouteName.editProfileScreen,
-                                  ));
+                                  unawaited(
+                                    Navigator.pushNamed(
+                                      context,
+                                      RouteName.editProfileScreen,
+                                    ),
+                                  );
                                 },
                               ),
                               Padding(
@@ -368,7 +366,7 @@ class _ProfilePageState extends State<ProfilePage> {
                       : 'Subscribe Plan'.tr().toString(),
                   onTap: () async {
                     if (widget.isPurchased) {
-                      Navigator.push(
+                      await Navigator.push(
                         context,
                         CupertinoPageRoute(
                           builder: (context) =>
@@ -376,7 +374,7 @@ class _ProfilePageState extends State<ProfilePage> {
                         ),
                       );
                     } else {
-                      Navigator.push(
+                      await Navigator.push(
                         context,
                         CupertinoPageRoute(
                           builder: (context) =>

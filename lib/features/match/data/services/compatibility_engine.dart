@@ -56,7 +56,7 @@ class CompatibilityEngine {
       );
 
       return totalScore;
-    } catch (e) {
+    } on Object catch (e) {
       debugPrint('❌ Error calculating compatibility: $e');
       return 0.5; // Return neutral score on error
     }
@@ -80,7 +80,7 @@ class CompatibilityEngine {
       } else {
         return 0.1;
       }
-    } catch (e) {
+    } on Object catch (e) {
       debugPrint('❌ Error calculating age compatibility: $e');
       return 0.5;
     }
@@ -116,7 +116,7 @@ class CompatibilityEngine {
       } else {
         return 0.1;
       }
-    } catch (e) {
+    } on Object catch (e) {
       debugPrint('❌ Error calculating location score: $e');
       return 0.5;
     }
@@ -144,7 +144,7 @@ class CompatibilityEngine {
       final boost = sharedCount >= 3 ? 0.2 : (sharedCount >= 2 ? 0.1 : 0.0);
 
       return (jaccardSimilarity + boost).clamp(0.0, 1.0);
-    } catch (e) {
+    } on Object catch (e) {
       debugPrint('❌ Error calculating interest score: $e');
       return 0.5;
     }
@@ -200,7 +200,7 @@ class CompatibilityEngine {
       final averageActivity = (activity1 + activity2) / 2;
       final activityBoost = averageActivity > 0.7 ? 0.2 : 0.0;
       return (similarityScore + activityBoost).clamp(0.0, 1.0);
-    } catch (e) {
+    } on Object catch (e) {
       debugPrint('❌ Error calculating activity score: $e');
       return 0.5;
     }
@@ -245,7 +245,7 @@ class CompatibilityEngine {
       final averageCompleteness = (completeness1 + completeness2) / 2;
       final boost = (completeness1 > 0.8 && completeness2 > 0.8) ? 0.2 : 0.0;
       return (averageCompleteness + boost).clamp(0.0, 1.0);
-    } catch (e) {
+    } on Object catch (e) {
       debugPrint('❌ Error calculating completeness score: $e');
       return 0.5;
     }

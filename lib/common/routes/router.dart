@@ -102,7 +102,7 @@ abstract class AppRouter {
         const widget = WelcomeScreen();
         debugPrint('✅ WelcomeScreen widget created successfully');
         return widget;
-      } catch (e, stackTrace) {
+      } on Object catch (e, stackTrace) {
         debugPrint('❌ Error creating WelcomeScreen: $e');
         debugPrint('Stack trace: $stackTrace');
         rethrow;
@@ -410,13 +410,15 @@ abstract class AppRouter {
     // The route name includes the full path with query parameters
     if (routeName.startsWith('/link')) {
       debugPrint(
-          '✅ Router: Handling Firebase auth callback deep link: $routeName',);
+        '✅ Router: Handling Firebase auth callback deep link: $routeName',
+      );
 
       // Simplified check: if route starts with /link and contains deep_link_id, treat as Firebase callback
       // This prevents "Page Not Found" errors - Firebase will handle the callback automatically
       if (routeName.contains('deep_link_id')) {
         debugPrint(
-            '✅ Router: Firebase auth callback detected, processing silently',);
+          '✅ Router: Firebase auth callback detected, processing silently',
+        );
 
         // Return a completely transparent route that immediately pops
         // This prevents any visible flash while Firebase processes the callback
@@ -444,11 +446,13 @@ abstract class AppRouter {
             debugPrint('🏗️ Router: Building widget for route "$routeName"');
             final widget = builder(context);
             debugPrint(
-                '✅ Router: Widget built successfully for route "$routeName"',);
+              '✅ Router: Widget built successfully for route "$routeName"',
+            );
             return widget;
-          } catch (e, stackTrace) {
+          } on Object catch (e, stackTrace) {
             debugPrint(
-                '❌ Router: Error building widget for route "$routeName": $e',);
+              '❌ Router: Error building widget for route "$routeName": $e',
+            );
             debugPrint('Stack trace: $stackTrace');
             // Return error widget instead of crashing
             return Scaffold(
@@ -526,11 +530,13 @@ abstract class AppRouter {
                 const SizedBox(height: 32),
                 ElevatedButton.icon(
                   onPressed: () {
-                    unawaited(Navigator.pushNamedAndRemoveUntil(
-                      context,
-                      RouteName.welcomeScreen,
-                      (route) => false,
-                    ));
+                    unawaited(
+                      Navigator.pushNamedAndRemoveUntil(
+                        context,
+                        RouteName.welcomeScreen,
+                        (route) => false,
+                      ),
+                    );
                   },
                   icon: const Icon(Icons.home),
                   label: const Text('Go to Home'),
@@ -546,11 +552,13 @@ abstract class AppRouter {
                 const SizedBox(height: 16),
                 TextButton(
                   onPressed: () {
-                    unawaited(Navigator.pushNamedAndRemoveUntil(
-                      context,
-                      RouteName.mainNavigation,
-                      (route) => false,
-                    ));
+                    unawaited(
+                      Navigator.pushNamedAndRemoveUntil(
+                        context,
+                        RouteName.mainNavigation,
+                        (route) => false,
+                      ),
+                    );
                   },
                   child: const Text('Go to Main App'),
                 ),

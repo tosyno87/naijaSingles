@@ -52,7 +52,8 @@ class AfropeepPrimaryButton extends StatelessWidget {
           padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(
-                isPrimary ? 16 : 28,), // Pill shape for secondary
+              isPrimary ? 16 : 28,
+            ), // Pill shape for secondary
           ),
           elevation: isEnabled && isPrimary ? 3 : 1,
           shadowColor: isEnabled && isPrimary

@@ -34,7 +34,7 @@ class ImageUploadService {
         return File(image.path);
       }
       return null;
-    } catch (e) {
+    } on Object catch (e) {
       throw Exception('Failed to pick image: $e');
     }
   }
@@ -63,7 +63,7 @@ class ImageUploadService {
       final String downloadUrl = await snapshot.ref.getDownloadURL();
 
       return downloadUrl;
-    } catch (e) {
+    } on Object catch (e) {
       throw Exception('Failed to upload image: $e');
     }
   }
@@ -85,7 +85,7 @@ class ImageUploadService {
         path: path,
         fileName: fileName,
       );
-    } catch (e) {
+    } on Object catch (e) {
       throw Exception('Failed to upload compressed image: $e');
     }
   }
@@ -95,7 +95,7 @@ class ImageUploadService {
     try {
       final Reference ref = _storage.refFromURL(imageUrl);
       await ref.delete();
-    } catch (e) {
+    } on Object catch (e) {
       throw Exception('Failed to delete image: $e');
     }
   }
@@ -105,7 +105,7 @@ class ImageUploadService {
     try {
       final Uint8List bytes = await imageFile.readAsBytes();
       return bytes.length;
-    } catch (e) {
+    } on Object catch (e) {
       throw Exception('Failed to get image size: $e');
     }
   }
@@ -135,14 +135,17 @@ class ImageUploadService {
       }
 
       return true;
-    } catch (e) {
+    } on Object {
       return false;
     }
   }
 
   /// Show image picker dialog
-  Future<File?> showImagePickerDialog() async => showDialog<File>(
-        context: navigatorKey.currentContext!,
+  Future<File?> showImagePickerDialog() async {
+    final ctx = navigatorKey.currentContext;
+    if (ctx == null) return null;
+    return showDialog<File>(
+        context: ctx,
         builder: (BuildContext context) => AlertDialog(
           title: const Text('Select Image'),
           content: Column(
@@ -193,6 +196,7 @@ class ImageUploadService {
           ),
         ),
       );
+  }
 }
 
 // Global navigator key for accessing context

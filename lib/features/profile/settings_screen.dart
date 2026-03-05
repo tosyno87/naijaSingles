@@ -70,7 +70,8 @@ class _SettingsScreenState extends State<SettingsScreen> {
                   title: 'Edit Profile',
                   subtitle: 'Update your photos and info',
                   onTap: () {
-                    unawaited(Navigator.pushNamed(context, RouteName.editProfileScreen));
+                    unawaited(Navigator.pushNamed(
+                        context, RouteName.editProfileScreen));
                   },
                 ),
                 _buildDivider(),
@@ -94,12 +95,14 @@ class _SettingsScreenState extends State<SettingsScreen> {
                   title: 'Privacy Settings',
                   subtitle: 'Control who can see your profile',
                   onTap: () {
-                    unawaited(Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder: (_) => const PrivacySettingsScreen(),
+                    unawaited(
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (_) => const PrivacySettingsScreen(),
+                        ),
                       ),
-                    ));
+                    );
                   },
                 ),
                 _buildDivider(),
@@ -116,12 +119,14 @@ class _SettingsScreenState extends State<SettingsScreen> {
                   title: 'Safety Center',
                   subtitle: 'Report issues and get help',
                   onTap: () {
-                    unawaited(Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder: (_) => const SafetyCenterScreen(),
+                    unawaited(
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (_) => const SafetyCenterScreen(),
+                        ),
                       ),
-                    ));
+                    );
                   },
                 ),
               ]),
@@ -148,12 +153,14 @@ class _SettingsScreenState extends State<SettingsScreen> {
                   title: 'Location',
                   subtitle: 'Update your location settings',
                   onTap: () {
-                    unawaited(Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder: (_) => const LocationSettingsScreen(),
+                    unawaited(
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (_) => const LocationSettingsScreen(),
+                        ),
                       ),
-                    ));
+                    );
                   },
                 ),
                 _buildDivider(),
@@ -162,12 +169,14 @@ class _SettingsScreenState extends State<SettingsScreen> {
                   title: 'Language',
                   subtitle: 'English (US)',
                   onTap: () {
-                    unawaited(Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder: (_) => const LanguageSettingsScreen(),
+                    unawaited(
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (_) => const LanguageSettingsScreen(),
+                        ),
                       ),
-                    ));
+                    );
                   },
                 ),
               ]),
@@ -184,12 +193,14 @@ class _SettingsScreenState extends State<SettingsScreen> {
                   title: 'Help Center',
                   subtitle: 'Get help and support',
                   onTap: () {
-                    unawaited(Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder: (_) => const HelpCenterScreen(),
+                    unawaited(
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (_) => const HelpCenterScreen(),
+                        ),
                       ),
-                    ));
+                    );
                   },
                 ),
                 _buildDivider(),
@@ -250,15 +261,17 @@ class _SettingsScreenState extends State<SettingsScreen> {
                   height: 56,
                   child: ElevatedButton.icon(
                     onPressed: () {
-                      unawaited(Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (_) => BlocProvider(
-                            create: (_) => AccountStatusBloc(),
-                            child: const AccountStatusScreen(),
+                      unawaited(
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (_) => BlocProvider(
+                              create: (_) => AccountStatusBloc(),
+                              child: const AccountStatusScreen(),
+                            ),
                           ),
                         ),
-                      ));
+                      );
                     },
                     icon: const Icon(Icons.pause_circle_outline, size: 22),
                     label: Text(
@@ -422,302 +435,313 @@ class _SettingsScreenState extends State<SettingsScreen> {
       );
 
   void _showSignOutDialog() {
-    unawaited(showDialog(
-      context: context,
-      builder: (context) => AlertDialog(
-        backgroundColor: Colors.white,
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(20),
-        ),
-        title: Row(
-          children: [
-            Container(
-              width: 40,
-              height: 40,
-              decoration: BoxDecoration(
-                color: Colors.red.shade50,
-                shape: BoxShape.circle,
+    unawaited(
+      showDialog(
+        context: context,
+        builder: (context) => AlertDialog(
+          backgroundColor: Colors.white,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(20),
+          ),
+          title: Row(
+            children: [
+              Container(
+                width: 40,
+                height: 40,
+                decoration: BoxDecoration(
+                  color: Colors.red.shade50,
+                  shape: BoxShape.circle,
+                ),
+                child: Icon(
+                  Icons.logout_outlined,
+                  color: Colors.red.shade700,
+                  size: 20,
+                ),
               ),
-              child: Icon(
-                Icons.logout_outlined,
-                color: Colors.red.shade700,
-                size: 20,
+              const SizedBox(width: 16),
+              Text(
+                'Sign Out',
+                style: GoogleFonts.montserrat(
+                  fontSize: 20,
+                  fontWeight: FontWeight.bold,
+                  color: textPrimary,
+                ),
+              ),
+            ],
+          ),
+          content: Text(
+            'Are you sure you want to sign out of your account?',
+            style: GoogleFonts.montserrat(
+              fontSize: 16,
+              color: textSecondary,
+              height: 1.4,
+            ),
+          ),
+          actions: [
+            // Cancel button
+            Padding(
+              padding: const EdgeInsets.only(right: 8),
+              child: TextButton(
+                onPressed: () => Navigator.pop(context),
+                style: TextButton.styleFrom(
+                  foregroundColor: textSecondary,
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                ),
+                child: Text(
+                  'Cancel',
+                  style: GoogleFonts.montserrat(
+                    fontSize: 14,
+                    fontWeight: FontWeight.w600,
+                    color: textSecondary,
+                  ),
+                ),
               ),
             ),
-            const SizedBox(width: 16),
-            Text(
-              'Sign Out',
-              style: GoogleFonts.montserrat(
-                fontSize: 20,
-                fontWeight: FontWeight.bold,
-                color: textPrimary,
+            // Sign Out confirmation button - Fixed layout
+            Padding(
+              padding: const EdgeInsets.only(left: 8),
+              child: ElevatedButton(
+                onPressed: _performSignOut,
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: Colors.red.shade600,
+                  foregroundColor: Colors.white,
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                  elevation: 2,
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 20,
+                    vertical: 12,
+                  ), // Proper padding
+                  minimumSize:
+                      const Size(100, 44), // Minimum size to prevent cramping
+                ),
+                child: Text(
+                  'Sign Out',
+                  style: GoogleFonts.montserrat(
+                    fontSize: 14, // Slightly smaller to fit better
+                    fontWeight: FontWeight.w600,
+                    color: Colors.white,
+                  ),
+                  textAlign: TextAlign.center,
+                ),
               ),
             ),
           ],
         ),
-        content: Text(
-          'Are you sure you want to sign out of your account?',
-          style: GoogleFonts.montserrat(
-            fontSize: 16,
-            color: textSecondary,
-            height: 1.4,
-          ),
-        ),
-        actions: [
-          // Cancel button
-          Padding(
-            padding: const EdgeInsets.only(right: 8),
-            child: TextButton(
-              onPressed: () => Navigator.pop(context),
-              style: TextButton.styleFrom(
-                foregroundColor: textSecondary,
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(12),
-                ),
-                padding:
-                    const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-              ),
-              child: Text(
-                'Cancel',
-                style: GoogleFonts.montserrat(
-                  fontSize: 14,
-                  fontWeight: FontWeight.w600,
-                  color: textSecondary,
-                ),
-              ),
-            ),
-          ),
-          // Sign Out confirmation button - Fixed layout
-          Padding(
-            padding: const EdgeInsets.only(left: 8),
-            child: ElevatedButton(
-              onPressed: _performSignOut,
-              style: ElevatedButton.styleFrom(
-                backgroundColor: Colors.red.shade600,
-                foregroundColor: Colors.white,
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(12),
-                ),
-                elevation: 2,
-                padding: const EdgeInsets.symmetric(
-                  horizontal: 20,
-                  vertical: 12,
-                ), // Proper padding
-                minimumSize:
-                    const Size(100, 44), // Minimum size to prevent cramping
-              ),
-              child: Text(
-                'Sign Out',
-                style: GoogleFonts.montserrat(
-                  fontSize: 14, // Slightly smaller to fit better
-                  fontWeight: FontWeight.w600,
-                  color: Colors.white,
-                ),
-                textAlign: TextAlign.center,
-              ),
-            ),
-          ),
-        ],
       ),
-    ));
+    );
   }
 
   void _showDeleteAccountDialog() {
-    unawaited(showDialog(
-      context: context,
-      builder: (context) => AlertDialog(
-        backgroundColor: Colors.white,
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(16),
-        ),
-        title: Text(
-          'Delete Account',
-          style: GoogleFonts.montserrat(
-            fontSize: 20,
-            fontWeight: FontWeight.bold,
-            color: Colors.red.shade700,
+    unawaited(
+      showDialog(
+        context: context,
+        builder: (context) => AlertDialog(
+          backgroundColor: Colors.white,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(16),
           ),
-        ),
-        content: Column(
-          mainAxisSize: MainAxisSize.min,
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            // Warning text with high contrast against cardColor
-            Text(
-              'This action cannot be undone. Deleting your account will:',
-              style: GoogleFonts.montserrat(
-                fontSize: 16,
-                fontWeight: FontWeight.w500,
-                color:
-                    textPrimary, // Use textPrimary for high contrast against cardColor
+          title: Text(
+            'Delete Account',
+            style: GoogleFonts.montserrat(
+              fontSize: 20,
+              fontWeight: FontWeight.bold,
+              color: Colors.red.shade700,
+            ),
+          ),
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              // Warning text with high contrast against cardColor
+              Text(
+                'This action cannot be undone. Deleting your account will:',
+                style: GoogleFonts.montserrat(
+                  fontSize: 16,
+                  fontWeight: FontWeight.w500,
+                  color:
+                      textPrimary, // Use textPrimary for high contrast against cardColor
+                ),
+              ),
+              const SizedBox(height: 16),
+              // Bullet points with high contrast and better formatting
+              Container(
+                padding: const EdgeInsets.all(12),
+                decoration: BoxDecoration(
+                  color:
+                      Colors.red.shade50, // Light red background for emphasis
+                  borderRadius: BorderRadius.circular(8),
+                  border: Border.all(color: Colors.red.shade200),
+                ),
+                child: Text(
+                  '• Remove all your photos and profile information\n'
+                  '• Delete all your matches and conversations\n'
+                  '• Cancel any active subscriptions\n'
+                  '• Make your profile invisible to other users',
+                  style: GoogleFonts.montserrat(
+                    fontSize: 14,
+                    fontWeight: FontWeight.w400,
+                    color:
+                        Colors.red.shade800, // High contrast red for warnings
+                    height: 1.6,
+                  ),
+                ),
+              ),
+            ],
+          ),
+          actions: [
+            // Cancel button
+            Padding(
+              padding: const EdgeInsets.only(right: 8),
+              child: TextButton(
+                onPressed: () => Navigator.pop(context),
+                style: TextButton.styleFrom(
+                  foregroundColor: textSecondary,
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                ),
+                child: Text(
+                  'Cancel',
+                  style: GoogleFonts.montserrat(
+                    fontSize: 14,
+                    fontWeight: FontWeight.w600,
+                    color: textSecondary,
+                  ),
+                ),
               ),
             ),
-            const SizedBox(height: 16),
-            // Bullet points with high contrast and better formatting
-            Container(
-              padding: const EdgeInsets.all(12),
-              decoration: BoxDecoration(
-                color: Colors.red.shade50, // Light red background for emphasis
-                borderRadius: BorderRadius.circular(8),
-                border: Border.all(color: Colors.red.shade200),
-              ),
-              child: Text(
-                '• Remove all your photos and profile information\n'
-                '• Delete all your matches and conversations\n'
-                '• Cancel any active subscriptions\n'
-                '• Make your profile invisible to other users',
-                style: GoogleFonts.montserrat(
-                  fontSize: 14,
-                  fontWeight: FontWeight.w400,
-                  color: Colors.red.shade800, // High contrast red for warnings
-                  height: 1.6,
+            // Delete button - Fixed layout
+            Padding(
+              padding: const EdgeInsets.only(left: 8),
+              child: ElevatedButton(
+                onPressed: _showDeleteConfirmation,
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: Colors.red.shade600,
+                  foregroundColor: Colors.white,
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                  elevation: 2,
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
+                  minimumSize: const Size(80, 44),
+                ),
+                child: Text(
+                  'Delete',
+                  style: GoogleFonts.montserrat(
+                    fontSize: 14,
+                    fontWeight: FontWeight.w600,
+                    color: Colors.white,
+                  ),
+                  textAlign: TextAlign.center,
                 ),
               ),
             ),
           ],
         ),
-        actions: [
-          // Cancel button
-          Padding(
-            padding: const EdgeInsets.only(right: 8),
-            child: TextButton(
-              onPressed: () => Navigator.pop(context),
-              style: TextButton.styleFrom(
-                foregroundColor: textSecondary,
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(12),
-                ),
-                padding:
-                    const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-              ),
-              child: Text(
-                'Cancel',
-                style: GoogleFonts.montserrat(
-                  fontSize: 14,
-                  fontWeight: FontWeight.w600,
-                  color: textSecondary,
-                ),
-              ),
-            ),
-          ),
-          // Delete button - Fixed layout
-          Padding(
-            padding: const EdgeInsets.only(left: 8),
-            child: ElevatedButton(
-              onPressed: _showDeleteConfirmation,
-              style: ElevatedButton.styleFrom(
-                backgroundColor: Colors.red.shade600,
-                foregroundColor: Colors.white,
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(12),
-                ),
-                elevation: 2,
-                padding:
-                    const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
-                minimumSize: const Size(80, 44),
-              ),
-              child: Text(
-                'Delete',
-                style: GoogleFonts.montserrat(
-                  fontSize: 14,
-                  fontWeight: FontWeight.w600,
-                  color: Colors.white,
-                ),
-                textAlign: TextAlign.center,
-              ),
-            ),
-          ),
-        ],
       ),
-    ));
+    );
   }
 
   void _showDeleteConfirmation() {
     Navigator.pop(context); // Close first dialog
 
-    unawaited(showDialog(
-      context: context,
-      builder: (context) => AlertDialog(
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(16),
-        ),
-        title: Text(
-          'Final Confirmation',
-          style: GoogleFonts.montserrat(
-            fontSize: 20,
-            fontWeight: FontWeight.bold,
-            color: Colors.red.shade700,
+    unawaited(
+      showDialog(
+        context: context,
+        builder: (context) => AlertDialog(
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(16),
           ),
-        ),
-        content: Text(
-          'Type "DELETE" to confirm account deletion:',
-          style: GoogleFonts.montserrat(
-            fontSize: 16,
-            color: textSecondary,
-          ),
-        ),
-        actions: [
-          // Cancel button
-          Padding(
-            padding: const EdgeInsets.only(right: 8),
-            child: TextButton(
-              onPressed: () => Navigator.pop(context),
-              style: TextButton.styleFrom(
-                foregroundColor: textSecondary,
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(12),
-                ),
-                padding:
-                    const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-              ),
-              child: Text(
-                'Cancel',
-                style: GoogleFonts.montserrat(
-                  fontSize: 14,
-                  fontWeight: FontWeight.w600,
-                  color: textSecondary,
-                ),
-              ),
+          title: Text(
+            'Final Confirmation',
+            style: GoogleFonts.montserrat(
+              fontSize: 20,
+              fontWeight: FontWeight.bold,
+              color: Colors.red.shade700,
             ),
           ),
-          // Confirm Delete button - Fixed layout
-          Padding(
-            padding: const EdgeInsets.only(left: 8),
-            child: ElevatedButton(
-              onPressed: () {
-                Navigator.pop(context);
-                unawaited(Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (_) => const AccountDeletionScreen(),
+          content: Text(
+            'Type "DELETE" to confirm account deletion:',
+            style: GoogleFonts.montserrat(
+              fontSize: 16,
+              color: textSecondary,
+            ),
+          ),
+          actions: [
+            // Cancel button
+            Padding(
+              padding: const EdgeInsets.only(right: 8),
+              child: TextButton(
+                onPressed: () => Navigator.pop(context),
+                style: TextButton.styleFrom(
+                  foregroundColor: textSecondary,
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(12),
                   ),
-                ));
-              },
-              style: ElevatedButton.styleFrom(
-                backgroundColor: Colors.red.shade600,
-                foregroundColor: Colors.white,
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(12),
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
                 ),
-                elevation: 2,
-                padding:
-                    const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-                minimumSize: const Size(120, 44), // Wider for "Confirm Delete"
-              ),
-              child: Text(
-                'Confirm Delete',
-                style: GoogleFonts.montserrat(
-                  fontSize: 13, // Smaller to fit the longer text
-                  fontWeight: FontWeight.w600,
-                  color: Colors.white,
+                child: Text(
+                  'Cancel',
+                  style: GoogleFonts.montserrat(
+                    fontSize: 14,
+                    fontWeight: FontWeight.w600,
+                    color: textSecondary,
+                  ),
                 ),
-                textAlign: TextAlign.center,
               ),
             ),
-          ),
-        ],
+            // Confirm Delete button - Fixed layout
+            Padding(
+              padding: const EdgeInsets.only(left: 8),
+              child: ElevatedButton(
+                onPressed: () {
+                  Navigator.pop(context);
+                  unawaited(
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (_) => const AccountDeletionScreen(),
+                      ),
+                    ),
+                  );
+                },
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: Colors.red.shade600,
+                  foregroundColor: Colors.white,
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                  elevation: 2,
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                  minimumSize:
+                      const Size(120, 44), // Wider for "Confirm Delete"
+                ),
+                child: Text(
+                  'Confirm Delete',
+                  style: GoogleFonts.montserrat(
+                    fontSize: 13, // Smaller to fit the longer text
+                    fontWeight: FontWeight.w600,
+                    color: Colors.white,
+                  ),
+                  textAlign: TextAlign.center,
+                ),
+              ),
+            ),
+          ],
+        ),
       ),
-    ));
+    );
   }
 
   Future<void> _performSignOut() async {
@@ -725,73 +749,73 @@ class _SettingsScreenState extends State<SettingsScreen> {
       // Close dialog
       Navigator.pop(context);
 
-      // Show loading
-      showDialog(
-        context: context,
-        barrierDismissible: false,
-        builder: (context) => Center(
-          child: Container(
-            padding: const EdgeInsets.all(24),
-            decoration: BoxDecoration(
-              color: Colors.white,
-              borderRadius: BorderRadius.circular(16),
-              boxShadow: [
-                BoxShadow(
-                  color: Colors.black.withValues(alpha: 0.1),
-                  blurRadius: 10,
-                  offset: const Offset(0, 4),
-                ),
-              ],
-            ),
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                const CircularProgressIndicator(
-                  color: primaryColor, // MVP green
-                  strokeWidth: 3,
-                ),
-                const SizedBox(height: 20),
-                Text(
-                  'Signing out...',
-                  style: GoogleFonts.montserrat(
-                    fontSize: 16,
-                    fontWeight: FontWeight.w500,
-                    color: textPrimary,
+      // Capture references before async gap
+      final userBloc = context.read<UserBloc>();
+      final navigator = Navigator.of(context);
+
+      // Show loading (not awaited — work continues while dialog is visible)
+      unawaited(
+        showDialog(
+          context: context,
+          barrierDismissible: false,
+          builder: (dialogCtx) => Center(
+            child: Container(
+              padding: const EdgeInsets.all(24),
+              decoration: BoxDecoration(
+                color: Colors.white,
+                borderRadius: BorderRadius.circular(16),
+                boxShadow: [
+                  BoxShadow(
+                    color: Colors.black.withValues(alpha: 0.1),
+                    blurRadius: 10,
+                    offset: const Offset(0, 4),
                   ),
-                ),
-              ],
+                ],
+              ),
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  const CircularProgressIndicator(
+                    color: primaryColor,
+                    strokeWidth: 3,
+                  ),
+                  const SizedBox(height: 20),
+                  Text(
+                    'Signing out...',
+                    style: GoogleFonts.montserrat(
+                      fontSize: 16,
+                      fontWeight: FontWeight.w500,
+                      color: textPrimary,
+                    ),
+                  ),
+                ],
+              ),
             ),
           ),
         ),
       );
 
-      // Cancel subscriptions and clear user data BEFORE sign out
       try {
-        final userBloc = context.read<UserBloc>();
         userBloc.add(const UserDataUpdated(null));
         userBloc.add(const UserListenStopped());
-      } catch (e) {
+      } on Object catch (e) {
         log('Error clearing user provider: $e');
       }
 
-      // Sign out from Firebase
       await _auth.signOut();
 
-      // Small delay to ensure subscriptions are fully canceled
       await Future.delayed(const Duration(milliseconds: 100));
 
-      // Close loading dialog
       if (!mounted) return;
-      Navigator.pop(context);
+      navigator.pop();
 
-      // Navigate to welcome screen to show all sign-in options (phone, Google, Apple)
       if (mounted) {
-        Navigator.of(context).pushNamedAndRemoveUntil(
+        await navigator.pushNamedAndRemoveUntil(
           RouteName.welcomeScreen,
           (route) => false,
         );
       }
-    } catch (e) {
+    } on Object catch (e) {
       log('Error signing out: $e');
       if (!mounted) return;
       Navigator.pop(context);
@@ -816,12 +840,14 @@ class _SettingsScreenState extends State<SettingsScreen> {
   }
 
   void _showChangePasswordDialog() {
-    unawaited(Navigator.push(
-      context,
-      MaterialPageRoute(
-        builder: (_) => const PasswordSettingsScreen(),
+    unawaited(
+      Navigator.push(
+        context,
+        MaterialPageRoute(
+          builder: (_) => const PasswordSettingsScreen(),
+        ),
       ),
-    ));
+    );
   }
 
   void _showFeedbackDialog() {
@@ -829,67 +855,69 @@ class _SettingsScreenState extends State<SettingsScreen> {
   }
 
   void _showAboutDialog() {
-    unawaited(showDialog(
-      context: context,
-      builder: (context) => AlertDialog(
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(16),
-        ),
-        title: Text(
-          'About Afropeep',
-          style: GoogleFonts.montserrat(
-            fontSize: 20,
-            fontWeight: FontWeight.bold,
-            color: textPrimary,
+    unawaited(
+      showDialog(
+        context: context,
+        builder: (context) => AlertDialog(
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(16),
           ),
-        ),
-        content: Column(
-          mainAxisSize: MainAxisSize.min,
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(
-              'Version 1.0.0',
-              style: GoogleFonts.montserrat(
-                fontSize: 16,
-                fontWeight: FontWeight.w600,
-                color: primaryColor,
-              ),
+          title: Text(
+            'About Afropeep',
+            style: GoogleFonts.montserrat(
+              fontSize: 20,
+              fontWeight: FontWeight.bold,
+              color: textPrimary,
             ),
-            const SizedBox(height: 12),
-            Text(
-              'Afropeep is a community platform built for Africans in the diaspora. '
-              'Connect with your people through friendships, shared culture, events, '
-              'and meaningful relationships.',
-              style: GoogleFonts.montserrat(
-                fontSize: 14,
-                color: textSecondary,
-                height: 1.5,
+          ),
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                'Version 1.0.0',
+                style: GoogleFonts.montserrat(
+                  fontSize: 16,
+                  fontWeight: FontWeight.w600,
+                  color: primaryColor,
+                ),
               ),
-            ),
-            const SizedBox(height: 16),
-            Text(
-              '© 2025 Afropeep. All rights reserved.',
-              style: GoogleFonts.montserrat(
-                fontSize: 12,
-                color: textSecondary,
+              const SizedBox(height: 12),
+              Text(
+                'Afropeep is a community platform built for Africans in the diaspora. '
+                'Connect with your people through friendships, shared culture, events, '
+                'and meaningful relationships.',
+                style: GoogleFonts.montserrat(
+                  fontSize: 14,
+                  color: textSecondary,
+                  height: 1.5,
+                ),
+              ),
+              const SizedBox(height: 16),
+              Text(
+                '© 2025 Afropeep. All rights reserved.',
+                style: GoogleFonts.montserrat(
+                  fontSize: 12,
+                  color: textSecondary,
+                ),
+              ),
+            ],
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.pop(context),
+              child: Text(
+                'Close',
+                style: GoogleFonts.montserrat(
+                  fontSize: 16,
+                  fontWeight: FontWeight.w600,
+                  color: primaryColor,
+                ),
               ),
             ),
           ],
         ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(context),
-            child: Text(
-              'Close',
-              style: GoogleFonts.montserrat(
-                fontSize: 16,
-                fontWeight: FontWeight.w600,
-                color: primaryColor,
-              ),
-            ),
-          ),
-        ],
       ),
-    ));
+    );
   }
 }

@@ -142,11 +142,13 @@ class UserNameState extends State<UserName> {
                       if (username.isNotEmpty) {
                         userData.addAll({'UserName': username});
                         log(userData.toString());
-                        unawaited(Navigator.pushNamed(
-                          context,
-                          RouteName.userDobScreen,
-                          arguments: userData,
-                        ));
+                        unawaited(
+                          Navigator.pushNamed(
+                            context,
+                            RouteName.userDobScreen,
+                            arguments: userData,
+                          ),
+                        );
                       } else {
                         CustomSnackbar.showSnackBarSimple(
                           'Please enter your name',

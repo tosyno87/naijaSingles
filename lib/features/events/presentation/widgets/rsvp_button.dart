@@ -74,9 +74,11 @@ class _RSVPButtonState extends State<RSVPButton>
   void _handleRSVPTap() {
     if (_isLoading) return;
 
-    unawaited(_animationController.forward().then((_) {
-      unawaited(_animationController.reverse());
-    }));
+    unawaited(
+      _animationController.forward().then((_) {
+        unawaited(_animationController.reverse());
+      }),
+    );
 
     if (_currentStatus == RSVPStatus.going) {
       _showRSVPOptions();
@@ -99,11 +101,13 @@ class _RSVPButtonState extends State<RSVPButton>
   }
 
   void _showRSVPOptions() {
-    unawaited(showModalBottomSheet(
-      context: context,
-      backgroundColor: Colors.transparent,
-      builder: (context) => _buildRSVPOptionsSheet(),
-    ));
+    unawaited(
+      showModalBottomSheet(
+        context: context,
+        backgroundColor: Colors.transparent,
+        builder: (context) => _buildRSVPOptionsSheet(),
+      ),
+    );
   }
 
   @override

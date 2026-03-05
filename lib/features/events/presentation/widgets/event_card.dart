@@ -75,7 +75,8 @@ class EventCard extends StatelessWidget {
                     color: Color(0xFFF5F5F5),
                     child: Center(
                       child: CircularProgressIndicator(
-                        valueColor: AlwaysStoppedAnimation(AppColors.primaryGreen),
+                        valueColor:
+                            AlwaysStoppedAnimation(AppColors.primaryGreen),
                       ),
                     ),
                   ),
@@ -361,7 +362,8 @@ class EventCard extends StatelessWidget {
     return 'Starts at $startTime';
   }
 
-  String _getLocationDisplayText() => LocationFormatter.formatLocation(event.location.displayAddress);
+  String _getLocationDisplayText() =>
+      LocationFormatter.formatLocation(event.location.displayAddress);
 }
 
 // Compact version for lists
@@ -374,7 +376,8 @@ class CompactEventCard extends StatelessWidget {
   final EventModel event;
   final VoidCallback? onTap;
 
-  String _getLocationText() => LocationFormatter.formatLocation(event.location.displayAddress);
+  String _getLocationText() =>
+      LocationFormatter.formatLocation(event.location.displayAddress);
 
   @override
   Widget build(BuildContext context) => GestureDetector(

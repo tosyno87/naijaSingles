@@ -149,7 +149,8 @@ class _EventsScreenState extends State<EventsScreen> {
               child: FloatingActionButton(
                 heroTag: 'events_screen_fab',
                 onPressed: () {
-                  unawaited(Navigator.pushNamed(context, RouteName.eventTemplateSelection));
+                  unawaited(Navigator.pushNamed(
+                      context, RouteName.eventTemplateSelection));
                 },
                 backgroundColor: AppColors.primaryGreen,
                 foregroundColor: Colors.white,
@@ -212,7 +213,8 @@ class _EventsScreenState extends State<EventsScreen> {
                 color: AppColors.primaryGreen,
                 size: 24,
               ),
-              tooltip: _isSearching ? 'Close Search'.tr() : 'Search Events'.tr(),
+              tooltip:
+                  _isSearching ? 'Close Search'.tr() : 'Search Events'.tr(),
             ),
           ),
         ],
@@ -294,7 +296,14 @@ class _EventsScreenState extends State<EventsScreen> {
       );
 
   Widget _buildCategoryFilters() {
-    final categories = ['All', 'Music', 'Business', 'Community', 'Social', 'Cultural'];
+    final categories = [
+      'All',
+      'Music',
+      'Business',
+      'Community',
+      'Social',
+      'Cultural'
+    ];
 
     return Container(
       height: 40,
@@ -412,10 +421,14 @@ class _EventsScreenState extends State<EventsScreen> {
           fontWeight: FontWeight.w500,
           color: const Color(0xFF333333),
         ),
-        items: dateRanges.map((String range) => DropdownMenuItem<String>(
-            value: range,
-            child: Text(range.tr()),
-          ),).toList(),
+        items: dateRanges
+            .map(
+              (String range) => DropdownMenuItem<String>(
+                value: range,
+                child: Text(range.tr()),
+              ),
+            )
+            .toList(),
         onChanged: (String? newValue) {
           if (newValue != null) {
             final newFilter = _getDateRangeFilter(newValue, true);
@@ -428,8 +441,7 @@ class _EventsScreenState extends State<EventsScreen> {
 
   bool _isDateRangeSelected(String dateRange) {
     if (dateRange == 'All Time') {
-      return _currentFilter.startDate == null &&
-          _currentFilter.endDate == null;
+      return _currentFilter.startDate == null && _currentFilter.endDate == null;
     }
 
     final now = DateTime.now();
@@ -529,7 +541,8 @@ class _EventsScreenState extends State<EventsScreen> {
       );
 
   void _navigateToEventDetails(EventModel event) {
-    unawaited(Navigator.pushNamed(context, RouteName.eventDetails, arguments: event));
+    unawaited(
+        Navigator.pushNamed(context, RouteName.eventDetails, arguments: event));
   }
 
   Widget _buildEventsList() => BlocConsumer<EventsBloc, EventsState>(
@@ -602,10 +615,12 @@ class _EventsScreenState extends State<EventsScreen> {
                   _eventsBloc?.add(ClearSearchEvent());
                 },
                 onCreateEvent: () {
-                  unawaited(Navigator.pushNamed(
-                    context,
-                    RouteName.eventTemplateSelection,
-                  ));
+                  unawaited(
+                    Navigator.pushNamed(
+                      context,
+                      RouteName.eventTemplateSelection,
+                    ),
+                  );
                 },
               );
             }
@@ -680,8 +695,7 @@ class _EventsScreenState extends State<EventsScreen> {
                     padding: const EdgeInsets.only(bottom: 16),
                     child: EventCard(
                       event: state.events[index],
-                      onTap: () =>
-                          _navigateToEventDetails(state.events[index]),
+                      onTap: () => _navigateToEventDetails(state.events[index]),
                     ),
                   );
                 },

@@ -279,8 +279,7 @@ class _OtpVerificationScreenState extends State<OtpVerificationScreen> {
                                 context,
                               );
                             } else {
-                              final value =
-                                  await state.user?.getIdToken();
+                              final value = await state.user?.getIdToken();
                               if (!context.mounted) return;
                               if (value != null) {
                                 BlocProvider.of<RegistrationBloc>(context)
@@ -293,17 +292,21 @@ class _OtpVerificationScreenState extends State<OtpVerificationScreen> {
                       BlocListener<RegistrationBloc, RegistrationStates>(
                         listener: (context, state) {
                           if (state is AlreadyRegistered) {
-                            unawaited(Navigator.pushNamedAndRemoveUntil(
-                              context,
-                              RouteName.mainNavigation,
-                              (route) => false,
-                            ));
+                            unawaited(
+                              Navigator.pushNamedAndRemoveUntil(
+                                context,
+                                RouteName.mainNavigation,
+                                (route) => false,
+                              ),
+                            );
                           } else if (state is NewRegistration) {
-                            unawaited(Navigator.pushNamedAndRemoveUntil(
-                              context,
-                              RouteName.onboarding,
-                              (route) => false,
-                            ));
+                            unawaited(
+                              Navigator.pushNamedAndRemoveUntil(
+                                context,
+                                RouteName.onboarding,
+                                (route) => false,
+                              ),
+                            );
                           }
                         },
                       ),

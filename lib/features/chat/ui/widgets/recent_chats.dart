@@ -61,7 +61,8 @@ class _RecentChatsState extends State<RecentChats> {
   }
 
   void _loadInitialChats() {
-    _chatSubscription = UserMessagingRepo.query(widget.currentUser, perPage).listen((snapshot) {
+    _chatSubscription =
+        UserMessagingRepo.query(widget.currentUser, perPage).listen((snapshot) {
       if (mounted) {
         setState(() {
           chats = snapshot.docs;
@@ -204,7 +205,8 @@ class _RecentChatsState extends State<RecentChats> {
                       } else {
                         final data = chats[index].data();
                         log(' lastmessage data is ${data.toString()}');
-                        final ChatModel chat = ChatModel?.from(data);
+                        final ChatModel chat =
+                            ChatModel.from(data as Map<String, dynamic>);
 
                         return FutureBuilder(
                           future: UserMessagingRepo.getChatUserDetails(
@@ -223,7 +225,7 @@ class _RecentChatsState extends State<RecentChats> {
                                 tempUser: snapshot2.data!,
                                 chat: chat,
                                 chatId:
-                                    chatId(widget.currentUser, snapshot2.data),
+                                    chatId(widget.currentUser, snapshot2.data!),
                                 currentUser: widget.currentUser,
                               );
                             }
@@ -253,7 +255,9 @@ class _RecentChatsState extends State<RecentChats> {
             child: Text(
               'No recent chat found'.tr().toString(),
               style: const TextStyle(
-                  color: AppColors.secondaryColor, fontSize: 16,),
+                color: AppColors.secondaryColor,
+                fontSize: 16,
+              ),
             ),
           ),
         );

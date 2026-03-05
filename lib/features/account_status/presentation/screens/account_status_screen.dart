@@ -38,7 +38,8 @@ class _AccountStatusScreenState extends State<AccountStatusScreen> {
           backgroundColor: AppColors.backgroundColor,
           elevation: 0,
           leading: IconButton(
-            icon: const Icon(Icons.arrow_back_ios, color: AppColors.textPrimary),
+            icon:
+                const Icon(Icons.arrow_back_ios, color: AppColors.textPrimary),
             onPressed: () => Navigator.pop(context),
           ),
           title: Text(
@@ -129,7 +130,8 @@ class _AccountStatusScreenState extends State<AccountStatusScreen> {
                   _StatusOptionCard(
                     icon: Icons.visibility_off_outlined,
                     title: 'Go Incognito',
-                    subtitle: 'Browse privately — you won\'t appear in anyone\'s '
+                    subtitle:
+                        'Browse privately — you won\'t appear in anyone\'s '
                         'discovery feed. Your matches and conversations '
                         'remain accessible.',
                     isSelected: currentStatus == 'incognito',
@@ -235,52 +237,55 @@ class _AccountStatusScreenState extends State<AccountStatusScreen> {
     required String description,
     required VoidCallback onConfirm,
   }) {
-    unawaited(showDialog(
-      context: context,
-      builder: (ctx) => AlertDialog(
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
-        title: Text(
-          title,
-          style: GoogleFonts.montserrat(fontWeight: FontWeight.bold),
-        ),
-        content: Text(
-          description,
-          style: GoogleFonts.montserrat(
-            fontSize: 14,
-            color: AppColors.textSecondary,
-            height: 1.5,
+    unawaited(
+      showDialog(
+        context: context,
+        builder: (ctx) => AlertDialog(
+          shape:
+              RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+          title: Text(
+            title,
+            style: GoogleFonts.montserrat(fontWeight: FontWeight.bold),
           ),
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(ctx),
-            child: Text(
-              'Cancel',
-              style: GoogleFonts.montserrat(color: AppColors.textSecondary),
+          content: Text(
+            description,
+            style: GoogleFonts.montserrat(
+              fontSize: 14,
+              color: AppColors.textSecondary,
+              height: 1.5,
             ),
           ),
-          ElevatedButton(
-            onPressed: () {
-              Navigator.pop(ctx);
-              onConfirm();
-            },
-            style: ElevatedButton.styleFrom(
-              backgroundColor: AppColors.primaryGreen,
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(12),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.pop(ctx),
+              child: Text(
+                'Cancel',
+                style: GoogleFonts.montserrat(color: AppColors.textSecondary),
               ),
             ),
-            child: Text(
-              'Confirm',
-              style: GoogleFonts.montserrat(
-                color: Colors.white,
-                fontWeight: FontWeight.w600,
+            ElevatedButton(
+              onPressed: () {
+                Navigator.pop(ctx);
+                onConfirm();
+              },
+              style: ElevatedButton.styleFrom(
+                backgroundColor: AppColors.primaryGreen,
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(12),
+                ),
+              ),
+              child: Text(
+                'Confirm',
+                style: GoogleFonts.montserrat(
+                  color: Colors.white,
+                  fontWeight: FontWeight.w600,
+                ),
               ),
             ),
-          ),
-        ],
+          ],
+        ),
       ),
-    ));
+    );
   }
 }
 
@@ -378,14 +383,11 @@ class _StatusOptionCard extends StatelessWidget {
           duration: const Duration(milliseconds: 250),
           padding: const EdgeInsets.all(16),
           decoration: BoxDecoration(
-            color: isSelected
-                ? accentColor.withValues(alpha: 0.08)
-                : Colors.white,
+            color:
+                isSelected ? accentColor.withValues(alpha: 0.08) : Colors.white,
             borderRadius: BorderRadius.circular(16),
             border: Border.all(
-              color: isSelected
-                  ? accentColor
-                  : Colors.grey.shade300,
+              color: isSelected ? accentColor : Colors.grey.shade300,
               width: isSelected ? 2 : 1,
             ),
             boxShadow: isSelected

@@ -371,16 +371,20 @@ class EventSharingWidget extends StatelessWidget {
 
   void _shareWithImage(BuildContext context) {
     if (event.imageUrl != null && event.imageUrl!.isNotEmpty) {
-      unawaited(SharePlus.instance.share(ShareParams(
-        text: _buildShareText(),
-        files: [
-          XFile.fromData(
-            Uint8List(0),
-            name: 'event_image.jpg',
-            mimeType: 'image/jpeg',
+      unawaited(
+        SharePlus.instance.share(
+          ShareParams(
+            text: _buildShareText(),
+            files: [
+              XFile.fromData(
+                Uint8List(0),
+                name: 'event_image.jpg',
+                mimeType: 'image/jpeg',
+              ),
+            ],
           ),
-        ],
-      ),));
+        ),
+      );
     } else {
       _shareText(context);
     }
@@ -510,64 +514,66 @@ Get more details: ${event.ticketUrl ?? 'Afropeep app'}
 ''';
 
   void _showInstagramInstructions(BuildContext context) {
-    unawaited(showDialog(
-      context: context,
-      builder: (context) => AlertDialog(
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(16),
-        ),
-        title: Text(
-          'Share to Instagram',
-          style: GoogleFonts.montserrat(
-            fontSize: 20,
-            fontWeight: FontWeight.bold,
-            color: const Color(0xFF333333),
+    unawaited(
+      showDialog(
+        context: context,
+        builder: (context) => AlertDialog(
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(16),
           ),
-        ),
-        content: Column(
-          mainAxisSize: MainAxisSize.min,
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(
-              'Event details have been copied to your clipboard!',
-              style: GoogleFonts.montserrat(
-                fontSize: 16,
-                color: const Color(0xFF666666),
-              ),
+          title: Text(
+            'Share to Instagram',
+            style: GoogleFonts.montserrat(
+              fontSize: 20,
+              fontWeight: FontWeight.bold,
+              color: const Color(0xFF333333),
             ),
-            const SizedBox(height: 16),
-            Text(
-              'To share on Instagram:',
-              style: GoogleFonts.montserrat(
-                fontSize: 14,
-                fontWeight: FontWeight.w600,
-                color: const Color(0xFF333333),
+          ),
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                'Event details have been copied to your clipboard!',
+                style: GoogleFonts.montserrat(
+                  fontSize: 16,
+                  color: const Color(0xFF666666),
+                ),
               ),
-            ),
-            const SizedBox(height: 8),
-            Text(
-              '1. Open Instagram\n2. Create a new post or story\n3. Paste the copied text\n4. Add the event image if available',
-              style: GoogleFonts.montserrat(
-                fontSize: 14,
-                color: const Color(0xFF666666),
+              const SizedBox(height: 16),
+              Text(
+                'To share on Instagram:',
+                style: GoogleFonts.montserrat(
+                  fontSize: 14,
+                  fontWeight: FontWeight.w600,
+                  color: const Color(0xFF333333),
+                ),
+              ),
+              const SizedBox(height: 8),
+              Text(
+                '1. Open Instagram\n2. Create a new post or story\n3. Paste the copied text\n4. Add the event image if available',
+                style: GoogleFonts.montserrat(
+                  fontSize: 14,
+                  color: const Color(0xFF666666),
+                ),
+              ),
+            ],
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.pop(context),
+              child: Text(
+                'Got it!',
+                style: GoogleFonts.montserrat(
+                  fontSize: 16,
+                  fontWeight: FontWeight.w600,
+                  color: AppColors.primaryGreen,
+                ),
               ),
             ),
           ],
         ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(context),
-            child: Text(
-              'Got it!',
-              style: GoogleFonts.montserrat(
-                fontSize: 16,
-                fontWeight: FontWeight.w600,
-                color: AppColors.primaryGreen,
-              ),
-            ),
-          ),
-        ],
       ),
-    ));
+    );
   }
 }

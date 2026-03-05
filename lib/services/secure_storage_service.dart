@@ -36,13 +36,13 @@ class SecureStorageService {
   /// Get the storage instance, initializing if necessary
   FlutterSecureStorage get storage {
     _storage ??= const FlutterSecureStorage(
-        // Android options - use encrypted shared preferences
-        aOptions: AndroidOptions(
-          encryptedSharedPreferences: true,
-        ),
-        // iOS options - default secure storage (Keychain)
-        // Web options - encrypted by default
-      );
+      // Android options - use encrypted shared preferences
+      aOptions: AndroidOptions(
+        encryptedSharedPreferences: true,
+      ),
+      // iOS options - default secure storage (Keychain)
+      // Web options - encrypted by default
+    );
     return _storage!;
   }
 
@@ -60,19 +60,19 @@ class SecureStorageService {
     try {
       // Initialize storage if not already done
       _storage ??= const FlutterSecureStorage(
-          // Android options - use encrypted shared preferences
-          aOptions: AndroidOptions(
-            encryptedSharedPreferences: true,
-          ),
-          // iOS options - default secure storage (Keychain)
-          // Web options - encrypted by default
-        );
+        // Android options - use encrypted shared preferences
+        aOptions: AndroidOptions(
+          encryptedSharedPreferences: true,
+        ),
+        // iOS options - default secure storage (Keychain)
+        // Web options - encrypted by default
+      );
 
       _initialized = true;
       if (kDebugMode) {
         log('✅ Secure storage service initialized');
       }
-    } catch (e) {
+    } on Object catch (e) {
       log('❌ Error initializing secure storage: $e');
       rethrow;
     }
@@ -91,7 +91,7 @@ class SecureStorageService {
         log('✅ Secure data written for key: $key');
       }
       return true;
-    } catch (e) {
+    } on Object catch (e) {
       log('❌ Error writing secure data for key $key: $e');
       return false;
     }
@@ -109,7 +109,7 @@ class SecureStorageService {
         log('✅ Secure data read for key: $key');
       }
       return value;
-    } catch (e) {
+    } on Object catch (e) {
       log('❌ Error reading secure data for key $key: $e');
       return null;
     }
@@ -127,7 +127,7 @@ class SecureStorageService {
         log('✅ Secure data deleted for key: $key');
       }
       return true;
-    } catch (e) {
+    } on Object catch (e) {
       log('❌ Error deleting secure data for key $key: $e');
       return false;
     }
@@ -143,7 +143,7 @@ class SecureStorageService {
         log('✅ Read all secure data: ${allData.length} entries');
       }
       return allData;
-    } catch (e) {
+    } on Object catch (e) {
       log('❌ Error reading all secure data: $e');
       return {};
     }
@@ -161,7 +161,7 @@ class SecureStorageService {
         log('✅ All secure data deleted');
       }
       return true;
-    } catch (e) {
+    } on Object catch (e) {
       log('❌ Error deleting all secure data: $e');
       return false;
     }
@@ -176,7 +176,7 @@ class SecureStorageService {
     try {
       final value = await storage.read(key: key);
       return value != null;
-    } catch (e) {
+    } on Object catch (e) {
       log('❌ Error checking if key exists: $key - $e');
       return false;
     }
@@ -185,7 +185,8 @@ class SecureStorageService {
   // Convenience methods for common use cases
 
   /// Store authentication token
-  Future<bool> storeAuthToken(String token) async => write(_authTokenKey, token);
+  Future<bool> storeAuthToken(String token) async =>
+      write(_authTokenKey, token);
 
   /// Get authentication token
   Future<String?> getAuthToken() async => read(_authTokenKey);
@@ -194,7 +195,8 @@ class SecureStorageService {
   Future<bool> deleteAuthToken() async => delete(_authTokenKey);
 
   /// Store refresh token
-  Future<bool> storeRefreshToken(String token) async => write(_refreshTokenKey, token);
+  Future<bool> storeRefreshToken(String token) async =>
+      write(_refreshTokenKey, token);
 
   /// Get refresh token
   Future<String?> getRefreshToken() async => read(_refreshTokenKey);
@@ -221,13 +223,16 @@ class SecureStorageService {
   Future<bool> deleteApiKey() async => delete(_apiKeyKey);
 
   /// Store biometric credentials (for future biometric auth integration)
-  Future<bool> storeBiometricCredentials(String credentials) async => write(_biometricCredentialsKey, credentials);
+  Future<bool> storeBiometricCredentials(String credentials) async =>
+      write(_biometricCredentialsKey, credentials);
 
   /// Get biometric credentials
-  Future<String?> getBiometricCredentials() async => read(_biometricCredentialsKey);
+  Future<String?> getBiometricCredentials() async =>
+      read(_biometricCredentialsKey);
 
   /// Delete biometric credentials
-  Future<bool> deleteBiometricCredentials() async => delete(_biometricCredentialsKey);
+  Future<bool> deleteBiometricCredentials() async =>
+      delete(_biometricCredentialsKey);
 
   /// Clear all authentication-related data
   /// This is useful when logging out
@@ -241,7 +246,7 @@ class SecureStorageService {
         log('✅ All authentication data cleared');
       }
       return true;
-    } catch (e) {
+    } on Object catch (e) {
       log('❌ Error clearing authentication data: $e');
       return false;
     }

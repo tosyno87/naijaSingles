@@ -17,7 +17,7 @@ class SecureConfig {
       if (kDebugMode) {
         AppLogger.info('✅ Secure configuration loaded successfully');
       }
-    } catch (e) {
+    } on Object catch (e) {
       if (kDebugMode) {
         AppLogger.warning('⚠️ Failed to load .env file', error: e);
         AppLogger.warning('⚠️ Make sure to create .env file from env.example');
@@ -25,7 +25,8 @@ class SecureConfig {
       // In production, .env file may not be bundled - use fallback values
       // Firebase will use firebase_options.dart which has hardcoded values
       if (kReleaseMode) {
-        AppLogger.warning('⚠️ .env file not found in production - using Firebase defaults');
+        AppLogger.warning(
+            '⚠️ .env file not found in production - using Firebase defaults');
         _initialized = true; // Mark as initialized to allow fallback behavior
       }
     }
@@ -105,7 +106,8 @@ class SecureConfig {
     if (!_initialized) {
       if (kReleaseMode) {
         // In production, .env may not be available - Firebase uses firebase_options.dart
-        AppLogger.warning('⚠️ SecureConfig not initialized - using Firebase defaults');
+        AppLogger.warning(
+            '⚠️ SecureConfig not initialized - using Firebase defaults');
         return;
       }
       throw Exception('SecureConfig not initialized. Call initialize() first.');
@@ -133,7 +135,8 @@ class SecureConfig {
     if (missingKeys.isNotEmpty) {
       if (kReleaseMode) {
         // In production, allow missing keys - Firebase will use firebase_options.dart
-        AppLogger.warning('⚠️ Some environment variables missing - using Firebase defaults');
+        AppLogger.warning(
+            '⚠️ Some environment variables missing - using Firebase defaults');
         return;
       }
       throw Exception(

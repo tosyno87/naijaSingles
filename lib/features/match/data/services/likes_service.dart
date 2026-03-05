@@ -74,7 +74,7 @@ class LikesService {
         debugPrint('💌 Like saved, waiting for mutual like');
         return null;
       }
-    } catch (e) {
+    } on Object catch (e) {
       debugPrint('❌ Error handling like: $e');
 
       // Provide more specific error messages
@@ -177,7 +177,7 @@ class LikesService {
         isMutualLike: isMutualLike,
         isExistingMatch: false,
       );
-    } catch (e) {
+    } on Object catch (e) {
       debugPrint('❌ Error checking mutual like: $e');
       return const MutualLikeCheckResult(
         isMutualLike: false,
@@ -222,10 +222,12 @@ class LikesService {
       }
 
       // Prevent match creation if either user is deactivated/incognito
-      final userAStatus =
-          (userADoc.data() as Map<String, dynamic>?)?['accountStatus'] as String? ?? 'active';
-      final userBStatus =
-          (userBDoc.data() as Map<String, dynamic>?)?['accountStatus'] as String? ?? 'active';
+      final userAStatus = (userADoc.data()
+              as Map<String, dynamic>?)?['accountStatus'] as String? ??
+          'active';
+      final userBStatus = (userBDoc.data()
+              as Map<String, dynamic>?)?['accountStatus'] as String? ??
+          'active';
       if (userAStatus != 'active' || userBStatus != 'active') {
         debugPrint(
           '⏸️ Skipping match creation — userA status: $userAStatus, userB status: $userBStatus',
@@ -319,7 +321,7 @@ class LikesService {
       _clearRelevantCaches(userAId, userBId);
 
       return matchId;
-    } catch (e) {
+    } on Object catch (e) {
       debugPrint('❌ Error creating optimized match: $e');
       return null;
     }
@@ -371,7 +373,7 @@ class LikesService {
 
       // Optional: Add immediate local feedback for the current user
       await _showLocalMatchFeedback(userAId, userBId);
-    } catch (e) {
+    } on Object catch (e) {
       debugPrint('❌ Error in match notification trigger: $e');
     }
   }
@@ -400,7 +402,7 @@ class LikesService {
 
       // You can add a local notification or UI feedback here
       // This provides instant gratification while the push notification is being sent
-    } catch (e) {
+    } on Object catch (e) {
       debugPrint('Error showing local match feedback: $e');
     }
   }
@@ -424,7 +426,7 @@ class LikesService {
       _likeCheckTimestamps[cacheKey] = DateTime.now();
 
       return hasLiked;
-    } catch (e) {
+    } on Object catch (e) {
       debugPrint('Error checking if user has liked: $e');
       return false;
     }
@@ -440,7 +442,7 @@ class LikesService {
           .map((doc) => doc.data() as Map<String, dynamic>)
           .map((data) => data['from'] as String)
           .toList();
-    } catch (e) {
+    } on Object catch (e) {
       debugPrint('Error getting users who liked me: $e');
       return [];
     }
@@ -456,7 +458,7 @@ class LikesService {
           .map((doc) => doc.data() as Map<String, dynamic>)
           .map((data) => data['to'] as String)
           .toList();
-    } catch (e) {
+    } on Object catch (e) {
       debugPrint('Error getting users I liked: $e');
       return [];
     }
@@ -472,7 +474,7 @@ class LikesService {
           .get();
 
       return querySnapshot.docs.map(MatchModel.fromDocument).toList();
-    } catch (e) {
+    } on Object catch (e) {
       debugPrint('Error getting user matches: $e');
       return [];
     }
@@ -491,7 +493,7 @@ class LikesService {
 
       debugPrint('Like removed: $fromUserId unliked $toUserId');
       return true;
-    } catch (e) {
+    } on Object catch (e) {
       debugPrint('Error removing like: $e');
       return false;
     }
@@ -505,7 +507,7 @@ class LikesService {
         return MatchModel.fromDocument(doc);
       }
       return null;
-    } catch (e) {
+    } on Object catch (e) {
       debugPrint('Error getting match by ID: $e');
       return null;
     }

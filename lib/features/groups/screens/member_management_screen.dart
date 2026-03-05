@@ -518,25 +518,27 @@ class _MemberManagementScreenState extends State<MemberManagementScreen>
       _isSearching = true;
     });
 
-    unawaited(_groupService
-        .searchUsersForInvitation(
-      query: query,
-      groupId: widget.group.id,
-    )
-        .then((results) {
-      if (mounted) {
-        setState(() {
-          _searchResults = results;
-          _isSearching = false;
-        });
-      }
-    }).catchError((error) {
-      if (mounted) {
-        setState(() {
-          _isSearching = false;
-        });
-      }
-    }));
+    unawaited(
+      _groupService
+          .searchUsersForInvitation(
+        query: query,
+        groupId: widget.group.id,
+      )
+          .then((results) {
+        if (mounted) {
+          setState(() {
+            _searchResults = results;
+            _isSearching = false;
+          });
+        }
+      }).catchError((error) {
+        if (mounted) {
+          setState(() {
+            _isSearching = false;
+          });
+        }
+      }),
+    );
   }
 
   void _handleMemberAction(String action, String memberId) {
@@ -568,7 +570,7 @@ class _MemberManagementScreenState extends State<MemberManagementScreen>
           ),
         );
       }
-    } catch (e) {
+    } on Object catch (e) {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
@@ -599,7 +601,7 @@ class _MemberManagementScreenState extends State<MemberManagementScreen>
           ),
         );
       }
-    } catch (e) {
+    } on Object catch (e) {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
@@ -621,7 +623,8 @@ class _MemberManagementScreenState extends State<MemberManagementScreen>
       builder: (context) => AlertDialog(
         title: const Text('Remove Member'),
         content: const Text(
-            'Are you sure you want to remove this member from the group?',),
+          'Are you sure you want to remove this member from the group?',
+        ),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context, false),
@@ -651,7 +654,7 @@ class _MemberManagementScreenState extends State<MemberManagementScreen>
             ),
           );
         }
-      } catch (e) {
+      } on Object catch (e) {
         if (mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
@@ -690,7 +693,7 @@ class _MemberManagementScreenState extends State<MemberManagementScreen>
           _searchResults.removeWhere((user) => user['id'] == userId);
         });
       }
-    } catch (e) {
+    } on Object catch (e) {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
@@ -707,39 +710,41 @@ class _MemberManagementScreenState extends State<MemberManagementScreen>
   }
 
   void _showInviteDialog() {
-    unawaited(showDialog(
-      context: context,
-      builder: (context) => AlertDialog(
-        title: const Text('Invite Members'),
-        content: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            TextField(
-              controller: _inviteMessageController,
-              decoration: const InputDecoration(
-                labelText: 'Custom message (optional)',
-                hintText: 'Add a personal message to your invitation',
-                border: OutlineInputBorder(),
+    unawaited(
+      showDialog(
+        context: context,
+        builder: (context) => AlertDialog(
+          title: const Text('Invite Members'),
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              TextField(
+                controller: _inviteMessageController,
+                decoration: const InputDecoration(
+                  labelText: 'Custom message (optional)',
+                  hintText: 'Add a personal message to your invitation',
+                  border: OutlineInputBorder(),
+                ),
+                maxLines: 3,
               ),
-              maxLines: 3,
+            ],
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.pop(context),
+              child: const Text('Cancel'),
+            ),
+            TextButton(
+              onPressed: () {
+                Navigator.pop(context);
+                _tabController.animateTo(2);
+              },
+              child: const Text('Continue'),
             ),
           ],
         ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(context),
-            child: const Text('Cancel'),
-          ),
-          TextButton(
-            onPressed: () {
-              Navigator.pop(context);
-              _tabController.animateTo(2);
-            },
-            child: const Text('Continue'),
-          ),
-        ],
       ),
-    ));
+    );
   }
 
   bool _canManageMember(String memberId) {

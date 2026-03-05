@@ -87,7 +87,7 @@ class _HingeProfileCardState extends State<HingeProfileCard> {
     );
   }
 
-  List<String> _extractPhotos(imageUrl) {
+  List<String> _extractPhotos(dynamic imageUrl) {
     if (imageUrl == null) return [];
     if (imageUrl is! List) return [];
     if (imageUrl.isEmpty) return [];
@@ -102,33 +102,33 @@ class _HingeProfileCardState extends State<HingeProfileCard> {
   }
 
   Widget _buildSinglePhotoPlaceholder(double height) => SizedBox(
-      height: height,
-      width: double.infinity,
-      child: DecoratedBox(
-        decoration: BoxDecoration(
-          color: Colors.grey[200],
-          borderRadius: const BorderRadius.vertical(
-            top: Radius.circular(20),
+        height: height,
+        width: double.infinity,
+        child: DecoratedBox(
+          decoration: BoxDecoration(
+            color: Colors.grey[200],
+            borderRadius: const BorderRadius.vertical(
+              top: Radius.circular(20),
+            ),
           ),
-        ),
-        child: Center(
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              Icon(Icons.person, size: 64, color: Colors.grey[400]),
-              const SizedBox(height: 8),
-              Text(
-                'Photo unavailable',
-                style: GoogleFonts.montserrat(
-                  fontSize: 14,
-                  color: Colors.grey[600],
+          child: Center(
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Icon(Icons.person, size: 64, color: Colors.grey[400]),
+                const SizedBox(height: 8),
+                Text(
+                  'Photo unavailable',
+                  style: GoogleFonts.montserrat(
+                    fontSize: 14,
+                    color: Colors.grey[600],
+                  ),
                 ),
-              ),
-            ],
+              ],
+            ),
           ),
         ),
-      ),
-    );
+      );
 
   Widget _buildPhotoPlaceholder() {
     final screenHeight = MediaQuery.of(context).size.height;
@@ -218,7 +218,8 @@ class _HingeProfileCardState extends State<HingeProfileCard> {
                     errorWidget: (context, url, error) {
                       if (kDebugMode) {
                         debugPrint(
-                            '❌ Error loading photo $index ($photoUrl): $error',);
+                          '❌ Error loading photo $index ($photoUrl): $error',
+                        );
                       }
                       return _buildSinglePhotoPlaceholder(screenHeight * 0.5);
                     },
@@ -312,48 +313,48 @@ class _HingeProfileCardState extends State<HingeProfileCard> {
   }
 
   Widget _buildBasicInfoItem(IconData icon, String text) => Row(
-      mainAxisSize: MainAxisSize.min,
-      children: [
-        Icon(icon, size: 18, color: AppColors.textSecondary),
-        const SizedBox(width: 4),
-        Text(
-          text,
-          style: GoogleFonts.montserrat(
-            fontSize: 14,
-            fontWeight: FontWeight.w500,
-            color: AppColors.textPrimary,
-          ),
-        ),
-      ],
-    );
-
-  Widget _buildBioSection(String bio) => Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 20),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
+        mainAxisSize: MainAxisSize.min,
         children: [
+          Icon(icon, size: 18, color: AppColors.textSecondary),
+          const SizedBox(width: 4),
           Text(
-            'About',
+            text,
             style: GoogleFonts.montserrat(
-              fontSize: 18,
-              fontWeight: FontWeight.w600,
+              fontSize: 14,
+              fontWeight: FontWeight.w500,
               color: AppColors.textPrimary,
             ),
           ),
-          const SizedBox(height: 12),
-          Text(
-            bio,
-            style: GoogleFonts.montserrat(
-              fontSize: 16,
-              fontWeight: FontWeight.w400,
-              color: AppColors.textSecondary,
-              height: 1.5,
-            ),
-          ),
-          const SizedBox(height: 24),
         ],
-      ),
-    );
+      );
+
+  Widget _buildBioSection(String bio) => Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 20),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              'About',
+              style: GoogleFonts.montserrat(
+                fontSize: 18,
+                fontWeight: FontWeight.w600,
+                color: AppColors.textPrimary,
+              ),
+            ),
+            const SizedBox(height: 12),
+            Text(
+              bio,
+              style: GoogleFonts.montserrat(
+                fontSize: 16,
+                fontWeight: FontWeight.w400,
+                color: AppColors.textSecondary,
+                height: 1.5,
+              ),
+            ),
+            const SizedBox(height: 24),
+          ],
+        ),
+      );
 
   Widget _buildPromptsSection() {
     // Placeholder for prompts - can be expanded later
@@ -379,7 +380,8 @@ class _HingeProfileCardState extends State<HingeProfileCard> {
     // Education - graduation cap icon (like Hinge)
     if (widget.user.education != null && widget.user.education!.isNotEmpty) {
       details.add(
-          {'icon': Icons.school, 'label': '', 'value': widget.user.education},);
+        {'icon': Icons.school, 'label': '', 'value': widget.user.education},
+      );
     }
 
     // Religion - book icon (like Hinge)
@@ -418,29 +420,31 @@ class _HingeProfileCardState extends State<HingeProfileCard> {
         children: [
           const SizedBox(height: 8),
           // Hinge-style details: just icon and value, no label
-          ...details.map((detail) => Padding(
-                padding: const EdgeInsets.only(bottom: 12),
-                child: Row(
-                  children: [
-                    Icon(
-                      detail['icon'] as IconData,
-                      size: 20,
-                      color: AppColors.textSecondary,
-                    ),
-                    const SizedBox(width: 12),
-                    Expanded(
-                      child: Text(
-                        detail['value'] as String,
-                        style: GoogleFonts.montserrat(
-                          fontSize: 16,
-                          fontWeight: FontWeight.w400,
-                          color: AppColors.textPrimary,
-                        ),
+          ...details.map(
+            (detail) => Padding(
+              padding: const EdgeInsets.only(bottom: 12),
+              child: Row(
+                children: [
+                  Icon(
+                    detail['icon'] as IconData,
+                    size: 20,
+                    color: AppColors.textSecondary,
+                  ),
+                  const SizedBox(width: 12),
+                  Expanded(
+                    child: Text(
+                      detail['value'] as String,
+                      style: GoogleFonts.montserrat(
+                        fontSize: 16,
+                        fontWeight: FontWeight.w400,
+                        color: AppColors.textPrimary,
                       ),
                     ),
-                  ],
-                ),
-              ),),
+                  ),
+                ],
+              ),
+            ),
+          ),
           const SizedBox(height: 24),
         ],
       ),
@@ -448,26 +452,29 @@ class _HingeProfileCardState extends State<HingeProfileCard> {
   }
 
   Widget _buildInterestsSection(List<String> interests) => Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 20),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text(
-            'Interests',
-            style: GoogleFonts.montserrat(
-              fontSize: 18,
-              fontWeight: FontWeight.w600,
-              color: AppColors.textPrimary,
+        padding: const EdgeInsets.symmetric(horizontal: 20),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              'Interests',
+              style: GoogleFonts.montserrat(
+                fontSize: 18,
+                fontWeight: FontWeight.w600,
+                color: AppColors.textPrimary,
+              ),
             ),
-          ),
-          const SizedBox(height: 12),
-          Wrap(
-            spacing: 8,
-            runSpacing: 8,
-            children: interests
-                .map((interest) => Container(
+            const SizedBox(height: 12),
+            Wrap(
+              spacing: 8,
+              runSpacing: 8,
+              children: interests
+                  .map(
+                    (interest) => Container(
                       padding: const EdgeInsets.symmetric(
-                          horizontal: 16, vertical: 10,),
+                        horizontal: 16,
+                        vertical: 10,
+                      ),
                       decoration: BoxDecoration(
                         color: AppColors.primaryGreen.withValues(alpha: 0.1),
                         borderRadius: BorderRadius.circular(20),
@@ -483,67 +490,68 @@ class _HingeProfileCardState extends State<HingeProfileCard> {
                           color: AppColors.primaryGreen,
                         ),
                       ),
-                    ),)
-                .toList(),
-          ),
-          const SizedBox(height: 24),
-        ],
-      ),
-    );
+                    ),
+                  )
+                  .toList(),
+            ),
+            const SizedBox(height: 24),
+          ],
+        ),
+      );
 
   Widget _buildActionButtons() => Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          // Pass button - circular, minimalistic
-          Material(
-            color: Colors.white,
-            shape: const CircleBorder(
-              side: BorderSide(color: AppColors.textSecondary, width: 1.5),
-            ),
-            child: InkWell(
-              onTap: widget.onPass,
-              customBorder: const CircleBorder(),
-              child: Container(
-                width: 56,
-                height: 56,
-                decoration: const BoxDecoration(
-                  shape: BoxShape.circle,
-                ),
-                child: const Icon(
-                  Icons.close,
-                  color: AppColors.textSecondary,
-                  size: 24,
+        padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            // Pass button - circular, minimalistic
+            Material(
+              color: Colors.white,
+              shape: const CircleBorder(
+                side: BorderSide(color: AppColors.textSecondary, width: 1.5),
+              ),
+              child: InkWell(
+                onTap: widget.onPass,
+                customBorder: const CircleBorder(),
+                child: Container(
+                  width: 56,
+                  height: 56,
+                  decoration: const BoxDecoration(
+                    shape: BoxShape.circle,
+                  ),
+                  child: const Icon(
+                    Icons.close,
+                    color: AppColors.textSecondary,
+                    size: 24,
+                  ),
                 ),
               ),
             ),
-          ),
-          const SizedBox(width: 24),
-          // Connect button - circular, minimalistic
-          Material(
-            color: AppColors.primaryGreen,
-            shape: const CircleBorder(),
-            child: InkWell(
-              onTap: widget.onConnect,
-              customBorder: const CircleBorder(),
-              child: Container(
-                width: 56,
-                height: 56,
-                decoration: const BoxDecoration(
-                  shape: BoxShape.circle,
-                ),
-                child: const Icon(
-                  Icons.favorite,
-                  color: Colors.white,
-                  size: 24,
+            const SizedBox(width: 24),
+            // Connect button - circular, minimalistic
+            Material(
+              color: AppColors.primaryGreen,
+              shape: const CircleBorder(),
+              child: InkWell(
+                onTap: widget.onConnect,
+                customBorder: const CircleBorder(),
+                child: Container(
+                  width: 56,
+                  height: 56,
+                  decoration: const BoxDecoration(
+                    shape: BoxShape.circle,
+                  ),
+                  child: const Icon(
+                    Icons.favorite,
+                    color: Colors.white,
+                    size: 24,
+                  ),
                 ),
               ),
             ),
-          ),
-        ],
-      ),
-    );
+          ],
+        ),
+      );
 
   List<String> _extractInterests() {
     final interests = <String>[];

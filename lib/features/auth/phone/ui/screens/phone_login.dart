@@ -53,10 +53,12 @@ class _PhoneNumberState extends State<PhoneNumber> {
 
     // For now, just navigate to the existing phone number screen
     // This is a temporary solution until we implement the proper phone login flow
-    unawaited(Navigator.pushNamed(
-      context,
-      RouteName.phoneNumberScreen,
-    ));
+    unawaited(
+      Navigator.pushNamed(
+        context,
+        RouteName.phoneNumberScreen,
+      ),
+    );
   }
 
   @override
@@ -194,7 +196,8 @@ class _PhoneNumberState extends State<PhoneNumber> {
                                       DropdownMenuItem<String>(
                                     value: value['code'],
                                     child: Text(
-                                        "${value['code']} (${value['name']})",),
+                                      "${value['code']} (${value['name']})",
+                                    ),
                                   ),
                                 )
                                 .toList(),
@@ -282,7 +285,8 @@ class _PhoneNumberState extends State<PhoneNumber> {
                       ),
                       GestureDetector(
                         onTap: () {
-                          unawaited(Navigator.pushReplacementNamed(context, '/welcome'));
+                          unawaited(Navigator.pushReplacementNamed(
+                              context, '/welcome'));
                         },
                         child: Text(
                           'Sign Up',

@@ -56,8 +56,7 @@ class NotificationService {
       await _setupFCMToken();
 
       // Setup message handlers
-      _setupMessageHandlers();
-
+      unawaited(_setupMessageHandlers());
       // Initialize instance-based API
       _instance._currentUserId = FirebaseAuth.instance.currentUser?.uid;
       if (_instance._currentUserId != null) {
@@ -71,7 +70,8 @@ class NotificationService {
         if (_instance._currentUserId != null) {
           _instance._startNotificationListener();
         } else {
-          unawaited(_instance._notificationsSubscription?.cancel() ?? Future<void>.value());
+          unawaited(_instance._notificationsSubscription?.cancel() ??
+              Future<void>.value());
           _instance._notificationsController.add([]);
           _instance._unreadCountController.add(0);
         }
@@ -79,7 +79,7 @@ class NotificationService {
 
       _initialized = true;
       debugPrint('✅ Notification Service initialized successfully');
-    } catch (e) {
+    } on Object catch (e) {
       debugPrint('❌ Error initializing notification service: $e');
     }
   }
@@ -200,7 +200,7 @@ class NotificationService {
             debugPrint('✅ APNS token obtained successfully');
             _retryCount = 0; // Reset on success
           }
-        } catch (e) {
+        } on Object catch (e) {
           debugPrint('⚠️ Error getting APNS token: $e');
           if (_retryCount < _maxRetries) {
             _retryCount++;
@@ -239,7 +239,7 @@ class NotificationService {
         '🔑 FCM token updated successfully: ${token.substring(0, 20)}...',
       );
       _retryCount = 0; // Reset on success
-    } catch (e) {
+    } on Object catch (e) {
       debugPrint('❌ Error updating FCM token: $e');
       _retryCount = 0; // Reset on error
     }
@@ -252,7 +252,7 @@ class NotificationService {
 
     final message = await _messaging.getInitialMessage();
     if (message != null) {
-      _handleMessageTap(message);
+      await _handleMessageTap(message);
     }
   }
 
@@ -342,7 +342,7 @@ class NotificationService {
       final data = jsonDecode(response.payload!) as Map<String, dynamic>;
       final message = RemoteMessage(data: data);
       unawaited(_handleMessageTap(message));
-    } catch (e) {
+    } on Object catch (e) {
       debugPrint('Error handling notification tap: $e');
     }
   }
@@ -354,7 +354,7 @@ class NotificationService {
     final context = _navigatorKey?.currentContext;
     if (context != null) {
       // Navigate to match confirmation screen or chat
-      Navigator.pushNamed(
+      await Navigator.pushNamed(
         context,
         '/match_confirmation',
         arguments: {
@@ -375,7 +375,7 @@ class NotificationService {
     final context = _navigatorKey?.currentContext;
     if (context != null) {
       // Navigate to specific chat thread
-      Navigator.pushNamed(
+      await Navigator.pushNamed(
         context,
         '/chat_thread',
         arguments: {
@@ -399,7 +399,7 @@ class NotificationService {
     final context = _navigatorKey?.currentContext;
     if (context != null) {
       // Navigate to user profile
-      Navigator.pushNamed(
+      await Navigator.pushNamed(
         context,
         '/user_profile',
         arguments: {
@@ -477,7 +477,7 @@ class NotificationService {
           .collection('notifications')
           .doc(notificationId)
           .update({'isRead': true});
-    } catch (e) {
+    } on Object catch (e) {
       debugPrint('❌ Error marking notification as read: $e');
     }
   }
@@ -489,7 +489,7 @@ class NotificationService {
           .collection('notifications')
           .doc(notificationId)
           .update({'isRead': true});
-    } catch (e) {
+    } on Object catch (e) {
       debugPrint('❌ Error marking notification as read: $e');
     }
   }
@@ -510,7 +510,7 @@ class NotificationService {
       }
 
       await batch.commit();
-    } catch (e) {
+    } on Object catch (e) {
       debugPrint('❌ Error marking all notifications as read: $e');
     }
   }
@@ -532,7 +532,7 @@ class NotificationService {
       }
 
       await batch.commit();
-    } catch (e) {
+    } on Object catch (e) {
       debugPrint('❌ Error marking all notifications as read: $e');
     }
   }
@@ -541,7 +541,7 @@ class NotificationService {
   Future<void> deleteNotification(String notificationId) async {
     try {
       await _firestore.collection('notifications').doc(notificationId).delete();
-    } catch (e) {
+    } on Object catch (e) {
       debugPrint('❌ Error deleting notification: $e');
     }
   }
@@ -562,7 +562,7 @@ class NotificationService {
         _settings = AppNotificationSettings.defaultSettings();
         await _saveUserSettings();
       }
-    } catch (e) {
+    } on Object catch (e) {
       debugPrint('Error loading notification settings: $e');
       _settings = AppNotificationSettings.defaultSettings();
     }
@@ -577,7 +577,7 @@ class NotificationService {
           .collection('notification_settings')
           .doc(_currentUserId)
           .set(_settings!.toFirestore());
-    } catch (e) {
+    } on Object catch (e) {
       debugPrint('Error saving notification settings: $e');
     }
   }

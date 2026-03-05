@@ -144,7 +144,7 @@ Future<void> reauthenticateWithPhone({
       // Delete user account
       await deleteUserAndNavigateToLogin(auth, context);
     }
-  } catch (e) {
+  } on Object catch (e) {
     log('Error re-authenticating user: $e');
     if (context.mounted) {
       CustomSnackbar.showSnackBarSimple(
@@ -181,7 +181,7 @@ Future<void> deleteUserAndNavigateToLogin(
     );
     userBloc.add(const UserDataUpdated(null));
     userBloc.add(const UserListenStopped());
-  } catch (e) {
+  } on Object catch (e) {
     log('Error deleting user account: $e');
     if (context.mounted) {
       CustomSnackbar.showSnackBarSimple(

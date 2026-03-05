@@ -49,7 +49,7 @@ class _CulturalProfileScreenState extends State<CulturalProfileScreen> {
       } else {
         setState(() => _isLoading = false);
       }
-    } catch (e) {
+    } on Object {
       setState(() => _isLoading = false);
     }
   }
@@ -85,7 +85,8 @@ class _CulturalProfileScreenState extends State<CulturalProfileScreen> {
               child: IconButton(
                 icon: Custom3DIcons.edit(size: 20),
                 onPressed: () {
-                  unawaited(Navigator.pushNamed(context, RouteName.settingsScreen));
+                  unawaited(
+                      Navigator.pushNamed(context, RouteName.settingsScreen));
                 },
               ),
             ),
@@ -534,7 +535,9 @@ class _CulturalProfileScreenState extends State<CulturalProfileScreen> {
                   .map(
                     (skill) => Container(
                       padding: const EdgeInsets.symmetric(
-                          horizontal: 12, vertical: 6,),
+                        horizontal: 12,
+                        vertical: 6,
+                      ),
                       decoration: BoxDecoration(
                         color: AppColors.primaryGreen.withValues(alpha: 0.1),
                         borderRadius: BorderRadius.circular(16),
@@ -620,7 +623,9 @@ class _CulturalProfileScreenState extends State<CulturalProfileScreen> {
                   .map(
                     (interest) => Container(
                       padding: const EdgeInsets.symmetric(
-                          horizontal: 12, vertical: 6,),
+                        horizontal: 12,
+                        vertical: 6,
+                      ),
                       decoration: BoxDecoration(
                         color: AppColors.primaryGreen.withValues(alpha: 0.1),
                         borderRadius: BorderRadius.circular(16),
@@ -660,7 +665,9 @@ class _CulturalProfileScreenState extends State<CulturalProfileScreen> {
                   .map(
                     (interest) => Container(
                       padding: const EdgeInsets.symmetric(
-                          horizontal: 12, vertical: 6,),
+                        horizontal: 12,
+                        vertical: 6,
+                      ),
                       decoration: BoxDecoration(
                         color: AppColors.textSecondary.withValues(alpha: 0.1),
                         borderRadius: BorderRadius.circular(16),
@@ -989,7 +996,7 @@ class _CulturalProfileScreenState extends State<CulturalProfileScreen> {
 
       // Default fallback
       return '18 - 50 years';
-    } catch (e) {
+    } on Object {
       return '18 - 50 years'; // Safe fallback
     }
   }
@@ -1027,7 +1034,7 @@ class _CulturalProfileScreenState extends State<CulturalProfileScreen> {
 
       // Format distance with proper unit based on region
       return RegionDetectionService.formatDistance(distanceKm, locationData);
-    } catch (e) {
+    } on Object {
       return '31 miles'; // Safe fallback
     }
   }

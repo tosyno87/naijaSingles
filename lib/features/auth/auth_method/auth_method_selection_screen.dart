@@ -95,14 +95,16 @@ class AuthMethodSelectionScreen extends StatelessWidget {
                     text: 'Continue with Phone',
                     color: primaryColor,
                     onTap: () {
-                      unawaited(Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (context) => PhoneNumber(
-                            updatePhoneNumber: false,
+                      unawaited(
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => PhoneNumber(
+                              updatePhoneNumber: false,
+                            ),
                           ),
                         ),
-                      ));
+                      );
                     },
                   ),
 
@@ -127,10 +129,12 @@ class AuthMethodSelectionScreen extends StatelessWidget {
                     child: BlocConsumer<GoogleSignInBloc, GoogleSignInState>(
                       listener: (context, state) {
                         if (state is GoogleSignInSuccess) {
-                          unawaited(Navigator.pushReplacementNamed(
-                            context,
-                            '/onboarding',
-                          ));
+                          unawaited(
+                            Navigator.pushReplacementNamed(
+                              context,
+                              '/onboarding',
+                            ),
+                          );
                         } else if (state is GoogleSignInFailure) {
                           CustomSnackbar.showSnackBarSimple(
                             state.error,
@@ -186,13 +190,15 @@ class AuthMethodSelectionScreen extends StatelessWidget {
                       ),
                       GestureDetector(
                         onTap: () {
-                          unawaited(Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                              builder: (context) =>
-                                  const SignInMethodSelectionScreen(),
+                          unawaited(
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (context) =>
+                                    const SignInMethodSelectionScreen(),
+                              ),
                             ),
-                          ));
+                          );
                         },
                         child: Text(
                           'Sign in',

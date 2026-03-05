@@ -60,7 +60,7 @@ class ImageOptimizationService {
 
       log('✅ Profile photo optimized: ${compressedFile.path}');
       return compressedFile;
-    } catch (e) {
+    } on Object catch (e) {
       log('❌ Error optimizing profile photo: $e');
       rethrow;
     }
@@ -84,7 +84,7 @@ class ImageOptimizationService {
 
       log('✅ Image optimized for web: ${compressedFile.path}');
       return compressedFile;
-    } catch (e) {
+    } on Object catch (e) {
       log('❌ Error optimizing for web: $e');
       rethrow;
     }
@@ -113,7 +113,7 @@ class ImageOptimizationService {
 
       log('✅ Thumbnail generated: ${compressedFile.path}');
       return File(compressedFile.path);
-    } catch (e) {
+    } on Object catch (e) {
       log('❌ Error generating thumbnail: $e');
       rethrow;
     }
@@ -144,7 +144,7 @@ class ImageOptimizationService {
       }
 
       return File(compressedFile.path);
-    } catch (e) {
+    } on Object catch (e) {
       log('❌ Error compressing image: $e');
       rethrow;
     }
@@ -228,7 +228,7 @@ class ImageOptimizationService {
         sizeInMB: sizeInMB,
         format: _getImageFormat(bytes),
       );
-    } catch (e) {
+    } on Object catch (e) {
       log('❌ Error getting image info: $e');
       rethrow;
     }
@@ -304,7 +304,7 @@ class ImageOptimizationService {
 
       log('✅ Image uploaded successfully: $downloadUrl');
       return downloadUrl;
-    } catch (e) {
+    } on Object catch (e) {
       log('❌ Error uploading optimized image: $e');
       rethrow;
     }
@@ -349,7 +349,7 @@ class ImageOptimizationService {
               break;
           }
           optimizedFiles.add(optimizedFile);
-        } catch (e) {
+        } on Object catch (e) {
           log('❌ Error optimizing image ${i + 1}: $e');
           // Continue with other images
         }
@@ -357,7 +357,7 @@ class ImageOptimizationService {
 
       log('✅ Batch optimization completed: ${optimizedFiles.length}/${imageFiles.length} images');
       return optimizedFiles;
-    } catch (e) {
+    } on Object catch (e) {
       log('❌ Error in batch optimization: $e');
       rethrow;
     }
@@ -384,7 +384,7 @@ class ImageOptimizationService {
         optimizedDimensions: '${optimizedInfo.width}x${optimizedInfo.height}',
         compressionRatio: optimizedInfo.sizeInMB / originalInfo.sizeInMB,
       );
-    } catch (e) {
+    } on Object catch (e) {
       log('❌ Error getting optimization result: $e');
       rethrow;
     }

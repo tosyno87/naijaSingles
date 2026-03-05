@@ -126,7 +126,7 @@ class ContentModerationService {
 
       log('✅ Text moderation completed: ${result.action}');
       return result;
-    } catch (e) {
+    } on Object catch (e) {
       log('❌ Error moderating text: $e');
       return ModerationResult(
         action: ModerationAction.approve,
@@ -177,7 +177,7 @@ class ContentModerationService {
 
       log('✅ Image moderation completed: ${result.action}');
       return result;
-    } catch (e) {
+    } on Object catch (e) {
       log('❌ Error moderating image: $e');
       return ModerationResult(
         action: ModerationAction.approve,
@@ -247,7 +247,7 @@ class ContentModerationService {
 
       log('✅ Profile moderation completed: ${result.action}');
       return result;
-    } catch (e) {
+    } on Object catch (e) {
       log('❌ Error moderating profile: $e');
       return ModerationResult(
         action: ModerationAction.approve,
@@ -286,7 +286,7 @@ class ContentModerationService {
       });
 
       log('✅ Content reported successfully');
-    } catch (e) {
+    } on Object catch (e) {
       log('❌ Error reporting content: $e');
       rethrow;
     }
@@ -321,7 +321,7 @@ class ContentModerationService {
               (data['moderatedAt'] as Timestamp?)?.toDate() ?? DateTime.now(),
         );
       }).toList();
-    } catch (e) {
+    } on Object catch (e) {
       log('❌ Error getting moderation history: $e');
       return [];
     }

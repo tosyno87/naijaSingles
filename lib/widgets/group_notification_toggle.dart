@@ -41,7 +41,7 @@ class _GroupNotificationToggleState extends State<GroupNotificationToggle> {
           _isLoading = false;
         });
       }
-    } catch (e) {
+    } on Object catch (e) {
       if (mounted) {
         setState(() {
           _isLoading = false;
@@ -82,7 +82,7 @@ class _GroupNotificationToggleState extends State<GroupNotificationToggle> {
           ),
         );
       }
-    } catch (e) {
+    } on Object catch (e) {
       if (mounted) {
         setState(() {
           _isLoading = false;
@@ -195,7 +195,8 @@ class _GroupNotificationToggleState extends State<GroupNotificationToggle> {
                       value: !_isMuted, // Switch shows "enabled" state
                       onChanged: (_) => _toggleMute(),
                       activeThumbColor: AppColors.primaryGreen,
-                      activeTrackColor: AppColors.primaryGreen.withValues(alpha: 0.3),
+                      activeTrackColor:
+                          AppColors.primaryGreen.withValues(alpha: 0.3),
                     ),
                 ],
               ),

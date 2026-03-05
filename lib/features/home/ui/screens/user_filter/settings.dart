@@ -246,11 +246,13 @@ class SettingPageState extends State<SettingPage> {
                               ],
                             ),
                             onTap: () {
-                              unawaited(Navigator.pushNamed(
-                                context,
-                                RouteName.updatePhoneScreen,
-                                arguments: widget.currentUser,
-                              ));
+                              unawaited(
+                                Navigator.pushNamed(
+                                  context,
+                                  RouteName.updatePhoneScreen,
+                                  arguments: widget.currentUser,
+                                ),
+                              );
                             },
                           ),
                         ),
@@ -345,9 +347,12 @@ class SettingPageState extends State<SettingPage> {
                     TextButtonWidget(
                       text: 'Invite your friends',
                       onTap: () async {
-                        await SharePlus.instance.share(ShareParams(
-                          text: 'check out my website https://deligence.com', //Replace with your dynamic link and msg for invite users
-                        ),);
+                        await SharePlus.instance.share(
+                          ShareParams(
+                            text:
+                                'check out my website https://deligence.com', //Replace with your dynamic link and msg for invite users
+                          ),
+                        );
                       },
                       icon: Icons.share_outlined,
                     ),
@@ -440,10 +445,12 @@ class _ConnectionModeWidgetState extends State<_ConnectionModeWidget> {
                 (entry) => RadioListTile<String>(
                   title: Text(entry.value),
                   value: entry.key,
+                  // ignore: deprecated_member_use
                   groupValue: _selected,
                   activeColor: AppColors.primaryGreen,
                   contentPadding: EdgeInsets.zero,
                   dense: true,
+                  // ignore: deprecated_member_use
                   onChanged: (value) {
                     if (value == null) return;
                     setState(() => _selected = value);

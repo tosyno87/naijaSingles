@@ -287,20 +287,24 @@ class _GroupListScreenState extends State<GroupListScreen> {
   }
 
   void _navigateToGroupChat(GroupChat group) {
-    unawaited(Navigator.push(
-      context,
-      MaterialPageRoute(
-        builder: (context) => GroupChatScreen(groupId: group.id),
+    unawaited(
+      Navigator.push(
+        context,
+        MaterialPageRoute(
+          builder: (context) => GroupChatScreen(groupId: group.id),
+        ),
       ),
-    ));
+    );
   }
 
   void _navigateToCreateGroup() {
-    unawaited(Navigator.push(
-      context,
-      MaterialPageRoute(
-        builder: (context) => const CreateGroupScreen(),
+    unawaited(
+      Navigator.push(
+        context,
+        MaterialPageRoute(
+          builder: (context) => const CreateGroupScreen(),
+        ),
       ),
-    ));
+    );
   }
 }

@@ -52,13 +52,17 @@ class _EventDetailsScreenState extends State<EventDetailsScreen> {
         firestoreService: EventsFirestoreService(),
         currentUserId: userId,
       )
-        ..add(LoadEventRSVPStatusEvent(
-          userId: userId,
-          eventId: widget.event.id,
-        ),)
-        ..add(LoadEventAttendeesEvent(
-          eventId: widget.event.id,
-        ),),
+        ..add(
+          LoadEventRSVPStatusEvent(
+            userId: userId,
+            eventId: widget.event.id,
+          ),
+        )
+        ..add(
+          LoadEventAttendeesEvent(
+            eventId: widget.event.id,
+          ),
+        ),
       child: Scaffold(
         backgroundColor: Colors.white,
         body: CustomScrollView(
@@ -392,56 +396,58 @@ ${widget.event.ticketUrl ?? 'More details in the Afropeep app!'}
   }
 
   void _showAllAttendees() {
-    unawaited(showModalBottomSheet(
-      context: context,
-      backgroundColor: Colors.transparent,
-      isScrollControlled: true,
-      builder: (context) => DraggableScrollableSheet(
-        initialChildSize: 0.7,
-        maxChildSize: 0.9,
-        minChildSize: 0.5,
-        builder: (context, scrollController) => DecoratedBox(
-          decoration: const BoxDecoration(
-            color: Colors.white,
-            borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
-          ),
-          child: Column(
-            children: [
-              Container(
-                width: 40,
-                height: 4,
-                margin: const EdgeInsets.symmetric(vertical: 12),
-                decoration: BoxDecoration(
-                  color: Colors.grey[300],
-                  borderRadius: BorderRadius.circular(2),
+    unawaited(
+      showModalBottomSheet(
+        context: context,
+        backgroundColor: Colors.transparent,
+        isScrollControlled: true,
+        builder: (context) => DraggableScrollableSheet(
+          initialChildSize: 0.7,
+          maxChildSize: 0.9,
+          minChildSize: 0.5,
+          builder: (context, scrollController) => DecoratedBox(
+            decoration: const BoxDecoration(
+              color: Colors.white,
+              borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+            ),
+            child: Column(
+              children: [
+                Container(
+                  width: 40,
+                  height: 4,
+                  margin: const EdgeInsets.symmetric(vertical: 12),
+                  decoration: BoxDecoration(
+                    color: Colors.grey[300],
+                    borderRadius: BorderRadius.circular(2),
+                  ),
                 ),
-              ),
-              Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 20),
-                child: Semantics(
-                  header: true,
-                  child: Text(
-                    'Event Attendees'.tr(),
-                    style: GoogleFonts.montserrat(
-                      fontSize: 20,
-                      fontWeight: FontWeight.bold,
-                      color: const Color(0xFF333333),
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 20),
+                  child: Semantics(
+                    header: true,
+                    child: Text(
+                      'Event Attendees'.tr(),
+                      style: GoogleFonts.montserrat(
+                        fontSize: 20,
+                        fontWeight: FontWeight.bold,
+                        color: const Color(0xFF333333),
+                      ),
                     ),
                   ),
                 ),
-              ),
-              const SizedBox(height: 20),
-              Expanded(
-                child: EventAttendeesList(
-                  eventId: widget.event.id,
-                  scrollController: scrollController,
-                  showAll: true,
+                const SizedBox(height: 20),
+                Expanded(
+                  child: EventAttendeesList(
+                    eventId: widget.event.id,
+                    scrollController: scrollController,
+                    showAll: true,
+                  ),
                 ),
-              ),
-            ],
+              ],
+            ),
           ),
         ),
       ),
-    ));
+    );
   }
 }

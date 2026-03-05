@@ -11,7 +11,6 @@ import '../../../../common/widgets/custom_3d_icons.dart';
 import '../../../../models/group_model.dart';
 import '../../data/services/group_service.dart';
 
-@Deprecated('Use CreateGroupScreen from group_chat/screens/ instead')
 class CreateGroupScreen extends StatefulWidget {
   const CreateGroupScreen({super.key});
 
@@ -83,7 +82,7 @@ class _CreateGroupScreenState extends State<CreateGroupScreen> {
       } else {
         throw Exception('Failed to create group');
       }
-    } catch (e) {
+    } on Object catch (e) {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
@@ -415,11 +414,15 @@ class _CreateGroupScreenState extends State<CreateGroupScreen> {
               onChanged: (value) {
                 setState(() => _selectedCategory = value!);
               },
-              icon: const Icon(Icons.arrow_drop_down,
-                  color: AppColors.primaryGreen,),
+              icon: const Icon(
+                Icons.arrow_drop_down,
+                color: AppColors.primaryGreen,
+              ),
               dropdownColor: Colors.white,
               style: GoogleFonts.montserrat(
-                  color: AppColors.textPrimary, fontSize: 14,),
+                color: AppColors.textPrimary,
+                fontSize: 14,
+              ),
             ),
           ),
         ],
@@ -454,7 +457,8 @@ class _CreateGroupScreenState extends State<CreateGroupScreen> {
                           color: AppColors.primaryGreen,
                         ),
                       ),
-                      backgroundColor: AppColors.primaryGreen.withValues(alpha: 0.1),
+                      backgroundColor:
+                          AppColors.primaryGreen.withValues(alpha: 0.1),
                       side: BorderSide(
                         color: AppColors.primaryGreen.withValues(alpha: 0.3),
                       ),
@@ -509,7 +513,9 @@ class _CreateGroupScreenState extends State<CreateGroupScreen> {
                         focusedBorder: OutlineInputBorder(
                           borderRadius: BorderRadius.circular(12),
                           borderSide: const BorderSide(
-                              color: AppColors.primaryGreen, width: 2,),
+                            color: AppColors.primaryGreen,
+                            width: 2,
+                          ),
                         ),
                         filled: true,
                         fillColor: Colors.white,
@@ -736,5 +742,4 @@ class _CreateGroupScreenState extends State<CreateGroupScreen> {
           ),
         ),
       );
-
 }

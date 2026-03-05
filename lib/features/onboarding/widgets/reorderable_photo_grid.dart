@@ -106,7 +106,8 @@ class _ReorderablePhotoGridState extends State<ReorderablePhotoGrid> {
 
   Widget _buildPhotoCard(int index, {required bool isPrimary, Key? key}) {
     final photo = widget.photos[index];
-    final guidance = widget.photoGuidance[index]!;
+    final guidance = widget.photoGuidance[index];
+    if (guidance == null) return const SizedBox.shrink();
     final bool isRequired = index < 3;
 
     return GestureDetector(
@@ -483,54 +484,56 @@ class _ReorderablePhotoGridState extends State<ReorderablePhotoGrid> {
   }
 
   void _showSetPrimaryDialog(int index) {
-    unawaited(showDialog(
-      context: context,
-      builder: (context) => AlertDialog(
-        title: Text(
-          'Set as Main Photo?',
-          style: GoogleFonts.montserrat(
-            fontSize: 18,
-            fontWeight: FontWeight.w600,
-            color: textDarkBrown,
+    unawaited(
+      showDialog(
+        context: context,
+        builder: (context) => AlertDialog(
+          title: Text(
+            'Set as Main Photo?',
+            style: GoogleFonts.montserrat(
+              fontSize: 18,
+              fontWeight: FontWeight.w600,
+              color: textDarkBrown,
+            ),
           ),
-        ),
-        content: Text(
-          'This photo will become your main profile photo and appear first to potential matches.',
-          style: GoogleFonts.montserrat(
-            fontSize: 14,
-            color: textLightBrown,
+          content: Text(
+            'This photo will become your main profile photo and appear first to potential matches.',
+            style: GoogleFonts.montserrat(
+              fontSize: 14,
+              color: textLightBrown,
+            ),
           ),
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(context),
-            child: Text(
-              'Cancel',
-              style: GoogleFonts.montserrat(
-                color: Colors.grey,
-                fontWeight: FontWeight.w500,
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.pop(context),
+              child: Text(
+                'Cancel',
+                style: GoogleFonts.montserrat(
+                  color: Colors.grey,
+                  fontWeight: FontWeight.w500,
+                ),
               ),
             ),
-          ),
-          ElevatedButton(
-            onPressed: () {
-              Navigator.pop(context);
-              widget.onSetPrimary(index);
-            },
-            style: ElevatedButton.styleFrom(
-              backgroundColor: goldAccent,
-              foregroundColor: Colors.white,
-            ),
-            child: Text(
-              'Set as Main',
-              style: GoogleFonts.montserrat(
-                fontWeight: FontWeight.w600,
+            ElevatedButton(
+              onPressed: () {
+                Navigator.pop(context);
+                widget.onSetPrimary(index);
+              },
+              style: ElevatedButton.styleFrom(
+                backgroundColor: goldAccent,
+                foregroundColor: Colors.white,
+              ),
+              child: Text(
+                'Set as Main',
+                style: GoogleFonts.montserrat(
+                  fontWeight: FontWeight.w600,
+                ),
               ),
             ),
-          ),
-        ],
+          ],
+        ),
       ),
-    ));
+    );
   }
 }
 

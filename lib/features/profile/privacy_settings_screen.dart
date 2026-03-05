@@ -32,7 +32,7 @@ class _PrivacySettingsScreenState extends State<PrivacySettingsScreen> {
         _settings = settings;
         _isLoading = false;
       });
-    } catch (e) {
+    } on Object {
       setState(() {
         _isLoading = false;
       });
@@ -52,7 +52,7 @@ class _PrivacySettingsScreenState extends State<PrivacySettingsScreen> {
       } else {
         _showErrorSnackBar('Failed to update privacy settings');
       }
-    } catch (e) {
+    } on Object {
       _showErrorSnackBar('Error updating privacy settings');
     } finally {
       setState(() {
@@ -426,8 +426,11 @@ class _PrivacySettingsScreenState extends State<PrivacySettingsScreen> {
           children: [
             Row(
               children: [
-                const Icon(Icons.privacy_tip,
-                    color: AppColors.primaryGreen, size: 20,),
+                const Icon(
+                  Icons.privacy_tip,
+                  color: AppColors.primaryGreen,
+                  size: 20,
+                ),
                 const SizedBox(width: 8),
                 Text(
                   'Privacy Summary',

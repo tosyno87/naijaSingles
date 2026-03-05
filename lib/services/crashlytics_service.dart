@@ -8,7 +8,7 @@ import 'package:flutter/foundation.dart';
 import '../env.dart';
 
 /// Service for Firebase Crashlytics crash reporting and analytics
-/// 
+///
 /// This service provides:
 /// - Automatic crash reporting
 /// - Custom error logging
@@ -18,7 +18,7 @@ import '../env.dart';
 class CrashlyticsService {
   factory CrashlyticsService() => _instance;
   CrashlyticsService._internal();
-  
+
   static final CrashlyticsService _instance = CrashlyticsService._internal();
 
   bool _initialized = false;
@@ -64,7 +64,7 @@ class CrashlyticsService {
         log('⏭️ Crashlytics disabled in development mode');
         _initialized = true; // Mark as initialized to prevent re-initialization
       }
-    } catch (e) {
+    } on Object catch (e) {
       log('❌ Error initializing Crashlytics: $e');
       // Don't throw - app should continue even if Crashlytics fails
     }
@@ -77,7 +77,7 @@ class CrashlyticsService {
     try {
       await FirebaseCrashlytics.instance.setUserIdentifier(userId);
       log('✅ Crashlytics user ID set: $userId');
-    } catch (e) {
+    } on Object catch (e) {
       log('⚠️ Error setting Crashlytics user ID: $e');
     }
   }
@@ -89,7 +89,7 @@ class CrashlyticsService {
     try {
       await FirebaseCrashlytics.instance.setUserIdentifier('');
       log('✅ Crashlytics user ID cleared');
-    } catch (e) {
+    } on Object catch (e) {
       log('⚠️ Error clearing Crashlytics user ID: $e');
     }
   }
@@ -99,11 +99,14 @@ class CrashlyticsService {
     if (!_initialized || !Environment.enableCrashlytics) return;
 
     try {
-      await FirebaseCrashlytics.instance.setCustomKey('app_version', Environment.appVersion);
-      await FirebaseCrashlytics.instance.setCustomKey('environment', Environment.environment);
-      await FirebaseCrashlytics.instance.setCustomKey('firebase_project', Environment.firebaseProjectId);
+      await FirebaseCrashlytics.instance
+          .setCustomKey('app_version', Environment.appVersion);
+      await FirebaseCrashlytics.instance
+          .setCustomKey('environment', Environment.environment);
+      await FirebaseCrashlytics.instance
+          .setCustomKey('firebase_project', Environment.firebaseProjectId);
       log('✅ Crashlytics custom keys set');
-    } catch (e) {
+    } on Object catch (e) {
       log('⚠️ Error setting Crashlytics custom keys: $e');
     }
   }
@@ -111,7 +114,7 @@ class CrashlyticsService {
   /// Log a non-fatal error
   /// Use this for errors that don't crash the app but should be tracked
   Future<void> logError(
-    exception,
+    Object exception,
     StackTrace? stackTrace, {
     String? reason,
     bool fatal = false,
@@ -128,7 +131,7 @@ class CrashlyticsService {
         fatal: fatal,
       );
       log('📊 Error logged to Crashlytics: $exception');
-    } catch (e) {
+    } on Object catch (e) {
       log('⚠️ Error logging to Crashlytics: $e');
     }
   }
@@ -143,7 +146,7 @@ class CrashlyticsService {
       if (kDebugMode) {
         log('📝 Crashlytics log: $message');
       }
-    } catch (e) {
+    } on Object catch (e) {
       log('⚠️ Error logging message to Crashlytics: $e');
     }
   }
@@ -154,7 +157,7 @@ class CrashlyticsService {
 
     try {
       await FirebaseCrashlytics.instance.setCustomKey(key, value);
-    } catch (e) {
+    } on Object catch (e) {
       log('⚠️ Error setting custom key: $e');
     }
   }
@@ -162,4 +165,3 @@ class CrashlyticsService {
   /// Check if Crashlytics is enabled
   bool get isEnabled => _initialized && Environment.enableCrashlytics;
 }
-

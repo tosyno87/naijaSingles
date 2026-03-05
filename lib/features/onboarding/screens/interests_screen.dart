@@ -65,14 +65,14 @@ class _InterestsScreenState extends State<InterestsScreen> {
       if (_selectedInterests.contains(interest)) {
         _selectedInterests.remove(interest);
         context.read<OnboardingBloc>().add(
-          OnboardingInterestRemoved(interest),
-        );
+              OnboardingInterestRemoved(interest),
+            );
       } else {
         if (_selectedInterests.length < 10) {
           _selectedInterests.add(interest);
           context.read<OnboardingBloc>().add(
-            OnboardingInterestAdded(interest),
-          );
+                OnboardingInterestAdded(interest),
+              );
         } else {
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(

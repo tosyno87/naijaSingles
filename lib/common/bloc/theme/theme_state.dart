@@ -15,7 +15,6 @@ class ThemeInitial extends ThemeState {
 
 /// Theme loaded with current mode
 class ThemeLoaded extends ThemeState {
-
   const ThemeLoaded(this.themeMode);
   final ThemeMode themeMode;
 
@@ -36,7 +35,6 @@ class ThemeLoaded extends ThemeState {
 
 /// Error loading theme
 class ThemeError extends ThemeState {
-
   const ThemeError(this.message);
   final String message;
 

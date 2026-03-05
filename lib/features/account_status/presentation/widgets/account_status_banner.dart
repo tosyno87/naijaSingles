@@ -25,11 +25,12 @@ class AccountStatusBanner extends StatelessWidget {
           .doc(userId)
           .snapshots(),
       builder: (context, snapshot) {
-        if (!snapshot.hasData || !snapshot.data!.exists) {
+        final snapshotData = snapshot.data;
+        if (!snapshot.hasData || snapshotData == null || !snapshotData.exists) {
           return const SizedBox.shrink();
         }
 
-        final data = snapshot.data!.data() as Map<String, dynamic>?;
+        final data = snapshotData.data() as Map<String, dynamic>?;
         final status = data?['accountStatus'] as String? ?? 'active';
 
         if (status == 'active') return const SizedBox.shrink();

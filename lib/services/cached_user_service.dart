@@ -73,7 +73,7 @@ class CachedUserService {
       }
 
       return result;
-    } catch (e) {
+    } on Object catch (e) {
       debugPrint('❌ Error in getCachedUsers: $e');
 
       // Try to return stale cache as fallback
@@ -135,7 +135,7 @@ class CachedUserService {
       );
 
       debugPrint('💾 Cached profile for user: ${user.name}');
-    } catch (e) {
+    } on Object catch (e) {
       debugPrint('❌ Error caching user profile: $e');
     }
   }
@@ -173,7 +173,7 @@ class CachedUserService {
 
       debugPrint('❌ No valid cached profile for: $userId');
       return null;
-    } catch (e) {
+    } on Object catch (e) {
       debugPrint('❌ Error getting cached user profile: $e');
       return null;
     }
@@ -202,7 +202,7 @@ class CachedUserService {
       }
 
       debugPrint('🗑️ All caches cleared');
-    } catch (e) {
+    } on Object catch (e) {
       debugPrint('❌ Error clearing cache: $e');
     }
   }
@@ -241,7 +241,7 @@ class CachedUserService {
       debugPrint(
         '🧹 Cleared ${expiredKeys.length} expired user list caches and ${expiredProfileKeys.length} expired profile caches',
       );
-    } catch (e) {
+    } on Object catch (e) {
       debugPrint('❌ Error clearing expired cache: $e');
     }
   }
@@ -284,7 +284,7 @@ class CachedUserService {
       }
 
       return false;
-    } catch (e) {
+    } on Object catch (e) {
       debugPrint('❌ Error checking cache validity: $e');
       return false;
     }
@@ -328,7 +328,7 @@ class CachedUserService {
       }
 
       return [];
-    } catch (e) {
+    } on Object catch (e) {
       debugPrint('❌ Error getting cached user list: $e');
       return [];
     }
@@ -356,7 +356,7 @@ class CachedUserService {
         '${_USER_LIST_TIMESTAMP_KEY}_$cacheKey',
         DateTime.now().millisecondsSinceEpoch,
       );
-    } catch (e) {
+    } on Object catch (e) {
       debugPrint('❌ Error caching user list: $e');
     }
   }

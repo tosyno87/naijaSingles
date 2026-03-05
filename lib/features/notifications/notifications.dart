@@ -231,7 +231,7 @@ class NotificationsState extends State<Notifications> {
                             ),
                             onTap: () async {
                               log(doc.get('Matches'));
-                              showDialog(
+                              await showDialog(
                                 context: context,
                                 builder: (context) => const Center(
                                   child: CircularProgressIndicator(
@@ -265,10 +265,12 @@ class NotificationsState extends State<Notifications> {
                                   context: context,
                                   builder: (context) {
                                     if (!doc.get('isRead')) {
-                                      unawaited(PaginationRepo.updateNotification(
-                                        currentUser!,
-                                        doc,
-                                      ));
+                                      unawaited(
+                                        PaginationRepo.updateNotification(
+                                          currentUser!,
+                                          doc,
+                                        ),
+                                      );
                                     }
                                     return Info(
                                       tempuser,

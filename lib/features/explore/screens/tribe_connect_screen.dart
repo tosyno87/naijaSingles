@@ -44,8 +44,8 @@ class _TribeConnectScreenState extends State<TribeConnectScreen> {
 
   // Get all available (not yet processed) users
   List<UserModel> get _availableUsers => widget.users
-        .where((user) => !_processedUserIds.contains(user.id))
-        .toList();
+      .where((user) => !_processedUserIds.contains(user.id))
+      .toList();
 
   @override
   Widget build(BuildContext context) => Scaffold(
@@ -152,23 +152,25 @@ class _TribeConnectScreenState extends State<TribeConnectScreen> {
   }
 
   void _showFilters() {
-    unawaited(showModalBottomSheet(
-      context: context,
-      backgroundColor: AppColors.backgroundColor,
-      shape: const RoundedRectangleBorder(
-        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+    unawaited(
+      showModalBottomSheet(
+        context: context,
+        backgroundColor: AppColors.backgroundColor,
+        shape: const RoundedRectangleBorder(
+          borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+        ),
+        builder: (context) => _ConnectFilterSheet(
+          currentUser: widget.currentUser,
+          onApply: () {
+            setState(() {
+              _processedUserIds.clear();
+              _currentProfileIndex = 0;
+            });
+            widget.onFiltersApplied?.call();
+          },
+        ),
       ),
-      builder: (context) => _ConnectFilterSheet(
-        currentUser: widget.currentUser,
-        onApply: () {
-          setState(() {
-            _processedUserIds.clear();
-            _currentProfileIndex = 0;
-          });
-          widget.onFiltersApplied?.call();
-        },
-      ),
-    ));
+    );
   }
 
   Future<void> _handleConnect(UserModel user) async {
@@ -188,7 +190,7 @@ class _TribeConnectScreenState extends State<TribeConnectScreen> {
 
       // Move to next profile after a brief delay
       _moveToNextProfile();
-    } catch (e) {
+    } on Object {
       // Revert on error
       setState(() {
         _processedUserIds.remove(user.id ?? '');
@@ -209,7 +211,7 @@ class _TribeConnectScreenState extends State<TribeConnectScreen> {
 
       // Move to next profile after a brief delay
       _moveToNextProfile();
-    } catch (e) {
+    } on Object {
       // Revert on error
       setState(() {
         _processedUserIds.remove(user.id ?? '');
@@ -238,18 +240,20 @@ class _TribeConnectScreenState extends State<TribeConnectScreen> {
   }
 
   void _showMatchConfirmation(UserModel user) {
-    unawaited(showDialog(
-      context: context,
-      builder: (context) => MatchConfirmationModal(
-        currentUserImageUrl: widget.currentUser.imageUrl?.isNotEmpty ?? false
-            ? widget.currentUser.imageUrl![0]
-            : 'https://images.pexels.com/photos/220453/pexels-photo-220453.jpeg',
-        matchedUserImageUrl:
-            user.imageUrl?.isNotEmpty ?? false ? user.imageUrl![0] : '',
-        matchedUserName: user.name ?? 'Unknown',
-        matchedUserId: user.id ?? '',
+    unawaited(
+      showDialog(
+        context: context,
+        builder: (context) => MatchConfirmationModal(
+          currentUserImageUrl: widget.currentUser.imageUrl?.isNotEmpty ?? false
+              ? widget.currentUser.imageUrl![0]
+              : 'https://images.pexels.com/photos/220453/pexels-photo-220453.jpeg',
+          matchedUserImageUrl:
+              user.imageUrl?.isNotEmpty ?? false ? user.imageUrl![0] : '',
+          matchedUserName: user.name ?? 'Unknown',
+          matchedUserId: user.id ?? '',
+        ),
       ),
-    ));
+    );
   }
 
   void _showConnectConfirmation(UserModel user) {
@@ -385,7 +389,8 @@ class _ConnectFilterSheetState extends State<_ConnectFilterSheet> {
                 style: ElevatedButton.styleFrom(
                   backgroundColor: AppColors.primaryGreen,
                   foregroundColor: Colors.white,
-                  disabledBackgroundColor: AppColors.primaryGreen.withAlpha(120),
+                  disabledBackgroundColor:
+                      AppColors.primaryGreen.withAlpha(120),
                   padding: const EdgeInsets.symmetric(vertical: 16),
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(12),
@@ -434,7 +439,8 @@ class _ConnectFilterSheetState extends State<_ConnectFilterSheet> {
           children: [
             Icon(
               option.icon,
-              color: isSelected ? AppColors.primaryGreen : AppColors.textSecondary,
+              color:
+                  isSelected ? AppColors.primaryGreen : AppColors.textSecondary,
               size: 22,
             ),
             const SizedBox(width: 12),

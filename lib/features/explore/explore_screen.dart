@@ -60,7 +60,7 @@ class _ExploreScreenState extends State<ExploreScreen> {
           });
         }
       }
-    } catch (e) {
+    } on Object catch (e) {
       log('Error loading current user: $e');
       if (mounted && !_disposed) {
         setState(() {
@@ -93,7 +93,7 @@ class _ExploreScreenState extends State<ExploreScreen> {
           _isLoading = false;
         });
       }
-    } catch (e) {
+    } on Object catch (e) {
       log('Error loading users: $e');
       if (mounted && !_disposed) {
         setState(() {

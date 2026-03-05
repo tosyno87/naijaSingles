@@ -58,7 +58,8 @@ class _BlockByAdminState extends State<BlockByAdmin> {
               const SizedBox(height: 20),
               Text(
                 "Sorry, you can't access the application!".tr().toString(),
-                style: const TextStyle(color: AppColors.primaryGreen, fontSize: 22),
+                style: const TextStyle(
+                    color: AppColors.primaryGreen, fontSize: 22),
               ),
               const SizedBox(height: 12),
               Text(

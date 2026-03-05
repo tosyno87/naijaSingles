@@ -63,7 +63,6 @@ class RouteName {
   // ===== LEGACY ROUTES (for backward compatibility) =====
   static const String splashScreen = '/splash';
   static const String loginScreen = '/login';
-  @Deprecated('Use mainNavigation instead. Tabbar is being phased out.')
   static const String tabScreen = '/tabbar';
   static const String datingHomePage = '/dating';
 

@@ -82,7 +82,7 @@ class AllowLocation extends StatelessWidget {
               context,
             );
           }
-        } catch (e) {
+        } on Object catch (e) {
           isProcessing.value = false;
           log('Error uploading profile: ${e.toString()}');
           if (!context.mounted) return;
@@ -91,7 +91,7 @@ class AllowLocation extends StatelessWidget {
             context,
           );
         }
-      } catch (e) {
+      } on Object catch (e) {
         isProcessing.value = false;
         log('Error in proceedWithoutLocation: ${e.toString()}');
         if (!context.mounted) return;
@@ -211,7 +211,9 @@ class AllowLocation extends StatelessWidget {
                         }
                         if (state is RegistrationSuccess) {
                           log('userregistrationsuccess');
-                          context.read<UserBloc>().add(UserDataUpdated(state.user));
+                          context
+                              .read<UserBloc>()
+                              .add(UserDataUpdated(state.user));
                           isProcessing.value = false;
                           unawaited(showWelcomDialog(context));
                         }
@@ -266,7 +268,7 @@ class AllowLocation extends StatelessWidget {
                                       context,
                                     );
                                   }
-                                } catch (e) {
+                                } on Object catch (e) {
                                   isProcessing.value = false;
                                   log('Error uploading profile: ${e.toString()}');
                                   if (!context.mounted) return;
@@ -275,7 +277,7 @@ class AllowLocation extends StatelessWidget {
                                     context,
                                   );
                                 }
-                              } catch (e) {
+                              } on Object catch (e) {
                                 isProcessing.value = false;
                                 log('Error adding user data: ${e.toString()}');
                                 CustomSnackbar.showSnackBarSimple(
@@ -293,7 +295,7 @@ class AllowLocation extends StatelessWidget {
                               );
 
                               // Show dialog to proceed with default location
-                              showDialog(
+                              await showDialog(
                                 context: context,
                                 barrierDismissible: false,
                                 builder: (BuildContext context) => AlertDialog(

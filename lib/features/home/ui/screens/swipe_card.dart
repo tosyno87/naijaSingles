@@ -59,12 +59,14 @@ class UsersListState extends State<UsersList> with WidgetsBindingObserver {
 
   // Navigate to user profile when card is tapped
   void _navigateToUserProfile(UserModel user) {
-    unawaited(Navigator.push(
-      context,
-      MaterialPageRoute(
-        builder: (context) => UserDetailScreen(user: user),
+    unawaited(
+      Navigator.push(
+        context,
+        MaterialPageRoute(
+          builder: (context) => UserDetailScreen(user: user),
+        ),
       ),
-    ));
+    );
   }
 
   @override
@@ -267,7 +269,8 @@ class UsersListState extends State<UsersList> with WidgetsBindingObserver {
                                       Text(
                                         '${widget.users[itemIndex].distanceBW!.toStringAsFixed(1)} miles away',
                                         style: GoogleFonts.montserrat(
-                                          color: Colors.white.withValues(alpha: 0.9),
+                                          color: Colors.white
+                                              .withValues(alpha: 0.9),
                                           fontSize: 14,
                                           fontWeight: FontWeight.w400,
                                         ),
@@ -277,7 +280,8 @@ class UsersListState extends State<UsersList> with WidgetsBindingObserver {
                                       Text(
                                         widget.users[itemIndex].address!,
                                         style: GoogleFonts.montserrat(
-                                          color: Colors.white.withValues(alpha: 0.9),
+                                          color: Colors.white
+                                              .withValues(alpha: 0.9),
                                           fontSize: 14,
                                           fontWeight: FontWeight.w400,
                                         ),
@@ -287,16 +291,18 @@ class UsersListState extends State<UsersList> with WidgetsBindingObserver {
                               ),
                               trailing: IconButton(
                                 onPressed: () {
-                                  unawaited(showDialog(
-                                    barrierDismissible: false,
-                                    context: context,
-                                    builder: (context) => Info(
-                                      widget.users[itemIndex],
-                                      widget.currentUser,
-                                      true,
-                                      controller: widget.stackController,
+                                  unawaited(
+                                    showDialog(
+                                      barrierDismissible: false,
+                                      context: context,
+                                      builder: (context) => Info(
+                                        widget.users[itemIndex],
+                                        widget.currentUser,
+                                        true,
+                                        controller: widget.stackController,
+                                      ),
                                     ),
-                                  ));
+                                  );
                                 },
                                 icon: const Icon(
                                   Icons.arrow_upward,

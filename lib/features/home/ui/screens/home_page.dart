@@ -158,7 +158,8 @@ class _HomepageState extends State<Homepage>
                         // Refresh user list after migration
                         context.read<SearchUserBloc>().add(
                               LoadUserEvent(
-                                  currentUser: controller.currentUser,),
+                                currentUser: controller.currentUser,
+                              ),
                             );
                         setState(() {
                           _shouldShowMigrationPrompt = false;

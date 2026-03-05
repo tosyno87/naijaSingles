@@ -53,7 +53,7 @@ class DefaultFirebaseOptions {
         authDomain: SecureConfig.firebaseAuthDomain,
         storageBucket: SecureConfig.firebaseStorageBucket,
       );
-    } catch (e) {
+    } on Object {
       // Fallback to production values
       return const FirebaseOptions(
         apiKey: 'AIzaSyAwsU8j3acGo_cKOECbgsXHd3-qvvLn_Fw',
@@ -77,7 +77,7 @@ class DefaultFirebaseOptions {
         projectId: SecureConfig.firebaseProjectId,
         storageBucket: SecureConfig.firebaseStorageBucket,
       );
-    } catch (e) {
+    } on Object {
       // Fallback to production values
       return const FirebaseOptions(
         apiKey: 'AIzaSyAwsU8j3acGo_cKOECbgsXHd3-qvvLn_Fw',
@@ -105,7 +105,7 @@ class DefaultFirebaseOptions {
         iosClientId: SecureConfig.firebaseIosClientId,
         iosBundleId: SecureConfig.firebaseIosBundleId,
       );
-    } catch (e) {
+    } on Object {
       // Fallback to hardcoded production values from GoogleService-Info.plist
       // These values are safe to include in the app bundle
       return const FirebaseOptions(
@@ -134,7 +134,7 @@ class DefaultFirebaseOptions {
         iosClientId: SecureConfig.firebaseIosClientId,
         iosBundleId: SecureConfig.firebaseIosBundleId,
       );
-    } catch (e) {
+    } on Object {
       // Fallback to production values (same as iOS)
       return const FirebaseOptions(
         apiKey: 'AIzaSyAwsU8j3acGo_cKOECbgsXHd3-qvvLn_Fw',
@@ -167,10 +167,11 @@ class FirebaseEmulators {
 
         unawaited(FirebaseAuth.instance.useAuthEmulator('localhost', 9099));
 
-        unawaited(FirebaseStorage.instance.useStorageEmulator('localhost', 9199));
+        unawaited(
+            FirebaseStorage.instance.useStorageEmulator('localhost', 9199));
 
         debugPrint('🔥 Connected to Firebase emulators');
-      } catch (e) {
+      } on Object catch (e) {
         debugPrint('❌ Failed to connect to Firebase emulators: $e');
       }
     }

@@ -109,7 +109,7 @@ class GoogleSignInBloc extends Bloc<GoogleSignInEvent, GoogleSignInState> {
         log('Failed to sign in with Google - user is null');
         emit(GoogleSignInFailure(error: 'Failed to sign in with Google'));
       }
-    } catch (e) {
+    } on Object catch (e) {
       log('Google Sign In error: $e');
       emit(
         GoogleSignInFailure(
@@ -148,7 +148,7 @@ class GoogleSignInBloc extends Bloc<GoogleSignInEvent, GoogleSignInState> {
         });
         log('Updated existing user document for: ${user.uid}');
       }
-    } catch (e) {
+    } on Object catch (e) {
       log('Error updating user data: $e');
       // We don't want to fail the sign-in if this fails
       // Just log the error

@@ -179,8 +179,10 @@ class SwipeStackState extends State<SwipeStack>
                 fit: StackFit.expand,
                 children: widget.children
                     .asMap()
-                    .map((int index, _) =>
-                        MapEntry(index, _item(constraints, index)),)
+                    .map(
+                      (int index, _) =>
+                          MapEntry(index, _item(constraints, index)),
+                    )
                     .values
                     .toList(),
               ),
@@ -271,7 +273,7 @@ class SwipeStackState extends State<SwipeStack>
     );
   }
 
-  void _onPandEnd(_) {
+  void _onPandEnd(dynamic _) {
     setState(() {});
     if (_progress < widget.threshold) {
       _goFirstPosition();

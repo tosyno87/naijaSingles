@@ -27,7 +27,7 @@ class StreetViewBloc extends Bloc<StreetViewEvent, StreetViewState> {
     try {
       final savedView = await _preferences.getView();
       emit(StreetViewLoaded(savedView));
-    } catch (e) {
+    } on Object catch (e) {
       emit(StreetViewError(e.toString()));
     }
   }

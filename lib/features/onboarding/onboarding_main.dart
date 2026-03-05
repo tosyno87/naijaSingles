@@ -197,10 +197,22 @@ class _OnboardingMainState extends State<OnboardingMain> {
         ),
         centerTitle: true,
         actions: [
-          // Skip button (like Tinder) - only show on optional screens
-          // Required screens: 0 (Basic Info), 1 (Photos), 2 (Location), 3 (Nationality), 6 (Preferences)
-          // Optional screens: 4 (Bio), 5 (Interests), 7 (Additional Info)
-          if (_currentPage == 4 || _currentPage == 5 || _currentPage == 7)
+          // Skip button — only on optional screens (4: Bio, 5: Interests, 7: Additional Info).
+          // Pages 4/5 advance to the next page so required page 6 (Preferences) is never bypassed.
+          // Page 7 is the final step, so Skip there completes onboarding.
+          if (_currentPage == 4 || _currentPage == 5)
+            TextButton(
+              onPressed: _nextPage,
+              child: Text(
+                'Skip',
+                style: GoogleFonts.montserrat(
+                  fontSize: 16,
+                  fontWeight: FontWeight.w600,
+                  color: primaryColor,
+                ),
+              ),
+            )
+          else if (_currentPage == 7)
             TextButton(
               onPressed: _completeOnboarding,
               child: Text(

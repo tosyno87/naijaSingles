@@ -6,6 +6,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:google_fonts/google_fonts.dart';
 
 import '../../../../../common/constants/app_colors.dart';
+import '../../../../../common/utils/auth_router.dart';
 import '../../../../../common/widgets/afropeep_app_bar.dart';
 import '../../../../../common/widgets/afropeep_primary_button.dart';
 import '../../../../../common/widgets/afropeep_text_field.dart';
@@ -56,9 +57,7 @@ class _EmailLoginScreenState extends State<EmailLoginScreen> {
         child: BlocConsumer<EmailAuthBloc, EmailAuthState>(
           listener: (context, state) {
             if (state is EmailAuthSuccess) {
-              // Navigate to home screen
-              unawaited(
-                  Navigator.pushReplacementNamed(context, '/main_navigation'));
+              unawaited(AuthRouter.navigateAfterAuth(context));
             } else if (state is EmailAuthError) {
               CustomSnackbar.showSnackBarSimple(
                 state.error,

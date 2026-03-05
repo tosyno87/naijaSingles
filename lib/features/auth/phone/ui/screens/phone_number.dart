@@ -57,19 +57,36 @@ class _PhoneNumberState extends State<PhoneNumber> {
     super.dispose();
   }
 
+  static const _minDigitsByPrefix = <String, int>{
+    '+1': 10, // US / CA
+    '+44': 10, // UK
+    '+233': 9, // Ghana
+    '+234': 10, // Nigeria
+    '+254': 9, // Kenya
+    '+27': 9, // South Africa
+    '+256': 9, // Uganda
+    '+255': 9, // Tanzania
+    '+237': 8, // Cameroon
+    '+225': 8, // Ivory Coast
+    '+221': 9, // Senegal
+    '+49': 10, // Germany
+    '+33': 9, // France
+    '+39': 10, // Italy
+  };
+
   void _validatePhoneNumber() {
     if (mounted) {
       final phoneDigits =
           phoneNumberController.text.trim().replaceAll(RegExp(r'[^\d]'), '');
 
-      const minDigits = 6;
+      final minDigits = _minDigitsByPrefix[countryCode] ?? 7;
       final isValid = phoneDigits.length >= minDigits;
 
       setState(() {
         isValidNumber = isValid;
       });
 
-      log('📞 Phone validation: "${phoneNumberController.text.trim()}" -> $phoneDigits digits -> button enabled: $isValid (min: $minDigits)');
+      log('📞 Phone validation: "${phoneNumberController.text.trim()}" -> $phoneDigits digits -> button enabled: $isValid (min: $minDigits for $countryCode)');
     }
   }
 
@@ -142,36 +159,46 @@ class _PhoneNumberState extends State<PhoneNumber> {
                   });
 
                   final String errorMessage = state.error;
-                  String debugHint = '';
 
+                  // User-facing messages only; debug hints stay in dev builds
+                  String userMessage = errorMessage;
                   if (state.error.contains('invalid-phone-number')) {
-                    String countrySpecificHint = '';
-                    if (countryCode == '+1') {
-                      countrySpecificHint =
-                          '\n\n⚠️ US/Canada numbers must be exactly 10 digits (not including country code +1)';
-                      countrySpecificHint +=
-                          '\nExample: 2179044453 (10 digits), not 21790444533 (11 digits)';
-                    }
-                    debugHint =
-                        '\n\n📋 Troubleshooting:$countrySpecificHint\n1. Check console logs for the EXACT number sent\n2. In Firebase Console, add test number WITHOUT spaces/dashes\n3. Format: +12179044453 (not +1 217 904 445 33)';
-                  } else if (state.error
-                      .contains('missing-verification-code')) {
-                    debugHint =
-                        '\n\n📋 Test number not found!\n1. Check console logs for exact number sent\n2. Add that EXACT number (no spaces) to Firebase Console\n3. Set a verification code (e.g., 123456)';
-                  } else if (state.error
-                      .contains('invalid-verification-code')) {
-                    debugHint =
-                        '\n\n📋 Wrong verification code!\nUse the code you set in Firebase Console test numbers';
+                    userMessage =
+                        'The phone number you entered is invalid. Please check it and try again.';
                   } else if (state.error.contains('quota-exceeded')) {
-                    debugHint =
-                        '\n\n📋 Too many requests!\nWait a few minutes and try again';
-                  } else {
-                    debugHint =
-                        '\n\n💡 For iOS Simulator: Use test phone numbers from Firebase Console.\nCheck console logs for exact number format needed.';
+                    userMessage =
+                        'Too many attempts. Please wait a few minutes and try again.';
+                  }
+
+                  if (kDebugMode) {
+                    String debugHint = '';
+                    if (state.error.contains('invalid-phone-number')) {
+                      String countrySpecificHint = '';
+                      if (countryCode == '+1') {
+                        countrySpecificHint =
+                            '\n\n⚠️ US/Canada numbers must be exactly 10 digits (not including country code +1)';
+                        countrySpecificHint +=
+                            '\nExample: 2179044453 (10 digits), not 21790444533 (11 digits)';
+                      }
+                      debugHint =
+                          '\n\n📋 Troubleshooting:$countrySpecificHint\n1. Check console logs for the EXACT number sent\n2. In Firebase Console, add test number WITHOUT spaces/dashes\n3. Format: +12179044453 (not +1 217 904 445 33)';
+                    } else if (state.error
+                        .contains('missing-verification-code')) {
+                      debugHint =
+                          '\n\n📋 Test number not found!\n1. Check console logs for exact number sent\n2. Add that EXACT number (no spaces) to Firebase Console\n3. Set a verification code (e.g., 123456)';
+                    } else if (state.error
+                        .contains('invalid-verification-code')) {
+                      debugHint =
+                          '\n\n📋 Wrong verification code!\nUse the code you set in Firebase Console test numbers';
+                    } else {
+                      debugHint =
+                          '\n\n💡 For iOS Simulator: Use test phone numbers from Firebase Console.\nCheck console logs for exact number format needed.';
+                    }
+                    userMessage = '$errorMessage$debugHint';
                   }
 
                   CustomSnackbar.showSnackBarSimple(
-                    '$errorMessage$debugHint',
+                    userMessage,
                     context,
                   );
                 }

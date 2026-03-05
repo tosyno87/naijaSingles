@@ -7,6 +7,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:google_fonts/google_fonts.dart';
 
 import '../../../common/constants/app_colors.dart';
+import '../../../common/utils/auth_router.dart';
 import '../../../common/widgets/afropeep_primary_button.dart';
 import '../../../common/widgets/custom_snackbar.dart';
 import '../google_login/google_login_bloc.dart';
@@ -164,10 +165,7 @@ class SignInMethodSelectionScreen extends StatelessWidget {
                           listener: (context, state) {
                             if (state is GoogleLoginSuccess) {
                               unawaited(
-                                Navigator.pushReplacementNamed(
-                                  context,
-                                  '/main_navigation',
-                                ),
+                                AuthRouter.navigateAfterAuth(context),
                               );
                             } else if (state is GoogleLoginFailed) {
                               CustomSnackbar.showSnackBarSimple(

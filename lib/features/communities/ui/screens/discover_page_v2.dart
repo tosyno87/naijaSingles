@@ -29,7 +29,6 @@ enum _DiscoverBlock {
   peopleYouMayLike,
   communities,
   happeningThisWeek,
-  suggestedConnections,
   stats,
 }
 
@@ -442,31 +441,13 @@ class _DiscoverPageV2State extends State<DiscoverPageV2> {
       );
 
   List<_DiscoverBlock> _composeBlocks() {
-    final hasPeopleContent =
-        _peopleLoading || _peopleError != null || _people.isNotEmpty;
-    final hasEventContent =
-        _eventsLoading || _eventsError != null || _events.isNotEmpty;
-    final hasCommunityContent = _communitiesLoading ||
-        _communitiesError != null ||
-        _communities.isNotEmpty;
-
-    final blocks = <_DiscoverBlock>[
+    return const <_DiscoverBlock>[
       _DiscoverBlock.trendingEvent,
-      if (hasPeopleContent) _DiscoverBlock.peopleYouMayLike,
-      if (hasCommunityContent) _DiscoverBlock.communities,
-      if (hasEventContent) _DiscoverBlock.happeningThisWeek,
-      if ((_peopleLoading || _peopleError != null) || _people.length > 2)
-        _DiscoverBlock.suggestedConnections,
-      if (!_statsLoading) _DiscoverBlock.stats,
+      _DiscoverBlock.peopleYouMayLike,
+      _DiscoverBlock.communities,
+      _DiscoverBlock.happeningThisWeek,
+      _DiscoverBlock.stats,
     ];
-
-    if (blocks.isEmpty) {
-      return const [
-        _DiscoverBlock.trendingEvent,
-        _DiscoverBlock.peopleYouMayLike
-      ];
-    }
-    return blocks;
   }
 
   List<Widget> _buildMixedDiscoverFeed() {
@@ -483,8 +464,6 @@ class _DiscoverPageV2State extends State<DiscoverPageV2> {
           widgets.add(_buildCommunitiesBlock());
         case _DiscoverBlock.happeningThisWeek:
           widgets.add(_buildHappeningThisWeekBlock());
-        case _DiscoverBlock.suggestedConnections:
-          widgets.add(_buildSuggestedConnectionsBlock());
         case _DiscoverBlock.stats:
           widgets.add(_buildStatsBlock());
       }
@@ -533,12 +512,11 @@ class _DiscoverPageV2State extends State<DiscoverPageV2> {
           horizontalPadding: 0);
     }
     if (_events.isEmpty) {
-      return _buildActionableEmpty(
-        icon: Icons.local_fire_department_outlined,
+      return _buildImageEmpty(
+        assetPath: 'assets/images/placeholders/discover_event_placeholder.png',
         message: 'No trending events nearby',
         actionLabel: 'Browse all events',
         onAction: _onSeeAllEvents,
-        horizontalPadding: 0,
       );
     }
     return EventCardOverlay(
@@ -551,7 +529,7 @@ class _DiscoverPageV2State extends State<DiscoverPageV2> {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           DiscoverSectionHeader(
-            title: 'People You May Like',
+            title: 'People Near You',
             actionLabel: 'See all',
             onAction: _onSeeAllPeople,
           ),
@@ -586,22 +564,6 @@ class _DiscoverPageV2State extends State<DiscoverPageV2> {
         ),
         const SizedBox(height: 12),
         _buildEventsSection(events: upcomingEvents),
-      ],
-    );
-  }
-
-  Widget _buildSuggestedConnectionsBlock() {
-    final suggested = _people.length > 2 ? _people.skip(2).toList() : _people;
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        DiscoverSectionHeader(
-          title: 'Suggested Connections',
-          actionLabel: 'See all',
-          onAction: _onSeeAllPeople,
-        ),
-        const SizedBox(height: 12),
-        _buildPeopleSection(people: suggested),
       ],
     );
   }
@@ -663,11 +625,15 @@ class _DiscoverPageV2State extends State<DiscoverPageV2> {
       return _buildInlineError(_eventsError!, _loadEvents);
     }
     if (sectionEvents.isEmpty) {
-      return _buildActionableEmpty(
-        icon: Icons.event_outlined,
-        message: 'No upcoming events nearby',
-        actionLabel: 'Browse all events',
-        onAction: _onSeeAllEvents,
+      return Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 24),
+        child: _buildImageEmpty(
+          assetPath:
+              'assets/images/placeholders/discover_event_placeholder.png',
+          message: 'No upcoming events nearby',
+          actionLabel: 'Browse all events',
+          onAction: _onSeeAllEvents,
+        ),
       );
     }
 
@@ -950,6 +916,87 @@ class _DiscoverPageV2State extends State<DiscoverPageV2> {
               ),
             ],
           ),
+        ),
+      );
+
+  Widget _buildImageEmpty({
+    required String assetPath,
+    required String message,
+    required String actionLabel,
+    required VoidCallback onAction,
+  }) =>
+      Container(
+        height: 220,
+        width: double.infinity,
+        decoration: BoxDecoration(
+          borderRadius: BorderRadius.circular(24),
+          color: Colors.grey.shade200,
+        ),
+        clipBehavior: Clip.antiAlias,
+        child: Stack(
+          fit: StackFit.expand,
+          children: [
+            Image.asset(
+              assetPath,
+              fit: BoxFit.cover,
+              errorBuilder: (_, __, ___) => Container(
+                color: AppColors.primaryGreen.withValues(alpha: 0.15),
+              ),
+            ),
+            DecoratedBox(
+              decoration: BoxDecoration(
+                gradient: LinearGradient(
+                  begin: Alignment.topCenter,
+                  end: Alignment.bottomCenter,
+                  colors: [
+                    Colors.black.withValues(alpha: 0.10),
+                    Colors.black.withValues(alpha: 0.65),
+                  ],
+                ),
+              ),
+            ),
+            Positioned(
+              left: 20,
+              right: 20,
+              bottom: 20,
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Text(
+                    message,
+                    style: GoogleFonts.montserrat(
+                      fontSize: 16,
+                      fontWeight: FontWeight.w600,
+                      color: Colors.white,
+                    ),
+                  ),
+                  const SizedBox(height: 12),
+                  SizedBox(
+                    height: 36,
+                    child: OutlinedButton(
+                      onPressed: onAction,
+                      style: OutlinedButton.styleFrom(
+                        foregroundColor: Colors.white,
+                        side: const BorderSide(color: Colors.white70),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(18),
+                        ),
+                        padding: const EdgeInsets.symmetric(horizontal: 16),
+                      ),
+                      child: Text(
+                        actionLabel,
+                        style: GoogleFonts.montserrat(
+                          fontSize: 13,
+                          fontWeight: FontWeight.w600,
+                        ),
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ],
         ),
       );
 }

@@ -238,25 +238,25 @@ class _WelcomeScreenState extends State<WelcomeScreen>
               ),
               child: Column(
                 children: [
-                  const SizedBox(height: 20),
+                  const SizedBox(height: 44),
 
-                  // Wordmark — serif like Hinge (Tiempos → DM Serif Display)
+                  // Wordmark — elegant script
                   FadeTransition(
                     opacity: _textFade,
                     child: Text(
                       'Afropeep',
-                      style: GoogleFonts.dmSerifDisplay(
-                        fontSize: 36,
+                      style: GoogleFonts.greatVibes(
+                        fontSize: 46,
                         fontWeight: FontWeight.w400,
                         color: Colors.white,
-                        letterSpacing: 1.0,
+                        letterSpacing: 2.0,
                         shadows: [
                           Shadow(
-                            color: Colors.black.withValues(alpha: 0.5),
-                            blurRadius: 12,
+                            color: Colors.black.withValues(alpha: 0.55),
+                            blurRadius: 14,
                           ),
                           Shadow(
-                            color: Colors.black.withValues(alpha: 0.25),
+                            color: Colors.black.withValues(alpha: 0.3),
                             blurRadius: 4,
                           ),
                         ],

@@ -557,32 +557,51 @@ class _DiscoverPageV2State extends State<DiscoverPageV2> {
                     ),
                   ],
                 ),
-                child: Row(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    _buildStatChip(
-                      Icons.event_rounded,
-                      '$_eventCount events this week',
-                    ),
-                    const SizedBox(width: 16),
-                    _buildStatChip(
-                      Icons.groups_rounded,
-                      '$_communityCount communities',
-                    ),
-                    const Spacer(),
-                    InkWell(
-                      onTap: _onSeeAllEvents,
-                      borderRadius: BorderRadius.circular(8),
-                      child: Padding(
-                        padding: const EdgeInsets.symmetric(
-                          horizontal: 4,
-                          vertical: 2,
+                    Row(
+                      children: [
+                        _buildStatChip(
+                          Icons.event_rounded,
+                          '$_eventCount events this week',
                         ),
-                        child: Text(
-                          'See all nearby',
-                          style: GoogleFonts.montserrat(
-                            fontSize: 12,
-                            fontWeight: FontWeight.w600,
-                            color: AppColors.primaryGreen,
+                        const SizedBox(width: 16),
+                        _buildStatChip(
+                          Icons.groups_rounded,
+                          '$_communityCount communities',
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: 10),
+                    Align(
+                      alignment: Alignment.centerRight,
+                      child: InkWell(
+                        onTap: _onSeeAllEvents,
+                        borderRadius: BorderRadius.circular(8),
+                        child: Padding(
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 4,
+                            vertical: 2,
+                          ),
+                          child: Row(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              Text(
+                                'See all nearby',
+                                style: GoogleFonts.montserrat(
+                                  fontSize: 12,
+                                  fontWeight: FontWeight.w600,
+                                  color: AppColors.primaryGreen,
+                                ),
+                              ),
+                              const SizedBox(width: 4),
+                              const Icon(
+                                Icons.arrow_forward_rounded,
+                                size: 14,
+                                color: AppColors.primaryGreen,
+                              ),
+                            ],
                           ),
                         ),
                       ),
@@ -597,12 +616,16 @@ class _DiscoverPageV2State extends State<DiscoverPageV2> {
         children: [
           Icon(icon, size: 14, color: AppColors.primaryGreen),
           const SizedBox(width: 4),
-          Text(
-            label,
-            style: GoogleFonts.montserrat(
-              fontSize: 12,
-              fontWeight: FontWeight.w500,
-              color: AppColors.textPrimary,
+          Flexible(
+            child: Text(
+              label,
+              style: GoogleFonts.montserrat(
+                fontSize: 12,
+                fontWeight: FontWeight.w500,
+                color: AppColors.textPrimary,
+              ),
+              overflow: TextOverflow.ellipsis,
+              maxLines: 1,
             ),
           ),
         ],

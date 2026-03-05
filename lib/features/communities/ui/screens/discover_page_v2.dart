@@ -811,7 +811,7 @@ class _DiscoverPageV2State extends State<DiscoverPageV2> {
         child: InkWell(
           onTap: _onBrowseCommunities,
           child: SizedBox(
-            height: 200,
+            height: 240,
             width: double.infinity,
             child: Stack(
               fit: StackFit.expand,
@@ -819,6 +819,7 @@ class _DiscoverPageV2State extends State<DiscoverPageV2> {
                 Image.asset(
                   _communityPlaceholderAsset,
                   fit: BoxFit.cover,
+                  alignment: Alignment.topCenter,
                   errorBuilder: (_, __, ___) => _communityFallbackBg(),
                 ),
                 DecoratedBox(

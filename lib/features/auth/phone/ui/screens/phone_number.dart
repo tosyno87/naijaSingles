@@ -307,16 +307,15 @@ class _PhoneNumberState extends State<PhoneNumber> {
                             ),
                             const SizedBox(height: 40),
 
-                            // Semi-transparent input field
                             Container(
                               height: 60,
                               decoration: BoxDecoration(
-                                color: Colors.white.withValues(alpha: 0.15),
+                                color: Colors.white.withValues(alpha: 0.92),
                                 borderRadius: BorderRadius.circular(16),
                                 border: Border.all(
                                   color: isValidNumber
                                       ? AppColors.primaryGreen
-                                      : Colors.white.withValues(alpha: 0.3),
+                                      : Colors.grey.shade300,
                                   width: isValidNumber ? 1.5 : 1,
                                 ),
                               ),
@@ -343,7 +342,7 @@ class _PhoneNumberState extends State<PhoneNumber> {
                                         'GB',
                                       ],
                                       textStyle: GoogleFonts.montserrat(
-                                        color: Colors.white,
+                                        color: AppColors.textPrimary,
                                         fontSize: 16,
                                         fontWeight: FontWeight.w500,
                                       ),
@@ -419,8 +418,7 @@ class _PhoneNumberState extends State<PhoneNumber> {
                                   Container(
                                     height: 30,
                                     width: 1,
-                                    color:
-                                        Colors.white.withValues(alpha: 0.3),
+                                    color: Colors.grey.withValues(alpha: 0.3),
                                   ),
 
                                   Expanded(
@@ -429,14 +427,13 @@ class _PhoneNumberState extends State<PhoneNumber> {
                                       keyboardType: TextInputType.phone,
                                       style: GoogleFonts.montserrat(
                                         fontSize: 16,
-                                        color: Colors.white,
+                                        color: AppColors.textPrimary,
                                         fontWeight: FontWeight.w500,
                                       ),
                                       decoration: InputDecoration(
                                         hintText: 'Phone number',
                                         hintStyle: GoogleFonts.montserrat(
-                                          color: Colors.white
-                                              .withValues(alpha: 0.5),
+                                          color: Colors.grey,
                                           fontWeight: FontWeight.w400,
                                         ),
                                         border: InputBorder.none,

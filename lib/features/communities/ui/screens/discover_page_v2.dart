@@ -584,11 +584,16 @@ class _DiscoverPageV2State extends State<DiscoverPageV2> {
       return _buildInlineError(_peopleError!, _loadPeople);
     }
     if (sectionPeople.isEmpty) {
-      return _buildActionableEmpty(
-        icon: Icons.people_outline_rounded,
-        message: 'No people found nearby',
-        actionLabel: 'Refresh',
-        onAction: _loadPeople,
+      return Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 24),
+        child: _buildImageEmpty(
+          assetPath:
+              'assets/images/placeholders/discover_people_placeholder.png',
+          message: 'No people found nearby',
+          actionLabel: 'Refresh',
+          onAction: _loadPeople,
+          height: 220,
+        ),
       );
     }
     return HorizontalSnapList(

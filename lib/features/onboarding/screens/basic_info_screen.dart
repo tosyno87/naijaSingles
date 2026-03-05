@@ -210,7 +210,7 @@ class _BasicInfoScreenState extends State<BasicInfoScreen> {
                     color: OnboardingTheme.primaryGreen,
                     size: OnboardingTheme.fieldIconSize,
                   ),
-                  dropdownColor: OnboardingTheme.fieldFill,
+                  dropdownColor: OnboardingTheme.background,
                   borderRadius: BorderRadius.circular(OnboardingTheme.fieldRadius),
                   items: _genderOptions
                       .map(

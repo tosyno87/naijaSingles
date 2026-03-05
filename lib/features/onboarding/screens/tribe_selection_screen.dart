@@ -350,7 +350,7 @@ class _TribeSelectionScreenState extends State<TribeSelectionScreen> {
                       color: OnboardingTheme.primaryGreen,
                       size: OnboardingTheme.fieldIconSize,
                     ),
-                    dropdownColor: OnboardingTheme.fieldFill,
+                    dropdownColor: OnboardingTheme.background,
                     borderRadius: BorderRadius.circular(
                       OnboardingTheme.fieldRadius,
                     ),

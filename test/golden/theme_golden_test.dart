@@ -1,3 +1,6 @@
+import 'dart:typed_data';
+
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 
@@ -24,6 +27,17 @@ void main() {
   late ThemeData testDark;
 
   setUpAll(() {
+    // Wrap the default LocalFileComparator with 0.5% pixel tolerance.
+    // CI (Linux) renders fonts/anti-aliasing slightly differently from macOS,
+    // producing ~0.3% diffs that are not visually meaningful.
+    final current = goldenFileComparator;
+    if (current is LocalFileComparator) {
+      goldenFileComparator = _TolerantLocalFileComparator(
+        current.basedir,
+        tolerance: 0.005,
+      );
+    }
+
     const lightText = TextTheme(
       displayLarge: TextStyle(
         color: AppColors.textPrimary,
@@ -264,4 +278,28 @@ void main() {
       expect(AppColors.navUnselected, const Color(0xFF666666));
     });
   });
+}
+
+/// Golden file comparator that tolerates small pixel differences caused by
+/// cross-platform font rendering (macOS vs Linux CI).
+class _TolerantLocalFileComparator extends LocalFileComparator {
+  _TolerantLocalFileComparator(super.testFile, {required this.tolerance});
+
+  final double tolerance;
+
+  @override
+  Future<bool> compare(Uint8List imageBytes, Uri golden) async {
+    final result = await GoldenFileComparator.compareLists(
+      imageBytes,
+      await getGoldenBytes(golden),
+    );
+    if (!result.passed && result.diffPercent <= tolerance) {
+      debugPrint(
+        'Golden "$golden": ${result.diffPercent}% diff '
+        '(within ${tolerance * 100}% tolerance)',
+      );
+      return true;
+    }
+    return result.passed;
+  }
 }

@@ -17,7 +17,7 @@ fi
 echo "Checking changed files for duplicate suffix patterns..."
 echo "Diff range: ${BASE_SHA}..${HEAD_SHA}"
 
-changed_files="$(git diff --name-only "${BASE_SHA}" "${HEAD_SHA}" || true)"
+changed_files="$(git diff --diff-filter=ACMR --name-only "${BASE_SHA}" "${HEAD_SHA}" || true)"
 if [[ -z "${changed_files}" ]]; then
   echo "No changed files in range."
   exit 0

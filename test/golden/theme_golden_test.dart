@@ -1,11 +1,12 @@
-import 'dart:typed_data';
+import 'dart:io';
 
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 import 'package:naijasingles/common/constants/app_colors.dart';
 import 'package:naijasingles/common/constants/theme.dart';
+
+final bool _isCI = Platform.environment.containsKey('CI');
 
 /// Golden tests for the AfroPeep design system.
 ///
@@ -27,17 +28,6 @@ void main() {
   late ThemeData testDark;
 
   setUpAll(() {
-    // Wrap the default LocalFileComparator with 0.5% pixel tolerance.
-    // CI (Linux) renders fonts/anti-aliasing slightly differently from macOS,
-    // producing ~0.3% diffs that are not visually meaningful.
-    final current = goldenFileComparator;
-    if (current is LocalFileComparator) {
-      goldenFileComparator = _TolerantLocalFileComparator(
-        current.basedir,
-        tolerance: 0.005,
-      );
-    }
-
     const lightText = TextTheme(
       displayLarge: TextStyle(
         color: AppColors.textPrimary,
@@ -173,21 +163,29 @@ void main() {
           ),
         );
 
-    testWidgets('Light theme swatch', (tester) async {
-      await tester.pumpWidget(themed(testLight, buildSwatch()));
-      await expectLater(
-        find.byType(MaterialApp),
-        matchesGoldenFile('goldens/light_theme_swatch.png'),
-      );
-    });
+    testWidgets(
+      'Light theme swatch',
+      (tester) async {
+        await tester.pumpWidget(themed(testLight, buildSwatch()));
+        await expectLater(
+          find.byType(MaterialApp),
+          matchesGoldenFile('goldens/light_theme_swatch.png'),
+        );
+      },
+      skip: _isCI,
+    );
 
-    testWidgets('Dark theme swatch', (tester) async {
-      await tester.pumpWidget(themed(testDark, buildSwatch()));
-      await expectLater(
-        find.byType(MaterialApp),
-        matchesGoldenFile('goldens/dark_theme_swatch.png'),
-      );
-    });
+    testWidgets(
+      'Dark theme swatch',
+      (tester) async {
+        await tester.pumpWidget(themed(testDark, buildSwatch()));
+        await expectLater(
+          find.byType(MaterialApp),
+          matchesGoldenFile('goldens/dark_theme_swatch.png'),
+        );
+      },
+      skip: _isCI,
+    );
   });
 
   // ─── Unit assertions on production theme factories ────────────────
@@ -280,26 +278,3 @@ void main() {
   });
 }
 
-/// Golden file comparator that tolerates small pixel differences caused by
-/// cross-platform font rendering (macOS vs Linux CI).
-class _TolerantLocalFileComparator extends LocalFileComparator {
-  _TolerantLocalFileComparator(super.testFile, {required this.tolerance});
-
-  final double tolerance;
-
-  @override
-  Future<bool> compare(Uint8List imageBytes, Uri golden) async {
-    final result = await GoldenFileComparator.compareLists(
-      imageBytes,
-      await getGoldenBytes(golden),
-    );
-    if (!result.passed && result.diffPercent <= tolerance) {
-      debugPrint(
-        'Golden "$golden": ${result.diffPercent}% diff '
-        '(within ${tolerance * 100}% tolerance)',
-      );
-      return true;
-    }
-    return result.passed;
-  }
-}

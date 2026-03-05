@@ -483,7 +483,7 @@ class _DiscoverPageV2State extends State<DiscoverPageV2> {
           ),
           const SizedBox(height: 12),
           Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 24),
+            padding: const EdgeInsets.symmetric(horizontal: 16),
             child: _buildTrendingEventCard(),
           ),
           if (_usingGlobalEventsFallback) ...[
@@ -505,7 +505,7 @@ class _DiscoverPageV2State extends State<DiscoverPageV2> {
 
   Widget _buildTrendingEventCard() {
     if (_eventsLoading) {
-      return const DiscoverSkeletonCard(height: 220);
+      return const DiscoverSkeletonCard(height: 260);
     }
     if (_eventsError != null) {
       return _buildInlineError(_eventsError!, _loadEvents,
@@ -924,9 +924,10 @@ class _DiscoverPageV2State extends State<DiscoverPageV2> {
     required String message,
     required String actionLabel,
     required VoidCallback onAction,
+    double height = 260,
   }) =>
       Container(
-        height: 220,
+        height: height,
         width: double.infinity,
         decoration: BoxDecoration(
           borderRadius: BorderRadius.circular(24),
@@ -939,6 +940,7 @@ class _DiscoverPageV2State extends State<DiscoverPageV2> {
             Image.asset(
               assetPath,
               fit: BoxFit.cover,
+              alignment: Alignment.topCenter,
               errorBuilder: (_, __, ___) => Container(
                 color: AppColors.primaryGreen.withValues(alpha: 0.15),
               ),

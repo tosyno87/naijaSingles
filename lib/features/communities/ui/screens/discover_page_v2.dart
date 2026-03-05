@@ -15,9 +15,7 @@ import '../../../discovery/data/services/discovery_service.dart';
 import '../../../events/data/models/event_model.dart';
 import '../../../events/data/services/events_firestore_service.dart';
 import '../../../groups/data/services/unified_group_service.dart';
-import '../../../groups/screens/group_details_screen.dart';
 import '../../../groups/screens/unified_groups_screen.dart';
-import '../widgets/discover_community_card.dart';
 import '../widgets/discover_section_header.dart';
 import '../widgets/discover_skeleton_card.dart';
 import '../widgets/event_card_overlay.dart';
@@ -45,6 +43,9 @@ class DiscoverPageV2 extends StatefulWidget {
 }
 
 class _DiscoverPageV2State extends State<DiscoverPageV2> {
+  static const String _communityPlaceholderAsset =
+      'assets/images/placeholders/discover_community_placeholder.png';
+
   final EventsFirestoreService _eventsService = EventsFirestoreService();
   final UnifiedGroupService _groupService = UnifiedGroupService();
 
@@ -311,21 +312,6 @@ class _DiscoverPageV2State extends State<DiscoverPageV2> {
     );
   }
 
-  void _onTapCommunity(UnifiedGroup group) {
-    final uid = FirebaseAuth.instance.currentUser?.uid ?? '';
-    unawaited(
-      Navigator.push(
-        context,
-        MaterialPageRoute(
-          builder: (_) => GroupDetailsScreen(
-            group: group,
-            isMember: group.isMember(uid),
-          ),
-        ),
-      ),
-    );
-  }
-
   // ---------------------------------------------------------------------------
   // Filter sheet
   // ---------------------------------------------------------------------------
@@ -547,13 +533,22 @@ class _DiscoverPageV2State extends State<DiscoverPageV2> {
             onAction: _onBrowseCommunities,
           ),
           const SizedBox(height: 12),
-          _buildCommunitiesSection(),
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 24),
+            child: _buildCommunitiesHeroCard(),
+          ),
         ],
       );
 
   Widget _buildHappeningThisWeekBlock() {
     final upcomingEvents =
         _events.length > 1 ? _events.skip(1).toList() : _events;
+
+    final showNonDuplicateEmpty = !_eventsLoading &&
+        _eventsError == null &&
+        upcomingEvents.isEmpty &&
+        _events.isNotEmpty;
+
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -563,7 +558,15 @@ class _DiscoverPageV2State extends State<DiscoverPageV2> {
           onAction: _onSeeAllEvents,
         ),
         const SizedBox(height: 12),
-        _buildEventsSection(events: upcomingEvents),
+        if (showNonDuplicateEmpty)
+          _buildActionableEmpty(
+            icon: Icons.event_note_outlined,
+            message: 'No additional events this week',
+            actionLabel: 'Browse all events',
+            onAction: _onSeeAllEvents,
+          )
+        else
+          _buildEventsSection(events: upcomingEvents),
       ],
     );
   }
@@ -777,31 +780,134 @@ class _DiscoverPageV2State extends State<DiscoverPageV2> {
   // Communities section
   // ---------------------------------------------------------------------------
 
-  Widget _buildCommunitiesSection() {
+  Widget _buildCommunitiesHeroCard() {
     if (_communitiesLoading) {
-      return _buildSkeletonRow(width: 200, height: 120, count: 3);
+      return const DiscoverSkeletonCard(height: 200);
     }
     if (_communitiesError != null) {
-      return _buildInlineError(_communitiesError!, _loadCommunities);
+      return _buildInlineError(_communitiesError!, _loadCommunities,
+          horizontalPadding: 0);
     }
     if (_communities.isEmpty) {
-      return _buildActionableEmpty(
-        icon: Icons.groups_outlined,
+      return _buildImageEmpty(
+        assetPath: _communityPlaceholderAsset,
         message: 'No communities yet',
         actionLabel: 'Browse all communities',
         onAction: _onBrowseCommunities,
+        height: 200,
       );
     }
-    return HorizontalSnapList(
-      itemWidth: 200,
-      itemHeight: 120,
-      itemCount: _communities.length,
-      itemBuilder: (_, i) => DiscoverCommunityCard(
-        group: _communities[i],
-        onTap: () => _onTapCommunity(_communities[i]),
+
+    final totalMembers =
+        _communities.fold<int>(0, (sum, g) => sum + g.memberCount);
+
+    return Semantics(
+      button: true,
+      label: 'Explore ${_communities.length} communities',
+      child: Material(
+        color: Colors.grey.shade200,
+        borderRadius: BorderRadius.circular(24),
+        clipBehavior: Clip.antiAlias,
+        child: InkWell(
+          onTap: _onBrowseCommunities,
+          child: SizedBox(
+            height: 200,
+            width: double.infinity,
+            child: Stack(
+              fit: StackFit.expand,
+              children: [
+                Image.asset(
+                  _communityPlaceholderAsset,
+                  fit: BoxFit.cover,
+                  errorBuilder: (_, __, ___) => _communityFallbackBg(),
+                ),
+                DecoratedBox(
+                  decoration: BoxDecoration(
+                    gradient: LinearGradient(
+                      begin: Alignment.topCenter,
+                      end: Alignment.bottomCenter,
+                      stops: const [0.3, 1.0],
+                      colors: [
+                        Colors.black.withValues(alpha: 0.05),
+                        Colors.black.withValues(alpha: 0.70),
+                      ],
+                    ),
+                  ),
+                ),
+                Positioned(
+                  left: 20,
+                  right: 20,
+                  bottom: 20,
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Text(
+                        '${_communities.length} communities near you',
+                        style: GoogleFonts.montserrat(
+                          fontSize: 18,
+                          fontWeight: FontWeight.w700,
+                          color: Colors.white,
+                        ),
+                      ),
+                      const SizedBox(height: 4),
+                      Text(
+                        '$totalMembers members across all groups',
+                        style: GoogleFonts.montserrat(
+                          fontSize: 13,
+                          fontWeight: FontWeight.w400,
+                          color: Colors.white70,
+                        ),
+                      ),
+                      const SizedBox(height: 12),
+                      SizedBox(
+                        height: 36,
+                        child: OutlinedButton(
+                          onPressed: _onBrowseCommunities,
+                          style: OutlinedButton.styleFrom(
+                            foregroundColor: Colors.white,
+                            side: const BorderSide(color: Colors.white70),
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(18),
+                            ),
+                            padding:
+                                const EdgeInsets.symmetric(horizontal: 16),
+                          ),
+                          child: Text(
+                            'Browse all',
+                            style: GoogleFonts.montserrat(
+                              fontSize: 13,
+                              fontWeight: FontWeight.w600,
+                            ),
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ),
       ),
     );
   }
+
+  Widget _communityFallbackBg() => Container(
+        decoration: BoxDecoration(
+          gradient: LinearGradient(
+            begin: Alignment.topLeft,
+            end: Alignment.bottomRight,
+            colors: [
+              AppColors.primaryGreen.withValues(alpha: 0.6),
+              AppColors.primaryGreen.withValues(alpha: 0.25),
+            ],
+          ),
+        ),
+        child: const Center(
+          child: Icon(Icons.groups_rounded, size: 48, color: Colors.white38),
+        ),
+      );
 
   // ---------------------------------------------------------------------------
   // Shared helpers

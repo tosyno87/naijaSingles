@@ -25,7 +25,12 @@ import '../widgets/horizontal_snap_list.dart';
 import '../widgets/people_card.dart';
 
 class DiscoverPageV2 extends StatefulWidget {
-  const DiscoverPageV2({super.key});
+  const DiscoverPageV2({
+    this.onSeeAllPeopleTap,
+    super.key,
+  });
+
+  final VoidCallback? onSeeAllPeopleTap;
 
   @override
   State<DiscoverPageV2> createState() => _DiscoverPageV2State();
@@ -248,8 +253,14 @@ class _DiscoverPageV2State extends State<DiscoverPageV2> {
   // ---------------------------------------------------------------------------
 
   void _onSeeAllPeople() {
-    final nav = DefaultTabController.of(context);
-    if (nav.length > 0) {
+    final onSeeAllPeopleTap = widget.onSeeAllPeopleTap;
+    if (onSeeAllPeopleTap != null) {
+      onSeeAllPeopleTap();
+      return;
+    }
+
+    final nav = DefaultTabController.maybeOf(context);
+    if (nav != null && nav.length > 0) {
       nav.animateTo(0);
     }
   }
@@ -423,29 +434,21 @@ class _DiscoverPageV2State extends State<DiscoverPageV2> {
               ),
             ),
             const SizedBox(width: 12),
-            Container(
-              width: 44,
-              height: 44,
-              decoration: BoxDecoration(
-                color: Colors.white,
-                borderRadius: BorderRadius.circular(14),
-                boxShadow: [
-                  BoxShadow(
-                    color: Colors.black.withValues(alpha: 0.06),
-                    blurRadius: 8,
-                    offset: const Offset(0, 2),
+            Material(
+              color: AppColors.primaryGreen.withValues(alpha: 0.08),
+              borderRadius: BorderRadius.circular(12),
+              child: InkWell(
+                onTap: _showFilterSheet,
+                borderRadius: BorderRadius.circular(12),
+                child: const SizedBox(
+                  width: 44,
+                  height: 44,
+                  child: Icon(
+                    Icons.tune_rounded,
+                    size: 20,
+                    color: AppColors.primaryGreen,
                   ),
-                ],
-              ),
-              child: IconButton(
-                icon: const Icon(
-                  Icons.tune_rounded,
-                  size: 22,
-                  color: AppColors.primaryGreen,
                 ),
-                onPressed: _showFilterSheet,
-                padding: EdgeInsets.zero,
-                tooltip: 'Filter',
               ),
             ),
           ],
@@ -464,7 +467,12 @@ class _DiscoverPageV2State extends State<DiscoverPageV2> {
       return _buildInlineError(_peopleError!, _loadPeople);
     }
     if (_people.isEmpty) {
-      return _buildEmptyState('No people found nearby');
+      return _buildActionableEmpty(
+        icon: Icons.people_outline_rounded,
+        message: 'No people found nearby',
+        actionLabel: 'Refresh',
+        onAction: _loadPeople,
+      );
     }
     return HorizontalSnapList(
       itemWidth: 160,
@@ -498,7 +506,12 @@ class _DiscoverPageV2State extends State<DiscoverPageV2> {
       return _buildInlineError(_eventsError!, _loadEvents);
     }
     if (_events.isEmpty) {
-      return _buildEmptyState('No upcoming events');
+      return _buildActionableEmpty(
+        icon: Icons.event_outlined,
+        message: 'No upcoming events nearby',
+        actionLabel: 'Browse all events',
+        onAction: _onSeeAllEvents,
+      );
     }
 
     final pairs = <List<EventModel>>[];
@@ -643,7 +656,12 @@ class _DiscoverPageV2State extends State<DiscoverPageV2> {
       return _buildInlineError(_communitiesError!, _loadCommunities);
     }
     if (_communities.isEmpty) {
-      return _buildEmptyState('No communities yet');
+      return _buildActionableEmpty(
+        icon: Icons.groups_outlined,
+        message: 'No communities yet',
+        actionLabel: 'Browse all communities',
+        onAction: _onBrowseCommunities,
+      );
     }
     return HorizontalSnapList(
       itemWidth: 200,
@@ -715,22 +733,58 @@ class _DiscoverPageV2State extends State<DiscoverPageV2> {
         ),
       );
 
-  Widget _buildEmptyState(String message) => Padding(
+  Widget _buildActionableEmpty({
+    required IconData icon,
+    required String message,
+    required String actionLabel,
+    required VoidCallback onAction,
+  }) =>
+      Padding(
         padding: const EdgeInsets.symmetric(horizontal: 24),
         child: Container(
-          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 24),
+          width: double.infinity,
+          padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 28),
           decoration: BoxDecoration(
             color: Colors.white,
             borderRadius: BorderRadius.circular(16),
+            border: Border.all(color: Colors.grey.shade100),
           ),
-          child: Center(
-            child: Text(
-              message,
-              style: GoogleFonts.montserrat(
-                fontSize: 14,
-                color: AppColors.textSecondary,
+          child: Column(
+            children: [
+              Icon(icon, size: 40, color: Colors.grey.shade300),
+              const SizedBox(height: 12),
+              Text(
+                message,
+                style: GoogleFonts.montserrat(
+                  fontSize: 14,
+                  fontWeight: FontWeight.w500,
+                  color: AppColors.textSecondary,
+                ),
+                textAlign: TextAlign.center,
               ),
-            ),
+              const SizedBox(height: 16),
+              SizedBox(
+                height: 40,
+                child: OutlinedButton(
+                  onPressed: onAction,
+                  style: OutlinedButton.styleFrom(
+                    foregroundColor: AppColors.primaryGreen,
+                    side: const BorderSide(color: AppColors.primaryGreen),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(20),
+                    ),
+                    padding: const EdgeInsets.symmetric(horizontal: 20),
+                  ),
+                  child: Text(
+                    actionLabel,
+                    style: GoogleFonts.montserrat(
+                      fontSize: 13,
+                      fontWeight: FontWeight.w600,
+                    ),
+                  ),
+                ),
+              ),
+            ],
           ),
         ),
       );

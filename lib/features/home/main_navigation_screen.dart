@@ -45,9 +45,11 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
   // Define the pages to be shown for each tab
   // Order matches the BottomNavigationBarItems below
   // CONNECT-FIRST NAVIGATION (Connect is the home page)
-  final List<Widget> _pages = [
+  List<Widget> get _pages => [
     const ExploreScreen(), // Tab 0: Connect (Dating/Friendship) - HOME PAGE
-    const DiscoverPageV2(), // Tab 1: Discover (Events & Communities)
+    DiscoverPageV2(
+      onSeeAllPeopleTap: () => _switchToTab(0),
+    ), // Tab 1: Discover (Events & Communities)
     const MessagesScreen(), // Tab 2: Messages
     const ProfileScreen(), // Tab 3: Profile
   ];
@@ -204,6 +206,13 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
         _backgroundTasksRunning = false;
       });
     }
+  }
+
+  void _switchToTab(int index) {
+    if (!mounted) return;
+    setState(() {
+      _selectedIndex = index.clamp(0, _pages.length - 1);
+    });
   }
 
   @override
@@ -426,18 +435,15 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
       bottomNavigationBar: BottomNavigationBar(
         currentIndex: _validSelectedIndex,
         onTap: (index) {
-          setState(() {
-            // Ensure index is within valid range
-            _selectedIndex = index.clamp(0, _pages.length - 1);
-            AppLogger.debug(
-              '🔄 Tab tapped: index=$index, _selectedIndex=$_selectedIndex, _validSelectedIndex=$_validSelectedIndex',
-            );
-            AppLogger.debug('📱 Pages length: ${_pages.length}');
-          });
+          _switchToTab(index);
+          AppLogger.debug(
+            '🔄 Tab tapped: index=$index, _selectedIndex=$_selectedIndex, _validSelectedIndex=$_validSelectedIndex',
+          );
+          AppLogger.debug('📱 Pages length: ${_pages.length}');
         },
         backgroundColor: Colors.white,
         selectedItemColor: AppColors.primaryGreen,
-        unselectedItemColor: Colors.grey,
+        unselectedItemColor: const Color(0xFF8E8E93),
         type: BottomNavigationBarType.fixed,
         selectedLabelStyle: GoogleFonts.montserrat(
           fontSize: 12,

@@ -147,6 +147,7 @@ flutter:
     - asset/translation/
     - asset/images/
     - assets/images/
+    - assets/images/backgrounds/
     # .env is optional - only included if it exists (gitignored for security)
   # An image asset can refer to one or more resolution-specific "variants", see
   # https://flutter.dev/assets-and-images/#resolution-aware

@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -6,8 +8,8 @@ import '../../../common/constants/app_colors.dart';
 import '../../../common/data/repo/user_search_repo.dart';
 import '../../../common/widgets/custom_3d_icons.dart';
 import '../../../models/user_model.dart';
-import '../widgets/match_confirmation_modal.dart';
 import '../widgets/hinge_profile_card.dart';
+import '../widgets/match_confirmation_modal.dart';
 
 class TribeConnectScreen extends StatefulWidget {
   const TribeConnectScreen({
@@ -41,11 +43,9 @@ class _TribeConnectScreenState extends State<TribeConnectScreen> {
   }
 
   // Get all available (not yet processed) users
-  List<UserModel> get _availableUsers {
-    return widget.users
-        .where((user) => !_processedUserIds.contains(user.id))
-        .toList();
-  }
+  List<UserModel> get _availableUsers => widget.users
+      .where((user) => !_processedUserIds.contains(user.id))
+      .toList();
 
   @override
   Widget build(BuildContext context) => Scaffold(
@@ -152,21 +152,23 @@ class _TribeConnectScreenState extends State<TribeConnectScreen> {
   }
 
   void _showFilters() {
-    showModalBottomSheet(
-      context: context,
-      backgroundColor: AppColors.backgroundColor,
-      shape: const RoundedRectangleBorder(
-        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
-      ),
-      builder: (context) => _ConnectFilterSheet(
-        currentUser: widget.currentUser,
-        onApply: () {
-          setState(() {
-            _processedUserIds.clear();
-            _currentProfileIndex = 0;
-          });
-          widget.onFiltersApplied?.call();
-        },
+    unawaited(
+      showModalBottomSheet(
+        context: context,
+        backgroundColor: AppColors.backgroundColor,
+        shape: const RoundedRectangleBorder(
+          borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+        ),
+        builder: (context) => _ConnectFilterSheet(
+          currentUser: widget.currentUser,
+          onApply: () {
+            setState(() {
+              _processedUserIds.clear();
+              _currentProfileIndex = 0;
+            });
+            widget.onFiltersApplied?.call();
+          },
+        ),
       ),
     );
   }
@@ -188,7 +190,7 @@ class _TribeConnectScreenState extends State<TribeConnectScreen> {
 
       // Move to next profile after a brief delay
       _moveToNextProfile();
-    } catch (e) {
+    } on Object {
       // Revert on error
       setState(() {
         _processedUserIds.remove(user.id ?? '');
@@ -209,7 +211,7 @@ class _TribeConnectScreenState extends State<TribeConnectScreen> {
 
       // Move to next profile after a brief delay
       _moveToNextProfile();
-    } catch (e) {
+    } on Object {
       // Revert on error
       setState(() {
         _processedUserIds.remove(user.id ?? '');
@@ -238,16 +240,18 @@ class _TribeConnectScreenState extends State<TribeConnectScreen> {
   }
 
   void _showMatchConfirmation(UserModel user) {
-    showDialog(
-      context: context,
-      builder: (context) => MatchConfirmationModal(
-        currentUserImageUrl: widget.currentUser.imageUrl?.isNotEmpty ?? false
-            ? widget.currentUser.imageUrl![0]
-            : 'https://images.pexels.com/photos/220453/pexels-photo-220453.jpeg',
-        matchedUserImageUrl:
-            user.imageUrl?.isNotEmpty ?? false ? user.imageUrl![0] : '',
-        matchedUserName: user.name ?? 'Unknown',
-        matchedUserId: user.id ?? '',
+    unawaited(
+      showDialog(
+        context: context,
+        builder: (context) => MatchConfirmationModal(
+          currentUserImageUrl: widget.currentUser.imageUrl?.isNotEmpty ?? false
+              ? widget.currentUser.imageUrl![0]
+              : 'https://images.pexels.com/photos/220453/pexels-photo-220453.jpeg',
+          matchedUserImageUrl:
+              user.imageUrl?.isNotEmpty ?? false ? user.imageUrl![0] : '',
+          matchedUserName: user.name ?? 'Unknown',
+          matchedUserId: user.id ?? '',
+        ),
       ),
     );
   }
@@ -385,7 +389,8 @@ class _ConnectFilterSheetState extends State<_ConnectFilterSheet> {
                 style: ElevatedButton.styleFrom(
                   backgroundColor: AppColors.primaryGreen,
                   foregroundColor: Colors.white,
-                  disabledBackgroundColor: AppColors.primaryGreen.withAlpha(120),
+                  disabledBackgroundColor:
+                      AppColors.primaryGreen.withAlpha(120),
                   padding: const EdgeInsets.symmetric(vertical: 16),
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(12),
@@ -434,7 +439,8 @@ class _ConnectFilterSheetState extends State<_ConnectFilterSheet> {
           children: [
             Icon(
               option.icon,
-              color: isSelected ? AppColors.primaryGreen : AppColors.textSecondary,
+              color:
+                  isSelected ? AppColors.primaryGreen : AppColors.textSecondary,
               size: 22,
             ),
             const SizedBox(width: 12),

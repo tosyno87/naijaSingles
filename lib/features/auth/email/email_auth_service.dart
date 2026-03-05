@@ -16,7 +16,7 @@ class EmailAuthService {
         email: email.trim(),
         password: password,
       );
-    } catch (e) {
+    } on Object catch (e) {
       debugPrint('Error signing in with email: $e');
       rethrow;
     }
@@ -48,7 +48,7 @@ class EmailAuthService {
       }
 
       return userCredential;
-    } catch (e) {
+    } on Object catch (e) {
       debugPrint('Error registering with email: $e');
       rethrow;
     }
@@ -73,7 +73,7 @@ class EmailAuthService {
         },
         SetOptions(merge: true),
       );
-    } catch (e) {
+    } on Object catch (e) {
       debugPrint('Error creating user document: $e');
       rethrow;
     }
@@ -83,7 +83,7 @@ class EmailAuthService {
   Future<void> sendPasswordResetEmail(String email) async {
     try {
       await _auth.sendPasswordResetEmail(email: email.trim());
-    } catch (e) {
+    } on Object catch (e) {
       debugPrint('Error sending password reset email: $e');
       rethrow;
     }
@@ -99,7 +99,7 @@ class EmailAuthService {
           'email': newEmail,
         });
       }
-    } catch (e) {
+    } on Object catch (e) {
       debugPrint('Error updating email: $e');
       rethrow;
     }
@@ -112,7 +112,7 @@ class EmailAuthService {
       if (user != null) {
         await user.updatePassword(newPassword);
       }
-    } catch (e) {
+    } on Object catch (e) {
       debugPrint('Error updating password: $e');
       rethrow;
     }
@@ -135,7 +135,7 @@ class EmailAuthService {
       );
 
       return await user.reauthenticateWithCredential(credential);
-    } catch (e) {
+    } on Object catch (e) {
       debugPrint('Error reauthenticating: $e');
       rethrow;
     }

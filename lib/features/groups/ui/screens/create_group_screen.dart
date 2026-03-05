@@ -11,7 +11,6 @@ import '../../../../common/widgets/custom_3d_icons.dart';
 import '../../../../models/group_model.dart';
 import '../../data/services/group_service.dart';
 
-@Deprecated('Use CreateGroupScreen from group_chat/screens/ instead')
 class CreateGroupScreen extends StatefulWidget {
   const CreateGroupScreen({super.key});
 
@@ -83,7 +82,7 @@ class _CreateGroupScreenState extends State<CreateGroupScreen> {
       } else {
         throw Exception('Failed to create group');
       }
-    } catch (e) {
+    } on Object catch (e) {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
@@ -415,11 +414,15 @@ class _CreateGroupScreenState extends State<CreateGroupScreen> {
               onChanged: (value) {
                 setState(() => _selectedCategory = value!);
               },
-              icon: const Icon(Icons.arrow_drop_down,
-                  color: AppColors.primaryGreen),
+              icon: const Icon(
+                Icons.arrow_drop_down,
+                color: AppColors.primaryGreen,
+              ),
               dropdownColor: Colors.white,
               style: GoogleFonts.montserrat(
-                  color: AppColors.textPrimary, fontSize: 14),
+                color: AppColors.textPrimary,
+                fontSize: 14,
+              ),
             ),
           ),
         ],
@@ -454,7 +457,8 @@ class _CreateGroupScreenState extends State<CreateGroupScreen> {
                           color: AppColors.primaryGreen,
                         ),
                       ),
-                      backgroundColor: AppColors.primaryGreen.withValues(alpha: 0.1),
+                      backgroundColor:
+                          AppColors.primaryGreen.withValues(alpha: 0.1),
                       side: BorderSide(
                         color: AppColors.primaryGreen.withValues(alpha: 0.3),
                       ),
@@ -509,7 +513,9 @@ class _CreateGroupScreenState extends State<CreateGroupScreen> {
                         focusedBorder: OutlineInputBorder(
                           borderRadius: BorderRadius.circular(12),
                           borderSide: const BorderSide(
-                              color: AppColors.primaryGreen, width: 2),
+                            color: AppColors.primaryGreen,
+                            width: 2,
+                          ),
                         ),
                         filled: true,
                         fillColor: Colors.white,
@@ -736,47 +742,4 @@ class _CreateGroupScreenState extends State<CreateGroupScreen> {
           ),
         ),
       );
-
-  LinearGradient _getCategoryGradient() {
-    switch (_selectedCategory.toLowerCase()) {
-      case 'cultural':
-        return const LinearGradient(
-          colors: [AppColors.culture, AppColors.heritage],
-          begin: Alignment.topLeft,
-          end: Alignment.bottomRight,
-        );
-      case 'professional':
-        return const LinearGradient(
-          colors: [AppColors.business, AppColors.success],
-          begin: Alignment.topLeft,
-          end: Alignment.bottomRight,
-        );
-      case 'social':
-        return const LinearGradient(
-          colors: [AppColors.community, AppColors.info],
-          begin: Alignment.topLeft,
-          end: Alignment.bottomRight,
-        );
-      case 'educational':
-        return const LinearGradient(
-          colors: [AppColors.primaryGreen, AppColors.primaryGreenLight],
-          begin: Alignment.topLeft,
-          end: Alignment.bottomRight,
-        );
-      case 'religious':
-        return const LinearGradient(
-          colors: [AppColors.warning, AppColors.error],
-          begin: Alignment.topLeft,
-          end: Alignment.bottomRight,
-        );
-      case 'regional':
-        return const LinearGradient(
-          colors: [AppColors.textPrimary, AppColors.textSecondary],
-          begin: Alignment.topLeft,
-          end: Alignment.bottomRight,
-        );
-      default:
-        return AppColors.primaryGradient;
-    }
-  }
 }

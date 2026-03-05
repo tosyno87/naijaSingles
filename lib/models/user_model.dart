@@ -69,7 +69,7 @@ class UserModel {
             if (T == double && value is num) return value.toDouble() as T;
           }
           return defaultValue;
-        } catch (e) {
+        } on Object catch (e) {
           debugPrint('Error getting $key: $e');
           return defaultValue;
         }
@@ -93,7 +93,7 @@ class UserModel {
             }
           }
           return defaultValue;
-        } catch (e) {
+        } on Object catch (e) {
           debugPrint('Error getting $parentKey.$childKey: $e');
           return defaultValue;
         }
@@ -120,7 +120,7 @@ class UserModel {
             }
           }
           return {'min': '18', 'max': '50'};
-        } catch (e) {
+        } on Object catch (e) {
           debugPrint('Error parsing age range: $e');
           return {'min': '18', 'max': '50'};
         }
@@ -133,7 +133,7 @@ class UserModel {
             return data['location'] as Map<String, dynamic>;
           }
           return {};
-        } catch (e) {
+        } on Object catch (e) {
           debugPrint('Error getting location: $e');
           return {};
         }
@@ -220,13 +220,13 @@ class UserModel {
             safeGetNested<String>('editInfo', 'occupation', ''),
         // Account status fields
         accountStatus: safeGet<String>('accountStatus', 'active'),
-        deactivatedAt:
-            data.containsKey('deactivatedAt') && data['deactivatedAt'] is Timestamp
-                ? (data['deactivatedAt'] as Timestamp).toDate()
-                : null,
+        deactivatedAt: data.containsKey('deactivatedAt') &&
+                data['deactivatedAt'] is Timestamp
+            ? (data['deactivatedAt'] as Timestamp).toDate()
+            : null,
         deactivationReason: safeGet<String>('deactivationReason'),
       );
-    } catch (e) {
+    } on Object catch (e) {
       debugPrint('Error creating UserModel from document ${doc.id}: $e');
       // Return a minimal user model to prevent crashes
       return UserModel(
@@ -292,13 +292,17 @@ class UserModel {
         editInfo: json['editInfo'],
         streetView: json['streetView'],
         imageUrl: json['photos'] is List
-            ? List<String>.from(json['photos']
-                .map((e) => e?.toString() ?? '')
-                .where((url) => url.isNotEmpty))
-            : json['Pictures'] is List
-                ? List<String>.from(json['Pictures']
+            ? List<String>.from(
+                json['photos']
                     .map((e) => e?.toString() ?? '')
-                    .where((url) => url.isNotEmpty))
+                    .where((url) => url.isNotEmpty),
+              )
+            : json['Pictures'] is List
+                ? List<String>.from(
+                    json['Pictures']
+                        .map((e) => e?.toString() ?? '')
+                        .where((url) => url.isNotEmpty),
+                  )
                 : [],
         distanceBW: json['distanceBW'] != null
             ? (json['distanceBW'] as num).round()
@@ -378,9 +382,11 @@ class UserModel {
         streetView: map['streetView'] as Map?,
         isBot: map['isBot'] as bool? ?? false,
         imageUrl: map['photos'] is List
-            ? List<String>.from((map['photos'] as List)
-                .map((e) => e?.toString() ?? '')
-                .where((url) => url.isNotEmpty))
+            ? List<String>.from(
+                (map['photos'] as List)
+                    .map((e) => e?.toString() ?? '')
+                    .where((url) => url.isNotEmpty),
+              )
             : null,
         distanceBW: map['distanceBW'] is num
             ? (map['distanceBW'] as num).toInt()
@@ -546,9 +552,7 @@ class UserModel {
 
   /// Whether this user is discoverable (shown in swipe/search/recommendations).
   /// Users are NOT discoverable when paused, incognito, deleted, or banned.
-  bool get isDiscoverable =>
-      accountStatus == null ||
-      accountStatus == 'active';
+  bool get isDiscoverable => accountStatus == null || accountStatus == 'active';
 
   /// Whether the account is temporarily deactivated (paused or incognito).
   bool get isDeactivated =>

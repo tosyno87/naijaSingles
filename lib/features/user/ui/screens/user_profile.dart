@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:developer';
 
 import 'package:easy_localization/easy_localization.dart';
@@ -25,13 +26,12 @@ import '../widgets/user_info.dart';
 
 class ProfilePage extends StatefulWidget {
   const ProfilePage({
-    required this.isPuchased,
+    required this.isPurchased,
     required this.items,
     required this.purchases,
     super.key,
   });
-  // final bool isPuchased;
-  final bool isPuchased;
+  final bool isPurchased;
   final Map items;
   final List<PurchaseDetails> purchases;
 
@@ -142,7 +142,7 @@ class _ProfilePageState extends State<ProfilePage> {
                                       checktype: 'profile',
                                     );
                                     log('file after edit is $file');
-                                    // ignore: use_build_context_synchronously
+                                    if (!context.mounted) return;
                                     BlocProvider.of<UserBloc>(context).add(
                                       UpdateUserProfilePictures(
                                         checktype: 'profile',
@@ -167,9 +167,7 @@ class _ProfilePageState extends State<ProfilePage> {
                           .toString()
                       : ''.tr().toString(),
                   style: TextStyle(
-                    color: isDarkMode
-                        ? Colors.white
-                        : Colors.black87,
+                    color: isDarkMode ? Colors.white : Colors.black87,
                     fontWeight: FontWeight.w500,
                     fontSize: 30,
                   ),
@@ -182,9 +180,7 @@ class _ProfilePageState extends State<ProfilePage> {
                       : ''.tr().toString(),
                   textAlign: TextAlign.center,
                   style: TextStyle(
-                    color: isDarkMode
-                        ? Colors.white
-                        : Colors.black54,
+                    color: isDarkMode ? Colors.white : Colors.black54,
                     fontWeight: FontWeight.w400,
                     fontSize: 20,
                   ),
@@ -198,9 +194,7 @@ class _ProfilePageState extends State<ProfilePage> {
                       : ''.tr().toString(),
                   textAlign: TextAlign.center,
                   style: TextStyle(
-                    color: isDarkMode
-                        ? Colors.white
-                        : Colors.black54,
+                    color: isDarkMode ? Colors.white : Colors.black54,
                     fontWeight: FontWeight.w400,
                     fontSize: 20,
                   ),
@@ -232,7 +226,7 @@ class _ProfilePageState extends State<ProfilePage> {
                                         context: context,
                                         checktype: 'addMedia',
                                       );
-                                      // ignore: use_build_context_synchronously
+                                      if (!context.mounted) return;
                                       BlocProvider.of<UserBloc>(context).add(
                                         UpdateUserProfilePictures(
                                           checktype: 'addMedia',
@@ -280,14 +274,16 @@ class _ProfilePageState extends State<ProfilePage> {
                                   size: 28,
                                 ),
                                 onPressed: () {
-                                  Navigator.pushNamed(
-                                    context,
-                                    RouteName.settingPage,
-                                    arguments: {
-                                      'currentUser': currentUser,
-                                      'isPurchased': widget.isPuchased,
-                                      'items': widget.items,
-                                    },
+                                  unawaited(
+                                    Navigator.pushNamed(
+                                      context,
+                                      RouteName.settingPage,
+                                      arguments: {
+                                        'currentUser': currentUser,
+                                        'isPurchased': widget.isPurchased,
+                                        'items': widget.items,
+                                      },
+                                    ),
                                   );
                                 },
                               ),
@@ -323,9 +319,11 @@ class _ProfilePageState extends State<ProfilePage> {
                                   size: 28,
                                 ),
                                 onPressed: () {
-                                  Navigator.pushNamed(
-                                    context,
-                                    RouteName.editProfileScreen,
+                                  unawaited(
+                                    Navigator.pushNamed(
+                                      context,
+                                      RouteName.editProfileScreen,
+                                    ),
                                   );
                                 },
                               ),
@@ -363,12 +361,12 @@ class _ProfilePageState extends State<ProfilePage> {
                 ),
                 SizedBox(height: MediaQuery.of(context).size.height * 0.02),
                 CustomButton(
-                  text: widget.isPuchased
+                  text: widget.isPurchased
                       ? 'Check Payment Details'.tr().toString()
                       : 'Subscribe Plan'.tr().toString(),
                   onTap: () async {
-                    if (widget.isPuchased) {
-                      Navigator.push(
+                    if (widget.isPurchased) {
+                      await Navigator.push(
                         context,
                         CupertinoPageRoute(
                           builder: (context) =>
@@ -376,7 +374,7 @@ class _ProfilePageState extends State<ProfilePage> {
                         ),
                       );
                     } else {
-                      Navigator.push(
+                      await Navigator.push(
                         context,
                         CupertinoPageRoute(
                           builder: (context) =>

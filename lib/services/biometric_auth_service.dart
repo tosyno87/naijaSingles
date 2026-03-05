@@ -42,7 +42,7 @@ class BiometricAuthService {
     try {
       final prefs = await SharedPreferences.getInstance();
       return prefs.getBool(_biometricEnabledKey) ?? false;
-    } catch (e) {
+    } on Object catch (e) {
       log('❌ Error checking biometric enabled status: $e');
       return false;
     }
@@ -55,7 +55,7 @@ class BiometricAuthService {
       await prefs.setBool(_biometricEnabledKey, true);
       log('✅ Biometric authentication enabled');
       return true;
-    } catch (e) {
+    } on Object catch (e) {
       log('❌ Error enabling biometric authentication: $e');
       return false;
     }
@@ -68,7 +68,7 @@ class BiometricAuthService {
       await prefs.setBool(_biometricEnabledKey, false);
       log('✅ Biometric authentication disabled');
       return true;
-    } catch (e) {
+    } on Object catch (e) {
       log('❌ Error disabling biometric authentication: $e');
       return false;
     }
@@ -105,7 +105,7 @@ class BiometricAuthService {
       await secureStorage.storeBiometricCredentials(credentials);
       log('✅ Biometric credentials stored securely');
       return true;
-    } catch (e) {
+    } on Object catch (e) {
       log('❌ Error storing biometric credentials: $e');
       return false;
     }
@@ -134,7 +134,7 @@ class BiometricAuthService {
         };
       }
       return null;
-    } catch (e) {
+    } on Object catch (e) {
       log('❌ Error retrieving biometric credentials: $e');
       return null;
     }
@@ -151,7 +151,7 @@ class BiometricAuthService {
         final secureStorage = SecureStorageService();
         await secureStorage.deleteBiometricCredentials();
         log('✅ Biometric credentials cleared from secure storage');
-      } catch (e) {
+      } on Object catch (e) {
         log('⚠️ Error clearing secure storage credentials: $e');
         // Continue to clear SharedPreferences
       }
@@ -163,7 +163,7 @@ class BiometricAuthService {
       await prefs.remove(_lastBiometricAuthKey);
       log('✅ Biometric settings cleared');
       return true;
-    } catch (e) {
+    } on Object catch (e) {
       log('❌ Error clearing biometric credentials: $e');
       return false;
     }
@@ -188,7 +188,7 @@ class BiometricAuthService {
 
   /// Show biometric settings dialog
   Future<void> showBiometricSettingsDialog(BuildContext context) async {
-    showDialog(
+    await showDialog(
       context: context,
       builder: (context) => AlertDialog(
         title: const Text('Biometric Authentication'),

@@ -19,7 +19,7 @@ class SearchUserForMapBloc
         final List<UserModel> userList =
             await ExploreMap.getUserListForMap(event.currentUser);
         emit(SearchUserLoadUserForMapState(userList));
-      } catch (e) {
+      } on Object catch (e) {
         emit(SearchUserFailedForMapState());
         log('Error loading map users: $e');
       }

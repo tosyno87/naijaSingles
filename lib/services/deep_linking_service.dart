@@ -21,7 +21,7 @@ class DeepLinkingService {
   Future<void> initialize() async {
     try {
       log('🔗 Deep linking service initialized successfully');
-    } catch (e) {
+    } on Object catch (e) {
       log('❌ Error initializing deep linking service: $e');
     }
   }
@@ -36,7 +36,7 @@ class DeepLinkingService {
       final String link = 'https://naijasingles.app/profile?userId=$userId';
       log('🔗 Created profile link: $link');
       return link;
-    } catch (e) {
+    } on Object catch (e) {
       log('❌ Error creating profile link: $e');
       rethrow;
     }
@@ -51,7 +51,7 @@ class DeepLinkingService {
       final String link = 'https://naijasingles.app/match?matchId=$matchId';
       log('🔗 Created match link: $link');
       return link;
-    } catch (e) {
+    } on Object catch (e) {
       log('❌ Error creating match link: $e');
       rethrow;
     }
@@ -67,7 +67,7 @@ class DeepLinkingService {
       final String link = 'https://naijasingles.app/event?eventId=$eventId';
       log('🔗 Created event link: $link');
       return link;
-    } catch (e) {
+    } on Object catch (e) {
       log('❌ Error creating event link: $e');
       rethrow;
     }
@@ -89,13 +89,15 @@ class DeepLinkingService {
       final String text =
           shareText ?? 'Check out $userName\'s profile on Afropeep! $link';
 
-      await SharePlus.instance.share(ShareParams(
-        text: text,
-        subject: 'Profile from Afropeep',
-      ));
+      await SharePlus.instance.share(
+        ShareParams(
+          text: text,
+          subject: 'Profile from Afropeep',
+        ),
+      );
 
       log('🔗 Profile shared successfully');
-    } catch (e) {
+    } on Object catch (e) {
       log('❌ Error sharing profile: $e');
       rethrow;
     }
@@ -114,16 +116,18 @@ class DeepLinkingService {
         matchName: matchName,
       );
 
-      final String text = shareText ??
-          'I have a new match with $matchName on Afropeep! $link';
+      final String text =
+          shareText ?? 'I have a new match with $matchName on Afropeep! $link';
 
-      await SharePlus.instance.share(ShareParams(
-        text: text,
-        subject: 'New Match on Afropeep',
-      ));
+      await SharePlus.instance.share(
+        ShareParams(
+          text: text,
+          subject: 'New Match on Afropeep',
+        ),
+      );
 
       log('🔗 Match shared successfully');
-    } catch (e) {
+    } on Object catch (e) {
       log('❌ Error sharing match: $e');
       rethrow;
     }
@@ -146,13 +150,15 @@ class DeepLinkingService {
 
       final String text = shareText ?? 'Join $eventName on $eventDate! $link';
 
-      await SharePlus.instance.share(ShareParams(
-        text: text,
-        subject: 'Event on Afropeep',
-      ));
+      await SharePlus.instance.share(
+        ShareParams(
+          text: text,
+          subject: 'Event on Afropeep',
+        ),
+      );
 
       log('🔗 Event shared successfully');
-    } catch (e) {
+    } on Object catch (e) {
       log('❌ Error sharing event: $e');
       rethrow;
     }
@@ -169,7 +175,7 @@ class DeepLinkingService {
         final deepLinkData = DeepLinkData.fromUri(link);
         _linkStreamController.add(deepLinkData);
       }
-    } catch (e) {
+    } on Object catch (e) {
       log('❌ Error handling incoming link: $e');
     }
   }
@@ -183,7 +189,7 @@ class DeepLinkingService {
         return true;
       }
       return false;
-    } catch (e) {
+    } on Object catch (e) {
       log('❌ Error launching URL: $e');
       return false;
     }
@@ -194,7 +200,7 @@ class DeepLinkingService {
 
   /// Dispose resources
   void dispose() {
-    _linkStreamController.close();
+    unawaited(_linkStreamController.close());
   }
 }
 

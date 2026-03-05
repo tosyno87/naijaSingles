@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:developer';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -83,14 +84,17 @@ class _PhoneAuthScreenState extends State<PhoneAuthScreen> {
 
                 // Use direct MaterialPageRoute instead of named route to avoid router issues
                 // This ensures smooth transition without any "Page Not Found" flash
-                Navigator.of(context).pushReplacement(
-                  MaterialPageRoute(
-                    builder: (context) => OtpPage(
-                      phoneNumber: _selectedCountryCode + _phoneController.text,
-                      verificationId: state.verificationId,
-                      codeController: _codeController.text,
-                      updatePhoneNumber: widget.updatePhoneNumber,
-                      isLogin: widget.isSignIn,
+                unawaited(
+                  Navigator.of(context).pushReplacement(
+                    MaterialPageRoute(
+                      builder: (context) => OtpPage(
+                        phoneNumber:
+                            _selectedCountryCode + _phoneController.text,
+                        verificationId: state.verificationId,
+                        codeController: _codeController.text,
+                        updatePhoneNumber: widget.updatePhoneNumber,
+                        isLogin: widget.isSignIn,
+                      ),
                     ),
                   ),
                 );
@@ -309,14 +313,18 @@ class _PhoneAuthScreenState extends State<PhoneAuthScreen> {
                         GestureDetector(
                           onTap: () {
                             if (widget.isSignIn) {
-                              Navigator.pushReplacementNamed(
-                                context,
-                                '/auth_method_selection',
+                              unawaited(
+                                Navigator.pushReplacementNamed(
+                                  context,
+                                  '/auth_method_selection',
+                                ),
                               );
                             } else {
-                              Navigator.pushReplacementNamed(
-                                context,
-                                '/sign_in_method_selection',
+                              unawaited(
+                                Navigator.pushReplacementNamed(
+                                  context,
+                                  '/sign_in_method_selection',
+                                ),
                               );
                             }
                           },

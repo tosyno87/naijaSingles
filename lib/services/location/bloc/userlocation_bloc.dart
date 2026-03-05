@@ -21,7 +21,7 @@ class UserLocationBloc extends Bloc<UserLocationEvents, UserLocationStates> {
         try {
           currentLocation =
               await userLocationReporistory.getLocationCoordinates();
-        } catch (e) {
+        } on Object catch (e) {
           log('Error getting location coordinates: ${e.toString()}');
           // Use default location as fallback
           currentLocation = await userLocationReporistory.getDefaultLocation();
@@ -64,7 +64,7 @@ class UserLocationBloc extends Bloc<UserLocationEvents, UserLocationStates> {
               formattedAddress: defaultLocation['PlaceName'],
             ),
           );
-        } catch (innerE) {
+        } on Object {
           emit(
             const UserLocationFailed(
               message:
@@ -72,7 +72,7 @@ class UserLocationBloc extends Bloc<UserLocationEvents, UserLocationStates> {
             ),
           );
         }
-      } catch (e) {
+      } on Object catch (e) {
         log('General exception in location bloc: ${e.toString()}');
         // Use default location as fallback
         try {
@@ -86,7 +86,7 @@ class UserLocationBloc extends Bloc<UserLocationEvents, UserLocationStates> {
               formattedAddress: defaultLocation['PlaceName'],
             ),
           );
-        } catch (innerE) {
+        } on Object {
           emit(
             UserLocationFailed(
               message: 'Could not access your location: ${e.toString()}',

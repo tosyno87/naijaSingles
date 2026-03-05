@@ -38,7 +38,13 @@ service cloud.firestore {
       // permission-denied if gated by canReadUserProfile.
       // App-side filtering (_passesAdditionalFilters, isDiscoverable)
       // handles privacy for discovery results.
-      allow list: if request.auth != null;
+      allow list: if request.auth != null
+                      && resource.data.isDeleted != true
+                      && resource.data.isProfilePrivate != true
+                      && resource.data.get('accountStatus', 'active') != 'deleted'
+                      && resource.data.get('accountStatus', 'active') != 'banned'
+                      && resource.data.get('accountStatus', 'active') != 'paused'
+                      && resource.data.get('accountStatus', 'active') != 'incognito';
       
       // Allow users to update their own profile with data validation
       allow update: if request.auth != null && 
@@ -496,8 +502,10 @@ service cloud.firestore {
 
     // Unified Groups collection - for the new unified group system
     match /unifiedGroups/{groupId} {
-      // Users can read groups
-      allow read: if request.auth != null;
+      // Users can read public groups or groups they belong to
+      allow read: if request.auth != null
+                      && (resource.data.get('isPublic', true) == true
+                          || request.auth.uid in resource.data.memberIds);
       
       // Users can create groups
       allow create: if request.auth != null && 
@@ -546,16 +554,10 @@ service cloud.firestore {
 
     // Legacy Groups collection - for backward compatibility
     match /groups/{groupId} {
-      // Users can read public groups
-      allow read: if request.auth != null && 
-                   resource.data.isPublic == true;
-      
-      // Users can read groups they're members of
-      allow read: if request.auth != null && 
-                   request.auth.uid in resource.data.memberIds;
-      
-      // Users can read group details for any group (needed for join validation)
-      allow read: if request.auth != null;
+      // Users can read public groups or groups they belong to
+      allow read: if request.auth != null
+                      && (resource.data.get('isPublic', true) == true
+                          || request.auth.uid in resource.data.memberIds);
       
       // Users can create groups
       allow create: if request.auth != null && 
@@ -580,12 +582,12 @@ service cloud.firestore {
 
     // Group Chats collection - for the original group chat system
     match /groupChats/{groupId} {
-      // Users can read groups they're members of
+      // Members can list and read group data
       allow read: if request.auth != null && 
                    request.auth.uid in resource.data.memberIds;
       
-      // Users can read group details for any group (needed for join validation)
-      allow read: if request.auth != null;
+      // Single-document lookup for join validation (does not allow list queries)
+      allow get: if request.auth != null;
       
       // Users can create groups
       allow create: if request.auth != null && 
@@ -688,8 +690,9 @@ service cloud.firestore {
                      request.auth.uid == request.resource.data.userId &&
                      request.resource.data.keys().hasAll(['userId', 'groupId', 'count', 'updatedAt']);
       
-      // System can update unread counts (for message sending)
-      allow update: if request.auth != null;
+      // Only the document owner can update their own unread counts
+      allow update: if request.auth != null &&
+                     request.auth.uid == resource.data.userId;
     }
 
     // Group Reports collection - for group abuse reports

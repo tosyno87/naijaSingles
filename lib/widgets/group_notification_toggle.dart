@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import '../common/constants/app_colors.dart';
@@ -27,7 +29,7 @@ class _GroupNotificationToggleState extends State<GroupNotificationToggle> {
   @override
   void initState() {
     super.initState();
-    _loadMuteStatus();
+    unawaited(_loadMuteStatus());
   }
 
   Future<void> _loadMuteStatus() async {
@@ -39,7 +41,7 @@ class _GroupNotificationToggleState extends State<GroupNotificationToggle> {
           _isLoading = false;
         });
       }
-    } catch (e) {
+    } on Object catch (e) {
       if (mounted) {
         setState(() {
           _isLoading = false;
@@ -80,7 +82,7 @@ class _GroupNotificationToggleState extends State<GroupNotificationToggle> {
           ),
         );
       }
-    } catch (e) {
+    } on Object catch (e) {
       if (mounted) {
         setState(() {
           _isLoading = false;
@@ -193,7 +195,8 @@ class _GroupNotificationToggleState extends State<GroupNotificationToggle> {
                       value: !_isMuted, // Switch shows "enabled" state
                       onChanged: (_) => _toggleMute(),
                       activeThumbColor: AppColors.primaryGreen,
-                      activeTrackColor: AppColors.primaryGreen.withValues(alpha: 0.3),
+                      activeTrackColor:
+                          AppColors.primaryGreen.withValues(alpha: 0.3),
                     ),
                 ],
               ),

@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:math';
 
 import 'package:flutter/widgets.dart';
@@ -178,8 +179,10 @@ class SwipeStackState extends State<SwipeStack>
                 fit: StackFit.expand,
                 children: widget.children
                     .asMap()
-                    .map((int index, _) =>
-                        MapEntry(index, _item(constraints, index)))
+                    .map(
+                      (int index, _) =>
+                          MapEntry(index, _item(constraints, index)),
+                    )
                     .values
                     .toList(),
               ),
@@ -270,7 +273,7 @@ class SwipeStackState extends State<SwipeStack>
     );
   }
 
-  void _onPandEnd(_) {
+  void _onPandEnd(dynamic _) {
     setState(() {});
     if (_progress < widget.threshold) {
       _goFirstPosition();
@@ -282,7 +285,7 @@ class SwipeStackState extends State<SwipeStack>
       ).animate(_animationController);
       _animationY = Tween<double>(begin: _top, end: _top + _top)
           .animate(_animationController);
-      _animationController.forward();
+      unawaited(_animationController.forward());
     }
   }
 
@@ -295,7 +298,7 @@ class SwipeStackState extends State<SwipeStack>
       _animationAngle =
           Tween<double>(begin: _angle, end: 0).animate(_animationController);
     }
-    _animationController.forward();
+    unawaited(_animationController.forward());
   }
 
   void swipeLeft() {
@@ -313,7 +316,7 @@ class SwipeStackState extends State<SwipeStack>
         _animationAngle = Tween<double>(begin: 0, end: _maxAngle * 0.7)
             .animate(_animationController);
       }
-      _animationController.forward();
+      unawaited(_animationController.forward());
     }
   }
 
@@ -332,7 +335,7 @@ class SwipeStackState extends State<SwipeStack>
         _animationAngle = Tween<double>(begin: 0, end: (_maxAngle * 0.7) * -1)
             .animate(_animationController);
       }
-      _animationController.forward();
+      unawaited(_animationController.forward());
     }
   }
 
@@ -353,7 +356,7 @@ class SwipeStackState extends State<SwipeStack>
             .animate(_animationController);
       }
 
-      _animationController.forward();
+      unawaited(_animationController.forward());
     }
   }
 

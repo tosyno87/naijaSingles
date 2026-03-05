@@ -86,7 +86,7 @@ class EventSearchService {
       }
 
       return events;
-    } catch (e) {
+    } on Object catch (e) {
       AppLogger.error('Error searching events', error: e);
       return [];
     }
@@ -112,7 +112,7 @@ class EventSearchService {
             ),
           )
           .toList();
-    } catch (e) {
+    } on Object catch (e) {
       AppLogger.error('Error getting trending events', error: e);
       return [];
     }
@@ -174,7 +174,7 @@ class EventSearchService {
       scoredEvents.sort((a, b) => b.score.compareTo(a.score));
 
       return scoredEvents.take(limit).map((e) => e.event).toList();
-    } catch (e) {
+    } on Object catch (e) {
       AppLogger.error('Error getting recommended events', error: e);
       return [];
     }

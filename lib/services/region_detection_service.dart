@@ -38,7 +38,7 @@ class RegionDetectionService {
       }
 
       return true;
-    } catch (e) {
+    } on Object catch (e) {
       log('Error detecting miles country: $e');
       return true;
     }
@@ -55,7 +55,7 @@ class RegionDetectionService {
     try {
       final miles = kilometersToMiles(distanceKm);
       return '${miles.round()} miles';
-    } catch (e) {
+    } on Object catch (e) {
       log('Error formatting distance: $e');
       final miles = kilometersToMiles(distanceKm);
       return '${miles.round()} miles';

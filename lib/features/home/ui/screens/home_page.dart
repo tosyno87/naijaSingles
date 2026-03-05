@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:swipable_stack/swipable_stack.dart';
@@ -38,17 +40,19 @@ class _HomepageState extends State<Homepage>
   void initState() {
     super.initState();
     stackController = SwipableStackController();
-    controller.initialize(context).then((_) {
-      setState(() {});
-      context
-          .read<SearchUserBloc>()
-          .add(LoadUserEvent(currentUser: controller.currentUser));
+    unawaited(_initializeController());
+  }
 
-      // Check if user needs privacy migration
-      context
-          .read<SearchUserBloc>()
-          .add(CheckMigrationStatusEvent(userId: controller.currentUser.id!));
-    });
+  Future<void> _initializeController() async {
+    await controller.initialize(context);
+    if (!mounted) return;
+    setState(() {});
+    context
+        .read<SearchUserBloc>()
+        .add(LoadUserEvent(currentUser: controller.currentUser));
+    context
+        .read<SearchUserBloc>()
+        .add(CheckMigrationStatusEvent(userId: controller.currentUser.id!));
   }
 
   @override
@@ -154,7 +158,8 @@ class _HomepageState extends State<Homepage>
                         // Refresh user list after migration
                         context.read<SearchUserBloc>().add(
                               LoadUserEvent(
-                                  currentUser: controller.currentUser),
+                                currentUser: controller.currentUser,
+                              ),
                             );
                         setState(() {
                           _shouldShowMigrationPrompt = false;

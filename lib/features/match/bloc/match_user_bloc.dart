@@ -25,7 +25,7 @@ class MatchUserBloc extends Bloc<MatchUserEvent, MatchUserState> {
       final matches = await getMatches(event.currentUser);
 
       emit(MatchUserLoadedState(matches));
-    } catch (e) {
+    } on Object catch (e) {
       debugPrint('Error loading matches: $e');
       emit(MatchUserFailedState());
     }

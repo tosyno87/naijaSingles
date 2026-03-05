@@ -68,7 +68,7 @@ class _EnhancedBioScreenState extends State<EnhancedBioScreen> {
             maxLines: 10,
             maxLength: _maxLength,
             decoration: InputDecoration(
-              hintText: "Tell people about yourself...",
+              hintText: 'Tell people about yourself...',
               hintStyle: GoogleFonts.montserrat(
                 color: Colors.grey.shade400,
                 fontSize: 16,

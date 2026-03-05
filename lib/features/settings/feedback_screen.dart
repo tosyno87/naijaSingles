@@ -521,7 +521,8 @@ class _FeedbackScreenState extends State<FeedbackScreen> {
             _buildTip('Be specific about the issue or suggestion'),
             _buildTip('Include steps to reproduce bugs'),
             _buildTip(
-                'Mention your device and app version for technical issues'),
+              'Mention your device and app version for technical issues',
+            ),
             _buildTip('Suggest solutions if you have ideas'),
           ],
         ),
@@ -617,7 +618,7 @@ class _FeedbackScreenState extends State<FeedbackScreen> {
 
       if (mounted) {
         // Show success dialog
-        showDialog(
+        await showDialog(
           context: context,
           barrierDismissible: false,
           builder: (context) => AlertDialog(
@@ -635,8 +636,11 @@ class _FeedbackScreenState extends State<FeedbackScreen> {
                     color: successColor.withValues(alpha: 0.1),
                     shape: BoxShape.circle,
                   ),
-                  child: const Icon(Icons.check_circle,
-                      color: successColor, size: 40),
+                  child: const Icon(
+                    Icons.check_circle,
+                    color: successColor,
+                    size: 40,
+                  ),
                 ),
                 const SizedBox(height: 16),
                 Text(
@@ -673,8 +677,11 @@ class _FeedbackScreenState extends State<FeedbackScreen> {
                   ),
                   child: Row(
                     children: [
-                      const Icon(Icons.info_outline,
-                          color: primaryColor, size: 20),
+                      const Icon(
+                        Icons.info_outline,
+                        color: primaryColor,
+                        size: 20,
+                      ),
                       const SizedBox(width: 8),
                       Expanded(
                         child: Text(
@@ -722,7 +729,7 @@ class _FeedbackScreenState extends State<FeedbackScreen> {
           ),
         );
       }
-    } catch (e) {
+    } on Object catch (e) {
       log('Error submitting feedback: $e');
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(

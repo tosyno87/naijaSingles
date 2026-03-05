@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 
@@ -51,11 +53,13 @@ class UpdateNumber extends StatelessWidget {
                   onTap: currentUser.phoneNumber!.isNotEmpty
                       ? null
                       : () {
-                          Navigator.pushReplacement(
-                            context,
-                            MaterialPageRoute(
-                              builder: (context) => PhoneNumber(
-                                updatePhoneNumber: true,
+                          unawaited(
+                            Navigator.pushReplacement(
+                              context,
+                              MaterialPageRoute(
+                                builder: (context) => PhoneNumber(
+                                  updatePhoneNumber: true,
+                                ),
                               ),
                             ),
                           );

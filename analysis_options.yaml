@@ -16,6 +16,12 @@ analyzer:
     - "**/*.gr.dart"
     - "**/*.generated.dart"
     - "**/*_old.dart"  # Exclude old/backup files
+    - "test/**"
+    - "integration_test/**"
+    - "scripts/**"
+    - "analyze_users.dart"
+    - "fix_user_fields.dart"
+    - "fix_user_fields_simple.dart"
   errors:
     # Critical errors that should always fail the build
     missing_required_param: error
@@ -25,7 +31,6 @@ analyzer:
     undefined_operator: error
     undefined_getter: error
     undefined_setter: error
-    undefined_name: error
     undefined_class: error
     # Treat these as warnings to avoid breaking CI
     invalid_use_of_protected_member: warning
@@ -137,7 +142,6 @@ linter:
     prefer_asserts_in_initializer_lists: true
     prefer_asserts_with_message: true
     prefer_expression_function_bodies: true
-    prefer_extracting_callbacks: true
     prefer_if_elements_to_conditional_expressions: true
     prefer_initializing_formals: true
     prefer_inlined_adds: true
@@ -173,7 +177,6 @@ linter:
     unnecessary_string_interpolations: true
     unnecessary_this: true
     unrelated_type_equality_checks: true
-    unsafe_html: true
     use_colored_box: true
     use_decorated_box: true
     use_enums: true

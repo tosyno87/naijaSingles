@@ -23,7 +23,7 @@ class BlocUserListBloc extends Bloc<BlocUserListEvent, BlocUserListState> {
         );
         lastDocument = blockList.isNotEmpty ? blockList.last : null;
         emit(BlockUserLoadedState(blockList));
-      } catch (e) {
+      } on Object catch (e) {
         emit(BlockUserFailedState());
         log('Error loading block users: $e');
       }
@@ -48,12 +48,12 @@ class BlocUserListBloc extends Bloc<BlocUserListEvent, BlocUserListState> {
 
           final List<BlockUserModel> updatedList = [
             ...currentList,
-            ...moreBlockList
+            ...moreBlockList,
           ];
 
           emit(BlockUserLoadedState(updatedList));
         }
-      } catch (e) {
+      } on Object catch (e) {
         emit(BlockUserFailedState());
         log('Error loading more block users: $e');
       }

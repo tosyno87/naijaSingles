@@ -1,4 +1,4 @@
-// ignore_for_file: sort_child_properties_last, depend_on_referenced_packages, prefer_typing_uninitialized_variables, avoid_function_literals_in_foreach_calls
+// ignore_for_file: sort_child_properties_last, depend_on_referenced_packages
 
 import 'dart:async';
 import 'dart:io';
@@ -15,11 +15,11 @@ import 'package:in_app_purchase_storekit/in_app_purchase_storekit.dart';
 import 'package:in_app_purchase_storekit/store_kit_wrappers.dart';
 import 'package:rflutter_alert/rflutter_alert.dart';
 
+import '../../../common/bloc/theme/theme_bloc.dart';
 import '../../../common/constants/adds.dart';
 import '../../../common/constants/app_colors.dart';
 import '../../../common/constants/constants.dart';
 import '../../../common/data/repo/in_app_purchase_repo.dart';
-import '../../../common/bloc/theme/theme_bloc.dart';
 import '../../../common/utils/crousle_slider.dart';
 import '../../../common/utils/privacy_page.dart';
 import '../../../common/widgets/custom_button.dart';
@@ -70,7 +70,7 @@ class ProductsState extends State<Products> {
   void initState() {
     super.initState();
     context.read<GetInAppProductsBloc>().add(RequestInAppProducts());
-    _initialize();
+    unawaited(_initialize());
     // Show payment failure alert.
     if (widget.isPaymentSuccess != null && !widget.isPaymentSuccess!) {
       WidgetsBinding.instance.addPostFrameCallback((_) async {
@@ -96,11 +96,14 @@ class ProductsState extends State<Products> {
 
   @override
   void dispose() {
-    _streamSubscription?.cancel();
+    unawaited(_streamSubscription?.cancel());
     super.dispose();
   }
 
   Future<void> _initialize() async {
+    final currentUser = widget.currentUser;
+    if (currentUser == null) return;
+
     isAvailable = await _iap.isAvailable();
     debugPrint('available is $isAvailable');
     if (isAvailable) {
@@ -119,6 +122,7 @@ class ProductsState extends State<Products> {
       }
 
       _streamSubscription = _iap.purchaseStream.listen((data) async {
+        if (!mounted) return;
         setState(() {
           purchases.addAll(data);
         });
@@ -127,13 +131,13 @@ class ProductsState extends State<Products> {
           await InAppPurchaseRepoImpl.verifyPuchase(
             purchase.productID,
             purchases,
-            widget.currentUser!,
+            currentUser,
             widget.items,
             context,
           ).whenComplete(() async {
             await firebaseFireStoreInstance
                 .collection('users')
-                .doc(widget.currentUser!.id)
+                .doc(currentUser.id)
                 .update({
               'isPremium': true,
               'subscriptionDate': FieldValue.serverTimestamp(),
@@ -141,8 +145,9 @@ class ProductsState extends State<Products> {
           });
         }
       });
-      _streamSubscription!.onError(
+      _streamSubscription?.onError(
         (error) {
+          if (!mounted) return;
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
               content: error != null
@@ -181,9 +186,8 @@ class ProductsState extends State<Products> {
             backgroundColor: Theme.of(context).primaryColor,
             appBar: AppBar(
               elevation: 0,
-              backgroundColor: isDarkMode
-                  ? const Color(0xff252020)
-                  : Colors.white,
+              backgroundColor:
+                  isDarkMode ? const Color(0xff252020) : Colors.white,
               centerTitle: true,
               title: Text(
                 'Get our premium plans'.tr().toString(),
@@ -316,7 +320,7 @@ class ProductsState extends State<Products> {
                                                 },
                                                 children:
                                                     state.result.map((product) {
-                                                  var iosP;
+                                                  AppStoreProductDetails? iosP;
                                                   product
                                                       as GooglePlayProductDetails;
                                                   if (Platform.isIOS) {
@@ -342,22 +346,25 @@ class ProductsState extends State<Products> {
                                                                     product,
                                                                   ),
                                                             intervalCount: Platform
-                                                                    .isIOS
+                                                                        .isIOS &&
+                                                                    iosP != null
                                                                 ? iosP
-                                                                    .skProduct
-                                                                    .subscriptionPeriod!
-                                                                    .numberOfUnits
-                                                                    .toString()
+                                                                        .skProduct
+                                                                        .subscriptionPeriod
+                                                                        ?.numberOfUnits
+                                                                        .toString() ??
+                                                                    ''
                                                                 : product
-                                                                    .productDetails
-                                                                    .subscriptionOfferDetails!
-                                                                    .first
-                                                                    .pricingPhases
-                                                                    .first
-                                                                    .billingPeriod
-                                                                    .split(
+                                                                        .productDetails
+                                                                        .subscriptionOfferDetails
+                                                                        ?.first
+                                                                        .pricingPhases
+                                                                        .first
+                                                                        .billingPeriod
+                                                                        .split(
+                                                                        '',
+                                                                      )[1] ??
                                                                     '',
-                                                                  )[1],
                                                             price:
                                                                 product.price,
                                                             onTap: () {
@@ -375,21 +382,27 @@ class ProductsState extends State<Products> {
                                         ),
                                       ),
                                       if (selectedProduct != null)
-                                        Center(
-                                          child: ListTile(
-                                            title: Text(
-                                              selectedProduct!.title,
-                                              textAlign: TextAlign.center,
+                                        Builder(builder: (context) {
+                                          final product = selectedProduct;
+                                          if (product == null) {
+                                            return const SizedBox.shrink();
+                                          }
+                                          return Center(
+                                            child: ListTile(
+                                              title: Text(
+                                                product.title,
+                                                textAlign: TextAlign.center,
+                                              ),
+                                              subtitle: Text(
+                                                product.description,
+                                                textAlign: TextAlign.center,
+                                              ),
+                                              trailing: Text(
+                                                '${state.result.indexOf(product) + 1}/${state.result.length}',
+                                              ),
                                             ),
-                                            subtitle: Text(
-                                              selectedProduct!.description,
-                                              textAlign: TextAlign.center,
-                                            ),
-                                            trailing: Text(
-                                              '${state.result.indexOf(selectedProduct!) + 1}/${state.result.length}',
-                                            ),
-                                          ),
-                                        )
+                                          );
+                                        })
                                       else
                                         Center(
                                           child: ListTile(
@@ -429,11 +442,13 @@ class ProductsState extends State<Products> {
                         ? CustomButton(
                             text: 'CONTINUE'.tr().toString(),
                             onTap: () async {
+                              final product = selectedProduct;
+                              if (product == null) return;
                               BlocProvider.of<BuyConsumableInAppProductsBloc>(
                                 context,
                               ).add(
                                 RequestBuyConsumableProducts(
-                                  productDetails: selectedProduct!,
+                                  productDetails: product,
                                 ),
                               );
                             },

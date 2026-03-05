@@ -20,7 +20,7 @@ class UserService {
         return UserProfile.fromMap(doc.data()!, doc.id);
       }
       return null;
-    } catch (e) {
+    } on Object catch (e) {
       AppLogger.error('Error getting user profile', error: e);
       return null;
     }
@@ -38,7 +38,7 @@ class UserService {
           .where((profile) => profile != null)
           .cast<UserProfile>()
           .toList();
-    } catch (e) {
+    } on Object catch (e) {
       AppLogger.error('Error getting user profiles', error: e);
       return [];
     }
@@ -65,7 +65,7 @@ class UserService {
       return snapshot.docs
           .map((doc) => UserProfile.fromMap(doc.data(), doc.id))
           .toList();
-    } catch (e) {
+    } on Object catch (e) {
       AppLogger.error('Error searching users', error: e);
       return [];
     }
@@ -79,7 +79,7 @@ class UserService {
           .doc(profile.id)
           .update(profile.toMap());
       return true;
-    } catch (e) {
+    } on Object catch (e) {
       AppLogger.error('Error updating user profile', error: e);
       return false;
     }
@@ -90,7 +90,7 @@ class UserService {
     try {
       final profile = await getUserProfile(userId);
       return profile?.displayName ?? 'Unknown User';
-    } catch (e) {
+    } on Object catch (e) {
       AppLogger.error('Error getting user display name', error: e);
       return 'Unknown User';
     }
@@ -101,7 +101,7 @@ class UserService {
     try {
       final profile = await getUserProfile(userId);
       return profile?.avatarUrl;
-    } catch (e) {
+    } on Object catch (e) {
       AppLogger.error('Error getting user avatar URL', error: e);
       return null;
     }
@@ -112,7 +112,7 @@ class UserService {
     try {
       final doc = await _firestore.collection('users').doc(userId).get();
       return doc.exists;
-    } catch (e) {
+    } on Object catch (e) {
       AppLogger.error('Error checking if user exists', error: e);
       return false;
     }

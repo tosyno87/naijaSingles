@@ -17,7 +17,7 @@ class PrivacyMigrationService {
       if (currentUser == null) return false;
 
       return await migrateUserData(currentUser.uid);
-    } catch (e) {
+    } on Object catch (e) {
       debugPrint('Error migrating current user data: $e');
       return false;
     }
@@ -85,7 +85,7 @@ class PrivacyMigrationService {
 
       debugPrint('✅ Privacy migration completed for user: $userId');
       return true;
-    } catch (e) {
+    } on Object catch (e) {
       debugPrint('❌ Error migrating user data: $e');
       return false;
     }
@@ -256,7 +256,7 @@ class PrivacyMigrationService {
 
           // Small delay to avoid overwhelming Firestore
           await Future.delayed(const Duration(milliseconds: 100));
-        } catch (e) {
+        } on Object catch (e) {
           debugPrint('❌ Error migrating user ${doc.id}: $e');
           errorCount++;
         }
@@ -266,7 +266,7 @@ class PrivacyMigrationService {
       debugPrint('   Total users: $totalUsers');
       debugPrint('   Successfully migrated: $migratedCount');
       debugPrint('   Errors: $errorCount');
-    } catch (e) {
+    } on Object catch (e) {
       debugPrint('❌ Error in bulk migration: $e');
     }
   }
@@ -282,7 +282,7 @@ class PrivacyMigrationService {
           .get();
 
       return publicDoc.exists;
-    } catch (e) {
+    } on Object catch (e) {
       debugPrint('Error checking migration status: $e');
       return false;
     }
@@ -322,7 +322,7 @@ class PrivacyMigrationService {
       } else {
         return {'migrated': false};
       }
-    } catch (e) {
+    } on Object catch (e) {
       return {'migrated': false, 'error': e.toString()};
     }
   }
@@ -375,7 +375,7 @@ class PrivacyMigrationService {
 
       debugPrint('✅ Migration rollback completed for user: $userId');
       return true;
-    } catch (e) {
+    } on Object catch (e) {
       debugPrint('❌ Error rolling back migration: $e');
       return false;
     }

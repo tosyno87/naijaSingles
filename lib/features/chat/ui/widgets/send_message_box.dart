@@ -1,21 +1,24 @@
+import 'dart:async';
 import 'dart:io';
 import 'dart:math';
+
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import '../../../../common/widgets/hookup_circularbar.dart';
-import '../../../match/ui/widget/matches_card.dart';
 import 'package:image_picker/image_picker.dart';
+
 import '../../../../common/constants/app_colors.dart';
 import '../../../../common/constants/constants.dart';
 import '../../../../common/data/repo/pagination_repo.dart';
 import '../../../../common/data/repo/user_messaging_repo.dart';
 import '../../../../common/utils/custom_toast.dart';
+import '../../../../common/widgets/hookup_circularbar.dart';
 import '../../../../config/app_config.dart';
 import '../../../../config/prompt_config.dart';
 import '../../../../models/user_model.dart';
+import '../../../match/ui/widget/matches_card.dart';
 import 'chatmessage_read.dart.dart';
 import 'generate_layout.dart';
 
@@ -43,6 +46,8 @@ class _MessageBoxState extends State<MessageBox> {
   final List<String> prompts = chatPrompts;
   late CollectionReference chatReference;
   final TextEditingController _textController = TextEditingController();
+  StreamSubscription<DocumentSnapshot>? _blockSubscription;
+  StreamSubscription<QuerySnapshot>? _messageSubscription;
   bool _isWritting = false;
   bool _isLoadingMore = false;
   bool _hasMoreMessages = true;
@@ -58,12 +63,19 @@ class _MessageBoxState extends State<MessageBox> {
 
   List<Widget> generateReceiverLayout(DocumentSnapshot documentSnapshot) {
     if (!documentSnapshot.get('isRead')) {
-      chatReference.doc(documentSnapshot.id).update({
-        'isRead': true,
-      });
-      db.collection('chats').doc(chatId(widget.second, widget.sender)).update({
-        'isRead': true,
-      });
+      unawaited(
+        chatReference.doc(documentSnapshot.id).update({
+          'isRead': true,
+        }),
+      );
+      unawaited(
+        db
+            .collection('chats')
+            .doc(chatId(widget.second, widget.sender))
+            .update({
+          'isRead': true,
+        }),
+      );
       return ChatMessageRead.messagesIsRead(
         documentSnapshot,
         widget.second,
@@ -92,7 +104,8 @@ class _MessageBoxState extends State<MessageBox> {
 
   String? blockedBy;
   void checkBlock() {
-    chatReference.doc('blocked').snapshots().listen((onData) {
+    _blockSubscription =
+        chatReference.doc('blocked').snapshots().listen((onData) {
       if (true) {
         // (onData.data != null) {
         blockedBy = onData.get('blockedBy');
@@ -109,6 +122,8 @@ class _MessageBoxState extends State<MessageBox> {
 
   @override
   void dispose() {
+    unawaited(_blockSubscription?.cancel());
+    unawaited(_messageSubscription?.cancel());
     _scrollController.removeListener(_scrollListener);
     _scrollController.dispose();
     super.dispose();
@@ -119,7 +134,7 @@ class _MessageBoxState extends State<MessageBox> {
             _scrollController.position.maxScrollExtent * 0.9 &&
         !_scrollController.position.outOfRange) {
       if (_hasMoreMessages && !_isLoadingMore) {
-        _loadMoreMessages();
+        unawaited(_loadMoreMessages());
       }
     }
   }
@@ -127,7 +142,7 @@ class _MessageBoxState extends State<MessageBox> {
   void _loadInitialMessages() {
     final Stream<QuerySnapshot> snapshotStream =
         PaginationRepo.listenForMessages(perpage, chatReference);
-    snapshotStream.listen((snapshot) {
+    _messageSubscription = snapshotStream.listen((snapshot) {
       if (mounted) {
         setState(() {
           messages = snapshot.docs;
@@ -263,7 +278,7 @@ class _MessageBoxState extends State<MessageBox> {
                     child: ActionChip(
                       label: Text(p),
                       onPressed: () {
-                        _sendText(p);
+                        unawaited(_sendText(p));
                       },
                     ),
                   ),
@@ -275,7 +290,8 @@ class _MessageBoxState extends State<MessageBox> {
 
   Widget _buildTextComposer() => IconTheme(
         data: IconThemeData(
-          color: _isWritting ? AppColors.primaryGreen : AppColors.secondaryColor,
+          color:
+              _isWritting ? AppColors.primaryGreen : AppColors.secondaryColor,
         ),
         child: Card(
           elevation: 10,
@@ -315,7 +331,7 @@ class _MessageBoxState extends State<MessageBox> {
                     await uploadTask.then((p0) async {
                       final String fileUrl =
                           await storageReference.getDownloadURL();
-                      UserMessagingRepo.sendImage(
+                      await UserMessagingRepo.sendImage(
                         'photo',
                         fileUrl,
                         chatReference,
@@ -374,7 +390,7 @@ class _MessageBoxState extends State<MessageBox> {
 
   Future _sendText(String text) async {
     _textController.clear();
-    UserMessagingRepo.addTexttoDb(
+    await UserMessagingRepo.addTexttoDb(
       chatReference,
       text,
       widget.chatId,

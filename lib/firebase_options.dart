@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart' show FirebaseOptions;
@@ -5,13 +7,19 @@ import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/foundation.dart'
     show defaultTargetPlatform, kIsWeb, TargetPlatform, debugPrint;
 
-// Note: Using hardcoded values from GoogleService-Info.plist for production
-// SecureConfig is only used in development when .env file is available
 import 'config/secure_config.dart';
+import 'firebase_options_staging.dart';
+
+/// Build with --dart-define=ENV=production for prod, otherwise defaults to staging.
+const String _env = String.fromEnvironment('ENV', defaultValue: 'staging');
+bool get isProduction => _env == 'production';
 
 /// Default Firebase configuration options for the current platform
 class DefaultFirebaseOptions {
   static FirebaseOptions get currentPlatform {
+    if (!isProduction) {
+      return StagingFirebaseOptions.currentPlatform;
+    }
     if (kIsWeb) {
       return web;
     }
@@ -51,9 +59,9 @@ class DefaultFirebaseOptions {
         authDomain: SecureConfig.firebaseAuthDomain,
         storageBucket: SecureConfig.firebaseStorageBucket,
       );
-    } catch (e) {
+    } on Object {
       // Fallback to production values
-      return FirebaseOptions(
+      return const FirebaseOptions(
         apiKey: 'AIzaSyAwsU8j3acGo_cKOECbgsXHd3-qvvLn_Fw',
         appId: '1:888697307756:web:95ea92b8c7288e31704e49',
         messagingSenderId: '888697307756',
@@ -75,9 +83,9 @@ class DefaultFirebaseOptions {
         projectId: SecureConfig.firebaseProjectId,
         storageBucket: SecureConfig.firebaseStorageBucket,
       );
-    } catch (e) {
+    } on Object {
       // Fallback to production values
-      return FirebaseOptions(
+      return const FirebaseOptions(
         apiKey: 'AIzaSyAwsU8j3acGo_cKOECbgsXHd3-qvvLn_Fw',
         appId: '1:888697307756:android:a62a339c4079bebc704e49',
         messagingSenderId: '888697307756',
@@ -103,10 +111,10 @@ class DefaultFirebaseOptions {
         iosClientId: SecureConfig.firebaseIosClientId,
         iosBundleId: SecureConfig.firebaseIosBundleId,
       );
-    } catch (e) {
+    } on Object {
       // Fallback to hardcoded production values from GoogleService-Info.plist
       // These values are safe to include in the app bundle
-      return FirebaseOptions(
+      return const FirebaseOptions(
         apiKey: 'AIzaSyAwsU8j3acGo_cKOECbgsXHd3-qvvLn_Fw',
         appId: '1:888697307756:ios:95ea92b8c7288e31704e49',
         messagingSenderId: '888697307756',
@@ -132,9 +140,9 @@ class DefaultFirebaseOptions {
         iosClientId: SecureConfig.firebaseIosClientId,
         iosBundleId: SecureConfig.firebaseIosBundleId,
       );
-    } catch (e) {
+    } on Object {
       // Fallback to production values (same as iOS)
-      return FirebaseOptions(
+      return const FirebaseOptions(
         apiKey: 'AIzaSyAwsU8j3acGo_cKOECbgsXHd3-qvvLn_Fw',
         appId: '1:888697307756:ios:95ea92b8c7288e31704e49',
         messagingSenderId: '888697307756',
@@ -163,12 +171,13 @@ class FirebaseEmulators {
           persistenceEnabled: false,
         );
 
-        FirebaseAuth.instance.useAuthEmulator('localhost', 9099);
+        unawaited(FirebaseAuth.instance.useAuthEmulator('localhost', 9099));
 
-        FirebaseStorage.instance.useStorageEmulator('localhost', 9199);
+        unawaited(
+            FirebaseStorage.instance.useStorageEmulator('localhost', 9199));
 
         debugPrint('🔥 Connected to Firebase emulators');
-      } catch (e) {
+      } on Object catch (e) {
         debugPrint('❌ Failed to connect to Firebase emulators: $e');
       }
     }

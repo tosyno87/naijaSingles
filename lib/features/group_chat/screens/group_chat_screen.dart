@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -26,7 +28,7 @@ class _GroupChatScreenState extends State<GroupChatScreen> {
   @override
   void initState() {
     super.initState();
-    _loadGroupDetails();
+    unawaited(_loadGroupDetails());
   }
 
   @override
@@ -45,7 +47,7 @@ class _GroupChatScreenState extends State<GroupChatScreen> {
           _isLoading = false;
         });
       }
-    } catch (e) {
+    } on Object catch (e) {
       if (mounted) {
         setState(() {
           _isLoading = false;
@@ -65,7 +67,7 @@ class _GroupChatScreenState extends State<GroupChatScreen> {
         groupId: widget.groupId,
         text: text,
       );
-    } catch (e) {
+    } on Object {
       _showErrorSnackBar('Failed to send message');
     }
   }
@@ -386,11 +388,13 @@ class _GroupChatScreenState extends State<GroupChatScreen> {
   }
 
   void _showGroupInfo() {
-    showModalBottomSheet(
-      context: context,
-      isScrollControlled: true,
-      backgroundColor: Colors.transparent,
-      builder: (context) => _buildGroupInfoSheet(),
+    unawaited(
+      showModalBottomSheet(
+        context: context,
+        isScrollControlled: true,
+        backgroundColor: Colors.transparent,
+        builder: (context) => _buildGroupInfoSheet(),
+      ),
     );
   }
 

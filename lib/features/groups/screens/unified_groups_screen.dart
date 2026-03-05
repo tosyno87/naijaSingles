@@ -1,10 +1,12 @@
+import 'dart:async';
+
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 
 import '../../../common/constants/app_colors.dart';
-import '../data/services/unified_group_service.dart';
 import '../../group_chat/screens/create_group_screen.dart';
+import '../data/services/unified_group_service.dart';
 import 'group_details_screen.dart';
 
 /// Unified Groups Screen that combines Cultural Groups and Group Chats
@@ -33,7 +35,7 @@ class _UnifiedGroupsScreenState extends State<UnifiedGroupsScreen>
   void initState() {
     super.initState();
     _tabController = TabController(length: 3, vsync: this);
-    _loadGroups();
+    unawaited(_loadGroups());
   }
 
   @override
@@ -61,7 +63,7 @@ class _UnifiedGroupsScreenState extends State<UnifiedGroupsScreen>
         _userGroups = userGroups;
         _isLoading = false;
       });
-    } catch (e) {
+    } on Object catch (e) {
       setState(() => _isLoading = false);
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
@@ -92,7 +94,7 @@ class _UnifiedGroupsScreenState extends State<UnifiedGroupsScreen>
         _groups = searchResults;
         _isSearching = false;
       });
-    } catch (e) {
+    } on Object catch (e) {
       setState(() => _isSearching = false);
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
@@ -118,7 +120,7 @@ class _UnifiedGroupsScreenState extends State<UnifiedGroupsScreen>
         );
         await _loadGroups(); // Refresh the list
       }
-    } catch (e) {
+    } on Object catch (e) {
       if (mounted) {
         String message;
         if (e.toString().contains('Already a member')) {
@@ -153,7 +155,7 @@ class _UnifiedGroupsScreenState extends State<UnifiedGroupsScreen>
       onPressed: () async {
         if (isMember) {
           // User is already a member - navigate to chat
-          _navigateToGroupDetails(group);
+          unawaited(_navigateToGroupDetails(group));
         } else {
           // User is not a member - join the group
           await _joinGroup(group);
@@ -177,11 +179,11 @@ class _UnifiedGroupsScreenState extends State<UnifiedGroupsScreen>
     );
   }
 
-  void _navigateToGroupDetails(UnifiedGroup group) {
+  Future<void> _navigateToGroupDetails(UnifiedGroup group) async {
     final currentUserId = FirebaseAuth.instance.currentUser?.uid ?? '';
     final isMember = group.isMember(currentUserId);
 
-    Navigator.push(
+    final result = await Navigator.push(
       context,
       MaterialPageRoute(
         builder: (context) => GroupDetailsScreen(
@@ -189,30 +191,22 @@ class _UnifiedGroupsScreenState extends State<UnifiedGroupsScreen>
           isMember: isMember,
         ),
       ),
-    ).then((result) {
-      // Refresh groups if user joined or left a group
-      if (result == true) {
-        _loadGroups();
-      }
-    });
+    );
+    if (!mounted) return;
+    if (result == true) {
+      unawaited(_loadGroups());
+    }
   }
 
-  void _navigateToCreateGroup() {
-    Navigator.push(
+  Future<void> _navigateToCreateGroup() async {
+    await Navigator.push(
       context,
       MaterialPageRoute(
         builder: (context) => const CreateGroupScreen(),
       ),
-    ).then((_) => _loadGroups()); // Refresh after creating
-  }
-
-  void _showGroupInfo(UnifiedGroup group) {
-    showModalBottomSheet(
-      context: context,
-      isScrollControlled: true,
-      backgroundColor: Colors.transparent,
-      builder: (context) => _buildGroupInfoSheet(group),
     );
+    if (!mounted) return;
+    unawaited(_loadGroups());
   }
 
   @override
@@ -295,7 +289,7 @@ class _UnifiedGroupsScreenState extends State<UnifiedGroupsScreen>
           controller: _searchController,
           onChanged: (value) {
             if (value.isEmpty) {
-              _loadGroups();
+              unawaited(_loadGroups());
             }
           },
           onSubmitted: (_) => _searchGroups(),
@@ -314,7 +308,7 @@ class _UnifiedGroupsScreenState extends State<UnifiedGroupsScreen>
                 ? IconButton(
                     onPressed: () {
                       _searchController.clear();
-                      _loadGroups();
+                      unawaited(_loadGroups());
                     },
                     icon: const Icon(
                       Icons.clear,
@@ -357,7 +351,7 @@ class _UnifiedGroupsScreenState extends State<UnifiedGroupsScreen>
                 selected: isSelected,
                 onSelected: (selected) {
                   setState(() => _selectedType = type);
-                  _loadGroups();
+                  unawaited(_loadGroups());
                 },
                 backgroundColor: Colors.white,
                 selectedColor: AppColors.primaryGreen,
@@ -518,8 +512,10 @@ class _UnifiedGroupsScreenState extends State<UnifiedGroupsScreen>
 
     // Filter groups created by current user
     final createdGroups = _userGroups
-        .where((group) =>
-            group.isCreator(FirebaseAuth.instance.currentUser?.uid ?? ''))
+        .where(
+          (group) =>
+              group.isCreator(FirebaseAuth.instance.currentUser?.uid ?? ''),
+        )
         .toList();
 
     if (createdGroups.isEmpty) {
@@ -765,93 +761,6 @@ class _UnifiedGroupsScreenState extends State<UnifiedGroupsScreen>
               ],
             ],
           ),
-        ),
-      );
-
-  Widget _buildGroupInfoSheet(UnifiedGroup group) => Container(
-        height: MediaQuery.of(context).size.height * 0.7,
-        decoration: const BoxDecoration(
-          color: Colors.white,
-          borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
-        ),
-        child: Column(
-          children: [
-            Container(
-              margin: const EdgeInsets.only(top: 8),
-              width: 40,
-              height: 4,
-              decoration: BoxDecoration(
-                color: Colors.grey[300],
-                borderRadius: BorderRadius.circular(2),
-              ),
-            ),
-            Padding(
-              padding: const EdgeInsets.all(20),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    'Community Info',
-                    style: GoogleFonts.montserrat(
-                      fontSize: 24,
-                      fontWeight: FontWeight.bold,
-                      color: Colors.black87,
-                    ),
-                  ),
-                  const SizedBox(height: 20),
-                  _buildInfoRow(Icons.group, 'Name', group.name),
-                  _buildInfoRow(
-                    Icons.description,
-                    'Description',
-                    group.description,
-                  ),
-                  _buildInfoRow(Icons.category, 'Type', group.typeDisplayName),
-                  _buildInfoRow(
-                    Icons.people,
-                    'Members',
-                    '${group.memberCount}/${group.maxMembers}',
-                  ),
-                  if (group.location != null)
-                    _buildInfoRow(
-                        Icons.location_on, 'Location', group.location!),
-                  if (group.tags.isNotEmpty)
-                    _buildInfoRow(Icons.tag, 'Tags', group.tags.join(', ')),
-                  _buildInfoRow(
-                    Icons.chat,
-                    'Chat',
-                    group.enableChat ? 'Enabled' : 'Disabled',
-                  ),
-                ],
-              ),
-            ),
-          ],
-        ),
-      );
-
-  Widget _buildInfoRow(IconData icon, String label, String value) => Padding(
-        padding: const EdgeInsets.only(bottom: 12),
-        child: Row(
-          children: [
-            Icon(icon, color: AppColors.primaryGreen, size: 20),
-            const SizedBox(width: 12),
-            Text(
-              '$label: ',
-              style: GoogleFonts.montserrat(
-                fontSize: 14,
-                fontWeight: FontWeight.w500,
-                color: Colors.grey[600],
-              ),
-            ),
-            Expanded(
-              child: Text(
-                value,
-                style: GoogleFonts.montserrat(
-                  fontSize: 14,
-                  color: Colors.black87,
-                ),
-              ),
-            ),
-          ],
         ),
       );
 

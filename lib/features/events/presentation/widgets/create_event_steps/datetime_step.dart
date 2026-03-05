@@ -18,7 +18,6 @@ class DateTimeStep extends StatefulWidget {
 
 class _DateTimeStepState extends State<DateTimeStep> {
   final DateFormat _dateFormat = DateFormat('MMM dd, yyyy');
-  final DateFormat _timeFormat = DateFormat('hh:mm a');
 
   @override
   Widget build(BuildContext context) => SingleChildScrollView(
@@ -234,8 +233,7 @@ class _DateTimeStepState extends State<DateTimeStep> {
               width: double.infinity,
               padding: const EdgeInsets.all(16),
               decoration: BoxDecoration(
-                color:
-                    AppColors.backgroundColor, // Afropeep cream background
+                color: AppColors.backgroundColor, // Afropeep cream background
                 borderRadius: BorderRadius.circular(12),
                 border: Border.all(
                   color: AppColors.primaryGreen
@@ -295,8 +293,7 @@ class _DateTimeStepState extends State<DateTimeStep> {
               width: double.infinity,
               padding: const EdgeInsets.all(16),
               decoration: BoxDecoration(
-                color:
-                    AppColors.backgroundColor, // Afropeep cream background
+                color: AppColors.backgroundColor, // Afropeep cream background
                 borderRadius: BorderRadius.circular(12),
                 border: Border.all(
                   color: AppColors.primaryGreen
@@ -417,8 +414,8 @@ class _DateTimeStepState extends State<DateTimeStep> {
       builder: (context, child) => Theme(
         data: Theme.of(context).copyWith(
           colorScheme: Theme.of(context).colorScheme.copyWith(
-            primary: AppColors.primaryGreen,
-          ),
+                primary: AppColors.primaryGreen,
+              ),
         ),
         child: child!,
       ),
@@ -442,8 +439,8 @@ class _DateTimeStepState extends State<DateTimeStep> {
       builder: (context, child) => Theme(
         data: Theme.of(context).copyWith(
           colorScheme: Theme.of(context).colorScheme.copyWith(
-            primary: AppColors.primaryGreen,
-          ),
+                primary: AppColors.primaryGreen,
+              ),
         ),
         child: child!,
       ),

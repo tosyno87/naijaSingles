@@ -9,7 +9,7 @@ class ChatModel {
     required this.isRead,
     required this.timestamp,
   });
-  factory ChatModel.from(doc) => ChatModel(
+  factory ChatModel.from(Map<String, dynamic> doc) => ChatModel(
         senderId: doc['sender_id'],
         receiverId: doc['receiver_id'],
         type: doc['type'],

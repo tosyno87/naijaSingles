@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -13,9 +15,9 @@ import '../../../user/ui/widgets/user_info.dart';
 
 class ChatMessageRead {
   static List<Widget> messagesIsRead(
-    documentSnapshot,
+    dynamic documentSnapshot,
     UserModel second,
-    sender,
+    UserModel sender,
     BuildContext context,
   ) {
     final isDarkMode = context.watch<ThemeBloc>().isDarkMode;
@@ -95,18 +97,22 @@ class ChatMessageRead {
                         ],
                       ),
                       onTap: () {
-                        Navigator.pushNamed(
-                          context,
-                          RouteName.largeImageScreen,
-                          arguments: documentSnapshot.get('image_url'),
+                        unawaited(
+                          Navigator.pushNamed(
+                            context,
+                            RouteName.largeImageScreen,
+                            arguments: documentSnapshot.get('image_url'),
+                          ),
                         );
                       },
                     )
                   : GestureDetector(
                       onLongPress: () {
-                        Clipboard.setData(
-                          ClipboardData(
-                            text: documentSnapshot.data()!['text'],
+                        unawaited(
+                          Clipboard.setData(
+                            ClipboardData(
+                              text: documentSnapshot.data()!['text'],
+                            ),
                           ),
                         );
                         CustomToast.showToast('Message Copied'.tr().toString());
@@ -133,9 +139,8 @@ class ChatMessageRead {
                             Text(
                               documentSnapshot.data()!['text'],
                               style: TextStyle(
-                                color: isDarkMode
-                                    ? Colors.white
-                                    : Colors.black87,
+                                color:
+                                    isDarkMode ? Colors.white : Colors.black87,
                                 fontSize: 16,
                                 fontWeight: FontWeight.w400,
                               ),

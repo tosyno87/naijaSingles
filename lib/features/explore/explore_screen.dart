@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:developer';
 
 import 'package:flutter/material.dart';
@@ -31,7 +32,7 @@ class _ExploreScreenState extends State<ExploreScreen> {
   @override
   void initState() {
     super.initState();
-    _loadCurrentUser();
+    unawaited(_loadCurrentUser());
   }
 
   @override
@@ -59,7 +60,7 @@ class _ExploreScreenState extends State<ExploreScreen> {
           });
         }
       }
-    } catch (e) {
+    } on Object catch (e) {
       log('Error loading current user: $e');
       if (mounted && !_disposed) {
         setState(() {
@@ -92,7 +93,7 @@ class _ExploreScreenState extends State<ExploreScreen> {
           _isLoading = false;
         });
       }
-    } catch (e) {
+    } on Object catch (e) {
       log('Error loading users: $e');
       if (mounted && !_disposed) {
         setState(() {

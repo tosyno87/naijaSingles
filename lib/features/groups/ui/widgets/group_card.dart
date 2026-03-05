@@ -1,3 +1,4 @@
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import '../../../../common/constants/app_colors.dart';
@@ -147,11 +148,13 @@ class GroupCard extends StatelessWidget {
         child: group.imageUrl != null
             ? ClipRRect(
                 borderRadius: BorderRadius.circular(12),
-                child: Image.network(
-                  group.imageUrl!,
+                child: CachedNetworkImage(
+                  imageUrl: group.imageUrl!,
                   fit: BoxFit.cover,
-                  errorBuilder: (context, error, stackTrace) =>
-                      _buildDefaultIcon(),
+                  placeholder: (context, url) => const Center(
+                    child: CircularProgressIndicator(strokeWidth: 2),
+                  ),
+                  errorWidget: (context, url, error) => _buildDefaultIcon(),
                 ),
               )
             : _buildDefaultIcon(),

@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -79,8 +81,7 @@ class _OnboardingMainState extends State<OnboardingMain> {
       }
     } else if (_currentPage == 2) {
       // Location page
-      if (data.locationName == null ||
-          data.locationName!.trim().isEmpty) {
+      if (data.locationName == null || data.locationName!.trim().isEmpty) {
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(content: Text('Please select your location')),
         );
@@ -88,8 +89,7 @@ class _OnboardingMainState extends State<OnboardingMain> {
       }
     } else if (_currentPage == 3) {
       // Nationality selection page (tribe optional)
-      if (data.nationality == null ||
-          data.nationality!.trim().isEmpty) {
+      if (data.nationality == null || data.nationality!.trim().isEmpty) {
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(content: Text('Please select your nationality')),
         );
@@ -120,9 +120,11 @@ class _OnboardingMainState extends State<OnboardingMain> {
 
     if (_currentPage < _totalPages - 1) {
       debugPrint('✅ Moving to next page');
-      _pageController.nextPage(
-        duration: const Duration(milliseconds: 300),
-        curve: Curves.easeInOut,
+      unawaited(
+        _pageController.nextPage(
+          duration: const Duration(milliseconds: 300),
+          curve: Curves.easeInOut,
+        ),
       );
     } else {
       // Complete onboarding
@@ -133,9 +135,11 @@ class _OnboardingMainState extends State<OnboardingMain> {
 
   void _previousPage() {
     if (_currentPage > 0) {
-      _pageController.previousPage(
-        duration: const Duration(milliseconds: 300),
-        curve: Curves.easeInOut,
+      unawaited(
+        _pageController.previousPage(
+          duration: const Duration(milliseconds: 300),
+          curve: Curves.easeInOut,
+        ),
       );
     }
   }
@@ -198,10 +202,7 @@ class _OnboardingMainState extends State<OnboardingMain> {
           // Optional screens: 4 (Bio), 5 (Interests), 7 (Additional Info)
           if (_currentPage == 4 || _currentPage == 5 || _currentPage == 7)
             TextButton(
-              onPressed: () {
-                // Skip onboarding - complete it immediately
-                _completeOnboarding();
-              },
+              onPressed: _completeOnboarding,
               child: Text(
                 'Skip',
                 style: GoogleFonts.montserrat(

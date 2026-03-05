@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:developer' as dev;
 
 import 'package:contacts_service/contacts_service.dart';
@@ -41,7 +42,7 @@ class ContactInvitationService {
       }
 
       return false;
-    } catch (e) {
+    } on Object catch (e) {
       dev.log('❌ Error requesting contact permission: $e');
       return false;
     }
@@ -65,7 +66,7 @@ class ContactInvitationService {
 
       dev.log('📱 Retrieved ${contacts.length} contacts');
       return contacts;
-    } catch (e) {
+    } on Object catch (e) {
       dev.log('❌ Error getting contacts: $e');
       return [];
     }
@@ -100,7 +101,7 @@ class ContactInvitationService {
 
         return name.contains(lowercaseQuery) || phones.contains(lowercaseQuery);
       }).toList();
-    } catch (e) {
+    } on Object catch (e) {
       dev.log('❌ Error searching contacts: $e');
       return [];
     }
@@ -171,7 +172,7 @@ class ContactInvitationService {
       // For now, we'll just log the action
       dev.log('SMS Message: $message');
       return true;
-    } catch (e) {
+    } on Object catch (e) {
       dev.log('❌ Error sending SMS: $e');
       return false;
     }
@@ -190,7 +191,7 @@ class ContactInvitationService {
       dev.log('Email Subject: $subject');
       dev.log('Email Message: $message');
       return true;
-    } catch (e) {
+    } on Object catch (e) {
       dev.log('❌ Error sending email: $e');
       return false;
     }
@@ -198,26 +199,28 @@ class ContactInvitationService {
 
   /// Show permission denied dialog
   void showPermissionDeniedDialog(BuildContext context) {
-    showDialog(
-      context: context,
-      builder: (context) => AlertDialog(
-        title: const Text('Permission Required'),
-        content: const Text(
-          'To add members from your contacts, please grant contact permission in your device settings.',
+    unawaited(
+      showDialog(
+        context: context,
+        builder: (context) => AlertDialog(
+          title: const Text('Permission Required'),
+          content: const Text(
+            'To add members from your contacts, please grant contact permission in your device settings.',
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.pop(context),
+              child: const Text('Cancel'),
+            ),
+            TextButton(
+              onPressed: () {
+                Navigator.pop(context);
+                unawaited(openAppSettings());
+              },
+              child: const Text('Open Settings'),
+            ),
+          ],
         ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(context),
-            child: const Text('Cancel'),
-          ),
-          TextButton(
-            onPressed: () {
-              Navigator.pop(context);
-              openAppSettings();
-            },
-            child: const Text('Open Settings'),
-          ),
-        ],
       ),
     );
   }

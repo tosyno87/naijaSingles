@@ -1,19 +1,17 @@
 /**
  * Like-related Cloud Function handlers
  */
-import * as functions from 'firebase-functions/v1';
 export declare class LikeHandlers {
     private userService;
     private notificationService;
     constructor();
-    /**
-     * Handle super like creation (Gen 1 - compatible with existing deployments)
-     */
-    onSuperLikeCreated: functions.CloudFunction<functions.firestore.QueryDocumentSnapshot>;
-    /**
-     * Handle like creation (Gen 1 - compatible with existing deployments)
-     */
-    onLikeCreated: functions.CloudFunction<functions.firestore.QueryDocumentSnapshot>;
+    onSuperLikeCreated: import("firebase-functions/core").CloudFunction<import("firebase-functions/v2/firestore").FirestoreEvent<import("firebase-functions/v2/firestore").QueryDocumentSnapshot | undefined, {
+        superLikeId: string;
+    }>>;
+    onLikeCreated: import("firebase-functions/core").CloudFunction<import("firebase-functions/v2/firestore").FirestoreEvent<import("firebase-functions/v2/firestore").QueryDocumentSnapshot | undefined, {
+        userId: string;
+        likeId: string;
+    }>>;
     /**
      * Log errors to Firestore for monitoring
      */

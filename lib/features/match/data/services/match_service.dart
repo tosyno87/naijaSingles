@@ -30,7 +30,7 @@ class MatchService {
       }
 
       return await _likesService.handleLike(currentUserId!, toUserId);
-    } catch (e) {
+    } on Object catch (e) {
       debugPrint('Error in handleLike: $e');
       return null;
     }
@@ -49,7 +49,7 @@ class MatchService {
 
       // Use the optimized likes service to create match
       return await _likesService.handleLike(currentUserId!, otherUserId);
-    } catch (e) {
+    } on Object catch (e) {
       debugPrint('Error creating match: $e');
       return null;
     }
@@ -61,8 +61,7 @@ class MatchService {
       if (currentUserId == null) return null;
 
       final querySnapshot = await _matchesCollection
-          .where('users', arrayContainsAny: [currentUserId, otherUserId])
-          .get();
+          .where('users', arrayContainsAny: [currentUserId, otherUserId]).get();
 
       for (final doc in querySnapshot.docs) {
         final data = doc.data() as Map<String, dynamic>;
@@ -74,7 +73,7 @@ class MatchService {
       }
 
       return null;
-    } catch (e) {
+    } on Object catch (e) {
       debugPrint('Error getting match between users: $e');
       return null;
     }
@@ -86,7 +85,7 @@ class MatchService {
       if (currentUserId == null) return [];
 
       return await _likesService.getUserMatches(currentUserId!);
-    } catch (e) {
+    } on Object catch (e) {
       debugPrint('Error getting user matches: $e');
       return [];
     }
@@ -110,7 +109,7 @@ class MatchService {
             },
           )
           .toList();
-    } catch (e) {
+    } on Object catch (e) {
       debugPrint('Error getting user matches: $e');
       return [];
     }
@@ -123,7 +122,7 @@ class MatchService {
         'matchStatus': status,
       });
       return true;
-    } catch (e) {
+    } on Object catch (e) {
       debugPrint('Error updating match status: $e');
       return false;
     }
@@ -134,7 +133,7 @@ class MatchService {
     try {
       await _matchesCollection.doc(matchId).delete();
       return true;
-    } catch (e) {
+    } on Object catch (e) {
       debugPrint('Error deleting match: $e');
       return false;
     }
@@ -145,7 +144,7 @@ class MatchService {
     try {
       if (currentUserId == null) return false;
       return await _likesService.hasUserLiked(currentUserId!, toUserId);
-    } catch (e) {
+    } on Object catch (e) {
       debugPrint('Error checking if user has liked: $e');
       return false;
     }
@@ -156,7 +155,7 @@ class MatchService {
     try {
       if (currentUserId == null) return [];
       return await _likesService.getUsersWhoLikedMe(currentUserId!);
-    } catch (e) {
+    } on Object catch (e) {
       debugPrint('Error getting users who liked me: $e');
       return [];
     }
@@ -171,7 +170,6 @@ class MatchService {
   }
 
   /// Get match by ID
-  Future<MatchModel?> getMatchById(String matchId) async {
-    return await _likesService.getMatchById(matchId);
-  }
+  Future<MatchModel?> getMatchById(String matchId) async =>
+      _likesService.getMatchById(matchId);
 }

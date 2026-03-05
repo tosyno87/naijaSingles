@@ -27,7 +27,7 @@ class SwipeBloc extends Bloc<SwipeblocEvent, SwipeblocState> {
 
         log('afterlefteventuser${userList.toString()}');
         log('cominguser from leftevent');
-      } catch (e) {
+      } on Object catch (e) {
         emit(SwipeFailedState());
         log('Error while processing left swipe: $e');
       }
@@ -55,7 +55,7 @@ class SwipeBloc extends Bloc<SwipeblocEvent, SwipeblocState> {
 
         log('afterrighteventuser${userList.toString()}');
         log('cominguser from rightevent');
-      } catch (e) {
+      } on Object catch (e) {
         emit(SwipeFailedState());
         log('Error while processing right swipe: $e');
       }

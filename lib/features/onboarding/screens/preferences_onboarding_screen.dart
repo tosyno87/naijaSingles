@@ -16,7 +16,7 @@ class _PreferencesOnboardingScreenState
     extends State<PreferencesOnboardingScreen> {
   String _selectedInterestedIn = 'everyone';
   RangeValues _ageRange = const RangeValues(18, 50);
-  double _maxDistance = 50.0; // Default 50 miles (industry standard)
+  double _maxDistance = 50; // Default 50 miles (industry standard)
 
   @override
   void initState() {

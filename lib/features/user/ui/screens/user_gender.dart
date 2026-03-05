@@ -1,14 +1,11 @@
-// ignore_for_file: unused_import
-
+import 'dart:async';
 import 'dart:developer';
 
-import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
 import '../../../../common/constants/app_colors.dart';
 import '../../../../common/routes/route_name.dart';
-import '../../../../common/widgets/custom_button.dart';
 import '../../../../common/widgets/custom_snackbar.dart';
 
 class Gender extends StatefulWidget {
@@ -24,7 +21,6 @@ class GenderState extends State<Gender> with SingleTickerProviderStateMixin {
 
   // Use nullable types instead of late initialization
   AnimationController? _animationController;
-  Animation<double>? _fadeAnimation;
 
   @override
   void initState() {
@@ -36,16 +32,10 @@ class GenderState extends State<Gender> with SingleTickerProviderStateMixin {
       vsync: this,
     );
 
-    // Initialize animation
-    _fadeAnimation = CurvedAnimation(
-      parent: _animationController!,
-      curve: Curves.easeInOut,
-    );
-
     // Start animation after frame is built
     WidgetsBinding.instance.addPostFrameCallback((_) {
       if (mounted && _animationController != null) {
-        _animationController!.forward();
+        unawaited(_animationController!.forward());
       }
     });
   }
@@ -195,10 +185,12 @@ class GenderState extends State<Gender> with SingleTickerProviderStateMixin {
                                 'showOnProfile': showOnProfile,
                               };
                               userData.addAll(userGender);
-                              Navigator.pushNamed(
-                                context,
-                                RouteName.nationalityScreen,
-                                arguments: userData,
+                              unawaited(
+                                Navigator.pushNamed(
+                                  context,
+                                  RouteName.nationalityScreen,
+                                  arguments: userData,
+                                ),
                               );
                             } else {
                               CustomSnackbar.showSnackBarSimple(
@@ -273,8 +265,7 @@ class GenderState extends State<Gender> with SingleTickerProviderStateMixin {
                 ),
                 child: Icon(
                   icon,
-                  color:
-                      isSelected ? AppColors.primaryGreen : Colors.grey[600],
+                  color: isSelected ? AppColors.primaryGreen : Colors.grey[600],
                   size: 28,
                 ),
               ),

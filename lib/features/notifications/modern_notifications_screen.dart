@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -31,6 +33,8 @@ class _ModernNotificationsScreenState extends State<ModernNotificationsScreen>
   int _unreadCount = 0;
   bool _isLoading = true;
   String _selectedFilter = 'all';
+  StreamSubscription<List<AppNotification>>? _notificationsSubscription;
+  StreamSubscription<int>? _unreadCountSubscription;
 
   late AnimationController _animationController;
   late Animation<double> _fadeAnimation;
@@ -62,17 +66,19 @@ class _ModernNotificationsScreenState extends State<ModernNotificationsScreen>
   }
 
   void _loadNotifications() {
-    _notificationService.notificationsStream.listen((notifications) {
+    _notificationsSubscription =
+        _notificationService.notificationsStream.listen((notifications) {
       if (mounted) {
         setState(() {
           _notifications = notifications;
           _isLoading = false;
         });
-        _animationController.forward();
+        unawaited(_animationController.forward());
       }
     });
 
-    _notificationService.unreadCountStream.listen((count) {
+    _unreadCountSubscription =
+        _notificationService.unreadCountStream.listen((count) {
       if (mounted) {
         setState(() {
           _unreadCount = count;
@@ -100,6 +106,8 @@ class _ModernNotificationsScreenState extends State<ModernNotificationsScreen>
 
   @override
   void dispose() {
+    unawaited(_notificationsSubscription?.cancel() ?? Future<void>.value());
+    unawaited(_unreadCountSubscription?.cancel() ?? Future<void>.value());
     _animationController.dispose();
     super.dispose();
   }
@@ -710,15 +718,15 @@ class _ModernNotificationsScreenState extends State<ModernNotificationsScreen>
   }
 
   void _markAsRead(AppNotification notification) {
-    _notificationService.markAsRead(notification.id);
+    unawaited(_notificationService.markAsRead(notification.id));
   }
 
   void _markAllAsRead() {
-    _notificationService.markAllAsRead();
+    unawaited(_notificationService.markAllAsRead());
   }
 
   void _deleteNotification(AppNotification notification) {
-    _notificationService.deleteNotification(notification.id);
+    unawaited(_notificationService.deleteNotification(notification.id));
 
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(

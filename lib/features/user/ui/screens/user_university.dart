@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:developer';
 
 import 'package:flutter/material.dart';
@@ -198,7 +199,8 @@ class _UniversityPage extends State<UniversityPage> {
                                         color: Colors.grey[50],
                                         borderRadius: BorderRadius.circular(20),
                                         border: Border.all(
-                                            color: Colors.grey[300]!),
+                                          color: Colors.grey[300]!,
+                                        ),
                                       ),
                                       child: Text(
                                         suggestion,
@@ -247,10 +249,12 @@ class _UniversityPage extends State<UniversityPage> {
                           });
 
                           log(userData.toString());
-                          Navigator.pushNamed(
-                            context,
-                            RouteName.profilePicSetScreen,
-                            arguments: userData,
+                          unawaited(
+                            Navigator.pushNamed(
+                              context,
+                              RouteName.profilePicSetScreen,
+                              arguments: userData,
+                            ),
                           );
                         }
                       : null,

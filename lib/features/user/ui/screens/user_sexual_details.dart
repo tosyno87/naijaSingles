@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:developer';
 
 import 'package:flutter/cupertino.dart';
@@ -246,10 +247,12 @@ class _SexualOrientationState extends State<SexualOrientation> {
                             },
                           });
                           log(userData.toString());
-                          Navigator.pushNamed(
-                            context,
-                            RouteName.showGenderScreen,
-                            arguments: userData,
+                          unawaited(
+                            Navigator.pushNamed(
+                              context,
+                              RouteName.showGenderScreen,
+                              arguments: userData,
+                            ),
                           );
                         },
                   style: ElevatedButton.styleFrom(

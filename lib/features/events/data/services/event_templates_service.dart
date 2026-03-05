@@ -194,7 +194,7 @@ class EventTemplatesService {
               'food',
               'learning',
               'african cuisine',
-              'hands-on'
+              'hands-on',
             ],
             ticketPrice: 35, // $35 for cooking class
             maxAttendees: 20,
@@ -248,7 +248,7 @@ class EventTemplatesService {
     try {
       return getAfrocentricTemplates()
           .firstWhere((template) => template.id == id);
-    } catch (e) {
+    } on Object {
       return null;
     }
   }

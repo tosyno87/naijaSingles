@@ -1,5 +1,5 @@
 name: naijasingles
-description: "A new Flutter project."
+description: "AfroPeep - Dating and social networking for Africans in the diaspora."
 # The following line prevents the package from being accidentally published to
 # pub.dev using `flutter pub publish`. This is preferred for private packages.
 publish_to: 'none' # Remove this line if you wish to publish to pub.dev
@@ -42,6 +42,7 @@ dependencies:
   cupertino_icons: ^1.0.8        # Updated to latest
   easy_localization: ^3.0.7+1    # Updated to latest
   equatable: ^2.0.7              # Updated to latest
+  firebase_app_check: ^0.4.1+5   # App Check for backend protection
   firebase_auth: ^6.0.1          # Updated to latest
   firebase_core: ^4.0.0         # Updated to latest
   firebase_crashlytics: ^5.0.1   # Crash reporting and analytics

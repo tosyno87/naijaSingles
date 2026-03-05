@@ -288,11 +288,31 @@ class EnhancedEventModel extends Equatable {
 
   @override
   List<Object?> get props => [
-        id, externalId, name, description, startDate, endDate,
-        imageUrls, location, ticketUrl, isFree, ticketPrice,
-        category, tags, attendeeCount, rsvpCount, maxAttendees,
-        createdAt, updatedAt, createdByUserId, isUserGenerated,
-        eventType, status, isPromoted, promotionExpiry, metadata,
+        id,
+        externalId,
+        name,
+        description,
+        startDate,
+        endDate,
+        imageUrls,
+        location,
+        ticketUrl,
+        isFree,
+        ticketPrice,
+        category,
+        tags,
+        attendeeCount,
+        rsvpCount,
+        maxAttendees,
+        createdAt,
+        updatedAt,
+        createdByUserId,
+        isUserGenerated,
+        eventType,
+        status,
+        isPromoted,
+        promotionExpiry,
+        metadata,
       ];
 }
 

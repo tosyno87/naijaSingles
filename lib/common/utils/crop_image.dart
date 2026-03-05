@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:io';
 import 'dart:math';
 
@@ -62,7 +63,7 @@ class CropMediaState extends State<CropMedia>
     // Start animation after frame is built
     WidgetsBinding.instance.addPostFrameCallback((_) {
       if (mounted && _animationController != null) {
-        _animationController!.forward();
+        unawaited(_animationController!.forward());
       }
     });
   }
@@ -119,11 +120,13 @@ class CropMediaState extends State<CropMedia>
                 setState(() {
                   isFinished = false;
                 });
-                _finished().then((value) {
-                  setState(() {
-                    isFinished = true;
-                  });
-                });
+                unawaited(
+                  _finished().then((value) {
+                    setState(() {
+                      isFinished = true;
+                    });
+                  }),
+                );
               },
             )
           else
@@ -283,11 +286,11 @@ class CropMediaState extends State<CropMedia>
       // Compress the final image for optimal size
       final compressedFile = await _compressImage(file);
 
-      // ignore: use_build_context_synchronously
+      if (!mounted) return;
       Navigator.pop(context, compressedFile);
-    } catch (e) {
+    } on Object catch (e) {
       debugPrint('Error in _finished: $e');
-      // ignore: use_build_context_synchronously
+      if (!mounted) return;
       Navigator.pop(context);
     }
   }
@@ -313,7 +316,7 @@ class CropMediaState extends State<CropMedia>
       } else {
         return imageFile; // Return original if compression fails
       }
-    } catch (e) {
+    } on Object catch (e) {
       debugPrint('Error compressing image: $e');
       return imageFile; // Return original if compression fails
     }

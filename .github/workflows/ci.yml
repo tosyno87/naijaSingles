@@ -71,7 +71,6 @@ jobs:
       
     - name: Run static analysis
       run: flutter analyze --no-fatal-infos
-      continue-on-error: true
       
     - name: Check code formatting
       run: dart format --output=none --set-exit-if-changed .
@@ -110,12 +109,10 @@ jobs:
       run: flutter pub get
       
     - name: Build
-      run: flutter build apk --debug || echo "Build completed with some warnings"
-      continue-on-error: true
+      run: flutter build apk --debug
       
     - name: Run tests with coverage
-      run: flutter test --coverage || echo "Tests completed with some failures"
-      continue-on-error: true
+      run: flutter test --coverage
       
     - name: SonarQube Scan
       uses: SonarSource/sonarqube-scan-action@fd88b7d7ccbaefd23d8f36f73b59db7a3d246602
@@ -176,7 +173,7 @@ jobs:
         echo "Checking for potential secrets in code..."
         # Check for hardcoded API keys (exclude Firebase public keys in firebase_options.dart)
         # Firebase API keys are public and safe to include in app bundle
-        if grep -r "AIza[0-9A-Za-z_-]" lib/ --exclude-dir=generated 2>/dev/null | grep -v "firebase_options.dart"; then
+        if grep -r "AIza[0-9A-Za-z_-]" lib/ --exclude-dir=generated 2>/dev/null | grep -v "firebase_options.dart" | grep -v "firebase_options_staging.dart"; then
           echo "⚠️  Potential API key found in code (excluding Firebase public keys)"
           exit 1
         fi
@@ -236,8 +233,7 @@ jobs:
       run: flutter pub get
       
     - name: Run unit tests with coverage
-      run: flutter test --coverage || echo "Some tests failed"
-      continue-on-error: true
+      run: flutter test --coverage
       
     - name: Check coverage threshold
       run: |
@@ -300,8 +296,7 @@ jobs:
       
     - name: Build Android APK
       if: matrix.platform == 'android'
-      run: flutter build apk --release || echo "Build failed - this may be due to dependency issues (e.g., contacts_service namespace)"
-      continue-on-error: true
+      run: flutter build apk --release
       
     - name: Upload build artifacts
       uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02

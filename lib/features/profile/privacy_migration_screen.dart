@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 
@@ -22,7 +24,7 @@ class _PrivacyMigrationScreenState extends State<PrivacyMigrationScreen> {
   @override
   void initState() {
     super.initState();
-    _checkMigrationStatus();
+    unawaited(_checkMigrationStatus());
   }
 
   Future<void> _checkMigrationStatus() async {
@@ -36,7 +38,7 @@ class _PrivacyMigrationScreenState extends State<PrivacyMigrationScreen> {
         _migrationStatus = status;
         _isLoading = false;
       });
-    } catch (e) {
+    } on Object {
       setState(() {
         _isLoading = false;
       });
@@ -58,7 +60,7 @@ class _PrivacyMigrationScreenState extends State<PrivacyMigrationScreen> {
 
         // Navigate to privacy settings
         if (mounted) {
-          Navigator.pushReplacement(
+          await Navigator.pushReplacement(
             context,
             MaterialPageRoute(
               builder: (_) => const PrivacySettingsScreen(),
@@ -68,7 +70,7 @@ class _PrivacyMigrationScreenState extends State<PrivacyMigrationScreen> {
       } else {
         _showErrorSnackBar('Migration failed. Please try again.');
       }
-    } catch (e) {
+    } on Object catch (e) {
       _showErrorSnackBar('Error during migration: ${e.toString()}');
     } finally {
       setState(() {
@@ -105,9 +107,9 @@ class _PrivacyMigrationScreenState extends State<PrivacyMigrationScreen> {
   Widget build(BuildContext context) {
     final colorScheme = Theme.of(context).colorScheme;
     return Scaffold(
-      backgroundColor: colorScheme.background,
+      backgroundColor: colorScheme.surface,
       appBar: AppBar(
-        backgroundColor: colorScheme.background,
+        backgroundColor: colorScheme.surface,
         elevation: 0,
         leading: IconButton(
           icon: const Icon(Icons.arrow_back_ios, color: AppColors.textPrimary),
@@ -156,7 +158,8 @@ class _PrivacyMigrationScreenState extends State<PrivacyMigrationScreen> {
                   end: Alignment.bottomRight,
                 ),
                 borderRadius: BorderRadius.circular(16),
-                border: Border.all(color: AppColors.primaryGreen.withValues(alpha: 0.3)),
+                border: Border.all(
+                    color: AppColors.primaryGreen.withValues(alpha: 0.3)),
               ),
               child: Column(
                 children: [
@@ -335,10 +338,12 @@ class _PrivacyMigrationScreenState extends State<PrivacyMigrationScreen> {
               height: 56,
               child: ElevatedButton(
                 onPressed: () {
-                  Navigator.pushReplacement(
-                    context,
-                    MaterialPageRoute(
-                      builder: (_) => const PrivacySettingsScreen(),
+                  unawaited(
+                    Navigator.pushReplacement(
+                      context,
+                      MaterialPageRoute(
+                        builder: (_) => const PrivacySettingsScreen(),
+                      ),
                     ),
                   );
                 },

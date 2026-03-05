@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
@@ -23,11 +25,12 @@ class AccountStatusBanner extends StatelessWidget {
           .doc(userId)
           .snapshots(),
       builder: (context, snapshot) {
-        if (!snapshot.hasData || !snapshot.data!.exists) {
+        final snapshotData = snapshot.data;
+        if (!snapshot.hasData || snapshotData == null || !snapshotData.exists) {
           return const SizedBox.shrink();
         }
 
-        final data = snapshot.data!.data() as Map<String, dynamic>?;
+        final data = snapshotData.data() as Map<String, dynamic>?;
         final status = data?['accountStatus'] as String? ?? 'active';
 
         if (status == 'active') return const SizedBox.shrink();
@@ -98,7 +101,7 @@ class AccountStatusBanner extends StatelessWidget {
   void _onTap(BuildContext context) {
     final userId = FirebaseAuth.instance.currentUser?.uid;
     if (userId == null) return;
-    AccountStatusService().reactivateAccount(userId: userId);
+    unawaited(AccountStatusService().reactivateAccount(userId: userId));
   }
 }
 

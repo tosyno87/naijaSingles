@@ -2,9 +2,9 @@ import 'package:equatable/equatable.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
-import '../models/match_model.dart';
 import '../data/services/likes_service.dart';
 import '../data/services/match_service.dart';
+import '../models/match_model.dart';
 
 part 'match_event.dart';
 part 'match_state.dart';
@@ -63,7 +63,7 @@ class MatchBloc extends Bloc<MatchEvent, MatchState> {
           ),
         );
       }
-    } catch (e) {
+    } on Object catch (e) {
       debugPrint('Error liking user: $e');
       emit(MatchError(message: 'Failed to like user: ${e.toString()}'));
     }
@@ -78,7 +78,7 @@ class MatchBloc extends Bloc<MatchEvent, MatchState> {
 
       final matches = await _matchService.getUserMatches();
       emit(MatchesLoaded(matches: matches));
-    } catch (e) {
+    } on Object catch (e) {
       debugPrint('Error loading matches: $e');
       emit(MatchError(message: 'Failed to load matches: ${e.toString()}'));
     }
@@ -97,7 +97,7 @@ class MatchBloc extends Bloc<MatchEvent, MatchState> {
           chatThreadId: match?.chatThreadId,
         ),
       );
-    } catch (e) {
+    } on Object catch (e) {
       debugPrint('Error handling match created: $e');
       emit(MatchError(message: 'Failed to handle match: ${e.toString()}'));
     }
@@ -130,7 +130,7 @@ class MatchBloc extends Bloc<MatchEvent, MatchState> {
       } else {
         emit(const MatchError(message: 'Failed to unlike user'));
       }
-    } catch (e) {
+    } on Object catch (e) {
       debugPrint('Error unliking user: $e');
       emit(MatchError(message: 'Failed to unlike user: ${e.toString()}'));
     }
@@ -150,7 +150,7 @@ class MatchBloc extends Bloc<MatchEvent, MatchState> {
       } else {
         emit(const MatchError(message: 'Failed to delete match'));
       }
-    } catch (e) {
+    } on Object catch (e) {
       debugPrint('Error deleting match: $e');
       emit(MatchError(message: 'Failed to delete match: ${e.toString()}'));
     }

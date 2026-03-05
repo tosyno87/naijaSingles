@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import '../../../../common/constants/app_colors.dart';
@@ -32,7 +34,7 @@ class _GroupsScreenState extends State<GroupsScreen>
   void initState() {
     super.initState();
     _tabController = TabController(length: 3, vsync: this);
-    _loadGroups();
+    unawaited(_loadGroups());
   }
 
   @override
@@ -56,7 +58,7 @@ class _GroupsScreenState extends State<GroupsScreen>
         _userGroups = userGroups;
         _isLoading = false;
       });
-    } catch (e) {
+    } on Object catch (e) {
       setState(() => _isLoading = false);
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
@@ -87,7 +89,7 @@ class _GroupsScreenState extends State<GroupsScreen>
         _groups = searchResults;
         _isSearching = false;
       });
-    } catch (e) {
+    } on Object catch (e) {
       setState(() => _isSearching = false);
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
@@ -122,21 +124,25 @@ class _GroupsScreenState extends State<GroupsScreen>
   }
 
   void _navigateToGroupDetails(GroupModel group) {
-    Navigator.push(
-      context,
-      MaterialPageRoute(
-        builder: (context) => GroupDetailsScreen(group: group),
+    unawaited(
+      Navigator.push(
+        context,
+        MaterialPageRoute(
+          builder: (context) => GroupDetailsScreen(group: group),
+        ),
       ),
     );
   }
 
-  void _navigateToCreateGroup() {
-    Navigator.push(
+  Future<void> _navigateToCreateGroup() async {
+    await Navigator.push(
       context,
       MaterialPageRoute(
         builder: (context) => const CreateGroupScreen(),
       ),
-    ).then((_) => _loadGroups()); // Refresh after creating
+    );
+    if (!mounted) return;
+    unawaited(_loadGroups());
   }
 
   @override
@@ -219,7 +225,7 @@ class _GroupsScreenState extends State<GroupsScreen>
           controller: _searchController,
           onChanged: (value) {
             if (value.isEmpty) {
-              _loadGroups();
+              unawaited(_loadGroups());
             }
           },
           onSubmitted: (_) => _searchGroups(),
@@ -238,7 +244,7 @@ class _GroupsScreenState extends State<GroupsScreen>
                 ? IconButton(
                     onPressed: () {
                       _searchController.clear();
-                      _loadGroups();
+                      unawaited(_loadGroups());
                     },
                     icon: const Icon(
                       Icons.clear,
@@ -281,7 +287,7 @@ class _GroupsScreenState extends State<GroupsScreen>
                 selected: isSelected,
                 onSelected: (selected) {
                   setState(() => _selectedCategory = category);
-                  _loadGroups();
+                  unawaited(_loadGroups());
                 },
                 backgroundColor: Colors.white,
                 selectedColor: AppColors.primaryGreen,

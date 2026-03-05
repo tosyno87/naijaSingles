@@ -1,11 +1,14 @@
+import 'dart:async';
 import 'dart:developer';
+
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:google_fonts/google_fonts.dart';
+
+import '../../../common/constants/app_colors.dart';
 import '../../../common/routes/route_name.dart';
 import '../../../common/widgets/afropeep_logo.dart';
-import '../../../common/constants/app_colors.dart';
 import '../auth_method/sign_in_method_selection_screen.dart';
 import '../phone/ui/screens/phone_number.dart';
 import 'widgets/rotating_greeting_widget.dart';
@@ -34,7 +37,7 @@ class _WelcomeScreenState extends State<WelcomeScreen>
   @override
   void initState() {
     super.initState();
-    _checkAuthStatus();
+    unawaited(_checkAuthStatus());
     _initializeAnimations();
   }
 
@@ -97,16 +100,16 @@ class _WelcomeScreenState extends State<WelcomeScreen>
 
     // Start animations with delays - check mounted before each call
     if (mounted) {
-      _logoController.forward();
+      unawaited(_logoController.forward());
     }
     Future.delayed(const Duration(milliseconds: 500), () {
       if (mounted) {
-        _textController.forward();
+        unawaited(_textController.forward());
       }
     });
     Future.delayed(const Duration(milliseconds: 1000), () {
       if (mounted) {
-        _buttonController.forward();
+        unawaited(_buttonController.forward());
       }
     });
   }
@@ -139,7 +142,7 @@ class _WelcomeScreenState extends State<WelcomeScreen>
         // This happens automatically when they click "Continue to App" but we can also do it here
         // However, we want to show the welcome screen first, so we'll let user click the button
       }
-    } catch (e) {
+    } on Object catch (e) {
       log('Error checking auth status: $e');
       if (mounted) {
         setState(() {
@@ -199,7 +202,8 @@ class _WelcomeScreenState extends State<WelcomeScreen>
                         ),
 
                         const SizedBox(
-                            height: 32), // Increased spacing for massive logo
+                          height: 32,
+                        ), // Increased spacing for massive logo
 
                         // Animated progress bar instead of decorative line
                         AnimatedBuilder(
@@ -263,7 +267,8 @@ class _WelcomeScreenState extends State<WelcomeScreen>
                         ),
 
                         const SizedBox(
-                            height: 40), // Fixed spacing instead of Spacer
+                          height: 40,
+                        ), // Fixed spacing instead of Spacer
 
                         // Show loading indicator while checking auth status
                         if (_isLoading)
@@ -280,9 +285,11 @@ class _WelcomeScreenState extends State<WelcomeScreen>
                               child: _buildGradientButton(
                                 text: 'Continue to App',
                                 onPressed: () {
-                                  Navigator.pushReplacementNamed(
-                                    context,
-                                    RouteName.mainNavigation,
+                                  unawaited(
+                                    Navigator.pushReplacementNamed(
+                                      context,
+                                      RouteName.mainNavigation,
+                                    ),
                                   );
                                 },
                               ),
@@ -296,11 +303,13 @@ class _WelcomeScreenState extends State<WelcomeScreen>
                               child: _buildGradientButton(
                                 text: 'Create Account',
                                 onPressed: () {
-                                  Navigator.push(
-                                    context,
-                                    MaterialPageRoute(
-                                      builder: (context) => PhoneNumber(
-                                        updatePhoneNumber: false,
+                                  unawaited(
+                                    Navigator.push(
+                                      context,
+                                      MaterialPageRoute(
+                                        builder: (context) => PhoneNumber(
+                                          updatePhoneNumber: false,
+                                        ),
                                       ),
                                     ),
                                   );
@@ -309,7 +318,8 @@ class _WelcomeScreenState extends State<WelcomeScreen>
                             ),
 
                             const SizedBox(
-                                height: 16), // Modern spacing between buttons
+                              height: 16,
+                            ), // Modern spacing between buttons
 
                             // Login Button - Secondary style
                             SlideTransition(
@@ -317,11 +327,13 @@ class _WelcomeScreenState extends State<WelcomeScreen>
                               child: _buildOutlinedButton(
                                 text: 'Login',
                                 onPressed: () {
-                                  Navigator.push(
-                                    context,
-                                    MaterialPageRoute(
-                                      builder: (context) =>
-                                          const SignInMethodSelectionScreen(),
+                                  unawaited(
+                                    Navigator.push(
+                                      context,
+                                      MaterialPageRoute(
+                                        builder: (context) =>
+                                            const SignInMethodSelectionScreen(),
+                                      ),
                                     ),
                                   );
                                 },
@@ -420,7 +432,7 @@ class _WelcomeScreenState extends State<WelcomeScreen>
         ),
         child: ElevatedButton(
           onPressed: () {
-            HapticFeedback.lightImpact();
+            unawaited(HapticFeedback.lightImpact());
             onPressed();
           },
           style: ElevatedButton.styleFrom(
@@ -452,7 +464,8 @@ class _WelcomeScreenState extends State<WelcomeScreen>
       Container(
         width: double.infinity,
         decoration: BoxDecoration(
-          color: AppColors.backgroundColor.withValues(alpha: 0.5), // Light cream fill
+          color: AppColors.backgroundColor
+              .withValues(alpha: 0.5), // Light cream fill
           borderRadius: BorderRadius.circular(28),
           border: Border.all(
             color: AppColors.primaryGreen,
@@ -461,7 +474,7 @@ class _WelcomeScreenState extends State<WelcomeScreen>
         ),
         child: OutlinedButton(
           onPressed: () {
-            HapticFeedback.lightImpact();
+            unawaited(HapticFeedback.lightImpact());
             onPressed();
           },
           style: OutlinedButton.styleFrom(

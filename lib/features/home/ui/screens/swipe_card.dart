@@ -1,20 +1,21 @@
+import 'dart:async';
 import 'dart:math';
 
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:swipable_stack/swipable_stack.dart';
 
-import '../../../../common/constants/app_colors.dart';
 import '../../../../common/bloc/theme/theme_bloc.dart';
+import '../../../../common/constants/app_colors.dart';
 import '../../../../common/widgets/image_widget.dart';
-import 'package:flutter_bloc/flutter_bloc.dart';
 import '../../../../models/user_model.dart';
-import '../../bloc/searchuser_bloc.dart';
 import '../../../dating/screens/user_detail_screen.dart';
 import '../../../user/ui/widgets/card_level.dart';
 import '../../../user/ui/widgets/gender_sign.dart';
 import '../../../user/ui/widgets/user_info.dart';
+import '../../bloc/searchuser_bloc.dart';
 
 // import 'MatchedAnimation.dart';
 
@@ -58,10 +59,12 @@ class UsersListState extends State<UsersList> with WidgetsBindingObserver {
 
   // Navigate to user profile when card is tapped
   void _navigateToUserProfile(UserModel user) {
-    Navigator.push(
-      context,
-      MaterialPageRoute(
-        builder: (context) => UserDetailScreen(user: user),
+    unawaited(
+      Navigator.push(
+        context,
+        MaterialPageRoute(
+          builder: (context) => UserDetailScreen(user: user),
+        ),
       ),
     );
   }
@@ -87,7 +90,7 @@ class UsersListState extends State<UsersList> with WidgetsBindingObserver {
                     child: Padding(
                       padding: const EdgeInsets.all(10),
                       child: Image.asset(
-                        'asset/hookup4u-Logo-BP.png',
+                        'asset/images/logo.png',
                         fit: BoxFit.contain,
                         color: AppColors.primaryGreen,
                       ),
@@ -130,7 +133,7 @@ class UsersListState extends State<UsersList> with WidgetsBindingObserver {
             horizontalSwipeThreshold: 0.8,
             verticalSwipeThreshold: 0.8,
             overlayBuilder: (context, properties) {
-              final opacity = min(properties.swipeProgress, 1.0).toDouble();
+              final opacity = min(properties.swipeProgress, 1).toDouble();
               if (properties.direction == SwipeDirection.right) {
                 return Padding(
                   padding: const EdgeInsets.only(top: 25, left: 25),
@@ -266,7 +269,8 @@ class UsersListState extends State<UsersList> with WidgetsBindingObserver {
                                       Text(
                                         '${widget.users[itemIndex].distanceBW!.toStringAsFixed(1)} miles away',
                                         style: GoogleFonts.montserrat(
-                                          color: Colors.white.withValues(alpha: 0.9),
+                                          color: Colors.white
+                                              .withValues(alpha: 0.9),
                                           fontSize: 14,
                                           fontWeight: FontWeight.w400,
                                         ),
@@ -276,7 +280,8 @@ class UsersListState extends State<UsersList> with WidgetsBindingObserver {
                                       Text(
                                         widget.users[itemIndex].address!,
                                         style: GoogleFonts.montserrat(
-                                          color: Colors.white.withValues(alpha: 0.9),
+                                          color: Colors.white
+                                              .withValues(alpha: 0.9),
                                           fontSize: 14,
                                           fontWeight: FontWeight.w400,
                                         ),
@@ -286,14 +291,16 @@ class UsersListState extends State<UsersList> with WidgetsBindingObserver {
                               ),
                               trailing: IconButton(
                                 onPressed: () {
-                                  showDialog(
-                                    barrierDismissible: false,
-                                    context: context,
-                                    builder: (context) => Info(
-                                      widget.users[itemIndex],
-                                      widget.currentUser,
-                                      true,
-                                      controller: widget.stackController,
+                                  unawaited(
+                                    showDialog(
+                                      barrierDismissible: false,
+                                      context: context,
+                                      builder: (context) => Info(
+                                        widget.users[itemIndex],
+                                        widget.currentUser,
+                                        true,
+                                        controller: widget.stackController,
+                                      ),
                                     ),
                                   );
                                 },

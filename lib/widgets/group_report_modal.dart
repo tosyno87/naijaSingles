@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import '../common/constants/app_colors.dart';
@@ -28,7 +30,7 @@ class _GroupReportModalState extends State<GroupReportModal> {
   @override
   void initState() {
     super.initState();
-    _checkIfUserReported();
+    unawaited(_checkIfUserReported());
   }
 
   @override
@@ -46,7 +48,7 @@ class _GroupReportModalState extends State<GroupReportModal> {
           _hasUserReported = hasReported;
         });
       }
-    } catch (e) {
+    } on Object {
       // Ignore error, allow user to proceed
     }
   }
@@ -84,7 +86,7 @@ class _GroupReportModalState extends State<GroupReportModal> {
           ),
         );
       }
-    } catch (e) {
+    } on Object catch (e) {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
@@ -178,8 +180,8 @@ class _GroupReportModalState extends State<GroupReportModal> {
                         decoration: BoxDecoration(
                           color: Colors.orange.withValues(alpha: 0.1),
                           borderRadius: BorderRadius.circular(8),
-                          border:
-                              Border.all(color: Colors.orange.withValues(alpha: 0.3)),
+                          border: Border.all(
+                              color: Colors.orange.withValues(alpha: 0.3)),
                         ),
                         child: Row(
                           children: [
@@ -226,7 +228,9 @@ class _GroupReportModalState extends State<GroupReportModal> {
                     ...GroupReportingService.reportReasons.map(
                       (reason) => RadioListTile<String>(
                         value: reason,
+                        // ignore: deprecated_member_use
                         groupValue: _selectedReason,
+                        // ignore: deprecated_member_use
                         onChanged: _hasUserReported
                             ? null
                             : (value) {

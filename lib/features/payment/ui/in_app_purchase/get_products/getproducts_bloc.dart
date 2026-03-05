@@ -18,7 +18,7 @@ class GetInAppProductsBloc
         emit(GetInAppProductsSuccessState(result: products));
       } on SocketException {
         emit(GetInAppProductsFailedState(msg: 'No Internet Connection'));
-      } catch (e) {
+      } on Object catch (e) {
         emit(GetInAppProductsFailedState(msg: e.toString()));
       }
     });

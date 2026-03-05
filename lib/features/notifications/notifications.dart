@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:developer';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
@@ -6,11 +7,11 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
 import '../../common/bloc/theme/theme_bloc.dart';
+import '../../common/bloc/user/user_bloc.dart';
 import '../../common/constants/app_colors.dart';
 import '../../common/constants/constants.dart';
 import '../../common/data/repo/pagination_repo.dart';
 import '../../common/data/repo/user_search_repo.dart';
-import '../../common/bloc/user/user_bloc.dart';
 import '../../common/widgets/custom_snackbar.dart';
 import '../../common/widgets/hookup_circularbar.dart';
 import '../../common/widgets/image_widget.dart';
@@ -52,7 +53,7 @@ class NotificationsState extends State<Notifications> {
         !_scrollController.position.outOfRange) {
       if (_hasMoreMessages && !_isLoadingMore) {
         log('load more called');
-        _loadMoreNotifications();
+        unawaited(_loadMoreNotifications());
       }
     }
   }
@@ -230,7 +231,7 @@ class NotificationsState extends State<Notifications> {
                             ),
                             onTap: () async {
                               log(doc.get('Matches'));
-                              showDialog(
+                              await showDialog(
                                 context: context,
                                 builder: (context) => const Center(
                                   child: CircularProgressIndicator(
@@ -264,9 +265,11 @@ class NotificationsState extends State<Notifications> {
                                   context: context,
                                   builder: (context) {
                                     if (!doc.get('isRead')) {
-                                      PaginationRepo.updateNotification(
-                                        currentUser!,
-                                        doc,
+                                      unawaited(
+                                        PaginationRepo.updateNotification(
+                                          currentUser!,
+                                          doc,
+                                        ),
                                       );
                                     }
                                     return Info(

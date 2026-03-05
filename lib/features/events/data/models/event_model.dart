@@ -77,9 +77,12 @@ class EventModel extends Equatable {
         createdByUserId: json['createdByUserId'] ?? 'unknown',
         distanceFromUser: json['distanceFromUser']?.toDouble(),
       );
-    } catch (e, stackTrace) {
-      AppLogger.error('❌ Error parsing EventModel from Firestore',
-          error: e, stackTrace: stackTrace);
+    } on Object catch (e, stackTrace) {
+      AppLogger.error(
+        '❌ Error parsing EventModel from Firestore',
+        error: e,
+        stackTrace: stackTrace,
+      );
       rethrow;
     }
   }
@@ -177,9 +180,26 @@ class EventModel extends Equatable {
 
   @override
   List<Object?> get props => [
-        id, externalId, name, description, startDate, endDate,
-        imageUrl, location, ticketUrl, isFree, ticketPrice,
-        category, tags, attendeeCount, rsvpCount, createdAt,
-        updatedAt, status, isPublic, createdByUserId, distanceFromUser,
+        id,
+        externalId,
+        name,
+        description,
+        startDate,
+        endDate,
+        imageUrl,
+        location,
+        ticketUrl,
+        isFree,
+        ticketPrice,
+        category,
+        tags,
+        attendeeCount,
+        rsvpCount,
+        createdAt,
+        updatedAt,
+        status,
+        isPublic,
+        createdByUserId,
+        distanceFromUser,
       ];
 }

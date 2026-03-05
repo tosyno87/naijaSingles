@@ -215,7 +215,7 @@ class HeightData {
         (option) => option['ft_in'] == ftIn,
       );
       return option['cm'];
-    } catch (e) {
+    } on Object {
       return null;
     }
   }
@@ -227,7 +227,7 @@ class HeightData {
         (option) => option['cm'] == cm,
       );
       return option['ft_in'];
-    } catch (e) {
+    } on Object {
       return null;
     }
   }
@@ -239,7 +239,7 @@ class HeightData {
         (option) => option['ft_in'] == ftIn,
       );
       return option['display'];
-    } catch (e) {
+    } on Object {
       return null;
     }
   }

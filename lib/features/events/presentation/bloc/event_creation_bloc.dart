@@ -197,7 +197,7 @@ class EventCreationBloc extends Bloc<EventCreationEvent, EventCreationState> {
       );
 
       log('Event created successfully: $eventId', name: 'EventCreationBloc');
-    } catch (e) {
+    } on Object catch (e) {
       log('Error creating event: $e', name: 'EventCreationBloc');
       emit(
         EventCreationError(
@@ -240,7 +240,7 @@ class EventCreationBloc extends Bloc<EventCreationEvent, EventCreationState> {
         'Event updated successfully: ${event.eventId}',
         name: 'EventCreationBloc',
       );
-    } catch (e) {
+    } on Object catch (e) {
       log('Error updating event: $e', name: 'EventCreationBloc');
       emit(
         EventCreationError(
@@ -263,7 +263,7 @@ class EventCreationBloc extends Bloc<EventCreationEvent, EventCreationState> {
       emit(EventDraftSaved(eventId));
 
       log('Event draft saved: $eventId', name: 'EventCreationBloc');
-    } catch (e) {
+    } on Object catch (e) {
       log('Error saving event draft: $e', name: 'EventCreationBloc');
       emit(
         EventCreationError(
@@ -286,7 +286,7 @@ class EventCreationBloc extends Bloc<EventCreationEvent, EventCreationState> {
       emit(EventPublished(event.eventId));
 
       log('Draft event published: ${event.eventId}', name: 'EventCreationBloc');
-    } catch (e) {
+    } on Object catch (e) {
       log('Error publishing draft event: $e', name: 'EventCreationBloc');
       emit(
         EventCreationError(
@@ -309,7 +309,7 @@ class EventCreationBloc extends Bloc<EventCreationEvent, EventCreationState> {
       emit(EventDeleted(event.eventId));
 
       log('Event deleted: ${event.eventId}', name: 'EventCreationBloc');
-    } catch (e) {
+    } on Object catch (e) {
       log('Error deleting event: $e', name: 'EventCreationBloc');
       emit(
         EventCreationError(
@@ -345,7 +345,7 @@ class EventCreationBloc extends Bloc<EventCreationEvent, EventCreationState> {
       emit(UserEventsLoaded(publishedEvents, drafts));
 
       log('Loaded ${events.length} user events', name: 'EventCreationBloc');
-    } catch (e) {
+    } on Object catch (e) {
       log('Error loading user events: $e', name: 'EventCreationBloc');
       emit(UserEventsError(_getErrorMessage(e)));
     }
@@ -445,7 +445,7 @@ class EventCreationBloc extends Bloc<EventCreationEvent, EventCreationState> {
     return errors;
   }
 
-  String _getErrorMessage(error) {
+  String _getErrorMessage(Object error) {
     if (error is UserEventException) {
       return error.message;
     }
@@ -466,7 +466,7 @@ class EventCreationBloc extends Bloc<EventCreationEvent, EventCreationState> {
     return 'An unexpected error occurred. Please try again';
   }
 
-  String? _getErrorCode(error) {
+  String? _getErrorCode(Object error) {
     if (error is EventValidationException) {
       return 'VALIDATION_ERROR';
     } else if (error is EventPermissionException) {

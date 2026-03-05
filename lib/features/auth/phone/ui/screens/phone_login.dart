@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -49,13 +51,13 @@ class _PhoneNumberState extends State<PhoneNumber> {
       _isLoading = true;
     });
 
-    final phoneNumber = _selectedCountryCode + _phoneController.text.trim();
-
     // For now, just navigate to the existing phone number screen
     // This is a temporary solution until we implement the proper phone login flow
-    Navigator.pushNamed(
-      context,
-      RouteName.phoneNumberScreen,
+    unawaited(
+      Navigator.pushNamed(
+        context,
+        RouteName.phoneNumberScreen,
+      ),
     );
   }
 
@@ -194,7 +196,8 @@ class _PhoneNumberState extends State<PhoneNumber> {
                                       DropdownMenuItem<String>(
                                     value: value['code'],
                                     child: Text(
-                                        "${value['code']} (${value['name']})"),
+                                      "${value['code']} (${value['name']})",
+                                    ),
                                   ),
                                 )
                                 .toList(),
@@ -282,7 +285,8 @@ class _PhoneNumberState extends State<PhoneNumber> {
                       ),
                       GestureDetector(
                         onTap: () {
-                          Navigator.pushReplacementNamed(context, '/welcome');
+                          unawaited(Navigator.pushReplacementNamed(
+                              context, '/welcome'));
                         },
                         child: Text(
                           'Sign Up',

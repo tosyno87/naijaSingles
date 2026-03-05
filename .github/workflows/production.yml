@@ -48,11 +48,10 @@ jobs:
         run: flutter pub get
         
       - name: Run Flutter analyzer
-        run: flutter analyze || echo "Analyzer completed with warnings"
+        run: flutter analyze --no-fatal-infos --no-fatal-warnings
         
       - name: Run tests
-        run: flutter test --coverage || echo "Some tests failed - continuing with deployment"
-        continue-on-error: true
+        run: flutter test --coverage
         
       - name: Upload coverage
         uses: codecov/codecov-action@ab904c41d6ece82784817410c45d8b8c02684457
@@ -268,10 +267,11 @@ jobs:
           echo "✅ Updated Xcode CURRENT_PROJECT_VERSION to: $NEW_BUILD"
           
       - name: Build iOS Release with Fastlane
+        env:
+          SKIP_FLUTTER_CLEAN: "true"
         run: |
-          # Re-run pub get to pick up version changes
           flutter pub get
-          
+          flutter build ios --release --dart-define=ENV=production --no-codesign
           cd ios
           bundle exec fastlane build_app
         
@@ -366,13 +366,14 @@ jobs:
               /usr/libexec/PlistBuddy -c "Set :CFBundleShortVersionString $CURRENT_VERSION" ios/Runner/Info.plist
               echo "✅ Updated Info.plist: CFBundleVersion=$NEW_BUILD, CFBundleShortVersionString=$CURRENT_VERSION"
               
-              # Rebuild with correct version
+              # Rebuild with correct version (must re-apply production dart-define)
               echo "🔨 Rebuilding with correct version..."
               flutter clean
               flutter pub get
+              flutter build ios --release --dart-define=ENV=production --no-codesign
               cd ios
               pod install
-              bundle exec fastlane build_app
+              SKIP_FLUTTER_CLEAN=true bundle exec fastlane build_app
               cd ..
               
               # Find the new IPA

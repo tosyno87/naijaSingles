@@ -2,7 +2,6 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/foundation.dart';
 
-import '../common/utils/distance.dart' as distance;
 import '../models/user_model.dart';
 
 /// Paginated user service for efficient user loading and discovery
@@ -85,7 +84,7 @@ class PaginatedUserService {
           debugPrint(
             '✅ Added user to results: ${user.name} (intent: ${user.lookingFor})',
           );
-        } catch (e) {
+        } on Object catch (e) {
           debugPrint('❌ Error processing user ${doc.id}: $e');
           continue;
         }
@@ -104,7 +103,7 @@ class PaginatedUserService {
         hasMore: hasMore,
         totalFetched: users.length,
       );
-    } catch (e) {
+    } on Object catch (e) {
       debugPrint('❌ Error fetching paginated users: $e');
       return PaginatedResult<UserModel>(
         items: [],
@@ -152,7 +151,7 @@ class PaginatedUserService {
       // First try ordering by age (which should exist)
       query = query.orderBy('age', descending: false);
       debugPrint('🔍 Ordering by age');
-    } catch (e) {
+    } on Object catch (e) {
       debugPrint('⚠️ Age ordering failed: $e');
       // If that fails, don't order at all for now
     }
@@ -197,58 +196,9 @@ class PaginatedUserService {
 
       debugPrint('🚫 Excluding ${excludedIds.length} users');
       return excludedIds;
-    } catch (e) {
+    } on Object catch (e) {
       debugPrint('❌ Error getting excluded user IDs: $e');
       return {currentUserId}; // At minimum, exclude current user
-    }
-  }
-
-  /// Check if user is within distance range
-  Future<bool> _isWithinDistance(
-    UserModel currentUser,
-    UserModel targetUser,
-  ) async {
-    try {
-      // Skip distance check if location data is missing
-      if (currentUser.coordinates == null ||
-          targetUser.coordinates == null ||
-          currentUser.coordinates!.isEmpty ||
-          targetUser.coordinates!.isEmpty) {
-        debugPrint('📍 Skipping distance check - missing location data');
-        return true; // Include user if location data is unavailable
-      }
-
-      final currentLat = currentUser.coordinates!['latitude'] as double?;
-      final currentLng = currentUser.coordinates!['longitude'] as double?;
-      final targetLat = targetUser.coordinates!['latitude'] as double?;
-      final targetLng = targetUser.coordinates!['longitude'] as double?;
-
-      if (currentLat == null ||
-          currentLng == null ||
-          targetLat == null ||
-          targetLng == null) {
-        return true; // Include if coordinates are invalid
-      }
-
-      // Calculate distance
-      final distanceKm = distance.calculateDistance(
-        currentLat,
-        currentLng,
-        targetLat,
-        targetLng,
-      );
-
-      // Use user's distance preference or default
-      final maxDistance = currentUser.distanceRange ?? MAX_DISTANCE_KM;
-
-      debugPrint(
-        '📍 Distance to ${targetUser.name}: ${(distanceKm * 0.621371).toStringAsFixed(1)} miles (max: ${(maxDistance * 0.621371).round()} miles)',
-      );
-
-      return distanceKm <= maxDistance;
-    } catch (e) {
-      debugPrint('❌ Error calculating distance: $e');
-      return true; // Include user if distance calculation fails
     }
   }
 
@@ -269,7 +219,7 @@ class PaginatedUserService {
       final availableCount = snapshot.docs.length - excludedIds.length;
 
       return availableCount > 0 ? availableCount : 0;
-    } catch (e) {
+    } on Object catch (e) {
       debugPrint('❌ Error getting total user count: $e');
       return 0;
     }
@@ -289,7 +239,7 @@ class PaginatedUserService {
 
       final snapshot = await query.get();
       return snapshot.docs.isNotEmpty;
-    } catch (e) {
+    } on Object catch (e) {
       debugPrint('❌ Error checking for more users: $e');
       return false;
     }

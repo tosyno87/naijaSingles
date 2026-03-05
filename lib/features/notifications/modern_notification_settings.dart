@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -37,7 +39,7 @@ class _ModernNotificationSettingsState extends State<ModernNotificationSettings>
   void initState() {
     super.initState();
     _setupAnimations();
-    _loadSettings();
+    unawaited(_loadSettings());
   }
 
   void _setupAnimations() {
@@ -62,7 +64,7 @@ class _ModernNotificationSettingsState extends State<ModernNotificationSettings>
       _isLoading = false;
     });
 
-    _animationController.forward();
+    unawaited(_animationController.forward());
   }
 
   Future<void> _updateSetting(AppNotificationSettings newSettings) async {
@@ -75,10 +77,10 @@ class _ModernNotificationSettingsState extends State<ModernNotificationSettings>
       });
 
       // Haptic feedback
-      HapticFeedback.lightImpact();
+      unawaited(HapticFeedback.lightImpact());
 
       _showSnackBar('Settings updated', isError: false);
-    } catch (e) {
+    } on Object {
       _showSnackBar('Failed to update settings', isError: true);
     } finally {
       setState(() => _isSaving = false);
@@ -273,7 +275,8 @@ class _ModernNotificationSettingsState extends State<ModernNotificationSettings>
             icon: Icons.chat_bubble_outline,
             value: _settings!.messageNotifications,
             onChanged: (value) => _updateSetting(
-                _settings!.copyWith(messageNotifications: value)),
+              _settings!.copyWith(messageNotifications: value),
+            ),
           ),
           _buildSettingTile(
             title: 'Profile Likes',
@@ -647,7 +650,7 @@ class _ModernNotificationSettingsState extends State<ModernNotificationSettings>
           ? _settings!.copyWith(quietHoursStart: timeString)
           : _settings!.copyWith(quietHoursEnd: timeString);
 
-      _updateSetting(newSettings);
+      await _updateSetting(newSettings);
     }
   }
 
@@ -671,8 +674,7 @@ class _ModernNotificationSettingsState extends State<ModernNotificationSettings>
   }
 
   void _sendTestNotification() {
-    // Send test notification
-    HapticFeedback.lightImpact();
+    unawaited(HapticFeedback.lightImpact());
     _showSnackBar('Test notification sent!', isError: false);
   }
 

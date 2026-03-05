@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:developer';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
@@ -6,13 +7,13 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:google_fonts/google_fonts.dart';
 
+import '../../common/constants/app_colors.dart';
 import '../../models/user_model.dart'; // Import UserModel
 import '../dating/screens/user_detail_screen.dart'; // Import for profile viewing
 import '../explore/explore_screen.dart'; // Import ExploreScreen directly
 import 'chat_thread_screen.dart';
 import 'message_model.dart';
 import 'services/chat_service.dart';
-import '../../common/constants/app_colors.dart';
 
 class MessagesScreen extends StatefulWidget {
   const MessagesScreen({super.key});
@@ -148,7 +149,7 @@ class _MessagesScreenState extends State<MessagesScreen> {
               avatarUrl: avatarUrl,
             ),
           );
-        } catch (e) {
+        } on Object catch (e) {
           log('Error processing thread: $e');
           continue;
         }
@@ -280,11 +281,12 @@ class _MessagesScreenState extends State<MessagesScreen> {
               const SizedBox(height: 32),
               ElevatedButton(
                 onPressed: () {
-                  // Navigate directly to ExploreScreen with back labelLarge
-                  Navigator.of(context).push(
-                    MaterialPageRoute(
-                      builder: (context) =>
-                          const ExploreScreen(showBackButton: true),
+                  unawaited(
+                    Navigator.of(context).push(
+                      MaterialPageRoute(
+                        builder: (context) =>
+                            const ExploreScreen(showBackButton: true),
+                      ),
                     ),
                   );
                 },
@@ -474,7 +476,8 @@ class _MessagesScreenState extends State<MessagesScreen> {
                                       Icon(
                                         Icons.info_outline,
                                         size: 16,
-                                        color: primaryColor.withValues(alpha: 0.7),
+                                        color:
+                                            primaryColor.withValues(alpha: 0.7),
                                       ),
                                     ],
                                   ),
@@ -520,18 +523,18 @@ class _MessagesScreenState extends State<MessagesScreen> {
       );
 
   void _openChatThread(MessageThreadInfo thread) {
-    // Mark as read when tapped
-    _chatService.markThreadAsRead(thread.threadId);
+    unawaited(_chatService.markThreadAsRead(thread.threadId));
 
-    // Navigate to chat thread screen
-    Navigator.push(
-      context,
-      MaterialPageRoute(
-        builder: (_) => ChatThreadScreen(
-          threadId: thread.threadId,
-          userName: thread.otherUserName,
-          avatarUrl: thread.avatarUrl,
-          otherUserId: thread.otherUserId,
+    unawaited(
+      Navigator.push(
+        context,
+        MaterialPageRoute(
+          builder: (_) => ChatThreadScreen(
+            threadId: thread.threadId,
+            userName: thread.otherUserName,
+            avatarUrl: thread.avatarUrl,
+            otherUserId: thread.otherUserId,
+          ),
         ),
       ),
     );
@@ -635,7 +638,8 @@ class _MessagesScreenState extends State<MessagesScreen> {
                     padding: const EdgeInsets.symmetric(vertical: 12),
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(12),
-                      side: BorderSide(color: textSecondary.withValues(alpha: 0.3)),
+                      side: BorderSide(
+                          color: textSecondary.withValues(alpha: 0.3)),
                     ),
                   ),
                   child: Text(
@@ -690,56 +694,59 @@ class _MessagesScreenState extends State<MessagesScreen> {
     if (!mounted) return;
 
     // Show MVP compliant loading indicator
-    showDialog(
-      context: context,
-      barrierDismissible: false,
-      builder: (context) => AlertDialog(
-        backgroundColor: cardColor,
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
-        elevation: 8,
-        contentPadding: const EdgeInsets.all(32),
-        content: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Container(
-              width: 80,
-              height: 80,
-              decoration: BoxDecoration(
-                color: primaryColor.withValues(alpha: 0.1),
-                shape: BoxShape.circle,
-              ),
-              child: const Center(
-                child: SizedBox(
-                  width: 40,
-                  height: 40,
-                  child: CircularProgressIndicator(
-                    color: primaryColor,
-                    strokeWidth: 3,
+    unawaited(
+      showDialog(
+        context: context,
+        barrierDismissible: false,
+        builder: (context) => AlertDialog(
+          backgroundColor: cardColor,
+          shape:
+              RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+          elevation: 8,
+          contentPadding: const EdgeInsets.all(32),
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Container(
+                width: 80,
+                height: 80,
+                decoration: BoxDecoration(
+                  color: primaryColor.withValues(alpha: 0.1),
+                  shape: BoxShape.circle,
+                ),
+                child: const Center(
+                  child: SizedBox(
+                    width: 40,
+                    height: 40,
+                    child: CircularProgressIndicator(
+                      color: primaryColor,
+                      strokeWidth: 3,
+                    ),
                   ),
                 ),
               ),
-            ),
-            const SizedBox(height: 24),
-            Text(
-              'Deleting Conversation',
-              style: GoogleFonts.montserrat(
-                fontSize: 18,
-                fontWeight: FontWeight.bold,
-                color: textPrimary,
+              const SizedBox(height: 24),
+              Text(
+                'Deleting Conversation',
+                style: GoogleFonts.montserrat(
+                  fontSize: 18,
+                  fontWeight: FontWeight.bold,
+                  color: textPrimary,
+                ),
+                textAlign: TextAlign.center,
               ),
-              textAlign: TextAlign.center,
-            ),
-            const SizedBox(height: 8),
-            Text(
-              'Please wait while we remove your conversation and unmatch you both...',
-              style: GoogleFonts.montserrat(
-                fontSize: 14,
-                color: textSecondary,
-                height: 1.4,
+              const SizedBox(height: 8),
+              Text(
+                'Please wait while we remove your conversation and unmatch you both...',
+                style: GoogleFonts.montserrat(
+                  fontSize: 14,
+                  color: textSecondary,
+                  height: 1.4,
+                ),
+                textAlign: TextAlign.center,
               ),
-              textAlign: TextAlign.center,
-            ),
-          ],
+            ],
+          ),
         ),
       ),
     );
@@ -787,13 +794,33 @@ class _MessagesScreenState extends State<MessagesScreen> {
           );
         }
       }
-    } catch (e) {
+    } on FirebaseException catch (_) {
       // Close loading dialog
       if (mounted && Navigator.canPop(context)) {
         Navigator.pop(context);
       }
 
       // Show error message
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(
+              'Error deleting conversation',
+              style: GoogleFonts.montserrat(color: Colors.white),
+            ),
+            backgroundColor: Colors.red,
+            behavior: SnackBarBehavior.floating,
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(8),
+            ),
+          ),
+        );
+      }
+    } on Object {
+      // Fallback for non-Firebase errors
+      if (mounted && Navigator.canPop(context)) {
+        Navigator.pop(context);
+      }
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
@@ -818,57 +845,59 @@ class _MessagesScreenState extends State<MessagesScreen> {
 
     try {
       // Show MVP compliant loading indicator
-      showDialog(
-        context: context,
-        barrierDismissible: false,
-        builder: (context) => AlertDialog(
-          backgroundColor: cardColor,
-          shape:
-              RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
-          elevation: 8,
-          contentPadding: const EdgeInsets.all(32),
-          content: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Container(
-                width: 80,
-                height: 80,
-                decoration: BoxDecoration(
-                  color: primaryColor.withValues(alpha: 0.1),
-                  shape: BoxShape.circle,
-                ),
-                child: const Center(
-                  child: SizedBox(
-                    width: 40,
-                    height: 40,
-                    child: CircularProgressIndicator(
-                      color: primaryColor,
-                      strokeWidth: 3,
+      unawaited(
+        showDialog(
+          context: context,
+          barrierDismissible: false,
+          builder: (context) => AlertDialog(
+            backgroundColor: cardColor,
+            shape:
+                RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+            elevation: 8,
+            contentPadding: const EdgeInsets.all(32),
+            content: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Container(
+                  width: 80,
+                  height: 80,
+                  decoration: BoxDecoration(
+                    color: primaryColor.withValues(alpha: 0.1),
+                    shape: BoxShape.circle,
+                  ),
+                  child: const Center(
+                    child: SizedBox(
+                      width: 40,
+                      height: 40,
+                      child: CircularProgressIndicator(
+                        color: primaryColor,
+                        strokeWidth: 3,
+                      ),
                     ),
                   ),
                 ),
-              ),
-              const SizedBox(height: 24),
-              Text(
-                'Loading Profile',
-                style: GoogleFonts.montserrat(
-                  fontSize: 18,
-                  fontWeight: FontWeight.bold,
-                  color: textPrimary,
+                const SizedBox(height: 24),
+                Text(
+                  'Loading Profile',
+                  style: GoogleFonts.montserrat(
+                    fontSize: 18,
+                    fontWeight: FontWeight.bold,
+                    color: textPrimary,
+                  ),
+                  textAlign: TextAlign.center,
                 ),
-                textAlign: TextAlign.center,
-              ),
-              const SizedBox(height: 8),
-              Text(
-                'Please wait while we fetch the user profile...',
-                style: GoogleFonts.montserrat(
-                  fontSize: 14,
-                  color: textSecondary,
-                  height: 1.4,
+                const SizedBox(height: 8),
+                Text(
+                  'Please wait while we fetch the user profile...',
+                  style: GoogleFonts.montserrat(
+                    fontSize: 14,
+                    color: textSecondary,
+                    height: 1.4,
+                  ),
+                  textAlign: TextAlign.center,
                 ),
-                textAlign: TextAlign.center,
-              ),
-            ],
+              ],
+            ),
           ),
         ),
       );
@@ -880,6 +909,8 @@ class _MessagesScreenState extends State<MessagesScreen> {
       if (mounted && Navigator.canPop(context)) {
         Navigator.pop(context);
       }
+
+      if (!mounted) return;
 
       if (userDoc.exists) {
         final userData = userDoc.data() as Map<String, dynamic>;
@@ -898,10 +929,12 @@ class _MessagesScreenState extends State<MessagesScreen> {
         );
 
         // Navigate to profile screen
-        Navigator.push(
-          context,
-          MaterialPageRoute(
-            builder: (context) => UserDetailScreen(user: userModel),
+        unawaited(
+          Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (context) => UserDetailScreen(user: userModel),
+            ),
           ),
         );
       } else {
@@ -920,13 +953,14 @@ class _MessagesScreenState extends State<MessagesScreen> {
           ),
         );
       }
-    } catch (e) {
+    } on Object catch (e) {
       // Close loading dialog if still open
       if (mounted && Navigator.canPop(context)) {
         Navigator.pop(context);
       }
 
       log('Error loading user profile: $e');
+      if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Text(

@@ -63,7 +63,8 @@ Future<Map<String, dynamic>?> showLocationDialog(
                           onPressed: () => Navigator.pop(context),
                           child: Text(
                             'No'.tr().toString(),
-                            style: const TextStyle(color: AppColors.primaryGreen),
+                            style:
+                                const TextStyle(color: AppColors.primaryGreen),
                           ),
                         ),
                         TextButton(
@@ -82,7 +83,8 @@ Future<Map<String, dynamic>?> showLocationDialog(
                           },
                           child: Text(
                             'Yes'.tr().toString(),
-                            style: const TextStyle(color: AppColors.primaryGreen),
+                            style:
+                                const TextStyle(color: AppColors.primaryGreen),
                           ),
                         ),
                       ],
@@ -131,14 +133,14 @@ Future<void> showAddressDialog(
       ),
     );
 
-Future getAddress(lat, lng) async {
+Future<String> getAddress(double? lat, double? lng) async {
   try {
     final reverseGeocode = await UserLocationReporistoryImpl()
-        .getReverseGeoding(lat: lat, lng: lng);
+        .getReverseGeoding(lat: lat ?? 0, lng: lng ?? 0);
     return reverseGeocode.formattedAddress;
   } on SocketException {
-    throw 'No internet connection'.tr().toString();
-  } catch (e) {
+    throw Exception('No internet connection'.tr().toString());
+  } on Object {
     rethrow;
   }
 }

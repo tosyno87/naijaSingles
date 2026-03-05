@@ -1,4 +1,5 @@
-// ignore_for_file: must_be_immutable
+import 'dart:async';
+
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -8,9 +9,9 @@ import '../../../../models/user_model.dart';
 import '../../../home/bloc/searchuser_bloc.dart';
 
 class MatchedPage extends StatefulWidget {
-  MatchedPage({required this.name, required this.currentUser, super.key});
-  String name;
-  UserModel currentUser;
+  const MatchedPage({required this.name, required this.currentUser, super.key});
+  final String name;
+  final UserModel currentUser;
 
   @override
   MAtchState createState() => MAtchState();
@@ -24,12 +25,15 @@ class MAtchState extends State<MatchedPage> {
     image = const AssetImage('asset/connected3.gif');
     super.initState();
 
-    Future.delayed(const Duration(milliseconds: 2000), () {
-      context
-          .read<SearchUserBloc>()
-          .add(LoadUserEvent(currentUser: widget.currentUser));
-      Navigator.pop(context);
-    });
+    unawaited(
+      Future.delayed(const Duration(milliseconds: 2000), () {
+        if (!mounted) return;
+        context
+            .read<SearchUserBloc>()
+            .add(LoadUserEvent(currentUser: widget.currentUser));
+        Navigator.pop(context);
+      }),
+    );
   }
 
   @override

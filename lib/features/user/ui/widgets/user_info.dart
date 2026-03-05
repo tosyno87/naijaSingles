@@ -1,8 +1,10 @@
+import 'dart:async';
+
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_swiper_null_safety/flutter_swiper_null_safety.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter_swiper_null_safety/flutter_swiper_null_safety.dart';
 import 'package:swipable_stack/swipable_stack.dart';
 
 import '../../../../common/bloc/theme/theme_bloc.dart';
@@ -76,19 +78,18 @@ class _InfoState extends State<Info> {
                         Swiper(
                           key: UniqueKey(),
                           physics: const ScrollPhysics(),
-                          itemBuilder: (BuildContext context, int index2) {
-                            // ignore: unnecessary_null_comparison
-                            return widget.user.imageUrl!.length != null
-                                ? Hero(
-                                    tag: 'abc',
-                                    child: CustomCNImage(
-                                      imageUrl: widget.user.imageUrl![index2],
-                                      fit: BoxFit.cover,
-                                    ),
-                                  )
-                                : Container();
-                          },
-                          itemCount: widget.user.imageUrl!.length,
+                          itemBuilder: (BuildContext context, int index2) =>
+                              widget.user.imageUrl != null &&
+                                      widget.user.imageUrl!.isNotEmpty
+                                  ? Hero(
+                                      tag: 'abc',
+                                      child: CustomCNImage(
+                                        imageUrl: widget.user.imageUrl![index2],
+                                        fit: BoxFit.cover,
+                                      ),
+                                    )
+                                  : Container(),
+                          itemCount: widget.user.imageUrl?.length ?? 0,
                           pagination: const SwiperPagination(
                             alignment: Alignment.bottomCenter,
                             builder: DotSwiperPaginationBuilder(
@@ -168,8 +169,8 @@ class _InfoState extends State<Info> {
                           if (widget.user.editInfo!['job_title'] != null)
                             ListTile(
                               dense: true,
-                              leading:
-                                  const Icon(Icons.work, color: AppColors.primaryGreen),
+                              leading: const Icon(Icons.work,
+                                  color: AppColors.primaryGreen),
                               title: Text(
                                 "${widget.user.editInfo!['job_title'].toString().trim()} ${widget.user.editInfo!['company'] != null ? 'at ${widget.user.editInfo!['company'].toString().trim()}' : ''}",
                                 style: const TextStyle(
@@ -184,8 +185,8 @@ class _InfoState extends State<Info> {
                           if (widget.user.editInfo!['university'] != null)
                             ListTile(
                               dense: true,
-                              leading:
-                                  const Icon(Icons.stars, color: AppColors.primaryGreen),
+                              leading: const Icon(Icons.stars,
+                                  color: AppColors.primaryGreen),
                               title: Text(
                                 widget.user.editInfo!['university']
                                     .toString()
@@ -202,8 +203,8 @@ class _InfoState extends State<Info> {
                           if (widget.user.editInfo!['living_in'] != null)
                             ListTile(
                               dense: true,
-                              leading:
-                                  const Icon(Icons.home, color: AppColors.primaryGreen),
+                              leading: const Icon(Icons.home,
+                                  color: AppColors.primaryGreen),
                               title: const Text(
                                 'Living in ',
                                 style: TextStyle(
@@ -340,9 +341,11 @@ class _InfoState extends State<Info> {
               isMe
                   ? FloatingButton(
                       onTap: () {
-                        Navigator.pushReplacementNamed(
-                          context,
-                          RouteName.editProfileScreen,
+                        unawaited(
+                          Navigator.pushReplacementNamed(
+                            context,
+                            RouteName.editProfileScreen,
+                          ),
                         );
                       },
                       icon: const Icon(
@@ -352,15 +355,17 @@ class _InfoState extends State<Info> {
                     )
                   : FloatingButton(
                       onTap: () {
-                        Navigator.push(
-                          context,
-                          CupertinoPageRoute(
-                            builder: (context) => ChatPage(
-                              sender: widget.currentUser,
-                              second: widget.user,
-                              chatId: chatId(
-                                widget.user,
-                                widget.currentUser,
+                        unawaited(
+                          Navigator.push(
+                            context,
+                            CupertinoPageRoute(
+                              builder: (context) => ChatPage(
+                                sender: widget.currentUser,
+                                second: widget.user,
+                                chatId: chatId(
+                                  widget.user,
+                                  widget.currentUser,
+                                ),
                               ),
                             ),
                           ),

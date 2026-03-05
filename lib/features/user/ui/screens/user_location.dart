@@ -1,5 +1,4 @@
-// ignore_for_file: use_build_context_synchronously
-
+import 'dart:async';
 import 'dart:developer';
 import 'dart:io';
 
@@ -9,7 +8,6 @@ import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
-import '../../../../common/bloc/theme/theme_bloc.dart';
 import '../../../../common/bloc/user/user_bloc.dart';
 import '../../../../common/constants/constants.dart';
 import '../../../../common/data/repo/phone_auth_repo.dart';
@@ -26,7 +24,6 @@ class AllowLocation extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final isDarkMode = context.watch<ThemeBloc>().isDarkMode;
     final auth = firebaseAuthInstance;
     final userData = (ModalRoute.of(context)!.settings.arguments
         as Map<String, dynamic>)['userData'];
@@ -73,28 +70,31 @@ class AllowLocation extends StatelessWidget {
           );
 
           if (task != null) {
-            // Complete registration
+            if (!context.mounted) return;
             context
                 .read<RegistrationBloc>()
                 .add(RegistrationRequest(userdata: userData));
           } else {
             isProcessing.value = false;
+            if (!context.mounted) return;
             CustomSnackbar.showSnackBarSimple(
               'Failed to upload image. Please try again.',
               context,
             );
           }
-        } catch (e) {
+        } on Object catch (e) {
           isProcessing.value = false;
           log('Error uploading profile: ${e.toString()}');
+          if (!context.mounted) return;
           CustomSnackbar.showSnackBarSimple(
             'Error uploading profile: ${e.toString()}',
             context,
           );
         }
-      } catch (e) {
+      } on Object catch (e) {
         isProcessing.value = false;
         log('Error in proceedWithoutLocation: ${e.toString()}');
+        if (!context.mounted) return;
         CustomSnackbar.showSnackBarSimple(
           'Error completing registration: ${e.toString()}',
           context,
@@ -211,9 +211,11 @@ class AllowLocation extends StatelessWidget {
                         }
                         if (state is RegistrationSuccess) {
                           log('userregistrationsuccess');
-                          context.read<UserBloc>().add(UserDataUpdated(state.user));
+                          context
+                              .read<UserBloc>()
+                              .add(UserDataUpdated(state.user));
                           isProcessing.value = false;
-                          showWelcomDialog(context);
+                          unawaited(showWelcomDialog(context));
                         }
                       },
                       builder: (context, state) {
@@ -252,6 +254,7 @@ class AllowLocation extends StatelessWidget {
                                   );
 
                                   if (task != null) {
+                                    if (!context.mounted) return;
                                     context.read<RegistrationBloc>().add(
                                           RegistrationRequest(
                                             userdata: userData,
@@ -259,20 +262,22 @@ class AllowLocation extends StatelessWidget {
                                         );
                                   } else {
                                     isProcessing.value = false;
+                                    if (!context.mounted) return;
                                     CustomSnackbar.showSnackBarSimple(
                                       'Failed to upload image. Please try again.',
                                       context,
                                     );
                                   }
-                                } catch (e) {
+                                } on Object catch (e) {
                                   isProcessing.value = false;
                                   log('Error uploading profile: ${e.toString()}');
+                                  if (!context.mounted) return;
                                   CustomSnackbar.showSnackBarSimple(
                                     'Error uploading profile: ${e.toString()}',
                                     context,
                                   );
                                 }
-                              } catch (e) {
+                              } on Object catch (e) {
                                 isProcessing.value = false;
                                 log('Error adding user data: ${e.toString()}');
                                 CustomSnackbar.showSnackBarSimple(
@@ -290,7 +295,7 @@ class AllowLocation extends StatelessWidget {
                               );
 
                               // Show dialog to proceed with default location
-                              showDialog(
+                              await showDialog(
                                 context: context,
                                 barrierDismissible: false,
                                 builder: (BuildContext context) => AlertDialog(
@@ -308,7 +313,7 @@ class AllowLocation extends StatelessWidget {
                                     TextButton(
                                       onPressed: () {
                                         Navigator.of(context).pop();
-                                        proceedWithoutLocation();
+                                        unawaited(proceedWithoutLocation());
                                       },
                                       child: const Text('Continue'),
                                     ),
@@ -374,7 +379,7 @@ class AllowLocation extends StatelessWidget {
                     TextButton(
                       onPressed: () {
                         if (!isProcessing.value) {
-                          proceedWithoutLocation();
+                          unawaited(proceedWithoutLocation());
                         }
                       },
                       child: const Text(

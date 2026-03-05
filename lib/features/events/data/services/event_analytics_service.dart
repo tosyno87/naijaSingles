@@ -93,7 +93,7 @@ class EventAnalyticsService {
         'Event view tracked for event: $eventId, user: $userId',
         name: 'EventAnalyticsService',
       );
-    } catch (e) {
+    } on Object catch (e) {
       log('Error tracking event view: $e', name: 'EventAnalyticsService');
     }
   }
@@ -132,7 +132,7 @@ class EventAnalyticsService {
         'Event RSVP tracked for event: $eventId, user: $userId',
         name: 'EventAnalyticsService',
       );
-    } catch (e) {
+    } on Object catch (e) {
       log('Error tracking event RSVP: $e', name: 'EventAnalyticsService');
     }
   }
@@ -169,7 +169,7 @@ class EventAnalyticsService {
         'Event share tracked for event: $eventId, user: $userId, method: $shareMethod',
         name: 'EventAnalyticsService',
       );
-    } catch (e) {
+    } on Object catch (e) {
       log('Error tracking event share: $e', name: 'EventAnalyticsService');
     }
   }
@@ -206,7 +206,7 @@ class EventAnalyticsService {
         'Event click tracked for event: $eventId, user: $userId, type: $clickType',
         name: 'EventAnalyticsService',
       );
-    } catch (e) {
+    } on Object catch (e) {
       log('Error tracking event click: $e', name: 'EventAnalyticsService');
     }
   }
@@ -242,7 +242,7 @@ class EventAnalyticsService {
         conversionRate: conversionRate,
         lastUpdated: (data['lastUpdated'] as Timestamp).toDate(),
       );
-    } catch (e) {
+    } on Object catch (e) {
       log('Error getting event analytics: $e', name: 'EventAnalyticsService');
       return null;
     }
@@ -276,7 +276,7 @@ class EventAnalyticsService {
       analyticsList.sort((a, b) => b.totalViews.compareTo(a.totalViews));
 
       return analyticsList;
-    } catch (e) {
+    } on Object catch (e) {
       log(
         'Error getting user event analytics: $e',
         name: 'EventAnalyticsService',
@@ -295,7 +295,7 @@ class EventAnalyticsService {
           .get();
 
       return query.docs.map((doc) => doc.id).toList();
-    } catch (e) {
+    } on Object catch (e) {
       log(
         'Error getting trending event IDs: $e',
         name: 'EventAnalyticsService',
@@ -344,7 +344,7 @@ class EventAnalyticsService {
         'averageConversionRate': averageConversionRate,
         'topPerformingEvent': topPerformingEvent?.toJson(),
       };
-    } catch (e) {
+    } on Object catch (e) {
       log('Error getting analytics summary: $e', name: 'EventAnalyticsService');
       return {
         'totalEvents': 0,
@@ -386,7 +386,7 @@ class EventAnalyticsService {
         'User demographics updated for event: $eventId, user: $userId',
         name: 'EventAnalyticsService',
       );
-    } catch (e) {
+    } on Object catch (e) {
       log(
         'Error updating user demographics: $e',
         name: 'EventAnalyticsService',

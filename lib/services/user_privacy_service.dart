@@ -148,7 +148,7 @@ class UserPrivacyService {
         await updatePrivacySettings(defaultSettings);
         return defaultSettings;
       }
-    } catch (e) {
+    } on Object catch (e) {
       debugPrint('Error getting privacy settings: $e');
       return const UserPrivacySettings();
     }
@@ -170,7 +170,7 @@ class UserPrivacyService {
       await _updatePublicProfile(settings);
 
       return true;
-    } catch (e) {
+    } on Object catch (e) {
       debugPrint('Error updating privacy settings: $e');
       return false;
     }
@@ -235,7 +235,7 @@ class UserPrivacyService {
           .collection('public')
           .doc('profile')
           .set(publicData, SetOptions(merge: true));
-    } catch (e) {
+    } on Object catch (e) {
       debugPrint('Error updating public profile: $e');
     }
   }
@@ -277,7 +277,7 @@ class UserPrivacyService {
       }
 
       return publicDoc.data();
-    } catch (e) {
+    } on Object catch (e) {
       debugPrint('Error getting filtered user data: $e');
       return null;
     }
@@ -354,7 +354,7 @@ class UserPrivacyService {
       // For now, only allow messages from matches
       // This simplifies the messaging system
       return false;
-    } catch (e) {
+    } on Object catch (e) {
       debugPrint('Error checking message permission: $e');
       return false;
     }
@@ -365,22 +365,6 @@ class UserPrivacyService {
     // This should integrate with your existing match checking logic
     // For now, return false as placeholder
     return false;
-  }
-
-  /// Check if user has liked another user (placeholder)
-  Future<bool> _checkIfLiked(String fromUserId, String toUserId) async {
-    try {
-      final likeDoc = await _firestore
-          .collection('likes')
-          .where('from', isEqualTo: fromUserId)
-          .where('to', isEqualTo: toUserId)
-          .get();
-
-      return likeDoc.docs.isNotEmpty;
-    } catch (e) {
-      debugPrint('Error checking like status: $e');
-      return false;
-    }
   }
 
   /// Get privacy summary for display

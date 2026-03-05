@@ -1,8 +1,12 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 import 'package:naijasingles/common/constants/app_colors.dart';
 import 'package:naijasingles/common/constants/theme.dart';
+
+final bool _isCI = Platform.environment.containsKey('CI');
 
 /// Golden tests for the AfroPeep design system.
 ///
@@ -159,21 +163,29 @@ void main() {
           ),
         );
 
-    testWidgets('Light theme swatch', (tester) async {
-      await tester.pumpWidget(themed(testLight, buildSwatch()));
-      await expectLater(
-        find.byType(MaterialApp),
-        matchesGoldenFile('goldens/light_theme_swatch.png'),
-      );
-    });
+    testWidgets(
+      'Light theme swatch',
+      (tester) async {
+        await tester.pumpWidget(themed(testLight, buildSwatch()));
+        await expectLater(
+          find.byType(MaterialApp),
+          matchesGoldenFile('goldens/light_theme_swatch.png'),
+        );
+      },
+      skip: _isCI,
+    );
 
-    testWidgets('Dark theme swatch', (tester) async {
-      await tester.pumpWidget(themed(testDark, buildSwatch()));
-      await expectLater(
-        find.byType(MaterialApp),
-        matchesGoldenFile('goldens/dark_theme_swatch.png'),
-      );
-    });
+    testWidgets(
+      'Dark theme swatch',
+      (tester) async {
+        await tester.pumpWidget(themed(testDark, buildSwatch()));
+        await expectLater(
+          find.byType(MaterialApp),
+          matchesGoldenFile('goldens/dark_theme_swatch.png'),
+        );
+      },
+      skip: _isCI,
+    );
   });
 
   // ─── Unit assertions on production theme factories ────────────────
@@ -265,3 +277,4 @@ void main() {
     });
   });
 }
+

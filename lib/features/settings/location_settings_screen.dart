@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:developer';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
@@ -42,7 +43,7 @@ class _LocationSettingsScreenState extends State<LocationSettingsScreen> {
   @override
   void initState() {
     super.initState();
-    _loadLocationSettings();
+    unawaited(_loadLocationSettings());
   }
 
   Future<void> _loadLocationSettings() async {
@@ -64,7 +65,7 @@ class _LocationSettingsScreenState extends State<LocationSettingsScreen> {
       await _getCurrentLocation();
 
       setState(() => _isLoading = false);
-    } catch (e) {
+    } on Object catch (e) {
       log('Error loading location settings: $e');
       setState(() => _isLoading = false);
     }
@@ -90,7 +91,9 @@ class _LocationSettingsScreenState extends State<LocationSettingsScreen> {
 
       // Get current position
       _currentPosition = await Geolocator.getCurrentPosition(
-        desiredAccuracy: LocationAccuracy.high,
+        locationSettings: const LocationSettings(
+          accuracy: LocationAccuracy.high,
+        ),
       );
 
       // Get address from coordinates
@@ -105,7 +108,7 @@ class _LocationSettingsScreenState extends State<LocationSettingsScreen> {
           _currentLocation = '${place.locality}, ${place.administrativeArea}';
         });
       }
-    } catch (e) {
+    } on Object catch (e) {
       log('Error getting current location: $e');
       setState(() => _currentLocation = 'Unable to get location');
     }
@@ -153,7 +156,7 @@ class _LocationSettingsScreenState extends State<LocationSettingsScreen> {
           ),
         );
       }
-    } catch (e) {
+    } on Object catch (e) {
       log('Error updating location settings: $e');
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(

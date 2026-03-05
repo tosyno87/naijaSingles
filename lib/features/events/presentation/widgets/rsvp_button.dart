@@ -1,11 +1,13 @@
+import 'dart:async';
+
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:google_fonts/google_fonts.dart';
 
+import '../../../../common/constants/app_colors.dart';
 import '../../data/models/rsvp_model.dart';
 import '../bloc/rsvp_bloc.dart';
-import '../../../../common/constants/app_colors.dart';
 
 class RSVPButton extends StatefulWidget {
   const RSVPButton({
@@ -72,9 +74,11 @@ class _RSVPButtonState extends State<RSVPButton>
   void _handleRSVPTap() {
     if (_isLoading) return;
 
-    _animationController.forward().then((_) {
-      _animationController.reverse();
-    });
+    unawaited(
+      _animationController.forward().then((_) {
+        unawaited(_animationController.reverse());
+      }),
+    );
 
     if (_currentStatus == RSVPStatus.going) {
       _showRSVPOptions();
@@ -97,10 +101,12 @@ class _RSVPButtonState extends State<RSVPButton>
   }
 
   void _showRSVPOptions() {
-    showModalBottomSheet(
-      context: context,
-      backgroundColor: Colors.transparent,
-      builder: (context) => _buildRSVPOptionsSheet(),
+    unawaited(
+      showModalBottomSheet(
+        context: context,
+        backgroundColor: Colors.transparent,
+        builder: (context) => _buildRSVPOptionsSheet(),
+      ),
     );
   }
 

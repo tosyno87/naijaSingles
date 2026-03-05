@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'dart:developer';
 
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
@@ -46,7 +47,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
   @override
   void dispose() {
     _photoPageController.dispose();
-    _userDataSubscription?.cancel();
+    unawaited(_userDataSubscription?.cancel());
     super.dispose();
   }
 
@@ -75,7 +76,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
       } else {
         setState(() => _isLoading = false);
       }
-    } catch (e) {
+    } on Object catch (e) {
       log('❌ Error setting up user data listener: $e');
       setState(() => _isLoading = false);
     }
@@ -98,7 +99,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
       } else {
         setState(() => _isLoading = false);
       }
-    } catch (e) {
+    } on Object catch (e) {
       log('❌ Error loading user data: $e');
       setState(() => _isLoading = false);
     }
@@ -131,21 +132,26 @@ class _ProfileScreenState extends State<ProfileScreen> {
               onSelected: (value) {
                 switch (value) {
                   case 'events':
-                    Navigator.pushNamed(context, RouteName.eventsScreen);
+                    unawaited(
+                        Navigator.pushNamed(context, RouteName.eventsScreen));
                     break;
                   case 'privacy':
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder: (_) => const PrivacySettingsScreen(),
+                    unawaited(
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (_) => const PrivacySettingsScreen(),
+                        ),
                       ),
                     );
                     break;
                   case 'settings':
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder: (_) => const SettingsScreen(),
+                    unawaited(
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (_) => const SettingsScreen(),
+                        ),
                       ),
                     );
                     break;
@@ -188,7 +194,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
         ),
         body: _isLoading
             ? const Center(
-                child: CircularProgressIndicator(color: primaryColor))
+                child: CircularProgressIndicator(color: primaryColor),
+              )
             : SafeArea(
                 child: SingleChildScrollView(
                   // Remove padding for seamless Hinge-style layout
@@ -223,6 +230,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
               ),
       );
 
+  // Legacy simplified layout retained as fallback.
+  // ignore: unused_element
   Widget _buildSimplifiedPhotoSection() {
     // Try multiple field names for compatibility
     final photos = _userData?['photos'] as List<dynamic>? ??
@@ -290,10 +299,13 @@ class _ProfileScreenState extends State<ProfileScreen> {
                 ),
                 child: ClipRRect(
                   borderRadius: BorderRadius.circular(16),
-                  child: Image.network(
-                    photos[index],
-                    fit: BoxFit.contain, // Show full image without cropping
-                    errorBuilder: (context, error, stackTrace) => ColoredBox(
+                  child: CachedNetworkImage(
+                    imageUrl: photos[index],
+                    fit: BoxFit.contain,
+                    placeholder: (context, url) => const Center(
+                      child: CircularProgressIndicator(strokeWidth: 2),
+                    ),
+                    errorWidget: (context, url, error) => ColoredBox(
                       color: Colors.grey.shade200,
                       child: Icon(
                         Icons.broken_image_outlined,
@@ -340,9 +352,11 @@ class _ProfileScreenState extends State<ProfileScreen> {
                 child: GestureDetector(
                   onTap: () {
                     if (_currentPhotoIndex > 0) {
-                      _photoPageController.previousPage(
-                        duration: const Duration(milliseconds: 300),
-                        curve: Curves.easeInOut,
+                      unawaited(
+                        _photoPageController.previousPage(
+                          duration: const Duration(milliseconds: 300),
+                          curve: Curves.easeInOut,
+                        ),
                       );
                     }
                   },
@@ -369,9 +383,11 @@ class _ProfileScreenState extends State<ProfileScreen> {
                 child: GestureDetector(
                   onTap: () {
                     if (_currentPhotoIndex < photos.length - 1) {
-                      _photoPageController.nextPage(
-                        duration: const Duration(milliseconds: 300),
-                        curve: Curves.easeInOut,
+                      unawaited(
+                        _photoPageController.nextPage(
+                          duration: const Duration(milliseconds: 300),
+                          curve: Curves.easeInOut,
+                        ),
                       );
                     }
                   },
@@ -396,6 +412,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
     );
   }
 
+  // ignore: unused_element
   Widget _buildSimplifiedBasicInfo() {
     final name = _userData?['name'] ?? 'Your Name';
     final age = _userData?['age'] ?? _calculateAge(_userData?['dateOfBirth']);
@@ -438,6 +455,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
     );
   }
 
+  // ignore: unused_element
   Widget _buildSimplifiedAbout() {
     final bio = _userData?['bio'] ?? '';
 
@@ -473,6 +491,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
     );
   }
 
+  // ignore: unused_element
   Widget _buildSimplifiedInterests() {
     final interests = _userData?['interests'] as List<dynamic>? ?? [];
 
@@ -522,12 +541,15 @@ class _ProfileScreenState extends State<ProfileScreen> {
                     .map(
                       (interest) => Container(
                         padding: const EdgeInsets.symmetric(
-                            horizontal: 12, vertical: 6),
+                          horizontal: 12,
+                          vertical: 6,
+                        ),
                         decoration: BoxDecoration(
                           color: primaryColor.withValues(alpha: 0.1),
                           borderRadius: BorderRadius.circular(20),
-                          border:
-                              Border.all(color: primaryColor.withValues(alpha: 0.3)),
+                          border: Border.all(
+                            color: primaryColor.withValues(alpha: 0.3),
+                          ),
                         ),
                         child: Text(
                           interest.toString(),
@@ -559,6 +581,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
     );
   }
 
+  // ignore: unused_element
   Widget _buildSimplifiedLocation() {
     // Handle both String and Map types for location and nationality
     String location = '';
@@ -685,7 +708,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
             );
 
             if (result == true) {
-              _loadUserData();
+              unawaited(_loadUserData());
             }
           },
           style: ElevatedButton.styleFrom(
@@ -725,7 +748,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
         age--;
       }
       return age;
-    } catch (e) {
+    } on Object {
       return null;
     }
   }
@@ -779,10 +802,13 @@ class _ProfileScreenState extends State<ProfileScreen> {
           child: Stack(
             fit: StackFit.expand,
             children: [
-              Image.network(
-                photos[index].toString(),
+              CachedNetworkImage(
+                imageUrl: photos[index].toString(),
                 fit: BoxFit.cover,
-                errorBuilder: (context, error, stackTrace) => ColoredBox(
+                placeholder: (context, url) => const Center(
+                  child: CircularProgressIndicator(strokeWidth: 2),
+                ),
+                errorWidget: (context, url, error) => ColoredBox(
                   color: Colors.grey.shade300,
                   child: const Icon(Icons.broken_image_outlined, size: 60),
                 ),
@@ -896,8 +922,11 @@ class _ProfileScreenState extends State<ProfileScreen> {
                     child: Row(
                       mainAxisSize: MainAxisSize.min,
                       children: [
-                        const Icon(Icons.location_on,
-                            size: 16, color: primaryColor),
+                        const Icon(
+                          Icons.location_on,
+                          size: 16,
+                          color: primaryColor,
+                        ),
                         const SizedBox(width: 6),
                         Text(
                           location,
@@ -981,7 +1010,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
         getValue('occupation');
     if (workTitle != null) {
       details.add(
-          {'icon': Icons.business_center, 'label': '', 'value': workTitle});
+        {'icon': Icons.business_center, 'label': '', 'value': workTitle},
+      );
     }
 
     // Religion - book icon (like Hinge)
@@ -995,7 +1025,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
         _userData?['preferences']?['relationshipIntent']?.toString();
     if (relationshipIntent != null && relationshipIntent.isNotEmpty) {
       details.add(
-          {'icon': Icons.search, 'label': '', 'value': relationshipIntent});
+        {'icon': Icons.search, 'label': '', 'value': relationshipIntent},
+      );
     }
 
     // Tribe - group icon
@@ -1021,29 +1052,31 @@ class _ProfileScreenState extends State<ProfileScreen> {
           ),
           const SizedBox(height: 8),
           // Hinge-style details: just icon and value, no label
-          ...details.map((detail) => Padding(
-                padding: const EdgeInsets.only(bottom: 12),
-                child: Row(
-                  children: [
-                    Icon(
-                      detail['icon'] as IconData,
-                      size: 20,
-                      color: textSecondary,
-                    ),
-                    const SizedBox(width: 12),
-                    Expanded(
-                      child: Text(
-                        detail['value'] as String,
-                        style: GoogleFonts.montserrat(
-                          fontSize: 16,
-                          fontWeight: FontWeight.w400,
-                          color: textPrimary,
-                        ),
+          ...details.map(
+            (detail) => Padding(
+              padding: const EdgeInsets.only(bottom: 12),
+              child: Row(
+                children: [
+                  Icon(
+                    detail['icon'] as IconData,
+                    size: 20,
+                    color: textSecondary,
+                  ),
+                  const SizedBox(width: 12),
+                  Expanded(
+                    child: Text(
+                      detail['value'] as String,
+                      style: GoogleFonts.montserrat(
+                        fontSize: 16,
+                        fontWeight: FontWeight.w400,
+                        color: textPrimary,
                       ),
                     ),
-                  ],
-                ),
-              )),
+                  ),
+                ],
+              ),
+            ),
+          ),
           const SizedBox(height: 24),
         ],
       ),
@@ -1073,25 +1106,29 @@ class _ProfileScreenState extends State<ProfileScreen> {
             spacing: 8,
             runSpacing: 8,
             children: interests
-                .map((interest) => Container(
-                      padding: const EdgeInsets.symmetric(
-                          horizontal: 16, vertical: 10),
-                      decoration: BoxDecoration(
-                        color: primaryColor.withValues(alpha: 0.1),
-                        borderRadius: BorderRadius.circular(20),
-                        border: Border.all(
-                          color: primaryColor.withValues(alpha: 0.3),
-                        ),
+                .map(
+                  (interest) => Container(
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 16,
+                      vertical: 10,
+                    ),
+                    decoration: BoxDecoration(
+                      color: primaryColor.withValues(alpha: 0.1),
+                      borderRadius: BorderRadius.circular(20),
+                      border: Border.all(
+                        color: primaryColor.withValues(alpha: 0.3),
                       ),
-                      child: Text(
-                        interest.toString(),
-                        style: GoogleFonts.montserrat(
-                          fontSize: 14,
-                          fontWeight: FontWeight.w500,
-                          color: primaryColor,
-                        ),
+                    ),
+                    child: Text(
+                      interest.toString(),
+                      style: GoogleFonts.montserrat(
+                        fontSize: 14,
+                        fontWeight: FontWeight.w500,
+                        color: primaryColor,
                       ),
-                    ))
+                    ),
+                  ),
+                )
                 .toList(),
           ),
           const SizedBox(height: 24),
@@ -1102,11 +1139,13 @@ class _ProfileScreenState extends State<ProfileScreen> {
 
   // Full screen photo viewer
   void _showFullScreenPhoto(List<dynamic> photos, int initialIndex) {
-    Navigator.of(context).push(
-      MaterialPageRoute(
-        builder: (context) => _FullScreenPhotoViewer(
-          photos: photos,
-          initialIndex: initialIndex,
+    unawaited(
+      Navigator.of(context).push(
+        MaterialPageRoute(
+          builder: (context) => _FullScreenPhotoViewer(
+            photos: photos,
+            initialIndex: initialIndex,
+          ),
         ),
       ),
     );
@@ -1172,10 +1211,13 @@ class _FullScreenPhotoViewerState extends State<_FullScreenPhotoViewer> {
             minScale: 0.5,
             maxScale: 3,
             child: Center(
-              child: Image.network(
-                widget.photos[index],
+              child: CachedNetworkImage(
+                imageUrl: widget.photos[index].toString(),
                 fit: BoxFit.contain,
-                errorBuilder: (context, error, stackTrace) => ColoredBox(
+                placeholder: (context, url) => const Center(
+                  child: CircularProgressIndicator(strokeWidth: 2),
+                ),
+                errorWidget: (context, url, error) => ColoredBox(
                   color: Colors.grey.shade800,
                   child: Column(
                     mainAxisAlignment: MainAxisAlignment.center,

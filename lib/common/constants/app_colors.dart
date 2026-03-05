@@ -30,8 +30,7 @@ class AppColors {
   static const Color textSecondary = Color(0xFF666666); // Medium grey
   static const Color textTertiary = Color(0xFF94A3B8);
 
-  // ⚠️ DEPRECATED: Use textSecondary instead. Kept for backward compatibility.
-  @Deprecated('Use AppColors.textSecondary instead')
+  // Legacy alias kept for backward compatibility.
   static const Color secondaryColor =
       Color(0xFF8D6E63); // Light brown (old secondary color)
   static const Color textOnPrimary = Colors.white; // White text on green
@@ -169,7 +168,6 @@ class AppColors {
           primary: primaryGreen,
           secondary: accentGreen,
           surface: surfaceColor,
-          background: backgroundColor,
           error: error,
         ),
         appBarTheme: const AppBarTheme(

@@ -33,7 +33,7 @@ class _BlockByAdminState extends State<BlockByAdmin> {
                         height: 50,
                         width: 100,
                         child: Image.asset(
-                          'asset/hookup4u-Logo-BP.png',
+                          'asset/images/logo.png',
                           fit: BoxFit.contain,
                         ),
                       ),
@@ -58,7 +58,8 @@ class _BlockByAdminState extends State<BlockByAdmin> {
               const SizedBox(height: 20),
               Text(
                 "Sorry, you can't access the application!".tr().toString(),
-                style: const TextStyle(color: AppColors.primaryGreen, fontSize: 22),
+                style: const TextStyle(
+                    color: AppColors.primaryGreen, fontSize: 22),
               ),
               const SizedBox(height: 12),
               Text(

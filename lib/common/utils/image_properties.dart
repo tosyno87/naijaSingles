@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:developer';
 import 'dart:io';
 
@@ -6,11 +7,11 @@ import 'package:easy_localization/easy_localization.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:http/http.dart' as http;
 import 'package:image/image.dart' as i;
 import 'package:image_cropper/image_cropper.dart';
 import 'package:image_picker/image_picker.dart';
-import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:path_provider/path_provider.dart';
 
 import '../../models/user_model.dart';
@@ -37,7 +38,7 @@ class ImageProperties {
             ..writeAsBytesSync(i.encodeJpg(imagefile, quality: 80));
 
       return compressedImagefile;
-    } catch (e) {
+    } on Object catch (e) {
       log('Error compressing image: $e');
       rethrow;
     }
@@ -95,9 +96,7 @@ class ImageProperties {
                               .tr(),
                           style: TextStyle(
                             fontSize: 15,
-                            color: isDarkMode
-                                ? Colors.white
-                                : Colors.black,
+                            color: isDarkMode ? Colors.white : Colors.black,
                             decoration: TextDecoration.none,
                           ),
                         ),
@@ -285,18 +284,20 @@ class ImageProperties {
     ImageSource source,
   ) {
     Navigator.pop(context);
-    showDialog(
-      barrierDismissible: source != ImageSource.gallery,
-      context: context,
-      builder: (context) {
-        getImage(source, context, currentUser, isProfilePicture);
-        return const Center(
-          child: CircularProgressIndicator(
-            strokeWidth: 2,
-            valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
-          ),
-        );
-      },
+    unawaited(
+      showDialog(
+        barrierDismissible: source != ImageSource.gallery,
+        context: context,
+        builder: (context) {
+          unawaited(getImage(source, context, currentUser, isProfilePicture));
+          return const Center(
+            child: CircularProgressIndicator(
+              strokeWidth: 2,
+              valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
+            ),
+          );
+        },
+      ),
     );
   }
 

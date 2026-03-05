@@ -1,4 +1,6 @@
+import 'dart:async';
 import 'dart:io';
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:image_picker/image_picker.dart';
@@ -58,12 +60,17 @@ class _GroupAvatarPickerState extends State<GroupAvatarPicker> {
                         height: widget.size,
                       )
                     : widget.defaultImageUrl != null
-                        ? Image.network(
-                            widget.defaultImageUrl!,
+                        ? CachedNetworkImage(
+                            imageUrl: widget.defaultImageUrl!,
                             fit: BoxFit.cover,
                             width: widget.size,
                             height: widget.size,
-                            errorBuilder: (context, error, stackTrace) =>
+                            placeholder: (context, url) => const Center(
+                              child: CircularProgressIndicator(
+                                strokeWidth: 2,
+                              ),
+                            ),
+                            errorWidget: (context, url, error) =>
                                 _buildDefaultAvatar(),
                           )
                         : _buildDefaultAvatar(),
@@ -140,119 +147,121 @@ class _GroupAvatarPickerState extends State<GroupAvatarPicker> {
       );
 
   void _showImagePickerDialog() {
-    showModalBottomSheet(
-      context: context,
-      builder: (BuildContext context) => SafeArea(
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            // Header
-            Container(
-              padding: const EdgeInsets.all(16),
-              child: Text(
-                'Select Group Photo',
-                style: GoogleFonts.montserrat(
-                  fontSize: 18,
-                  fontWeight: FontWeight.w600,
-                  color: Colors.black87,
+    unawaited(
+      showModalBottomSheet(
+        context: context,
+        builder: (BuildContext context) => SafeArea(
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              // Header
+              Container(
+                padding: const EdgeInsets.all(16),
+                child: Text(
+                  'Select Group Photo',
+                  style: GoogleFonts.montserrat(
+                    fontSize: 18,
+                    fontWeight: FontWeight.w600,
+                    color: Colors.black87,
+                  ),
                 ),
               ),
-            ),
 
-            // Options
-            ListTile(
-              leading: Container(
-                padding: const EdgeInsets.all(8),
-                decoration: BoxDecoration(
-                  color: AppColors.primaryGreen.withValues(alpha: 0.1),
-                  borderRadius: BorderRadius.circular(8),
+              // Options
+              ListTile(
+                leading: Container(
+                  padding: const EdgeInsets.all(8),
+                  decoration: BoxDecoration(
+                    color: AppColors.primaryGreen.withValues(alpha: 0.1),
+                    borderRadius: BorderRadius.circular(8),
+                  ),
+                  child: const Icon(
+                    Icons.photo_library,
+                    color: AppColors.primaryGreen,
+                    size: 24,
+                  ),
                 ),
-                child: const Icon(
-                  Icons.photo_library,
-                  color: AppColors.primaryGreen,
-                  size: 24,
+                title: Text(
+                  'Choose from Gallery',
+                  style: GoogleFonts.montserrat(
+                    fontSize: 16,
+                    fontWeight: FontWeight.w500,
+                  ),
                 ),
+                subtitle: Text(
+                  'Select an existing photo',
+                  style: GoogleFonts.montserrat(
+                    fontSize: 14,
+                    color: Colors.grey[600],
+                  ),
+                ),
+                onTap: () async {
+                  Navigator.pop(context);
+                  await _pickImage(ImageSource.gallery);
+                },
               ),
-              title: Text(
-                'Choose from Gallery',
-                style: GoogleFonts.montserrat(
-                  fontSize: 16,
-                  fontWeight: FontWeight.w500,
-                ),
-              ),
-              subtitle: Text(
-                'Select an existing photo',
-                style: GoogleFonts.montserrat(
-                  fontSize: 14,
-                  color: Colors.grey[600],
-                ),
-              ),
-              onTap: () async {
-                Navigator.pop(context);
-                await _pickImage(ImageSource.gallery);
-              },
-            ),
 
-            ListTile(
-              leading: Container(
-                padding: const EdgeInsets.all(8),
-                decoration: BoxDecoration(
-                  color: AppColors.primaryGreen.withValues(alpha: 0.1),
-                  borderRadius: BorderRadius.circular(8),
+              ListTile(
+                leading: Container(
+                  padding: const EdgeInsets.all(8),
+                  decoration: BoxDecoration(
+                    color: AppColors.primaryGreen.withValues(alpha: 0.1),
+                    borderRadius: BorderRadius.circular(8),
+                  ),
+                  child: const Icon(
+                    Icons.camera_alt,
+                    color: AppColors.primaryGreen,
+                    size: 24,
+                  ),
                 ),
-                child: const Icon(
-                  Icons.camera_alt,
-                  color: AppColors.primaryGreen,
-                  size: 24,
+                title: Text(
+                  'Take Photo',
+                  style: GoogleFonts.montserrat(
+                    fontSize: 16,
+                    fontWeight: FontWeight.w500,
+                  ),
                 ),
+                subtitle: Text(
+                  'Capture a new photo',
+                  style: GoogleFonts.montserrat(
+                    fontSize: 14,
+                    color: Colors.grey[600],
+                  ),
+                ),
+                onTap: () async {
+                  Navigator.pop(context);
+                  await _pickImage(ImageSource.camera);
+                },
               ),
-              title: Text(
-                'Take Photo',
-                style: GoogleFonts.montserrat(
-                  fontSize: 16,
-                  fontWeight: FontWeight.w500,
-                ),
-              ),
-              subtitle: Text(
-                'Capture a new photo',
-                style: GoogleFonts.montserrat(
-                  fontSize: 14,
-                  color: Colors.grey[600],
-                ),
-              ),
-              onTap: () async {
-                Navigator.pop(context);
-                await _pickImage(ImageSource.camera);
-              },
-            ),
 
-            // Cancel button
-            ListTile(
-              leading: Container(
-                padding: const EdgeInsets.all(8),
-                decoration: BoxDecoration(
-                  color: Colors.grey.withValues(alpha: 0.1),
-                  borderRadius: BorderRadius.circular(8),
+              // Cancel button
+              ListTile(
+                leading: Container(
+                  padding: const EdgeInsets.all(8),
+                  decoration: BoxDecoration(
+                    color: Colors.grey.withValues(alpha: 0.1),
+                    borderRadius: BorderRadius.circular(8),
+                  ),
+                  child: Icon(
+                    Icons.close,
+                    color: Colors.grey[600],
+                    size: 24,
+                  ),
                 ),
-                child: Icon(
-                  Icons.close,
-                  color: Colors.grey[600],
-                  size: 24,
+                title: Text(
+                  'Cancel',
+                  style: GoogleFonts.montserrat(
+                    fontSize: 16,
+                    fontWeight: FontWeight.w500,
+                    color: Colors.grey[600],
+                  ),
                 ),
+                onTap: () => Navigator.pop(context),
               ),
-              title: Text(
-                'Cancel',
-                style: GoogleFonts.montserrat(
-                  fontSize: 16,
-                  fontWeight: FontWeight.w500,
-                  color: Colors.grey[600],
-                ),
-              ),
-              onTap: () => Navigator.pop(context),
-            ),
 
-            const SizedBox(height: 16),
-          ],
+              const SizedBox(height: 16),
+            ],
+          ),
         ),
       ),
     );
@@ -283,7 +292,7 @@ class _GroupAvatarPickerState extends State<GroupAvatarPicker> {
           }
         }
       }
-    } catch (e) {
+    } on Object catch (e) {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(

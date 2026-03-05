@@ -17,7 +17,6 @@ class _EnhancedAdditionalInfoScreenState
     extends State<EnhancedAdditionalInfoScreen> {
   // Afropeep theme colors
   static const Color afropeepGreen = Color(0xFF008037); // MVP green
-  static const Color cardBackground = Color(0xFFF7E8DA);
   static const Color textDarkBrown = Color(0xFF3A1D0F);
   static const Color textLightBrown = Color(0xFF8B6C59);
 
@@ -32,7 +31,6 @@ class _EnhancedAdditionalInfoScreenState
   String _religion = '';
   String _primaryLanguage = ''; // Changed from List<String> _languages
   String _customLanguage = ''; // For when user selects "Other"
-  String _occupation = '';
   String _drinkingPreference = '';
   String _smokingPreference = '';
 
@@ -494,7 +492,6 @@ class _EnhancedAdditionalInfoScreenState
       }
     }
 
-    _occupation = data.occupation ?? '';
     _drinkingPreference = data.drinkingPreference;
     _smokingPreference = data.smokingPreference;
   }
@@ -630,7 +627,7 @@ class _EnhancedAdditionalInfoScreenState
                           color: afropeepGreen,
                         ),
                       ),
-                      SizedBox(height: 4),
+                      const SizedBox(height: 4),
                       Text(
                         'You can skip this and complete it later in your profile settings. Adding more details helps us find better matches!',
                         style: GoogleFonts.montserrat(
@@ -668,8 +665,8 @@ class _EnhancedAdditionalInfoScreenState
                 _heightCm = heightCm;
               });
               context.read<OnboardingBloc>().add(
-                OnboardingHeightFromDropdownUpdated(heightFtIn, heightCm),
-              );
+                    OnboardingHeightFromDropdownUpdated(heightFtIn, heightCm),
+                  );
             },
           ),
 
@@ -702,8 +699,8 @@ class _EnhancedAdditionalInfoScreenState
                   _relationshipIntent = value;
                 });
                 context.read<OnboardingBloc>().add(
-                  OnboardingRelationshipIntentUpdated(value),
-                );
+                      OnboardingRelationshipIntentUpdated(value),
+                    );
               },
             ),
           ],
@@ -768,8 +765,8 @@ class _EnhancedAdditionalInfoScreenState
                 _education = value;
               });
               context.read<OnboardingBloc>().add(
-                OnboardingEducationUpdated(value),
-              );
+                    OnboardingEducationUpdated(value),
+                  );
             },
           ),
 
@@ -791,8 +788,8 @@ class _EnhancedAdditionalInfoScreenState
                   _religion = value;
                 });
                 context.read<OnboardingBloc>().add(
-                  OnboardingReligionUpdated(value),
-                );
+                      OnboardingReligionUpdated(value),
+                    );
               },
             ),
             SizedBox(height: isTablet ? 32 : 24),
@@ -828,8 +825,8 @@ class _EnhancedAdditionalInfoScreenState
               final languageToSave = value == 'Other' ? _customLanguage : value;
               if (languageToSave.isNotEmpty) {
                 context.read<OnboardingBloc>().add(
-                  OnboardingLanguagesUpdated([languageToSave]),
-                );
+                      OnboardingLanguagesUpdated([languageToSave]),
+                    );
               }
             },
           ),
@@ -884,8 +881,8 @@ class _EnhancedAdditionalInfoScreenState
                   });
                   if (value.isNotEmpty) {
                     context.read<OnboardingBloc>().add(
-                      OnboardingLanguagesUpdated([value]),
-                    );
+                          OnboardingLanguagesUpdated([value]),
+                        );
                   }
                 },
               ),
@@ -921,8 +918,8 @@ class _EnhancedAdditionalInfoScreenState
                   _drinkingPreference = value;
                 });
                 context.read<OnboardingBloc>().add(
-                  OnboardingDrinkingPreferenceUpdated(value),
-                );
+                      OnboardingDrinkingPreferenceUpdated(value),
+                    );
               },
             ),
 
@@ -947,8 +944,8 @@ class _EnhancedAdditionalInfoScreenState
                   _smokingPreference = value;
                 });
                 context.read<OnboardingBloc>().add(
-                  OnboardingSmokingPreferenceUpdated(value),
-                );
+                      OnboardingSmokingPreferenceUpdated(value),
+                    );
               },
             ),
 
@@ -1099,96 +1096,6 @@ class _EnhancedAdditionalInfoScreenState
           ],
         ),
       );
-
-  List<Widget> _buildEnhancedOptions(
-    List<Map<String, dynamic>> options,
-    String selectedValue,
-    Function(String) onSelected,
-  ) {
-    final screenWidth = MediaQuery.of(context).size.width;
-    final isTablet = screenWidth > 600;
-
-    return options.map((option) {
-      final isSelected = selectedValue == option['value'];
-
-      return Padding(
-        padding: EdgeInsets.only(bottom: isTablet ? 12 : 10),
-        child: GestureDetector(
-          onTap: () => onSelected(option['value']),
-          child: Container(
-            width: double.infinity,
-            padding: EdgeInsets.all(isTablet ? 16 : 14),
-            decoration: BoxDecoration(
-              color: isSelected
-                  ? afropeepGreen.withValues(alpha: 0.1)
-                  : Colors.white,
-              border: Border.all(
-                color: isSelected ? afropeepGreen : Colors.grey.shade300,
-                width: 2,
-              ),
-              borderRadius: BorderRadius.circular(12),
-              boxShadow: [
-                BoxShadow(
-                  color: Colors.black.withValues(alpha: 0.05),
-                  blurRadius: 4,
-                  offset: const Offset(0, 2),
-                ),
-              ],
-            ),
-            child: Row(
-              children: [
-                Container(
-                  padding: const EdgeInsets.all(8),
-                  decoration: BoxDecoration(
-                    color: (option['color'] as Color).withValues(alpha: 0.2),
-                    borderRadius: BorderRadius.circular(8),
-                  ),
-                  child: Icon(
-                    option['icon'],
-                    color: option['color'],
-                    size: isTablet ? 20 : 18,
-                  ),
-                ),
-                SizedBox(width: isTablet ? 16 : 12),
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        option['label'],
-                        style: GoogleFonts.montserrat(
-                          fontSize: isTablet ? 16 : 14,
-                          fontWeight:
-                              isSelected ? FontWeight.w600 : FontWeight.w500,
-                          color: isSelected ? afropeepGreen : textDarkBrown,
-                        ),
-                      ),
-                      if (option['description'] != null) ...[
-                        const SizedBox(height: 2),
-                        Text(
-                          option['description'],
-                          style: GoogleFonts.montserrat(
-                            fontSize: isTablet ? 12 : 11,
-                            color: isSelected ? afropeepGreen : textLightBrown,
-                          ),
-                        ),
-                      ],
-                    ],
-                  ),
-                ),
-                if (isSelected)
-                  Icon(
-                    Icons.check_circle,
-                    color: afropeepGreen,
-                    size: isTablet ? 24 : 20,
-                  ),
-              ],
-            ),
-          ),
-        ),
-      );
-    }).toList();
-  }
 
   Widget _buildGenericDropdown({
     required String value,
@@ -1433,129 +1340,12 @@ class _EnhancedAdditionalInfoScreenState
                   controllerValue = 'Dating';
               }
               context.read<OnboardingBloc>().add(
-                OnboardingLookingForUpdated(controllerValue),
-              );
+                    OnboardingLookingForUpdated(controllerValue),
+                  );
             }
           },
         ),
       ),
     );
   }
-
-  List<Widget> _buildStandardOptions(
-    List<Map<String, dynamic>> options,
-    String selectedValue,
-    Function(String) onSelected,
-  ) {
-    final screenWidth = MediaQuery.of(context).size.width;
-    final isTablet = screenWidth > 600;
-
-    return options.map((option) {
-      final isSelected = selectedValue == option['value'];
-
-      return Padding(
-        padding: EdgeInsets.only(bottom: isTablet ? 10 : 8),
-        child: GestureDetector(
-          onTap: () => onSelected(option['value']),
-          child: Container(
-            width: double.infinity,
-            padding: EdgeInsets.symmetric(
-              horizontal: isTablet ? 16 : 14,
-              vertical: isTablet ? 14 : 12,
-            ),
-            decoration: BoxDecoration(
-              color: isSelected
-                  ? afropeepGreen.withValues(alpha: 0.1)
-                  : Colors.white,
-              border: Border.all(
-                color: isSelected ? afropeepGreen : Colors.grey.shade300,
-                width: 1.5,
-              ),
-              borderRadius: BorderRadius.circular(10),
-            ),
-            child: Row(
-              children: [
-                Icon(
-                  option['icon'],
-                  color: isSelected ? afropeepGreen : Colors.grey.shade600,
-                  size: isTablet ? 20 : 18,
-                ),
-                SizedBox(width: isTablet ? 12 : 10),
-                Expanded(
-                  child: Text(
-                    option['label'],
-                    style: GoogleFonts.montserrat(
-                      fontSize: isTablet ? 15 : 13,
-                      fontWeight:
-                          isSelected ? FontWeight.w600 : FontWeight.normal,
-                      color: isSelected ? afropeepGreen : textDarkBrown,
-                    ),
-                  ),
-                ),
-                if (isSelected)
-                  Icon(
-                    Icons.check_circle,
-                    color: afropeepGreen,
-                    size: isTablet ? 20 : 18,
-                  ),
-              ],
-            ),
-          ),
-        ),
-      );
-    }).toList();
-  }
-
-  List<Widget> _buildCompactOptions(
-    List<Map<String, dynamic>> options,
-    String selectedValue,
-    Function(String) onSelected,
-  ) =>
-      [
-        Wrap(
-          spacing: 8,
-          runSpacing: 8,
-          children: options.map((option) {
-            final isSelected = selectedValue == option['value'];
-
-            return GestureDetector(
-              onTap: () => onSelected(option['value']),
-              child: Container(
-                padding:
-                    const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-                decoration: BoxDecoration(
-                  color: isSelected
-                      ? afropeepGreen.withValues(alpha: 0.1)
-                      : cardBackground,
-                  border: Border.all(
-                    color: isSelected ? afropeepGreen : Colors.grey.shade300,
-                    width: 1.5,
-                  ),
-                  borderRadius: BorderRadius.circular(20),
-                ),
-                child: Row(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    Icon(
-                      option['icon'],
-                      size: 16,
-                      color: isSelected ? afropeepGreen : Colors.grey.shade600,
-                    ),
-                    const SizedBox(width: 6),
-                    Text(
-                      option['label'],
-                      style: GoogleFonts.montserrat(
-                        fontSize: 12,
-                        fontWeight:
-                            isSelected ? FontWeight.w600 : FontWeight.normal,
-                        color: isSelected ? afropeepGreen : textDarkBrown,
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-            );
-          }).toList(),
-        ),
-      ];
 }

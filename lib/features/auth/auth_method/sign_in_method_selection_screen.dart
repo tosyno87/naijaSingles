@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:io';
 
 import 'package:flutter/material.dart';
@@ -134,9 +135,11 @@ class SignInMethodSelectionScreen extends StatelessWidget {
                               BlocConsumer<GoogleLoginBloc, GoogleLoginStates>(
                             listener: (context, state) {
                               if (state is GoogleLoginSuccess) {
-                                Navigator.pushReplacementNamed(
-                                  context,
-                                  '/main_navigation',
+                                unawaited(
+                                  Navigator.pushReplacementNamed(
+                                    context,
+                                    '/main_navigation',
+                                  ),
                                 );
                               } else if (state is GoogleLoginFailed) {
                                 CustomSnackbar.showSnackBarSimple(
@@ -170,14 +173,14 @@ class SignInMethodSelectionScreen extends StatelessWidget {
                           backgroundColor: primaryColor,
                           textColor: Colors.white,
                           onPressed: () {
-                            // Use pushReplacement to remove this screen from stack
-                            // This prevents both screens from being visible during transition
-                            Navigator.pushReplacement(
-                              context,
-                              MaterialPageRoute(
-                                builder: (context) => PhoneNumber(
-                                  updatePhoneNumber: false,
-                                  isSignIn: true,
+                            unawaited(
+                              Navigator.pushReplacement(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (context) => PhoneNumber(
+                                    updatePhoneNumber: false,
+                                    isSignIn: true,
+                                  ),
                                 ),
                               ),
                             );
@@ -199,12 +202,13 @@ class SignInMethodSelectionScreen extends StatelessWidget {
                             ),
                             GestureDetector(
                               onTap: () {
-                                // Use pushReplacement to remove this screen from stack
-                                Navigator.pushReplacement(
-                                  context,
-                                  MaterialPageRoute(
-                                    builder: (context) => PhoneNumber(
-                                      updatePhoneNumber: false,
+                                unawaited(
+                                  Navigator.pushReplacement(
+                                    context,
+                                    MaterialPageRoute(
+                                      builder: (context) => PhoneNumber(
+                                        updatePhoneNumber: false,
+                                      ),
                                     ),
                                   ),
                                 );

@@ -25,7 +25,7 @@ class MessageDeliveryService {
         'statusUpdatedAt': FieldValue.serverTimestamp(),
       });
       log('✅ Message $messageId status updated to ${status.name}');
-    } catch (e) {
+    } on Object catch (e) {
       log('❌ Error updating message status for $messageId: $e');
     }
   }
@@ -55,7 +55,7 @@ class MessageDeliveryService {
         });
       }
       log('✅ Marked ${unreadMessages.docs.length} messages as read in chat $chatId');
-    } catch (e) {
+    } on Object catch (e) {
       log('❌ Error marking messages as read in chat $chatId: $e');
     }
   }

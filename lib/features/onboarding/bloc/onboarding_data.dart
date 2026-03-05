@@ -78,8 +78,7 @@ class OnboardingData extends Equatable {
     final today = DateTime.now();
     int a = today.year - dateOfBirth!.year;
     if (today.month < dateOfBirth!.month ||
-        (today.month == dateOfBirth!.month &&
-            today.day < dateOfBirth!.day)) {
+        (today.month == dateOfBirth!.month && today.day < dateOfBirth!.day)) {
       a--;
     }
     return a;
@@ -95,11 +94,10 @@ class OnboardingData extends Equatable {
     return '$feet\'$inches"';
   }
 
-  File? get profilePhoto =>
-      profilePhotos.cast<File?>().firstWhere(
-            (p) => p != null,
-            orElse: () => null,
-          );
+  File? get profilePhoto => profilePhotos.cast<File?>().firstWhere(
+        (p) => p != null,
+        orElse: () => null,
+      );
 
   bool get isBasicInfoComplete =>
       fullName.isNotEmpty &&
@@ -113,8 +111,7 @@ class OnboardingData extends Equatable {
 
   bool get areInterestsSelected => interests.length >= 5;
 
-  bool get isPhotoUploaded =>
-      profilePhotos.where((p) => p != null).length >= 1;
+  bool get isPhotoUploaded => profilePhotos.where((p) => p != null).isNotEmpty;
 
   OnboardingData copyWithPhotoAt(int index, File? file) {
     final updated = List<File?>.from(profilePhotos);

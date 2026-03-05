@@ -1,10 +1,12 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:google_fonts/google_fonts.dart';
 
 import '../../common/bloc/theme/theme_bloc.dart';
-import '../../common/constants/app_colors.dart';
 import '../../common/bloc/user/user_bloc.dart';
+import '../../common/constants/app_colors.dart';
 import '../../services/settings_service.dart';
 
 class NotificationSettingsScreen extends StatefulWidget {
@@ -31,7 +33,7 @@ class _NotificationSettingsScreenState
   void _initializeData() {
     _currentUserId = context.read<UserBloc>().currentUser?.id;
     if (_currentUserId != null) {
-      _loadNotificationSettings();
+      unawaited(_loadNotificationSettings());
     }
   }
 
@@ -49,7 +51,7 @@ class _NotificationSettingsScreenState
           _isLoading = false;
         });
       }
-    } catch (e) {
+    } on Object {
       if (mounted) {
         setState(() => _isLoading = false);
         _showSnackBar('Error loading notification settings', isError: true);
@@ -77,7 +79,7 @@ class _NotificationSettingsScreenState
           _showSnackBar('Failed to save settings', isError: true);
         }
       }
-    } catch (e) {
+    } on Object {
       if (mounted) {
         setState(() => _isSaving = false);
         _showSnackBar('Error saving settings', isError: true);
@@ -89,7 +91,7 @@ class _NotificationSettingsScreenState
     setState(() {
       _settings = newSettings;
     });
-    _saveSettings();
+    unawaited(_saveSettings());
   }
 
   Future<void> _showTimePickerDialog(bool isStartTime) async {
@@ -267,7 +269,8 @@ class _NotificationSettingsScreenState
               icon: Icons.favorite,
               value: _settings!.matchNotifications,
               onChanged: (value) => _updateSetting(
-                  _settings!.copyWith(matchNotifications: value)),
+                _settings!.copyWith(matchNotifications: value),
+              ),
               isDarkMode: isDarkMode,
             ),
 

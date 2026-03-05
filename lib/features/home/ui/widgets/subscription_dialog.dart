@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import '../../../../common/constants/app_colors.dart';
@@ -10,7 +12,7 @@ Future<void> showSubscriptionDialog({
   required UserModel currentUser,
   required Map items,
 }) async {
-  showDialog(
+  await showDialog(
     context: context,
     builder: (BuildContext context) => Dialog(
       shape: RoundedRectangleBorder(
@@ -24,7 +26,8 @@ Future<void> showSubscriptionDialog({
           children: [
             Text(
               'Subscription Required'.tr().toString(),
-              style: const TextStyle(fontSize: 18, color: AppColors.primaryGreen),
+              style:
+                  const TextStyle(fontSize: 18, color: AppColors.primaryGreen),
             ),
             const SizedBox(height: 10),
             Text(
@@ -49,12 +52,13 @@ Future<void> showSubscriptionDialog({
                 TextButton(
                   onPressed: () {
                     Navigator.of(context).pop();
-                    // Navigate to the subscription page
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder: (context) =>
-                            Products(currentUser, null, items),
+                    unawaited(
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) =>
+                              Products(currentUser, null, items),
+                        ),
                       ),
                     );
                   },

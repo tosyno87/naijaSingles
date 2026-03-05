@@ -1,8 +1,11 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+
+import '../../../../common/constants/app_colors.dart';
 import '../../../../common/routes/route_name.dart';
 import '../../data/services/event_templates_service.dart';
-import '../../../../common/constants/app_colors.dart';
 
 class EventTemplateSelectionScreen extends StatelessWidget {
   const EventTemplateSelectionScreen({super.key});
@@ -88,7 +91,8 @@ class EventTemplateSelectionScreen extends StatelessWidget {
                 child: OutlinedButton.icon(
                   onPressed: () => _navigateToCreateEvent(context, null),
                   style: OutlinedButton.styleFrom(
-                    side: const BorderSide(color: AppColors.primaryGreen, width: 2),
+                    side: const BorderSide(
+                        color: AppColors.primaryGreen, width: 2),
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(16),
                     ),
@@ -208,10 +212,12 @@ class EventTemplateSelectionScreen extends StatelessWidget {
       );
 
   void _navigateToCreateEvent(BuildContext context, EventTemplate? template) {
-    Navigator.pushReplacementNamed(
-      context,
-      RouteName.createEvent,
-      arguments: {'template': template},
+    unawaited(
+      Navigator.pushReplacementNamed(
+        context,
+        RouteName.createEvent,
+        arguments: {'template': template},
+      ),
     );
   }
 }

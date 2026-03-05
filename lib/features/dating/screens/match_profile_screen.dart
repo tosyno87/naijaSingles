@@ -1,3 +1,6 @@
+import 'dart:async';
+
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -49,8 +52,7 @@ class _MatchProfileScreenState extends State<MatchProfileScreen>
     });
 
     try {
-      HapticFeedback.mediumImpact();
-
+      unawaited(HapticFeedback.mediumImpact());
       // Get or create chat thread
       String? threadId = await _chatService.getChatThreadId(widget.user.id!);
 
@@ -61,7 +63,7 @@ class _MatchProfileScreenState extends State<MatchProfileScreen>
 
       if (threadId != null && mounted) {
         // Navigate to chat thread
-        Navigator.push(
+        await Navigator.push(
           context,
           MaterialPageRoute(
             builder: (context) => ChatThreadScreen(
@@ -77,7 +79,7 @@ class _MatchProfileScreenState extends State<MatchProfileScreen>
       } else {
         throw Exception('Failed to create or find chat thread');
       }
-    } catch (e) {
+    } on Object catch (e) {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
@@ -192,11 +194,13 @@ class _MatchProfileScreenState extends State<MatchProfileScreen>
                     borderRadius: BorderRadius.circular(75),
                     child: widget.user.imageUrl != null &&
                             widget.user.imageUrl!.isNotEmpty
-                        ? Image.network(
-                            widget.user.imageUrl![0],
+                        ? CachedNetworkImage(
+                            imageUrl: widget.user.imageUrl![0],
                             fit: BoxFit.cover,
-                            errorBuilder: (context, error, stackTrace) =>
-                                Container(
+                            placeholder: (context, url) => const Center(
+                              child: CircularProgressIndicator(strokeWidth: 2),
+                            ),
+                            errorWidget: (context, url, error) => Container(
                               color: Colors.grey[300],
                               child: const Icon(
                                 Icons.person,
@@ -375,7 +379,7 @@ class _MatchProfileScreenState extends State<MatchProfileScreen>
               icon: Icons.close,
               color: Colors.red.shade400,
               onTap: () {
-                HapticFeedback.mediumImpact();
+                unawaited(HapticFeedback.mediumImpact());
                 Navigator.pop(context);
               },
               label: 'Pass',
@@ -386,12 +390,12 @@ class _MatchProfileScreenState extends State<MatchProfileScreen>
               icon: _isLiked ? Icons.favorite : Icons.favorite_border,
               color: const Color(0xFF008037),
               onTap: () {
-                HapticFeedback.mediumImpact();
+                unawaited(HapticFeedback.mediumImpact());
                 setState(() {
                   _isLiked = !_isLiked;
                 });
                 _animationController.reset();
-                _animationController.forward();
+                unawaited(_animationController.forward());
 
                 // Show a snackbar when liked
                 if (_isLiked) {

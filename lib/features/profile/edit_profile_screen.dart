@@ -1,6 +1,8 @@
+import 'dart:async';
 import 'dart:developer';
 import 'dart:io';
 
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_storage/firebase_storage.dart';
@@ -100,7 +102,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
 
     // Load existing user data
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      _loadUserData();
+      unawaited(_loadUserData());
     });
 
     // Add listener to bio text field to validate form
@@ -154,8 +156,11 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
       final docSnapshot =
           await _firestore.collection('users').doc(user.uid).get();
 
+      if (!mounted) return;
+
       if (docSnapshot.exists) {
-        final userData = docSnapshot.data()!;
+        final userData = docSnapshot.data();
+        if (userData == null) return;
 
         // Load basic info
         _nameController.text = userData['name'] ?? '';
@@ -185,8 +190,9 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
         if (userData['tribe'] != null) {
           setState(() {
             _selectedTribe = userData['tribe'];
-            if (!_tribes.contains(_selectedTribe) && _selectedTribe != null) {
-              _otherTribeController.text = _selectedTribe!;
+            final tribe = _selectedTribe;
+            if (!_tribes.contains(tribe) && tribe != null) {
+              _otherTribeController.text = tribe;
               _selectedTribe = 'Other';
             }
           });
@@ -254,8 +260,9 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
 
       // Validate form after loading data
       _validateForm();
-    } catch (e) {
+    } on Object catch (e) {
       log('Error loading user data: $e');
+      if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text('Error loading profile: $e')),
       );
@@ -280,12 +287,14 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
       );
 
       if (pickedFile != null) {
+        if (!mounted) return;
         setState(() {
           _photos[index] = File(pickedFile.path);
           _validateForm();
         });
       }
-    } catch (e) {
+    } on Object catch (e) {
+      if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text('Error picking image: $e')),
       );
@@ -350,7 +359,8 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
             color: AppColors.backgroundColor,
             borderRadius: BorderRadius.circular(12),
             border: Border.all(
-                color: AppColors.primaryGreen.withValues(alpha: 0.3)),
+              color: AppColors.primaryGreen.withValues(alpha: 0.3),
+            ),
           ),
           child: Column(
             mainAxisSize: MainAxisSize.min,
@@ -440,7 +450,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
       );
 
   Future<void> _saveProfile() async {
-    if (!_formKey.currentState!.validate()) return;
+    if (!(_formKey.currentState?.validate() ?? false)) return;
 
     setState(() => _isUploading = true);
 
@@ -473,7 +483,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
             final url = await ref.getDownloadURL();
             photoUrls.add(url);
             log('Successfully uploaded photo $i to: profile_photos/${user.uid}/photo_$i.jpg');
-          } catch (storageError) {
+          } on Object catch (storageError) {
             log('Storage upload error for photo $i: $storageError');
             throw Exception('Failed to upload photo ${i + 1}: $storageError');
           }
@@ -515,6 +525,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
       // Update display name in Firebase Auth
       await user.updateDisplayName(_nameController.text.trim());
 
+      if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
           content: Text('Profile updated successfully'),
@@ -524,8 +535,9 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
 
       // Navigate back with success indicator
       Navigator.pop(context, true);
-    } catch (e) {
+    } on Object catch (e) {
       log('Error saving profile: $e');
+      if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Text('Error updating profile: $e'),
@@ -607,7 +619,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                   onSurface: AppColors.textPrimary,
                 ),
               ),
-              child: child!,
+              child: child ?? const SizedBox.shrink(),
             ),
           );
 
@@ -881,11 +893,12 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
       );
 
   void _calculateAge() {
-    if (_selectedDOB != null) {
+    final dob = _selectedDOB;
+    if (dob != null) {
       final now = DateTime.now();
-      int age = now.year - _selectedDOB!.year;
-      if (now.month < _selectedDOB!.month ||
-          (now.month == _selectedDOB!.month && now.day < _selectedDOB!.day)) {
+      int age = now.year - dob.year;
+      if (now.month < dob.month ||
+          (now.month == dob.month && now.day < dob.day)) {
         age--;
       }
       setState(() {
@@ -919,7 +932,8 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
                     const CircularProgressIndicator(
-                        color: AppColors.primaryGreen),
+                      color: AppColors.primaryGreen,
+                    ),
                     const SizedBox(height: 16),
                     Text(
                       'Updating profile...',
@@ -1208,31 +1222,19 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                                   photo,
                                   fit: BoxFit.cover,
                                 )
-                              : Image.network(
-                                  photo,
+                              : CachedNetworkImage(
+                                  imageUrl: photo,
                                   fit: BoxFit.cover,
-                                  loadingBuilder:
-                                      (context, child, loadingProgress) {
-                                    if (loadingProgress == null) return child;
-                                    return ColoredBox(
-                                      color: Colors.grey.shade100,
-                                      child: Center(
-                                        child: CircularProgressIndicator(
-                                          value: loadingProgress
-                                                      .expectedTotalBytes !=
-                                                  null
-                                              ? loadingProgress
-                                                      .cumulativeBytesLoaded /
-                                                  loadingProgress
-                                                      .expectedTotalBytes!
-                                              : null,
-                                          color: AppColors.primaryGreen,
-                                          strokeWidth: 2,
-                                        ),
+                                  placeholder: (context, url) => ColoredBox(
+                                    color: Colors.grey.shade100,
+                                    child: const Center(
+                                      child: CircularProgressIndicator(
+                                        color: AppColors.primaryGreen,
+                                        strokeWidth: 2,
                                       ),
-                                    );
-                                  },
-                                  errorBuilder: (context, error, stackTrace) {
+                                    ),
+                                  ),
+                                  errorWidget: (context, url, error) {
                                     log('Error loading image: $error');
                                     return ColoredBox(
                                       color: Colors.grey.shade200,
@@ -1362,7 +1364,8 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                       child: Text(
                         tribe,
                         style: GoogleFonts.montserrat(
-                            color: AppColors.textPrimary),
+                          color: AppColors.textPrimary,
+                        ),
                       ),
                     ),
                   )
@@ -1377,11 +1380,15 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                 // Tribe is now optional - no validation required
                 return null;
               },
-              icon: const Icon(Icons.arrow_drop_down,
-                  color: AppColors.primaryGreen),
+              icon: const Icon(
+                Icons.arrow_drop_down,
+                color: AppColors.primaryGreen,
+              ),
               dropdownColor: Colors.white,
               style: GoogleFonts.montserrat(
-                  fontSize: 16, color: AppColors.textPrimary),
+                fontSize: 16,
+                color: AppColors.textPrimary,
+              ),
             ),
           ),
           if (_selectedTribe == 'Other') ...[

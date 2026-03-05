@@ -5,9 +5,9 @@ import 'package:flutter/foundation.dart';
 import '../../../../models/user_model.dart';
 import '../../../../services/cached_user_service.dart';
 import '../../../../services/mode_specific_compatibility_engine.dart';
-import '../../../match/data/services/compatibility_engine.dart';
-import '../../../../services/paginated_user_service.dart';
+import '../../../../services/paginated_user_service.dart' show PaginatedResult;
 import '../../../../services/performance_monitor.dart';
+import '../../../match/data/services/compatibility_engine.dart';
 
 /// Smart match service that provides intelligent user ordering and discovery
 /// Implements Priority 2: Enhanced Matching Algorithm
@@ -17,7 +17,6 @@ class SmartMatchService {
   static const double MEDIUM_COMPATIBILITY_THRESHOLD = 0.5;
   static const int MAX_CONSECUTIVE_HIGH_MATCHES = 3;
 
-  final PaginatedUserService _paginatedUserService = PaginatedUserService();
   final CachedUserService _cachedUserService = CachedUserService();
 
   /// Get optimized user list with compatibility scoring and smart ordering
@@ -67,7 +66,7 @@ class SmartMatchService {
             highCompatibilityCount:
                 orderedUsers.where((uc) => uc.isHighCompatibility).length,
           );
-        } catch (e) {
+        } on Object catch (e) {
           debugPrint('❌ Error in smart matching: $e');
           return SmartMatchResult.error(e.toString());
         }
@@ -290,8 +289,10 @@ class SmartMatchService {
   double _calculateAverageCompatibility(List<UserCompatibility> users) {
     if (users.isEmpty) return 0;
 
-    final totalScore =
-        users.fold(0.0, (sum, user) => sum + user.compatibilityScore);
+    final totalScore = users.fold<double>(
+      0,
+      (sum, user) => sum + user.compatibilityScore,
+    );
     return totalScore / users.length;
   }
 
@@ -348,7 +349,7 @@ class SmartMatchService {
       );
 
       return newSmartResult;
-    } catch (e) {
+    } on Object catch (e) {
       debugPrint('❌ Error getting more optimized users: $e');
       return SmartMatchResult.error(e.toString());
     }
@@ -404,7 +405,7 @@ class SmartMatchService {
             _calculateAverageCompatibility(highCompatibilityUsers),
         highCompatibilityCount: highCompatibilityUsers.length,
       );
-    } catch (e) {
+    } on Object catch (e) {
       debugPrint('❌ Error getting high compatibility users: $e');
       return SmartMatchResult.error(e.toString());
     }
@@ -461,7 +462,7 @@ class SmartMatchService {
         recommendations:
             _generateRecommendations(currentUser, compatibilityResults),
       );
-    } catch (e) {
+    } on Object catch (e) {
       debugPrint('❌ Error analyzing matching patterns: $e');
       return MatchingAnalysis.empty();
     }

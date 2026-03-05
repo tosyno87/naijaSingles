@@ -32,7 +32,7 @@ class GoogleLoginBloc extends Bloc<GoogleLoginEvents, GoogleLoginStates> {
     } on SocketException {
       log('Google sign-in failed: No Internet Connection');
       emit(const GoogleLoginFailed(message: 'No Internet Connection'));
-    } catch (e) {
+    } on Object catch (e) {
       log('Google sign-in failed: ${e.toString()}');
       final errorMessage = e.toString().contains('Exception:')
           ? e.toString().split('Exception:').last.trim()

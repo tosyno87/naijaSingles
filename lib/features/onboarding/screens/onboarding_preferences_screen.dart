@@ -174,9 +174,11 @@ class _OnboardingPreferencesScreenState
   void _saveAndContinue() {
     context.read<OnboardingBloc>()
       ..add(OnboardingInterestedInUpdated(_selectedInterestedIn))
-      ..add(OnboardingAgeRangeUpdated(
-        [_ageRange.start.round(), _ageRange.end.round()],
-      ));
+      ..add(
+        OnboardingAgeRangeUpdated(
+          [_ageRange.start.round(), _ageRange.end.round()],
+        ),
+      );
 
     if (widget.onNext != null) {
       widget.onNext!();

@@ -1,13 +1,10 @@
-// ignore_for_file: unused_import
+import 'dart:async';
 import 'dart:developer';
 
-import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 
 import '../../../../common/constants/app_colors.dart';
 import '../../../../common/routes/route_name.dart';
-import '../../../../common/widgets/custom_button.dart';
-import '../../../../common/widgets/custom_snackbar.dart';
 
 class ShowGender extends StatefulWidget {
   const ShowGender({super.key});
@@ -149,10 +146,12 @@ class _ShowGenderState extends State<ShowGender> {
                       : () {
                           userData.addAll({'showGender': selectedPreference});
                           log(userData.toString());
-                          Navigator.pushNamed(
-                            context,
-                            RouteName.universityScreen,
-                            arguments: userData,
+                          unawaited(
+                            Navigator.pushNamed(
+                              context,
+                              RouteName.universityScreen,
+                              arguments: userData,
+                            ),
                           );
                         },
                   style: ElevatedButton.styleFrom(

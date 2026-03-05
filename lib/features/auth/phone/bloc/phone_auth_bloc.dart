@@ -68,7 +68,7 @@ class PhoneAuthBloc extends Bloc<PhoneAuthEvent, PhoneAuthState> {
       } else {
         emit(const PhoneAuthError(error: 'User is null'));
       }
-    } catch (e) {
+    } on Object catch (e) {
       emit(PhoneAuthError(error: e.toString()));
     }
   }
@@ -143,8 +143,11 @@ class PhoneAuthBloc extends Bloc<PhoneAuthEvent, PhoneAuthState> {
             } else if (e.code == 'quota-exceeded') {
               log('⚠️ Quota exceeded - too many requests');
             }
-            add(OnPhoneAuthErrorEvent(
-                error: '${e.code}: ${e.message ?? e.toString()}'));
+            add(
+              OnPhoneAuthErrorEvent(
+                error: '${e.code}: ${e.message ?? e.toString()}',
+              ),
+            );
           },
           codeAutoRetrievalTimeout: (String verificationId) {
             log('⏱️ Code auto-retrieval timeout: $verificationId');
@@ -170,15 +173,18 @@ class PhoneAuthBloc extends Bloc<PhoneAuthEvent, PhoneAuthState> {
           },
           verificationFailed: (FirebaseAuthException e) {
             log('❌ Phone verification failed: ${e.code} - ${e.message}');
-            add(OnPhoneAuthErrorEvent(
-                error: '${e.code}: ${e.message ?? e.toString()}'));
+            add(
+              OnPhoneAuthErrorEvent(
+                error: '${e.code}: ${e.message ?? e.toString()}',
+              ),
+            );
           },
           codeAutoRetrievalTimeout: (String verificationId) {
             log('⏱️ Code auto-retrieval timeout: $verificationId');
           },
         );
       }
-    } catch (e) {
+    } on Object catch (e) {
       emit(PhoneAuthError(error: e.toString()));
     }
   }
@@ -195,7 +201,7 @@ class PhoneAuthBloc extends Bloc<PhoneAuthEvent, PhoneAuthState> {
         smsCode: event.otpCode,
       );
       add(OnPhoneAuthVerificationCompleteEvent(credential: credential));
-    } catch (e) {
+    } on Object catch (e) {
       emit(PhoneAuthError(error: e.toString()));
     }
   }
@@ -206,14 +212,13 @@ class PhoneAuthBloc extends Bloc<PhoneAuthEvent, PhoneAuthState> {
   ) async {
     // After receiving the credential from the event, we will login with the credential and then will emit the [PhoneAuthVerified] state after successful login
     try {
-      await auth.signInWithCredential(event.credential).then((user) {
-        if (user.user != null) {
-          emit(PhoneAuthVerified(user: user.user));
-        }
-      });
+      final user = await auth.signInWithCredential(event.credential);
+      if (user.user != null) {
+        emit(PhoneAuthVerified(user: user.user));
+      }
     } on FirebaseAuthException catch (e) {
       emit(PhoneAuthError(error: e.code));
-    } catch (e) {
+    } on Object catch (e) {
       emit(PhoneAuthError(error: e.toString()));
     }
   }
@@ -231,7 +236,7 @@ class PhoneAuthBloc extends Bloc<PhoneAuthEvent, PhoneAuthState> {
           error: 'Test authentication is not available in production',
         ),
       );
-    } catch (e) {
+    } on Object catch (e) {
       emit(PhoneAuthError(error: e.toString()));
     }
   }

@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
@@ -98,18 +100,21 @@ class PremiumDialog extends StatelessWidget {
                     ),
                     ElevatedButton(
                       onPressed: () {
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                            builder: (context) =>
-                                Products(currentUser, null, const {}),
+                        unawaited(
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) =>
+                                  Products(currentUser, null, const {}),
+                            ),
                           ),
                         );
                       },
                       style: ButtonStyle(
                         backgroundColor: WidgetStatePropertyAll(
                           AppColors.primaryGreen.withValues(
-                              alpha: (0.9 * 255).toDouble()),
+                            alpha: (0.9 * 255).toDouble(),
+                          ),
                         ),
                       ),
                       child: Text(

@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:developer';
 import 'dart:io';
 import 'dart:math' as math;
@@ -48,7 +49,7 @@ class _UserProfilePicState extends State<UserProfilePic>
     // Start animation after frame is built
     WidgetsBinding.instance.addPostFrameCallback((_) {
       if (mounted && _animationController != null) {
-        _animationController!.forward();
+        unawaited(_animationController!.forward());
       }
     });
   }
@@ -167,13 +168,15 @@ class _UserProfilePicState extends State<UserProfilePic>
                   onPressed: canContinue
                       ? () {
                           log('userdata is ${userData.toString()}');
-                          Navigator.pushNamed(
-                            context,
-                            RouteName.allowLocationScreen,
-                            arguments: {
-                              'userData': userData,
-                              'profilePic': photos[selectedPhotoIndex],
-                            },
+                          unawaited(
+                            Navigator.pushNamed(
+                              context,
+                              RouteName.allowLocationScreen,
+                              arguments: {
+                                'userData': userData,
+                                'profilePic': photos[selectedPhotoIndex],
+                              },
+                            ),
                           );
                         }
                       : null,
@@ -371,8 +374,7 @@ class _UserProfilePicState extends State<UserProfilePic>
                         selectedPhotoIndex = index;
                       });
                     } else {
-                      // Add new photo
-                      _pickImage(index);
+                      unawaited(_pickImage(index));
                     }
                   },
                   child: Container(

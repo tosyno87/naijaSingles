@@ -35,7 +35,7 @@ class ModeSpecificFilteringService {
 
       debugPrint('✅ Applied $mode-specific filters');
       return filteredQuery;
-    } catch (e) {
+    } on Object catch (e) {
       debugPrint('❌ Error applying mode-specific filters: $e');
       return baseQuery; // Return original query on error
     }
@@ -75,7 +75,7 @@ class ModeSpecificFilteringService {
     // try {
     //   query = query.where('lookingFor', whereIn: ['Dating', 'Romance', 'Relationship', 'Love', 'Marriage']);
     //   debugPrint('💕 Filtering by lookingFor: Dating/Romance/Relationship/Love/Marriage');
-    // } catch (e) {
+    // } on Object catch (e) {
     //   debugPrint('⚠️ lookingFor filter failed, continuing without it: $e');
     // }
 
@@ -97,14 +97,16 @@ class ModeSpecificFilteringService {
   /// Age range is already applied by _buildOptimizedQuery; adding it again
   /// would trigger a Firestore duplicate-condition assertion.
   static Query _applyFriendshipFilters(Query query, UserModel currentUser) {
-    debugPrint('🤝 Applying friendship-specific filters (age handled by base query)');
+    debugPrint(
+        '🤝 Applying friendship-specific filters (age handled by base query)');
     return query;
   }
 
   /// Apply networking-specific filters.
   /// Age range is already applied by _buildOptimizedQuery.
   static Query _applyNetworkingFilters(Query query, UserModel currentUser) {
-    debugPrint('💼 Applying networking-specific filters (age handled by base query)');
+    debugPrint(
+        '💼 Applying networking-specific filters (age handled by base query)');
     return query;
   }
 
@@ -203,7 +205,7 @@ class ModeSpecificFilteringService {
         default:
           return true;
       }
-    } catch (e) {
+    } on Object catch (e) {
       debugPrint('❌ Error validating mode match: $e');
       return true;
     }

@@ -1,10 +1,10 @@
+import 'dart:async';
 import 'dart:developer';
 
 import 'package:easy_localization/easy_localization.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
-import '../../../../common/widgets/custom_snackbar.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
 import '../../../../common/bloc/user/user_bloc.dart';
@@ -13,6 +13,7 @@ import '../../../../common/constants/constants.dart';
 import '../../../../common/data/repo/facebooklogin_repo.dart';
 import '../../../../common/data/repo/phone_auth_repo.dart';
 import '../../../../common/routes/route_name.dart';
+import '../../../../common/widgets/custom_snackbar.dart';
 import '../../../../common/widgets/text_button.dart';
 
 class DeleteAccountWidget extends StatefulWidget {
@@ -37,7 +38,7 @@ class _DeleteAccountWidgetState extends State<DeleteAccountWidget> {
   Widget build(BuildContext context) => TextButtonWidget(
         text: 'Delete Account',
         onTap: () async {
-          showDialog(
+          await showDialog(
             context: context,
             builder: (BuildContext context) => Theme(
               data: Theme.of(context).copyWith(
@@ -95,93 +96,95 @@ class _DeleteAccountWidgetState extends State<DeleteAccountWidget> {
       );
 
   void _showFinalConfirmationDialog() {
-    showDialog(
-      context: context,
-      builder: (BuildContext context) => Theme(
-        data: Theme.of(context).copyWith(
-          colorScheme: Theme.of(context).colorScheme.copyWith(
-                surface: Colors.white,
-              ),
-          dialogTheme: const DialogThemeData(backgroundColor: Colors.white),
-        ),
-        child: AlertDialog(
-          backgroundColor: Colors.white,
-          title: const Text(
-            'Final Confirmation',
-            style: TextStyle(
-              fontSize: 18,
-              fontWeight: FontWeight.bold,
-              color: Colors.red,
-            ),
+    unawaited(
+      showDialog(
+        context: context,
+        builder: (BuildContext context) => Theme(
+          data: Theme.of(context).copyWith(
+            colorScheme: Theme.of(context).colorScheme.copyWith(
+                  surface: Colors.white,
+                ),
+            dialogTheme: const DialogThemeData(backgroundColor: Colors.white),
           ),
-          content: Column(
-            mainAxisSize: MainAxisSize.min,
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              const Text(
-                'Type "DELETE" to confirm account deletion:',
-                style: TextStyle(fontSize: 16),
+          child: AlertDialog(
+            backgroundColor: Colors.white,
+            title: const Text(
+              'Final Confirmation',
+              style: TextStyle(
+                fontSize: 18,
+                fontWeight: FontWeight.bold,
+                color: Colors.red,
               ),
-              const SizedBox(height: 16),
-              TextField(
-                controller: _confirmationController,
-                decoration: InputDecoration(
-                  hintText: 'Type DELETE here',
-                  border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(8),
+            ),
+            content: Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                const Text(
+                  'Type "DELETE" to confirm account deletion:',
+                  style: TextStyle(fontSize: 16),
+                ),
+                const SizedBox(height: 16),
+                TextField(
+                  controller: _confirmationController,
+                  decoration: InputDecoration(
+                    hintText: 'Type DELETE here',
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(8),
+                    ),
+                    focusedBorder: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(8),
+                      borderSide: const BorderSide(color: Colors.red, width: 2),
+                    ),
                   ),
-                  focusedBorder: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(8),
-                    borderSide: const BorderSide(color: Colors.red, width: 2),
+                  onChanged: (value) {
+                    setState(() {});
+                  },
+                ),
+                const SizedBox(height: 16),
+                const Text(
+                  '⚠️ This action cannot be undone. All your data will be permanently deleted.',
+                  style: TextStyle(
+                    fontSize: 14,
+                    color: Colors.red,
+                    fontWeight: FontWeight.w500,
                   ),
                 ),
-                onChanged: (value) {
-                  setState(() {});
+              ],
+            ),
+            actions: [
+              TextButton(
+                onPressed: () {
+                  _confirmationController.clear();
+                  Navigator.of(context).pop();
                 },
+                child: const Text(
+                  'Cancel',
+                  style: TextStyle(color: Colors.grey),
+                ),
               ),
-              const SizedBox(height: 16),
-              const Text(
-                '⚠️ This action cannot be undone. All your data will be permanently deleted.',
-                style: TextStyle(
-                  fontSize: 14,
-                  color: Colors.red,
-                  fontWeight: FontWeight.w500,
+              TextButton(
+                onPressed: _confirmationController.text.trim().toUpperCase() ==
+                        'DELETE'
+                    ? () {
+                        Navigator.of(context).pop();
+                        _confirmationController.clear();
+                        unawaited(_performAccountDeletion());
+                      }
+                    : null,
+                child: Text(
+                  'Confirm Delete',
+                  style: TextStyle(
+                    color: _confirmationController.text.trim().toUpperCase() ==
+                            'DELETE'
+                        ? Colors.red
+                        : Colors.grey,
+                    fontWeight: FontWeight.bold,
+                  ),
                 ),
               ),
             ],
           ),
-          actions: [
-            TextButton(
-              onPressed: () {
-                _confirmationController.clear();
-                Navigator.of(context).pop();
-              },
-              child: const Text(
-                'Cancel',
-                style: TextStyle(color: Colors.grey),
-              ),
-            ),
-            TextButton(
-              onPressed:
-                  _confirmationController.text.trim().toUpperCase() == 'DELETE'
-                      ? () {
-                          Navigator.of(context).pop();
-                          _confirmationController.clear();
-                          _performAccountDeletion();
-                        }
-                      : null,
-              child: Text(
-                'Confirm Delete',
-                style: TextStyle(
-                  color: _confirmationController.text.trim().toUpperCase() ==
-                          'DELETE'
-                      ? Colors.red
-                      : Colors.grey,
-                  fontWeight: FontWeight.bold,
-                ),
-              ),
-            ),
-          ],
         ),
       ),
     );
@@ -214,14 +217,13 @@ class _DeleteAccountWidgetState extends State<DeleteAccountWidget> {
         // Fallback for other auth methods
         await _deleteUserWithReauth(user);
       }
-    } catch (e) {
+    } on Object catch (e) {
       log('Error in account deletion: ${e.toString()}');
-      if (context.mounted) {
-        CustomSnackbar.showSnackBarSimple(
-          'Failed to delete account. Please try again.'.tr().toString(),
-          context,
-        );
-      }
+      if (!mounted) return;
+      CustomSnackbar.showSnackBarSimple(
+        'Failed to delete account. Please try again.'.tr().toString(),
+        context,
+      );
     }
   }
 
@@ -230,7 +232,7 @@ class _DeleteAccountWidgetState extends State<DeleteAccountWidget> {
       await user.delete();
       await _cleanupUserData(user);
       await _showSuccessAndNavigate();
-    } catch (e) {
+    } on Object catch (e) {
       if (e is FirebaseAuthException && e.code == 'requires-recent-login') {
         // Show Google re-auth dialog
         _showGoogleReauthDialog();
@@ -245,7 +247,7 @@ class _DeleteAccountWidgetState extends State<DeleteAccountWidget> {
       await user.delete();
       await _cleanupUserData(user);
       await _showSuccessAndNavigate();
-    } catch (e) {
+    } on Object catch (e) {
       if (e is FirebaseAuthException && e.code == 'requires-recent-login') {
         // Show Facebook re-auth dialog
         _showFacebookReauthDialog();
@@ -260,7 +262,7 @@ class _DeleteAccountWidgetState extends State<DeleteAccountWidget> {
       await user.delete();
       await _cleanupUserData(user);
       await _showSuccessAndNavigate();
-    } catch (e) {
+    } on Object catch (e) {
       if (e is FirebaseAuthException && e.code == 'requires-recent-login') {
         // Show phone re-auth dialog
         _showPhoneReauthDialog();
@@ -275,7 +277,7 @@ class _DeleteAccountWidgetState extends State<DeleteAccountWidget> {
       await user.delete();
       await _cleanupUserData(user);
       await _showSuccessAndNavigate();
-    } catch (e) {
+    } on Object catch (e) {
       if (e is FirebaseAuthException && e.code == 'requires-recent-login') {
         // Show generic re-auth dialog
         _showGenericReauthDialog();
@@ -291,141 +293,162 @@ class _DeleteAccountWidgetState extends State<DeleteAccountWidget> {
   }
 
   Future<void> _showSuccessAndNavigate() async {
-    if (context.mounted) {
-      CustomSnackbar.showSnackBarSimple(
-        'Account deleted successfully'.tr().toString(),
-        context,
-      );
-      final userBloc = context.read<UserBloc>();
-      Navigator.pushNamedAndRemoveUntil(
-        context,
-        RouteName.welcomeScreen,
-        (route) => false,
-      ).then((value) {
-        userBloc.add(const UserDataUpdated(null));
-        userBloc.add(const UserListenStopped());
-      });
-    }
+    if (!context.mounted) return;
+    CustomSnackbar.showSnackBarSimple(
+      'Account deleted successfully'.tr().toString(),
+      context,
+    );
+    final userBloc = context.read<UserBloc>();
+    await Navigator.pushNamedAndRemoveUntil(
+      context,
+      RouteName.welcomeScreen,
+      (route) => false,
+    );
+    userBloc.add(const UserDataUpdated(null));
+    userBloc.add(const UserListenStopped());
   }
 
   void _showGoogleReauthDialog() {
-    showDialog(
-      context: context,
-      builder: (BuildContext context) => AlertDialog(
-        backgroundColor: Colors.white,
-        title: const Text('Re-authentication Required'),
-        content: const Text(
-          'Please sign in with Google again to confirm account deletion.',
+    unawaited(
+      showDialog(
+        context: context,
+        builder: (BuildContext context) => AlertDialog(
+          backgroundColor: Colors.white,
+          title: const Text('Re-authentication Required'),
+          content: const Text(
+            'Please sign in with Google again to confirm account deletion.',
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.pop(context),
+              child: const Text('Cancel'),
+            ),
+            TextButton(
+              onPressed: () async {
+                final scaffoldMessenger = ScaffoldMessenger.of(context);
+                Navigator.pop(context);
+                scaffoldMessenger.showSnackBar(
+                  const SnackBar(
+                    content: Text(
+                      'Google re-authentication not yet implemented',
+                      style: TextStyle(color: Colors.white),
+                    ),
+                    backgroundColor: AppColors.primaryGreen,
+                  ),
+                );
+              },
+              child: const Text('Continue'),
+            ),
+          ],
         ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(context),
-            child: const Text('Cancel'),
-          ),
-          TextButton(
-            onPressed: () async {
-              Navigator.pop(context);
-              // Implement Google re-auth here
-              // This would require Google Sign-In re-authentication
-              CustomSnackbar.showSnackBarSimple(
-                'Google re-authentication not yet implemented',
-                context,
-              );
-            },
-            child: const Text('Continue'),
-          ),
-        ],
       ),
     );
   }
 
   void _showFacebookReauthDialog() {
-    showDialog(
-      context: context,
-      builder: (BuildContext context) => AlertDialog(
-        backgroundColor: Colors.white,
-        title: const Text('Re-authentication Required'),
-        content: const Text(
-          'Please sign in with Facebook again to confirm account deletion.',
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(context),
-            child: const Text('Cancel'),
+    unawaited(
+      showDialog(
+        context: context,
+        builder: (BuildContext context) => AlertDialog(
+          backgroundColor: Colors.white,
+          title: const Text('Re-authentication Required'),
+          content: const Text(
+            'Please sign in with Facebook again to confirm account deletion.',
           ),
-          TextButton(
-            onPressed: () async {
-              Navigator.pop(context);
-              try {
-                final User? fbUser =
-                    await FaceBookLoginRepositoryImpl().signInWithFacebook();
-                if (fbUser != null) {
-                  await fbUser.delete();
-                  await _cleanupUserData(fbUser);
-                  await _showSuccessAndNavigate();
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.pop(context),
+              child: const Text('Cancel'),
+            ),
+            TextButton(
+              onPressed: () async {
+                final scaffoldMessenger = ScaffoldMessenger.of(context);
+                Navigator.pop(context);
+                try {
+                  final User? fbUser =
+                      await FaceBookLoginRepositoryImpl().signInWithFacebook();
+                  if (fbUser != null) {
+                    await fbUser.delete();
+                    await _cleanupUserData(fbUser);
+                    await _showSuccessAndNavigate();
+                  }
+                } on Object {
+                  scaffoldMessenger.showSnackBar(
+                    const SnackBar(
+                      content: Text(
+                        'Facebook re-authentication failed',
+                        style: TextStyle(color: Colors.white),
+                      ),
+                      backgroundColor: Colors.red,
+                    ),
+                  );
                 }
-              } catch (e) {
-                CustomSnackbar.showSnackBarSimple(
-                  'Facebook re-authentication failed',
-                  context,
-                );
-              }
-            },
-            child: const Text('Continue'),
-          ),
-        ],
+              },
+              child: const Text('Continue'),
+            ),
+          ],
+        ),
       ),
     );
   }
 
   void _showPhoneReauthDialog() {
-    showDialog(
-      context: context,
-      builder: (BuildContext context) => AlertDialog(
-        backgroundColor: Colors.white,
-        title: const Text('Re-authentication Required'),
-        content: const Text(
-          'Please verify your phone number again to confirm account deletion.',
+    unawaited(
+      showDialog(
+        context: context,
+        builder: (BuildContext context) => AlertDialog(
+          backgroundColor: Colors.white,
+          title: const Text('Re-authentication Required'),
+          content: const Text(
+            'Please verify your phone number again to confirm account deletion.',
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.pop(context),
+              child: const Text('Cancel'),
+            ),
+            TextButton(
+              onPressed: () async {
+                final scaffoldMessenger = ScaffoldMessenger.of(context);
+                Navigator.pop(context);
+                scaffoldMessenger.showSnackBar(
+                  const SnackBar(
+                    content: Text(
+                      'Phone re-authentication not yet implemented',
+                      style: TextStyle(color: Colors.white),
+                    ),
+                    backgroundColor: AppColors.primaryGreen,
+                  ),
+                );
+              },
+              child: const Text('Continue'),
+            ),
+          ],
         ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(context),
-            child: const Text('Cancel'),
-          ),
-          TextButton(
-            onPressed: () async {
-              Navigator.pop(context);
-              // Implement phone re-auth here
-              CustomSnackbar.showSnackBarSimple(
-                'Phone re-authentication not yet implemented',
-                context,
-              );
-            },
-            child: const Text('Continue'),
-          ),
-        ],
       ),
     );
   }
 
   void _showGenericReauthDialog() {
-    showDialog(
-      context: context,
-      builder: (BuildContext context) => AlertDialog(
-        backgroundColor: Colors.white,
-        title: const Text('Re-authentication Required'),
-        content:
-            const Text('Please sign in again to confirm account deletion.'),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(context),
-            child: const Text('Cancel'),
-          ),
-          TextButton(
-            onPressed: () => Navigator.pop(context),
-            child: const Text('Continue'),
-          ),
-        ],
+    unawaited(
+      showDialog(
+        context: context,
+        builder: (BuildContext context) => AlertDialog(
+          backgroundColor: Colors.white,
+          title: const Text('Re-authentication Required'),
+          content:
+              const Text('Please sign in again to confirm account deletion.'),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.pop(context),
+              child: const Text('Cancel'),
+            ),
+            TextButton(
+              onPressed: () => Navigator.pop(context),
+              child: const Text('Continue'),
+            ),
+          ],
+        ),
       ),
     );
   }

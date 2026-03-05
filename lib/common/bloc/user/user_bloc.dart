@@ -115,7 +115,8 @@ class UserBloc extends Bloc<UserEvent, UserState> {
                 add(UserDataUpdated(userData));
               } else {
                 AppLogger.warning(
-                    'User document does not exist for UID: ${user.uid}');
+                  'User document does not exist for UID: ${user.uid}',
+                );
                 add(const UserDataUpdated(null));
               }
             } on Exception catch (e) {

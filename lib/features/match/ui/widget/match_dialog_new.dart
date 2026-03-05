@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
@@ -137,16 +139,18 @@ class _MatchDialogPageState extends State<MatchDialogPage> {
             InkWell(
               onTap: () {
                 Navigator.pop(context);
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (_) => ChatPage(
-                      chatId: chatId(
-                        widget.currentUser,
-                        widget.matchedUser,
+                unawaited(
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (_) => ChatPage(
+                        chatId: chatId(
+                          widget.currentUser,
+                          widget.matchedUser,
+                        ),
+                        sender: widget.currentUser,
+                        second: widget.matchedUser,
                       ),
-                      sender: widget.currentUser,
-                      second: widget.matchedUser,
                     ),
                   ),
                 );

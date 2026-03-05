@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:contacts_service/contacts_service.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -44,7 +46,7 @@ class _ContactPickerWidgetState extends State<ContactPickerWidget> {
   @override
   void initState() {
     super.initState();
-    _loadContacts();
+    unawaited(_loadContacts());
     _messageController.text =
         'You are invited to join "${widget.groupName}" group!';
   }
@@ -88,7 +90,7 @@ class _ContactPickerWidgetState extends State<ContactPickerWidget> {
           _isLoading = false;
         });
       }
-    } catch (e) {
+    } on Object catch (e) {
       if (mounted) {
         setState(() {
           _isLoading = false;
@@ -435,54 +437,54 @@ class _ContactPickerWidgetState extends State<ContactPickerWidget> {
                       : _filteredContacts.isEmpty
                           ? _buildEmptyContactsState()
                           : ListView.builder(
-                          itemCount: _filteredContacts.length,
-                          itemBuilder: (context, index) {
-                            final contact = _filteredContacts[index];
-                            final isSelected =
-                                _selectedContacts.contains(contact);
-                            final phone =
-                                _contactService.getPrimaryPhone(contact);
+                              itemCount: _filteredContacts.length,
+                              itemBuilder: (context, index) {
+                                final contact = _filteredContacts[index];
+                                final isSelected =
+                                    _selectedContacts.contains(contact);
+                                final phone =
+                                    _contactService.getPrimaryPhone(contact);
 
-                            return ListTile(
-                              leading: CircleAvatar(
-                                backgroundColor: isSelected
-                                    ? AppColors.primaryGreen
-                                    : Colors.grey[300],
-                                child: Icon(
-                                  Icons.person,
-                                  color: isSelected
-                                      ? Colors.white
-                                      : Colors.grey[600],
-                                ),
-                              ),
-                              title: Text(
-                                contact.displayName ?? 'Unknown',
-                                style: GoogleFonts.montserrat(
-                                  fontWeight: FontWeight.w500,
-                                  color: AppColors.textPrimary,
-                                ),
-                              ),
-                              subtitle: phone != null
-                                  ? Text(
-                                      phone,
-                                      style: GoogleFonts.montserrat(
-                                        color: Colors.grey[600],
-                                      ),
-                                    )
-                                  : null,
-                              trailing: isSelected
-                                  ? const Icon(
-                                      Icons.check_circle,
-                                      color: AppColors.primaryGreen,
-                                    )
-                                  : const Icon(
-                                      Icons.radio_button_unchecked,
-                                      color: Colors.grey,
+                                return ListTile(
+                                  leading: CircleAvatar(
+                                    backgroundColor: isSelected
+                                        ? AppColors.primaryGreen
+                                        : Colors.grey[300],
+                                    child: Icon(
+                                      Icons.person,
+                                      color: isSelected
+                                          ? Colors.white
+                                          : Colors.grey[600],
                                     ),
-                              onTap: () => _toggleContactSelection(contact),
-                            );
-                          },
-                        ),
+                                  ),
+                                  title: Text(
+                                    contact.displayName ?? 'Unknown',
+                                    style: GoogleFonts.montserrat(
+                                      fontWeight: FontWeight.w500,
+                                      color: AppColors.textPrimary,
+                                    ),
+                                  ),
+                                  subtitle: phone != null
+                                      ? Text(
+                                          phone,
+                                          style: GoogleFonts.montserrat(
+                                            color: Colors.grey[600],
+                                          ),
+                                        )
+                                      : null,
+                                  trailing: isSelected
+                                      ? const Icon(
+                                          Icons.check_circle,
+                                          color: AppColors.primaryGreen,
+                                        )
+                                      : const Icon(
+                                          Icons.radio_button_unchecked,
+                                          color: Colors.grey,
+                                        ),
+                                  onTap: () => _toggleContactSelection(contact),
+                                );
+                              },
+                            ),
             ),
           ],
         ),

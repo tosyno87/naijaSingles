@@ -744,7 +744,7 @@ class _HelpCenterScreenState extends State<HelpCenterScreen> {
       } else {
         _showErrorSnackBar('Could not open email app');
       }
-    } catch (e) {
+    } on Object catch (e) {
       log('Error opening email: $e');
       _showErrorSnackBar('Could not open email app');
     }

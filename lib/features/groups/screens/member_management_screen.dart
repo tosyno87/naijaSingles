@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -29,7 +31,6 @@ class _MemberManagementScreenState extends State<MemberManagementScreen>
   List<Map<String, dynamic>> _searchResults = [];
   bool _isSearching = false;
   bool _isLoading = false;
-  String? _error;
 
   @override
   void initState() {
@@ -82,12 +83,25 @@ class _MemberManagementScreenState extends State<MemberManagementScreen>
             ],
           ),
         ),
-        body: TabBarView(
-          controller: _tabController,
+        body: Stack(
           children: [
-            _buildMembersTab(),
-            _buildAdminsTab(),
-            _buildInviteTab(),
+            TabBarView(
+              controller: _tabController,
+              children: [
+                _buildMembersTab(),
+                _buildAdminsTab(),
+                _buildInviteTab(),
+              ],
+            ),
+            if (_isLoading)
+              ColoredBox(
+                color: Colors.black.withValues(alpha: 0.2),
+                child: const Center(
+                  child: CircularProgressIndicator(
+                    color: AppColors.primaryGreen,
+                  ),
+                ),
+              ),
           ],
         ),
       );
@@ -504,38 +518,39 @@ class _MemberManagementScreenState extends State<MemberManagementScreen>
       _isSearching = true;
     });
 
-    _groupService
-        .searchUsersForInvitation(
-      query: query,
-      groupId: widget.group.id,
-    )
-        .then((results) {
-      if (mounted) {
-        setState(() {
-          _searchResults = results;
-          _isSearching = false;
-        });
-      }
-    }).catchError((error) {
-      if (mounted) {
-        setState(() {
-          _error = error.toString();
-          _isSearching = false;
-        });
-      }
-    });
+    unawaited(
+      _groupService
+          .searchUsersForInvitation(
+        query: query,
+        groupId: widget.group.id,
+      )
+          .then((results) {
+        if (mounted) {
+          setState(() {
+            _searchResults = results;
+            _isSearching = false;
+          });
+        }
+      }).catchError((error) {
+        if (mounted) {
+          setState(() {
+            _isSearching = false;
+          });
+        }
+      }),
+    );
   }
 
   void _handleMemberAction(String action, String memberId) {
     switch (action) {
       case 'promote':
-        _promoteMember(memberId);
+        unawaited(_promoteMember(memberId));
         break;
       case 'demote':
-        _demoteMember(memberId);
+        unawaited(_demoteMember(memberId));
         break;
       case 'remove':
-        _removeMember(memberId);
+        unawaited(_removeMember(memberId));
         break;
     }
   }
@@ -555,7 +570,7 @@ class _MemberManagementScreenState extends State<MemberManagementScreen>
           ),
         );
       }
-    } catch (e) {
+    } on Object catch (e) {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
@@ -586,7 +601,7 @@ class _MemberManagementScreenState extends State<MemberManagementScreen>
           ),
         );
       }
-    } catch (e) {
+    } on Object catch (e) {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
@@ -608,7 +623,8 @@ class _MemberManagementScreenState extends State<MemberManagementScreen>
       builder: (context) => AlertDialog(
         title: const Text('Remove Member'),
         content: const Text(
-            'Are you sure you want to remove this member from the group?'),
+          'Are you sure you want to remove this member from the group?',
+        ),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context, false),
@@ -638,7 +654,7 @@ class _MemberManagementScreenState extends State<MemberManagementScreen>
             ),
           );
         }
-      } catch (e) {
+      } on Object catch (e) {
         if (mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
@@ -677,7 +693,7 @@ class _MemberManagementScreenState extends State<MemberManagementScreen>
           _searchResults.removeWhere((user) => user['id'] == userId);
         });
       }
-    } catch (e) {
+    } on Object catch (e) {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
@@ -694,37 +710,39 @@ class _MemberManagementScreenState extends State<MemberManagementScreen>
   }
 
   void _showInviteDialog() {
-    showDialog(
-      context: context,
-      builder: (context) => AlertDialog(
-        title: const Text('Invite Members'),
-        content: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            TextField(
-              controller: _inviteMessageController,
-              decoration: const InputDecoration(
-                labelText: 'Custom message (optional)',
-                hintText: 'Add a personal message to your invitation',
-                border: OutlineInputBorder(),
+    unawaited(
+      showDialog(
+        context: context,
+        builder: (context) => AlertDialog(
+          title: const Text('Invite Members'),
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              TextField(
+                controller: _inviteMessageController,
+                decoration: const InputDecoration(
+                  labelText: 'Custom message (optional)',
+                  hintText: 'Add a personal message to your invitation',
+                  border: OutlineInputBorder(),
+                ),
+                maxLines: 3,
               ),
-              maxLines: 3,
+            ],
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.pop(context),
+              child: const Text('Cancel'),
+            ),
+            TextButton(
+              onPressed: () {
+                Navigator.pop(context);
+                _tabController.animateTo(2);
+              },
+              child: const Text('Continue'),
             ),
           ],
         ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(context),
-            child: const Text('Cancel'),
-          ),
-          TextButton(
-            onPressed: () {
-              Navigator.pop(context);
-              _tabController.animateTo(2); // Switch to invite tab
-            },
-            child: const Text('Continue'),
-          ),
-        ],
       ),
     );
   }

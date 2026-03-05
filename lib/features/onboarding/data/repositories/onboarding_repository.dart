@@ -5,7 +5,6 @@ import 'dart:io';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_storage/firebase_storage.dart';
-import 'package:flutter/material.dart';
 
 import '../../../../common/utils/app_logger.dart';
 import '../../bloc/onboarding_data.dart';
@@ -88,32 +87,28 @@ class OnboardingRepository {
 
         final snapshot = await uploadTask.timeout(
           const Duration(minutes: 2),
-          onTimeout: () =>
-              throw TimeoutException('Photo upload timed out'),
+          onTimeout: () => throw TimeoutException('Photo upload timed out'),
         );
 
         final url = await snapshot.ref.getDownloadURL();
         photoUrls.add(url);
-      } catch (e) {
+      } on Object catch (e) {
         log('❌ Error uploading photo $i: $e');
       }
     }
 
     if (photoUrls.isNotEmpty) {
-      await FirebaseFirestore.instance
-          .collection('users')
-          .doc(userId)
-          .set(
-            {
-              'profilePicture': photoUrls[0],
-              'photos': photoUrls,
-              'Pictures': photoUrls,
-              'imageUrl': photoUrls,
-              'profilePhotoCount': photoUrls.length,
-              'lastPhotoUpdate': FieldValue.serverTimestamp(),
-            },
-            SetOptions(merge: true),
-          );
+      await FirebaseFirestore.instance.collection('users').doc(userId).set(
+        {
+          'profilePicture': photoUrls[0],
+          'photos': photoUrls,
+          'Pictures': photoUrls,
+          'imageUrl': photoUrls,
+          'profilePhotoCount': photoUrls.length,
+          'lastPhotoUpdate': FieldValue.serverTimestamp(),
+        },
+        SetOptions(merge: true),
+      );
     }
   }
 
@@ -170,9 +165,15 @@ class OnboardingRepository {
         'maximumDistance': d.maxDistance,
       },
       'showGender': d.interestedIn,
-      'ageRange': {'min': d.ageRange[0].toString(), 'max': d.ageRange[1].toString()},
+      'ageRange': {
+        'min': d.ageRange[0].toString(),
+        'max': d.ageRange[1].toString()
+      },
       'userGender': d.gender,
-      'age_range': {'min': d.ageRange[0].toString(), 'max': d.ageRange[1].toString()},
+      'age_range': {
+        'min': d.ageRange[0].toString(),
+        'max': d.ageRange[1].toString()
+      },
       'maximum_distance': d.maxDistance,
       'maxDistance': d.maxDistance,
       'location': {

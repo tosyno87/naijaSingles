@@ -17,7 +17,7 @@ class UserBloc extends Bloc<UserEvents, UserStates> {
         emit(UserUpdated());
       } on SocketException {
         emit(const UserUpdationFailed(message: 'No Internet Connection'));
-      } catch (e) {
+      } on Object catch (e) {
         emit(UserUpdationFailed(message: e.toString()));
         log('Error updating user: $e');
       }
@@ -37,7 +37,7 @@ class UserBloc extends Bloc<UserEvents, UserStates> {
         emit(UserProfilePictureUploaded(url: imageUrl));
       } on SocketException {
         emit(const UserUpdationFailed(message: 'No Internet Connection'));
-      } catch (e) {
+      } on Object catch (e) {
         emit(UserUpdationFailed(message: e.toString()));
       }
     });

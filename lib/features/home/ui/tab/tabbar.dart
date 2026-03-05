@@ -1,5 +1,3 @@
-// ignore_for_file: unnecessary_string_interpolations, use_build_context_synchronously, avoid_function_literals_in_foreach_calls
-
 import 'dart:async';
 import 'dart:io';
 
@@ -21,6 +19,7 @@ import '../../../profile/profile_screen.dart';
 import '../screens/home_page.dart';
 
 // Background message handler
+// ignore: unused_element
 Future<void> _firebaseMessagingBackgroundHandler(RemoteMessage message) async {
   await Firebase.initializeApp();
 
@@ -37,7 +36,6 @@ Future<void> _firebaseMessagingBackgroundHandler(RemoteMessage message) async {
 // in_app_purchase_repo.dart depend on isPaymentSuccess / currentUserId params.
 // TODO: Move payment-success dialog to a service or overlay, then migrate all
 // remaining callers to MainNavigationScreen and delete this file.
-@Deprecated('Use MainNavigationScreen from home/main_navigation_screen.dart')
 class Tabbar extends StatefulWidget {
   const Tabbar({super.key, this.isPaymentSuccess, this.currentUserId});
   final bool? isPaymentSuccess;
@@ -52,6 +50,8 @@ class TabbarState extends State<Tabbar> with WidgetsBindingObserver {
   int swipedcount = 0;
   int currentIndex = 0;
   late StreamSubscription<List<PurchaseDetails>> _subscription;
+  StreamSubscription<RemoteMessage>? _onMessageSubscription;
+  StreamSubscription<RemoteMessage>? _onMessageOpenedAppSubscription;
   final InAppPurchase iap = InAppPurchase.instance;
   Set<String> shownNotificationForegroundIds = <String>{};
 
@@ -75,12 +75,11 @@ class TabbarState extends State<Tabbar> with WidgetsBindingObserver {
     if (widget.isPaymentSuccess != null && widget.isPaymentSuccess!) {
       WidgetsBinding.instance.addPostFrameCallback((_) async {
         final isDarkMode = context.read<ThemeBloc>().isDarkMode;
-        showDialog(
+        unawaited(showDialog(
           context: context,
           builder: (BuildContext context) => AlertDialog(
-            backgroundColor: isDarkMode
-                ? AppColors.darkCard
-                : AppColors.backgroundColor,
+            backgroundColor:
+                isDarkMode ? AppColors.darkCard : AppColors.backgroundColor,
             shape: RoundedRectangleBorder(
               borderRadius: BorderRadius.circular(20),
             ),
@@ -111,7 +110,7 @@ class TabbarState extends State<Tabbar> with WidgetsBindingObserver {
               ),
             ],
           ),
-        );
+        ));
       });
     }
   }
@@ -119,7 +118,10 @@ class TabbarState extends State<Tabbar> with WidgetsBindingObserver {
   @override
   void dispose() {
     WidgetsBinding.instance.removeObserver(this);
-    _subscription.cancel();
+    unawaited(_subscription.cancel());
+    unawaited(_onMessageSubscription?.cancel() ?? Future<void>.value());
+    unawaited(
+        _onMessageOpenedAppSubscription?.cancel() ?? Future<void>.value());
     super.dispose();
   }
 
@@ -146,7 +148,8 @@ class TabbarState extends State<Tabbar> with WidgetsBindingObserver {
   }
 
   void initFirebase(BuildContext context) {
-    FirebaseMessaging.onMessage.listen((RemoteMessage message) async {
+    _onMessageSubscription =
+        FirebaseMessaging.onMessage.listen((RemoteMessage message) async {
       final String notificationId = message.data['notificationId'] ?? '';
 
       if (shownNotificationForegroundIds.contains(notificationId)) {
@@ -161,7 +164,8 @@ class TabbarState extends State<Tabbar> with WidgetsBindingObserver {
       }
     });
 
-    FirebaseMessaging.onMessageOpenedApp.listen((RemoteMessage message) async {
+    _onMessageOpenedAppSubscription = FirebaseMessaging.onMessageOpenedApp
+        .listen((RemoteMessage message) async {
       final String notificationId = message.data['notificationId'] ?? '';
 
       if (shownNotificationForegroundIds.contains(notificationId)) {
@@ -171,41 +175,43 @@ class TabbarState extends State<Tabbar> with WidgetsBindingObserver {
       shownNotificationForegroundIds.add(notificationId);
       // Handle non-call notifications only
       if (message.data['type'] != 'Call') {
-        // Navigate to appropriate screen based on notification type
+        if (!context.mounted) return;
         if (message.data['type'] == 'message') {
-          Navigator.pushNamed(
+          unawaited(Navigator.pushNamed(
             context,
             RouteName.tabScreen,
             arguments: 'messages',
-          );
+          ));
         } else {
-          Navigator.pushNamed(
+          unawaited(Navigator.pushNamed(
             context,
             RouteName.tabScreen,
             arguments: 'notification',
-          );
+          ));
         }
       }
     });
 
-    FirebaseMessaging.instance
-        .getInitialMessage()
-        .then((RemoteMessage? message) async {
-      if (message != null) {
-        final String notificationId = message.data['notificationId'] ?? '';
+    unawaited(
+      FirebaseMessaging.instance
+          .getInitialMessage()
+          .then((RemoteMessage? message) async {
+        if (message != null) {
+          final String notificationId = message.data['notificationId'] ?? '';
 
-        if (shownNotificationForegroundIds.contains(notificationId)) {
-          return;
-        }
+          if (shownNotificationForegroundIds.contains(notificationId)) {
+            return;
+          }
 
-        shownNotificationForegroundIds.add(notificationId);
-        // Handle non-call notifications only
-        if (message.data['type'] != 'Call') {
-          // Handle app launch from notification
-          debugPrint('App launched from notification: ${message.data}');
+          shownNotificationForegroundIds.add(notificationId);
+          // Handle non-call notifications only
+          if (message.data['type'] != 'Call') {
+            // Handle app launch from notification
+            debugPrint('App launched from notification: ${message.data}');
+          }
         }
-      }
-    });
+      }),
+    );
   }
 
   @override
@@ -214,13 +220,13 @@ class TabbarState extends State<Tabbar> with WidgetsBindingObserver {
 
     return PopScope(
       canPop: false,
-      onPopInvoked: (didPop) async {
+      onPopInvokedWithResult: (didPop, result) async {
         if (didPop) return;
 
         final shouldExit = await onWillPop(context);
         if (shouldExit && context.mounted) {
           if (Platform.isAndroid) {
-            SystemNavigator.pop();
+            unawaited(SystemNavigator.pop());
           } else if (Platform.isIOS) {
             exit(0);
           }
@@ -236,11 +242,9 @@ class TabbarState extends State<Tabbar> with WidgetsBindingObserver {
               backgroundColor: Theme.of(context).scaffoldBackgroundColor,
               automaticallyImplyLeading: false,
               title: TabBar(
-                labelColor:
-                    isDarkMode ? Colors.white : AppColors.primaryGreen,
-                unselectedLabelColor: isDarkMode
-                    ? Colors.grey[400]
-                    : Colors.grey[600],
+                labelColor: isDarkMode ? Colors.white : AppColors.primaryGreen,
+                unselectedLabelColor:
+                    isDarkMode ? Colors.grey[400] : Colors.grey[600],
                 indicatorColor: AppColors.primaryGreen,
                 indicatorWeight: 3,
                 labelStyle: const TextStyle(

@@ -27,7 +27,7 @@ class UserLocationReporistoryImpl implements UserLocationReporistory {
             log('Location services are disabled and user declined to enable');
             return getDefaultLocation();
           }
-        } catch (e) {
+        } on Object catch (e) {
           log('Error requesting location service: ${e.toString()}');
           return getDefaultLocation();
         }
@@ -44,7 +44,7 @@ class UserLocationReporistoryImpl implements UserLocationReporistory {
             return getDefaultLocation();
           }
         }
-      } catch (e) {
+      } on Object catch (e) {
         log('Error checking location permission: ${e.toString()}');
         return getDefaultLocation();
       }
@@ -54,7 +54,7 @@ class UserLocationReporistoryImpl implements UserLocationReporistory {
       try {
         coordinates =
             await location.getLocation().timeout(const Duration(seconds: 10));
-      } catch (e) {
+      } on Object catch (e) {
         log('Error getting location with timeout: ${e.toString()}');
         return getDefaultLocation();
       }
@@ -70,7 +70,7 @@ class UserLocationReporistoryImpl implements UserLocationReporistory {
           lng: coordinates.longitude!,
         );
         return reverseGeocode;
-      } catch (e) {
+      } on Object catch (e) {
         log('Geocoding error: ${e.toString()}');
         // Return basic location data even if geocoding fails
         return {
@@ -81,7 +81,7 @@ class UserLocationReporistoryImpl implements UserLocationReporistory {
           'longitude': coordinates.longitude,
         };
       }
-    } catch (e) {
+    } on Object catch (e) {
       log('Location error: ${e.toString()}');
       return getDefaultLocation();
     }
@@ -112,7 +112,7 @@ class UserLocationReporistoryImpl implements UserLocationReporistory {
       final response = await http.get(url).timeout(
         const Duration(seconds: 5),
         onTimeout: () {
-          throw 'Request timed out';
+          throw Exception('Request timed out');
         },
       );
 
@@ -128,14 +128,14 @@ class UserLocationReporistoryImpl implements UserLocationReporistory {
           final addressDetails = extractedData['results'][0];
           return ReverseGeocode.fromJson(addressDetails);
         } else {
-          throw "Couldn't get the address from response";
+          throw Exception("Couldn't get the address from response");
         }
       } else {
-        throw 'Network Error! Status code: ${response.statusCode}';
+        throw Exception('Network Error! Status code: ${response.statusCode}');
       }
-    } catch (e) {
+    } on Object catch (e) {
       log('Reverse geocoding error: ${e.toString()}');
-      throw 'Failed to get address: ${e.toString()}';
+      throw Exception('Failed to get address: ${e.toString()}');
     }
   }
 
@@ -151,7 +151,7 @@ class UserLocationReporistoryImpl implements UserLocationReporistory {
       final response = await http.get(url).timeout(
         const Duration(seconds: 5),
         onTimeout: () {
-          throw 'Request timed out';
+          throw Exception('Request timed out');
         },
       );
 
@@ -164,7 +164,9 @@ class UserLocationReporistoryImpl implements UserLocationReporistory {
         // Check if the API returned an error
         if (extractedData.containsKey('error_message')) {
           log("Google Maps API error: ${extractedData["error_message"]}");
-          throw "Google Maps API error: ${extractedData["error_message"]}";
+          throw Exception(
+            "Google Maps API error: ${extractedData["error_message"]}",
+          );
         }
 
         if (extractedData.containsKey('results') &&
@@ -221,7 +223,7 @@ class UserLocationReporistoryImpl implements UserLocationReporistory {
           'longitude': lng,
         };
       }
-    } catch (e) {
+    } on Object catch (e) {
       log('Geocoding error: ${e.toString()}');
       // Return basic location data
       return {

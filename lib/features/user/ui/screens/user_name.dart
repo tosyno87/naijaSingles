@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:developer';
 
 import 'package:flutter/material.dart';
@@ -141,10 +142,12 @@ class UserNameState extends State<UserName> {
                       if (username.isNotEmpty) {
                         userData.addAll({'UserName': username});
                         log(userData.toString());
-                        Navigator.pushNamed(
-                          context,
-                          RouteName.userDobScreen,
-                          arguments: userData,
+                        unawaited(
+                          Navigator.pushNamed(
+                            context,
+                            RouteName.userDobScreen,
+                            arguments: userData,
+                          ),
                         );
                       } else {
                         CustomSnackbar.showSnackBarSimple(

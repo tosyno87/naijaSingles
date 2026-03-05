@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:developer';
 import 'dart:io';
 
@@ -18,11 +19,11 @@ import 'bloc/explore_map_bloc.dart';
 class ExploreMapWidget extends StatefulWidget {
   const ExploreMapWidget({
     required this.currentUser,
-    required this.isPuchased,
+    required this.isPurchased,
     super.key,
   });
   final UserModel currentUser;
-  final bool isPuchased;
+  final bool isPurchased;
 
   @override
   State<ExploreMapWidget> createState() => _ExploreMapWidgetState();
@@ -38,7 +39,7 @@ class _ExploreMapWidgetState extends State<ExploreMapWidget>
   bool get wantKeepAlive => true;
   @override
   void initState() {
-    getCurrentAdddressName();
+    unawaited(getCurrentAdddressName());
     super.initState();
   }
 
@@ -52,25 +53,25 @@ class _ExploreMapWidgetState extends State<ExploreMapWidget>
     currentAddressName = await getAddress(
       currentCoordinates?.latitude,
       currentCoordinates?.longitude,
-    ).whenComplete(() {
-      context.read<SearchUserForMapBloc>().add(
-            LoadUserForMapEvent(
-              currentUser: widget.currentUser,
-            ),
-          );
-    });
+    );
+    if (!mounted) return;
+    context.read<SearchUserForMapBloc>().add(
+          LoadUserForMapEvent(
+            currentUser: widget.currentUser,
+          ),
+        );
     log('name is $currentAddressName');
     setState(() {});
   }
 
-  Future getAddress(lat, lng) async {
+  Future<String> getAddress(double? lat, double? lng) async {
     try {
       final address = await UserLocationReporistoryImpl()
-          .getReverseGeocodingData(lat: lat, lng: lng);
-      return address['subLocality'];
+          .getReverseGeocodingData(lat: lat ?? 0, lng: lng ?? 0);
+      return (address['subLocality'] ?? '') as String;
     } on SocketException {
-      throw 'No internet connection'.tr().toString();
-    } catch (e) {
+      throw Exception('No internet connection'.tr().toString());
+    } on Object {
       rethrow;
     }
   }
@@ -87,7 +88,7 @@ class _ExploreMapWidgetState extends State<ExploreMapWidget>
         width: MediaQuery.of(context).size.width,
         child:
 
-            //  widget.isPuchased ?
+            //  widget.isPurchased ?
 
             BlocBuilder<SearchUserForMapBloc, SearchUserForMapState>(
           builder: (context, state) {
@@ -106,7 +107,8 @@ class _ExploreMapWidgetState extends State<ExploreMapWidget>
                             height: 25,
                             width: 25,
                             child: CircularProgressIndicator(
-                              valueColor: AlwaysStoppedAnimation(AppColors.primaryGreen),
+                              valueColor: AlwaysStoppedAnimation(
+                                  AppColors.primaryGreen),
                             ),
                           ),
                           Text(
@@ -130,9 +132,7 @@ class _ExploreMapWidgetState extends State<ExploreMapWidget>
                   'Error to load data.'.tr().toString(),
                   textAlign: TextAlign.center,
                   style: TextStyle(
-                    color: isDarkMode
-                        ? Colors.white
-                        : Colors.black54,
+                    color: isDarkMode ? Colors.white : Colors.black54,
                     fontStyle: FontStyle.normal,
                     letterSpacing: 1,
                     decoration: TextDecoration.none,

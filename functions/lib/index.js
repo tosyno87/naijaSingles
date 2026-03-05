@@ -41,34 +41,31 @@ var __importStar = (this && this.__importStar) || (function () {
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.healthCheck = exports.createTestUsers = exports.onLikeCreated = exports.onSuperLikeCreated = exports.onMessageSent = exports.onMatchCreated = void 0;
 const admin = __importStar(require("firebase-admin"));
+const https_1 = require("firebase-functions/v2/https");
 const matchHandlers_1 = require("./handlers/matchHandlers");
 const messageHandlers_1 = require("./handlers/messageHandlers");
 const likeHandlers_1 = require("./handlers/likeHandlers");
 const testUserHandlers_1 = require("./handlers/testUserHandlers");
-// Initialize Firebase Admin SDK
 admin.initializeApp();
-// Initialize handlers
 const matchHandlers = new matchHandlers_1.MatchHandlers();
 const messageHandlers = new messageHandlers_1.MessageHandlers();
 const likeHandlers = new likeHandlers_1.LikeHandlers();
 const testUserHandlers = new testUserHandlers_1.TestUserHandlers();
-// Export all Cloud Functions
-// Match-related functions
 exports.onMatchCreated = matchHandlers.onMatchCreated;
-// Message-related functions
 exports.onMessageSent = messageHandlers.onMessageSent;
-// Like-related functions
 exports.onSuperLikeCreated = likeHandlers.onSuperLikeCreated;
 exports.onLikeCreated = likeHandlers.onLikeCreated;
-// Test user creation function (development/testing)
-exports.createTestUsers = testUserHandlers.createTestUsers;
-// Health check function
-const healthCheck = async (req, res) => {
+const isTestEnvEnabled = process.env.ENABLE_TEST_ENDPOINTS === 'true';
+exports.createTestUsers = isTestEnvEnabled
+    ? testUserHandlers.createTestUsers
+    : (0, https_1.onRequest)((req, res) => {
+        res.status(404).json({ error: 'Not available in production' });
+    });
+exports.healthCheck = (0, https_1.onRequest)((req, res) => {
     res.status(200).json({
         status: 'healthy',
         timestamp: new Date().toISOString(),
         version: '1.0.0',
     });
-};
-exports.healthCheck = healthCheck;
+});
 //# sourceMappingURL=index.js.map

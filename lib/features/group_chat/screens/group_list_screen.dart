@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 
@@ -285,19 +287,23 @@ class _GroupListScreenState extends State<GroupListScreen> {
   }
 
   void _navigateToGroupChat(GroupChat group) {
-    Navigator.push(
-      context,
-      MaterialPageRoute(
-        builder: (context) => GroupChatScreen(groupId: group.id),
+    unawaited(
+      Navigator.push(
+        context,
+        MaterialPageRoute(
+          builder: (context) => GroupChatScreen(groupId: group.id),
+        ),
       ),
     );
   }
 
   void _navigateToCreateGroup() {
-    Navigator.push(
-      context,
-      MaterialPageRoute(
-        builder: (context) => const CreateGroupScreen(),
+    unawaited(
+      Navigator.push(
+        context,
+        MaterialPageRoute(
+          builder: (context) => const CreateGroupScreen(),
+        ),
       ),
     );
   }

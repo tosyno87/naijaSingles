@@ -1,5 +1,4 @@
-// ignore_for_file: use_build_context_synchronously
-
+import 'dart:async';
 import 'dart:developer';
 import 'dart:io';
 
@@ -9,9 +8,9 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
+import '../../../../common/bloc/user/user_bloc.dart';
 import '../../../../common/constants/constants.dart';
 import '../../../../common/data/repo/phone_auth_repo.dart';
-import '../../../../common/bloc/user/user_bloc.dart';
 import '../../../../common/data/repo/user_location_repo.dart';
 import '../../../../common/utils/welcome_dialog.dart';
 import '../../../../common/widgets/custom_snackbar.dart';
@@ -53,7 +52,7 @@ class _SearchLocationState extends State<SearchLocation>
       curve: Curves.easeOut,
     );
 
-    _animationController!.forward();
+    unawaited(_animationController!.forward());
 
     _focusNode.addListener(() {
       if (mounted) {
@@ -296,8 +295,9 @@ class _SearchLocationState extends State<SearchLocation>
                             listener: (context, registrationState) {
                               if (registrationState is RegistrationSuccess) {
                                 log('userregistrationsuccess');
-                                context.read<UserBloc>().add(UserDataUpdated(registrationState.user));
-                                showWelcomDialog(context);
+                                context.read<UserBloc>().add(
+                                    UserDataUpdated(registrationState.user));
+                                unawaited(showWelcomDialog(context));
                               }
                             },
                             builder: (context, registrationState) {
@@ -356,6 +356,7 @@ class _SearchLocationState extends State<SearchLocation>
                                                 auth.currentUser!.uid,
                                             file: profilePic,
                                           );
+                                          if (!context.mounted) return;
                                           context.read<RegistrationBloc>().add(
                                                 RegistrationRequest(
                                                   userdata: userData,

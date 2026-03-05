@@ -1,5 +1,5 @@
-import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:firebase_auth/firebase_auth.dart';
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 
@@ -13,15 +13,11 @@ class SafetyCenterScreen extends StatefulWidget {
 }
 
 class _SafetyCenterScreenState extends State<SafetyCenterScreen> {
-  final FirebaseAuth _auth = FirebaseAuth.instance;
-  final FirebaseFirestore _firestore = FirebaseFirestore.instance;
-
   // Afropeep MVP Color Scheme
   static const Color primaryColor = Color(0xFF008037); // Deep green
   static const Color cardColor = Color(0xFFFFFFFF); // White for cards
   static const Color errorColor = Color(0xFFFF5A5F); // Red for errors/danger
   static const Color warningColor = Color(0xFFFF9500); // Orange for warnings
-  static const Color successColor = Color(0xFF4CAF50); // Green for success
   static final Color textPrimary = Colors.brown.shade800;
   static final Color textSecondary = Colors.brown.shade600;
   static final Color textLight = Colors.grey.shade600;
@@ -358,7 +354,7 @@ class _SafetyCenterScreenState extends State<SafetyCenterScreen> {
             title: 'View Blocked Users',
             subtitle: 'Manage your blocked users list',
             onTap: () {
-              Navigator.pushNamed(context, '/blocked_users');
+              unawaited(Navigator.pushNamed(context, '/blocked_users'));
             },
           ),
         ],
@@ -431,139 +427,145 @@ class _SafetyCenterScreenState extends State<SafetyCenterScreen> {
       );
 
   void _showReportDialog() {
-    showDialog(
-      context: context,
-      builder: (context) => AlertDialog(
-        backgroundColor: cardColor,
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
-        elevation: 8,
-        contentPadding: const EdgeInsets.all(24),
-        title: Column(
-          children: [
-            Container(
-              width: 60,
-              height: 60,
-              decoration: BoxDecoration(
-                color: errorColor.withValues(alpha: 0.1),
-                shape: BoxShape.circle,
+    unawaited(
+      showDialog(
+        context: context,
+        builder: (context) => AlertDialog(
+          backgroundColor: cardColor,
+          shape:
+              RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+          elevation: 8,
+          contentPadding: const EdgeInsets.all(24),
+          title: Column(
+            children: [
+              Container(
+                width: 60,
+                height: 60,
+                decoration: BoxDecoration(
+                  color: errorColor.withValues(alpha: 0.1),
+                  shape: BoxShape.circle,
+                ),
+                child: const Icon(Icons.report, color: errorColor, size: 30),
               ),
-              child: const Icon(Icons.report, color: errorColor, size: 30),
+              const SizedBox(height: 16),
+              Text(
+                'Report User',
+                style: GoogleFonts.montserrat(
+                  fontWeight: FontWeight.bold,
+                  fontSize: 20,
+                  color: textPrimary,
+                ),
+                textAlign: TextAlign.center,
+              ),
+            ],
+          ),
+          content: Text(
+            'To report a specific user, go to their profile and tap the report button. This will help us take appropriate action.',
+            style: GoogleFonts.montserrat(
+              color: textSecondary,
+              fontSize: 16,
+              height: 1.5,
             ),
-            const SizedBox(height: 16),
-            Text(
-              'Report User',
-              style: GoogleFonts.montserrat(
-                fontWeight: FontWeight.bold,
-                fontSize: 20,
-                color: textPrimary,
+            textAlign: TextAlign.center,
+          ),
+          actions: [
+            SizedBox(
+              width: double.infinity,
+              child: ElevatedButton(
+                onPressed: () => Navigator.pop(context),
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: primaryColor,
+                  foregroundColor: Colors.white,
+                  padding: const EdgeInsets.symmetric(vertical: 12),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                  elevation: 0,
+                ),
+                child: Text(
+                  'Got it',
+                  style: GoogleFonts.montserrat(
+                    fontWeight: FontWeight.w600,
+                    fontSize: 16,
+                  ),
+                ),
               ),
-              textAlign: TextAlign.center,
             ),
           ],
+          actionsPadding: const EdgeInsets.fromLTRB(24, 0, 24, 24),
         ),
-        content: Text(
-          'To report a specific user, go to their profile and tap the report button. This will help us take appropriate action.',
-          style: GoogleFonts.montserrat(
-            color: textSecondary,
-            fontSize: 16,
-            height: 1.5,
-          ),
-          textAlign: TextAlign.center,
-        ),
-        actions: [
-          SizedBox(
-            width: double.infinity,
-            child: ElevatedButton(
-              onPressed: () => Navigator.pop(context),
-              style: ElevatedButton.styleFrom(
-                backgroundColor: primaryColor,
-                foregroundColor: Colors.white,
-                padding: const EdgeInsets.symmetric(vertical: 12),
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(12),
-                ),
-                elevation: 0,
-              ),
-              child: Text(
-                'Got it',
-                style: GoogleFonts.montserrat(
-                  fontWeight: FontWeight.w600,
-                  fontSize: 16,
-                ),
-              ),
-            ),
-          ),
-        ],
-        actionsPadding: const EdgeInsets.fromLTRB(24, 0, 24, 24),
       ),
     );
   }
 
   void _showBlockDialog() {
-    showDialog(
-      context: context,
-      builder: (context) => AlertDialog(
-        backgroundColor: cardColor,
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
-        elevation: 8,
-        contentPadding: const EdgeInsets.all(24),
-        title: Column(
-          children: [
-            Container(
-              width: 60,
-              height: 60,
-              decoration: BoxDecoration(
-                color: warningColor.withValues(alpha: 0.1),
-                shape: BoxShape.circle,
+    unawaited(
+      showDialog(
+        context: context,
+        builder: (context) => AlertDialog(
+          backgroundColor: cardColor,
+          shape:
+              RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+          elevation: 8,
+          contentPadding: const EdgeInsets.all(24),
+          title: Column(
+            children: [
+              Container(
+                width: 60,
+                height: 60,
+                decoration: BoxDecoration(
+                  color: warningColor.withValues(alpha: 0.1),
+                  shape: BoxShape.circle,
+                ),
+                child: const Icon(Icons.block, color: warningColor, size: 30),
               ),
-              child: const Icon(Icons.block, color: warningColor, size: 30),
+              const SizedBox(height: 16),
+              Text(
+                'Block User',
+                style: GoogleFonts.montserrat(
+                  fontWeight: FontWeight.bold,
+                  fontSize: 20,
+                  color: textPrimary,
+                ),
+                textAlign: TextAlign.center,
+              ),
+            ],
+          ),
+          content: Text(
+            'To block a specific user, go to their profile and tap the block button. You can manage blocked users in your settings.',
+            style: GoogleFonts.montserrat(
+              color: textSecondary,
+              fontSize: 16,
+              height: 1.5,
             ),
-            const SizedBox(height: 16),
-            Text(
-              'Block User',
-              style: GoogleFonts.montserrat(
-                fontWeight: FontWeight.bold,
-                fontSize: 20,
-                color: textPrimary,
+            textAlign: TextAlign.center,
+          ),
+          actions: [
+            SizedBox(
+              width: double.infinity,
+              child: ElevatedButton(
+                onPressed: () => Navigator.pop(context),
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: primaryColor,
+                  foregroundColor: Colors.white,
+                  padding: const EdgeInsets.symmetric(vertical: 12),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                  elevation: 0,
+                ),
+                child: Text(
+                  'Got it',
+                  style: GoogleFonts.montserrat(
+                    fontWeight: FontWeight.w600,
+                    fontSize: 16,
+                  ),
+                ),
               ),
-              textAlign: TextAlign.center,
             ),
           ],
+          actionsPadding: const EdgeInsets.fromLTRB(24, 0, 24, 24),
         ),
-        content: Text(
-          'To block a specific user, go to their profile and tap the block button. You can manage blocked users in your settings.',
-          style: GoogleFonts.montserrat(
-            color: textSecondary,
-            fontSize: 16,
-            height: 1.5,
-          ),
-          textAlign: TextAlign.center,
-        ),
-        actions: [
-          SizedBox(
-            width: double.infinity,
-            child: ElevatedButton(
-              onPressed: () => Navigator.pop(context),
-              style: ElevatedButton.styleFrom(
-                backgroundColor: primaryColor,
-                foregroundColor: Colors.white,
-                padding: const EdgeInsets.symmetric(vertical: 12),
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(12),
-                ),
-                elevation: 0,
-              ),
-              child: Text(
-                'Got it',
-                style: GoogleFonts.montserrat(
-                  fontWeight: FontWeight.w600,
-                  fontSize: 16,
-                ),
-              ),
-            ),
-          ),
-        ],
-        actionsPadding: const EdgeInsets.fromLTRB(24, 0, 24, 24),
       ),
     );
   }

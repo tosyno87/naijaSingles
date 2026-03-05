@@ -93,7 +93,7 @@ class GroupChatService {
 
       log('✅ Group chat created successfully: $groupId');
       return group;
-    } catch (e) {
+    } on Object catch (e) {
       log('❌ Error creating group chat: $e');
       rethrow;
     }
@@ -126,7 +126,7 @@ class GroupChatService {
       await _notifyGroupMembers(groupId, 'A new member joined the group');
 
       log('✅ Successfully joined group: $groupId');
-    } catch (e) {
+    } on Object catch (e) {
       log('❌ Error joining group: $e');
       rethrow;
     }
@@ -160,7 +160,7 @@ class GroupChatService {
       );
 
       log('✅ Successfully left group: $groupId');
-    } catch (e) {
+    } on Object catch (e) {
       log('❌ Error leaving group: $e');
       rethrow;
     }
@@ -210,7 +210,7 @@ class GroupChatService {
       await _notifyGroupMembers(groupId, 'You were invited to join a group');
 
       log('✅ Successfully invited users to group: $groupId');
-    } catch (e) {
+    } on Object catch (e) {
       log('❌ Error inviting users to group: $e');
       rethrow;
     }
@@ -256,7 +256,7 @@ class GroupChatService {
       );
 
       log('✅ Successfully removed user from group: $groupId');
-    } catch (e) {
+    } on Object catch (e) {
       log('❌ Error removing user from group: $e');
       rethrow;
     }
@@ -300,7 +300,7 @@ class GroupChatService {
       );
 
       log('✅ Successfully promoted user to admin: $groupId');
-    } catch (e) {
+    } on Object catch (e) {
       log('❌ Error promoting user to admin: $e');
       rethrow;
     }
@@ -387,7 +387,7 @@ class GroupChatService {
 
       log('✅ Group message sent successfully: ${docRef.id}');
       return message;
-    } catch (e) {
+    } on Object catch (e) {
       log('❌ Error sending group message: $e');
       rethrow;
     }
@@ -454,7 +454,7 @@ class GroupChatService {
         'updatedAt': data['updatedAt'],
         'lastActivityAt': data['lastActivityAt'],
       });
-    } catch (e) {
+    } on Object catch (e) {
       log('❌ Error getting group details: $e');
       return null;
     }
@@ -503,7 +503,7 @@ class GroupChatService {
       }
 
       log('✅ Group settings updated successfully: $groupId');
-    } catch (e) {
+    } on Object catch (e) {
       log('❌ Error updating group settings: $e');
       rethrow;
     }
@@ -541,7 +541,7 @@ class GroupChatService {
       });
 
       log('✅ Group deleted successfully: $groupId');
-    } catch (e) {
+    } on Object catch (e) {
       log('❌ Error deleting group: $e');
       rethrow;
     }
@@ -574,7 +574,7 @@ class GroupChatService {
           .doc(groupId)
           .collection('messages')
           .add(messageData);
-    } catch (e) {
+    } on Object catch (e) {
       log('❌ Error sending group message: $e');
     }
   }
@@ -608,7 +608,7 @@ class GroupChatService {
           });
         }
       }
-    } catch (e) {
+    } on Object catch (e) {
       log('❌ Error notifying group members: $e');
     }
   }

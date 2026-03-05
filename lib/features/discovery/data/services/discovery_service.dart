@@ -45,13 +45,14 @@ class DiscoveryService {
     bool forceRefresh = false,
   }) async {
     try {
+      final userId = currentUser.id;
+      if (userId == null) return [];
+
       debugPrint('🔍 Starting user discovery for: ${currentUser.name}');
-      debugPrint('🔍 Current user ID: ${currentUser.id}');
+      debugPrint('🔍 Current user ID: $userId');
       debugPrint('🔍 Intent filter: $intentFilter');
 
-      // Check if current user has been migrated to privacy system
-      final isMigrated =
-          await _migrationService.isUserMigrated(currentUser.id!);
+      final isMigrated = await _migrationService.isUserMigrated(userId);
       debugPrint('🔍 User migration status: $isMigrated');
 
       if (isMigrated) {
@@ -73,7 +74,25 @@ class DiscoveryService {
           forceRefresh: forceRefresh,
         );
       }
-    } catch (e) {
+    } on FirebaseException catch (e) {
+      debugPrint(
+        '❌ Firebase error in getUsersForDiscovery: ${e.code} - ${e.message}',
+      );
+      debugPrint('❌ Stack trace: ${StackTrace.current}');
+
+      // Fallback to unified method if privacy-aware fails
+      try {
+        debugPrint('🔄 Falling back to unified discovery');
+        return await _getUsersForDiscoveryUnified(
+          currentUser,
+          intentFilter: intentFilter,
+          forceRefresh: forceRefresh,
+        );
+      } on Object catch (fallbackError) {
+        debugPrint('❌ Fallback also failed: $fallbackError');
+        return [];
+      }
+    } on Object catch (e) {
       debugPrint('❌ Error in getUsersForDiscovery: $e');
       debugPrint('❌ Stack trace: ${StackTrace.current}');
 
@@ -85,7 +104,7 @@ class DiscoveryService {
           intentFilter: intentFilter,
           forceRefresh: forceRefresh,
         );
-      } catch (fallbackError) {
+      } on Object catch (fallbackError) {
         debugPrint('❌ Fallback also failed: $fallbackError');
         return [];
       }
@@ -98,11 +117,12 @@ class DiscoveryService {
     double radiusMiles,
   ) async {
     try {
+      final userId = currentUser.id;
+      if (userId == null) return [];
+
       debugPrint('🗺️ Getting nearby users within $radiusMiles miles');
 
-      // Check if privacy system is available
-      final isMigrated =
-          await _migrationService.isUserMigrated(currentUser.id!);
+      final isMigrated = await _migrationService.isUserMigrated(userId);
 
       if (isMigrated) {
         debugPrint('🔒 Using privacy-aware nearby search');
@@ -121,8 +141,13 @@ class DiscoveryService {
             )
             .toList();
       }
-    } catch (e) {
-      debugPrint('❌ Error in getNearbyUsers: $e');
+    } on FirebaseException catch (e) {
+      debugPrint(
+        '❌ Firebase error in getNearbyUsers: ${e.code} - ${e.message}',
+      );
+      return [];
+    } on Object catch (e) {
+      debugPrint('❌ Unexpected error in getNearbyUsers: $e');
       return [];
     }
   }
@@ -130,11 +155,12 @@ class DiscoveryService {
   /// Get matches (privacy-aware)
   static Future<List<UserModel>> getMatches(UserModel currentUser) async {
     try {
+      final userId = currentUser.id;
+      if (userId == null) return [];
+
       debugPrint('💕 Getting matches for: ${currentUser.name}');
 
-      // Check if privacy system is available
-      final isMigrated =
-          await _migrationService.isUserMigrated(currentUser.id!);
+      final isMigrated = await _migrationService.isUserMigrated(userId);
 
       if (isMigrated) {
         debugPrint('🔒 Using privacy-aware matches');
@@ -146,8 +172,13 @@ class DiscoveryService {
         // Fallback: Load matches from user's Matches subcollection
         return await _getTraditionalMatches(currentUser);
       }
-    } catch (e) {
-      debugPrint('❌ Error in getMatches: $e');
+    } on FirebaseException catch (e) {
+      debugPrint(
+        '❌ Firebase error in getMatches: ${e.code} - ${e.message}',
+      );
+      return [];
+    } on Object catch (e) {
+      debugPrint('❌ Unexpected error in getMatches: $e');
       return [];
     }
   }
@@ -172,14 +203,24 @@ class DiscoveryService {
             final user = UserModel.fromDocument(userDoc);
             matchesList.add(user);
           }
-        } catch (e) {
+        } on FirebaseException catch (e) {
+          debugPrint(
+            '⚠️ Firebase error loading traditional match ${doc.id}: ${e.code} - ${e.message}',
+          );
+          continue;
+        } on Object catch (e) {
           debugPrint('⚠️ Error loading traditional match ${doc.id}: $e');
           continue;
         }
       }
       return matchesList;
-    } catch (e) {
-      debugPrint('❌ Error in _getTraditionalMatches: $e');
+    } on FirebaseException catch (e) {
+      debugPrint(
+        '❌ Firebase error in _getTraditionalMatches: ${e.code} - ${e.message}',
+      );
+      return [];
+    } on Object catch (e) {
+      debugPrint('❌ Unexpected error in _getTraditionalMatches: $e');
       return [];
     }
   }
@@ -189,8 +230,13 @@ class DiscoveryService {
     try {
       final isMigrated = await _migrationService.isUserMigrated(userId);
       return !isMigrated;
-    } catch (e) {
-      debugPrint('❌ Error checking migration status: $e');
+    } on FirebaseException catch (e) {
+      debugPrint(
+        '❌ Firebase error checking migration status: ${e.code} - ${e.message}',
+      );
+      return false;
+    } on Object catch (e) {
+      debugPrint('❌ Unexpected error checking migration status: $e');
       return false;
     }
   }
@@ -200,8 +246,16 @@ class DiscoveryService {
     UserModel currentUser,
   ) async {
     try {
-      final isMigrated =
-          await _migrationService.isUserMigrated(currentUser.id!);
+      final userId = currentUser.id;
+      if (userId == null) {
+        return {
+          'isMigrated': false,
+          'swipedToday': 0,
+          'privacyEnabled': false,
+          'discoveryMethod': 'unified',
+        };
+      }
+      final isMigrated = await _migrationService.isUserMigrated(userId);
       final swipedCount = isMigrated
           ? await PrivacyAwareUserSearchRepo.getSwipedCount(currentUser)
           : await UserSearchRepo.getSwipedCount(currentUser);
@@ -212,8 +266,18 @@ class DiscoveryService {
         'privacyEnabled': isMigrated,
         'discoveryMethod': isMigrated ? 'privacy-aware' : 'unified',
       };
-    } catch (e) {
-      debugPrint('❌ Error getting discovery stats: $e');
+    } on FirebaseException catch (e) {
+      debugPrint(
+        '❌ Firebase error getting discovery stats: ${e.code} - ${e.message}',
+      );
+      return {
+        'isMigrated': false,
+        'swipedToday': 0,
+        'privacyEnabled': false,
+        'discoveryMethod': 'unified',
+      };
+    } on Object catch (e) {
+      debugPrint('❌ Unexpected error getting discovery stats: $e');
       return {
         'isMigrated': false,
         'swipedToday': 0,
@@ -238,8 +302,13 @@ class DiscoveryService {
         debugPrint('❌ Migration failed');
         return false;
       }
-    } catch (e) {
-      debugPrint('❌ Error in migrateAndRefreshDiscovery: $e');
+    } on FirebaseException catch (e) {
+      debugPrint(
+        '❌ Firebase error in migrateAndRefreshDiscovery: ${e.code} - ${e.message}',
+      );
+      return false;
+    } on Object catch (e) {
+      debugPrint('❌ Unexpected error in migrateAndRefreshDiscovery: $e');
       return false;
     }
   }
@@ -248,8 +317,13 @@ class DiscoveryService {
   static Future<bool> isUserDataFiltered(String userId) async {
     try {
       return await _migrationService.isUserMigrated(userId);
-    } catch (e) {
-      debugPrint('❌ Error checking if user data is filtered: $e');
+    } on FirebaseException catch (e) {
+      debugPrint(
+        '❌ Firebase error checking if user data is filtered: ${e.code} - ${e.message}',
+      );
+      return false;
+    } on Object catch (e) {
+      debugPrint('❌ Unexpected error checking if user data is filtered: $e');
       return false;
     }
   }
@@ -273,8 +347,13 @@ class DiscoveryService {
       }
 
       return null;
-    } catch (e) {
-      debugPrint('❌ Error getting privacy-aware user data: $e');
+    } on FirebaseException catch (e) {
+      debugPrint(
+        '❌ Firebase error getting privacy-aware user data: ${e.code} - ${e.message}',
+      );
+      return null;
+    } on Object catch (e) {
+      debugPrint('❌ Unexpected error getting privacy-aware user data: $e');
       return null;
     }
   }
@@ -298,17 +377,18 @@ class DiscoveryService {
       debugPrint(
         '   - Age range: ${currentUser.ageRangeMin}-${currentUser.ageRangeMax}',
       );
+      final maxDist = currentUser.maxDistance ?? 100;
       debugPrint(
-        '   - Max distance: ${(currentUser.maxDistance! * 0.621371).round()} miles',
+        '   - Max distance: ${(maxDist * 0.621371).round()} miles',
       );
 
-      // Get already checked users
-      final checkedUserIds = await _getCheckedUserIds(currentUser.id!);
+      final userId = currentUser.id;
+      if (userId == null) return [];
+      final checkedUserIds = await _getCheckedUserIds(userId);
       debugPrint('   - Already checked: ${checkedUserIds.length} users');
 
       // Resolve the effective mode from the user's onboarding intent.
-      final effectiveMode =
-          intentFilter ?? currentUser.lookingFor ?? 'Dating';
+      final effectiveMode = intentFilter ?? currentUser.lookingFor ?? 'Dating';
 
       // Build optimized query with mode-specific filtering
       Query query = _buildOptimizedQuery(currentUser, intentFilter);
@@ -342,7 +422,8 @@ class DiscoveryService {
             user,
             effectiveMode,
           )) {
-            debugPrint('⚠️ User $userId does not match $effectiveMode criteria');
+            debugPrint(
+                '⚠️ User $userId does not match $effectiveMode criteria');
             continue;
           }
 
@@ -352,20 +433,20 @@ class DiscoveryService {
           }
 
           // Calculate distance if both users have coordinates
-          if (user.latitude != null &&
-              user.longitude != null &&
-              currentUser.latitude != null &&
-              currentUser.longitude != null) {
+          final uLat = user.latitude;
+          final uLng = user.longitude;
+          final cLat = currentUser.latitude;
+          final cLng = currentUser.longitude;
+          if (uLat != null && uLng != null && cLat != null && cLng != null) {
             final calculatedDistance = distance.calculateDistance(
-              currentUser.latitude!,
-              currentUser.longitude!,
-              user.latitude!,
-              user.longitude!,
+              cLat,
+              cLng,
+              uLat,
+              uLng,
             );
             user.distanceBW = calculatedDistance.round();
 
-            // Apply distance filter
-            if (calculatedDistance > (currentUser.maxDistance ?? 100)) {
+            if (calculatedDistance > maxDist) {
               continue;
             }
           }
@@ -374,7 +455,12 @@ class DiscoveryService {
             '✅ Adding user: ${user.name} (${user.distanceBW ?? 'unknown'} miles away)',
           );
           userList.add(user);
-        } catch (e) {
+        } on FirebaseException catch (e) {
+          debugPrint(
+            '⚠️ Firebase error processing user ${doc.id}: ${e.code} - ${e.message}',
+          );
+          continue;
+        } on Object catch (e) {
           debugPrint('⚠️ Error processing user ${doc.id}: $e');
           continue;
         }
@@ -388,8 +474,13 @@ class DiscoveryService {
 
       debugPrint('🎯 Final result: ${userList.length} discoverable users');
       return userList;
-    } catch (e) {
-      debugPrint('❌ Error in UnifiedDiscoveryService: $e');
+    } on FirebaseException catch (e) {
+      debugPrint(
+        '❌ Firebase error in UnifiedDiscoveryService: ${e.code} - ${e.message}',
+      );
+      return [];
+    } on Object catch (e) {
+      debugPrint('❌ Unexpected error in UnifiedDiscoveryService: $e');
       return [];
     }
   }
@@ -404,7 +495,8 @@ class DiscoveryService {
         DiscoveryFiltering.normalizeGender(currentUser.showGender);
     if (DiscoveryFiltering.isEveryonePreference(normalizedPreference)) {
       debugPrint(
-          '🔍 Gender preference is everyone - skipping gender query filter');
+        '🔍 Gender preference is everyone - skipping gender query filter',
+      );
     } else {
       debugPrint(
         '🔍 Applying gender filter in-memory for compatibility: $normalizedPreference',
@@ -457,8 +549,13 @@ class DiscoveryService {
       }
 
       return checkedIds;
-    } catch (e) {
-      debugPrint('Error getting checked users: $e');
+    } on FirebaseException catch (e) {
+      debugPrint(
+        'Firebase error getting checked users: ${e.code} - ${e.message}',
+      );
+      return [];
+    } on Object catch (e) {
+      debugPrint('Unexpected error getting checked users: $e');
       return [];
     }
   }
@@ -485,12 +582,11 @@ class DiscoveryService {
     }
 
     // Skip users without complete profiles
-    if (user.name == null || user.name!.isEmpty) {
+    if (user.name?.isEmpty ?? true) {
       return false;
     }
 
-    // Skip users without photos
-    if (user.imageUrl == null || user.imageUrl!.isEmpty) {
+    if (user.imageUrl?.isEmpty ?? true) {
       return false;
     }
 
@@ -526,9 +622,8 @@ class DiscoveryService {
 
         // Keep only users that passed intent/mode filtering, in the
         // smart-match compatibility order.
-        final intersected = result.users
-            .where((u) => filteredIds.contains(u.id))
-            .toList();
+        final intersected =
+            result.users.where((u) => filteredIds.contains(u.id)).toList();
 
         // Append any filtered users that the cache missed so no results
         // are silently dropped.
@@ -548,8 +643,13 @@ class DiscoveryService {
         debugPrint('⚠️ Smart matching returned empty, keeping original list');
         return userList;
       }
-    } catch (e) {
-      debugPrint('❌ Error in smart matching: $e');
+    } on FirebaseException catch (e) {
+      debugPrint(
+        '❌ Firebase error in smart matching: ${e.code} - ${e.message}',
+      );
+      return userList;
+    } on Object catch (e) {
+      debugPrint('❌ Unexpected error in smart matching: $e');
       return userList;
     }
   }
@@ -561,22 +661,24 @@ class DiscoveryService {
   /// Get real-time stream of users for discovery
   static Stream<List<UserModel>> getUsersStream(UserModel currentUser) {
     try {
+      final userId = currentUser.id;
+      if (userId == null) return Stream.value([]);
+
       debugPrint(
         '🔍 Starting real-time discovery stream for ${currentUser.name}',
       );
 
-      // Build query with basic filters
       final Query query = _firestore
           .collection('users')
-          .where('id', isNotEqualTo: currentUser.id) // Exclude current user
-          .limit(20); // Limit for performance
+          .where('id', isNotEqualTo: userId)
+          .limit(20);
 
       return query.snapshots().asyncMap((snapshot) async {
         debugPrint('📡 Real-time stream update: ${snapshot.docs.length} users');
 
         final List<UserModel> users = [];
         final List<String> checkedUserIds =
-            await _getCheckedUserIds(currentUser.id!);
+            await _getCheckedUserIds(userId);
 
         for (var doc in snapshot.docs) {
           try {
@@ -592,39 +694,49 @@ class DiscoveryService {
             final user = UserModel.fromDocument(doc);
 
             if (!DiscoveryFiltering.matchesGenderPreference(
-                user, currentUser)) {
+              user,
+              currentUser,
+            )) {
               continue;
             }
 
-            // Calculate distance if coordinates available
-            if (user.latitude != null &&
-                user.longitude != null &&
-                currentUser.latitude != null &&
-                currentUser.longitude != null) {
-              user.distanceBW = distance
-                  .calculateDistance(
-                    currentUser.latitude!,
-                    currentUser.longitude!,
-                    user.latitude!,
-                    user.longitude!,
-                  )
-                  .round();
+            {
+              final uLat = user.latitude;
+              final uLng = user.longitude;
+              final cLat = currentUser.latitude;
+              final cLng = currentUser.longitude;
+              if (uLat != null && uLng != null && cLat != null && cLng != null) {
+                user.distanceBW = distance
+                    .calculateDistance(cLat, cLng, uLat, uLng)
+                    .round();
+              }
             }
 
-            // Apply age filter
-            if (user.age != null && currentUser.ageRange != null) {
-              final minAge = currentUser.ageRange!['min'] ?? 18;
-              final maxAge = currentUser.ageRange!['max'] ?? 100;
-              if (user.age! < minAge || user.age! > maxAge) continue;
+            {
+              final ageRange = currentUser.ageRange;
+              final userAge = user.age;
+              if (userAge != null && ageRange != null) {
+                final minAge = ageRange['min'] ?? 18;
+                final maxAge = ageRange['max'] ?? 100;
+                if (userAge < minAge || userAge > maxAge) continue;
+              }
             }
 
-            // Apply distance filter
-            if (user.distanceBW != null && currentUser.maxDistance != null) {
-              if (user.distanceBW! > currentUser.maxDistance!) continue;
+            {
+              final dist = user.distanceBW;
+              final maxDist = currentUser.maxDistance;
+              if (dist != null && maxDist != null) {
+                if (dist > maxDist) continue;
+              }
             }
 
             users.add(user);
-          } catch (e) {
+          } on FirebaseException catch (e) {
+            debugPrint(
+              '⚠️ Firebase error processing user ${doc.id}: ${e.code} - ${e.message}',
+            );
+            continue;
+          } on Object catch (e) {
             debugPrint('⚠️ Error processing user ${doc.id}: $e');
             continue;
           }
@@ -633,8 +745,13 @@ class DiscoveryService {
         debugPrint('✅ Real-time stream processed: ${users.length} valid users');
         return users;
       });
-    } catch (e) {
-      debugPrint('❌ Error creating real-time stream: $e');
+    } on FirebaseException catch (e) {
+      debugPrint(
+        '❌ Firebase error creating real-time stream: ${e.code} - ${e.message}',
+      );
+      return Stream.value([]);
+    } on Object catch (e) {
+      debugPrint('❌ Unexpected error creating real-time stream: $e');
       return Stream.value([]);
     }
   }
@@ -646,17 +763,19 @@ class DiscoveryService {
     DocumentSnapshot? lastDocument,
   }) {
     try {
+      final userId = currentUser.id;
+      if (userId == null) return Stream.value([]);
+
       debugPrint(
         '📄 Starting paginated real-time stream (page size: $pageSize)',
       );
 
       Query query = _firestore
           .collection('users')
-          .where('id', isNotEqualTo: currentUser.id)
+          .where('id', isNotEqualTo: userId)
           .orderBy('lastvisited', descending: true)
           .limit(pageSize);
 
-      // Add pagination if last document provided
       if (lastDocument != null) {
         query = query.startAfterDocument(lastDocument);
       }
@@ -666,7 +785,7 @@ class DiscoveryService {
 
         final List<UserModel> users = [];
         final List<String> checkedUserIds =
-            await _getCheckedUserIds(currentUser.id!);
+            await _getCheckedUserIds(userId);
 
         for (var doc in snapshot.docs) {
           try {
@@ -678,38 +797,49 @@ class DiscoveryService {
             final user = UserModel.fromDocument(doc);
 
             if (!DiscoveryFiltering.matchesGenderPreference(
-                user, currentUser)) {
+              user,
+              currentUser,
+            )) {
               continue;
             }
 
-            // Calculate distance
-            if (user.latitude != null &&
-                user.longitude != null &&
-                currentUser.latitude != null &&
-                currentUser.longitude != null) {
-              user.distanceBW = distance
-                  .calculateDistance(
-                    currentUser.latitude!,
-                    currentUser.longitude!,
-                    user.latitude!,
-                    user.longitude!,
-                  )
-                  .round();
+            {
+              final uLat = user.latitude;
+              final uLng = user.longitude;
+              final cLat = currentUser.latitude;
+              final cLng = currentUser.longitude;
+              if (uLat != null && uLng != null && cLat != null && cLng != null) {
+                user.distanceBW = distance
+                    .calculateDistance(cLat, cLng, uLat, uLng)
+                    .round();
+              }
             }
 
-            // Apply filters
-            if (user.age != null && currentUser.ageRange != null) {
-              final minAge = currentUser.ageRange!['min'] ?? 18;
-              final maxAge = currentUser.ageRange!['max'] ?? 100;
-              if (user.age! < minAge || user.age! > maxAge) continue;
+            {
+              final ageRange = currentUser.ageRange;
+              final userAge = user.age;
+              if (userAge != null && ageRange != null) {
+                final minAge = ageRange['min'] ?? 18;
+                final maxAge = ageRange['max'] ?? 100;
+                if (userAge < minAge || userAge > maxAge) continue;
+              }
             }
 
-            if (user.distanceBW != null && currentUser.maxDistance != null) {
-              if (user.distanceBW! > currentUser.maxDistance!) continue;
+            {
+              final dist = user.distanceBW;
+              final maxDist = currentUser.maxDistance;
+              if (dist != null && maxDist != null) {
+                if (dist > maxDist) continue;
+              }
             }
 
             users.add(user);
-          } catch (e) {
+          } on FirebaseException catch (e) {
+            debugPrint(
+              '⚠️ Firebase error processing paginated user ${doc.id}: ${e.code} - ${e.message}',
+            );
+            continue;
+          } on Object catch (e) {
             debugPrint('⚠️ Error processing paginated user ${doc.id}: $e');
             continue;
           }
@@ -718,8 +848,13 @@ class DiscoveryService {
         debugPrint('✅ Paginated stream processed: ${users.length} valid users');
         return users;
       });
-    } catch (e) {
-      debugPrint('❌ Error creating paginated stream: $e');
+    } on FirebaseException catch (e) {
+      debugPrint(
+        '❌ Firebase error creating paginated stream: ${e.code} - ${e.message}',
+      );
+      return Stream.value([]);
+    } on Object catch (e) {
+      debugPrint('❌ Unexpected error creating paginated stream: $e');
       return Stream.value([]);
     }
   }
@@ -730,21 +865,22 @@ class DiscoveryService {
     double radiusMiles,
   ) {
     try {
+      final userId = currentUser.id;
+      if (userId == null) return Stream.value([]);
+
       debugPrint('🗺️ Starting nearby users stream (radius: ${radiusMiles}mi)');
 
-      // For nearby users, we need to get all users and filter by distance
-      // This is less efficient but necessary for geolocation queries
       final Query query = _firestore
           .collection('users')
-          .where('id', isNotEqualTo: currentUser.id)
-          .limit(50); // Limit for performance
+          .where('id', isNotEqualTo: userId)
+          .limit(50);
 
       return query.snapshots().asyncMap((snapshot) async {
         debugPrint('📡 Nearby stream update: ${snapshot.docs.length} users');
 
         final List<UserModel> users = [];
         final List<String> checkedUserIds =
-            await _getCheckedUserIds(currentUser.id!);
+            await _getCheckedUserIds(userId);
 
         for (var doc in snapshot.docs) {
           try {
@@ -756,29 +892,35 @@ class DiscoveryService {
             final user = UserModel.fromDocument(doc);
 
             if (!DiscoveryFiltering.matchesGenderPreference(
-                user, currentUser)) {
+              user,
+              currentUser,
+            )) {
               continue;
             }
 
-            // Calculate distance
-            if (user.latitude != null &&
-                user.longitude != null &&
-                currentUser.latitude != null &&
-                currentUser.longitude != null) {
+            final uLat = user.latitude;
+            final uLng = user.longitude;
+            final cLat = currentUser.latitude;
+            final cLng = currentUser.longitude;
+            if (uLat != null && uLng != null && cLat != null && cLng != null) {
               final distanceMiles = distance.calculateDistance(
-                currentUser.latitude!,
-                currentUser.longitude!,
-                user.latitude!,
-                user.longitude!,
+                cLat,
+                cLng,
+                uLat,
+                uLng,
               );
 
-              // Filter by radius
               if (distanceMiles <= radiusMiles) {
                 user.distanceBW = distanceMiles.round();
                 users.add(user);
               }
             }
-          } catch (e) {
+          } on FirebaseException catch (e) {
+            debugPrint(
+              '⚠️ Firebase error processing nearby user ${doc.id}: ${e.code} - ${e.message}',
+            );
+            continue;
+          } on Object catch (e) {
             debugPrint('⚠️ Error processing nearby user ${doc.id}: $e');
             continue;
           }
@@ -789,8 +931,13 @@ class DiscoveryService {
         );
         return users;
       });
-    } catch (e) {
-      debugPrint('❌ Error creating nearby stream: $e');
+    } on FirebaseException catch (e) {
+      debugPrint(
+        '❌ Firebase error creating nearby stream: ${e.code} - ${e.message}',
+      );
+      return Stream.value([]);
+    } on Object catch (e) {
+      debugPrint('❌ Unexpected error creating nearby stream: $e');
       return Stream.value([]);
     }
   }
@@ -813,8 +960,17 @@ class DiscoveryService {
           'lastUpdated': DateTime.now().toIso8601String(),
         };
       });
-    } catch (e) {
-      debugPrint('❌ Error creating stats stream: $e');
+    } on FirebaseException catch (e) {
+      debugPrint(
+        '❌ Firebase error creating stats stream: ${e.code} - ${e.message}',
+      );
+      return Stream.value({
+        'swipedToday': 0,
+        'discoveryMethod': 'real-time',
+        'lastUpdated': DateTime.now().toIso8601String(),
+      });
+    } on Object catch (e) {
+      debugPrint('❌ Unexpected error creating stats stream: $e');
       return Stream.value({
         'swipedToday': 0,
         'discoveryMethod': 'real-time',

@@ -106,7 +106,7 @@ class _UpdateAddressWidgetState extends State<UpdateAddressWidget> {
                               );
                         }
                       } else {
-                        showSubscriptionDialog(
+                        await showSubscriptionDialog(
                           context: context,
                           currentUser: widget.currentUser,
                           items: widget.items,
@@ -125,90 +125,93 @@ class _UpdateAddressWidgetState extends State<UpdateAddressWidget> {
       );
 
   void _updateAddress(Map<dynamic, dynamic> address) {
-    showCupertinoModalPopup(
-      context: context,
-      builder: (ctx) {
-        final themeBloc = context.read<ThemeBloc>();
-        final isDarkMode = themeBloc.isDarkMode;
-        return Container(
-          color: Theme.of(context).primaryColor,
-          width: MediaQuery.of(context).size.width,
-          height: MediaQuery.of(context).size.height * .4,
-          child: Column(
-            children: <Widget>[
-              Material(
-                child: ListTile(
-                  title: Padding(
-                    padding: const EdgeInsets.all(8),
-                    child: Text(
-                      'New address:'.tr().toString(),
-                      style: const TextStyle(
-                        color: Colors.black,
-                        fontSize: 18,
-                        fontWeight: FontWeight.w500,
-                        decoration: TextDecoration.none,
-                      ),
-                    ),
-                  ),
-                  trailing: IconButton(
-                    icon: Icon(
-                      Icons.cancel,
-                      color: isDarkMode
-                          ? Colors.white
-                          : Colors.black26,
-                    ),
-                    onPressed: () => Navigator.pop(context),
-                  ),
-                  subtitle: Card(
-                    child: Padding(
+    unawaited(
+      showCupertinoModalPopup(
+        context: context,
+        builder: (ctx) {
+          final themeBloc = context.read<ThemeBloc>();
+          final isDarkMode = themeBloc.isDarkMode;
+          return Container(
+            color: Theme.of(context).primaryColor,
+            width: MediaQuery.of(context).size.width,
+            height: MediaQuery.of(context).size.height * .4,
+            child: Column(
+              children: <Widget>[
+                Material(
+                  child: ListTile(
+                    title: Padding(
                       padding: const EdgeInsets.all(8),
                       child: Text(
-                        address['address'] ?? '',
-                        style: TextStyle(
-                          color: isDarkMode
-                              ? Colors.white
-                              : Colors.black,
-                          fontSize: 16,
-                          fontWeight: FontWeight.w300,
+                        'New address:'.tr().toString(),
+                        style: const TextStyle(
+                          color: Colors.black,
+                          fontSize: 18,
+                          fontWeight: FontWeight.w500,
                           decoration: TextDecoration.none,
+                        ),
+                      ),
+                    ),
+                    trailing: IconButton(
+                      icon: Icon(
+                        Icons.cancel,
+                        color: isDarkMode ? Colors.white : Colors.black26,
+                      ),
+                      onPressed: () => Navigator.pop(context),
+                    ),
+                    subtitle: Card(
+                      child: Padding(
+                        padding: const EdgeInsets.all(8),
+                        child: Text(
+                          address['address'] ?? '',
+                          style: TextStyle(
+                            color: isDarkMode ? Colors.white : Colors.black,
+                            fontSize: 16,
+                            fontWeight: FontWeight.w300,
+                            decoration: TextDecoration.none,
+                          ),
                         ),
                       ),
                     ),
                   ),
                 ),
-              ),
-              ElevatedButton(
-                style: ButtonStyle(
-                  backgroundColor: WidgetStateProperty.all<Color>(AppColors.primaryGreen),
-                ),
-                child: Text(
-                  'Confirm'.tr().toString(),
-                  style: const TextStyle(color: Colors.white),
-                ),
-                onPressed: () async {
-                  Navigator.pop(context);
-                  await firebaseFireStoreInstance
-                      .collection('users')
-                      .doc('${widget.currentUser.id}')
-                      .update({
-                        'location': {
-                          'latitude': address['position']['coordinates'][1],
-                          'longitude': address['position']['coordinates'][0],
-                          'address': address['address'],
-                        },
-                      })
-                      .whenComplete(
-                        () => showDialog(
+                ElevatedButton(
+                  style: ButtonStyle(
+                    backgroundColor:
+                        WidgetStateProperty.all<Color>(AppColors.primaryGreen),
+                  ),
+                  child: Text(
+                    'Confirm'.tr().toString(),
+                    style: const TextStyle(color: Colors.white),
+                  ),
+                  onPressed: () async {
+                    Navigator.pop(context);
+                    await firebaseFireStoreInstance
+                        .collection('users')
+                        .doc('${widget.currentUser.id}')
+                        .update({
+                      'location': {
+                        'latitude': address['position']['coordinates'][1],
+                        'longitude': address['position']['coordinates'][0],
+                        'address': address['address'],
+                      },
+                    }).whenComplete(() {
+                      if (!mounted) return;
+                      unawaited(
+                        showDialog(
                           barrierDismissible: false,
                           context: context,
                           builder: (_) {
-                            Future.delayed(const Duration(seconds: 3), () {
-                              setState(() {
-                                widget.currentUser.address = address['address'];
-                              });
+                            unawaited(
+                              Future.delayed(const Duration(seconds: 3), () {
+                                if (!mounted) return;
+                                setState(() {
+                                  widget.currentUser.address =
+                                      address['address'];
+                                });
 
-                              Navigator.pop(context);
-                            });
+                                Navigator.pop(context);
+                              }),
+                            );
                             return Center(
                               child: Container(
                                 width: 160,
@@ -222,8 +225,8 @@ class _UpdateAddressWidgetState extends State<UpdateAddressWidget> {
                                     Image.asset(
                                       'asset/auth/verified.jpg',
                                       height: 60,
-color: AppColors.primaryGreen,
-                                    colorBlendMode: BlendMode.color,
+                                      color: AppColors.primaryGreen,
+                                      colorBlendMode: BlendMode.color,
                                     ),
                                     Text(
                                       'location\nchanged'.tr().toString(),
@@ -242,14 +245,21 @@ color: AppColors.primaryGreen,
                             );
                           },
                         ),
-                      )
-                      .catchError(log);
-                },
-              ),
-            ],
-          ),
-        );
-      },
+                      );
+                    }).catchError((Object error, StackTrace stackTrace) {
+                      log(
+                        'Failed to update user location',
+                        error: error,
+                        stackTrace: stackTrace,
+                      );
+                    });
+                  },
+                ),
+              ],
+            ),
+          );
+        },
+      ),
     );
   }
 }

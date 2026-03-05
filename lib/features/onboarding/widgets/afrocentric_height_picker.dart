@@ -319,9 +319,6 @@ class _AfrocentricHeightPickerState extends State<AfrocentricHeightPicker> {
           maxCm - minCm + 1,
           (index) {
             final int cm = minCm + index;
-            final double totalInches = cm / 2.54;
-            final int feet = (totalInches / 12).floor();
-            final int inches = (totalInches % 12).round();
 
             return Center(
               child: Column(

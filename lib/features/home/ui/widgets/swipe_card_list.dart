@@ -1,10 +1,12 @@
+import 'dart:async';
+
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:swipable_stack/swipable_stack.dart';
 
-import '../../../../common/constants/app_colors.dart';
 import '../../../../common/bloc/theme/theme_bloc.dart';
+import '../../../../common/constants/app_colors.dart';
 import '../../../../models/user_model.dart';
 import '../../../home/controllers/home_controller.dart';
 import '../../../match/ui/widget/match_dialog_new.dart';
@@ -35,11 +37,13 @@ class _SwipeCardListState extends State<SwipeCardList> {
     return BlocListener<SwipeBloc, SwipeblocState>(
       listener: (context, swipeState) {
         if (swipeState is SwipeMatchCreatedState) {
-          showDialog(
-            context: context,
-            builder: (ctx) => MatchDialogPage(
-              matchedUser: swipeState.matchedUser,
-              currentUser: widget.controller.currentUser,
+          unawaited(
+            showDialog(
+              context: context,
+              builder: (ctx) => MatchDialogPage(
+                matchedUser: swipeState.matchedUser,
+                currentUser: widget.controller.currentUser,
+              ),
             ),
           );
         }
@@ -89,7 +93,7 @@ class _SwipeCardListState extends State<SwipeCardList> {
                               child: Padding(
                                 padding: const EdgeInsets.all(10),
                                 child: Image.asset(
-                                  'asset/hookup4u-Logo-BP.png',
+                                  'asset/images/logo.png',
                                   fit: BoxFit.contain,
                                   color: AppColors.primaryGreen,
                                 ),

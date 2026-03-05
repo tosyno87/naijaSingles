@@ -1,13 +1,13 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:google_fonts/google_fonts.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:google_fonts/google_fonts.dart';
 
 import '../../../common/constants/app_colors.dart';
-
 import 'bloc/onboarding_bloc.dart';
 import 'bloc/onboarding_data.dart';
-import 'shared_styles.dart';
 
 /// Third step of onboarding focusing on personal values.
 ///
@@ -84,320 +84,327 @@ class _OnboardingStepCValuesState extends State<OnboardingStepCValues>
   }
 
   @override
-  Widget build(BuildContext context) {
-    return BlocBuilder<OnboardingBloc, OnboardingState>(
-      builder: (context, state) {
-        final data = state.data ?? OnboardingData();
+  Widget build(BuildContext context) =>
+      BlocBuilder<OnboardingBloc, OnboardingState>(
+        builder: (context, state) {
+          final data = state.data ?? OnboardingData();
 
-    // Deep green color for selected elements
-    const Color deepGreen = Color(0xFF008037);
+          // Deep green color for selected elements
+          const Color deepGreen = Color(0xFF008037);
 
-    return Scaffold(
-      backgroundColor: widget.backgroundColor,
-      body: SafeArea(
-        child: SingleChildScrollView(
-          padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 32),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              // Progress indicator
-              Row(
-                children: [
-                  Container(
-                    padding:
-                        const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-                    decoration: BoxDecoration(
-                      color: deepGreen.withValues(alpha: 0.1),
-                      borderRadius: BorderRadius.circular(20),
-                    ),
-                    child: Text(
-                      'Step 3 of 3',
-                      style: GoogleFonts.montserrat(
-                        fontSize: 14,
-                        fontWeight: FontWeight.w500,
-                        color: deepGreen,
-                      ),
-                    ),
-                  ),
-                ],
-              ),
-
-              const SizedBox(height: 20),
-
-              // Header
-              Text(
-                'Your Values & Preferences',
-                style: GoogleFonts.montserrat(
-                  fontSize: 22,
-                  fontWeight: FontWeight.bold,
-                  color: Colors.brown.shade800,
-                ),
-                semanticsLabel: 'Your Values and Preferences, Step 3 of 3',
-              ),
-              const SizedBox(height: 12),
-              Text(
-                'Tell us what matters most to you in relationships.',
-                style: GoogleFonts.montserrat(
-                  fontSize: 15,
-                  color: Colors.brown.shade600,
-                ),
-              ),
-              const SizedBox(height: 32),
-
-              // Partner values card
-              Container(
-                decoration: BoxDecoration(
-                  color: Colors.white,
-                  borderRadius: BorderRadius.circular(16),
-                  boxShadow: [
-                    BoxShadow(
-                      color: Colors.black.withValues(alpha: 0.05),
-                      blurRadius: 10,
-                      offset: const Offset(0, 4),
-                    ),
-                  ],
-                ),
-                padding: const EdgeInsets.all(20),
+          return Scaffold(
+            backgroundColor: widget.backgroundColor,
+            body: SafeArea(
+              child: SingleChildScrollView(
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 24, vertical: 32),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    _buildSectionTitle('What matters most in a partner?'),
-                    const SizedBox(height: 8),
-                    Text(
-                      'Select at least 3 values that are important to you',
-                      style: GoogleFonts.montserrat(
-                        fontSize: 14,
-                        color: Colors.grey[700],
-                      ),
-                    ),
-                    const SizedBox(height: 16),
-                    Semantics(
-                      label: 'Partner values selection',
-                      hint:
-                          'Select at least 3 values that matter to you in a partner',
-                      child: Wrap(
-                        key: _valuesKey,
-                        spacing: 8,
-                        runSpacing: 12,
-                        children: _partnerValues.map((value) {
-                          final isSelected =
-                              controller.values.contains(value['id']);
-                          return _buildValueCheckbox(
-                            label: value['label'],
-                            isSelected: isSelected,
-                            onChanged: (selected) {
-                              final List<String> updatedValues = [
-                                ...controller.values,
-                              ];
-                              if (selected) {
-                                updatedValues.add(value['id']);
-                              } else {
-                                updatedValues.remove(value['id']);
-                              }
-                              context.read<OnboardingBloc>().add(OnboardingValuesUpdated(updatedValues));
-                              HapticFeedback.selectionClick();
-                            },
-                            deepGreen: deepGreen,
-                          );
-                        }).toList(),
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-
-              const SizedBox(height: 32),
-
-              // Dealbreakers card
-              Container(
-                decoration: BoxDecoration(
-                  color: Colors.white,
-                  borderRadius: BorderRadius.circular(16),
-                  boxShadow: [
-                    BoxShadow(
-                      color: Colors.black.withValues(alpha: 0.05),
-                      blurRadius: 10,
-                      offset: const Offset(0, 4),
-                    ),
-                  ],
-                ),
-                padding: const EdgeInsets.all(20),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    _buildSectionTitle('Any dealbreakers? (Optional)'),
-                    const SizedBox(height: 8),
-                    Text(
-                      'Select any absolute dealbreakers for you',
-                      style: GoogleFonts.montserrat(
-                        fontSize: 14,
-                        color: Colors.grey[700],
-                      ),
-                    ),
-                    const SizedBox(height: 16),
-                    Semantics(
-                      label: 'Dealbreakers selection',
-                      hint:
-                          'Select any absolute dealbreakers for you in a relationship',
-                      child: Wrap(
-                        key: _dealbreakersKey,
-                        spacing: 8,
-                        runSpacing: 12,
-                        children: _dealbreakers.map((dealbreaker) {
-                          final isSelected = data.dealbreakers
-                              .contains(dealbreaker['id']);
-                          return _buildValueCheckbox(
-                            label: dealbreaker['label'],
-                            isSelected: isSelected,
-                            onChanged: (selected) {
-                              final List<String> updatedDealbreakers = [
-                                ...data.dealbreakers,
-                              ];
-                              if (selected) {
-                                updatedDealbreakers.add(dealbreaker['id']);
-                              } else {
-                                updatedDealbreakers.remove(dealbreaker['id']);
-                              }
-                              context.read<OnboardingBloc>().add(
-                                OnboardingDealbreakersUpdated(updatedDealbreakers),
-                              );
-                              HapticFeedback.selectionClick();
-                            },
-                            deepGreen: deepGreen,
-                          );
-                        }).toList(),
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-
-              const SizedBox(height: 40),
-
-              // Validation message
-              AnimatedOpacity(
-                opacity: _showValidationMessage ? 1.0 : 0.0,
-                duration: const Duration(milliseconds: 300),
-                child: _showValidationMessage
-                    ? Container(
-                        margin: const EdgeInsets.only(bottom: 16),
-                        padding: const EdgeInsets.symmetric(
-                          horizontal: 16,
-                          vertical: 12,
-                        ),
-                        decoration: BoxDecoration(
-                          color: Colors.amber.withValues(alpha: 0.2),
-                          borderRadius: BorderRadius.circular(8),
-                          border: Border.all(color: Colors.amber),
-                        ),
-                        child: Row(
-                          children: [
-                            const Icon(
-                              Icons.info_outline,
-                              color: Colors.amber,
-                              size: 20,
+                    // Progress indicator
+                    Row(
+                      children: [
+                        Container(
+                          padding: const EdgeInsets.symmetric(
+                              horizontal: 12, vertical: 6),
+                          decoration: BoxDecoration(
+                            color: deepGreen.withValues(alpha: 0.1),
+                            borderRadius: BorderRadius.circular(20),
+                          ),
+                          child: Text(
+                            'Step 3 of 3',
+                            style: GoogleFonts.montserrat(
+                              fontSize: 14,
+                              fontWeight: FontWeight.w500,
+                              color: deepGreen,
                             ),
-                            const SizedBox(width: 8),
-                            Expanded(
-                              child: Text(
-                                'Please select at least 3 values that matter to you',
-                                style: GoogleFonts.montserrat(
-                                  fontSize: 14,
-                                  color: Colors.amber[800],
-                                ),
+                          ),
+                        ),
+                      ],
+                    ),
+
+                    const SizedBox(height: 20),
+
+                    // Header
+                    Text(
+                      'Your Values & Preferences',
+                      style: GoogleFonts.montserrat(
+                        fontSize: 22,
+                        fontWeight: FontWeight.bold,
+                        color: Colors.brown.shade800,
+                      ),
+                      semanticsLabel:
+                          'Your Values and Preferences, Step 3 of 3',
+                    ),
+                    const SizedBox(height: 12),
+                    Text(
+                      'Tell us what matters most to you in relationships.',
+                      style: GoogleFonts.montserrat(
+                        fontSize: 15,
+                        color: Colors.brown.shade600,
+                      ),
+                    ),
+                    const SizedBox(height: 32),
+
+                    // Partner values card
+                    Container(
+                      decoration: BoxDecoration(
+                        color: Colors.white,
+                        borderRadius: BorderRadius.circular(16),
+                        boxShadow: [
+                          BoxShadow(
+                            color: Colors.black.withValues(alpha: 0.05),
+                            blurRadius: 10,
+                            offset: const Offset(0, 4),
+                          ),
+                        ],
+                      ),
+                      padding: const EdgeInsets.all(20),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          _buildSectionTitle('What matters most in a partner?'),
+                          const SizedBox(height: 8),
+                          Text(
+                            'Select at least 3 values that are important to you',
+                            style: GoogleFonts.montserrat(
+                              fontSize: 14,
+                              color: Colors.grey[700],
+                            ),
+                          ),
+                          const SizedBox(height: 16),
+                          Semantics(
+                            label: 'Partner values selection',
+                            hint:
+                                'Select at least 3 values that matter to you in a partner',
+                            child: Wrap(
+                              key: _valuesKey,
+                              spacing: 8,
+                              runSpacing: 12,
+                              children: _partnerValues.map((value) {
+                                final isSelected =
+                                    data.values.contains(value['id']);
+                                return _buildValueCheckbox(
+                                  label: value['label'],
+                                  isSelected: isSelected,
+                                  onChanged: (selected) {
+                                    final List<String> updatedValues = [
+                                      ...data.values,
+                                    ];
+                                    if (selected) {
+                                      updatedValues.add(value['id']);
+                                    } else {
+                                      updatedValues.remove(value['id']);
+                                    }
+                                    context.read<OnboardingBloc>().add(
+                                        OnboardingValuesUpdated(updatedValues));
+                                    unawaited(HapticFeedback.selectionClick());
+                                  },
+                                  deepGreen: deepGreen,
+                                );
+                              }).toList(),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+
+                    const SizedBox(height: 32),
+
+                    // Dealbreakers card
+                    Container(
+                      decoration: BoxDecoration(
+                        color: Colors.white,
+                        borderRadius: BorderRadius.circular(16),
+                        boxShadow: [
+                          BoxShadow(
+                            color: Colors.black.withValues(alpha: 0.05),
+                            blurRadius: 10,
+                            offset: const Offset(0, 4),
+                          ),
+                        ],
+                      ),
+                      padding: const EdgeInsets.all(20),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          _buildSectionTitle('Any dealbreakers? (Optional)'),
+                          const SizedBox(height: 8),
+                          Text(
+                            'Select any absolute dealbreakers for you',
+                            style: GoogleFonts.montserrat(
+                              fontSize: 14,
+                              color: Colors.grey[700],
+                            ),
+                          ),
+                          const SizedBox(height: 16),
+                          Semantics(
+                            label: 'Dealbreakers selection',
+                            hint:
+                                'Select any absolute dealbreakers for you in a relationship',
+                            child: Wrap(
+                              key: _dealbreakersKey,
+                              spacing: 8,
+                              runSpacing: 12,
+                              children: _dealbreakers.map((dealbreaker) {
+                                final isSelected = data.dealbreakers
+                                    .contains(dealbreaker['id']);
+                                return _buildValueCheckbox(
+                                  label: dealbreaker['label'],
+                                  isSelected: isSelected,
+                                  onChanged: (selected) {
+                                    final List<String> updatedDealbreakers = [
+                                      ...data.dealbreakers,
+                                    ];
+                                    if (selected) {
+                                      updatedDealbreakers
+                                          .add(dealbreaker['id']);
+                                    } else {
+                                      updatedDealbreakers
+                                          .remove(dealbreaker['id']);
+                                    }
+                                    context.read<OnboardingBloc>().add(
+                                          OnboardingDealbreakersUpdated(
+                                              updatedDealbreakers),
+                                        );
+                                    unawaited(HapticFeedback.selectionClick());
+                                  },
+                                  deepGreen: deepGreen,
+                                );
+                              }).toList(),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+
+                    const SizedBox(height: 40),
+
+                    // Validation message
+                    AnimatedOpacity(
+                      opacity: _showValidationMessage ? 1.0 : 0.0,
+                      duration: const Duration(milliseconds: 300),
+                      child: _showValidationMessage
+                          ? Container(
+                              margin: const EdgeInsets.only(bottom: 16),
+                              padding: const EdgeInsets.symmetric(
+                                horizontal: 16,
+                                vertical: 12,
+                              ),
+                              decoration: BoxDecoration(
+                                color: Colors.amber.withValues(alpha: 0.2),
+                                borderRadius: BorderRadius.circular(8),
+                                border: Border.all(color: Colors.amber),
+                              ),
+                              child: Row(
+                                children: [
+                                  const Icon(
+                                    Icons.info_outline,
+                                    color: Colors.amber,
+                                    size: 20,
+                                  ),
+                                  const SizedBox(width: 8),
+                                  Expanded(
+                                    child: Text(
+                                      'Please select at least 3 values that matter to you',
+                                      style: GoogleFonts.montserrat(
+                                        fontSize: 14,
+                                        color: Colors.amber[800],
+                                      ),
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            )
+                          : const SizedBox.shrink(),
+                    ),
+
+                    // Navigation labelLarges
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        // Back labelLarge
+                        TextButton.icon(
+                          onPressed: () {
+                            unawaited(HapticFeedback.lightImpact());
+                            widget.onBack();
+                          },
+                          icon: const Icon(Icons.arrow_back, size: 16),
+                          label: Text(
+                            'Back',
+                            style: GoogleFonts.montserrat(
+                              fontSize: 16,
+                              fontWeight: FontWeight.w500,
+                            ),
+                          ),
+                          style: TextButton.styleFrom(
+                            foregroundColor: Colors.grey.shade700,
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 16,
+                              vertical: 12,
+                            ),
+                          ),
+                        ),
+
+                        // Finish labelLarge
+                        SizedBox(
+                          width: 150,
+                          height: 56,
+                          child: ElevatedButton(
+                            key: _finishButtonKey,
+                            onPressed: _isStepValid(data)
+                                ? () {
+                                    unawaited(HapticFeedback.mediumImpact());
+                                    unawaited(
+                                      Navigator.pushReplacementNamed(
+                                        context,
+                                        '/dating',
+                                      ),
+                                    );
+                                  }
+                                : () {
+                                    setState(() {
+                                      _showValidationMessage = true;
+                                      // Hide the message after 3 seconds
+                                      Future.delayed(const Duration(seconds: 3),
+                                          () {
+                                        if (mounted) {
+                                          setState(() {
+                                            _showValidationMessage = false;
+                                          });
+                                        }
+                                      });
+                                    });
+                                    unawaited(HapticFeedback.vibrate());
+                                  },
+                            style: ElevatedButton.styleFrom(
+                              backgroundColor: deepGreen,
+                              foregroundColor: Colors.white,
+                              disabledBackgroundColor: Colors.grey[400],
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(12),
+                              ),
+                              elevation: 2,
+                            ),
+                            child: Text(
+                              'Finish',
+                              style: GoogleFonts.montserrat(
+                                fontSize: 16,
+                                fontWeight: FontWeight.w600,
                               ),
                             ),
-                          ],
+                          ),
                         ),
-                      )
-                    : const SizedBox.shrink(),
+                      ],
+                    ),
+                    const SizedBox(height: 24),
+                  ],
+                ),
               ),
-
-              // Navigation labelLarges
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  // Back labelLarge
-                  TextButton.icon(
-                    onPressed: () {
-                      HapticFeedback.lightImpact();
-                      widget.onBack();
-                    },
-                    icon: const Icon(Icons.arrow_back, size: 16),
-                    label: Text(
-                      'Back',
-                      style: GoogleFonts.montserrat(
-                        fontSize: 16,
-                        fontWeight: FontWeight.w500,
-                      ),
-                    ),
-                    style: TextButton.styleFrom(
-                      foregroundColor: Colors.grey.shade700,
-                      padding: const EdgeInsets.symmetric(
-                        horizontal: 16,
-                        vertical: 12,
-                      ),
-                    ),
-                  ),
-
-                  // Finish labelLarge
-                  SizedBox(
-                    width: 150,
-                    height: 56,
-                    child: ElevatedButton(
-                      key: _finishButtonKey,
-                      onPressed: _isStepValid(data)
-                          ? () {
-                              HapticFeedback.mediumImpact();
-                              // Navigate to Dating Homepage instead of calling finishOnboarding
-                              Navigator.pushReplacementNamed(
-                                context,
-                                '/dating',
-                              );
-                            }
-                          : () {
-                              setState(() {
-                                _showValidationMessage = true;
-                                // Hide the message after 3 seconds
-                                Future.delayed(const Duration(seconds: 3), () {
-                                  if (mounted) {
-                                    setState(() {
-                                      _showValidationMessage = false;
-                                    });
-                                  }
-                                });
-                              });
-                              HapticFeedback.vibrate();
-                            },
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: deepGreen,
-                        foregroundColor: Colors.white,
-                        disabledBackgroundColor: Colors.grey[400],
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(12),
-                        ),
-                        elevation: 2,
-                      ),
-                      child: Text(
-                        'Finish',
-                        style: GoogleFonts.montserrat(
-                          fontSize: 16,
-                          fontWeight: FontWeight.w600,
-                        ),
-                      ),
-                    ),
-                  ),
-                ],
-              ),
-              const SizedBox(height: 24),
-            ],
-          ),
-        ),
-      ),
-    );
-      },
-    );
-  }
+            ),
+          );
+        },
+      );
 
   /// Builds a section title with consistent styling
   Widget _buildSectionTitle(String title) => Text(
@@ -426,7 +433,7 @@ class _OnboardingStepCValuesState extends State<OnboardingStepCValues>
               onTap: () {
                 onChanged(!isSelected);
                 _animationController.reset();
-                _animationController.forward();
+                unawaited(_animationController.forward());
               },
               borderRadius: BorderRadius.circular(8),
               splashColor: deepGreen.withValues(alpha: 0.1),
@@ -488,7 +495,5 @@ class _OnboardingStepCValuesState extends State<OnboardingStepCValues>
       );
 
   /// Validates if all required fields are filled
-  bool _isStepValid(OnboardingData data) {
-    return data.values.length >= 3;
-  }
+  bool _isStepValid(OnboardingData data) => data.values.length >= 3;
 }

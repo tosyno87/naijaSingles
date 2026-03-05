@@ -45,7 +45,7 @@ class GroupModel {
         tags: List<String>.from(data['tags'] ?? []),
         settings: data['settings'] as Map<String, dynamic>?,
       );
-    } catch (e) {
+    } on Object catch (e) {
       debugPrint('Error creating GroupModel from document: $e');
       throw Exception('Failed to create GroupModel from document');
     }

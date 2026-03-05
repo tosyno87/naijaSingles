@@ -2,7 +2,6 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 
-import '../../../features/match/data/services/likes_service.dart';
 import '../../../models/user_model.dart';
 import '../../../services/location_privacy_service.dart';
 import '../../../services/user_privacy_service.dart';
@@ -15,7 +14,6 @@ class PrivacyAwareUserSearchRepo {
   static CollectionReference get docRef => db.collection('users');
 
   static FirebaseAuth firebaseAuth = firebaseAuthInstance;
-  static final LikesService _likesService = LikesService();
   static final UserPrivacyService _privacyService = UserPrivacyService();
 
   static Map items = {};
@@ -29,11 +27,10 @@ class PrivacyAwareUserSearchRepo {
   static Map disLikedMap = {};
 
   static Future<void> getAccessItems() async {
-    db.collection('Item_access').snapshots().listen((doc) {
-      if (doc.docs.isNotEmpty) {
-        items = doc.docs[0].data();
-      }
-    });
+    final doc = await db.collection('Item_access').get();
+    if (doc.docs.isNotEmpty) {
+      items = doc.docs[0].data();
+    }
   }
 
   static Future<int> getSwipedCount(UserModel currentUser) async {
@@ -113,7 +110,7 @@ class PrivacyAwareUserSearchRepo {
 
       debugPrint('✅ Final privacy-aware user list size: ${userList.length}');
       return userList;
-    } catch (e) {
+    } on Object catch (e) {
       debugPrint('❌ Error in privacy-aware getUserList: $e');
       rethrow;
     }
@@ -182,7 +179,7 @@ class PrivacyAwareUserSearchRepo {
 
           debugPrint('✅ Adding privacy-aware user: ${user.name}');
           userList.add(user);
-        } catch (e) {
+        } on Object catch (e) {
           debugPrint(
             '⚠️ Error processing privacy-aware document ${doc.id}: $e',
           );
@@ -191,7 +188,7 @@ class PrivacyAwareUserSearchRepo {
       }
 
       return userList;
-    } catch (e) {
+    } on Object catch (e) {
       debugPrint('❌ Error in _getPrivacyAwareUsers: $e');
       return [];
     }
@@ -232,14 +229,14 @@ class PrivacyAwareUserSearchRepo {
             debugPrint('📋 Adding fallback user: ${temp.name}');
             userList.add(temp);
           }
-        } catch (e) {
+        } on Object catch (e) {
           debugPrint('⚠️ Error processing fallback document ${doc.id}: $e');
           continue;
         }
       }
 
       return userList;
-    } catch (e) {
+    } on Object catch (e) {
       debugPrint('❌ Error in _getFallbackUsers: $e');
       return [];
     }
@@ -323,13 +320,17 @@ class PrivacyAwareUserSearchRepo {
       latitude: latitude,
       longitude: longitude,
       imageUrl: data['photos'] is List
-          ? List<String>.from((data['photos'] as List)
-              .map((e) => e?.toString() ?? '')
-              .where((url) => url.toString().isNotEmpty))
-          : data['Pictures'] is List
-              ? List<String>.from((data['Pictures'] as List)
+          ? List<String>.from(
+              (data['photos'] as List)
                   .map((e) => e?.toString() ?? '')
-                  .where((url) => url.toString().isNotEmpty))
+                  .where((url) => url.toString().isNotEmpty),
+            )
+          : data['Pictures'] is List
+              ? List<String>.from(
+                  (data['Pictures'] as List)
+                      .map((e) => e?.toString() ?? '')
+                      .where((url) => url.toString().isNotEmpty),
+                )
               : [],
       isBlocked: data['isBlocked'] ?? false,
       lookingFor: data['lookingFor']?.toString() ?? 'Dating',
@@ -401,12 +402,12 @@ class PrivacyAwareUserSearchRepo {
                   }
                 }
               }
-            } catch (e) {
+            } on Object catch (e) {
               debugPrint('⚠️ Error processing nearby user ${doc.id}: $e');
               continue;
             }
           }
-        } catch (e) {
+        } on Object catch (e) {
           debugPrint('⚠️ Error querying GeoHash $geoHash: $e');
           continue;
         }
@@ -414,7 +415,7 @@ class PrivacyAwareUserSearchRepo {
 
       debugPrint('🗺️ Found ${nearbyUsers.length} nearby users');
       return nearbyUsers;
-    } catch (e) {
+    } on Object catch (e) {
       debugPrint('❌ Error in getUsersNearby: $e');
       return [];
     }
@@ -446,7 +447,7 @@ class PrivacyAwareUserSearchRepo {
               await _createUserModelFromFilteredData(filteredData, doc.id);
           matchesList.add(user);
         }
-      } catch (e) {
+      } on Object catch (e) {
         debugPrint('⚠️ Error loading match ${doc.id}: $e');
         continue;
       }

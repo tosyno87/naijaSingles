@@ -71,10 +71,8 @@ class AccountStatusService {
   }
 
   /// Stream the account status for real-time UI updates.
-  Stream<String> watchAccountStatus(String userId) => _usersCollection
-      .doc(userId)
-      .snapshots()
-      .map((snap) {
+  Stream<String> watchAccountStatus(String userId) =>
+      _usersCollection.doc(userId).snapshots().map((snap) {
         if (!snap.exists) return 'active';
         final data = snap.data();
         return (data?['accountStatus'] as String?) ?? 'active';

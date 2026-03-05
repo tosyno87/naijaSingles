@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:developer';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
@@ -52,8 +53,7 @@ class _ChatThreadScreenState extends State<ChatThreadScreen> {
       }
     });
 
-    // Mark thread as read when opening
-    _chatService.markThreadAsRead(widget.threadId);
+    unawaited(_chatService.markThreadAsRead(widget.threadId));
 
     // Scroll to bottom when messages load
     WidgetsBinding.instance.addPostFrameCallback((_) {
@@ -70,15 +70,17 @@ class _ChatThreadScreenState extends State<ChatThreadScreen> {
 
   void _scrollToBottom() {
     if (_scrollController.hasClients) {
-      _scrollController.animateTo(
-        _scrollController.position.maxScrollExtent,
-        duration: const Duration(milliseconds: 300),
-        curve: Curves.easeOut,
+      unawaited(
+        _scrollController.animateTo(
+          _scrollController.position.maxScrollExtent,
+          duration: const Duration(milliseconds: 300),
+          curve: Curves.easeOut,
+        ),
       );
     }
   }
 
-  void _sendMessage() {
+  Future<void> _sendMessage() async {
     final text = _messageController.text.trim();
     if (text.isEmpty) return;
 
@@ -90,22 +92,22 @@ class _ChatThreadScreenState extends State<ChatThreadScreen> {
       return;
     }
 
-    _chatService.sendMessage(widget.threadId, text).then((success) {
+    try {
+      final success = await _chatService.sendMessage(widget.threadId, text);
       if (success) {
         _messageController.clear();
-        // Scroll to bottom after sending message
         Future.delayed(const Duration(milliseconds: 100), _scrollToBottom);
       }
-    }).catchError((error) {
+    } on Object catch (error) {
       _showErrorSnackBar(error.toString().replaceAll('Exception: ', ''));
-    });
+    }
   }
 
   @override
   Widget build(BuildContext context) {
     final colorScheme = Theme.of(context).colorScheme;
     return Scaffold(
-      backgroundColor: colorScheme.background, // Use MVP background color
+      backgroundColor: colorScheme.surface, // Use MVP background color
       appBar: AppBar(
         backgroundColor: AppColors.cardColor, // Use MVP card color
         elevation: 1,
@@ -126,7 +128,7 @@ class _ChatThreadScreenState extends State<ChatThreadScreen> {
                 child: CircleAvatar(
                   radius: 16,
                   backgroundImage: widget.avatarUrl != null
-                      ? NetworkImage(widget.avatarUrl!)
+                      ? NetworkImage(widget.avatarUrl ?? '')
                       : const AssetImage(
                           'assets/images/placeholder_profile.jpg',
                         ) as ImageProvider,
@@ -263,7 +265,8 @@ class _ChatThreadScreenState extends State<ChatThreadScreen> {
                           style: GoogleFonts.montserrat(
                             // Use Montserrat for MVP
                             fontSize: 14,
-                            color: AppColors.primaryGreen, // Use MVP primary color
+                            color:
+                                AppColors.primaryGreen, // Use MVP primary color
                           ),
                         ),
                       ],
@@ -371,7 +374,8 @@ class _ChatThreadScreenState extends State<ChatThreadScreen> {
                     width: 48,
                     height: 48,
                     decoration: BoxDecoration(
-                      color: _hasText ? AppColors.primaryGreen : Colors.grey[300],
+                      color:
+                          _hasText ? AppColors.primaryGreen : Colors.grey[300],
                       shape: BoxShape.circle,
                     ),
                     child: IconButton(
@@ -430,7 +434,7 @@ class _ChatThreadScreenState extends State<ChatThreadScreen> {
                 radius: 16,
                 backgroundColor: Colors.grey.shade200,
                 backgroundImage: widget.avatarUrl != null
-                    ? NetworkImage(widget.avatarUrl!)
+                    ? NetworkImage(widget.avatarUrl ?? '')
                     : null,
                 onBackgroundImageError:
                     widget.avatarUrl != null ? (_, __) {} : null,
@@ -565,72 +569,74 @@ class _ChatThreadScreenState extends State<ChatThreadScreen> {
 
   // Show emoji picker for enhanced messaging
   void _showEmojiPicker() {
-    showModalBottomSheet(
-      context: context,
-      backgroundColor: Colors.transparent,
-      builder: (context) => Container(
-        height: 200,
-        decoration: const BoxDecoration(
-          color: Colors.white,
-          borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
-        ),
-        child: Column(
-          children: [
-            Container(
-              width: 40,
-              height: 4,
-              margin: const EdgeInsets.symmetric(vertical: 12),
-              decoration: BoxDecoration(
-                color: Colors.grey[300],
-                borderRadius: BorderRadius.circular(2),
+    unawaited(
+      showModalBottomSheet(
+        context: context,
+        backgroundColor: Colors.transparent,
+        builder: (context) => Container(
+          height: 200,
+          decoration: const BoxDecoration(
+            color: Colors.white,
+            borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+          ),
+          child: Column(
+            children: [
+              Container(
+                width: 40,
+                height: 4,
+                margin: const EdgeInsets.symmetric(vertical: 12),
+                decoration: BoxDecoration(
+                  color: Colors.grey[300],
+                  borderRadius: BorderRadius.circular(2),
+                ),
               ),
-            ),
-            Expanded(
-              child: GridView.count(
-                crossAxisCount: 8,
-                padding: const EdgeInsets.all(16),
-                children: [
-                  '😊',
-                  '😂',
-                  '❤️',
-                  '👍',
-                  '👎',
-                  '😢',
-                  '😮',
-                  '😡',
-                  '🎉',
-                  '🔥',
-                  '💯',
-                  '👏',
-                  '🙏',
-                  '💪',
-                  '✨',
-                  '🌟',
-                ]
-                    .map(
-                      (emoji) => GestureDetector(
-                        onTap: () {
-                          _messageController.text += emoji;
-                          Navigator.pop(context);
-                        },
-                        child: DecoratedBox(
-                          decoration: BoxDecoration(
-                            borderRadius: BorderRadius.circular(8),
-                            color: Colors.grey[100],
-                          ),
-                          child: Center(
-                            child: Text(
-                              emoji,
-                              style: const TextStyle(fontSize: 24),
+              Expanded(
+                child: GridView.count(
+                  crossAxisCount: 8,
+                  padding: const EdgeInsets.all(16),
+                  children: [
+                    '😊',
+                    '😂',
+                    '❤️',
+                    '👍',
+                    '👎',
+                    '😢',
+                    '😮',
+                    '😡',
+                    '🎉',
+                    '🔥',
+                    '💯',
+                    '👏',
+                    '🙏',
+                    '💪',
+                    '✨',
+                    '🌟',
+                  ]
+                      .map(
+                        (emoji) => GestureDetector(
+                          onTap: () {
+                            _messageController.text += emoji;
+                            Navigator.pop(context);
+                          },
+                          child: DecoratedBox(
+                            decoration: BoxDecoration(
+                              borderRadius: BorderRadius.circular(8),
+                              color: Colors.grey[100],
+                            ),
+                            child: Center(
+                              child: Text(
+                                emoji,
+                                style: const TextStyle(fontSize: 24),
+                              ),
                             ),
                           ),
                         ),
-                      ),
-                    )
-                    .toList(),
+                      )
+                      .toList(),
+                ),
               ),
-            ),
-          ],
+            ],
+          ),
         ),
       ),
     );
@@ -653,29 +659,32 @@ class _ChatThreadScreenState extends State<ChatThreadScreen> {
 
     try {
       // Show loading indicator
-      showDialog(
-        context: context,
-        barrierDismissible: false,
-        builder: (context) => Center(
-          child: Container(
-            padding: const EdgeInsets.all(20),
-            decoration: BoxDecoration(
-              color: Colors.white,
-              borderRadius: BorderRadius.circular(12),
-            ),
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                const CircularProgressIndicator(color: AppColors.primaryGreen),
-                const SizedBox(height: 16),
-                Text(
-                  'Loading profile...',
-                  style: GoogleFonts.montserrat(
-                    fontSize: 16,
-                    color: AppColors.textPrimary,
+      unawaited(
+        showDialog(
+          context: context,
+          barrierDismissible: false,
+          builder: (context) => Center(
+            child: Container(
+              padding: const EdgeInsets.all(20),
+              decoration: BoxDecoration(
+                color: Colors.white,
+                borderRadius: BorderRadius.circular(12),
+              ),
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  const CircularProgressIndicator(
+                      color: AppColors.primaryGreen),
+                  const SizedBox(height: 16),
+                  Text(
+                    'Loading profile...',
+                    style: GoogleFonts.montserrat(
+                      fontSize: 16,
+                      color: AppColors.textPrimary,
+                    ),
                   ),
-                ),
-              ],
+                ],
+              ),
             ),
           ),
         ),
@@ -689,6 +698,8 @@ class _ChatThreadScreenState extends State<ChatThreadScreen> {
 
       // Close loading dialog
       if (mounted) Navigator.pop(context);
+
+      if (!mounted) return;
 
       if (userDoc.exists) {
         final userData = userDoc.data() as Map<String, dynamic>;
@@ -707,10 +718,12 @@ class _ChatThreadScreenState extends State<ChatThreadScreen> {
         );
 
         // Navigate to profile screen
-        Navigator.push(
-          context,
-          MaterialPageRoute(
-            builder: (context) => UserDetailScreen(user: userModel),
+        unawaited(
+          Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (context) => UserDetailScreen(user: userModel),
+            ),
           ),
         );
       } else {
@@ -725,11 +738,12 @@ class _ChatThreadScreenState extends State<ChatThreadScreen> {
           ),
         );
       }
-    } catch (e) {
+    } on Object catch (e) {
       // Close loading dialog if still open
       if (mounted) Navigator.pop(context);
 
       log('Error loading user profile: $e');
+      if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Text(
@@ -744,10 +758,11 @@ class _ChatThreadScreenState extends State<ChatThreadScreen> {
 
   // Show user profile quick view (keeping for the info button)
   void _showUserProfile() {
-    _viewFullUserProfile(); // Just redirect to full profile
+    unawaited(_viewFullUserProfile());
   }
 
   // Build quick action button
+  // ignore: unused_element
   Widget _buildQuickActionButton({
     required IconData icon,
     required String label,
@@ -787,145 +802,148 @@ class _ChatThreadScreenState extends State<ChatThreadScreen> {
   // Show block user dialog
   // Show MVP-styled block user dialog
   void _showBlockUserDialog() {
-    showDialog(
-      context: context,
-      barrierDismissible: false,
-      builder: (context) => AlertDialog(
-        backgroundColor: Colors.white,
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(20),
-        ),
-        contentPadding: const EdgeInsets.all(24),
-        content: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            // Warning icon with MVP styling
-            Container(
-              width: 60,
-              height: 60,
-              decoration: BoxDecoration(
-                color: Colors.red.withValues(alpha: 0.1),
-                shape: BoxShape.circle,
+    unawaited(
+      showDialog(
+        context: context,
+        barrierDismissible: false,
+        builder: (context) => AlertDialog(
+          backgroundColor: Colors.white,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(20),
+          ),
+          contentPadding: const EdgeInsets.all(24),
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              // Warning icon with MVP styling
+              Container(
+                width: 60,
+                height: 60,
+                decoration: BoxDecoration(
+                  color: Colors.red.withValues(alpha: 0.1),
+                  shape: BoxShape.circle,
+                ),
+                child: const Icon(
+                  Icons.block,
+                  color: Colors.red,
+                  size: 30,
+                ),
               ),
-              child: const Icon(
-                Icons.block,
-                color: Colors.red,
-                size: 30,
-              ),
-            ),
-            const SizedBox(height: 20),
+              const SizedBox(height: 20),
 
-            // Title with Poppins font
-            Text(
-              'Block ${widget.userName}?',
-              style: GoogleFonts.montserrat(
-                fontSize: 20,
-                fontWeight: FontWeight.w600,
-                color: const Color(0xFF2D3748),
+              // Title with Poppins font
+              Text(
+                'Block ${widget.userName}?',
+                style: GoogleFonts.montserrat(
+                  fontSize: 20,
+                  fontWeight: FontWeight.w600,
+                  color: const Color(0xFF2D3748),
+                ),
+                textAlign: TextAlign.center,
               ),
-              textAlign: TextAlign.center,
-            ),
-            const SizedBox(height: 16),
+              const SizedBox(height: 16),
 
-            // Description with MVP colors
-            Text(
-              'This will remove them from your matches, delete this conversation, and prevent future contact.',
-              style: GoogleFonts.montserrat(
-                fontSize: 14,
-                color: const Color(0xFF718096),
-                height: 1.5,
+              // Description with MVP colors
+              Text(
+                'This will remove them from your matches, delete this conversation, and prevent future contact.',
+                style: GoogleFonts.montserrat(
+                  fontSize: 14,
+                  color: const Color(0xFF718096),
+                  height: 1.5,
+                ),
+                textAlign: TextAlign.center,
               ),
-              textAlign: TextAlign.center,
-            ),
-            const SizedBox(height: 24),
+              const SizedBox(height: 24),
 
-            // MVP-styled action buttons
-            Row(
-              children: [
-                // Cancel button with border
-                Expanded(
-                  child: Container(
-                    height: 48,
-                    decoration: BoxDecoration(
-                      border: Border.all(
-                        color: const Color(0xFFE2E8F0),
-                      ),
-                      borderRadius: BorderRadius.circular(12),
-                    ),
-                    child: TextButton(
-                      onPressed: () => Navigator.pop(context),
-                      style: TextButton.styleFrom(
-                        foregroundColor: const Color(0xFF718096),
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(12),
+              // MVP-styled action buttons
+              Row(
+                children: [
+                  // Cancel button with border
+                  Expanded(
+                    child: Container(
+                      height: 48,
+                      decoration: BoxDecoration(
+                        border: Border.all(
+                          color: const Color(0xFFE2E8F0),
                         ),
+                        borderRadius: BorderRadius.circular(12),
                       ),
-                      child: Text(
-                        'Cancel',
-                        style: GoogleFonts.montserrat(
-                          fontSize: 16,
-                          fontWeight: FontWeight.w500,
+                      child: TextButton(
+                        onPressed: () => Navigator.pop(context),
+                        style: TextButton.styleFrom(
+                          foregroundColor: const Color(0xFF718096),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(12),
+                          ),
+                        ),
+                        child: Text(
+                          'Cancel',
+                          style: GoogleFonts.montserrat(
+                            fontSize: 16,
+                            fontWeight: FontWeight.w500,
+                          ),
                         ),
                       ),
                     ),
                   ),
-                ),
-                const SizedBox(width: 12),
+                  const SizedBox(width: 12),
 
-                // Block button with gradient and shadow
-                Expanded(
-                  child: Container(
-                    height: 48,
-                    decoration: BoxDecoration(
-                      gradient: const LinearGradient(
-                        colors: [Color(0xFFE53E3E), Color(0xFFC53030)],
-                        begin: Alignment.topLeft,
-                        end: Alignment.bottomRight,
-                      ),
-                      borderRadius: BorderRadius.circular(12),
-                      boxShadow: [
-                        BoxShadow(
-                          color: const Color(0xFFE53E3E).withValues(alpha: 0.3),
-                          blurRadius: 8,
-                          offset: const Offset(0, 4),
+                  // Block button with gradient and shadow
+                  Expanded(
+                    child: Container(
+                      height: 48,
+                      decoration: BoxDecoration(
+                        gradient: const LinearGradient(
+                          colors: [Color(0xFFE53E3E), Color(0xFFC53030)],
+                          begin: Alignment.topLeft,
+                          end: Alignment.bottomRight,
                         ),
-                      ],
-                    ),
-                    child: TextButton(
-                      onPressed: () {
-                        Navigator.pop(context);
-                        _blockUser();
-                      },
-                      style: TextButton.styleFrom(
-                        foregroundColor: Colors.white,
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(12),
-                        ),
+                        borderRadius: BorderRadius.circular(12),
+                        boxShadow: [
+                          BoxShadow(
+                            color:
+                                const Color(0xFFE53E3E).withValues(alpha: 0.3),
+                            blurRadius: 8,
+                            offset: const Offset(0, 4),
+                          ),
+                        ],
                       ),
-                      child: Text(
-                        'Block',
-                        style: GoogleFonts.montserrat(
-                          fontSize: 16,
-                          fontWeight: FontWeight.w600,
+                      child: TextButton(
+                        onPressed: () {
+                          Navigator.pop(context);
+                          unawaited(_blockUser());
+                        },
+                        style: TextButton.styleFrom(
+                          foregroundColor: Colors.white,
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(12),
+                          ),
+                        ),
+                        child: Text(
+                          'Block',
+                          style: GoogleFonts.montserrat(
+                            fontSize: 16,
+                            fontWeight: FontWeight.w600,
+                          ),
                         ),
                       ),
                     ),
                   ),
-                ),
-              ],
-            ),
-            const SizedBox(height: 12),
-
-            // Info text
-            Text(
-              'You can unblock them later in Settings',
-              style: GoogleFonts.montserrat(
-                fontSize: 12,
-                color: const Color(0xFFA0AEC0),
+                ],
               ),
-              textAlign: TextAlign.center,
-            ),
-          ],
+              const SizedBox(height: 12),
+
+              // Info text
+              Text(
+                'You can unblock them later in Settings',
+                style: GoogleFonts.montserrat(
+                  fontSize: 12,
+                  color: const Color(0xFFA0AEC0),
+                ),
+                textAlign: TextAlign.center,
+              ),
+            ],
+          ),
         ),
       ),
     );
@@ -933,98 +951,104 @@ class _ChatThreadScreenState extends State<ChatThreadScreen> {
 
   // Show report user dialog
   void _showReportUserDialog() {
-    showDialog(
-      context: context,
-      builder: (context) => AlertDialog(
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-        title: Text(
-          'Report ${widget.userName}?',
-          style: GoogleFonts.montserrat(
-            fontWeight: FontWeight.bold,
-            color: AppColors.textPrimary,
-          ),
-        ),
-        content: Text(
-          'Help us keep the community safe by reporting inappropriate behavior.',
-          style: GoogleFonts.montserrat(
-            color: AppColors.textSecondary,
-            height: 1.4,
-          ),
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(context),
-            child: Text(
-              'Cancel',
-              style: GoogleFonts.montserrat(
-                color: Colors.grey[600],
-                fontWeight: FontWeight.w600,
-              ),
+    unawaited(
+      showDialog(
+        context: context,
+        builder: (context) => AlertDialog(
+          shape:
+              RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+          title: Text(
+            'Report ${widget.userName}?',
+            style: GoogleFonts.montserrat(
+              fontWeight: FontWeight.bold,
+              color: AppColors.textPrimary,
             ),
           ),
-          TextButton(
-            onPressed: () {
-              Navigator.pop(context);
-              _showComingSoonSnackBar('Report feature coming soon!');
-            },
-            child: Text(
-              'Report',
-              style: GoogleFonts.montserrat(
-                color: Colors.orange,
-                fontWeight: FontWeight.w600,
-              ),
+          content: Text(
+            'Help us keep the community safe by reporting inappropriate behavior.',
+            style: GoogleFonts.montserrat(
+              color: AppColors.textSecondary,
+              height: 1.4,
             ),
           ),
-        ],
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.pop(context),
+              child: Text(
+                'Cancel',
+                style: GoogleFonts.montserrat(
+                  color: Colors.grey[600],
+                  fontWeight: FontWeight.w600,
+                ),
+              ),
+            ),
+            TextButton(
+              onPressed: () {
+                Navigator.pop(context);
+                _showComingSoonSnackBar('Report feature coming soon!');
+              },
+              child: Text(
+                'Report',
+                style: GoogleFonts.montserrat(
+                  color: Colors.orange,
+                  fontWeight: FontWeight.w600,
+                ),
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }
 
   // Show clear chat dialog
   void _showClearChatDialog() {
-    showDialog(
-      context: context,
-      builder: (context) => AlertDialog(
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-        title: Text(
-          'Clear Chat History?',
-          style: GoogleFonts.montserrat(
-            fontWeight: FontWeight.bold,
-            color: AppColors.textPrimary,
-          ),
-        ),
-        content: Text(
-          'This will delete all messages in this conversation. This action cannot be undone.',
-          style: GoogleFonts.montserrat(
-            color: AppColors.textSecondary,
-            height: 1.4,
-          ),
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(context),
-            child: Text(
-              'Cancel',
-              style: GoogleFonts.montserrat(
-                color: Colors.grey[600],
-                fontWeight: FontWeight.w600,
-              ),
+    unawaited(
+      showDialog(
+        context: context,
+        builder: (context) => AlertDialog(
+          shape:
+              RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+          title: Text(
+            'Clear Chat History?',
+            style: GoogleFonts.montserrat(
+              fontWeight: FontWeight.bold,
+              color: AppColors.textPrimary,
             ),
           ),
-          TextButton(
-            onPressed: () {
-              Navigator.pop(context);
-              _showComingSoonSnackBar('Clear chat feature coming soon!');
-            },
-            child: Text(
-              'Clear',
-              style: GoogleFonts.montserrat(
-                color: Colors.red,
-                fontWeight: FontWeight.w600,
-              ),
+          content: Text(
+            'This will delete all messages in this conversation. This action cannot be undone.',
+            style: GoogleFonts.montserrat(
+              color: AppColors.textSecondary,
+              height: 1.4,
             ),
           ),
-        ],
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.pop(context),
+              child: Text(
+                'Cancel',
+                style: GoogleFonts.montserrat(
+                  color: Colors.grey[600],
+                  fontWeight: FontWeight.w600,
+                ),
+              ),
+            ),
+            TextButton(
+              onPressed: () {
+                Navigator.pop(context);
+                _showComingSoonSnackBar('Clear chat feature coming soon!');
+              },
+              child: Text(
+                'Clear',
+                style: GoogleFonts.montserrat(
+                  color: Colors.red,
+                  fontWeight: FontWeight.w600,
+                ),
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }
@@ -1066,10 +1090,11 @@ class _ChatThreadScreenState extends State<ChatThreadScreen> {
   // Block the user (called after confirmation from _showBlockUserDialog)
   Future<void> _blockUser() async {
     final currentUserId = FirebaseAuth.instance.currentUser?.uid;
-    if (widget.otherUserId == null || currentUserId == null) return;
+    final otherUserId = widget.otherUserId;
+    if (otherUserId == null || currentUserId == null) return;
 
     // Show MVP-styled loading dialog
-    showDialog(
+    await showDialog(
       context: context,
       barrierDismissible: false,
       builder: (context) => AlertDialog(
@@ -1092,7 +1117,8 @@ class _ChatThreadScreenState extends State<ChatThreadScreen> {
               ),
               child: const CircularProgressIndicator(
                 strokeWidth: 3,
-                valueColor: AlwaysStoppedAnimation<Color>(AppColors.primaryGreen),
+                valueColor:
+                    AlwaysStoppedAnimation<Color>(AppColors.primaryGreen),
               ),
             ),
             const SizedBox(height: 20),
@@ -1113,7 +1139,7 @@ class _ChatThreadScreenState extends State<ChatThreadScreen> {
       // Block the user using settings service
       final success = await SettingsService.blockUser(
         currentUserId,
-        widget.otherUserId!,
+        otherUserId,
         reason: 'Blocked from chat',
       );
 
@@ -1174,7 +1200,7 @@ class _ChatThreadScreenState extends State<ChatThreadScreen> {
           _showErrorSnackBar('Failed to block user. Please try again.');
         }
       }
-    } catch (e) {
+    } on Object catch (e) {
       debugPrint('Error blocking user: $e');
       if (mounted) {
         Navigator.pop(context); // Close loading dialog

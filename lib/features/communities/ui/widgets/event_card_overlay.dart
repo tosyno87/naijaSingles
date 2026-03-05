@@ -15,6 +15,10 @@ class EventCardOverlay extends StatelessWidget {
 
   final EventModel event;
   final VoidCallback onTap;
+  static const String _eventPlaceholderAsset =
+      'assets/images/placeholders/discover_event_placeholder.png';
+  static const String _fallbackPlaceholderAsset =
+      'assets/images/backgrounds/welcome_couple.png';
 
   String get _formattedDate {
     final now = DateTime.now();
@@ -88,13 +92,11 @@ class EventCardOverlay extends StatelessWidget {
                 CachedNetworkImage(
                   imageUrl: event.imageUrl!,
                   fit: BoxFit.cover,
-                  placeholder: (_, __) => Container(
-                    color: AppColors.primaryGreen.withValues(alpha: 0.08),
-                  ),
-                  errorWidget: (_, __, ___) => _buildFallbackBg(),
+                  placeholder: (_, __) => _buildAssetFallback(),
+                  errorWidget: (_, __, ___) => _buildAssetFallback(),
                 )
               else
-                _buildFallbackBg(),
+                _buildAssetFallback(),
 
               // Dark gradient overlay
               Positioned.fill(
@@ -193,6 +195,16 @@ class EventCardOverlay extends StatelessWidget {
           ),
         ),
         ),
+        ),
+      );
+
+  Widget _buildAssetFallback() => Image.asset(
+        _eventPlaceholderAsset,
+        fit: BoxFit.cover,
+        errorBuilder: (_, __, ___) => Image.asset(
+          _fallbackPlaceholderAsset,
+          fit: BoxFit.cover,
+          errorBuilder: (_, __, ___) => _buildFallbackBg(),
         ),
       );
 

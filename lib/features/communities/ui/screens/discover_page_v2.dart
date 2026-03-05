@@ -24,6 +24,15 @@ import '../widgets/event_card_overlay.dart';
 import '../widgets/horizontal_snap_list.dart';
 import '../widgets/people_card.dart';
 
+enum _DiscoverBlock {
+  trendingEvent,
+  peopleYouMayLike,
+  communities,
+  happeningThisWeek,
+  suggestedConnections,
+  stats,
+}
+
 class DiscoverPageV2 extends StatefulWidget {
   const DiscoverPageV2({
     this.onSeeAllPeopleTap,
@@ -49,6 +58,7 @@ class _DiscoverPageV2State extends State<DiscoverPageV2> {
   List<EventModel> _events = [];
   bool _eventsLoading = true;
   String? _eventsError;
+  bool _usingGlobalEventsFallback = false;
 
   List<UnifiedGroup> _communities = [];
   bool _communitiesLoading = true;
@@ -119,6 +129,7 @@ class _DiscoverPageV2State extends State<DiscoverPageV2> {
     setState(() {
       _eventsLoading = true;
       _eventsError = null;
+      _usingGlobalEventsFallback = false;
     });
 
     try {
@@ -136,6 +147,7 @@ class _DiscoverPageV2State extends State<DiscoverPageV2> {
           .toList();
 
       List<EventModel> filtered;
+      var usingGlobalFallback = false;
 
       if (locationTokens.isNotEmpty) {
         filtered = results.where((e) {
@@ -151,6 +163,7 @@ class _DiscoverPageV2State extends State<DiscoverPageV2> {
 
         if (filtered.isEmpty) {
           filtered = results.take(6).toList();
+          usingGlobalFallback = true;
         }
       } else {
         filtered = results;
@@ -160,6 +173,7 @@ class _DiscoverPageV2State extends State<DiscoverPageV2> {
       setState(() {
         _events = filtered.take(6).toList();
         _eventsLoading = false;
+        _usingGlobalEventsFallback = usingGlobalFallback;
       });
     } on Object catch (e) {
       log('Error loading events: $e');
@@ -369,36 +383,8 @@ class _DiscoverPageV2State extends State<DiscoverPageV2> {
                 children: [
                   const SizedBox(height: 4),
                   _buildSubtitleRow(),
-                  const SizedBox(height: 24),
-                  // People Near You
-                  DiscoverSectionHeader(
-                    title: 'People Near You',
-                    actionLabel: 'See all',
-                    onAction: _onSeeAllPeople,
-                  ),
-                  const SizedBox(height: 12),
-                  _buildPeopleSection(),
-                  const SizedBox(height: 24),
-                  // Happening Near You
-                  DiscoverSectionHeader(
-                    title: 'Happening Near You',
-                    actionLabel: 'See all nearby',
-                    onAction: _onSeeAllEvents,
-                  ),
-                  const SizedBox(height: 12),
-                  _buildEventsSection(),
-                  const SizedBox(height: 8),
-                  _buildStatsRow(),
-                  const SizedBox(height: 24),
-                  // Explore Communities
-                  DiscoverSectionHeader(
-                    title: 'Explore Communities',
-                    actionLabel: 'Browse all',
-                    onAction: _onBrowseCommunities,
-                  ),
-                  const SizedBox(height: 12),
-                  _buildCommunitiesSection(),
-                  const SizedBox(height: 32),
+                  ..._buildMixedDiscoverFeed(),
+                  const SizedBox(height: 28),
                 ],
               ),
             ),
@@ -455,18 +441,187 @@ class _DiscoverPageV2State extends State<DiscoverPageV2> {
         ),
       );
 
+  List<_DiscoverBlock> _composeBlocks() {
+    final hasPeopleContent =
+        _peopleLoading || _peopleError != null || _people.isNotEmpty;
+    final hasEventContent =
+        _eventsLoading || _eventsError != null || _events.isNotEmpty;
+    final hasCommunityContent = _communitiesLoading ||
+        _communitiesError != null ||
+        _communities.isNotEmpty;
+
+    final blocks = <_DiscoverBlock>[
+      _DiscoverBlock.trendingEvent,
+      if (hasPeopleContent) _DiscoverBlock.peopleYouMayLike,
+      if (hasCommunityContent) _DiscoverBlock.communities,
+      if (hasEventContent) _DiscoverBlock.happeningThisWeek,
+      if ((_peopleLoading || _peopleError != null) || _people.length > 2)
+        _DiscoverBlock.suggestedConnections,
+      if (!_statsLoading) _DiscoverBlock.stats,
+    ];
+
+    if (blocks.isEmpty) {
+      return const [
+        _DiscoverBlock.trendingEvent,
+        _DiscoverBlock.peopleYouMayLike
+      ];
+    }
+    return blocks;
+  }
+
+  List<Widget> _buildMixedDiscoverFeed() {
+    final blocks = _composeBlocks();
+    final widgets = <Widget>[const SizedBox(height: 24)];
+
+    for (final block in blocks) {
+      switch (block) {
+        case _DiscoverBlock.trendingEvent:
+          widgets.add(_buildTrendingEventBlock());
+        case _DiscoverBlock.peopleYouMayLike:
+          widgets.add(_buildPeopleYouMayLikeBlock());
+        case _DiscoverBlock.communities:
+          widgets.add(_buildCommunitiesBlock());
+        case _DiscoverBlock.happeningThisWeek:
+          widgets.add(_buildHappeningThisWeekBlock());
+        case _DiscoverBlock.suggestedConnections:
+          widgets.add(_buildSuggestedConnectionsBlock());
+        case _DiscoverBlock.stats:
+          widgets.add(_buildStatsBlock());
+      }
+      widgets.add(const SizedBox(height: 24));
+    }
+
+    return widgets;
+  }
+
+  Widget _buildTrendingEventBlock() => Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          DiscoverSectionHeader(
+            title: 'Trending Near You',
+            actionLabel: 'See all nearby',
+            onAction: _onSeeAllEvents,
+          ),
+          const SizedBox(height: 12),
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 24),
+            child: _buildTrendingEventCard(),
+          ),
+          if (_usingGlobalEventsFallback) ...[
+            const SizedBox(height: 10),
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 24),
+              child: Text(
+                'Showing popular events outside your area',
+                style: GoogleFonts.montserrat(
+                  fontSize: 12,
+                  fontWeight: FontWeight.w500,
+                  color: AppColors.textSecondary,
+                ),
+              ),
+            ),
+          ],
+        ],
+      );
+
+  Widget _buildTrendingEventCard() {
+    if (_eventsLoading) {
+      return const DiscoverSkeletonCard(height: 220);
+    }
+    if (_eventsError != null) {
+      return _buildInlineError(_eventsError!, _loadEvents,
+          horizontalPadding: 0);
+    }
+    if (_events.isEmpty) {
+      return _buildActionableEmpty(
+        icon: Icons.local_fire_department_outlined,
+        message: 'No trending events nearby',
+        actionLabel: 'Browse all events',
+        onAction: _onSeeAllEvents,
+        horizontalPadding: 0,
+      );
+    }
+    return EventCardOverlay(
+      event: _events.first,
+      onTap: () => _onTapEvent(_events.first),
+    );
+  }
+
+  Widget _buildPeopleYouMayLikeBlock() => Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          DiscoverSectionHeader(
+            title: 'People You May Like',
+            actionLabel: 'See all',
+            onAction: _onSeeAllPeople,
+          ),
+          const SizedBox(height: 12),
+          _buildPeopleSection(),
+        ],
+      );
+
+  Widget _buildCommunitiesBlock() => Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          DiscoverSectionHeader(
+            title: 'Explore Communities',
+            actionLabel: 'Browse all',
+            onAction: _onBrowseCommunities,
+          ),
+          const SizedBox(height: 12),
+          _buildCommunitiesSection(),
+        ],
+      );
+
+  Widget _buildHappeningThisWeekBlock() {
+    final upcomingEvents =
+        _events.length > 1 ? _events.skip(1).toList() : _events;
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        DiscoverSectionHeader(
+          title: 'Happening This Week',
+          actionLabel: 'See all nearby',
+          onAction: _onSeeAllEvents,
+        ),
+        const SizedBox(height: 12),
+        _buildEventsSection(events: upcomingEvents),
+      ],
+    );
+  }
+
+  Widget _buildSuggestedConnectionsBlock() {
+    final suggested = _people.length > 2 ? _people.skip(2).toList() : _people;
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        DiscoverSectionHeader(
+          title: 'Suggested Connections',
+          actionLabel: 'See all',
+          onAction: _onSeeAllPeople,
+        ),
+        const SizedBox(height: 12),
+        _buildPeopleSection(people: suggested),
+      ],
+    );
+  }
+
+  Widget _buildStatsBlock() => _buildStatsRow();
+
   // ---------------------------------------------------------------------------
   // People section
   // ---------------------------------------------------------------------------
 
-  Widget _buildPeopleSection() {
+  Widget _buildPeopleSection({List<UserModel>? people}) {
+    final sectionPeople = people ?? _people;
+
     if (_peopleLoading) {
       return _buildSkeletonRow(width: 160, height: 220, count: 3);
     }
     if (_peopleError != null) {
       return _buildInlineError(_peopleError!, _loadPeople);
     }
-    if (_people.isEmpty) {
+    if (sectionPeople.isEmpty) {
       return _buildActionableEmpty(
         icon: Icons.people_outline_rounded,
         message: 'No people found nearby',
@@ -477,10 +632,10 @@ class _DiscoverPageV2State extends State<DiscoverPageV2> {
     return HorizontalSnapList(
       itemWidth: 160,
       itemHeight: 220,
-      itemCount: _people.length,
+      itemCount: sectionPeople.length,
       itemBuilder: (_, i) => PeopleCard(
-        user: _people[i],
-        onTap: () => _onTapPerson(_people[i]),
+        user: sectionPeople[i],
+        onTap: () => _onTapPerson(sectionPeople[i]),
       ),
     );
   }
@@ -489,7 +644,9 @@ class _DiscoverPageV2State extends State<DiscoverPageV2> {
   // Events section
   // ---------------------------------------------------------------------------
 
-  Widget _buildEventsSection() {
+  Widget _buildEventsSection({List<EventModel>? events}) {
+    final sectionEvents = events ?? _events;
+
     if (_eventsLoading) {
       return Padding(
         padding: const EdgeInsets.symmetric(horizontal: 24),
@@ -505,7 +662,7 @@ class _DiscoverPageV2State extends State<DiscoverPageV2> {
     if (_eventsError != null) {
       return _buildInlineError(_eventsError!, _loadEvents);
     }
-    if (_events.isEmpty) {
+    if (sectionEvents.isEmpty) {
       return _buildActionableEmpty(
         icon: Icons.event_outlined,
         message: 'No upcoming events nearby',
@@ -515,8 +672,9 @@ class _DiscoverPageV2State extends State<DiscoverPageV2> {
     }
 
     final pairs = <List<EventModel>>[];
-    for (var i = 0; i < _events.length; i += 2) {
-      pairs.add(_events.sublist(i, (i + 2).clamp(0, _events.length)));
+    for (var i = 0; i < sectionEvents.length; i += 2) {
+      pairs.add(
+          sectionEvents.sublist(i, (i + 2).clamp(0, sectionEvents.length)));
     }
 
     return Padding(
@@ -691,8 +849,13 @@ class _DiscoverPageV2State extends State<DiscoverPageV2> {
             DiscoverSkeletonCard(width: width, height: height),
       );
 
-  Widget _buildInlineError(String message, VoidCallback onRetry) => Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 24),
+  Widget _buildInlineError(
+    String message,
+    VoidCallback onRetry, {
+    double horizontalPadding = 24,
+  }) =>
+      Padding(
+        padding: EdgeInsets.symmetric(horizontal: horizontalPadding),
         child: Container(
           padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 20),
           decoration: BoxDecoration(
@@ -738,9 +901,10 @@ class _DiscoverPageV2State extends State<DiscoverPageV2> {
     required String message,
     required String actionLabel,
     required VoidCallback onAction,
+    double horizontalPadding = 24,
   }) =>
       Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 24),
+        padding: EdgeInsets.symmetric(horizontal: horizontalPadding),
         child: Container(
           width: double.infinity,
           padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 28),
@@ -931,8 +1095,9 @@ class _DiscoverFilterSheetState extends State<_DiscoverFilterSheet> {
                                 e.value.$1,
                                 style: GoogleFonts.montserrat(
                                   fontSize: 15,
-                                  fontWeight:
-                                      isSelected ? FontWeight.w600 : FontWeight.w500,
+                                  fontWeight: isSelected
+                                      ? FontWeight.w600
+                                      : FontWeight.w500,
                                   color: isSelected
                                       ? AppColors.primaryGreen
                                       : AppColors.textPrimary,

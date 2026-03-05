@@ -123,16 +123,12 @@ class _EnhancedPhotoUploadScreenState extends State<EnhancedPhotoUploadScreen> {
           child: Container(
             decoration: BoxDecoration(
               color: photo == null
-                  ? OnboardingTheme.primaryGreen.withValues(alpha: 0.08)
+                  ? OnboardingTheme.fieldFill
                   : OnboardingTheme.background,
               borderRadius: BorderRadius.circular(OnboardingTheme.fieldRadius),
               border: isMainPhoto && photo != null
                   ? Border.all(color: OnboardingTheme.primaryGreen, width: 3)
-                  : Border.all(
-                      color: photo == null
-                          ? OnboardingTheme.primaryGreen.withValues(alpha: 0.3)
-                          : OnboardingTheme.fieldBorder,
-                    ),
+                  : Border.all(color: OnboardingTheme.fieldBorder),
             ),
             clipBehavior: Clip.antiAlias,
             child: Stack(
@@ -149,7 +145,7 @@ class _EnhancedPhotoUploadScreenState extends State<EnhancedPhotoUploadScreen> {
                     child: Icon(
                       Icons.add_photo_alternate,
                       size: 48,
-                      color: OnboardingTheme.primaryGreen.withValues(alpha: 0.35),
+                      color: OnboardingTheme.fieldBorder,
                     ),
                   ),
 

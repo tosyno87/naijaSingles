@@ -11,7 +11,6 @@ import '../../../common/routes/route_name.dart';
 import '../../../common/widgets/afropeep_logo.dart';
 import '../auth_method/sign_in_method_selection_screen.dart';
 import '../phone/ui/screens/phone_number.dart';
-import 'widgets/rotating_greeting_widget.dart';
 
 class WelcomeScreen extends StatefulWidget {
   const WelcomeScreen({super.key});
@@ -71,7 +70,7 @@ class _WelcomeScreenState extends State<WelcomeScreen>
       vsync: this,
     );
     _buttonSlide = Tween<Offset>(
-      begin: const Offset(0, 0.5),
+      begin: const Offset(0, 0.4),
       end: Offset.zero,
     ).animate(
       CurvedAnimation(parent: _buttonController, curve: Curves.easeOutCubic),
@@ -133,172 +132,151 @@ class _WelcomeScreenState extends State<WelcomeScreen>
 
     final screenHeight = MediaQuery.of(context).size.height;
     final screenWidth = MediaQuery.of(context).size.width;
+    final topPadding = MediaQuery.of(context).padding.top;
     final bottomPadding = MediaQuery.of(context).padding.bottom;
+
+    final heroHeight = screenHeight * 0.48;
+    const cardOverlap = 28.0;
 
     return Scaffold(
       body: Stack(
         fit: StackFit.expand,
         children: [
-          // Photo background (top) + cream fill (bottom)
-          Column(
-            children: [
-              SizedBox(
-                height: screenHeight * 0.55,
-                width: double.infinity,
-                child: Image.asset(
-                  'assets/images/backgrounds/welcome_couple.png',
-                  fit: BoxFit.cover,
-                  errorBuilder: (context, error, stackTrace) => Container(
-                    decoration: const BoxDecoration(
-                      gradient: LinearGradient(
-                        begin: Alignment.topCenter,
-                        end: Alignment.bottomCenter,
-                        colors: [Color(0xFF1A3D2B), Color(0xFF006B2E)],
-                      ),
-                    ),
-                  ),
-                ),
-              ),
-              const Expanded(child: ColoredBox(color: _creamBackground)),
-            ],
-          ),
-
-          // Top vignette for status bar + logo readability
+          // Hero photo
           Positioned(
             top: 0,
             left: 0,
             right: 0,
-            height: screenHeight * 0.18,
-            child: DecoratedBox(
-              decoration: BoxDecoration(
-                gradient: LinearGradient(
-                  begin: Alignment.topCenter,
-                  end: Alignment.bottomCenter,
-                  colors: [
-                    Colors.black.withValues(alpha: 0.35),
-                    Colors.black.withValues(alpha: 0),
-                  ],
+            height: heroHeight,
+            child: Image.asset(
+              'assets/images/backgrounds/welcome_couple.png',
+              fit: BoxFit.cover,
+              errorBuilder: (context, error, stackTrace) => Container(
+                decoration: const BoxDecoration(
+                  gradient: LinearGradient(
+                    begin: Alignment.topCenter,
+                    end: Alignment.bottomCenter,
+                    colors: [Color(0xFF1A3D2B), Color(0xFF006B2E)],
+                  ),
                 ),
               ),
             ),
           ),
 
-          // Gradient transition from photo into cream
+          // Dark gradient overlay (cinematic: dark edges, clear center)
           Positioned(
-            top: screenHeight * 0.36,
+            top: 0,
             left: 0,
             right: 0,
-            height: screenHeight * 0.21,
+            height: heroHeight,
             child: DecoratedBox(
               decoration: BoxDecoration(
                 gradient: LinearGradient(
                   begin: Alignment.topCenter,
                   end: Alignment.bottomCenter,
                   colors: [
-                    _creamBackground.withValues(alpha: 0),
-                    _creamBackground.withValues(alpha: 0.7),
-                    _creamBackground,
+                    Colors.black.withValues(alpha: 0.3),
+                    Colors.black.withValues(alpha: 0.0),
+                    Colors.black.withValues(alpha: 0.45),
                   ],
-                  stops: const [0.0, 0.55, 1.0],
+                  stops: const [0.0, 0.35, 1.0],
                 ),
               ),
             ),
           ),
 
-          // Content layer
-          SafeArea(
-            child: Column(
-              children: [
-                const SizedBox(height: 32),
+          // Logo centered on hero
+          Positioned(
+            top: topPadding + 32,
+            left: 0,
+            right: 0,
+            child: FadeTransition(
+              opacity: _logoFade,
+              child: ScaleTransition(
+                scale: _logoScale,
+                child: const AfropeepLogo(size: 100),
+              ),
+            ),
+          ),
 
-                // Logo + brand name overlaid on photo
-                FadeTransition(
-                  opacity: _logoFade,
-                  child: ScaleTransition(
-                    scale: _logoScale,
-                    child: _buildLogoSection(),
-                  ),
+          // Content card overlapping hero
+          Positioned(
+            top: heroHeight - cardOverlap,
+            left: 0,
+            right: 0,
+            bottom: 0,
+            child: Container(
+              decoration: const BoxDecoration(
+                color: _creamBackground,
+                borderRadius: BorderRadius.vertical(
+                  top: Radius.circular(28),
                 ),
-
-                const Spacer(),
-
-                // Greeting + tagline in the cream area
-                FadeTransition(
-                  opacity: _contentFade,
-                  child: Column(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      const RotatingGreetingWidget(
-                        fontSize: 28,
-                        fontWeight: FontWeight.w600,
-                        textColor: Color(0xFF2D2D2D),
+              ),
+              child: Padding(
+                padding: EdgeInsets.fromLTRB(
+                  24,
+                  36,
+                  24,
+                  bottomPadding > 0 ? bottomPadding + 12 : 28,
+                ),
+                child: Column(
+                  children: [
+                    // Title + value prop
+                    FadeTransition(
+                      opacity: _contentFade,
+                      child: Column(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Text(
+                            'Find Your Tribe Anywhere',
+                            textAlign: TextAlign.center,
+                            style: GoogleFonts.montserrat(
+                              fontSize: 26,
+                              fontWeight: FontWeight.w700,
+                              color: const Color(0xFF2D2D2D),
+                              height: 1.2,
+                            ),
+                          ),
+                          const SizedBox(height: 12),
+                          Text(
+                            'Where African culture meets modern dating',
+                            textAlign: TextAlign.center,
+                            style: GoogleFonts.montserrat(
+                              fontSize: 15,
+                              fontWeight: FontWeight.w400,
+                              color: const Color(0xFF666666),
+                              height: 1.4,
+                            ),
+                          ),
+                        ],
                       ),
-                      const SizedBox(height: 8),
-                      Text(
-                        'Find your tribe anywhere',
-                        textAlign: TextAlign.center,
-                        style: GoogleFonts.montserrat(
-                          fontSize: 16,
-                          fontWeight: FontWeight.w400,
-                          color: const Color(0xFF666666),
-                          height: 1.4,
+                    ),
+
+                    const Spacer(),
+
+                    // Buttons
+                    if (_isLoading)
+                      const CircularProgressIndicator(
+                        color: AppColors.primaryGreen,
+                      ),
+
+                    if (!_isLoading)
+                      SlideTransition(
+                        position: _buttonSlide,
+                        child: FadeTransition(
+                          opacity: _buttonFade,
+                          child: _buildButtons(screenWidth),
                         ),
                       ),
-                    ],
-                  ),
+                  ],
                 ),
-
-                const SizedBox(height: 40),
-
-                // Buttons
-                if (_isLoading)
-                  const Padding(
-                    padding: EdgeInsets.only(bottom: 40),
-                    child: CircularProgressIndicator(
-                      color: AppColors.primaryGreen,
-                    ),
-                  ),
-
-                if (!_isLoading)
-                  SlideTransition(
-                    position: _buttonSlide,
-                    child: FadeTransition(
-                      opacity: _buttonFade,
-                      child: _buildButtons(screenWidth),
-                    ),
-                  ),
-
-                SizedBox(height: bottomPadding > 0 ? bottomPadding + 16 : 32),
-              ],
+              ),
             ),
           ),
         ],
       ),
     );
   }
-
-  Widget _buildLogoSection() => Column(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          const AfropeepLogo(size: 100),
-          const SizedBox(height: 8),
-          Text(
-            'Afropeep',
-            style: GoogleFonts.montserrat(
-              fontSize: 22,
-              fontWeight: FontWeight.w700,
-              color: Colors.white,
-              letterSpacing: 0.5,
-              shadows: [
-                Shadow(
-                  color: Colors.black.withValues(alpha: 0.4),
-                  blurRadius: 10,
-                ),
-              ],
-            ),
-          ),
-        ],
-      );
 
   Widget _buildButtons(double screenWidth) {
     final buttonWidth = screenWidth * 0.82;
@@ -309,14 +287,12 @@ class _WelcomeScreenState extends State<WelcomeScreen>
           width: buttonWidth,
           child: _buildPrimaryButton(
             text: 'Continue to App',
-            onPressed: () {
-              unawaited(
-                Navigator.pushReplacementNamed(
-                  context,
-                  RouteName.mainNavigation,
-                ),
-              );
-            },
+            onPressed: () => unawaited(
+              Navigator.pushReplacementNamed(
+                context,
+                RouteName.mainNavigation,
+              ),
+            ),
           ),
         ),
       );
@@ -330,17 +306,15 @@ class _WelcomeScreenState extends State<WelcomeScreen>
             width: buttonWidth,
             child: _buildPrimaryButton(
               text: 'Create Account',
-              onPressed: () {
-                unawaited(
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (context) =>
-                          PhoneNumber(updatePhoneNumber: false),
-                    ),
+              onPressed: () => unawaited(
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) =>
+                        PhoneNumber(updatePhoneNumber: false),
                   ),
-                );
-              },
+                ),
+              ),
             ),
           ),
         ),
@@ -350,17 +324,15 @@ class _WelcomeScreenState extends State<WelcomeScreen>
             width: buttonWidth,
             child: _buildSecondaryButton(
               text: 'Log in',
-              onPressed: () {
-                unawaited(
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (context) =>
-                          const SignInMethodSelectionScreen(),
-                    ),
+              onPressed: () => unawaited(
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) =>
+                        const SignInMethodSelectionScreen(),
                   ),
-                );
-              },
+                ),
+              ),
             ),
           ),
         ),
@@ -414,38 +386,30 @@ class _WelcomeScreenState extends State<WelcomeScreen>
     required String text,
     required VoidCallback onPressed,
   }) =>
-      Container(
-        decoration: BoxDecoration(
-          color: _creamBackground,
-          borderRadius: BorderRadius.circular(28),
-          border: Border.all(
-            color: const Color(0xFFE0D5C5),
-            width: 1.5,
+      OutlinedButton(
+        onPressed: () {
+          unawaited(HapticFeedback.lightImpact());
+          onPressed();
+        },
+        style: OutlinedButton.styleFrom(
+          backgroundColor: Colors.white.withValues(alpha: 0.6),
+          foregroundColor: AppColors.primaryGreenDark,
+          side: BorderSide(
+            color: AppColors.primaryGreenDark.withValues(alpha: 0.3),
+          ),
+          minimumSize: const Size(double.infinity, 52),
+          padding: const EdgeInsets.symmetric(vertical: 14, horizontal: 24),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(28),
           ),
         ),
-        child: OutlinedButton(
-          onPressed: () {
-            unawaited(HapticFeedback.lightImpact());
-            onPressed();
-          },
-          style: OutlinedButton.styleFrom(
-            backgroundColor: Colors.transparent,
-            foregroundColor: AppColors.primaryGreenDark,
-            side: BorderSide.none,
-            minimumSize: const Size(double.infinity, 54),
-            padding: const EdgeInsets.symmetric(vertical: 15, horizontal: 24),
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(28),
-            ),
-          ),
-          child: Text(
-            text,
-            style: GoogleFonts.montserrat(
-              fontSize: 16,
-              fontWeight: FontWeight.w600,
-              letterSpacing: 0.3,
-              color: AppColors.primaryGreenDark,
-            ),
+        child: Text(
+          text,
+          style: GoogleFonts.montserrat(
+            fontSize: 15,
+            fontWeight: FontWeight.w500,
+            letterSpacing: 0.3,
+            color: AppColors.primaryGreenDark,
           ),
         ),
       );

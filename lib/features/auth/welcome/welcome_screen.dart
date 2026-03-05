@@ -240,16 +240,26 @@ class _WelcomeScreenState extends State<WelcomeScreen>
                 children: [
                   const SizedBox(height: 20),
 
-                  // Wordmark
+                  // Wordmark — serif like Hinge (Tiempos → DM Serif Display)
                   FadeTransition(
                     opacity: _textFade,
                     child: Text(
                       'Afropeep',
-                      style: GoogleFonts.montserrat(
-                        fontSize: 32,
-                        fontWeight: FontWeight.w600,
+                      style: GoogleFonts.dmSerifDisplay(
+                        fontSize: 36,
+                        fontWeight: FontWeight.w400,
                         color: Colors.white,
-                        letterSpacing: 0.5,
+                        letterSpacing: 1.0,
+                        shadows: [
+                          Shadow(
+                            color: Colors.black.withValues(alpha: 0.5),
+                            blurRadius: 12,
+                          ),
+                          Shadow(
+                            color: Colors.black.withValues(alpha: 0.25),
+                            blurRadius: 4,
+                          ),
+                        ],
                       ),
                     ),
                   ),

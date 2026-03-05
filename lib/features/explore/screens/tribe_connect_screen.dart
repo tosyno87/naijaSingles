@@ -2,11 +2,11 @@ import 'dart:async';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
+import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:google_fonts/google_fonts.dart';
 
 import '../../../common/constants/app_colors.dart';
 import '../../../common/data/repo/user_search_repo.dart';
-import '../../../common/widgets/custom_3d_icons.dart';
 import '../../../models/user_model.dart';
 import '../widgets/hinge_profile_card.dart';
 import '../widgets/match_confirmation_modal.dart';
@@ -62,7 +62,7 @@ class _TribeConnectScreenState extends State<TribeConnectScreen> {
         actions: [
           IconButton(
             onPressed: _showFilters,
-            icon: Custom3DIcons.filter(),
+            icon: _buildToolbarIcon(FontAwesomeIcons.sliders),
           ),
           const SizedBox(width: 8),
         ],
@@ -94,7 +94,7 @@ class _TribeConnectScreenState extends State<TribeConnectScreen> {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Custom3DIcons.communities(size: 80, color: AppColors.primaryGreen),
+            _buildEmptyStateIcon(),
             const SizedBox(height: 24),
             Text(
               'No More Profiles',
@@ -120,8 +120,7 @@ class _TribeConnectScreenState extends State<TribeConnectScreen> {
               style: ElevatedButton.styleFrom(
                 backgroundColor: AppColors.primaryGreen,
                 foregroundColor: Colors.white,
-                disabledBackgroundColor:
-                    AppColors.primaryGreen.withAlpha(120),
+                disabledBackgroundColor: AppColors.primaryGreen.withAlpha(120),
                 padding:
                     const EdgeInsets.symmetric(horizontal: 32, vertical: 16),
                 shape: RoundedRectangleBorder(
@@ -146,6 +145,59 @@ class _TribeConnectScreenState extends State<TribeConnectScreen> {
                     ),
             ),
           ],
+        ),
+      );
+
+  Widget _buildToolbarIcon(IconData icon) => Container(
+        width: 38,
+        height: 38,
+        decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.circular(12),
+          border: Border.all(
+            color: const Color(0xFFE8E8EC),
+          ),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black.withValues(alpha: 0.06),
+              blurRadius: 12,
+              offset: const Offset(0, 4),
+            ),
+          ],
+        ),
+        child: Center(
+          child: FaIcon(
+            icon,
+            size: 16,
+            color: AppColors.textPrimary,
+          ),
+        ),
+      );
+
+  Widget _buildEmptyStateIcon() => Container(
+        width: 92,
+        height: 92,
+        decoration: BoxDecoration(
+          borderRadius: BorderRadius.circular(28),
+          gradient: const LinearGradient(
+            colors: [Color(0xFF0F9D58), Color(0xFF007A39)],
+            begin: Alignment.topLeft,
+            end: Alignment.bottomRight,
+          ),
+          boxShadow: [
+            BoxShadow(
+              color: const Color(0xFF0F9D58).withValues(alpha: 0.28),
+              blurRadius: 18,
+              offset: const Offset(0, 8),
+            ),
+          ],
+        ),
+        child: const Center(
+          child: FaIcon(
+            FontAwesomeIcons.userGroup,
+            size: 38,
+            color: Colors.white,
+          ),
         ),
       );
 

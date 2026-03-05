@@ -5,8 +5,10 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 
 import '../../../common/constants/app_colors.dart';
+import '../../../services/group_unread_service.dart';
 import '../../group_chat/screens/create_group_screen.dart';
 import '../data/services/unified_group_service.dart';
+import '../widgets/unified_group_card.dart';
 import 'group_details_screen.dart';
 
 /// Unified Groups Screen that combines Cultural Groups and Group Chats
@@ -21,10 +23,12 @@ class UnifiedGroupsScreen extends StatefulWidget {
 class _UnifiedGroupsScreenState extends State<UnifiedGroupsScreen>
     with TickerProviderStateMixin {
   final UnifiedGroupService _groupService = UnifiedGroupService();
+  final GroupUnreadService _unreadService = GroupUnreadService();
   final TextEditingController _searchController = TextEditingController();
 
   List<UnifiedGroup> _groups = [];
   List<UnifiedGroup> _userGroups = [];
+  Map<String, int> _unreadCounts = {};
   bool _isLoading = false;
   bool _isSearching = false;
   GroupType? _selectedType;
@@ -35,44 +39,58 @@ class _UnifiedGroupsScreenState extends State<UnifiedGroupsScreen>
   void initState() {
     super.initState();
     _tabController = TabController(length: 3, vsync: this);
+    _searchController.addListener(_onSearchTextChanged);
     unawaited(_loadGroups());
   }
 
   @override
   void dispose() {
+    _searchController.removeListener(_onSearchTextChanged);
     _searchController.dispose();
     _tabController.dispose();
     super.dispose();
   }
 
+  void _onSearchTextChanged() {
+    setState(() {});
+  }
+
   Future<void> _loadGroups() async {
+    if (!mounted) return;
     setState(() => _isLoading = true);
 
     try {
-      // Load public groups for discovery
       final publicGroupsStream =
           _groupService.getPublicGroups(type: _selectedType);
       final publicGroups = await publicGroupsStream.first;
 
-      // Load user's groups
       final userGroupsStream = _groupService.getUserGroups();
       final userGroups = await userGroupsStream.first;
 
+      final unreadResults = await Future.wait(
+        userGroups.map((g) => _unreadService.getUnreadCount(g.id)),
+      );
+      final counts = {
+        for (var i = 0; i < userGroups.length; i++)
+          userGroups[i].id: unreadResults[i],
+      };
+
+      if (!mounted) return;
       setState(() {
         _groups = publicGroups;
         _userGroups = userGroups;
+        _unreadCounts = counts;
         _isLoading = false;
       });
     } on Object catch (e) {
+      if (!mounted) return;
       setState(() => _isLoading = false);
-      if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text('Error loading groups: $e'),
-            backgroundColor: AppColors.error,
-          ),
-        );
-      }
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('Error loading groups: $e'),
+          backgroundColor: AppColors.error,
+        ),
+      );
     }
   }
 
@@ -82,6 +100,7 @@ class _UnifiedGroupsScreenState extends State<UnifiedGroupsScreen>
       return;
     }
 
+    if (!mounted) return;
     setState(() => _isSearching = true);
 
     try {
@@ -90,20 +109,20 @@ class _UnifiedGroupsScreenState extends State<UnifiedGroupsScreen>
         type: _selectedType,
       );
 
+      if (!mounted) return;
       setState(() {
         _groups = searchResults;
         _isSearching = false;
       });
     } on Object catch (e) {
+      if (!mounted) return;
       setState(() => _isSearching = false);
-      if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text('Error searching groups: $e'),
-            backgroundColor: AppColors.error,
-          ),
-        );
-      }
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('Error searching groups: $e'),
+          backgroundColor: AppColors.error,
+        ),
+      );
     }
   }
 
@@ -147,34 +166,24 @@ class _UnifiedGroupsScreenState extends State<UnifiedGroupsScreen>
     }
   }
 
-  Widget _buildActionButton(UnifiedGroup group) {
-    final currentUserId = FirebaseAuth.instance.currentUser?.uid ?? '';
-    final isMember = group.isMember(currentUserId);
+  Widget _buildCard(UnifiedGroup group, {bool showAdminBadge = false}) {
+    final uid = FirebaseAuth.instance.currentUser?.uid ?? '';
+    final member = group.isMember(uid);
+    final admin = showAdminBadge && group.isAdmin(uid);
+    final isFeatured =
+        group.memberCount > 20 ||
+        DateTime.now().difference(group.lastActivityAt).inHours < 1;
 
-    return ElevatedButton(
-      onPressed: () async {
-        if (isMember) {
-          // User is already a member - navigate to chat
-          unawaited(_navigateToGroupDetails(group));
-        } else {
-          // User is not a member - join the group
-          await _joinGroup(group);
-        }
-      },
-      style: ElevatedButton.styleFrom(
-        backgroundColor: isMember ? Colors.blue : AppColors.primaryGreen,
-        foregroundColor: Colors.white,
-        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(8),
-        ),
-      ),
-      child: Text(
-        isMember ? (group.enableChat ? 'Enter Chat' : 'View Group') : 'Join',
-        style: GoogleFonts.montserrat(
-          fontSize: 12,
-          fontWeight: FontWeight.w600,
-        ),
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 16),
+      child: UnifiedGroupCard(
+        group: group,
+        isMember: member,
+        isAdmin: admin,
+        featured: isFeatured,
+        hasUnread: member && (_unreadCounts[group.id] ?? 0) > 0,
+        onTap: () => _navigateToGroupDetails(group),
+        onJoin: member ? null : () => _joinGroup(group),
       ),
     );
   }
@@ -436,7 +445,7 @@ class _UnifiedGroupsScreenState extends State<UnifiedGroupsScreen>
         itemCount: _groups.length,
         itemBuilder: (context, index) {
           final group = _groups[index];
-          return _buildGroupCard(group);
+          return _buildCard(group);
         },
       ),
     );
@@ -495,7 +504,7 @@ class _UnifiedGroupsScreenState extends State<UnifiedGroupsScreen>
         itemCount: _userGroups.length,
         itemBuilder: (context, index) {
           final group = _userGroups[index];
-          return _buildGroupCard(group, showJoinButton: false);
+          return _buildCard(group, showAdminBadge: false);
         },
       ),
     );
@@ -540,148 +549,11 @@ class _UnifiedGroupsScreenState extends State<UnifiedGroupsScreen>
         itemCount: createdGroups.length,
         itemBuilder: (context, index) {
           final group = createdGroups[index];
-          return _buildGroupCard(
-            group,
-            showJoinButton: false,
-            showAdminBadge: true,
-          );
+          return _buildCard(group, showAdminBadge: true);
         },
       ),
     );
   }
-
-  Widget _buildGroupCard(
-    UnifiedGroup group, {
-    bool showJoinButton = true,
-    bool showAdminBadge = false,
-  }) =>
-      Container(
-        margin: const EdgeInsets.only(bottom: 12),
-        decoration: BoxDecoration(
-          color: Colors.white,
-          borderRadius: BorderRadius.circular(12),
-          boxShadow: [
-            BoxShadow(
-              color: Colors.grey.withValues(alpha: 0.1),
-              blurRadius: 4,
-              offset: const Offset(0, 2),
-            ),
-          ],
-        ),
-        child: ListTile(
-          contentPadding: const EdgeInsets.all(16),
-          leading: _buildGroupAvatar(group),
-          title: Row(
-            children: [
-              Expanded(
-                child: Text(
-                  group.name,
-                  style: GoogleFonts.montserrat(
-                    fontSize: 16,
-                    fontWeight: FontWeight.w600,
-                    color: Colors.black87,
-                  ),
-                ),
-              ),
-              if (showAdminBadge)
-                Container(
-                  padding:
-                      const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
-                  decoration: BoxDecoration(
-                    color: AppColors.primaryGreen,
-                    borderRadius: BorderRadius.circular(8),
-                  ),
-                  child: Text(
-                    'ADMIN',
-                    style: GoogleFonts.montserrat(
-                      fontSize: 10,
-                      fontWeight: FontWeight.bold,
-                      color: Colors.white,
-                    ),
-                  ),
-                ),
-            ],
-          ),
-          subtitle: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              const SizedBox(height: 4),
-              Text(
-                group.description,
-                style: GoogleFonts.montserrat(
-                  fontSize: 14,
-                  color: Colors.grey[600],
-                ),
-                maxLines: 2,
-                overflow: TextOverflow.ellipsis,
-              ),
-              const SizedBox(height: 8),
-              Row(
-                children: [
-                  _buildTypeChip(group.type),
-                  const SizedBox(width: 8),
-                  Text(
-                    '${group.memberCount}/${group.maxMembers}',
-                    style: GoogleFonts.montserrat(
-                      fontSize: 12,
-                      color: Colors.grey[500],
-                    ),
-                  ),
-                  if (group.enableChat) ...[
-                    const SizedBox(width: 8),
-                    Icon(
-                      Icons.chat_bubble_outline,
-                      size: 14,
-                      color: Colors.grey[500],
-                    ),
-                  ],
-                  const Spacer(),
-                  if (group.lastMessageAt != null)
-                    Text(
-                      _formatLastActivityTime(group.lastActivityAt),
-                      style: GoogleFonts.montserrat(
-                        fontSize: 12,
-                        color: Colors.grey[500],
-                      ),
-                    ),
-                ],
-              ),
-            ],
-          ),
-          trailing: showJoinButton ? _buildActionButton(group) : null,
-          onTap: () => _navigateToGroupDetails(group),
-        ),
-      );
-
-  Widget _buildGroupAvatar(UnifiedGroup group) => Container(
-        width: 50,
-        height: 50,
-        decoration: BoxDecoration(
-          color: _getTypeColor(group.type),
-          borderRadius: BorderRadius.circular(25),
-        ),
-        child: Icon(
-          _getTypeIcon(group.type),
-          color: Colors.white,
-          size: 24,
-        ),
-      );
-
-  Widget _buildTypeChip(GroupType type) => Container(
-        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
-        decoration: BoxDecoration(
-          color: _getTypeColor(type).withValues(alpha: 0.1),
-          borderRadius: BorderRadius.circular(8),
-        ),
-        child: Text(
-          _getTypeLabel(type).toUpperCase(),
-          style: GoogleFonts.montserrat(
-            fontSize: 10,
-            fontWeight: FontWeight.w600,
-            color: _getTypeColor(type),
-          ),
-        ),
-      );
 
   Widget _buildCreateButton() => SizedBox(
         width: double.infinity,
@@ -816,122 +688,4 @@ class _UnifiedGroupsScreenState extends State<UnifiedGroupsScreen>
     }
   }
 
-  Color _getTypeColor(GroupType type) {
-    switch (type) {
-      // Interest & Hobby Groups
-      case GroupType.music:
-        return Colors.purple;
-      case GroupType.sports:
-        return Colors.orange;
-      case GroupType.travel:
-        return Colors.blue;
-      case GroupType.food:
-        return Colors.red;
-      case GroupType.art:
-        return Colors.pink;
-
-      // Lifestyle & Career Groups
-      case GroupType.career:
-        return Colors.indigo;
-      case GroupType.fitness:
-        return Colors.green;
-      case GroupType.gaming:
-        return Colors.deepPurple;
-      case GroupType.reading:
-        return Colors.brown;
-      case GroupType.movies:
-        return Colors.teal;
-
-      // Social & Community Groups
-      case GroupType.events:
-        return Colors.amber;
-      case GroupType.networking:
-        return Colors.cyan;
-      case GroupType.support:
-        return Colors.lightBlue;
-      case GroupType.study:
-        return Colors.deepOrange;
-      case GroupType.local:
-        return Colors.lightGreen;
-
-      // Special Interest Groups
-      case GroupType.tech:
-        return Colors.blueGrey;
-      case GroupType.fashion:
-        return Colors.pinkAccent;
-      case GroupType.pets:
-        return Colors.amberAccent;
-      case GroupType.parenting:
-        return Colors.lightGreenAccent;
-      case GroupType.seniors:
-        return Colors.grey;
-    }
-  }
-
-  IconData _getTypeIcon(GroupType type) {
-    switch (type) {
-      // Interest & Hobby Groups
-      case GroupType.music:
-        return Icons.music_note;
-      case GroupType.sports:
-        return Icons.sports_soccer;
-      case GroupType.travel:
-        return Icons.travel_explore;
-      case GroupType.food:
-        return Icons.restaurant;
-      case GroupType.art:
-        return Icons.palette;
-
-      // Lifestyle & Career Groups
-      case GroupType.career:
-        return Icons.work;
-      case GroupType.fitness:
-        return Icons.fitness_center;
-      case GroupType.gaming:
-        return Icons.sports_esports;
-      case GroupType.reading:
-        return Icons.menu_book;
-      case GroupType.movies:
-        return Icons.movie;
-
-      // Social & Community Groups
-      case GroupType.events:
-        return Icons.event;
-      case GroupType.networking:
-        return Icons.people;
-      case GroupType.support:
-        return Icons.support_agent;
-      case GroupType.study:
-        return Icons.school;
-      case GroupType.local:
-        return Icons.location_on;
-
-      // Special Interest Groups
-      case GroupType.tech:
-        return Icons.computer;
-      case GroupType.fashion:
-        return Icons.checkroom;
-      case GroupType.pets:
-        return Icons.pets;
-      case GroupType.parenting:
-        return Icons.child_care;
-      case GroupType.seniors:
-        return Icons.elderly;
-    }
-  }
-
-  String _formatLastActivityTime(DateTime timestamp) {
-    final now = DateTime.now();
-    final difference = now.difference(timestamp);
-
-    if (difference.inDays > 0) {
-      return '${difference.inDays}d ago';
-    } else if (difference.inHours > 0) {
-      return '${difference.inHours}h ago';
-    } else if (difference.inMinutes > 0) {
-      return '${difference.inMinutes}m ago';
-    } else {
-      return 'now';
-    }
-  }
 }

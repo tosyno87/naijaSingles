@@ -80,14 +80,11 @@ class _PhoneNumberState extends State<PhoneNumber> {
 
   @override
   Widget build(BuildContext context) {
-    // Set system UI overlay style for status bar
     SystemChrome.setSystemUIOverlayStyle(
-      SystemUiOverlayStyle.dark.copyWith(
+      SystemUiOverlayStyle.light.copyWith(
         statusBarColor: Colors.transparent,
       ),
     );
-
-    // Using centralized AppColors - no need for local color constants
 
     return RepositoryProvider(
       create: (context) => PhoneAuthRepository(),
@@ -98,10 +95,13 @@ class _PhoneNumberState extends State<PhoneNumber> {
         ),
         child: Scaffold(
           key: _scaffoldKey,
-          backgroundColor: AppColors.backgroundColor,
+          extendBodyBehindAppBar: true,
+          backgroundColor: Colors.black,
           appBar: AfropeepAppBar(
             title:
                 widget.isSignIn ? 'Sign In with Phone' : 'Sign Up with Phone',
+            titleColor: Colors.white,
+            backButtonColor: Colors.white,
           ),
           body: BlocListener<PhoneAuthBloc, PhoneAuthState>(
             listener: (context, state) {
@@ -185,7 +185,37 @@ class _PhoneNumberState extends State<PhoneNumber> {
                 }
               }
             },
-            child: SafeArea(
+            child: Stack(
+              fit: StackFit.expand,
+              children: [
+                Image.asset(
+                  'assets/images/backgrounds/welcome_couple.png',
+                  fit: BoxFit.cover,
+                  errorBuilder: (context, error, stackTrace) => Container(
+                    decoration: const BoxDecoration(
+                      gradient: LinearGradient(
+                        begin: Alignment.topCenter,
+                        end: Alignment.bottomCenter,
+                        colors: [Color(0xFF1A3D2B), Color(0xFF006B2E)],
+                      ),
+                    ),
+                  ),
+                ),
+                const DecoratedBox(
+                  decoration: BoxDecoration(
+                    gradient: LinearGradient(
+                      begin: Alignment.topCenter,
+                      end: Alignment.bottomCenter,
+                      colors: [
+                        Color(0x59000000), // 35%
+                        Color(0x1A000000), // 10%
+                        Color(0xBF000000), // 75% — heavier for form readability
+                      ],
+                      stops: [0.0, 0.3, 1.0],
+                    ),
+                  ),
+                ),
+                SafeArea(
               child: Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 24),
                 child: Center(
@@ -193,28 +223,32 @@ class _PhoneNumberState extends State<PhoneNumber> {
                     child: Column(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
-                        // Phone icon using reusable widget
                         const AuthIconContainer(
                           icon: Icons.phone_android,
+                          backgroundColor: Color(0x33FFFFFF),
+                          iconColor: Colors.white,
                         ),
 
                         const SizedBox(height: 32),
 
-                        // Debug info banner for iOS Simulator
                         if (kDebugMode && Platform.isIOS)
                           Container(
                             margin: const EdgeInsets.only(bottom: 20),
                             padding: const EdgeInsets.all(12),
                             decoration: BoxDecoration(
-                              color: Colors.blue.shade50,
+                              color: Colors.blue.shade50
+                                  .withValues(alpha: 0.15),
                               borderRadius: BorderRadius.circular(8),
-                              border: Border.all(color: Colors.blue.shade200),
+                              border: Border.all(
+                                color:
+                                    Colors.blue.shade200.withValues(alpha: 0.4),
+                              ),
                             ),
                             child: Row(
                               children: [
                                 Icon(
                                   Icons.info_outline,
-                                  color: Colors.blue.shade700,
+                                  color: Colors.blue.shade200,
                                   size: 20,
                                 ),
                                 const SizedBox(width: 8),
@@ -223,7 +257,7 @@ class _PhoneNumberState extends State<PhoneNumber> {
                                     '💡 iOS Simulator: Use test phone numbers from Firebase Console',
                                     style: GoogleFonts.montserrat(
                                       fontSize: 12,
-                                      color: Colors.blue.shade900,
+                                      color: Colors.blue.shade100,
                                     ),
                                   ),
                                 ),
@@ -236,7 +270,7 @@ class _PhoneNumberState extends State<PhoneNumber> {
                           style: GoogleFonts.montserrat(
                             fontSize: 24,
                             fontWeight: FontWeight.w600,
-                            color: AppColors.primaryGreen,
+                            color: Colors.white,
                           ),
                           textAlign: TextAlign.center,
                         ),
@@ -245,7 +279,7 @@ class _PhoneNumberState extends State<PhoneNumber> {
                           "We'll send you a verification code",
                           style: GoogleFonts.montserrat(
                             fontSize: 16,
-                            color: AppColors.textSecondary,
+                            color: const Color(0xB3FFFFFF),
                           ),
                           textAlign: TextAlign.center,
                         ),
@@ -470,19 +504,17 @@ class _PhoneNumberState extends State<PhoneNumber> {
 
                         const SizedBox(height: 24),
 
-                        // Consent text
                         Text(
                           'By continuing, you agree to receive SMS messages for verification and may be subject to carrier fees.',
                           textAlign: TextAlign.center,
                           style: GoogleFonts.montserrat(
                             fontSize: 12,
-                            color: const Color(0xFF999999),
+                            color: const Color(0x80FFFFFF),
                           ),
                         ),
 
                         const SizedBox(height: 40),
 
-                        // Account toggle
                         Row(
                           mainAxisAlignment: MainAxisAlignment.center,
                           children: [
@@ -492,7 +524,7 @@ class _PhoneNumberState extends State<PhoneNumber> {
                                   : 'Already have an account? ',
                               style: GoogleFonts.montserrat(
                                 fontSize: 14,
-                                color: AppColors.textPrimary,
+                                color: const Color(0xB3FFFFFF),
                               ),
                             ),
                             GestureDetector(
@@ -518,7 +550,7 @@ class _PhoneNumberState extends State<PhoneNumber> {
                                 style: GoogleFonts.montserrat(
                                   fontSize: 14,
                                   fontWeight: FontWeight.w600,
-                                  color: AppColors.primaryGreen,
+                                  color: Colors.white,
                                 ),
                               ),
                             ),
@@ -529,6 +561,8 @@ class _PhoneNumberState extends State<PhoneNumber> {
                   ),
                 ),
               ),
+              ),
+              ],
             ),
           ),
         ),

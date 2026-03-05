@@ -10,8 +10,8 @@ class OnboardingTheme {
   // Colors
   // ---------------------------------------------------------------------------
   static const Color background = Color(0xFFF9F9F7);
-  static const Color fieldFill = Color(0xFFF3E8DB);
-  static const Color fieldBorder = Color(0xFFE3D9CD);
+  static final Color fieldFill = primaryGreen.withValues(alpha: 0.08);
+  static final Color fieldBorder = primaryGreen.withValues(alpha: 0.3);
   static const Color focusBorder = Color(0xFF008037);
   static const Color titleColor = Color(0xFF1F1F1F);
   static const Color subtitleColor = Color(0xFF6B6B6B);
@@ -133,11 +133,11 @@ class OnboardingTheme {
         suffixIcon: suffix,
         border: OutlineInputBorder(
           borderRadius: BorderRadius.circular(fieldRadius),
-          borderSide: const BorderSide(color: fieldBorder, width: fieldBorderWidth),
+          borderSide: BorderSide(color: fieldBorder, width: fieldBorderWidth),
         ),
         enabledBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(fieldRadius),
-          borderSide: const BorderSide(color: fieldBorder, width: fieldBorderWidth),
+          borderSide: BorderSide(color: fieldBorder, width: fieldBorderWidth),
         ),
         focusedBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(fieldRadius),

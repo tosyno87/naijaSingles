@@ -72,7 +72,7 @@ class _BasicInfoScreenState extends State<BasicInfoScreen> {
       lastDate: DateTime.now().subtract(const Duration(days: 365 * 18)),
       builder: (context, child) => Theme(
         data: Theme.of(context).copyWith(
-          colorScheme: const ColorScheme.light(
+          colorScheme: ColorScheme.light(
             primary: OnboardingTheme.primaryGreen,
             surface: OnboardingTheme.fieldFill,
             onSurface: OnboardingTheme.sectionLabelColor,

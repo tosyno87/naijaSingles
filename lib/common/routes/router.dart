@@ -25,7 +25,7 @@ import '../../features/events/presentation/screens/events_screen.dart';
 import '../../features/events/presentation/screens/my_events_screen.dart';
 import '../../features/explore/explore_screen.dart';
 import '../../features/group_chat/screens/group_list_screen.dart';
-import '../../features/groups/ui/screens/groups_screen.dart';
+import '../../features/groups/screens/unified_groups_screen.dart';
 import '../../features/home/main_navigation_screen.dart';
 import '../../features/home/ui/screens/splash.dart';
 import '../../features/home/ui/screens/user_filter/settings.dart';
@@ -301,7 +301,7 @@ abstract class AppRouter {
     RouteName.onboardingFlow: (context) => const OnboardingMain(),
     RouteName.exploreScreen: (context) =>
         const ExploreScreen(), // No back button by default
-    RouteName.groupsScreen: (context) => const GroupsScreen(),
+    RouteName.groupsScreen: (context) => const UnifiedGroupsScreen(),
     RouteName.groupChatsScreen: (context) => const GroupListScreen(),
 
     // Settings screens

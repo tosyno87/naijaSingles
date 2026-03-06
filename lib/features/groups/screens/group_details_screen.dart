@@ -61,12 +61,13 @@ class _GroupDetailsScreenState extends State<GroupDetailsScreen> {
             style: GoogleFonts.montserrat(
               fontSize: 18,
               fontWeight: FontWeight.w600,
-              color: Colors.white,
+              color: AppColors.textPrimary,
             ),
           ),
-          backgroundColor: AppColors.primaryGreen,
-          foregroundColor: Colors.white,
+          backgroundColor: AppColors.backgroundColor,
+          foregroundColor: AppColors.textPrimary,
           elevation: 0,
+          scrolledUnderElevation: 0.5,
           actions: [
             if (widget.isMember) ...[
               IconButton(

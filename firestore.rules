@@ -674,19 +674,26 @@ service cloud.firestore {
     }
 
     // Group Unread Counts collection - for tracking unread messages per group
+    // Doc IDs follow the pattern {groupId}_{userId}.
     match /group_unread_counts/{countId} {
-      // Users can read and write their own unread counts
-      allow read, write: if request.auth != null && 
-                          request.auth.uid == resource.data.userId;
-      
+      // Single-doc reads must work even when the document doesn't exist yet
+      // (resource is null), so we scope by doc-ID suffix instead of
+      // resource.data which would fail on a missing document.
+      allow get: if request.auth != null &&
+                    countId.matches('.*_' + request.auth.uid);
+
+      // List queries filter by userId field on existing documents.
+      allow list: if request.auth != null &&
+                     resource.data.userId == request.auth.uid;
+
       // Users can create their own unread count records
       allow create: if request.auth != null && 
                      request.auth.uid == request.resource.data.userId &&
                      request.resource.data.keys().hasAll(['userId', 'groupId', 'count', 'updatedAt']);
       
-      // Only the document owner can update their own unread counts
-      allow update: if request.auth != null &&
-                     request.auth.uid == resource.data.userId;
+      // Only the document owner can update/delete their own unread counts
+      allow update, delete: if request.auth != null &&
+                               request.auth.uid == resource.data.userId;
     }
 
     // Group Reports collection - for group abuse reports

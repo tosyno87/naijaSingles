@@ -31,7 +31,7 @@ class UnifiedGroupCard extends StatelessWidget {
   final GroupBadge? badge;
   final List<String?> memberAvatars;
 
-  double get _imageHeight => featured ? 180 : 140;
+  double get _imageHeight => featured ? 200 : 170;
 
   bool get _isActiveNow =>
       DateTime.now().difference(group.lastActivityAt).inMinutes < 30;
@@ -83,7 +83,7 @@ class UnifiedGroupCard extends StatelessWidget {
               CachedNetworkImage(
                 imageUrl: group.imageUrl!,
                 fit: BoxFit.cover,
-                alignment: Alignment.topCenter,
+                alignment: Alignment.center,
                 placeholder: (_, __) => _buildBannerFallback(),
                 errorWidget: (_, __, ___) => _buildBannerFallback(),
               )
@@ -252,7 +252,7 @@ class UnifiedGroupCard extends StatelessWidget {
   // ---------------------------------------------------------------------------
 
   Widget _buildBody() => Padding(
-        padding: const EdgeInsets.fromLTRB(16, 14, 16, 14),
+        padding: const EdgeInsets.fromLTRB(16, 14, 16, 16),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
@@ -451,13 +451,14 @@ class UnifiedGroupCard extends StatelessWidget {
     if (!isMember) {
       return SizedBox(
         width: double.infinity,
-        height: 38,
+        height: 42,
         child: ElevatedButton(
           onPressed: onJoin,
           style: ElevatedButton.styleFrom(
             backgroundColor: AppColors.primaryGreen,
             foregroundColor: Colors.white,
             elevation: 0,
+            padding: const EdgeInsets.symmetric(vertical: 10),
             shape: RoundedRectangleBorder(
               borderRadius: BorderRadius.circular(12),
             ),
@@ -476,12 +477,13 @@ class UnifiedGroupCard extends StatelessWidget {
     final label = group.enableChat ? 'Open Chat' : 'View Community';
     return SizedBox(
       width: double.infinity,
-      height: 38,
+      height: 42,
       child: OutlinedButton(
         onPressed: onTap,
         style: OutlinedButton.styleFrom(
           foregroundColor: AppColors.primaryGreen,
           side: const BorderSide(color: AppColors.primaryGreen),
+          padding: const EdgeInsets.symmetric(vertical: 10),
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(12),
           ),

@@ -1001,12 +1001,14 @@ class _CreateGroupScreenState extends State<CreateGroupScreen>
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                // Photo banner
-                SizedBox(
-                  height: 100,
-                  width: double.infinity,
+                AspectRatio(
+                  aspectRatio: 16 / 9,
                   child: _selectedImage != null
-                      ? Image.file(_selectedImage!, fit: BoxFit.cover)
+                      ? Image.file(
+                          _selectedImage!,
+                          fit: BoxFit.cover,
+                          width: double.infinity,
+                        )
                       : DecoratedBox(
                           decoration: BoxDecoration(
                             gradient: LinearGradient(
@@ -1555,6 +1557,54 @@ class _CreateGroupScreenState extends State<CreateGroupScreen>
           );
         } on Object catch (e) {
           AppLogger.error('Image upload failed', error: e);
+
+          if (!mounted) return;
+          LoadingDialog.hide(context);
+
+          final proceed = await showDialog<bool>(
+            context: context,
+            builder: (ctx) => AlertDialog(
+              title: Text(
+                'Image upload failed',
+                style: GoogleFonts.montserrat(fontWeight: FontWeight.w600),
+              ),
+              content: Text(
+                'The cover photo could not be uploaded. '
+                'Create the community without it?',
+                style: GoogleFonts.montserrat(fontSize: 14),
+              ),
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(16),
+              ),
+              actions: [
+                TextButton(
+                  onPressed: () => Navigator.pop(ctx, false),
+                  child: Text(
+                    'Cancel',
+                    style: GoogleFonts.montserrat(fontWeight: FontWeight.w600),
+                  ),
+                ),
+                TextButton(
+                  onPressed: () => Navigator.pop(ctx, true),
+                  child: Text(
+                    'Continue without photo',
+                    style: GoogleFonts.montserrat(
+                      fontWeight: FontWeight.w600,
+                      color: AppColors.primaryGreen,
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          );
+
+          if (proceed != true) {
+            if (mounted) setState(() => _isCreating = false);
+            return;
+          }
+
+          if (!mounted) return;
+          unawaited(LoadingDialog.show(context: context));
         }
       }
 

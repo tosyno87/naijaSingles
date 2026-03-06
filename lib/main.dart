@@ -68,11 +68,15 @@ Future<void> main() async {
     );
     log('🔥 Firebase initialized successfully');
 
-    await FirebaseAppCheck.instance.activate(
-      appleProvider:
-          kDebugMode ? AppleProvider.debug : AppleProvider.deviceCheck,
-    );
-    log('🛡️ Firebase App Check activated');
+    try {
+      await FirebaseAppCheck.instance.activate(
+        appleProvider:
+            kDebugMode ? AppleProvider.debug : AppleProvider.deviceCheck,
+      );
+      log('🛡️ Firebase App Check activated');
+    } on Object catch (e) {
+      log('⚠️ App Check activation failed (Storage will work without it): $e');
+    }
 
     // Configure Firebase Auth for iOS Simulator testing
     if (Platform.isIOS && kDebugMode) {

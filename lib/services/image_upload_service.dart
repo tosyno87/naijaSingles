@@ -2,7 +2,6 @@ import 'dart:developer' as dev;
 import 'dart:io';
 import 'dart:typed_data';
 
-import 'package:firebase_app_check/firebase_app_check.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
@@ -68,14 +67,6 @@ class ImageUploadService {
         '📤 Upload: $storagePath | bucket=$bucket | '
         'size=${fileSize}B | type=$contentType',
       );
-
-      try {
-        final token = await FirebaseAppCheck.instance.getToken(true);
-        dev.log('🛡️ App Check token: ${token != null ? 'OK (${token.length} chars)' : 'NULL'}');
-      } on Object catch (e) {
-        dev.log('⚠️ App Check token fetch failed: $e — '
-            'if enforcement is on for Storage, uploads will fail');
-      }
 
       final Reference ref = _storage.ref().child(storagePath);
 

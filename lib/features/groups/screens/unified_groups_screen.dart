@@ -6,6 +6,7 @@ import 'package:google_fonts/google_fonts.dart';
 
 import '../../../common/constants/app_colors.dart';
 import '../../../services/group_unread_service.dart';
+import '../../communities/ui/widgets/discover_skeleton_card.dart';
 import '../../group_chat/screens/create_group_screen.dart';
 import '../data/services/unified_group_service.dart';
 import '../widgets/unified_group_card.dart';
@@ -32,6 +33,8 @@ class _UnifiedGroupsScreenState extends State<UnifiedGroupsScreen>
   bool _isLoading = false;
   bool _isSearching = false;
   GroupType? _selectedType;
+  Timer? _searchDebounce;
+  int _requestVersion = 0;
 
   late TabController _tabController;
 
@@ -45,6 +48,7 @@ class _UnifiedGroupsScreenState extends State<UnifiedGroupsScreen>
 
   @override
   void dispose() {
+    _searchDebounce?.cancel();
     _searchController.removeListener(_onSearchTextChanged);
     _searchController.dispose();
     _tabController.dispose();
@@ -53,10 +57,19 @@ class _UnifiedGroupsScreenState extends State<UnifiedGroupsScreen>
 
   void _onSearchTextChanged() {
     setState(() {});
+    _searchDebounce?.cancel();
+    _searchDebounce = Timer(const Duration(milliseconds: 400), () {
+      if (_searchController.text.trim().isEmpty) {
+        unawaited(_loadGroups());
+      } else {
+        unawaited(_searchGroups());
+      }
+    });
   }
 
   Future<void> _loadGroups() async {
     if (!mounted) return;
+    final version = ++_requestVersion;
     setState(() => _isLoading = true);
 
     try {
@@ -67,23 +80,16 @@ class _UnifiedGroupsScreenState extends State<UnifiedGroupsScreen>
       final userGroupsStream = _groupService.getUserGroups();
       final userGroups = await userGroupsStream.first;
 
-      final unreadResults = await Future.wait(
-        userGroups.map((g) => _unreadService.getUnreadCount(g.id)),
-      );
-      final counts = {
-        for (var i = 0; i < userGroups.length; i++)
-          userGroups[i].id: unreadResults[i],
-      };
-
-      if (!mounted) return;
+      if (!mounted || version != _requestVersion) return;
       setState(() {
         _groups = publicGroups;
         _userGroups = userGroups;
-        _unreadCounts = counts;
         _isLoading = false;
       });
+
+      unawaited(_loadUnreadCounts(userGroups, version));
     } on Object catch (e) {
-      if (!mounted) return;
+      if (!mounted || version != _requestVersion) return;
       setState(() => _isLoading = false);
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
@@ -94,6 +100,24 @@ class _UnifiedGroupsScreenState extends State<UnifiedGroupsScreen>
     }
   }
 
+  Future<void> _loadUnreadCounts(List<UnifiedGroup> groups, int version) async {
+    if (groups.isEmpty) return;
+    try {
+      final results = await Future.wait(
+        groups.map((g) => _unreadService.getUnreadCount(g.id)),
+      );
+      if (!mounted || version != _requestVersion) return;
+      setState(() {
+        _unreadCounts = {
+          for (var i = 0; i < groups.length; i++)
+            groups[i].id: results[i],
+        };
+      });
+    } on Object {
+      // Non-critical; cards render fine without unread badges
+    }
+  }
+
   Future<void> _searchGroups() async {
     if (_searchController.text.trim().isEmpty) {
       await _loadGroups();
@@ -101,6 +125,7 @@ class _UnifiedGroupsScreenState extends State<UnifiedGroupsScreen>
     }
 
     if (!mounted) return;
+    final version = ++_requestVersion;
     setState(() => _isSearching = true);
 
     try {
@@ -109,13 +134,13 @@ class _UnifiedGroupsScreenState extends State<UnifiedGroupsScreen>
         type: _selectedType,
       );
 
-      if (!mounted) return;
+      if (!mounted || version != _requestVersion) return;
       setState(() {
         _groups = searchResults;
         _isSearching = false;
       });
     } on Object catch (e) {
-      if (!mounted) return;
+      if (!mounted || version != _requestVersion) return;
       setState(() => _isSearching = false);
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
@@ -311,12 +336,10 @@ class _UnifiedGroupsScreenState extends State<UnifiedGroupsScreen>
         ),
         child: TextField(
           controller: _searchController,
-          onChanged: (value) {
-            if (value.isEmpty) {
-              unawaited(_loadGroups());
-            }
+          onSubmitted: (_) {
+            _searchDebounce?.cancel();
+            unawaited(_searchGroups());
           },
-          onSubmitted: (_) => _searchGroups(),
           decoration: InputDecoration(
             hintText: 'Search communities...',
             hintStyle: GoogleFonts.montserrat(
@@ -431,13 +454,20 @@ class _UnifiedGroupsScreenState extends State<UnifiedGroupsScreen>
         ),
       );
 
-  Widget _buildDiscoverTab() {
-    if (_isLoading) {
-      return const Center(
-        child: CircularProgressIndicator(
-          color: AppColors.primaryGreen,
+  Widget _buildLoadingSkeleton() => ListView(
+        padding: const EdgeInsets.all(16),
+        children: List.generate(
+          4,
+          (_) => const Padding(
+            padding: EdgeInsets.only(bottom: 16),
+            child: DiscoverSkeletonCard(height: 200, radius: 20),
+          ),
         ),
       );
+
+  Widget _buildDiscoverTab() {
+    if (_isLoading) {
+      return _buildLoadingSkeleton();
     }
 
     if (_groups.isEmpty) {
@@ -471,11 +501,7 @@ class _UnifiedGroupsScreenState extends State<UnifiedGroupsScreen>
 
   Widget _buildMyGroupsTab() {
     if (_isLoading) {
-      return const Center(
-        child: CircularProgressIndicator(
-          color: AppColors.primaryGreen,
-        ),
-      );
+      return _buildLoadingSkeleton();
     }
 
     if (_userGroups.isEmpty) {
@@ -530,11 +556,7 @@ class _UnifiedGroupsScreenState extends State<UnifiedGroupsScreen>
 
   Widget _buildCreatedTab() {
     if (_isLoading) {
-      return const Center(
-        child: CircularProgressIndicator(
-          color: AppColors.primaryGreen,
-        ),
-      );
+      return _buildLoadingSkeleton();
     }
 
     // Filter groups created by current user

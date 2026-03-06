@@ -1,3 +1,4 @@
+import 'dart:developer' as dev;
 import 'dart:io';
 import 'dart:typed_data';
 
@@ -58,33 +59,47 @@ class ImageUploadService {
           '${DateTime.now().millisecondsSinceEpoch}'
               '${extension.isNotEmpty ? extension : '.jpg'}';
 
-      // Create reference to Firebase Storage
-      final Reference ref = _storage.ref().child('$path/$finalFileName');
+      final storagePath = '$path/$finalFileName';
+      final bucket = _storage.app.options.storageBucket ?? 'NO_BUCKET';
+      final fileSize = imageFile.lengthSync();
 
-      // Upload file
+      dev.log(
+        '📤 Upload: $storagePath | bucket=$bucket | '
+        'size=${fileSize}B | type=$contentType',
+      );
+
+      final Reference ref = _storage.ref().child(storagePath);
+
       final UploadTask uploadTask = ref.putFile(
         imageFile,
         SettableMetadata(contentType: contentType),
       );
 
-      // Wait for upload to complete
       final TaskSnapshot snapshot = await uploadTask;
-
-      // Get download URL
       final String downloadUrl = await snapshot.ref.getDownloadURL();
 
+      dev.log('✅ Upload succeeded: $storagePath');
       return downloadUrl;
     } on FirebaseException catch (e) {
+      final bucket = _storage.app.options.storageBucket ?? 'NO_BUCKET';
+      dev.log(
+        '❌ Upload FirebaseException: code=${e.code}, '
+        'message=${e.message}, plugin=${e.plugin}, bucket=$bucket',
+      );
       throw Exception(
-        'Failed to upload image [${e.code}] ${e.message ?? 'unknown'} '
-        '(bucket: ${_storage.app.options.storageBucket})',
+        'Storage error [${e.code}]: ${e.message ?? 'no details'} '
+        '(plugin: ${e.plugin}, bucket: $bucket)',
       );
     } on Object catch (e) {
+      dev.log('❌ Upload error: $e');
       throw Exception('Failed to upload image: $e');
     }
   }
 
-  /// Upload image with compression
+  /// Upload image with compression.
+  ///
+  /// Currently delegates directly to [uploadImage]. When a compression
+  /// package (e.g. flutter_image_compress) is added, compress here first.
   Future<String> uploadCompressedImage({
     required File imageFile,
     required String path,
@@ -92,19 +107,12 @@ class ImageUploadService {
     int quality = 85,
     int maxWidth = 800,
     int maxHeight = 800,
-  }) async {
-    try {
-      // For now, upload as-is. In production, you'd compress the image
-      // using packages like flutter_image_compress
-      return await uploadImage(
+  }) =>
+      uploadImage(
         imageFile: imageFile,
         path: path,
         fileName: fileName,
       );
-    } on Object catch (e) {
-      throw Exception('Failed to upload compressed image: $e');
-    }
-  }
 
   /// Delete image from Firebase Storage
   Future<void> deleteImage(String imageUrl) async {

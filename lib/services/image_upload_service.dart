@@ -4,7 +4,6 @@ import 'dart:typed_data';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
-import 'package:path/path.dart' as path;
 
 /// Service for handling image uploads to Firebase Storage
 class ImageUploadService {
@@ -46,15 +45,27 @@ class ImageUploadService {
     String? fileName,
   }) async {
     try {
+      if (!imageFile.existsSync()) {
+        throw Exception('Selected image file does not exist.');
+      }
+
+      final extension = _extensionFromPath(imageFile.path);
+      final contentType = _contentTypeForExtension(extension);
+
       // Generate unique filename if not provided
       final String finalFileName =
-          fileName ?? '${DateTime.now().millisecondsSinceEpoch}.jpg';
+          fileName ??
+          '${DateTime.now().millisecondsSinceEpoch}'
+              '${extension.isNotEmpty ? extension : '.jpg'}';
 
       // Create reference to Firebase Storage
       final Reference ref = _storage.ref().child('$path/$finalFileName');
 
       // Upload file
-      final UploadTask uploadTask = ref.putFile(imageFile);
+      final UploadTask uploadTask = ref.putFile(
+        imageFile,
+        SettableMetadata(contentType: contentType),
+      );
 
       // Wait for upload to complete
       final TaskSnapshot snapshot = await uploadTask;
@@ -63,6 +74,11 @@ class ImageUploadService {
       final String downloadUrl = await snapshot.ref.getDownloadURL();
 
       return downloadUrl;
+    } on FirebaseException catch (e) {
+      throw Exception(
+        'Failed to upload image [${e.code}] ${e.message ?? 'unknown'} '
+        '(bucket: ${_storage.app.options.storageBucket})',
+      );
     } on Object catch (e) {
       throw Exception('Failed to upload image: $e');
     }
@@ -113,13 +129,15 @@ class ImageUploadService {
   /// Validate image file
   bool validateImage(File imageFile) {
     try {
-      final String extension = path.extension(imageFile.path).toLowerCase();
+      final String extension = _extensionFromPath(imageFile.path);
       const List<String> allowedExtensions = [
         '.jpg',
         '.jpeg',
         '.png',
         '.gif',
         '.webp',
+        '.heic',
+        '.heif',
       ];
 
       if (!allowedExtensions.contains(extension)) {
@@ -138,6 +156,34 @@ class ImageUploadService {
     } on Object {
       return false;
     }
+  }
+
+  String _contentTypeForExtension(String extension) {
+    switch (extension) {
+      case '.jpg':
+      case '.jpeg':
+        return 'image/jpeg';
+      case '.png':
+        return 'image/png';
+      case '.gif':
+        return 'image/gif';
+      case '.webp':
+        return 'image/webp';
+      case '.heic':
+        return 'image/heic';
+      case '.heif':
+        return 'image/heif';
+      default:
+        return 'image/jpeg';
+    }
+  }
+
+  String _extensionFromPath(String filePath) {
+    final index = filePath.lastIndexOf('.');
+    if (index < 0 || index == filePath.length - 1) {
+      return '';
+    }
+    return filePath.substring(index).toLowerCase();
   }
 
   /// Show image picker dialog

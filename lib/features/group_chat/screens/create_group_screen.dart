@@ -1558,7 +1558,7 @@ class _CreateGroupScreenState extends State<CreateGroupScreen>
           }
           imageUrl = await _imageService.uploadCompressedImage(
             imageFile: _selectedImage!,
-            path: 'group_avatars/$uid',
+            path: 'users/$uid/group_avatars',
           );
         } on Object catch (e) {
           AppLogger.error('Image upload failed', error: e);

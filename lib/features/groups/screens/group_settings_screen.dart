@@ -128,7 +128,7 @@ class _GroupSettingsScreenState extends State<GroupSettingsScreen> {
           AppLogger.info('Uploading group image...');
           imageUrl = await _imageService.uploadImage(
             imageFile: _selectedImage!,
-            path: 'group_avatars/$uid',
+            path: 'users/$uid/group_avatars',
             fileName:
                 '${widget.group.id}_${DateTime.now().millisecondsSinceEpoch}.jpg',
           );

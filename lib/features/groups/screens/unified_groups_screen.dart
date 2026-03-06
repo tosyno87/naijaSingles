@@ -6,6 +6,7 @@ import 'package:google_fonts/google_fonts.dart';
 
 import '../../../common/constants/app_colors.dart';
 import '../../../services/group_unread_service.dart';
+import '../../../services/user_service.dart';
 import '../../communities/ui/widgets/discover_skeleton_card.dart';
 import '../../group_chat/screens/create_group_screen.dart';
 import '../data/services/unified_group_service.dart';
@@ -25,11 +26,13 @@ class _UnifiedGroupsScreenState extends State<UnifiedGroupsScreen>
     with TickerProviderStateMixin {
   final UnifiedGroupService _groupService = UnifiedGroupService();
   final GroupUnreadService _unreadService = GroupUnreadService();
+  final UserService _userService = UserService();
   final TextEditingController _searchController = TextEditingController();
 
   List<UnifiedGroup> _groups = [];
   List<UnifiedGroup> _userGroups = [];
   Map<String, int> _unreadCounts = {};
+  Map<String, List<String?>> _memberAvatars = {};
   bool _isLoading = false;
   bool _isSearching = false;
   GroupType? _selectedType;
@@ -88,6 +91,7 @@ class _UnifiedGroupsScreenState extends State<UnifiedGroupsScreen>
       });
 
       unawaited(_loadUnreadCounts(userGroups, version));
+      unawaited(_loadMemberAvatars([...publicGroups, ...userGroups], version));
     } on Object catch (e) {
       if (!mounted || version != _requestVersion) return;
       setState(() => _isLoading = false);
@@ -115,6 +119,37 @@ class _UnifiedGroupsScreenState extends State<UnifiedGroupsScreen>
       });
     } on Object {
       // Non-critical; cards render fine without unread badges
+    }
+  }
+
+  Future<void> _loadMemberAvatars(
+    List<UnifiedGroup> groups,
+    int version,
+  ) async {
+    if (groups.isEmpty) return;
+    try {
+      final seen = <String>{};
+      final unique = groups.where((g) => seen.add(g.id)).toList();
+
+      final groupResults = await Future.wait(
+        unique.map((group) {
+          final ids = group.memberIds.take(3).toList();
+          if (ids.isEmpty) return Future.value(<String?>[]);
+          return Future.wait(
+            ids.map((id) => _userService.getUserAvatarUrl(id)),
+          );
+        }),
+      );
+
+      if (!mounted || version != _requestVersion) return;
+      setState(() {
+        _memberAvatars = {
+          for (var i = 0; i < unique.length; i++)
+            unique[i].id: groupResults[i],
+        };
+      });
+    } on Object {
+      // Non-critical; cards fall back to icon + count
     }
   }
 
@@ -215,6 +250,7 @@ class _UnifiedGroupsScreenState extends State<UnifiedGroupsScreen>
         isAdmin: admin,
         featured: isFeatured,
         hasUnread: member && (_unreadCounts[group.id] ?? 0) > 0,
+        memberAvatars: _memberAvatars[group.id] ?? const [],
         badge: isNew
             ? GroupBadge.isNew
             : isTrending
@@ -341,7 +377,7 @@ class _UnifiedGroupsScreenState extends State<UnifiedGroupsScreen>
             unawaited(_searchGroups());
           },
           decoration: InputDecoration(
-            hintText: 'Search communities...',
+            hintText: 'Search communities, topics, or people',
             hintStyle: GoogleFonts.montserrat(
               color: AppColors.textSecondary,
               fontSize: 14,
@@ -355,7 +391,6 @@ class _UnifiedGroupsScreenState extends State<UnifiedGroupsScreen>
                 ? IconButton(
                     onPressed: () {
                       _searchController.clear();
-                      unawaited(_loadGroups());
                     },
                     icon: const Icon(
                       Icons.clear,

@@ -17,6 +17,7 @@ class UnifiedGroupCard extends StatelessWidget {
     this.featured = false,
     this.hasUnread = false,
     this.badge,
+    this.memberAvatars = const [],
     super.key,
   });
 
@@ -28,6 +29,7 @@ class UnifiedGroupCard extends StatelessWidget {
   final bool featured;
   final bool hasUnread;
   final GroupBadge? badge;
+  final List<String?> memberAvatars;
 
   double get _imageHeight => featured ? 180 : 140;
 
@@ -67,6 +69,10 @@ class UnifiedGroupCard extends StatelessWidget {
         ),
       );
 
+  // ---------------------------------------------------------------------------
+  // Cover image with overlays
+  // ---------------------------------------------------------------------------
+
   Widget _buildCoverImage() => SizedBox(
         height: _imageHeight,
         width: double.infinity,
@@ -77,13 +83,13 @@ class UnifiedGroupCard extends StatelessWidget {
               CachedNetworkImage(
                 imageUrl: group.imageUrl!,
                 fit: BoxFit.cover,
-                placeholder: (_, __) => _buildGradientFallback(),
-                errorWidget: (_, __, ___) => _buildGradientFallback(),
+                alignment: Alignment.topCenter,
+                placeholder: (_, __) => _buildBannerFallback(),
+                errorWidget: (_, __, ___) => _buildBannerFallback(),
               )
             else
-              _buildGradientFallback(),
+              _buildBannerFallback(),
 
-            // Bottom gradient for badge readability
             Positioned.fill(
               child: DecoratedBox(
                 decoration: BoxDecoration(
@@ -129,7 +135,7 @@ class UnifiedGroupCard extends StatelessWidget {
               ),
             ),
 
-            // Ranking badge (top-right, above activity)
+            // Ranking badge (top-right)
             if (badge != null)
               Positioned(
                 top: 12,
@@ -167,7 +173,7 @@ class UnifiedGroupCard extends StatelessWidget {
                 ),
               ),
 
-            // Activity badge (top-right, below ranking badge if present)
+            // Active now badge
             if (_isActiveNow)
               Positioned(
                 top: badge != null ? 40 : 12,
@@ -241,57 +247,53 @@ class UnifiedGroupCard extends StatelessWidget {
         ),
       );
 
+  // ---------------------------------------------------------------------------
+  // Card body — name, description, metadata row, CTA
+  // ---------------------------------------------------------------------------
+
   Widget _buildBody() => Padding(
         padding: const EdgeInsets.fromLTRB(16, 14, 16, 14),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            // Name row + CTA
+            // Name + admin badge
             Row(
               children: [
-                Expanded(
-                  child: Row(
-                    children: [
-                      Flexible(
-                        child: Text(
-                          group.name,
-                          style: GoogleFonts.montserrat(
-                            fontSize: 16,
-                            fontWeight: FontWeight.w700,
-                            color: AppColors.textPrimary,
-                          ),
-                          maxLines: 1,
-                          overflow: TextOverflow.ellipsis,
-                        ),
-                      ),
-                      if (isAdmin) ...[
-                        const SizedBox(width: 6),
-                        Container(
-                          padding: const EdgeInsets.symmetric(
-                              horizontal: 6, vertical: 2),
-                          decoration: BoxDecoration(
-                            color: AppColors.primaryGreen,
-                            borderRadius: BorderRadius.circular(6),
-                          ),
-                          child: Text(
-                            'ADMIN',
-                            style: GoogleFonts.montserrat(
-                              fontSize: 9,
-                              fontWeight: FontWeight.w700,
-                              color: Colors.white,
-                            ),
-                          ),
-                        ),
-                      ],
-                    ],
+                Flexible(
+                  child: Text(
+                    group.name,
+                    style: GoogleFonts.montserrat(
+                      fontSize: 16,
+                      fontWeight: FontWeight.w700,
+                      color: AppColors.textPrimary,
+                    ),
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
                   ),
                 ),
-                const SizedBox(width: 8),
-                _buildCta(),
+                if (isAdmin) ...[
+                  const SizedBox(width: 6),
+                  Container(
+                    padding:
+                        const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                    decoration: BoxDecoration(
+                      color: AppColors.primaryGreen,
+                      borderRadius: BorderRadius.circular(6),
+                    ),
+                    child: Text(
+                      'ADMIN',
+                      style: GoogleFonts.montserrat(
+                        fontSize: 9,
+                        fontWeight: FontWeight.w700,
+                        color: Colors.white,
+                      ),
+                    ),
+                  ),
+                ],
               ],
             ),
 
-            const SizedBox(height: 6),
+            const SizedBox(height: 4),
 
             // Description
             Text(
@@ -306,111 +308,133 @@ class UnifiedGroupCard extends StatelessWidget {
               overflow: TextOverflow.ellipsis,
             ),
 
-            const SizedBox(height: 10),
-
-            // Engagement row
-            _buildEngagementRow(),
-          ],
-        ),
-      );
-
-  Widget _buildCta() {
-    if (!isMember) {
-      return SizedBox(
-        height: 32,
-        child: ElevatedButton(
-          onPressed: onJoin,
-          style: ElevatedButton.styleFrom(
-            backgroundColor: AppColors.primaryGreen,
-            foregroundColor: Colors.white,
-            elevation: 0,
-            padding: const EdgeInsets.symmetric(horizontal: 16),
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(16),
-            ),
-          ),
-          child: Text(
-            'Join',
-            style: GoogleFonts.montserrat(
-              fontSize: 13,
-              fontWeight: FontWeight.w600,
-            ),
-          ),
-        ),
-      );
-    }
-
-    final label = group.enableChat ? 'Open Chat' : 'View';
-    return SizedBox(
-      height: 32,
-      child: OutlinedButton(
-        onPressed: onTap,
-        style: OutlinedButton.styleFrom(
-          foregroundColor: AppColors.primaryGreen,
-          side: const BorderSide(color: AppColors.primaryGreen),
-          padding: const EdgeInsets.symmetric(horizontal: 14),
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(16),
-          ),
-        ),
-        child: Text(
-          label,
-          style: GoogleFonts.montserrat(
-            fontSize: 13,
-            fontWeight: FontWeight.w600,
-          ),
-        ),
-      ),
-    );
-  }
-
-  Widget _buildEngagementRow() => Row(
-        children: [
-          Icon(Icons.people_outline_rounded,
-              size: 14, color: Colors.grey.shade500),
-          const SizedBox(width: 3),
-          Text(
-            _memberLabel,
-            style: GoogleFonts.montserrat(
-              fontSize: 12,
-              fontWeight: FontWeight.w500,
-              color: Colors.grey.shade600,
-            ),
-          ),
-          if (_activeThisWeek) ...[
-            _dot(),
-            Icon(Icons.bolt_rounded,
-                size: 14, color: AppColors.primaryGreen),
-            const SizedBox(width: 2),
-            Text(
-              'Active this week',
-              style: GoogleFonts.montserrat(
-                fontSize: 12,
-                fontWeight: FontWeight.w500,
-                color: AppColors.primaryGreen,
+            // Location line (subtle, below description)
+            if (group.location != null && group.location!.isNotEmpty) ...[
+              const SizedBox(height: 4),
+              Row(
+                children: [
+                  Icon(Icons.location_on_outlined,
+                      size: 13, color: Colors.grey.shade400),
+                  const SizedBox(width: 3),
+                  Flexible(
+                    child: Text(
+                      group.location!,
+                      style: GoogleFonts.montserrat(
+                        fontSize: 12,
+                        fontWeight: FontWeight.w400,
+                        color: Colors.grey.shade500,
+                      ),
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                  ),
+                ],
               ),
-            ),
+            ],
+
+            const SizedBox(height: 12),
+
+            // Metadata row: avatar stack + activity
+            _buildMetadataRow(),
+
+            const SizedBox(height: 12),
+
+            // Full-width CTA
+            _buildFullWidthCta(),
           ],
-          if (group.location != null && group.location!.isNotEmpty) ...[
-            _dot(),
-            Icon(Icons.location_on_outlined,
-                size: 13, color: Colors.grey.shade500),
+        ),
+      );
+
+  // ---------------------------------------------------------------------------
+  // Metadata row — avatar stack + activity signal
+  // ---------------------------------------------------------------------------
+
+  Widget _buildMetadataRow() => Row(
+        children: [
+          _buildAvatarStack(),
+          if (_activeThisWeek) ...[
+            const SizedBox(width: 12),
+            Icon(Icons.bolt_rounded, size: 14, color: AppColors.primaryGreen),
             const SizedBox(width: 2),
             Flexible(
               child: Text(
-                group.location!,
+                'Active this week',
                 style: GoogleFonts.montserrat(
                   fontSize: 12,
                   fontWeight: FontWeight.w500,
-                  color: Colors.grey.shade600,
+                  color: AppColors.primaryGreen,
                 ),
-                maxLines: 1,
                 overflow: TextOverflow.ellipsis,
               ),
             ),
           ],
         ],
       );
+
+  // ---------------------------------------------------------------------------
+  // Avatar stack — overlapping circles + member count
+  // ---------------------------------------------------------------------------
+
+  Widget _buildAvatarStack() {
+    final shown = memberAvatars.length.clamp(0, 3);
+    final remaining = group.memberCount - shown;
+    const diameter = 24.0;
+    const overlap = 8.0;
+    final stackWidth = shown > 0
+        ? diameter + (shown - 1) * (diameter - overlap)
+        : 0.0;
+
+    return Row(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        if (shown > 0)
+          SizedBox(
+            width: stackWidth,
+            height: diameter,
+            child: Stack(
+              children: List.generate(shown, (i) {
+                final url = memberAvatars[i];
+                return Positioned(
+                  left: i * (diameter - overlap),
+                  child: Container(
+                    width: diameter,
+                    height: diameter,
+                    decoration: BoxDecoration(
+                      shape: BoxShape.circle,
+                      border: Border.all(color: Colors.white, width: 2),
+                    ),
+                    child: CircleAvatar(
+                      radius: (diameter - 4) / 2,
+                      backgroundColor: _typeColor.withValues(alpha: 0.3),
+                      backgroundImage:
+                          url != null ? NetworkImage(url) : null,
+                      child: url == null
+                          ? Icon(Icons.person, size: 12,
+                              color: _typeColor)
+                          : null,
+                    ),
+                  ),
+                );
+              }),
+            ),
+          )
+        else
+          Icon(Icons.people_outline_rounded,
+              size: 16, color: Colors.grey.shade500),
+        const SizedBox(width: 6),
+        Text(
+          remaining > 0 && shown > 0
+              ? '+$remaining ${remaining == 1 ? 'member' : 'members'}'
+              : _memberLabel,
+          style: GoogleFonts.montserrat(
+            fontSize: 12,
+            fontWeight: FontWeight.w500,
+            color: Colors.grey.shade600,
+          ),
+        ),
+      ],
+    );
+  }
 
   String get _memberLabel {
     if (group.memberCount >= 1000) {
@@ -419,17 +443,76 @@ class UnifiedGroupCard extends StatelessWidget {
     return '${group.memberCount} ${group.memberCount == 1 ? 'member' : 'members'}';
   }
 
-  Widget _dot() => Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 6),
-        child: Text(
-          '\u00B7',
-          style: TextStyle(
-            fontSize: 14,
-            fontWeight: FontWeight.w900,
-            color: Colors.grey.shade400,
+  // ---------------------------------------------------------------------------
+  // Full-width CTA button
+  // ---------------------------------------------------------------------------
+
+  Widget _buildFullWidthCta() {
+    if (!isMember) {
+      return SizedBox(
+        width: double.infinity,
+        height: 38,
+        child: ElevatedButton(
+          onPressed: onJoin,
+          style: ElevatedButton.styleFrom(
+            backgroundColor: AppColors.primaryGreen,
+            foregroundColor: Colors.white,
+            elevation: 0,
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(12),
+            ),
+          ),
+          child: Text(
+            'Join Community',
+            style: GoogleFonts.montserrat(
+              fontSize: 14,
+              fontWeight: FontWeight.w600,
+            ),
           ),
         ),
       );
+    }
+
+    final label = group.enableChat ? 'Open Chat' : 'View Community';
+    return SizedBox(
+      width: double.infinity,
+      height: 38,
+      child: OutlinedButton(
+        onPressed: onTap,
+        style: OutlinedButton.styleFrom(
+          foregroundColor: AppColors.primaryGreen,
+          side: const BorderSide(color: AppColors.primaryGreen),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(12),
+          ),
+        ),
+        child: Text(
+          label,
+          style: GoogleFonts.montserrat(
+            fontSize: 14,
+            fontWeight: FontWeight.w600,
+          ),
+        ),
+      ),
+    );
+  }
+
+  // ---------------------------------------------------------------------------
+  // Banner fallback — type-specific asset > gradient
+  // ---------------------------------------------------------------------------
+
+  Widget _buildBannerFallback() {
+    final assetPath = _typeAssetFor(group.type);
+    if (assetPath != null) {
+      return Image.asset(
+        assetPath,
+        fit: BoxFit.cover,
+        alignment: Alignment.topCenter,
+        errorBuilder: (_, __, ___) => _buildGradientFallback(),
+      );
+    }
+    return _buildGradientFallback();
+  }
 
   Widget _buildGradientFallback() {
     final base = HSLColor.fromColor(_typeColor);
@@ -477,9 +560,32 @@ class UnifiedGroupCard extends StatelessWidget {
     );
   }
 
-  // -------------------------------------------------------------------------
-  // Type mapping helpers (static, no instance state needed)
-  // -------------------------------------------------------------------------
+  // ---------------------------------------------------------------------------
+  // Type-specific asset mapping (top 5 types get lifestyle banners)
+  // ---------------------------------------------------------------------------
+
+  static String? _typeAssetFor(GroupType type) {
+    switch (type) {
+      case GroupType.gaming:
+        return 'assets/images/placeholders/community_gaming.png';
+      case GroupType.career:
+      case GroupType.networking:
+        return 'assets/images/placeholders/community_career.png';
+      case GroupType.travel:
+        return 'assets/images/placeholders/community_travel.png';
+      case GroupType.music:
+        return 'assets/images/placeholders/community_music.png';
+      case GroupType.sports:
+      case GroupType.fitness:
+        return 'assets/images/placeholders/community_sports.png';
+      default:
+        return null;
+    }
+  }
+
+  // ---------------------------------------------------------------------------
+  // Type mapping helpers
+  // ---------------------------------------------------------------------------
 
   static String _typeLabelFor(GroupType type) {
     switch (type) {

@@ -5,6 +5,8 @@ import 'package:google_fonts/google_fonts.dart';
 import '../../../common/constants/app_colors.dart';
 import '../data/services/unified_group_service.dart';
 
+enum GroupBadge { trending, isNew }
+
 class UnifiedGroupCard extends StatelessWidget {
   const UnifiedGroupCard({
     required this.group,
@@ -14,6 +16,7 @@ class UnifiedGroupCard extends StatelessWidget {
     this.isAdmin = false,
     this.featured = false,
     this.hasUnread = false,
+    this.badge,
     super.key,
   });
 
@@ -24,22 +27,17 @@ class UnifiedGroupCard extends StatelessWidget {
   final bool isAdmin;
   final bool featured;
   final bool hasUnread;
+  final GroupBadge? badge;
 
   double get _imageHeight => featured ? 180 : 140;
-
-  String get _activityLabel {
-    final diff = DateTime.now().difference(group.lastActivityAt);
-    if (diff.inMinutes < 30) return 'Active now';
-    if (diff.inHours < 1) return '${diff.inMinutes}m ago';
-    if (diff.inHours < 24) return '${diff.inHours}h ago';
-    if (diff.inDays < 7) return '${diff.inDays}d ago';
-    return '';
-  }
 
   bool get _isActiveNow =>
       DateTime.now().difference(group.lastActivityAt).inMinutes < 30;
 
   bool get _hasNewMessages => isMember && hasUnread;
+
+  bool get _activeThisWeek =>
+      DateTime.now().difference(group.lastActivityAt).inDays < 7;
 
   Color get _typeColor => _typeColorFor(group.type);
   IconData get _typeIcon => _typeIconFor(group.type);
@@ -131,10 +129,48 @@ class UnifiedGroupCard extends StatelessWidget {
               ),
             ),
 
-            // Activity badge (top-right)
-            if (_isActiveNow)
+            // Ranking badge (top-right, above activity)
+            if (badge != null)
               Positioned(
                 top: 12,
+                right: 12,
+                child: Container(
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 9, vertical: 4),
+                  decoration: BoxDecoration(
+                    color: badge == GroupBadge.isNew
+                        ? const Color(0xFF5C6BC0)
+                        : const Color(0xFFFF6D00),
+                    borderRadius: BorderRadius.circular(10),
+                  ),
+                  child: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Icon(
+                        badge == GroupBadge.isNew
+                            ? Icons.fiber_new_rounded
+                            : Icons.trending_up_rounded,
+                        size: 13,
+                        color: Colors.white,
+                      ),
+                      const SizedBox(width: 3),
+                      Text(
+                        badge == GroupBadge.isNew ? 'New' : 'Trending',
+                        style: GoogleFonts.montserrat(
+                          fontSize: 10,
+                          fontWeight: FontWeight.w700,
+                          color: Colors.white,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+
+            // Activity badge (top-right, below ranking badge if present)
+            if (_isActiveNow)
+              Positioned(
+                top: badge != null ? 40 : 12,
                 right: 12,
                 child: Container(
                   padding:
@@ -334,17 +370,31 @@ class UnifiedGroupCard extends StatelessWidget {
               size: 14, color: Colors.grey.shade500),
           const SizedBox(width: 3),
           Text(
-            '${group.memberCount}',
+            _memberLabel,
             style: GoogleFonts.montserrat(
               fontSize: 12,
               fontWeight: FontWeight.w500,
               color: Colors.grey.shade600,
             ),
           ),
+          if (_activeThisWeek) ...[
+            _dot(),
+            Icon(Icons.bolt_rounded,
+                size: 14, color: AppColors.primaryGreen),
+            const SizedBox(width: 2),
+            Text(
+              'Active this week',
+              style: GoogleFonts.montserrat(
+                fontSize: 12,
+                fontWeight: FontWeight.w500,
+                color: AppColors.primaryGreen,
+              ),
+            ),
+          ],
           if (group.location != null && group.location!.isNotEmpty) ...[
             _dot(),
             Icon(Icons.location_on_outlined,
-                size: 14, color: Colors.grey.shade500),
+                size: 13, color: Colors.grey.shade500),
             const SizedBox(width: 2),
             Flexible(
               child: Text(
@@ -359,30 +409,15 @@ class UnifiedGroupCard extends StatelessWidget {
               ),
             ),
           ],
-          if (_activityLabel.isNotEmpty) ...[
-            _dot(),
-            if (_isActiveNow)
-              Container(
-                width: 6,
-                height: 6,
-                margin: const EdgeInsets.only(right: 3),
-                decoration: const BoxDecoration(
-                  color: AppColors.success,
-                  shape: BoxShape.circle,
-                ),
-              ),
-            Text(
-              _activityLabel,
-              style: GoogleFonts.montserrat(
-                fontSize: 12,
-                fontWeight: FontWeight.w500,
-                color:
-                    _isActiveNow ? AppColors.success : Colors.grey.shade500,
-              ),
-            ),
-          ],
         ],
       );
+
+  String get _memberLabel {
+    if (group.memberCount >= 1000) {
+      return '${(group.memberCount / 1000).toStringAsFixed(1)}k members';
+    }
+    return '${group.memberCount} ${group.memberCount == 1 ? 'member' : 'members'}';
+  }
 
   Widget _dot() => Padding(
         padding: const EdgeInsets.symmetric(horizontal: 6),
@@ -396,25 +431,51 @@ class UnifiedGroupCard extends StatelessWidget {
         ),
       );
 
-  Widget _buildGradientFallback() => Container(
-        decoration: BoxDecoration(
-          gradient: LinearGradient(
-            begin: Alignment.topLeft,
-            end: Alignment.bottomRight,
-            colors: [
-              _typeColor.withValues(alpha: 0.7),
-              _typeColor.withValues(alpha: 0.3),
-            ],
+  Widget _buildGradientFallback() {
+    final base = HSLColor.fromColor(_typeColor);
+    final lighter = base.withLightness(
+      (base.lightness + 0.15).clamp(0.0, 1.0),
+    );
+    final darker = base.withLightness(
+      (base.lightness - 0.1).clamp(0.0, 1.0),
+    );
+
+    return Stack(
+      fit: StackFit.expand,
+      children: [
+        DecoratedBox(
+          decoration: BoxDecoration(
+            gradient: LinearGradient(
+              begin: Alignment.topLeft,
+              end: Alignment.bottomRight,
+              stops: const [0.0, 0.5, 1.0],
+              colors: [
+                lighter.toColor(),
+                _typeColor.withValues(alpha: 0.85),
+                darker.toColor().withValues(alpha: 0.9),
+              ],
+            ),
           ),
         ),
-        child: Center(
+        Positioned(
+          right: -20,
+          bottom: -20,
           child: Icon(
             _typeIcon,
-            size: featured ? 56 : 44,
-            color: Colors.white.withValues(alpha: 0.4),
+            size: featured ? 100 : 80,
+            color: Colors.white.withValues(alpha: 0.08),
           ),
         ),
-      );
+        Center(
+          child: Icon(
+            _typeIcon,
+            size: featured ? 48 : 38,
+            color: Colors.white.withValues(alpha: 0.55),
+          ),
+        ),
+      ],
+    );
+  }
 
   // -------------------------------------------------------------------------
   // Type mapping helpers (static, no instance state needed)

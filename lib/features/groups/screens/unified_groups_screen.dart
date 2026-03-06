@@ -166,13 +166,21 @@ class _UnifiedGroupsScreenState extends State<UnifiedGroupsScreen>
     }
   }
 
-  Widget _buildCard(UnifiedGroup group, {bool showAdminBadge = false}) {
+  Widget _buildCard(
+    UnifiedGroup group, {
+    bool showAdminBadge = false,
+  }) {
     final uid = FirebaseAuth.instance.currentUser?.uid ?? '';
     final member = group.isMember(uid);
     final admin = showAdminBadge && group.isAdmin(uid);
     final isFeatured =
         group.memberCount > 20 ||
         DateTime.now().difference(group.lastActivityAt).inHours < 1;
+    final isNew =
+        DateTime.now().difference(group.createdAt).inDays <= 7;
+    final recentActivity =
+        DateTime.now().difference(group.lastActivityAt).inHours < 24;
+    final isTrending = !isNew && recentActivity && group.memberCount >= 5;
 
     return Padding(
       padding: const EdgeInsets.only(bottom: 16),
@@ -182,6 +190,11 @@ class _UnifiedGroupsScreenState extends State<UnifiedGroupsScreen>
         isAdmin: admin,
         featured: isFeatured,
         hasUnread: member && (_unreadCounts[group.id] ?? 0) > 0,
+        badge: isNew
+            ? GroupBadge.isNew
+            : isTrending
+                ? GroupBadge.trending
+                : null,
         onTap: () => _navigateToGroupDetails(group),
         onJoin: member ? null : () => _joinGroup(group),
       ),
@@ -269,6 +282,8 @@ class _UnifiedGroupsScreenState extends State<UnifiedGroupsScreen>
             // Type Filter
             _buildTypeFilter(),
 
+            const SizedBox(height: 12),
+
             // Tab Bar
             _buildTabBar(),
 
@@ -335,24 +350,24 @@ class _UnifiedGroupsScreenState extends State<UnifiedGroupsScreen>
         ),
       );
 
-  Widget _buildTypeFilter() => Container(
-        height: 50,
-        margin: const EdgeInsets.fromLTRB(16, 0, 16, 16),
+  Widget _buildTypeFilter() => SizedBox(
+        height: 44,
         child: ListView.builder(
           scrollDirection: Axis.horizontal,
+          padding: const EdgeInsets.symmetric(horizontal: 16),
           itemCount: GroupType.values.length + 1,
           itemBuilder: (context, index) {
             final type = index == 0 ? null : GroupType.values[index - 1];
             final isSelected = _selectedType == type;
             final label = type == null ? 'All' : _getTypeLabel(type);
 
-            return Container(
-              margin: const EdgeInsets.only(right: 8),
+            return Padding(
+              padding: const EdgeInsets.only(right: 8),
               child: ChoiceChip(
                 label: Text(
                   label,
                   style: GoogleFonts.montserrat(
-                    fontSize: 14,
+                    fontSize: 13,
                     fontWeight: isSelected ? FontWeight.w600 : FontWeight.w500,
                     color: isSelected ? Colors.white : AppColors.textPrimary,
                   ),
@@ -365,13 +380,15 @@ class _UnifiedGroupsScreenState extends State<UnifiedGroupsScreen>
                 backgroundColor: Colors.white,
                 selectedColor: AppColors.primaryGreen,
                 side: BorderSide(
-                  color: isSelected ? AppColors.primaryGreen : AppColors.border,
+                  color: isSelected
+                      ? AppColors.primaryGreen
+                      : Colors.grey.shade300,
                 ),
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(20),
                 ),
-                labelPadding:
-                    const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
+                visualDensity: VisualDensity.compact,
+                labelPadding: const EdgeInsets.symmetric(horizontal: 8),
               ),
             );
           },
@@ -379,26 +396,27 @@ class _UnifiedGroupsScreenState extends State<UnifiedGroupsScreen>
       );
 
   Widget _buildTabBar() => Container(
-        margin: const EdgeInsets.fromLTRB(16, 0, 16, 16),
+        margin: const EdgeInsets.fromLTRB(16, 0, 16, 12),
         decoration: BoxDecoration(
           color: Colors.white,
           borderRadius: BorderRadius.circular(12),
-          boxShadow: AppColors.cardShadow,
         ),
         child: TabBar(
           controller: _tabController,
           indicator: const UnderlineTabIndicator(
             borderSide: BorderSide(
               color: AppColors.primaryGreen,
-              width: 3,
+              width: 2,
             ),
-            insets: EdgeInsets.symmetric(horizontal: 16),
+            insets: EdgeInsets.symmetric(horizontal: 20),
           ),
           indicatorSize: TabBarIndicatorSize.label,
+          dividerHeight: 0.5,
+          dividerColor: Colors.grey.shade200,
           labelColor: AppColors.primaryGreen,
           unselectedLabelColor: AppColors.textSecondary,
           labelStyle: GoogleFonts.montserrat(
-            fontWeight: FontWeight.bold,
+            fontWeight: FontWeight.w600,
             fontSize: 14,
           ),
           unselectedLabelStyle: GoogleFonts.montserrat(

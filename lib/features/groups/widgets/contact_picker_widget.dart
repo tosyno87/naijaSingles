@@ -20,11 +20,13 @@ class ContactPickerWidget extends StatefulWidget {
     required this.groupName,
     required this.groupId,
     required this.onInvitationsSent,
+    this.deferSending = false,
     super.key,
   });
   final String groupName;
   final String groupId;
   final Function(List<Map<String, dynamic>>) onInvitationsSent;
+  final bool deferSending;
 
   @override
   State<ContactPickerWidget> createState() => _ContactPickerWidgetState();
@@ -177,19 +179,20 @@ class _ContactPickerWidgetState extends State<ContactPickerWidget> {
       });
     }
 
-    // Send invitations
-    for (final invitation in invitations) {
-      if (invitation['invitationType'] == 'phone') {
-        await _contactService.sendSMSInvitation(
-          phoneNumber: invitation['phone']!,
-          message: invitation['message'],
-        );
-      } else {
-        await _contactService.sendEmailInvitation(
-          email: invitation['email']!,
-          subject: 'Invitation to join ${invitation['groupName']}',
-          message: invitation['message'],
-        );
+    if (!widget.deferSending) {
+      for (final invitation in invitations) {
+        if (invitation['invitationType'] == 'phone') {
+          await _contactService.sendSMSInvitation(
+            phoneNumber: invitation['phone']!,
+            message: invitation['message'],
+          );
+        } else {
+          await _contactService.sendEmailInvitation(
+            email: invitation['email']!,
+            subject: 'Invitation to join ${invitation['groupName']}',
+            message: invitation['message'],
+          );
+        }
       }
     }
 
@@ -197,12 +200,15 @@ class _ContactPickerWidgetState extends State<ContactPickerWidget> {
       widget.onInvitationsSent(invitations);
       Navigator.pop(context);
 
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text('${invitations.length} invitations sent successfully!'),
-          backgroundColor: AppColors.primaryGreen,
-        ),
-      );
+      if (!widget.deferSending) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content:
+                Text('${invitations.length} invitations sent successfully!'),
+            backgroundColor: AppColors.primaryGreen,
+          ),
+        );
+      }
     }
   }
 

@@ -70,8 +70,9 @@ class ImageUploadService {
 
       final Reference ref = _storage.ref().child(storagePath);
 
-      final UploadTask uploadTask = ref.putFile(
-        imageFile,
+      final bytes = await imageFile.readAsBytes();
+      final UploadTask uploadTask = ref.putData(
+        bytes,
         SettableMetadata(contentType: contentType),
       );
 

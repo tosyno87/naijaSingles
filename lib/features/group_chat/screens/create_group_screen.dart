@@ -2,6 +2,7 @@ import 'dart:async';
 import 'dart:io';
 import 'dart:math' show pi, sin;
 
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -1551,9 +1552,13 @@ class _CreateGroupScreenState extends State<CreateGroupScreen>
 
       if (_selectedImage != null) {
         try {
+          final uid = FirebaseAuth.instance.currentUser?.uid;
+          if (uid == null || uid.isEmpty) {
+            throw Exception('You must be signed in to upload a cover photo.');
+          }
           imageUrl = await _imageService.uploadCompressedImage(
             imageFile: _selectedImage!,
-            path: 'group_avatars',
+            path: 'group_avatars/$uid',
           );
         } on Object catch (e) {
           AppLogger.error('Image upload failed', error: e);

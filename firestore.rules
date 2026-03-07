@@ -30,6 +30,14 @@ service cloud.firestore {
              );
     }
 
+    function isEventOwner(eventData) {
+      return request.auth != null &&
+             ((eventData.keys().hasAny(['createdByUserId']) &&
+               request.auth.uid == eventData.createdByUserId) ||
+              (eventData.keys().hasAny(['creatorId']) &&
+               request.auth.uid == eventData.creatorId));
+    }
+
     // Users collection - allow authenticated users to read others for matching
     match /users/{userId} {
       // Owner can always read/create/delete their own data.
@@ -409,13 +417,13 @@ service cloud.firestore {
       
       // Users can update their own events
       allow update: if request.auth != null && 
-                     request.auth.uid == resource.data.createdByUserId &&
+                     isEventOwner(resource.data) &&
                      // Prevent changing the creator
-                     !request.resource.data.diff(resource.data).affectedKeys().hasAny(['createdByUserId']);
+                     !request.resource.data.diff(resource.data).affectedKeys().hasAny(['createdByUserId', 'creatorId']);
       
       // Users can delete their own events
       allow delete: if request.auth != null && 
-                     request.auth.uid == resource.data.createdByUserId;
+                     isEventOwner(resource.data);
     }
 
     // Event RSVPs collection - for tracking event attendance
@@ -423,7 +431,7 @@ service cloud.firestore {
       // Users can read RSVPs for events they created
       allow read: if request.auth != null && 
                    exists(/databases/$(database)/documents/events/$(resource.data.eventId)) &&
-                   request.auth.uid == get(/databases/$(database)/documents/events/$(resource.data.eventId)).data.createdByUserId;
+                   isEventOwner(get(/databases/$(database)/documents/events/$(resource.data.eventId)).data);
       
       // Users can read their own RSVPs
       allow read: if request.auth != null && 
@@ -478,7 +486,7 @@ service cloud.firestore {
       // Event creators can read attendees of their events
       allow read: if request.auth != null && 
                    exists(/databases/$(database)/documents/events/$(eventId)) &&
-                   request.auth.uid == get(/databases/$(database)/documents/events/$(eventId)).data.createdByUserId;
+                   isEventOwner(get(/databases/$(database)/documents/events/$(eventId)).data);
       
       // Attendees subcollection
       match /attendees/{userId} {
@@ -489,7 +497,7 @@ service cloud.firestore {
         // Event creators can read attendees
         allow read: if request.auth != null && 
                      exists(/databases/$(database)/documents/events/$(eventId)) &&
-                     request.auth.uid == get(/databases/$(database)/documents/events/$(eventId)).data.createdByUserId;
+                     isEventOwner(get(/databases/$(database)/documents/events/$(eventId)).data);
       }
     }
 
@@ -498,7 +506,7 @@ service cloud.firestore {
       // Users can read moderation status of their own events
       allow read: if request.auth != null && 
                    exists(/databases/$(database)/documents/events/$(eventId)) &&
-                   request.auth.uid == get(/databases/$(database)/documents/events/$(eventId)).data.createdByUserId;
+                   isEventOwner(get(/databases/$(database)/documents/events/$(eventId)).data);
       
       // Client-side writes blocked. Use Admin SDK (Cloud Functions) for moderation.
       allow create, update: if false;
@@ -690,7 +698,10 @@ service cloud.firestore {
       // (resource is null), so we scope by doc-ID suffix instead of
       // resource.data which would fail on a missing document.
       allow get: if request.auth != null &&
-                    countId.matches('.*_' + request.auth.uid);
+                    (
+                      (resource != null && resource.data.userId == request.auth.uid) ||
+                      countId.matches('.*_' + request.auth.uid)
+                    );
 
       // List queries filter by userId field on existing documents.
       allow list: if request.auth != null &&

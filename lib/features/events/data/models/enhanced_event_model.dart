@@ -26,6 +26,7 @@ class EnhancedEventModel extends Equatable {
     this.rsvpCount = 0,
     this.maxAttendees = 100,
     this.createdByUserId,
+    this.creatorId,
     this.isUserGenerated = false,
     this.eventType = EventType.userGenerated,
     this.status = EventStatus.published,
@@ -102,6 +103,7 @@ class EnhancedEventModel extends Equatable {
         createdAt: parseDateTime(json['createdAt']),
         updatedAt: parseDateTime(json['updatedAt']),
         createdByUserId: json['createdByUserId'],
+        creatorId: json['creatorId'],
         isUserGenerated: json['isUserGenerated'] ?? false,
         eventType: parseEventType(json['eventType']),
         status: parseEventStatus(json['status']),
@@ -131,6 +133,7 @@ class EnhancedEventModel extends Equatable {
   final DateTime createdAt;
   final DateTime updatedAt;
   final String? createdByUserId;
+  final String? creatorId;
   final bool isUserGenerated;
   final EventType eventType;
   final EventStatus status;
@@ -139,6 +142,7 @@ class EnhancedEventModel extends Equatable {
   final Map<String, dynamic> metadata;
 
   bool get isPublished => status == EventStatus.published;
+  String? get ownerUserId => createdByUserId ?? creatorId;
   bool get isVisible => isPublished && endDate.isAfter(DateTime.now());
   bool get isActive => isVisible;
   bool get isDraft => status == EventStatus.draft;
@@ -221,6 +225,7 @@ class EnhancedEventModel extends Equatable {
         'createdAt': Timestamp.fromDate(createdAt),
         'updatedAt': Timestamp.fromDate(updatedAt),
         'createdByUserId': createdByUserId,
+        if (creatorId != null) 'creatorId': creatorId,
         'isUserGenerated': isUserGenerated,
         'eventType': eventType.toString().split('.').last,
         'status': status.toString().split('.').last,
@@ -251,6 +256,7 @@ class EnhancedEventModel extends Equatable {
     DateTime? createdAt,
     DateTime? updatedAt,
     String? createdByUserId,
+    String? creatorId,
     bool? isUserGenerated,
     EventType? eventType,
     EventStatus? status,
@@ -278,6 +284,7 @@ class EnhancedEventModel extends Equatable {
         createdAt: createdAt ?? this.createdAt,
         updatedAt: updatedAt ?? this.updatedAt,
         createdByUserId: createdByUserId ?? this.createdByUserId,
+        creatorId: creatorId ?? this.creatorId,
         isUserGenerated: isUserGenerated ?? this.isUserGenerated,
         eventType: eventType ?? this.eventType,
         status: status ?? this.status,
@@ -307,6 +314,7 @@ class EnhancedEventModel extends Equatable {
         createdAt,
         updatedAt,
         createdByUserId,
+        creatorId,
         isUserGenerated,
         eventType,
         status,

@@ -5,6 +5,7 @@ import 'dart:io';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -454,6 +455,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
     if (!(_formKey.currentState?.validate() ?? false)) return;
 
     setState(() => _isUploading = true);
+    var saveStage = 'validate_form';
 
     try {
       final user = _auth.currentUser;
@@ -462,6 +464,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
       }
 
       // Verify user is still authenticated
+      saveStage = 'auth_reload';
       await user.reload();
       if (_auth.currentUser == null) {
         throw Exception('Authentication expired. Please log in again.');
@@ -478,6 +481,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
         if (photo is File) {
           // Upload new photo - path must match Firebase Storage rules
           try {
+            saveStage = 'upload_photo_$i';
             final ref =
                 _storage.ref().child('profile_photos/${user.uid}/photo_$i.jpg');
             await ref.putFile(photo);
@@ -521,9 +525,11 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
       };
 
       // Update Firestore
+      saveStage = 'update_firestore';
       await _firestore.collection('users').doc(user.uid).update(userData);
 
       // Update display name in Firebase Auth
+      saveStage = 'update_auth_display_name';
       await user.updateDisplayName(_nameController.text.trim());
 
       if (!mounted) return;
@@ -536,8 +542,32 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
 
       // Navigate back with success indicator
       Navigator.pop(context, true);
+    } on FirebaseException catch (e, stackTrace) {
+      log(
+        'Firebase error saving profile at stage=$saveStage, code=${e.code}, message=${e.message}, userId=${_auth.currentUser?.uid}',
+        stackTrace: stackTrace,
+      );
+      await _recordProfileUpdateFailure(
+        stage: saveStage,
+        errorType: 'firebase_${e.plugin}',
+        errorMessage: e.message ?? e.code,
+      );
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('Error updating profile: ${e.message ?? e.code}'),
+          backgroundColor: Colors.red,
+        ),
+      );
     } on Object catch (e) {
-      log('Error saving profile: $e');
+      log(
+        'Error saving profile at stage=$saveStage, userId=${_auth.currentUser?.uid}, error=$e',
+      );
+      await _recordProfileUpdateFailure(
+        stage: saveStage,
+        errorType: 'unknown',
+        errorMessage: e.toString(),
+      );
       if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
@@ -547,6 +577,32 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
       );
     } finally {
       setState(() => _isUploading = false);
+    }
+  }
+
+  Future<void> _recordProfileUpdateFailure({
+    required String stage,
+    required String errorType,
+    required String errorMessage,
+  }) async {
+    final userId = _auth.currentUser?.uid;
+    if (userId == null) return;
+
+    try {
+      await _firestore
+          .collection('users')
+          .doc(userId)
+          .collection('private')
+          .doc('profile_update_logs')
+          .collection('entries')
+          .add({
+        'stage': stage,
+        'errorType': errorType,
+        'errorMessage': errorMessage,
+        'createdAt': FieldValue.serverTimestamp(),
+      });
+    } on Object catch (logError) {
+      log('Failed to persist profile update diagnostics: $logError');
     }
   }
 

@@ -142,22 +142,83 @@ class GroupChatService {
         throw Exception('User not authenticated');
       }
 
-      // Remove user from group members
-      log('🔍 Attempting to leave group: $groupId');
-      log('🔍 Current user: $currentUserId');
+      final groupRef = _firestore.collection('unifiedGroups').doc(groupId);
+      var enableChat = false;
+      await _firestore.runTransaction((transaction) async {
+        final groupDoc = await transaction.get(groupRef);
+        if (!groupDoc.exists) {
+          throw Exception('Group not found');
+        }
 
-      await _firestore.collection('unifiedGroups').doc(groupId).update({
-        'memberIds': FieldValue.arrayRemove([currentUserId]),
-        'adminIds': FieldValue.arrayRemove([currentUserId]),
-        'memberCount': FieldValue.increment(-1),
+        final groupData = groupDoc.data() as Map<String, dynamic>;
+        enableChat = groupData['enableChat'] == true;
+        final existingMembers = List<String>.from(groupData['memberIds'] ?? []);
+        if (!existingMembers.contains(currentUserId)) {
+          throw Exception('User is not a member of this group');
+        }
+
+        final updatedMembers = existingMembers.toSet()..remove(currentUserId);
+        final updatedAdmins = List<String>.from(groupData['adminIds'] ?? [])
+            .toSet()
+          ..remove(currentUserId);
+        final creatorId = groupData['creatorId'] as String?;
+
+        if (updatedMembers.isEmpty) {
+          transaction.update(groupRef, {
+            'memberIds': <String>[],
+            'adminIds': <String>[],
+            'memberCount': 0,
+            'isActive': false,
+          });
+          return;
+        }
+
+        final nextMembers = updatedMembers.toList();
+        final nextAdmins = updatedAdmins.toList();
+        final updateData = <String, dynamic>{
+          'memberIds': nextMembers,
+          'memberCount': nextMembers.length,
+          'adminIds': nextAdmins,
+        };
+
+        if (creatorId == currentUserId) {
+          final newCreatorId =
+              nextAdmins.isNotEmpty ? nextAdmins.first : nextMembers.first;
+          if (!nextAdmins.contains(newCreatorId)) {
+            nextAdmins.add(newCreatorId);
+            updateData['adminIds'] = nextAdmins;
+          }
+          updateData['creatorId'] = newCreatorId;
+        }
+
+        transaction.update(groupRef, updateData);
       });
 
-      // Send leave message
-      await _sendGroupMessage(
-        groupId: groupId,
-        text: 'left the group',
-        messageType: MessageType.system,
-      );
+      // Write a best-effort system message after leave only when chat is enabled.
+      if (enableChat) {
+        try {
+          await _firestore
+              .collection('unifiedGroups')
+              .doc(groupId)
+              .collection('messages')
+              .add({
+            'groupId': groupId,
+            'senderId': currentUserId,
+            'text': 'left the group',
+            'messageType': MessageType.system.name,
+            'timestamp': FieldValue.serverTimestamp(),
+            'isRead': false,
+            'readBy': [currentUserId],
+          });
+          await _firestore.collection('unifiedGroups').doc(groupId).update({
+            'lastMessageAt': FieldValue.serverTimestamp(),
+            'lastMessageText': 'left the group',
+            'lastMessageSenderId': currentUserId,
+          });
+        } on Object catch (messageError) {
+          log('⚠️ Leave message skipped for group $groupId: $messageError');
+        }
+      }
 
       log('✅ Successfully left group: $groupId');
     } on Object catch (e) {

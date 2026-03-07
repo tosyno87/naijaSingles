@@ -19,6 +19,9 @@ class UserEventService {
   CollectionReference get _eventModerationCollection =>
       _firestore.collection('event_moderation');
 
+  bool _isOwnedByCurrentUser(EnhancedEventModel event, String userId) =>
+      event.ownerUserId == userId;
+
   /// Create a new user-generated event
   Future<String> createEvent(EventCreationData data) async {
     try {
@@ -84,7 +87,7 @@ class UserEventService {
       );
 
       // Check if user owns the event
-      if (existingEvent.createdByUserId != currentUser.uid) {
+      if (!_isOwnedByCurrentUser(existingEvent, currentUser.uid)) {
         throw Exception('User does not have permission to update this event');
       }
 
@@ -151,7 +154,7 @@ class UserEventService {
       );
 
       // Check if user owns the event
-      if (existingEvent.createdByUserId != currentUser.uid) {
+      if (!_isOwnedByCurrentUser(existingEvent, currentUser.uid)) {
         throw Exception('User does not have permission to delete this event');
       }
 
@@ -174,22 +177,33 @@ class UserEventService {
   /// Get events created by a specific user
   Future<List<EnhancedEventModel>> getUserEvents(String userId) async {
     try {
-      final querySnapshot = await _eventsCollection
+      final createdByQuerySnapshot = await _eventsCollection
           .where('createdByUserId', isEqualTo: userId)
           .where('isUserGenerated', isEqualTo: true)
-          .orderBy('createdAt', descending: true)
           .get();
 
-      // Filter out cancelled/deleted events
-      return querySnapshot.docs
-          .map(
-            (doc) => EnhancedEventModel.fromFirestoreJson(
-              doc.data() as Map<String, dynamic>,
-              doc.id,
-            ),
-          )
-          .where((event) => event.status != EventStatus.cancelled)
-          .toList();
+      final creatorQuerySnapshot = await _eventsCollection
+          .where('creatorId', isEqualTo: userId)
+          .where('isUserGenerated', isEqualTo: true)
+          .get();
+
+      final eventById = <String, EnhancedEventModel>{};
+      for (final doc in [
+        ...createdByQuerySnapshot.docs,
+        ...creatorQuerySnapshot.docs
+      ]) {
+        final event = EnhancedEventModel.fromFirestoreJson(
+          doc.data() as Map<String, dynamic>,
+          doc.id,
+        );
+        if (event.status != EventStatus.cancelled) {
+          eventById[doc.id] = event;
+        }
+      }
+
+      final events = eventById.values.toList()
+        ..sort((a, b) => b.createdAt.compareTo(a.createdAt));
+      return events;
     } on Object catch (e) {
       log('Error fetching user events: $e', name: 'UserEventService');
       rethrow;
@@ -323,7 +337,7 @@ class UserEventService {
       );
 
       // Check if user owns the event
-      if (existingEvent.createdByUserId != currentUser.uid) {
+      if (!_isOwnedByCurrentUser(existingEvent, currentUser.uid)) {
         throw Exception('User does not have permission to publish this event');
       }
 

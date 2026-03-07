@@ -121,10 +121,14 @@ class _GroupSettingsScreenState extends State<GroupSettingsScreen> {
       // Upload image if a new one is selected
       if (_selectedImage != null) {
         try {
+          final uid = FirebaseAuth.instance.currentUser?.uid;
+          if (uid == null || uid.isEmpty) {
+            throw Exception('You must be signed in to upload a group photo.');
+          }
           AppLogger.info('Uploading group image...');
           imageUrl = await _imageService.uploadImage(
             imageFile: _selectedImage!,
-            path: 'group_avatars',
+            path: 'users/$uid/group_avatars',
             fileName:
                 '${widget.group.id}_${DateTime.now().millisecondsSinceEpoch}.jpg',
           );

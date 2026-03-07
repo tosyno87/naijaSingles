@@ -49,7 +49,8 @@ class UserModel {
     this.accountStatus,
     this.deactivatedAt,
     this.deactivationReason,
-  });
+    bool? storedDiscoverable,
+  }) : _storedDiscoverable = storedDiscoverable;
 
   factory UserModel.fromDocument(DocumentSnapshot doc) {
     try {
@@ -220,6 +221,7 @@ class UserModel {
             safeGetNested<String>('editInfo', 'occupation', ''),
         // Account status fields
         accountStatus: safeGet<String>('accountStatus', 'active'),
+        storedDiscoverable: safeGet<bool>('isDiscoverable'),
         deactivatedAt: data.containsKey('deactivatedAt') &&
                 data['deactivatedAt'] is Timestamp
             ? (data['deactivatedAt'] as Timestamp).toDate()
@@ -345,6 +347,7 @@ class UserModel {
             (json['editInfo'] != null ? json['editInfo']['occupation'] : null),
         // Account status fields
         accountStatus: json['accountStatus'] ?? 'active',
+        storedDiscoverable: json['isDiscoverable'] as bool?,
         deactivatedAt: json['deactivatedAt'] != null
             ? DateTime.tryParse(json['deactivatedAt'].toString())
             : null,
@@ -409,6 +412,7 @@ class UserModel {
         occupation: map['occupation']?.toString(),
         // Account status fields
         accountStatus: map['accountStatus']?.toString() ?? 'active',
+        storedDiscoverable: map['isDiscoverable'] as bool?,
         deactivatedAt: map['deactivatedAt'] != null
             ? DateTime.tryParse(map['deactivatedAt'].toString())
             : null,
@@ -550,9 +554,13 @@ class UserModel {
   /// Get distance range preference
   int? get distanceRange => maxDistance;
 
+  final bool? _storedDiscoverable;
+
   /// Whether this user is discoverable (shown in swipe/search/recommendations).
-  /// Users are NOT discoverable when paused, incognito, deleted, or banned.
-  bool get isDiscoverable => accountStatus == null || accountStatus == 'active';
+  /// Prefers the Cloud Function–managed stored field; falls back to computing
+  /// from accountStatus for documents that haven't been backfilled yet.
+  bool get isDiscoverable =>
+      _storedDiscoverable ?? (accountStatus == null || accountStatus == 'active');
 
   /// Whether the account is temporarily deactivated (paused or incognito).
   bool get isDeactivated =>

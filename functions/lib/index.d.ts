@@ -18,6 +18,10 @@ export declare const onLikeCreated: import("firebase-functions/core").CloudFunct
     userId: string;
     likeId: string;
 }>>;
+export declare const onUserWritten: import("firebase-functions/core").CloudFunction<import("firebase-functions/firestore").FirestoreEvent<import("firebase-functions/core").Change<import("firebase-functions/firestore").DocumentSnapshot> | undefined, {
+    userId: string;
+}>>;
 export declare const createTestUsers: import("firebase-functions/v2/https").HttpsFunction;
 export declare const healthCheck: import("firebase-functions/v2/https").HttpsFunction;
+export declare const backfillDiscoverable: import("firebase-functions/v2/https").HttpsFunction;
 //# sourceMappingURL=index.d.ts.map

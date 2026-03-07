@@ -39,22 +39,25 @@ var __importStar = (this && this.__importStar) || (function () {
     };
 })();
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.healthCheck = exports.createTestUsers = exports.onLikeCreated = exports.onSuperLikeCreated = exports.onMessageSent = exports.onMatchCreated = void 0;
+exports.backfillDiscoverable = exports.healthCheck = exports.createTestUsers = exports.onUserWritten = exports.onLikeCreated = exports.onSuperLikeCreated = exports.onMessageSent = exports.onMatchCreated = void 0;
 const admin = __importStar(require("firebase-admin"));
 const https_1 = require("firebase-functions/v2/https");
 const matchHandlers_1 = require("./handlers/matchHandlers");
 const messageHandlers_1 = require("./handlers/messageHandlers");
 const likeHandlers_1 = require("./handlers/likeHandlers");
 const testUserHandlers_1 = require("./handlers/testUserHandlers");
+const discoverabilityHandlers_1 = require("./handlers/discoverabilityHandlers");
 admin.initializeApp();
 const matchHandlers = new matchHandlers_1.MatchHandlers();
 const messageHandlers = new messageHandlers_1.MessageHandlers();
 const likeHandlers = new likeHandlers_1.LikeHandlers();
 const testUserHandlers = new testUserHandlers_1.TestUserHandlers();
+const discoverabilityHandlers = new discoverabilityHandlers_1.DiscoverabilityHandlers();
 exports.onMatchCreated = matchHandlers.onMatchCreated;
 exports.onMessageSent = messageHandlers.onMessageSent;
 exports.onSuperLikeCreated = likeHandlers.onSuperLikeCreated;
 exports.onLikeCreated = likeHandlers.onLikeCreated;
+exports.onUserWritten = discoverabilityHandlers.onUserWritten;
 const isTestEnvEnabled = process.env.ENABLE_TEST_ENDPOINTS === 'true';
 exports.createTestUsers = isTestEnvEnabled
     ? testUserHandlers.createTestUsers
@@ -66,6 +69,56 @@ exports.healthCheck = (0, https_1.onRequest)((req, res) => {
         status: 'healthy',
         timestamp: new Date().toISOString(),
         version: '1.0.0',
+    });
+});
+// Temporary one-time backfill endpoint. Remove after running.
+exports.backfillDiscoverable = (0, https_1.onRequest)(async (req, res) => {
+    const db = admin.firestore();
+    const batchSize = 500;
+    let lastDoc;
+    let totalUpdated = 0;
+    let totalSkipped = 0;
+    const compute = (data) => {
+        var _a;
+        const status = (_a = data.accountStatus) !== null && _a !== void 0 ? _a : 'active';
+        if (status !== 'active')
+            return false;
+        if (data.isDeleted === true)
+            return false;
+        if (data.isProfilePrivate === true)
+            return false;
+        return true;
+    };
+    // eslint-disable-next-line no-constant-condition
+    while (true) {
+        let query = db.collection('users').orderBy('__name__').limit(batchSize);
+        if (lastDoc)
+            query = query.startAfter(lastDoc);
+        const snapshot = await query.get();
+        if (snapshot.empty)
+            break;
+        const batch = db.batch();
+        let batchCount = 0;
+        for (const doc of snapshot.docs) {
+            const data = doc.data();
+            const computed = compute(data);
+            if (data.isDiscoverable !== computed) {
+                batch.update(doc.ref, { isDiscoverable: computed });
+                batchCount++;
+            }
+        }
+        if (batchCount > 0)
+            await batch.commit();
+        totalUpdated += batchCount;
+        totalSkipped += snapshot.docs.length - batchCount;
+        lastDoc = snapshot.docs[snapshot.docs.length - 1];
+        if (snapshot.docs.length < batchSize)
+            break;
+    }
+    res.status(200).json({
+        status: 'complete',
+        updated: totalUpdated,
+        alreadyCorrect: totalSkipped,
     });
 });
 //# sourceMappingURL=index.js.map

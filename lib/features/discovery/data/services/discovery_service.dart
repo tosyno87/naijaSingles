@@ -490,7 +490,8 @@ class DiscoveryService {
     UserModel currentUser,
     String? intentFilter,
   ) {
-    Query query = _usersCollection;
+    Query query = _usersCollection
+        .where('isDiscoverable', isEqualTo: true);
     final normalizedPreference =
         DiscoveryFiltering.normalizeGender(currentUser.showGender);
     if (DiscoveryFiltering.isEveryonePreference(normalizedPreference)) {
@@ -670,7 +671,7 @@ class DiscoveryService {
 
       final Query query = _firestore
           .collection('users')
-          .where('id', isNotEqualTo: userId)
+          .where('isDiscoverable', isEqualTo: true)
           .limit(20);
 
       return query.snapshots().asyncMap((snapshot) async {
@@ -682,15 +683,13 @@ class DiscoveryService {
 
         for (var doc in snapshot.docs) {
           try {
-            // Skip already checked users
+            if (doc.id == userId) continue;
             if (checkedUserIds.contains(doc.id)) continue;
 
-            // Skip blocked users
             if ((doc.data() as Map<String, dynamic>?)?['isBlocked'] == true) {
               continue;
             }
 
-            // Create user model
             final user = UserModel.fromDocument(doc);
 
             if (!DiscoveryFiltering.matchesGenderPreference(
@@ -772,7 +771,7 @@ class DiscoveryService {
 
       Query query = _firestore
           .collection('users')
-          .where('id', isNotEqualTo: userId)
+          .where('isDiscoverable', isEqualTo: true)
           .orderBy('lastvisited', descending: true)
           .limit(pageSize);
 
@@ -789,6 +788,7 @@ class DiscoveryService {
 
         for (var doc in snapshot.docs) {
           try {
+            if (doc.id == userId) continue;
             if (checkedUserIds.contains(doc.id)) continue;
             if ((doc.data() as Map<String, dynamic>?)?['isBlocked'] == true) {
               continue;
@@ -872,7 +872,7 @@ class DiscoveryService {
 
       final Query query = _firestore
           .collection('users')
-          .where('id', isNotEqualTo: userId)
+          .where('isDiscoverable', isEqualTo: true)
           .limit(50);
 
       return query.snapshots().asyncMap((snapshot) async {
@@ -884,6 +884,7 @@ class DiscoveryService {
 
         for (var doc in snapshot.docs) {
           try {
+            if (doc.id == userId) continue;
             if (checkedUserIds.contains(doc.id)) continue;
             if ((doc.data() as Map<String, dynamic>?)?['isBlocked'] == true) {
               continue;

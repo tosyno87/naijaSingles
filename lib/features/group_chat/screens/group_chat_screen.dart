@@ -87,11 +87,19 @@ class _GroupChatScreenState extends State<GroupChatScreen> {
       return Scaffold(
         backgroundColor: AppColors.backgroundColor,
         appBar: AppBar(
-          backgroundColor: AppColors.primaryGreen,
-          title: const Text('Loading...'),
+          backgroundColor: AppColors.backgroundColor,
+          elevation: 0,
+          iconTheme: const IconThemeData(color: AppColors.textPrimary),
+          title: Text(
+            'Loading...',
+            style: GoogleFonts.montserrat(
+              color: AppColors.textPrimary,
+              fontWeight: FontWeight.w600,
+            ),
+          ),
         ),
         body: const Center(
-          child: CircularProgressIndicator(),
+          child: CircularProgressIndicator(color: AppColors.primaryGreen),
         ),
       );
     }
@@ -100,8 +108,16 @@ class _GroupChatScreenState extends State<GroupChatScreen> {
       return Scaffold(
         backgroundColor: AppColors.backgroundColor,
         appBar: AppBar(
-          backgroundColor: AppColors.primaryGreen,
-          title: const Text('Group Not Found'),
+          backgroundColor: AppColors.backgroundColor,
+          elevation: 0,
+          iconTheme: const IconThemeData(color: AppColors.textPrimary),
+          title: Text(
+            'Group Not Found',
+            style: GoogleFonts.montserrat(
+              color: AppColors.textPrimary,
+              fontWeight: FontWeight.w600,
+            ),
+          ),
         ),
         body: const Center(
           child: Text('Group not found'),
@@ -112,7 +128,10 @@ class _GroupChatScreenState extends State<GroupChatScreen> {
     return Scaffold(
       backgroundColor: AppColors.backgroundColor,
       appBar: AppBar(
-        backgroundColor: AppColors.primaryGreen,
+        backgroundColor: AppColors.backgroundColor,
+        elevation: 0,
+        scrolledUnderElevation: 0.5,
+        iconTheme: const IconThemeData(color: AppColors.textPrimary),
         title: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
@@ -121,21 +140,24 @@ class _GroupChatScreenState extends State<GroupChatScreen> {
               style: GoogleFonts.montserrat(
                 fontSize: 18,
                 fontWeight: FontWeight.w600,
-                color: Colors.white,
+                color: AppColors.textPrimary,
               ),
             ),
             Text(
               '${_group!.memberCount} members',
               style: GoogleFonts.montserrat(
                 fontSize: 12,
-                color: Colors.white70,
+                color: AppColors.textSecondary,
               ),
             ),
           ],
         ),
         actions: [
           IconButton(
-            icon: const Icon(Icons.info_outline, color: Colors.white),
+            icon: const Icon(
+              Icons.info_outline,
+              color: AppColors.textSecondary,
+            ),
             onPressed: _showGroupInfo,
           ),
         ],
@@ -244,7 +266,7 @@ class _GroupChatScreenState extends State<GroupChatScreen> {
           if (!isCurrentUser) ...[
             CircleAvatar(
               radius: 16,
-              backgroundColor: AppColors.primaryGreen,
+              backgroundColor: AppColors.primaryGreenLight,
               child: Text(
                 message.senderId.substring(0, 1).toUpperCase(),
                 style: const TextStyle(
@@ -260,8 +282,9 @@ class _GroupChatScreenState extends State<GroupChatScreen> {
             child: Container(
               padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
               decoration: BoxDecoration(
-                color:
-                    isCurrentUser ? AppColors.primaryGreen : Colors.grey[200],
+                color: isCurrentUser
+                    ? AppColors.primaryGreenLight
+                    : Colors.grey[200],
                 borderRadius: BorderRadius.circular(18),
               ),
               child: Column(
@@ -300,7 +323,7 @@ class _GroupChatScreenState extends State<GroupChatScreen> {
             const SizedBox(width: 8),
             const CircleAvatar(
               radius: 16,
-              backgroundColor: AppColors.primaryGreen,
+              backgroundColor: AppColors.primaryGreenLight,
               child: Icon(
                 Icons.person,
                 color: Colors.white,
@@ -510,7 +533,7 @@ class _GroupChatScreenState extends State<GroupChatScreen> {
         children: [
           CircleAvatar(
             radius: 20,
-            backgroundColor: AppColors.primaryGreen,
+            backgroundColor: AppColors.primaryGreenLight,
             child: Text(
               memberId.substring(0, 1).toUpperCase(),
               style: const TextStyle(

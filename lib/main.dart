@@ -61,63 +61,64 @@ Future<void> main() async {
     // Continue anyway - secure storage will use defaults
   }
 
-  // Initialize Firebase with error handling
+  // Initialize Firebase — handle native SDK already having the default app
   try {
     await Firebase.initializeApp(
       options: DefaultFirebaseOptions.currentPlatform,
     );
     log('🔥 Firebase initialized successfully');
+  } on Object catch (e) {
+    if (e.toString().contains('duplicate-app')) {
+      log('ℹ️ Firebase already initialized by native SDK — using existing app');
+    } else {
+      log('❌ Firebase initialization error: $e');
+    }
+  }
 
+  // App Check (non-blocking — failures must not poison Storage)
+  try {
     await FirebaseAppCheck.instance.activate(
       appleProvider:
           kDebugMode ? AppleProvider.debug : AppleProvider.deviceCheck,
     );
     log('🛡️ Firebase App Check activated');
+  } on Object catch (e) {
+    log('⚠️ App Check activation failed (continuing without it): $e');
+  }
 
-    // Configure Firebase Auth for iOS Simulator testing
-    if (Platform.isIOS && kDebugMode) {
-      // Disable app verification for testing on iOS Simulator
-      // This allows phone auth to work without real SMS
-      // IMPORTANT: Only use test phone numbers from Firebase Console
-      // Go to: Firebase Console > Authentication > Sign-in method > Phone > Phone numbers for testing
-      try {
-        // Note: Flutter doesn't have direct access to Auth.auth().settings
-        // Instead, we'll handle this in the phone auth repository
-        log('📱 iOS Simulator detected - Test phone numbers should be configured in Firebase Console');
-        log('💡 Configure test numbers at: Firebase Console > Auth > Sign-in method > Phone > Test phone numbers');
-      } on Object catch (e) {
-        log('⚠️ Could not configure simulator settings: $e');
-      }
-    }
+  // Configure Firebase Auth for iOS Simulator testing
+  if (Platform.isIOS && kDebugMode) {
+    log('📱 iOS Simulator detected — configure test numbers in Firebase Console');
+  }
 
-    // Initialize Crashlytics for crash reporting
-    try {
-      await CrashlyticsService().initialize();
-      log('📊 Crashlytics initialized successfully');
-    } on Object catch (e) {
-      log('❌ Crashlytics initialization error: $e');
-      // Continue anyway - app should work without Crashlytics
-    }
+  // Initialize Crashlytics for crash reporting
+  try {
+    await CrashlyticsService().initialize();
+    log('📊 Crashlytics initialized successfully');
+  } on Object catch (e) {
+    log('❌ Crashlytics initialization error: $e');
+  }
 
-    // Initialize Notification Service
+  // Initialize Notification Service
+  try {
     await NotificationService.initialize();
     log('🔔 Notification Service initialized');
-
-    // Seed events only in debug mode to prevent fake data in production
-    if (kDebugMode) {
-      try {
-        final currentUser = FirebaseAuth.instance.currentUser;
-        if (currentUser != null) {
-          final seedService = SeedEventsService();
-          await seedService.seedEventsIfEmpty();
-          log('🎉 Events seeding completed (debug only)');
-        }
-      } on Object catch (e) {
-        log('⚠️ Events seeding error (debug only): $e');
-      }
-    }
   } on Object catch (e) {
-    log('❌ Firebase initialization error: $e');
+    log('❌ Notification Service initialization error: $e');
+  }
+
+  // Seed events only in debug mode to prevent fake data in production
+  if (kDebugMode) {
+    try {
+      final currentUser = FirebaseAuth.instance.currentUser;
+      if (currentUser != null) {
+        final seedService = SeedEventsService();
+        await seedService.seedEventsIfEmpty();
+        log('🎉 Events seeding completed (debug only)');
+      }
+    } on Object catch (e) {
+      log('⚠️ Events seeding error (debug only): $e');
+    }
   }
 
   // Authentication state will be managed by the app flow

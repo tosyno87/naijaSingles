@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'dart:developer';
+import 'dart:ui';
 
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
@@ -8,10 +9,8 @@ import 'package:google_fonts/google_fonts.dart';
 
 import '../../../common/constants/app_colors.dart';
 import '../../../common/routes/route_name.dart';
-import '../../../common/widgets/afropeep_logo.dart';
 import '../auth_method/sign_in_method_selection_screen.dart';
 import '../phone/ui/screens/phone_number.dart';
-import 'widgets/rotating_greeting_widget.dart';
 
 class WelcomeScreen extends StatefulWidget {
   const WelcomeScreen({super.key});
@@ -25,14 +24,17 @@ class _WelcomeScreenState extends State<WelcomeScreen>
   bool _isAuthenticated = false;
   bool _isLoading = true;
 
-  late AnimationController _logoController;
-  late AnimationController _textController;
-  late AnimationController _buttonController;
+  // Ken Burns — perpetual slow zoom + pan
+  late AnimationController _kenBurnsController;
+  late Animation<double> _kenBurnsScale;
+  late Animation<double> _kenBurnsTranslateY;
 
-  late Animation<double> _logoScale;
-  late Animation<double> _textOpacity;
+  // Entrance — fast and snappy
+  late AnimationController _textController;
+  late Animation<double> _textFade;
+  late AnimationController _buttonController;
   late Animation<Offset> _buttonSlide;
-  late Animation<double> _backgroundOpacity;
+  late Animation<double> _buttonFade;
 
   @override
   void initState() {
@@ -42,81 +44,54 @@ class _WelcomeScreenState extends State<WelcomeScreen>
   }
 
   void _initializeAnimations() {
-    // Logo bounce-in animation with fade
-    _logoController = AnimationController(
-      duration: const Duration(milliseconds: 2500),
+    // Ken Burns: 12s, reverse loop
+    _kenBurnsController = AnimationController(
+      duration: const Duration(seconds: 12),
       vsync: this,
+    )..repeat(reverse: true);
+
+    _kenBurnsScale = Tween<double>(begin: 1.0, end: 1.06).animate(
+      CurvedAnimation(parent: _kenBurnsController, curve: Curves.easeInOut),
     );
-    _logoScale = Tween<double>(
-      begin: 0.3,
-      end: 1,
-    ).animate(
-      CurvedAnimation(
-        parent: _logoController,
-        curve: Curves.elasticOut,
-      ),
+    _kenBurnsTranslateY = Tween<double>(begin: 0, end: -14).animate(
+      CurvedAnimation(parent: _kenBurnsController, curve: Curves.easeInOut),
     );
 
-    // Text fade-in animation
+    // Text entrance: 250ms
     _textController = AnimationController(
-      duration: const Duration(milliseconds: 1500),
+      duration: const Duration(milliseconds: 250),
       vsync: this,
     );
-    _textOpacity = Tween<double>(
-      begin: 0,
-      end: 1,
-    ).animate(
-      CurvedAnimation(
-        parent: _textController,
-        curve: Curves.easeInOut,
-      ),
+    _textFade = CurvedAnimation(
+      parent: _textController,
+      curve: Curves.easeOut,
     );
 
-    // Button slide-in animation
+    // Button entrance: 350ms, delayed 120ms after text
     _buttonController = AnimationController(
-      duration: const Duration(milliseconds: 1000),
+      duration: const Duration(milliseconds: 350),
       vsync: this,
     );
     _buttonSlide = Tween<Offset>(
-      begin: const Offset(0, 0.3),
+      begin: const Offset(0, 0.25),
       end: Offset.zero,
     ).animate(
-      CurvedAnimation(
-        parent: _buttonController,
-        curve: Curves.easeOutBack,
-      ),
+      CurvedAnimation(parent: _buttonController, curve: Curves.easeOutCubic),
+    );
+    _buttonFade = CurvedAnimation(
+      parent: _buttonController,
+      curve: Curves.easeIn,
     );
 
-    // Background pattern fade-in animation
-    _backgroundOpacity = Tween<double>(
-      begin: 0,
-      end: 0.02,
-    ).animate(
-      CurvedAnimation(
-        parent: _textController,
-        curve: Curves.easeInOut,
-      ),
-    );
-
-    // Start animations with delays - check mounted before each call
-    if (mounted) {
-      unawaited(_logoController.forward());
-    }
-    Future.delayed(const Duration(milliseconds: 500), () {
-      if (mounted) {
-        unawaited(_textController.forward());
-      }
-    });
-    Future.delayed(const Duration(milliseconds: 1000), () {
-      if (mounted) {
-        unawaited(_buttonController.forward());
-      }
+    if (mounted) unawaited(_textController.forward());
+    Future.delayed(const Duration(milliseconds: 120), () {
+      if (mounted) unawaited(_buttonController.forward());
     });
   }
 
   @override
   void dispose() {
-    _logoController.dispose();
+    _kenBurnsController.dispose();
     _textController.dispose();
     _buttonController.dispose();
     super.dispose();
@@ -124,9 +99,7 @@ class _WelcomeScreenState extends State<WelcomeScreen>
 
   Future<void> _checkAuthStatus() async {
     try {
-      // Add small delay to ensure smooth rendering
       await Future.delayed(const Duration(milliseconds: 100));
-
       if (!mounted) return;
 
       final currentUser = FirebaseAuth.instance.currentUser;
@@ -137,10 +110,6 @@ class _WelcomeScreenState extends State<WelcomeScreen>
           _isLoading = false;
         });
         log("User authentication status: ${_isAuthenticated ? 'Authenticated' : 'Not authenticated'}");
-
-        // If user is authenticated and has completed profile, navigate to main app
-        // This happens automatically when they click "Continue to App" but we can also do it here
-        // However, we want to show the welcome screen first, so we'll let user click the button
       }
     } on Object catch (e) {
       log('Error checking auth status: $e');
@@ -155,278 +124,277 @@ class _WelcomeScreenState extends State<WelcomeScreen>
 
   @override
   Widget build(BuildContext context) {
-    // Set system UI overlay style for status bar
     SystemChrome.setSystemUIOverlayStyle(
-      SystemUiOverlayStyle.dark.copyWith(
+      SystemUiOverlayStyle.light.copyWith(
         statusBarColor: Colors.transparent,
       ),
     );
 
+    final screenHeight = MediaQuery.of(context).size.height;
+    final screenWidth = MediaQuery.of(context).size.width;
+    final bottomPadding = MediaQuery.of(context).padding.bottom;
+
     return Scaffold(
-      body: AnimatedBuilder(
-        animation: _backgroundOpacity,
-        builder: (context, child) => DecoratedBox(
-          decoration: BoxDecoration(
-            // Clean white background
-            color: Colors.white,
-            image: DecorationImage(
-              image: const AssetImage('assets/images/african_pattern.png'),
-              fit: BoxFit.cover,
-              opacity: _backgroundOpacity.value, // Animated opacity for polish
+      body: Stack(
+        fit: StackFit.expand,
+        children: [
+          // 1. Full-screen hero with Ken Burns + cinematic color grade
+          AnimatedBuilder(
+            animation: _kenBurnsController,
+            builder: (context, child) => Transform(
+              alignment: Alignment.center,
+              transform: Matrix4.identity()
+                ..scale(_kenBurnsScale.value, _kenBurnsScale.value)
+                ..translate(0.0, _kenBurnsTranslateY.value),
+              child: child,
             ),
-          ),
-          child: SafeArea(
-            child: LayoutBuilder(
-              builder: (context, constraints) => SingleChildScrollView(
-                child: ConstrainedBox(
-                  constraints: BoxConstraints(
-                    minHeight: constraints.maxHeight,
-                  ),
-                  child: Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 24),
-                    child: Column(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        const SizedBox(height: 40),
-
-                        // Clean Afropeep Logo with bounce-in and fade animation
-                        AnimatedBuilder(
-                          animation: _logoScale,
-                          builder: (context, child) => Transform.scale(
-                            scale: _logoScale.value,
-                            child: Opacity(
-                              opacity: _logoScale.value.clamp(0.0, 1.0),
-                              child: _buildCleanLogo(),
-                            ),
-                          ),
-                        ),
-
-                        const SizedBox(
-                          height: 32,
-                        ), // Increased spacing for massive logo
-
-                        // Animated progress bar instead of decorative line
-                        AnimatedBuilder(
-                          animation: _textOpacity,
-                          builder: (context, child) => Opacity(
-                            opacity: _textOpacity.value,
-                            child: _buildAnimatedProgressBar(),
-                          ),
-                        ),
-
-                        const SizedBox(height: 40), // Increased spacing
-
-                        // Welcome message with animation
-                        AnimatedBuilder(
-                          animation: _textOpacity,
-                          builder: (context, child) => Opacity(
-                            opacity: _textOpacity.value,
-                            child: Text(
-                              'Welcome to Afropeep — community, culture, and connection for Africans everywhere.',
-                              textAlign: TextAlign.center,
-                              style: GoogleFonts.montserrat(
-                                fontSize: 16,
-                                fontWeight: FontWeight.w500,
-                                fontStyle: FontStyle.italic,
-                                color: AppColors.textSecondary,
-                                height: 1.4,
-                              ),
-                            ),
-                          ),
-                        ),
-
-                        const SizedBox(height: 24), // Increased spacing
-
-                        // Rotating greeting in African languages with animation
-                        AnimatedBuilder(
-                          animation: _textOpacity,
-                          builder: (context, child) => Opacity(
-                            opacity: _textOpacity.value,
-                            child: const RotatingGreetingWidget(),
-                          ),
-                        ),
-
-                        const SizedBox(height: 32), // Increased spacing
-
-                        // Main tagline with animation
-                        AnimatedBuilder(
-                          animation: _textOpacity,
-                          builder: (context, child) => Opacity(
-                            opacity: _textOpacity.value,
-                            child: Text(
-                              'Connect Your Tribe From Anywhere',
-                              textAlign: TextAlign.center,
-                              style: GoogleFonts.montserrat(
-                                fontSize: 18,
-                                fontWeight: FontWeight.w500,
-                                color: AppColors.textPrimary,
-                                height: 1.3,
-                              ),
-                            ),
-                          ),
-                        ),
-
-                        const SizedBox(
-                          height: 40,
-                        ), // Fixed spacing instead of Spacer
-
-                        // Show loading indicator while checking auth status
-                        if (_isLoading)
-                          const CircularProgressIndicator(
-                            color: AppColors.primaryGreen,
-                          ),
-
-                        // Show different buttons based on authentication status
-                        if (!_isLoading) ...[
-                          // Continue to App button for authenticated users
-                          if (_isAuthenticated)
-                            SlideTransition(
-                              position: _buttonSlide,
-                              child: _buildGradientButton(
-                                text: 'Continue to App',
-                                onPressed: () {
-                                  unawaited(
-                                    Navigator.pushReplacementNamed(
-                                      context,
-                                      RouteName.mainNavigation,
-                                    ),
-                                  );
-                                },
-                              ),
-                            ),
-
-                          // Create Account and Login buttons for unauthenticated users
-                          if (!_isAuthenticated) ...[
-                            // Create Account Button - Direct to phone sign-up
-                            SlideTransition(
-                              position: _buttonSlide,
-                              child: _buildGradientButton(
-                                text: 'Create Account',
-                                onPressed: () {
-                                  unawaited(
-                                    Navigator.push(
-                                      context,
-                                      MaterialPageRoute(
-                                        builder: (context) => PhoneNumber(
-                                          updatePhoneNumber: false,
-                                        ),
-                                      ),
-                                    ),
-                                  );
-                                },
-                              ),
-                            ),
-
-                            const SizedBox(
-                              height: 16,
-                            ), // Modern spacing between buttons
-
-                            // Login Button - Secondary style
-                            SlideTransition(
-                              position: _buttonSlide,
-                              child: _buildOutlinedButton(
-                                text: 'Login',
-                                onPressed: () {
-                                  unawaited(
-                                    Navigator.push(
-                                      context,
-                                      MaterialPageRoute(
-                                        builder: (context) =>
-                                            const SignInMethodSelectionScreen(),
-                                      ),
-                                    ),
-                                  );
-                                },
-                              ),
-                            ),
-                          ],
-                        ],
-
-                        // Dynamic bottom spacing based on safe area
-                        SizedBox(
-                          height: MediaQuery.of(context).padding.bottom > 0
-                              ? MediaQuery.of(context).padding.bottom + 32
-                              : 40,
-                        ),
-                      ],
+            child: ColorFiltered(
+              colorFilter: const ColorFilter.matrix(<double>[
+                1.10, 0, 0, 0, -13, // R: +10% contrast
+                0, 1.08, 0, 0, -10, // G: slightly warm
+                0, 0, 1.04, 0, -5, // B: warmest channel
+                0, 0, 0, 1, 0,
+              ]),
+              child: Image.asset(
+                'assets/images/backgrounds/welcome_couple.png',
+                fit: BoxFit.cover,
+                width: double.infinity,
+                height: double.infinity,
+                errorBuilder: (context, error, stackTrace) => Container(
+                  decoration: const BoxDecoration(
+                    gradient: LinearGradient(
+                      begin: Alignment.topCenter,
+                      end: Alignment.bottomCenter,
+                      colors: [Color(0xFF1A3D2B), Color(0xFF006B2E)],
                     ),
                   ),
                 ),
               ),
             ),
           ),
-        ),
+
+          // 2. Subtle blur behind bottom content (glass effect)
+          Positioned(
+            left: 0,
+            right: 0,
+            bottom: 0,
+            height: screenHeight * 0.42,
+            child: ClipRect(
+              child: BackdropFilter(
+                filter: ImageFilter.blur(sigmaX: 3, sigmaY: 3),
+                child: const ColoredBox(color: Colors.transparent),
+              ),
+            ),
+          ),
+
+          // 3. Top gradient — brand area (45% black -> transparent)
+          Positioned(
+            top: 0,
+            left: 0,
+            right: 0,
+            height: screenHeight * 0.28,
+            child: const DecoratedBox(
+              decoration: BoxDecoration(
+                gradient: LinearGradient(
+                  begin: Alignment.topCenter,
+                  end: Alignment.bottomCenter,
+                  colors: [
+                    Color(0x73000000), // 45% black
+                    Color(0x00000000), // transparent
+                  ],
+                ),
+              ),
+            ),
+          ),
+
+          // 4. Bottom gradient — CTA area (transparent -> 65% black)
+          Positioned(
+            left: 0,
+            right: 0,
+            bottom: 0,
+            height: screenHeight * 0.55,
+            child: const DecoratedBox(
+              decoration: BoxDecoration(
+                gradient: LinearGradient(
+                  begin: Alignment.topCenter,
+                  end: Alignment.bottomCenter,
+                  colors: [
+                    Color(0x00000000), // transparent
+                    Color(0xA6000000), // 65% black
+                  ],
+                ),
+              ),
+            ),
+          ),
+
+          // 5. Content
+          SafeArea(
+            child: Padding(
+              padding: EdgeInsets.fromLTRB(
+                24,
+                0,
+                24,
+                bottomPadding > 0 ? bottomPadding : 24,
+              ),
+              child: Column(
+                children: [
+                  const SizedBox(height: 44),
+
+                  // Wordmark
+                  FadeTransition(
+                    opacity: _textFade,
+                    child: Text(
+                      'Afropeep',
+                      style: GoogleFonts.plusJakartaSans(
+                        fontSize: 34,
+                        fontWeight: FontWeight.w700,
+                        color: Colors.white,
+                        letterSpacing: 0.6,
+                        shadows: [
+                          Shadow(
+                            color: Colors.black.withValues(alpha: 0.5),
+                            blurRadius: 12,
+                          ),
+                          Shadow(
+                            color: Colors.black.withValues(alpha: 0.25),
+                            blurRadius: 4,
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+
+                  const Spacer(),
+
+                  // Headline + value prop
+                  FadeTransition(
+                    opacity: _textFade,
+                    child: Column(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Text(
+                          'Find Your Tribe Anywhere',
+                          textAlign: TextAlign.center,
+                          style: GoogleFonts.montserrat(
+                            fontSize: 28,
+                            fontWeight: FontWeight.w700,
+                            color: Colors.white,
+                            height: 1.2,
+                          ),
+                        ),
+                        const SizedBox(height: 10),
+                        Text(
+                          'Where African culture meets modern dating',
+                          textAlign: TextAlign.center,
+                          style: GoogleFonts.montserrat(
+                            fontSize: 14,
+                            fontWeight: FontWeight.w400,
+                            color: Color(0xB3FFFFFF),
+                            height: 1.4,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+
+                  const SizedBox(height: 32),
+
+                  // Buttons
+                  if (_isLoading)
+                    const CircularProgressIndicator(color: Colors.white),
+
+                  if (!_isLoading)
+                    SlideTransition(
+                      position: _buttonSlide,
+                      child: FadeTransition(
+                        opacity: _buttonFade,
+                        child: _buildButtons(screenWidth),
+                      ),
+                    ),
+                ],
+              ),
+            ),
+          ),
+        ],
       ),
     );
   }
 
-  // Clean logo without glow - stands confidently on its own
-  Widget _buildCleanLogo() {
-    return const AfropeepLogo(size: 280); // Doubled size - hero element
-  }
+  Widget _buildButtons(double screenWidth) {
+    final buttonWidth = screenWidth * 0.80;
 
-  // Animated progress bar
-  Widget _buildAnimatedProgressBar() => TweenAnimationBuilder<double>(
-        duration: const Duration(seconds: 2),
-        tween: Tween(begin: 0, end: 1),
-        builder: (context, value, child) => Container(
-          width: 200,
-          height: 2,
-          decoration: BoxDecoration(
-            borderRadius: BorderRadius.circular(1),
-            gradient: LinearGradient(
-              colors: [
-                AppColors.primaryGreen.withValues(alpha: 0.1),
-                AppColors.primaryGreen.withValues(alpha: 0.3),
-                AppColors.primaryGreen.withValues(alpha: 0.1),
-              ],
-            ),
-          ),
-          child: FractionallySizedBox(
-            alignment: Alignment.centerLeft,
-            widthFactor: value,
-            child: Container(
-              decoration: BoxDecoration(
-                gradient: AppColors.primaryGradient,
-                borderRadius: BorderRadius.circular(1),
+    if (_isAuthenticated) {
+      return Center(
+        child: SizedBox(
+          width: buttonWidth,
+          child: _buildPrimaryButton(
+            text: 'Continue to App',
+            onPressed: () => unawaited(
+              Navigator.pushReplacementNamed(
+                context,
+                RouteName.mainNavigation,
               ),
             ),
           ),
         ),
       );
+    }
 
-  // Afropeep-branded button widget
-  Widget _buildAfropeepButton({
-    required String text,
-    required VoidCallback onPressed,
-    required bool isPrimary,
-  }) =>
-      TweenAnimationBuilder<double>(
-        duration: const Duration(milliseconds: 1500),
-        tween: Tween(begin: 0.98, end: 1),
-        builder: (context, scale, child) => Transform.scale(
-          scale: scale,
-          child: isPrimary
-              ? _buildPrimaryButton(text: text, onPressed: onPressed)
-              : _buildSecondaryButton(text: text, onPressed: onPressed),
+    return Column(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        Center(
+          child: SizedBox(
+            width: buttonWidth,
+            child: _buildPrimaryButton(
+              text: 'Create Account',
+              onPressed: () => unawaited(
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) =>
+                        PhoneNumber(updatePhoneNumber: false),
+                  ),
+                ),
+              ),
+            ),
+          ),
         ),
-      );
+        const SizedBox(height: 16),
+        Center(
+          child: SizedBox(
+            width: buttonWidth,
+            child: _buildSecondaryButton(
+              text: 'Log in',
+              onPressed: () => unawaited(
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) =>
+                        const SignInMethodSelectionScreen(),
+                  ),
+                ),
+              ),
+            ),
+          ),
+        ),
+      ],
+    );
+  }
 
-  // Primary button: Green gradient with white text
   Widget _buildPrimaryButton({
     required String text,
     required VoidCallback onPressed,
   }) =>
       Container(
-        width: double.infinity,
         decoration: BoxDecoration(
           gradient: AppColors.primaryGradient,
           borderRadius: BorderRadius.circular(28),
           boxShadow: [
             BoxShadow(
-              color: AppColors.primaryGreen.withValues(alpha: 0.25),
-              blurRadius: 12,
-              offset: const Offset(0, 4),
+              color: AppColors.primaryGreen.withValues(alpha: 0.3),
+              blurRadius: 16,
+              offset: const Offset(0, 6),
             ),
           ],
         ),
@@ -437,10 +405,10 @@ class _WelcomeScreenState extends State<WelcomeScreen>
           },
           style: ElevatedButton.styleFrom(
             backgroundColor: Colors.transparent,
-            foregroundColor: AppColors.textOnPrimary,
+            foregroundColor: Colors.white,
             shadowColor: Colors.transparent,
-            minimumSize: const Size(double.infinity, 56),
-            padding: const EdgeInsets.symmetric(vertical: 16, horizontal: 24),
+            minimumSize: const Size(double.infinity, 54),
+            padding: const EdgeInsets.symmetric(vertical: 15, horizontal: 24),
             shape: RoundedRectangleBorder(
               borderRadius: BorderRadius.circular(28),
             ),
@@ -456,67 +424,35 @@ class _WelcomeScreenState extends State<WelcomeScreen>
         ),
       );
 
-  // Secondary button: Ghost style with green border
   Widget _buildSecondaryButton({
     required String text,
     required VoidCallback onPressed,
   }) =>
-      Container(
-        width: double.infinity,
-        decoration: BoxDecoration(
-          color: AppColors.backgroundColor
-              .withValues(alpha: 0.5), // Light cream fill
-          borderRadius: BorderRadius.circular(28),
-          border: Border.all(
-            color: AppColors.primaryGreen,
-            width: 2,
+      OutlinedButton(
+        onPressed: () {
+          unawaited(HapticFeedback.lightImpact());
+          onPressed();
+        },
+        style: OutlinedButton.styleFrom(
+          backgroundColor: Colors.white.withValues(alpha: 0.12),
+          foregroundColor: Colors.white,
+          side: BorderSide(
+            color: Colors.white.withValues(alpha: 0.4),
+          ),
+          minimumSize: const Size(double.infinity, 52),
+          padding: const EdgeInsets.symmetric(vertical: 14, horizontal: 24),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(28),
           ),
         ),
-        child: OutlinedButton(
-          onPressed: () {
-            unawaited(HapticFeedback.lightImpact());
-            onPressed();
-          },
-          style: OutlinedButton.styleFrom(
-            backgroundColor: Colors.transparent,
-            foregroundColor: AppColors.primaryGreen,
-            side: BorderSide.none,
-            minimumSize: const Size(double.infinity, 56),
-            padding: const EdgeInsets.symmetric(vertical: 16, horizontal: 24),
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(28),
-            ),
-          ),
-          child: Text(
-            text,
-            style: GoogleFonts.montserrat(
-              fontSize: 17,
-              fontWeight: FontWeight.w600,
-              letterSpacing: 0.3,
-              color: AppColors.primaryGreen,
-            ),
+        child: Text(
+          text,
+          style: GoogleFonts.montserrat(
+            fontSize: 15,
+            fontWeight: FontWeight.w500,
+            letterSpacing: 0.3,
+            color: Colors.white.withValues(alpha: 0.9),
           ),
         ),
-      );
-
-  // Legacy methods kept for compatibility - now use _buildAfropeepButton
-  Widget _buildGradientButton({
-    required String text,
-    required VoidCallback onPressed,
-  }) =>
-      _buildAfropeepButton(
-        text: text,
-        onPressed: onPressed,
-        isPrimary: true,
-      );
-
-  Widget _buildOutlinedButton({
-    required String text,
-    required VoidCallback onPressed,
-  }) =>
-      _buildAfropeepButton(
-        text: text,
-        onPressed: onPressed,
-        isPrimary: false,
       );
 }

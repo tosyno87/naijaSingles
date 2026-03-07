@@ -5,6 +5,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:google_fonts/google_fonts.dart';
 
 import '../../common/bloc/user/user_bloc.dart';
@@ -14,7 +15,6 @@ import '../../common/routes/route_name.dart';
 import '../../common/utils/account_deletion_scope.dart';
 import '../../common/utils/app_logger.dart';
 import '../../common/utils/profile_completion_guard.dart';
-import '../../common/widgets/custom_3d_icons.dart';
 import '../../debug/quick_analysis.dart';
 import '../../models/user_model.dart';
 import '../account_status/presentation/widgets/account_status_banner.dart';
@@ -45,12 +45,14 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
   // Define the pages to be shown for each tab
   // Order matches the BottomNavigationBarItems below
   // CONNECT-FIRST NAVIGATION (Connect is the home page)
-  final List<Widget> _pages = [
-    const ExploreScreen(), // Tab 0: Connect (Dating/Friendship) - HOME PAGE
-    const DiscoverPageV2(), // Tab 1: Discover (Events & Communities)
-    const MessagesScreen(), // Tab 2: Messages
-    const ProfileScreen(), // Tab 3: Profile
-  ];
+  List<Widget> get _pages => [
+        const ExploreScreen(), // Tab 0: Connect (Dating/Friendship) - HOME PAGE
+        DiscoverPageV2(
+          onSeeAllPeopleTap: () => _switchToTab(0),
+        ), // Tab 1: Discover (Events & Communities)
+        const MessagesScreen(), // Tab 2: Messages
+        const ProfileScreen(), // Tab 3: Profile
+      ];
 
   // Deep green color for accents
   // Using centralized app colors
@@ -204,6 +206,13 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
         _backgroundTasksRunning = false;
       });
     }
+  }
+
+  void _switchToTab(int index) {
+    if (!mounted) return;
+    setState(() {
+      _selectedIndex = index.clamp(0, _pages.length - 1);
+    });
   }
 
   @override
@@ -426,18 +435,15 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
       bottomNavigationBar: BottomNavigationBar(
         currentIndex: _validSelectedIndex,
         onTap: (index) {
-          setState(() {
-            // Ensure index is within valid range
-            _selectedIndex = index.clamp(0, _pages.length - 1);
-            AppLogger.debug(
-              '🔄 Tab tapped: index=$index, _selectedIndex=$_selectedIndex, _validSelectedIndex=$_validSelectedIndex',
-            );
-            AppLogger.debug('📱 Pages length: ${_pages.length}');
-          });
+          _switchToTab(index);
+          AppLogger.debug(
+            '🔄 Tab tapped: index=$index, _selectedIndex=$_selectedIndex, _validSelectedIndex=$_validSelectedIndex',
+          );
+          AppLogger.debug('📱 Pages length: ${_pages.length}');
         },
         backgroundColor: Colors.white,
         selectedItemColor: AppColors.primaryGreen,
-        unselectedItemColor: Colors.grey,
+        unselectedItemColor: const Color(0xFF8E8E93),
         type: BottomNavigationBarType.fixed,
         selectedLabelStyle: GoogleFonts.montserrat(
           fontSize: 12,
@@ -448,25 +454,51 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
         ),
         items: [
           BottomNavigationBarItem(
-            icon: Custom3DIcons.connect(),
+            icon: _buildPremiumNavIcon(FontAwesomeIcons.heart),
+            activeIcon: _buildPremiumNavIcon(FontAwesomeIcons.solidHeart,
+                isActive: true),
             label: 'Connect',
           ),
           BottomNavigationBarItem(
-            icon: Custom3DIcons.discover(),
+            icon: _buildPremiumNavIcon(FontAwesomeIcons.compass),
+            activeIcon: _buildPremiumNavIcon(FontAwesomeIcons.solidCompass,
+                isActive: true),
             label: 'Discover',
           ),
           BottomNavigationBarItem(
-            icon: Custom3DIcons.messages(),
+            icon: _buildPremiumNavIcon(FontAwesomeIcons.comment),
+            activeIcon: _buildPremiumNavIcon(FontAwesomeIcons.solidComment,
+                isActive: true),
             label: 'Messages',
           ),
           BottomNavigationBarItem(
-            icon: Custom3DIcons.profile(),
+            icon: _buildPremiumNavIcon(FontAwesomeIcons.user),
+            activeIcon: _buildPremiumNavIcon(FontAwesomeIcons.solidUser,
+                isActive: true),
             label: 'Profile',
           ),
         ],
       ),
     );
   }
+
+  Widget _buildPremiumNavIcon(IconData icon, {bool isActive = false}) =>
+      AnimatedContainer(
+        duration: const Duration(milliseconds: 180),
+        curve: Curves.easeOut,
+        padding: const EdgeInsets.all(8),
+        decoration: BoxDecoration(
+          color: isActive
+              ? AppColors.primaryGreen.withValues(alpha: 0.12)
+              : Colors.transparent,
+          borderRadius: BorderRadius.circular(12),
+        ),
+        child: FaIcon(
+          icon,
+          size: 18,
+          color: isActive ? AppColors.primaryGreen : const Color(0xFF8E8E93),
+        ),
+      );
 
   // Temporary analysis method (remove after testing)
   void _runUserAnalysis(BuildContext context) {

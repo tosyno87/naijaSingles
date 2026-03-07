@@ -1,8 +1,11 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:google_fonts/google_fonts.dart';
 
 import '../bloc/onboarding_bloc.dart';
+import '../onboarding_theme.dart';
 
 class TribeSelectionScreen extends StatefulWidget {
   const TribeSelectionScreen({super.key});
@@ -15,15 +18,11 @@ class _TribeSelectionScreenState extends State<TribeSelectionScreen> {
   String? _selectedNationality;
   String? _selectedTribe;
   final TextEditingController _otherTribeController = TextEditingController();
+  final TextEditingController _nationalitySearchController =
+      TextEditingController();
   bool _showOtherField = false;
+  String _nationalityFilter = '';
 
-  // Afropeep MVP theme colors
-  static const Color afropeepGreen = Color(0xFF008037); // MVP green
-  static const Color cardBackground = Color(0xFFF7E8DA);
-  static const Color textDarkBrown = Color(0xFF3A1D0F);
-  static const Color textLightBrown = Color(0xFF8B6C59);
-
-  // List of African nationalities
   final List<String> _nationalities = [
     'Nigeria',
     'Ghana',
@@ -79,7 +78,6 @@ class _TribeSelectionScreenState extends State<TribeSelectionScreen> {
     'Other',
   ];
 
-  // List of main Nigerian tribes for dropdown (optional)
   final List<String> _mainTribes = [
     'Yoruba',
     'Igbo',
@@ -98,7 +96,6 @@ class _TribeSelectionScreenState extends State<TribeSelectionScreen> {
   void initState() {
     super.initState();
 
-    // Initialize with existing data if available
     WidgetsBinding.instance.addPostFrameCallback((_) {
       final data = context.read<OnboardingBloc>().state.data;
 
@@ -125,6 +122,7 @@ class _TribeSelectionScreenState extends State<TribeSelectionScreen> {
   @override
   void dispose() {
     _otherTribeController.dispose();
+    _nationalitySearchController.dispose();
     super.dispose();
   }
 
@@ -148,190 +146,254 @@ class _TribeSelectionScreenState extends State<TribeSelectionScreen> {
     });
   }
 
-  @override
-  Widget build(BuildContext context) => SingleChildScrollView(
-        padding: const EdgeInsets.all(24),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            // Description text
-            Text(
-              'This helps us connect you with people from similar backgrounds',
-              style: GoogleFonts.montserrat(
-                fontSize: 14,
-                color: textLightBrown,
-              ),
-            ),
+  void _showNationalitySearch() {
+    _nationalitySearchController.text = '';
+    _nationalityFilter = '';
 
-            const SizedBox(height: 32),
+    unawaited(showModalBottomSheet<String>(
+      context: context,
+      isScrollControlled: true,
+      backgroundColor: OnboardingTheme.background,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+      ),
+      builder: (ctx) => StatefulBuilder(
+        builder: (ctx, setSheetState) {
+          final filtered = _nationalityFilter.isEmpty
+              ? _nationalities
+              : _nationalities
+                  .where((n) => n
+                      .toLowerCase()
+                      .contains(_nationalityFilter.toLowerCase()))
+                  .toList();
 
-            // Nationality field (required)
-            Text(
-              'Nationality *',
-              style: GoogleFonts.montserrat(
-                fontSize: 16,
-                fontWeight: FontWeight.w600,
-                color: textDarkBrown,
-              ),
-            ),
-            const SizedBox(height: 12),
-            Container(
-              decoration: BoxDecoration(
-                color: cardBackground,
-                borderRadius: BorderRadius.circular(12),
-                border: Border.all(
-                  color: _selectedNationality != null
-                      ? afropeepGreen
-                      : Colors.transparent,
-                ),
-              ),
-              padding: const EdgeInsets.symmetric(horizontal: 16),
-              child: DropdownButtonHideUnderline(
-                child: DropdownButton<String>(
-                  value: _selectedNationality,
-                  hint: Text(
-                    'Select your nationality',
-                    style: GoogleFonts.montserrat(
-                      color: textLightBrown,
-                      fontSize: 16,
+          return DraggableScrollableSheet(
+            expand: false,
+            initialChildSize: 0.7,
+            maxChildSize: 0.9,
+            minChildSize: 0.5,
+            builder: (_, scrollController) => SafeArea(
+              child: Column(
+                children: [
+                  Container(
+                    margin: const EdgeInsets.only(top: 12, bottom: 8),
+                    width: 40,
+                    height: 4,
+                    decoration: BoxDecoration(
+                      color: Colors.grey.shade300,
+                      borderRadius: BorderRadius.circular(2),
                     ),
                   ),
-                  isExpanded: true,
-                  icon: const Icon(Icons.arrow_drop_down, color: afropeepGreen),
-                  dropdownColor: cardBackground,
-                  style: GoogleFonts.montserrat(
-                    color: textDarkBrown,
-                    fontSize: 16,
-                  ),
-                  items: _nationalities
-                      .map(
-                        (String nationality) => DropdownMenuItem<String>(
-                          value: nationality,
-                          child: Text(nationality),
+                  Padding(
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: OnboardingTheme.horizontalPadding,
+                      vertical: 8,
+                    ),
+                    child: TextField(
+                      controller: _nationalitySearchController,
+                      autofocus: true,
+                      style: OnboardingTheme.fieldTextStyle,
+                      decoration: OnboardingTheme.fieldDecoration(
+                        hint: 'Search nationality...',
+                        prefix: const Icon(
+                          Icons.search,
+                          color: OnboardingTheme.primaryGreen,
                         ),
-                      )
-                      .toList(),
-                  onChanged: _selectNationality,
-                ),
+                      ),
+                      onChanged: (value) {
+                        setSheetState(() {
+                          _nationalityFilter = value;
+                        });
+                      },
+                    ),
+                  ),
+                  Expanded(
+                    child: ListView.builder(
+                      controller: scrollController,
+                      itemCount: filtered.length,
+                      itemBuilder: (_, i) {
+                        final nation = filtered[i];
+                        final isSelected = nation == _selectedNationality;
+                        return ListTile(
+                          title: Text(
+                            nation,
+                            style: OnboardingTheme.fieldTextStyle.copyWith(
+                              color: isSelected
+                                  ? OnboardingTheme.primaryGreen
+                                  : OnboardingTheme.fieldTextColor,
+                              fontWeight: isSelected
+                                  ? FontWeight.w700
+                                  : FontWeight.w500,
+                            ),
+                          ),
+                          trailing: isSelected
+                              ? const Icon(
+                                  Icons.check_circle,
+                                  color: OnboardingTheme.primaryGreen,
+                                )
+                              : null,
+                          onTap: () {
+                            Navigator.pop(ctx, nation);
+                          },
+                        );
+                      },
+                    ),
+                  ),
+                ],
               ),
             ),
+          );
+        },
+      ),
+    ).then((selected) {
+      if (selected != null) {
+        _selectNationality(selected);
+      }
+    }));
+  }
 
-            const SizedBox(height: 32),
+  @override
+  Widget build(BuildContext context) => OnboardingTheme.constrainedContent(
+        child: SingleChildScrollView(
+          padding: OnboardingTheme.pagePadding,
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                'This helps us connect you with people from similar backgrounds',
+                style: OnboardingTheme.subtitleStyle,
+              ),
 
-            // Tribe field (optional)
-            Row(
-              children: [
-                Text(
-                  'Tribe or Ethnic Group',
-                  style: GoogleFonts.montserrat(
-                    fontSize: 16,
-                    fontWeight: FontWeight.w600,
-                    color: textDarkBrown,
+              const SizedBox(height: OnboardingTheme.subtitleToField),
+
+              Text('Nationality *', style: OnboardingTheme.sectionLabelStyle),
+              const SizedBox(height: OnboardingTheme.labelToField),
+
+              // Searchable nationality selector
+              GestureDetector(
+                onTap: _showNationalitySearch,
+                child: Container(
+                  width: double.infinity,
+                  constraints: const BoxConstraints(
+                    minHeight: OnboardingTheme.fieldHeight,
+                  ),
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: OnboardingTheme.fieldContentPadding,
+                  ),
+                  decoration: OnboardingTheme.dropdownDecoration(
+                    hasFocus: _selectedNationality != null,
+                  ),
+                  child: Row(
+                    children: [
+                      Expanded(
+                        child: Text(
+                          _selectedNationality ?? 'Search and select nationality',
+                          style: _selectedNationality != null
+                              ? OnboardingTheme.fieldTextStyle
+                              : GoogleFonts.montserrat(
+                                  color: OnboardingTheme.subtitleColor,
+                                  fontSize: 16,
+                                ),
+                        ),
+                      ),
+                      const Icon(
+                        Icons.search,
+                        color: OnboardingTheme.primaryGreen,
+                        size: OnboardingTheme.fieldIconSize,
+                      ),
+                    ],
                   ),
                 ),
-                const SizedBox(width: 8),
-                Text(
-                  '(Optional)',
-                  style: GoogleFonts.montserrat(
-                    fontSize: 14,
-                    fontWeight: FontWeight.normal,
-                    color: textLightBrown,
-                    fontStyle: FontStyle.italic,
+              ),
+
+              const SizedBox(height: OnboardingTheme.fieldToSection),
+
+              Row(
+                children: [
+                  Text(
+                    'Tribe or Ethnic Group',
+                    style: OnboardingTheme.sectionLabelStyle,
                   ),
+                  const SizedBox(width: 8),
+                  Text(
+                    '(Optional)',
+                    style: OnboardingTheme.helperStyle.copyWith(
+                      fontStyle: FontStyle.italic,
+                    ),
+                  ),
+                ],
+              ),
+              const SizedBox(height: OnboardingTheme.labelToField),
+              Container(
+                constraints: const BoxConstraints(
+                  minHeight: OnboardingTheme.fieldHeight,
+                ),
+                padding: const EdgeInsets.symmetric(
+                  horizontal: OnboardingTheme.fieldContentPadding,
+                ),
+                decoration: OnboardingTheme.dropdownDecoration(
+                  hasFocus: _selectedTribe != null,
+                ),
+                child: DropdownButtonHideUnderline(
+                  child: DropdownButton<String>(
+                    value: _selectedTribe,
+                    hint: Text(
+                      'Select your tribe (optional)',
+                      style: GoogleFonts.montserrat(
+                        color: OnboardingTheme.subtitleColor,
+                        fontSize: 16,
+                      ),
+                    ),
+                    isExpanded: true,
+                    icon: const Icon(
+                      Icons.arrow_drop_down,
+                      color: OnboardingTheme.primaryGreen,
+                      size: OnboardingTheme.fieldIconSize,
+                    ),
+                    dropdownColor: OnboardingTheme.background,
+                    borderRadius: BorderRadius.circular(
+                      OnboardingTheme.fieldRadius,
+                    ),
+                    style: OnboardingTheme.fieldTextStyle,
+                    items: _mainTribes
+                        .map(
+                          (String tribe) => DropdownMenuItem<String>(
+                            value: tribe,
+                            child: Text(tribe),
+                          ),
+                        )
+                        .toList(),
+                    onChanged: _selectTribe,
+                  ),
+                ),
+              ),
+
+              if (_showOtherField) ...[
+                const SizedBox(height: OnboardingTheme.fieldToSection),
+                Text(
+                  'Please specify your tribe',
+                  style: OnboardingTheme.sectionLabelStyle,
+                ),
+                const SizedBox(height: OnboardingTheme.labelToField),
+                TextField(
+                  controller: _otherTribeController,
+                  style: OnboardingTheme.fieldTextStyle,
+                  decoration: OnboardingTheme.fieldDecoration(
+                    hint: 'Enter your tribe',
+                  ),
+                  onChanged: (value) {
+                    if (value.trim().isNotEmpty) {
+                      context.read<OnboardingBloc>().add(
+                            OnboardingTribeUpdated(value.trim()),
+                          );
+                    }
+                  },
                 ),
               ],
-            ),
-            const SizedBox(height: 12),
-            Container(
-              decoration: BoxDecoration(
-                color: cardBackground,
-                borderRadius: BorderRadius.circular(12),
-                border: Border.all(
-                  color: _selectedTribe != null
-                      ? afropeepGreen
-                      : Colors.transparent,
-                ),
-              ),
-              padding: const EdgeInsets.symmetric(horizontal: 16),
-              child: DropdownButtonHideUnderline(
-                child: DropdownButton<String>(
-                  value: _selectedTribe,
-                  hint: Text(
-                    'Select your tribe (optional)',
-                    style: GoogleFonts.montserrat(
-                      color: textLightBrown,
-                      fontSize: 16,
-                    ),
-                  ),
-                  isExpanded: true,
-                  icon: const Icon(Icons.arrow_drop_down, color: afropeepGreen),
-                  dropdownColor: cardBackground,
-                  style: GoogleFonts.montserrat(
-                    color: textDarkBrown,
-                    fontSize: 16,
-                  ),
-                  items: _mainTribes
-                      .map(
-                        (String tribe) => DropdownMenuItem<String>(
-                          value: tribe,
-                          child: Text(tribe),
-                        ),
-                      )
-                      .toList(),
-                  onChanged: _selectTribe,
-                ),
-              ),
-            ),
 
-            // Other tribe input field (conditionally shown)
-            if (_showOtherField) ...[
-              const SizedBox(height: 24),
-              Text(
-                'Please specify your tribe',
-                style: GoogleFonts.montserrat(
-                  fontSize: 16,
-                  fontWeight: FontWeight.w500,
-                  color: textDarkBrown,
-                ),
-              ),
-              const SizedBox(height: 12),
-              TextField(
-                controller: _otherTribeController,
-                style: GoogleFonts.montserrat(
-                  fontSize: 16,
-                  color: textDarkBrown,
-                ),
-                decoration: InputDecoration(
-                  filled: true,
-                  fillColor: cardBackground,
-                  hintText: 'Enter your tribe',
-                  hintStyle: GoogleFonts.montserrat(
-                    color: textLightBrown,
-                  ),
-                  border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(12),
-                    borderSide: BorderSide.none,
-                  ),
-                  focusedBorder: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(12),
-                    borderSide:
-                        const BorderSide(color: afropeepGreen, width: 2),
-                  ),
-                  contentPadding: const EdgeInsets.symmetric(
-                    horizontal: 16,
-                    vertical: 16,
-                  ),
-                ),
-                onChanged: (value) {
-                  if (value.trim().isNotEmpty) {
-                    context.read<OnboardingBloc>().add(
-                          OnboardingTribeUpdated(value.trim()),
-                        );
-                  }
-                },
-              ),
+              const SizedBox(height: OnboardingTheme.fieldToBottom),
             ],
-          ],
+          ),
         ),
       );
 }

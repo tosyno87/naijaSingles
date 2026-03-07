@@ -11,13 +11,24 @@ class UserService {
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
   final FirebaseAuth _auth = FirebaseAuth.instance;
 
-  /// Get user profile data by ID
+  /// Get user profile data by ID.
+  /// Returns null when the profile is private/paused/banned (permission-denied
+  /// from Firestore rules is expected for those cases).
   Future<UserProfile?> getUserProfile(String userId) async {
     try {
       final doc = await _firestore.collection('users').doc(userId).get();
 
       if (doc.exists) {
         return UserProfile.fromMap(doc.data()!, doc.id);
+      }
+      return null;
+    } on FirebaseException catch (e) {
+      if (e.code == 'permission-denied') {
+        AppLogger.debug(
+          'Profile read denied for $userId (private/paused/banned)',
+        );
+      } else {
+        AppLogger.error('Error getting user profile', error: e);
       }
       return null;
     } on Object catch (e) {

@@ -11,6 +11,7 @@ import {MatchHandlers} from './handlers/matchHandlers';
 import {MessageHandlers} from './handlers/messageHandlers';
 import {LikeHandlers} from './handlers/likeHandlers';
 import {TestUserHandlers} from './handlers/testUserHandlers';
+import {DiscoverabilityHandlers} from './handlers/discoverabilityHandlers';
 
 admin.initializeApp();
 
@@ -18,11 +19,13 @@ const matchHandlers = new MatchHandlers();
 const messageHandlers = new MessageHandlers();
 const likeHandlers = new LikeHandlers();
 const testUserHandlers = new TestUserHandlers();
+const discoverabilityHandlers = new DiscoverabilityHandlers();
 
 export const onMatchCreated = matchHandlers.onMatchCreated;
 export const onMessageSent = messageHandlers.onMessageSent;
 export const onSuperLikeCreated = likeHandlers.onSuperLikeCreated;
 export const onLikeCreated = likeHandlers.onLikeCreated;
+export const onUserWritten = discoverabilityHandlers.onUserWritten;
 
 const isTestEnvEnabled = process.env.ENABLE_TEST_ENDPOINTS === 'true';
 export const createTestUsers = isTestEnvEnabled
@@ -38,3 +41,4 @@ export const healthCheck = onRequest((req, res) => {
     version: '1.0.0',
   });
 });
+

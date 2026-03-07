@@ -35,7 +35,7 @@ class _OnboardingMainState extends State<OnboardingMain> {
     'Basic Info',
     'Profile Photo',
     'Your Location',
-    'Nationality',
+    'Country & Identity',
     'Tell Your Story',
     'Your Interests',
     'Dating Preferences',
@@ -90,7 +90,7 @@ class _OnboardingMainState extends State<OnboardingMain> {
     } else if (_currentPage == 3) {
       if (data.nationality == null || data.nationality!.trim().isEmpty) {
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Please select your nationality')),
+          const SnackBar(content: Text('Please select your country')),
         );
         return;
       }

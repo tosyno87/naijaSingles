@@ -126,6 +126,7 @@ class OnboardingRepository {
       'dateOfBirth': d.dateOfBirth?.toIso8601String(),
       'age': d.age,
       'gender': d.gender,
+      'race': d.race,
       'tribe': d.tribe,
       'bio': d.bio,
       'interests': d.interests,
@@ -156,7 +157,12 @@ class OnboardingRepository {
       'isPremium': false,
       'createdAt': DateTime.now().toIso8601String(),
       'updatedAt': DateTime.now().toIso8601String(),
-      'editInfo': {'userGender': d.gender, 'userName': d.fullName},
+      'editInfo': {
+        'userGender': d.gender,
+        'userName': d.fullName,
+        'race': d.race,
+        'tribe': d.tribe,
+      },
       'preferences': {
         'interestedIn': d.interestedIn,
         'ageRange': d.ageRange,

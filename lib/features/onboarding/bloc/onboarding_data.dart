@@ -9,6 +9,7 @@ class OnboardingData extends Equatable {
     this.dateOfBirth,
     this.gender = '',
     this.tribe = '',
+    this.race = '',
     this.bio = '',
     this.interests = const [],
     List<File?>? profilePhotos,
@@ -45,6 +46,7 @@ class OnboardingData extends Equatable {
   final DateTime? dateOfBirth;
   final String gender;
   final String tribe;
+  final String race;
   final String bio;
   final List<String> interests;
   final String? userName;
@@ -126,6 +128,7 @@ class OnboardingData extends Equatable {
     DateTime? dateOfBirth,
     String? gender,
     String? tribe,
+    String? race,
     String? bio,
     List<String>? interests,
     List<File?>? profilePhotos,
@@ -160,6 +163,7 @@ class OnboardingData extends Equatable {
         dateOfBirth: dateOfBirth ?? this.dateOfBirth,
         gender: gender ?? this.gender,
         tribe: tribe ?? this.tribe,
+        race: race ?? this.race,
         bio: bio ?? this.bio,
         interests: interests ?? List.from(this.interests),
         profilePhotos: profilePhotos ?? List.from(this.profilePhotos),
@@ -196,6 +200,7 @@ class OnboardingData extends Equatable {
         dateOfBirth,
         gender,
         tribe,
+        race,
         bio,
         interests,
         profilePhotos,

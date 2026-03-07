@@ -18,7 +18,7 @@ class _EnhancedAdditionalInfoScreenState
     extends State<EnhancedAdditionalInfoScreen> {
   String _heightFtIn = HeightData.defaultHeightFtIn;
   int _heightCm = HeightData.defaultHeightCm;
-  String _platformPurpose = 'Dating & Romance';
+  String _platformPurpose = '';
   String _relationshipIntent = '';
 
   final List<Map<String, dynamic>> _platformPurposeOptions = [
@@ -102,7 +102,7 @@ class _EnhancedAdditionalInfoScreenState
 
     if (data == null) return;
 
-    String displayValue;
+    String displayValue = '';
     switch (data.lookingFor) {
       case 'Dating':
         displayValue = 'Dating & Romance';
@@ -113,7 +113,7 @@ class _EnhancedAdditionalInfoScreenState
       case 'Mixed':
         displayValue = 'All of the Above';
       default:
-        displayValue = 'Dating & Romance';
+        displayValue = '';
     }
     _platformPurpose = displayValue;
     _relationshipIntent = data.relationshipIntent;
@@ -135,12 +135,13 @@ class _EnhancedAdditionalInfoScreenState
 
               const SizedBox(height: 16),
 
-              // Optional step indicator
               Container(
-                padding: const EdgeInsets.all(OnboardingTheme.fieldContentPadding),
+                padding:
+                    const EdgeInsets.all(OnboardingTheme.fieldContentPadding),
                 decoration: BoxDecoration(
                   color: OnboardingTheme.primaryGreen.withValues(alpha: 0.08),
-                  borderRadius: BorderRadius.circular(OnboardingTheme.fieldRadius),
+                  borderRadius:
+                      BorderRadius.circular(OnboardingTheme.fieldRadius),
                   border: Border.all(
                     color: OnboardingTheme.primaryGreen.withValues(alpha: 0.3),
                   ),
@@ -148,14 +149,14 @@ class _EnhancedAdditionalInfoScreenState
                 child: Row(
                   children: [
                     const Icon(
-                      Icons.info_outline,
+                      Icons.check_circle_outline,
                       color: OnboardingTheme.primaryGreen,
                       size: OnboardingTheme.fieldIconSize,
                     ),
                     const SizedBox(width: 12),
                     Expanded(
                       child: Text(
-                        'This step is optional. You can complete it later in your profile settings.',
+                        'Complete this section to finish registration.',
                         style: OnboardingTheme.helperStyle.copyWith(
                           color: OnboardingTheme.sectionLabelColor,
                         ),

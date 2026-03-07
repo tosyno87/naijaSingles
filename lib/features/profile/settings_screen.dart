@@ -35,6 +35,13 @@ class _SettingsScreenState extends State<SettingsScreen> {
   static const Color textPrimary = Color(0xFF3E1F0D); // Deep brown
   static const Color textSecondary = Color(0xFF666666); // Medium gray
 
+  bool get _isPasswordProviderUser =>
+      _auth.currentUser?.providerData.any((p) => p.providerId == 'password') ??
+      false;
+  bool get _hasAccountEmail =>
+      _auth.currentUser?.email?.trim().isNotEmpty == true;
+  bool get _canManagePassword => _isPasswordProviderUser || _hasAccountEmail;
+
   @override
   Widget build(BuildContext context) => Scaffold(
         backgroundColor: AppColors.backgroundColor,
@@ -74,13 +81,21 @@ class _SettingsScreenState extends State<SettingsScreen> {
                         context, RouteName.editProfileScreen));
                   },
                 ),
-                _buildDivider(),
-                _buildSettingsItem(
-                  icon: Icons.lock_outline,
-                  title: 'Change Password',
-                  subtitle: 'Update your password',
-                  onTap: _showChangePasswordDialog,
-                ),
+                if (_canManagePassword) ...[
+                  _buildDivider(),
+                  _buildSettingsItem(
+                    icon: Icons.lock_outline,
+                    title: _isPasswordProviderUser
+                        ? 'Change Password'
+                        : 'Set Password',
+                    subtitle: _isPasswordProviderUser
+                        ? 'Update your password'
+                        : 'Create a password for your account',
+                    onTap: _isPasswordProviderUser
+                        ? _showChangePasswordDialog
+                        : _showSetPasswordDialog,
+                  ),
+                ],
               ]),
 
               const SizedBox(height: 32),
@@ -848,6 +863,58 @@ class _SettingsScreenState extends State<SettingsScreen> {
         ),
       ),
     );
+  }
+
+  Future<void> _showSetPasswordDialog() async {
+    final email = _auth.currentUser?.email;
+    if (email == null || email.trim().isEmpty) {
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('No email found for this account.'),
+        ),
+      );
+      return;
+    }
+
+    try {
+      await _auth.sendPasswordResetEmail(email: email);
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(
+            'Password setup link sent to $email',
+            style: GoogleFonts.montserrat(color: Colors.white),
+          ),
+          backgroundColor: primaryColor,
+          behavior: SnackBarBehavior.floating,
+        ),
+      );
+    } on FirebaseAuthException catch (e) {
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(
+            e.message ?? 'Unable to send password setup email.',
+            style: GoogleFonts.montserrat(color: Colors.white),
+          ),
+          backgroundColor: Colors.red.shade600,
+          behavior: SnackBarBehavior.floating,
+        ),
+      );
+    } catch (_) {
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(
+            'Unable to send password setup email.',
+            style: GoogleFonts.montserrat(color: Colors.white),
+          ),
+          backgroundColor: Colors.red.shade600,
+          behavior: SnackBarBehavior.floating,
+        ),
+      );
+    }
   }
 
   void _showFeedbackDialog() {

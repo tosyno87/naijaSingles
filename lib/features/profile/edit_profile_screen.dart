@@ -181,10 +181,11 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
           });
         }
 
-        // Check if user has completed onboarding (has gender, DOB, and tribe)
-        _hasCompletedOnboarding = userData['gender'] != null &&
-            userData['dateOfBirth'] != null &&
-            userData['tribe'] != null;
+        // Prefer explicit completion flags over field-presence heuristics.
+        _hasCompletedOnboarding = userData['onboardingCompleted'] == true ||
+            userData['profileSetupComplete'] == true ||
+            userData['isProfileComplete'] == true ||
+            (userData['gender'] != null && userData['dateOfBirth'] != null);
 
         // Load tribe
         if (userData['tribe'] != null) {
@@ -976,17 +977,20 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                       const SizedBox(height: 16),
 
                       // Name field
-                      _buildTextField(
-                        controller: _nameController,
-                        labelText: 'Full Name',
-                        prefixIcon: Icons.person,
-                        validator: (value) {
-                          if (value == null || value.isEmpty) {
-                            return 'Please enter your name';
-                          }
-                          return null;
-                        },
-                      ),
+                      if (_hasCompletedOnboarding)
+                        _buildReadOnlyField(_nameController.text, Icons.person)
+                      else
+                        _buildTextField(
+                          controller: _nameController,
+                          labelText: 'Full Name',
+                          prefixIcon: Icons.person,
+                          validator: (value) {
+                            if (value == null || value.isEmpty) {
+                              return 'Please enter your name';
+                            }
+                            return null;
+                          },
+                        ),
                       const SizedBox(height: 16),
 
                       // Bio field - Custom implementation to match registration

@@ -24,6 +24,9 @@ class OnboardingMain extends StatefulWidget {
 }
 
 class _OnboardingMainState extends State<OnboardingMain> {
+  static const int _minBioLength = 20;
+  static const int _minInterests = 3;
+
   final PageController _pageController = PageController();
   int _currentPage = 0;
   final int _totalPages = 8;
@@ -91,12 +94,56 @@ class _OnboardingMainState extends State<OnboardingMain> {
         );
         return;
       }
+    } else if (_currentPage == 4) {
+      if (data.bio.trim().length < _minBioLength) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(
+              'Please write at least $_minBioLength characters in your bio',
+            ),
+          ),
+        );
+        return;
+      }
+    } else if (_currentPage == 5) {
+      if (data.interests.length < _minInterests) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Please select at least $_minInterests interests'),
+          ),
+        );
+        return;
+      }
     } else if (_currentPage == 6) {
       if (data.interestedIn.isEmpty) {
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(
             content: Text("Please select who you're interested in"),
           ),
+        );
+        return;
+      }
+    } else if (_currentPage == 7) {
+      final missingPurpose = data.lookingFor.trim().isEmpty;
+      final missingIntent = data.relationshipIntent.trim().isEmpty;
+      if (missingPurpose && missingIntent) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('Please complete all required fields on this page'),
+          ),
+        );
+        return;
+      }
+      if (missingPurpose) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Please select what brings you here')),
+        );
+        return;
+      }
+      if (missingIntent) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+              content: Text('Please select your relationship goals')),
         );
         return;
       }
@@ -177,37 +224,7 @@ class _OnboardingMainState extends State<OnboardingMain> {
           ),
         ),
         centerTitle: true,
-        actions: [
-          // Skip button — only on optional screens (4: Bio, 5: Interests, 7: Additional Info).
-          // Pages 4/5 advance to the next page so required page 6 (Preferences) is never bypassed.
-          // Page 7 is the final step, so Skip there completes onboarding.
-          if (_currentPage == 4 || _currentPage == 5)
-            TextButton(
-              onPressed: _nextPage,
-              child: Text(
-                'Skip',
-                style: GoogleFonts.montserrat(
-                  fontSize: 16,
-                  fontWeight: FontWeight.w600,
-                  color: OnboardingTheme.primaryGreen,
-                ),
-              ),
-            )
-          else if (_currentPage == 7)
-            TextButton(
-              onPressed: _completeOnboarding,
-              child: Text(
-                'Skip',
-                style: GoogleFonts.montserrat(
-                  fontSize: 16,
-                  fontWeight: FontWeight.w600,
-                  color: OnboardingTheme.primaryGreen,
-                ),
-              ),
-            ),
-          if (_currentPage == 4 || _currentPage == 5 || _currentPage == 7)
-            const SizedBox(width: 8),
-        ],
+        actions: const [],
       ),
       body: Column(
         children: [
@@ -221,7 +238,8 @@ class _OnboardingMainState extends State<OnboardingMain> {
               backgroundColor: OnboardingTheme.progressTrack,
               color: OnboardingTheme.primaryGreen,
               minHeight: OnboardingTheme.progressHeight,
-              borderRadius: BorderRadius.circular(OnboardingTheme.progressRadius),
+              borderRadius:
+                  BorderRadius.circular(OnboardingTheme.progressRadius),
             ),
           ),
 
@@ -257,8 +275,7 @@ class _OnboardingMainState extends State<OnboardingMain> {
               bottom: bottomPadding,
             ),
             child: BlocBuilder<OnboardingBloc, OnboardingState>(
-              buildWhen: (prev, curr) =>
-                  prev.data != curr.data || prev != curr,
+              buildWhen: (prev, curr) => prev.data != curr.data || prev != curr,
               builder: (context, state) {
                 final data = state.data;
                 bool canContinue = false;
@@ -276,11 +293,14 @@ class _OnboardingMainState extends State<OnboardingMain> {
                       canContinue = data.nationality != null &&
                           data.nationality!.isNotEmpty;
                     case 4:
+                      canContinue = data.bio.trim().length >= _minBioLength;
                     case 5:
-                    case 7:
-                      canContinue = true;
+                      canContinue = data.interests.length >= _minInterests;
                     case 6:
                       canContinue = data.interestedIn.isNotEmpty;
+                    case 7:
+                      canContinue = data.lookingFor.trim().isNotEmpty &&
+                          data.relationshipIntent.trim().isNotEmpty;
                   }
                 }
 
@@ -289,9 +309,13 @@ class _OnboardingMainState extends State<OnboardingMain> {
                   height: OnboardingTheme.buttonHeight,
                   child: DecoratedBox(
                     decoration: BoxDecoration(
-                      gradient: canContinue ? OnboardingTheme.buttonGradient : null,
-                      color: canContinue ? null : OnboardingTheme.primaryGreen.withValues(alpha: 0.4),
-                      borderRadius: BorderRadius.circular(OnboardingTheme.buttonRadius),
+                      gradient:
+                          canContinue ? OnboardingTheme.buttonGradient : null,
+                      color: canContinue
+                          ? null
+                          : OnboardingTheme.primaryGreen.withValues(alpha: 0.4),
+                      borderRadius:
+                          BorderRadius.circular(OnboardingTheme.buttonRadius),
                     ),
                     child: ElevatedButton(
                       onPressed: canContinue ? _nextPage : null,
@@ -302,7 +326,8 @@ class _OnboardingMainState extends State<OnboardingMain> {
                         disabledBackgroundColor: Colors.transparent,
                         disabledForegroundColor: Colors.white60,
                         shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(OnboardingTheme.buttonRadius),
+                          borderRadius: BorderRadius.circular(
+                              OnboardingTheme.buttonRadius),
                         ),
                         elevation: 0,
                       ),

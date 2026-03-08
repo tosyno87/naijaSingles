@@ -113,8 +113,7 @@ class _UnifiedGroupsScreenState extends State<UnifiedGroupsScreen>
       if (!mounted || version != _requestVersion) return;
       setState(() {
         _unreadCounts = {
-          for (var i = 0; i < groups.length; i++)
-            groups[i].id: results[i],
+          for (var i = 0; i < groups.length; i++) groups[i].id: results[i],
         };
       });
     } on Object {
@@ -136,7 +135,7 @@ class _UnifiedGroupsScreenState extends State<UnifiedGroupsScreen>
           final ids = group.memberIds.take(3).toList();
           if (ids.isEmpty) return Future.value(<String?>[]);
           return Future.wait(
-            ids.map((id) => _userService.getUserAvatarUrl(id)),
+            ids.map(_userService.getUserAvatarUrl),
           );
         }),
       );
@@ -144,8 +143,7 @@ class _UnifiedGroupsScreenState extends State<UnifiedGroupsScreen>
       if (!mounted || version != _requestVersion) return;
       setState(() {
         _memberAvatars = {
-          for (var i = 0; i < unique.length; i++)
-            unique[i].id: groupResults[i],
+          for (var i = 0; i < unique.length; i++) unique[i].id: groupResults[i],
         };
       });
     } on Object {
@@ -233,11 +231,9 @@ class _UnifiedGroupsScreenState extends State<UnifiedGroupsScreen>
     final uid = FirebaseAuth.instance.currentUser?.uid ?? '';
     final member = group.isMember(uid);
     final admin = showAdminBadge && group.isAdmin(uid);
-    final isFeatured =
-        group.memberCount > 20 ||
+    final isFeatured = group.memberCount > 20 ||
         DateTime.now().difference(group.lastActivityAt).inHours < 1;
-    final isNew =
-        DateTime.now().difference(group.createdAt).inDays <= 7;
+    final isNew = DateTime.now().difference(group.createdAt).inDays <= 7;
     final recentActivity =
         DateTime.now().difference(group.lastActivityAt).inHours < 24;
     final isTrending = !isNew && recentActivity && group.memberCount >= 5;
@@ -389,9 +385,7 @@ class _UnifiedGroupsScreenState extends State<UnifiedGroupsScreen>
             ),
             suffixIcon: _searchController.text.isNotEmpty
                 ? IconButton(
-                    onPressed: () {
-                      _searchController.clear();
-                    },
+                    onPressed: _searchController.clear,
                     icon: const Icon(
                       Icons.clear,
                       color: AppColors.textSecondary,
@@ -583,7 +577,7 @@ class _UnifiedGroupsScreenState extends State<UnifiedGroupsScreen>
         itemCount: _userGroups.length,
         itemBuilder: (context, index) {
           final group = _userGroups[index];
-          return _buildCard(group, showAdminBadge: false);
+          return _buildCard(group);
         },
       ),
     );
@@ -762,5 +756,4 @@ class _UnifiedGroupsScreenState extends State<UnifiedGroupsScreen>
         return 'Seniors';
     }
   }
-
 }

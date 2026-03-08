@@ -216,8 +216,11 @@ class _LanguageSelectionDropdownState extends State<LanguageSelectionDropdown> {
   }
 }
 
-void _refreshPage(BuildContext context,
-    {required String lCode, required String cCode}) {
+void _refreshPage(
+  BuildContext context, {
+  required String lCode,
+  required String cCode,
+}) {
   context.read<LanguageBloc>().add(
         LanguageLocaleChanged(Locale(lCode, cCode), context),
       );

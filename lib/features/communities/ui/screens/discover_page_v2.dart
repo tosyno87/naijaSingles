@@ -158,7 +158,7 @@ class _DiscoverPageV2State extends State<DiscoverPageV2> {
             e.location.name,
           ].where((s) => s != null).join(' ').toLowerCase();
 
-          return locationTokens.any((token) => haystack.contains(token));
+          return locationTokens.any(haystack.contains);
         }).toList();
 
         if (filtered.isEmpty) {
@@ -426,15 +426,13 @@ class _DiscoverPageV2State extends State<DiscoverPageV2> {
         ),
       );
 
-  List<_DiscoverBlock> _composeBlocks() {
-    return const <_DiscoverBlock>[
-      _DiscoverBlock.peopleYouMayLike,
-      _DiscoverBlock.trendingEvent,
-      _DiscoverBlock.communities,
-      _DiscoverBlock.happeningThisWeek,
-      _DiscoverBlock.stats,
-    ];
-  }
+  List<_DiscoverBlock> _composeBlocks() => const <_DiscoverBlock>[
+        _DiscoverBlock.peopleYouMayLike,
+        _DiscoverBlock.trendingEvent,
+        _DiscoverBlock.communities,
+        _DiscoverBlock.happeningThisWeek,
+        _DiscoverBlock.stats,
+      ];
 
   List<Widget> _buildMixedDiscoverFeed() {
     final blocks = _composeBlocks();
@@ -494,8 +492,11 @@ class _DiscoverPageV2State extends State<DiscoverPageV2> {
       return const DiscoverSkeletonCard(height: 260);
     }
     if (_eventsError != null) {
-      return _buildInlineError(_eventsError!, _loadEvents,
-          horizontalPadding: 0);
+      return _buildInlineError(
+        _eventsError!,
+        _loadEvents,
+        horizontalPadding: 0,
+      );
     }
     if (_events.isEmpty) {
       return _buildImageEmpty(
@@ -622,12 +623,12 @@ class _DiscoverPageV2State extends State<DiscoverPageV2> {
     final sectionEvents = events ?? _events;
 
     if (_eventsLoading) {
-      return Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 24),
+      return const Padding(
+        padding: EdgeInsets.symmetric(horizontal: 24),
         child: Row(
           children: [
             Expanded(child: DiscoverSkeletonCard(height: 200)),
-            const SizedBox(width: 12),
+            SizedBox(width: 12),
             Expanded(child: DiscoverSkeletonCard(height: 200)),
           ],
         ),
@@ -652,7 +653,8 @@ class _DiscoverPageV2State extends State<DiscoverPageV2> {
     final pairs = <List<EventModel>>[];
     for (var i = 0; i < sectionEvents.length; i += 2) {
       pairs.add(
-          sectionEvents.sublist(i, (i + 2).clamp(0, sectionEvents.length)));
+        sectionEvents.sublist(i, (i + 2).clamp(0, sectionEvents.length)),
+      );
     }
 
     return Padding(
@@ -789,8 +791,11 @@ class _DiscoverPageV2State extends State<DiscoverPageV2> {
       return const DiscoverSkeletonCard(height: 200);
     }
     if (_communitiesError != null) {
-      return _buildInlineError(_communitiesError!, _loadCommunities,
-          horizontalPadding: 0);
+      return _buildInlineError(
+        _communitiesError!,
+        _loadCommunities,
+        horizontalPadding: 0,
+      );
     }
     if (_communities.isEmpty) {
       return _buildImageEmpty(
@@ -803,7 +808,7 @@ class _DiscoverPageV2State extends State<DiscoverPageV2> {
     }
 
     final totalMembers =
-        _communities.fold<int>(0, (sum, g) => sum + g.memberCount);
+        _communities.fold<int>(0, (acc, g) => acc + g.memberCount);
 
     return Semantics(
       button: true,
@@ -875,8 +880,7 @@ class _DiscoverPageV2State extends State<DiscoverPageV2> {
                             shape: RoundedRectangleBorder(
                               borderRadius: BorderRadius.circular(18),
                             ),
-                            padding:
-                                const EdgeInsets.symmetric(horizontal: 16),
+                            padding: const EdgeInsets.symmetric(horizontal: 16),
                           ),
                           child: Text(
                             'Browse all',
@@ -898,7 +902,7 @@ class _DiscoverPageV2State extends State<DiscoverPageV2> {
     );
   }
 
-  Widget _communityFallbackBg() => Container(
+  Widget _communityFallbackBg() => DecoratedBox(
         decoration: BoxDecoration(
           gradient: LinearGradient(
             begin: Alignment.topLeft,

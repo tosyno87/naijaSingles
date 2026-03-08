@@ -149,9 +149,8 @@ class GroupReportingService {
       final currentUserId = _auth.currentUser?.uid;
       if (currentUserId == null) throw Exception('User not authenticated');
 
-      // TODO: Add admin/moderator permission check
-      // For now, allowing any authenticated user to update status
-      // In production, this should check user roles
+      // TODO(dev): Add admin/moderator permission check. For now, allowing any
+      // authenticated user to update status. In production, check user roles.
 
       await _firestore.collection('group_reports').doc(reportId).update({
         'status': status,

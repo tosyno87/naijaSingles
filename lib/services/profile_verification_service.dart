@@ -535,8 +535,8 @@ class ProfileVerificationService {
     if (verifications.isEmpty) return 0;
 
     final totalScore = verifications.values.fold<double>(
-      0.0,
-      (sum, v) => sum + v.score,
+      0,
+      (acc, v) => acc + v.score,
     );
     return totalScore / verifications.length;
   }

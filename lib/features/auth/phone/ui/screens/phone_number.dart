@@ -131,8 +131,7 @@ class _PhoneNumberState extends State<PhoneNumber> {
                     Navigator.of(context).pushReplacement(
                       MaterialPageRoute(
                         builder: (context) => OtpPage(
-                          phoneNumber:
-                              countryCode + phoneNumberController.text,
+                          phoneNumber: countryCode + phoneNumberController.text,
                           verificationId: state.verificationId,
                           codeController: _codeController.text,
                           updatePhoneNumber: widget.updatePhoneNumber,
@@ -250,9 +249,7 @@ class _PhoneNumberState extends State<PhoneNumber> {
                               backgroundColor: Color(0x33FFFFFF),
                               iconColor: Colors.white,
                             ),
-
                             const SizedBox(height: 32),
-
                             if (kDebugMode && Platform.isIOS)
                               Container(
                                 margin: const EdgeInsets.only(bottom: 20),
@@ -286,7 +283,6 @@ class _PhoneNumberState extends State<PhoneNumber> {
                                   ],
                                 ),
                               ),
-
                             Text(
                               'Enter your phone number',
                               style: GoogleFonts.montserrat(
@@ -306,7 +302,6 @@ class _PhoneNumberState extends State<PhoneNumber> {
                               textAlign: TextAlign.center,
                             ),
                             const SizedBox(height: 40),
-
                             Container(
                               height: 60,
                               decoration: BoxDecoration(
@@ -362,8 +357,7 @@ class _PhoneNumberState extends State<PhoneNumber> {
                                       barrierColor: Colors.black54,
                                       backgroundColor: Colors.white,
                                       dialogSize: Size(
-                                        MediaQuery.of(context).size.width *
-                                            0.9,
+                                        MediaQuery.of(context).size.width * 0.9,
                                         MediaQuery.of(context).size.height *
                                             0.7,
                                       ),
@@ -414,13 +408,11 @@ class _PhoneNumberState extends State<PhoneNumber> {
                                       ),
                                     ),
                                   ),
-
                                   Container(
                                     height: 30,
                                     width: 1,
                                     color: Colors.grey.withValues(alpha: 0.3),
                                   ),
-
                                   Expanded(
                                     child: TextField(
                                       controller: phoneNumberController,
@@ -452,9 +444,7 @@ class _PhoneNumberState extends State<PhoneNumber> {
                                 ],
                               ),
                             ),
-
                             const SizedBox(height: 40),
-
                             Center(
                               child: SizedBox(
                                 width: buttonWidth,
@@ -487,8 +477,7 @@ class _PhoneNumberState extends State<PhoneNumber> {
                                                     .trim();
 
                                             final fullPhoneNumber =
-                                                countryCode +
-                                                    cleanPhoneNumber;
+                                                countryCode + cleanPhoneNumber;
 
                                             log('');
                                             log('═══════════════════════════════════════════════════════');
@@ -523,9 +512,7 @@ class _PhoneNumberState extends State<PhoneNumber> {
                                 ),
                               ),
                             ),
-
                             const SizedBox(height: 24),
-
                             Text(
                               'By continuing, you agree to receive SMS messages for verification and may be subject to carrier fees.',
                               textAlign: TextAlign.center,
@@ -534,9 +521,7 @@ class _PhoneNumberState extends State<PhoneNumber> {
                                 color: const Color(0x99FFFFFF),
                               ),
                             ),
-
                             const SizedBox(height: 40),
-
                             Row(
                               mainAxisAlignment: MainAxisAlignment.center,
                               children: [
@@ -568,9 +553,7 @@ class _PhoneNumberState extends State<PhoneNumber> {
                                     }
                                   },
                                   child: Text(
-                                    widget.isSignIn
-                                        ? 'Create one'
-                                        : 'Sign in',
+                                    widget.isSignIn ? 'Create one' : 'Sign in',
                                     style: GoogleFonts.montserrat(
                                       fontSize: 14,
                                       fontWeight: FontWeight.w600,

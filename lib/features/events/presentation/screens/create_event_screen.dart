@@ -396,11 +396,7 @@ class _CreateEventScreenState extends State<CreateEventScreen> {
     return true;
   }
 
-  bool _validateCulturalHeritage({bool showErrors = true}) {
-    // Age group is now optional (like Facebook Events)
-    // No longer requiring cultural heritage or language requirements
-    return true;
-  }
+  bool _validateCulturalHeritage({bool showErrors = true}) => true;
 
   bool _validateDateTime({bool showErrors = true}) {
     if (_eventData.startDate == null) {
@@ -555,8 +551,11 @@ class _CreateEventScreenState extends State<CreateEventScreen> {
           contentPadding: const EdgeInsets.all(20),
           title: Row(
             children: [
-              const Icon(Icons.check_circle,
-                  color: AppColors.primaryGreen, size: 28),
+              const Icon(
+                Icons.check_circle,
+                color: AppColors.primaryGreen,
+                size: 28,
+              ),
               const SizedBox(width: 12),
               Expanded(
                 // Prevent text overflow
@@ -611,7 +610,8 @@ class _CreateEventScreenState extends State<CreateEventScreen> {
                     child: ElevatedButton(
                       onPressed: () {
                         AppLogger.debug(
-                            '[DEBUG] View My Events button pressed');
+                          '[DEBUG] View My Events button pressed',
+                        );
                         // Close the dialog first
                         Navigator.of(context).pop();
                         AppLogger.debug(

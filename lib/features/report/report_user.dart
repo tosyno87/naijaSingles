@@ -30,9 +30,7 @@ class ReportUserState extends State<ReportUser> {
   bool isFeedbackDialog = false;
   String? title;
 
-  Color get primaryColor {
-    return const Color(0xFF008037); // Deep green
-  }
+  Color get primaryColor => const Color(0xFF008037);
 
   String? get otherReason {
     final text = reasonCtlr.text.trim();

@@ -86,7 +86,8 @@ class _CulturalProfileScreenState extends State<CulturalProfileScreen> {
                 icon: Custom3DIcons.edit(size: 20),
                 onPressed: () {
                   unawaited(
-                      Navigator.pushNamed(context, RouteName.settingsScreen));
+                    Navigator.pushNamed(context, RouteName.settingsScreen),
+                  );
                 },
               ),
             ),

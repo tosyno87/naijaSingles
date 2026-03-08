@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 
 import '../../common/constants/app_colors.dart';
+import '../../common/widgets/state_views/state_views.dart';
 import '../../features/notifications/data/services/notification_service.dart';
 import 'notification_model.dart';
 
@@ -589,58 +590,12 @@ class _ModernNotificationsScreenState extends State<ModernNotificationsScreen>
         ],
       );
 
-  Widget _buildEmptyState() => Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Container(
-              width: 120,
-              height: 120,
-              decoration: BoxDecoration(
-                color: AppColors.primaryGreen.withValues(alpha: 0.1),
-                shape: BoxShape.circle,
-              ),
-              child: Icon(
-                Icons.notifications_off_outlined,
-                size: 60,
-                color: AppColors.primaryGreen.withValues(alpha: 0.6),
-              ),
-            ),
-            const SizedBox(height: 24),
-            Text(
-              _getEmptyStateTitle(),
-              style: GoogleFonts.montserrat(
-                fontSize: 20,
-                fontWeight: FontWeight.bold,
-                color: AppColors.textPrimary,
-              ),
-            ),
-            const SizedBox(height: 8),
-            Text(
-              _getEmptyStateMessage(),
-              style: GoogleFonts.montserrat(
-                fontSize: 14,
-                color: AppColors.textSecondary,
-              ),
-              textAlign: TextAlign.center,
-            ),
-            const SizedBox(height: 24),
-            ElevatedButton.icon(
-              onPressed: _refreshNotifications,
-              icon: const Icon(Icons.refresh),
-              label: const Text('Refresh'),
-              style: ElevatedButton.styleFrom(
-                backgroundColor: AppColors.primaryGreen,
-                foregroundColor: Colors.white,
-                padding:
-                    const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(12),
-                ),
-              ),
-            ),
-          ],
-        ),
+  Widget _buildEmptyState() => AppEmptyView(
+        title: _getEmptyStateTitle(),
+        subtitle: _getEmptyStateMessage(),
+        icon: Icons.notifications_off_outlined,
+        actionLabel: 'Refresh',
+        onAction: _refreshNotifications,
       );
 
   String _getEmptyStateTitle() {

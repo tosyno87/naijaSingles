@@ -149,8 +149,12 @@ class _EventsScreenState extends State<EventsScreen> {
               child: FloatingActionButton(
                 heroTag: 'events_screen_fab',
                 onPressed: () {
-                  unawaited(Navigator.pushNamed(
-                      context, RouteName.eventTemplateSelection));
+                  unawaited(
+                    Navigator.pushNamed(
+                      context,
+                      RouteName.eventTemplateSelection,
+                    ),
+                  );
                 },
                 backgroundColor: AppColors.primaryGreen,
                 foregroundColor: Colors.white,
@@ -302,7 +306,7 @@ class _EventsScreenState extends State<EventsScreen> {
       'Business',
       'Community',
       'Social',
-      'Cultural'
+      'Cultural',
     ];
 
     return Container(
@@ -542,7 +546,8 @@ class _EventsScreenState extends State<EventsScreen> {
 
   void _navigateToEventDetails(EventModel event) {
     unawaited(
-        Navigator.pushNamed(context, RouteName.eventDetails, arguments: event));
+      Navigator.pushNamed(context, RouteName.eventDetails, arguments: event),
+    );
   }
 
   Widget _buildEventsList() => BlocConsumer<EventsBloc, EventsState>(

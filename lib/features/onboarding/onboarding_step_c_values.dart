@@ -106,7 +106,9 @@ class _OnboardingStepCValuesState extends State<OnboardingStepCValues>
                       children: [
                         Container(
                           padding: const EdgeInsets.symmetric(
-                              horizontal: 12, vertical: 6),
+                            horizontal: 12,
+                            vertical: 6,
+                          ),
                           decoration: BoxDecoration(
                             color: deepGreen.withValues(alpha: 0.1),
                             borderRadius: BorderRadius.circular(20),
@@ -197,7 +199,9 @@ class _OnboardingStepCValuesState extends State<OnboardingStepCValues>
                                       updatedValues.remove(value['id']);
                                     }
                                     context.read<OnboardingBloc>().add(
-                                        OnboardingValuesUpdated(updatedValues));
+                                          OnboardingValuesUpdated(
+                                              updatedValues,),
+                                        );
                                     unawaited(HapticFeedback.selectionClick());
                                   },
                                   deepGreen: deepGreen,
@@ -265,7 +269,8 @@ class _OnboardingStepCValuesState extends State<OnboardingStepCValues>
                                     }
                                     context.read<OnboardingBloc>().add(
                                           OnboardingDealbreakersUpdated(
-                                              updatedDealbreakers),
+                                            updatedDealbreakers,
+                                          ),
                                         );
                                     unawaited(HapticFeedback.selectionClick());
                                   },

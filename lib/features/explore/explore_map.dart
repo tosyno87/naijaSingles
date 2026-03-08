@@ -108,7 +108,8 @@ class _ExploreMapWidgetState extends State<ExploreMapWidget>
                             width: 25,
                             child: CircularProgressIndicator(
                               valueColor: AlwaysStoppedAnimation(
-                                  AppColors.primaryGreen),
+                                AppColors.primaryGreen,
+                              ),
                             ),
                           ),
                           Text(

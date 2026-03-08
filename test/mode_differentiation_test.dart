@@ -84,9 +84,11 @@ void main() {
 
         debugPrint('Dating Score: ${(datingScore * 100).toStringAsFixed(1)}%');
         debugPrint(
-            'Friendship Score: ${(friendshipScore * 100).toStringAsFixed(1)}%',);
+          'Friendship Score: ${(friendshipScore * 100).toStringAsFixed(1)}%',
+        );
         debugPrint(
-            'Networking Score: ${(networkingScore * 100).toStringAsFixed(1)}%',);
+          'Networking Score: ${(networkingScore * 100).toStringAsFixed(1)}%',
+        );
       });
 
       test('should return compatibility breakdown', () {
@@ -158,13 +160,17 @@ void main() {
         expect(datingPrefs['ageRange']['max'], equals(28)); // 30 - 2
 
         // Friendship should have expanded age range
-        expect(friendshipPrefs['ageRange']['min'],
-            equals(18),); // 20 - 5, clamped to 18
+        expect(
+          friendshipPrefs['ageRange']['min'],
+          equals(18),
+        ); // 20 - 5, clamped to 18
         expect(friendshipPrefs['ageRange']['max'], equals(35)); // 30 + 5
 
         // Networking should have most expanded age range
-        expect(networkingPrefs['ageRange']['min'],
-            equals(18),); // 20 - 10, clamped to 18
+        expect(
+          networkingPrefs['ageRange']['min'],
+          equals(18),
+        ); // 20 - 10, clamped to 18
         expect(networkingPrefs['ageRange']['max'], equals(40)); // 30 + 10
 
         // Distance preferences should be different
@@ -183,14 +189,18 @@ void main() {
         // Test friendship validation (should fail because user is looking for dating)
         expect(
           ModeSpecificFilteringService.validateModeMatch(
-              targetUser, 'Friendship',),
+            targetUser,
+            'Friendship',
+          ),
           isFalse,
         );
 
         // Test networking validation (should fail because user is looking for dating)
         expect(
           ModeSpecificFilteringService.validateModeMatch(
-              targetUser, 'Networking',),
+            targetUser,
+            'Networking',
+          ),
           isFalse,
         );
       });
@@ -200,10 +210,12 @@ void main() {
             ModeSpecificFilteringService.getModeSpecificSuggestions('Dating');
         final friendshipSuggestions =
             ModeSpecificFilteringService.getModeSpecificSuggestions(
-                'Friendship',);
+          'Friendship',
+        );
         final networkingSuggestions =
             ModeSpecificFilteringService.getModeSpecificSuggestions(
-                'Networking',);
+          'Networking',
+        );
 
         expect(datingSuggestions, isNotEmpty);
         expect(friendshipSuggestions, isNotEmpty);
@@ -268,8 +280,7 @@ void main() {
         expect(
           datingDelta,
           greaterThan(friendDelta),
-          reason:
-              'Dating (30% age weight) should show larger score delta than '
+          reason: 'Dating (30% age weight) should show larger score delta than '
               'Friendship (10% age weight) for the same age difference',
         );
       });
@@ -322,8 +333,7 @@ void main() {
         );
       });
 
-      test(
-          'matching profession scores higher in networking than mismatching',
+      test('matching profession scores higher in networking than mismatching',
           () {
         final user = UserModel(
           id: 'u1',
@@ -366,8 +376,7 @@ void main() {
         expect(
           sameScore,
           greaterThan(diffScore),
-          reason:
-              'Same profession must score higher in networking mode',
+          reason: 'Same profession must score higher in networking mode',
         );
       });
 
@@ -450,7 +459,8 @@ void main() {
 
         expect(networkingScore, inInclusiveRange(0.0, 1.0));
         debugPrint(
-            'Networking User Score: ${(networkingScore * 100).toStringAsFixed(1)}%',);
+          'Networking User Score: ${(networkingScore * 100).toStringAsFixed(1)}%',
+        );
       });
 
       test('should handle edge cases gracefully', () {

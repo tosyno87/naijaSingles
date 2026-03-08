@@ -5,7 +5,6 @@ import 'dart:io';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -1441,10 +1440,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                   _validateForm();
                 });
               },
-              validator: (value) {
-                // Tribe is now optional - no validation required
-                return null;
-              },
+              validator: (value) => null,
               icon: const Icon(
                 Icons.arrow_drop_down,
                 color: AppColors.primaryGreen,
@@ -1470,10 +1466,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                 fillColor: Colors.white,
               ),
               style: GoogleFonts.montserrat(),
-              validator: (value) {
-                // Tribe is now optional - no validation required even for "Other"
-                return null;
-              },
+              validator: (value) => null,
               onChanged: (_) => _validateForm(),
             ),
           ],

@@ -79,8 +79,7 @@ void main() {
     test('returns the only purchase when list has a single matching item', () {
       final purchase = _makePurchase('solo');
 
-      final result =
-          InAppPurchaseRepoImpl.hasPurchased('solo', [purchase]);
+      final result = InAppPurchaseRepoImpl.hasPurchased('solo', [purchase]);
 
       expect(identical(result, purchase), isTrue);
       expect(result.productID, 'solo');
@@ -89,8 +88,7 @@ void main() {
     test('returned purchase preserves its original status', () {
       final purchase = _makePurchase('premium');
 
-      final result =
-          InAppPurchaseRepoImpl.hasPurchased('premium', [purchase]);
+      final result = InAppPurchaseRepoImpl.hasPurchased('premium', [purchase]);
 
       expect(result.status, PurchaseStatus.purchased);
     });
@@ -122,8 +120,7 @@ void main() {
         _makePurchase('target'),
       ];
 
-      final result =
-          InAppPurchaseRepoImpl.hasPurchased('target', purchases);
+      final result = InAppPurchaseRepoImpl.hasPurchased('target', purchases);
 
       expect(result.productID, 'target');
       expect(identical(result, purchases.last), isTrue);
@@ -138,8 +135,7 @@ void main() {
         _makePurchase('e'),
       ];
 
-      final result =
-          InAppPurchaseRepoImpl.hasPurchased('first', purchases);
+      final result = InAppPurchaseRepoImpl.hasPurchased('first', purchases);
 
       expect(result.productID, 'first');
       expect(identical(result, purchases.first), isTrue);

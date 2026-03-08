@@ -217,9 +217,7 @@ class _EnhancedInterestsScreenState extends State<EnhancedInterestsScreen> {
                   fontWeight: FontWeight.w600,
                 ),
               ),
-
               const SizedBox(height: OnboardingTheme.subtitleToField),
-
               ..._categories.entries.map((entry) {
                 final categoryKey = entry.key;
                 final category = entry.value;
@@ -249,7 +247,6 @@ class _EnhancedInterestsScreenState extends State<EnhancedInterestsScreen> {
                         ],
                       ),
                     ),
-
                     Wrap(
                       spacing: 8,
                       runSpacing: 8,
@@ -297,7 +294,6 @@ class _EnhancedInterestsScreenState extends State<EnhancedInterestsScreen> {
                         );
                       }).toList(),
                     ),
-
                     if (hasMore)
                       Padding(
                         padding: const EdgeInsets.only(

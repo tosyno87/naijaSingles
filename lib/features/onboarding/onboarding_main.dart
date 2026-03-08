@@ -97,7 +97,7 @@ class _OnboardingMainState extends State<OnboardingMain> {
     } else if (_currentPage == 4) {
       if (data.bio.trim().length < _minBioLength) {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
+          const SnackBar(
             content: Text(
               'Please write at least $_minBioLength characters in your bio',
             ),
@@ -108,7 +108,7 @@ class _OnboardingMainState extends State<OnboardingMain> {
     } else if (_currentPage == 5) {
       if (data.interests.length < _minInterests) {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
+          const SnackBar(
             content: Text('Please select at least $_minInterests interests'),
           ),
         );
@@ -143,7 +143,8 @@ class _OnboardingMainState extends State<OnboardingMain> {
       if (missingIntent) {
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(
-              content: Text('Please select your relationship goals')),
+            content: Text('Please select your relationship goals'),
+          ),
         );
         return;
       }
@@ -199,7 +200,7 @@ class _OnboardingMainState extends State<OnboardingMain> {
   @override
   Widget build(BuildContext context) {
     final bottomSafe = MediaQuery.of(context).padding.bottom;
-    final bottomPadding = math.max(16.0, bottomSafe);
+    final bottomPadding = math.max(16, bottomSafe).toDouble();
 
     return Scaffold(
       backgroundColor: OnboardingTheme.background,
@@ -327,7 +328,8 @@ class _OnboardingMainState extends State<OnboardingMain> {
                         disabledForegroundColor: Colors.white60,
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(
-                              OnboardingTheme.buttonRadius),
+                            OnboardingTheme.buttonRadius,
+                          ),
                         ),
                         elevation: 0,
                       ),

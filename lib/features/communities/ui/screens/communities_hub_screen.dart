@@ -67,7 +67,8 @@ class _CommunitiesHubScreenState extends State<CommunitiesHubScreen> {
                   const Color(0xFF008037), // Green accent
                   () {
                     unawaited(
-                        Navigator.pushNamed(context, RouteName.eventsScreen));
+                      Navigator.pushNamed(context, RouteName.eventsScreen),
+                    );
                   },
                 ),
               ),

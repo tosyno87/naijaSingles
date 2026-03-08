@@ -130,7 +130,8 @@ class _BasicInfoScreenState extends State<BasicInfoScreen> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Text("What's your name?", style: OnboardingTheme.sectionLabelStyle),
+              Text("What's your name?",
+                  style: OnboardingTheme.sectionLabelStyle,),
               const SizedBox(height: OnboardingTheme.labelToField),
               TextField(
                 controller: _nameController,
@@ -144,10 +145,9 @@ class _BasicInfoScreenState extends State<BasicInfoScreen> {
                       );
                 },
               ),
-
               const SizedBox(height: OnboardingTheme.fieldToSection),
-
-              Text('When were you born?', style: OnboardingTheme.sectionLabelStyle),
+              Text('When were you born?',
+                  style: OnboardingTheme.sectionLabelStyle,),
               const SizedBox(height: OnboardingTheme.labelToField),
               TextField(
                 controller: _dobController,
@@ -163,7 +163,6 @@ class _BasicInfoScreenState extends State<BasicInfoScreen> {
                 ),
                 onTap: () => _selectDate(context),
               ),
-
               if (_selectedDate != null) ...[
                 const SizedBox(height: 8),
                 Align(
@@ -179,10 +178,9 @@ class _BasicInfoScreenState extends State<BasicInfoScreen> {
                   ),
                 ),
               ],
-
               const SizedBox(height: OnboardingTheme.fieldToSection),
-
-              Text("What's your gender?", style: OnboardingTheme.sectionLabelStyle),
+              Text("What's your gender?",
+                  style: OnboardingTheme.sectionLabelStyle,),
               const SizedBox(height: OnboardingTheme.labelToField),
               Container(
                 constraints: const BoxConstraints(
@@ -211,7 +209,8 @@ class _BasicInfoScreenState extends State<BasicInfoScreen> {
                     size: OnboardingTheme.fieldIconSize,
                   ),
                   dropdownColor: OnboardingTheme.background,
-                  borderRadius: BorderRadius.circular(OnboardingTheme.fieldRadius),
+                  borderRadius:
+                      BorderRadius.circular(OnboardingTheme.fieldRadius),
                   items: _genderOptions
                       .map(
                         (String gender) => DropdownMenuItem<String>(
@@ -230,7 +229,6 @@ class _BasicInfoScreenState extends State<BasicInfoScreen> {
                   },
                 ),
               ),
-
               const SizedBox(height: OnboardingTheme.fieldToBottom),
             ],
           ),

@@ -1,6 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:flutter/foundation.dart';
 
+import '../common/utils/app_logger.dart';
 import '../common/utils/firestore_helpers.dart';
 import '../features/match/data/services/likes_service.dart';
 import '../features/match/data/services/match_service.dart';
@@ -9,10 +9,10 @@ import 'performance_monitor.dart';
 /// Super like service that provides premium highlighting and instant notifications
 /// Implements Priority 3: User Experience Enhancements
 class SuperLikeService {
-  static const int FREE_SUPER_LIKES_PER_DAY = 1;
-  static const int PREMIUM_SUPER_LIKES_PER_DAY = 5;
-  static const Duration SUPER_LIKE_COOLDOWN = Duration(hours: 24);
-  static const Duration SUPER_LIKE_HIGHLIGHT_DURATION = Duration(days: 3);
+  static const int freeSuperLikesPerDay = 1;
+  static const int premiumSuperLikesPerDay = 5;
+  static const Duration superLikeCooldown = Duration(hours: 24);
+  static const Duration superLikeHighlightDuration = Duration(days: 3);
 
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
   final MatchService _matchService = MatchService();
@@ -61,9 +61,8 @@ class SuperLikeService {
     String? toUserName,
   }) async =>
       PerformanceMonitor.measure('send_super_like', () async {
-        final sw = Stopwatch()..start();
         try {
-          debugPrint('⭐ Sending super like: $fromUserId → $toUserId');
+          AppLogger.debug('Sending super like: $fromUserId → $toUserId');
 
           // ── Phase 1: parallel prerequisite checks ──
           final checks = await Future.wait<Object?>([
@@ -71,7 +70,6 @@ class SuperLikeService {
             _getExistingSuperLike(fromUserId, toUserId),
             _hasAlreadyLiked(fromUserId, toUserId),
           ]);
-          debugPrint('  ⏱ checks: ${sw.elapsedMilliseconds}ms');
 
           final canSend = checks[0]! as SuperLikeEligibility;
           if (!canSend.canSend) {
@@ -116,15 +114,15 @@ class SuperLikeService {
               fromUserData = docs[0].data() as Map<String, dynamic>;
               toUserData = docs[1].data() as Map<String, dynamic>;
             } on FirebaseException catch (e) {
-              debugPrint(
-                '⚠️ Could not fetch user docs for super like metadata: '
+              AppLogger.warning(
+                'Could not fetch user docs for super like metadata: '
                 '${e.code} — using fallback names',
+                error: e,
               );
               fromUserData = {'name': 'Someone', 'imageUrl': <String>[]};
               toUserData = {'name': 'Someone'};
             }
           }
-          debugPrint('  ⏱ metadata: ${sw.elapsedMilliseconds}ms');
 
           // ── Phase 3: batched write (super like + usage in one round-trip) ──
           final superLikeRef = _superLikesCollection.doc();
@@ -145,7 +143,7 @@ class SuperLikeService {
             'isActive': true,
             'responded': false,
             'highlightUntil': Timestamp.fromDate(
-              DateTime.now().add(SUPER_LIKE_HIGHLIGHT_DURATION),
+              DateTime.now().add(superLikeHighlightDuration),
             ),
           });
           batch.update(_usersCollection.doc(fromUserId), {
@@ -157,7 +155,6 @@ class SuperLikeService {
             'dailyCount': cachedCount + 1,
           });
           await batch.commit();
-          debugPrint('  ⏱ write: ${sw.elapsedMilliseconds}ms');
 
           _setCachedDailyCount(fromUserId, cachedCount + 1);
 
@@ -168,10 +165,7 @@ class SuperLikeService {
           // ── Phase 4: instant match check (post-write) ──
           final instantMatch =
               await _checkForInstantMatch(fromUserId, toUserId);
-          debugPrint(
-            '  ⏱ total: ${sw.elapsedMilliseconds}ms  '
-            '✅ Super like sent: ${superLikeRef.id}',
-          );
+          AppLogger.debug('Super like sent: ${superLikeRef.id}');
 
           return SuperLikeResult.success(
             superLikeId: superLikeRef.id,
@@ -179,12 +173,10 @@ class SuperLikeService {
             matchId: instantMatch,
           );
         } on FirebaseException catch (e) {
-          debugPrint(
-            '❌ Firebase error sending super like: ${e.code} - ${e.message}',
-          );
+          AppLogger.error('Firebase error sending super like', error: e);
           return SuperLikeResult.failed('Error: ${e.toString()}');
         } on Object catch (e) {
-          debugPrint('❌ Unexpected error sending super like: $e');
+          AppLogger.error('Unexpected error sending super like', error: e);
           return SuperLikeResult.failed('Error: ${e.toString()}');
         }
       });
@@ -199,7 +191,7 @@ class SuperLikeService {
       final dailyCount = results[0] as int;
       final isPremium = results[1] as bool;
       final dailyLimit =
-          isPremium ? PREMIUM_SUPER_LIKES_PER_DAY : FREE_SUPER_LIKES_PER_DAY;
+          isPremium ? premiumSuperLikesPerDay : freeSuperLikesPerDay;
 
       if (dailyCount >= dailyLimit) {
         return SuperLikeEligibility(
@@ -216,9 +208,7 @@ class SuperLikeService {
         nextResetTime: _getNextResetTime(),
       );
     } on FirebaseException catch (e) {
-      debugPrint(
-        '❌ Firebase error checking super like eligibility: ${e.code} - ${e.message}',
-      );
+      AppLogger.error('Firebase error checking super like eligibility', error: e);
       return SuperLikeEligibility(
         canSend: false,
         reason: 'Error checking eligibility',
@@ -226,7 +216,7 @@ class SuperLikeService {
         nextResetTime: _getNextResetTime(),
       );
     } on Object catch (e) {
-      debugPrint('❌ Unexpected error checking super like eligibility: $e');
+      AppLogger.error('Unexpected error checking super like eligibility', error: e);
       return SuperLikeEligibility(
         canSend: false,
         reason: 'Error checking eligibility',
@@ -262,12 +252,10 @@ class SuperLikeService {
       _setCachedDailyCount(userId, count);
       return count;
     } on FirebaseException catch (e) {
-      debugPrint(
-        '❌ Firebase error getting daily super like count: ${e.code} - ${e.message}',
-      );
+      AppLogger.error('Firebase error getting daily super like count', error: e);
       return 0;
     } on Object catch (e) {
-      debugPrint('❌ Unexpected error getting daily super like count: $e');
+      AppLogger.error('Unexpected error getting daily super like count', error: e);
       return 0;
     }
   }
@@ -286,17 +274,13 @@ class SuperLikeService {
           final superLikes =
               querySnapshot.docs.map(SuperLike.fromDocument).toList();
 
-          debugPrint(
-            '📬 Found ${superLikes.length} super likes for user $userId',
-          );
+          AppLogger.debug('Found ${superLikes.length} super likes for user $userId');
           return superLikes;
         } on FirebaseException catch (e) {
-          debugPrint(
-            '❌ Firebase error getting received super likes: ${e.code} - ${e.message}',
-          );
+          AppLogger.error('Firebase error getting received super likes', error: e);
           return [];
         } on Object catch (e) {
-          debugPrint('❌ Unexpected error getting received super likes: $e');
+          AppLogger.error('Unexpected error getting received super likes', error: e);
           return [];
         }
       });
@@ -314,17 +298,13 @@ class SuperLikeService {
           final superLikes =
               querySnapshot.docs.map(SuperLike.fromDocument).toList();
 
-          debugPrint(
-            '📤 Found ${superLikes.length} sent super likes for user $userId',
-          );
+          AppLogger.debug('Found ${superLikes.length} sent super likes for user $userId');
           return superLikes;
         } on FirebaseException catch (e) {
-          debugPrint(
-            '❌ Firebase error getting sent super likes: ${e.code} - ${e.message}',
-          );
+          AppLogger.error('Firebase error getting sent super likes', error: e);
           return [];
         } on Object catch (e) {
-          debugPrint('❌ Unexpected error getting sent super likes: $e');
+          AppLogger.error('Unexpected error getting sent super likes', error: e);
           return [];
         }
       });
@@ -337,9 +317,7 @@ class SuperLikeService {
   }) async =>
       PerformanceMonitor.measure('respond_to_super_like', () async {
         try {
-          debugPrint(
-            '💫 Responding to super like: $superLikeId (like: $isLike)',
-          );
+          AppLogger.debug('Responding to super like: $superLikeId (like: $isLike)');
 
           final superLikeDoc =
               await _superLikesCollection.doc(superLikeId).get();
@@ -369,9 +347,7 @@ class SuperLikeService {
             );
 
             if (matchId != null) {
-              debugPrint(
-                '🎉 Super like resulted in match: $matchId',
-              );
+              AppLogger.debug('Super like resulted in match: $matchId');
 
               return SuperLikeResponse.success(
                 isMatch: true,
@@ -392,16 +368,14 @@ class SuperLikeService {
             }
           } else {
             // User passed on the super like
-            debugPrint('👎 User passed on super like: $superLikeId');
+            AppLogger.debug('User passed on super like: $superLikeId');
             return SuperLikeResponse.success();
           }
         } on FirebaseException catch (e) {
-          debugPrint(
-            '❌ Firebase error responding to super like: ${e.code} - ${e.message}',
-          );
+          AppLogger.error('Firebase error responding to super like', error: e);
           return SuperLikeResponse.failed('Error: ${e.toString()}');
         } on Object catch (e) {
-          debugPrint('❌ Unexpected error responding to super like: $e');
+          AppLogger.error('Unexpected error responding to super like', error: e);
           return SuperLikeResponse.failed('Error: ${e.toString()}');
         }
       });
@@ -411,9 +385,7 @@ class SuperLikeService {
   /// It sends both the FCM push and the in-app notification via Admin SDK,
   /// which avoids Firestore rule limitations on cross-user writes.
   void _logNotificationDelegation(String toUserId) {
-    debugPrint(
-      '📱 Super-like notification for $toUserId delegated to Cloud Function',
-    );
+    AppLogger.debug('Super-like notification for $toUserId delegated to Cloud Function');
   }
 
   /// Check for instant match when super like is sent
@@ -434,12 +406,10 @@ class SuperLikeService {
 
       return null;
     } on FirebaseException catch (e) {
-      debugPrint(
-        '❌ Firebase error checking for instant match: ${e.code} - ${e.message}',
-      );
+      AppLogger.error('Firebase error checking for instant match', error: e);
       return null;
     } on Object catch (e) {
-      debugPrint('❌ Unexpected error checking for instant match: $e');
+      AppLogger.error('Unexpected error checking for instant match', error: e);
       return null;
     }
   }
@@ -462,12 +432,10 @@ class SuperLikeService {
 
       return null;
     } on FirebaseException catch (e) {
-      debugPrint(
-        '❌ Firebase error getting existing super like: ${e.code} - ${e.message}',
-      );
+      AppLogger.error('Firebase error getting existing super like', error: e);
       return null;
     } on Object catch (e) {
-      debugPrint('❌ Unexpected error getting existing super like: $e');
+      AppLogger.error('Unexpected error getting existing super like', error: e);
       return null;
     }
   }
@@ -479,12 +447,10 @@ class SuperLikeService {
           await _likesCollection.doc('${fromUserId}_likes_$toUserId').get();
       return likeDoc.exists;
     } on FirebaseException catch (e) {
-      debugPrint(
-        '❌ Firebase error checking existing like: ${e.code} - ${e.message}',
-      );
+      AppLogger.error('Firebase error checking existing like', error: e);
       return false;
     } on Object catch (e) {
-      debugPrint('❌ Unexpected error checking existing like: $e');
+      AppLogger.error('Unexpected error checking existing like', error: e);
       return false;
     }
   }
@@ -499,12 +465,10 @@ class SuperLikeService {
       }
       return false;
     } on FirebaseException catch (e) {
-      debugPrint(
-        '❌ Firebase error checking premium status: ${e.code} - ${e.message}',
-      );
+      AppLogger.error('Firebase error checking premium status', error: e);
       return false;
     } on Object catch (e) {
-      debugPrint('❌ Unexpected error checking premium status: $e');
+      AppLogger.error('Unexpected error checking premium status', error: e);
       return false;
     }
   }
@@ -536,19 +500,17 @@ class SuperLikeService {
         receivedCount: received.length,
         dailyUsedCount: dailyCount,
         dailyLimit:
-            isPremium ? PREMIUM_SUPER_LIKES_PER_DAY : FREE_SUPER_LIKES_PER_DAY,
+            isPremium ? premiumSuperLikesPerDay : freeSuperLikesPerDay,
         responseRate: responseRate,
         matchRate: matchRate,
         isPremium: isPremium,
         nextResetTime: _getNextResetTime(),
       );
     } on FirebaseException catch (e) {
-      debugPrint(
-        '❌ Firebase error getting super like stats: ${e.code} - ${e.message}',
-      );
+      AppLogger.error('Firebase error getting super like stats', error: e);
       return SuperLikeStats.empty();
     } on Object catch (e) {
-      debugPrint('❌ Unexpected error getting super like stats: $e');
+      AppLogger.error('Unexpected error getting super like stats', error: e);
       return SuperLikeStats.empty();
     }
   }
@@ -569,16 +531,12 @@ class SuperLikeService {
 
       if (expiredQuery.docs.isNotEmpty) {
         await batch.commit();
-        debugPrint(
-          '🧹 Cleaned up ${expiredQuery.docs.length} expired super like highlights',
-        );
+        AppLogger.debug('Cleaned up ${expiredQuery.docs.length} expired super like highlights');
       }
     } on FirebaseException catch (e) {
-      debugPrint(
-        '❌ Firebase error cleaning up expired highlights: ${e.code} - ${e.message}',
-      );
+      AppLogger.error('Firebase error cleaning up expired highlights', error: e);
     } on Object catch (e) {
-      debugPrint('❌ Unexpected error cleaning up expired highlights: $e');
+      AppLogger.error('Unexpected error cleaning up expired highlights', error: e);
     }
   }
 }
@@ -747,7 +705,7 @@ class SuperLikeStats {
         sentCount: 0,
         receivedCount: 0,
         dailyUsedCount: 0,
-        dailyLimit: SuperLikeService.FREE_SUPER_LIKES_PER_DAY,
+        dailyLimit: SuperLikeService.freeSuperLikesPerDay,
         responseRate: 0,
         matchRate: 0,
         isPremium: false,

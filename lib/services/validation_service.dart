@@ -144,23 +144,21 @@ class ValidationService {
   }
 
   /// Sanitize text input
-  static String sanitizeText(String text) {
-    return text
-        .trim()
-        .replaceAll(
-          RegExp(r'\s+'),
-          ' ',
-        ) // Replace multiple spaces with single space
-        .replaceAll(
-          RegExp(r'[^\w\s\-]'),
-          '',
-        ); // Remove special characters except allowed ones
-  }
+  static String sanitizeText(String text) =>
+      text
+          .trim()
+          .replaceAll(
+            RegExp(r'\s+'),
+            ' ',
+          )
+          .replaceAll(
+            RegExp(r'[^\w\s\-]'),
+            '',
+          );
 
   /// Check if group name is available (placeholder for future implementation)
   static Future<bool> isGroupNameAvailable(String groupName) async {
-    // TODO: Implement actual check against Firestore
-    // For now, return true (available)
+    // TODO(dev): Implement actual check against Firestore. For now, return true.
     await Future.delayed(
       const Duration(milliseconds: 500),
     ); // Simulate network delay

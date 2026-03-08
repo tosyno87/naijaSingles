@@ -89,7 +89,7 @@ class _HingeProfileCardState extends State<HingeProfileCard> {
     );
   }
 
-  List<String> _extractPhotos(dynamic imageUrl) {
+  List<String> _extractPhotos(imageUrl) {
     if (imageUrl == null) return [];
     if (imageUrl is! List) return [];
     if (imageUrl.isEmpty) return [];
@@ -358,11 +358,7 @@ class _HingeProfileCardState extends State<HingeProfileCard> {
         ),
       );
 
-  Widget _buildPromptsSection() {
-    // Placeholder for prompts - can be expanded later
-    // Hinge uses 3 prompts, we can add this feature later
-    return const SizedBox.shrink();
-  }
+  Widget _buildPromptsSection() => const SizedBox.shrink();
 
   Widget _buildDetailsSection() {
     final details = <Map<String, dynamic>>[];

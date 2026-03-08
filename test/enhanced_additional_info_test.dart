@@ -78,8 +78,7 @@ void main() {
   });
 
   group('Enhanced Additional Info Bloc Integration', () {
-    testWidgets('Bloc is properly initialized',
-        (WidgetTester tester) async {
+    testWidgets('Bloc is properly initialized', (WidgetTester tester) async {
       final bloc = OnboardingBloc(
         repository: mockRepository,
         userBloc: mockUserBloc,

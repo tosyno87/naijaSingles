@@ -265,9 +265,8 @@ class MyApp extends StatelessWidget {
     return BlocBuilder<ThemeBloc, ThemeState>(
       builder: (context, themeState) {
         // Get theme mode from BLoC state
-        final isDarkMode = themeState is ThemeLoaded
-            ? themeState.isDarkMode
-            : false; // Default to light mode if not loaded
+        final isDarkMode = themeState is ThemeLoaded &&
+            themeState.isDarkMode; // Default to light mode if not loaded
 
         return MaterialApp(
           navigatorKey: navigatorKey, // Add navigator key

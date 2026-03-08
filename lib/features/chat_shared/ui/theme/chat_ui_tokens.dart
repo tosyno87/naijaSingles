@@ -48,8 +48,7 @@ class ChatUiTokens extends ThemeExtension<ChatUiTokens> {
         inputFillColor: Colors.grey.shade100,
         sendButtonActiveColor: AppColors.primaryGreen,
         sendButtonInactiveColor: Colors.grey.shade300,
-        bubblePadding:
-            const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+        bubblePadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
         bubbleRadius: 20,
         bubbleTailRadius: 4,
         bubbleShadow: [
@@ -165,8 +164,7 @@ class ChatUiTokens extends ThemeExtension<ChatUiTokens> {
         senderNameFontSize: senderNameFontSize ?? this.senderNameFontSize,
         inputBorderRadius: inputBorderRadius ?? this.inputBorderRadius,
         readReceiptColor: readReceiptColor ?? this.readReceiptColor,
-        readReceiptReadColor:
-            readReceiptReadColor ?? this.readReceiptReadColor,
+        readReceiptReadColor: readReceiptReadColor ?? this.readReceiptReadColor,
       );
 
   @override
@@ -184,12 +182,10 @@ class ChatUiTokens extends ThemeExtension<ChatUiTokens> {
           Color.lerp(timestampOwnColor, other.timestampOwnColor, t)!,
       timestampOtherColor:
           Color.lerp(timestampOtherColor, other.timestampOtherColor, t)!,
-      senderNameColor:
-          Color.lerp(senderNameColor, other.senderNameColor, t)!,
+      senderNameColor: Color.lerp(senderNameColor, other.senderNameColor, t)!,
       systemBubbleColor:
           Color.lerp(systemBubbleColor, other.systemBubbleColor, t)!,
-      systemTextColor:
-          Color.lerp(systemTextColor, other.systemTextColor, t)!,
+      systemTextColor: Color.lerp(systemTextColor, other.systemTextColor, t)!,
       composerBackground:
           Color.lerp(composerBackground, other.composerBackground, t)!,
       inputFillColor: Color.lerp(inputFillColor, other.inputFillColor, t)!,
@@ -205,8 +201,7 @@ class ChatUiTokens extends ThemeExtension<ChatUiTokens> {
       bubbleTailRadius:
           lerpDouble(bubbleTailRadius, other.bubbleTailRadius, t)!,
       bubbleShadow: other.bubbleShadow,
-      messageFontSize:
-          lerpDouble(messageFontSize, other.messageFontSize, t)!,
+      messageFontSize: lerpDouble(messageFontSize, other.messageFontSize, t)!,
       timestampFontSize:
           lerpDouble(timestampFontSize, other.timestampFontSize, t)!,
       senderNameFontSize:

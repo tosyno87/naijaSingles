@@ -70,8 +70,10 @@ class NotificationService {
         if (_instance._currentUserId != null) {
           _instance._startNotificationListener();
         } else {
-          unawaited(_instance._notificationsSubscription?.cancel() ??
-              Future<void>.value());
+          unawaited(
+            _instance._notificationsSubscription?.cancel() ??
+                Future<void>.value(),
+          );
           _instance._notificationsController.add([]);
           _instance._unreadCountController.add(0);
         }

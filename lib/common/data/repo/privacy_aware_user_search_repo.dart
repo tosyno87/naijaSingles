@@ -248,7 +248,7 @@ class PrivacyAwareUserSearchRepo {
 
   /// Build privacy-aware query
   static Query _buildPrivacyAwareQuery(UserModel currentUser) {
-    Query query = docRef.where('isDiscoverable', isEqualTo: true);
+    final Query query = docRef.where('isDiscoverable', isEqualTo: true);
 
     return query.limit(50);
   }
@@ -329,9 +329,7 @@ class PrivacyAwareUserSearchRepo {
       final value = data[key];
       if (value is List && value.isNotEmpty) {
         return List<String>.from(
-          value
-              .map((e) => e?.toString() ?? '')
-              .where((url) => url.isNotEmpty),
+          value.map((e) => e?.toString() ?? '').where((url) => url.isNotEmpty),
         );
       }
     }
@@ -384,8 +382,7 @@ class PrivacyAwareUserSearchRepo {
               if (rawData == null || rawData.isEmpty) {
                 continue;
               }
-              final filteredData =
-                  _privacyService.filterForDiscovery(rawData);
+              final filteredData = _privacyService.filterForDiscovery(rawData);
               final user = await _createUserModelFromFilteredData(
                 filteredData,
                 doc.id,

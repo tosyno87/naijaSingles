@@ -8,8 +8,11 @@ class ChatLoadingView extends StatelessWidget {
   const ChatLoadingView({super.key});
 
   @override
-  Widget build(BuildContext context) => const Center(
-        child: CircularProgressIndicator(color: AppColors.primaryGreen),
+  Widget build(BuildContext context) => Semantics(
+        label: 'Loading chat messages',
+        child: const Center(
+          child: CircularProgressIndicator(color: AppColors.primaryGreen),
+        ),
       );
 }
 
@@ -19,13 +22,17 @@ class ChatErrorView extends StatelessWidget {
   final String message;
 
   @override
-  Widget build(BuildContext context) => Center(
-        child: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 32),
-          child: Text(
-            message,
-            style: GoogleFonts.montserrat(color: Colors.red, fontSize: 14),
-            textAlign: TextAlign.center,
+  Widget build(BuildContext context) => Semantics(
+        label: 'Chat error: $message',
+        liveRegion: true,
+        child: Center(
+          child: Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 32),
+            child: Text(
+              message,
+              style: GoogleFonts.montserrat(color: Colors.red, fontSize: 14),
+              textAlign: TextAlign.center,
+            ),
           ),
         ),
       );
@@ -46,28 +53,36 @@ class ChatEmptyView extends StatelessWidget {
   final Color? subtitleColor;
 
   @override
-  Widget build(BuildContext context) => Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Icon(Icons.chat_bubble_outline, size: 64, color: Colors.grey[400]),
-            const SizedBox(height: 16),
-            Text(
-              'No messages yet',
-              style: GoogleFonts.montserrat(
-                fontSize: 16,
-                color: Colors.grey[600],
+  Widget build(BuildContext context) => Semantics(
+        label: 'No messages yet. $subtitle',
+        child: Center(
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Icon(
+                Icons.chat_bubble_outline,
+                size: 64,
+                color: Colors.grey[400],
+                semanticLabel: 'Empty chat',
               ),
-            ),
-            const SizedBox(height: 8),
-            Text(
-              subtitle,
-              style: GoogleFonts.montserrat(
-                fontSize: 14,
-                color: subtitleColor ?? AppColors.primaryGreen,
+              const SizedBox(height: 16),
+              Text(
+                'No messages yet',
+                style: GoogleFonts.montserrat(
+                  fontSize: 16,
+                  color: Colors.grey[600],
+                ),
               ),
-            ),
-          ],
+              const SizedBox(height: 8),
+              Text(
+                subtitle,
+                style: GoogleFonts.montserrat(
+                  fontSize: 14,
+                  color: subtitleColor ?? AppColors.primaryGreen,
+                ),
+              ),
+            ],
+          ),
         ),
       );
 }

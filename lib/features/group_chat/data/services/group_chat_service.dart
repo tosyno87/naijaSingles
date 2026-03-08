@@ -2,8 +2,7 @@ import 'dart:developer';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import '../../../../common/utils/firestore_helpers.dart';
-import '../../../groups/data/services/unified_group_service.dart'
-    as unified;
+import '../../../groups/data/services/unified_group_service.dart' as unified;
 
 /// Industry-standard group chat service
 /// Features:
@@ -371,20 +370,18 @@ class GroupChatService {
   }
 
   /// Get group messages
-  Stream<List<GroupMessage>> getGroupMessages(String groupId) {
-    // Use unifiedGroups collection since that's where our groups are stored
-    return _firestore
-        .collection('unifiedGroups')
-        .doc(groupId)
-        .collection('messages')
-        .orderBy('timestamp', descending: true)
-        .snapshots()
-        .map(
-          (snapshot) => snapshot.docs
-              .map((doc) => GroupMessage.fromMap(doc.id, doc.data()))
-              .toList(),
-        );
-  }
+  Stream<List<GroupMessage>> getGroupMessages(String groupId) =>
+      _firestore
+          .collection('unifiedGroups')
+          .doc(groupId)
+          .collection('messages')
+          .orderBy('timestamp', descending: true)
+          .snapshots()
+          .map(
+            (snapshot) => snapshot.docs
+                .map((doc) => GroupMessage.fromMap(doc.id, doc.data()))
+                .toList(),
+          );
 
   /// Get user's groups
   Stream<List<GroupChat>> getUserGroups() {

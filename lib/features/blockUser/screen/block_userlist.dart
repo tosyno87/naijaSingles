@@ -263,7 +263,7 @@ class _BlockedUserState extends State<BlockedUser> {
         }
 
         return Padding(
-          padding: const EdgeInsets.all(0),
+          padding: EdgeInsets.zero,
           child: Center(
             child: Text(
               'No Block user found'.tr().toString(),

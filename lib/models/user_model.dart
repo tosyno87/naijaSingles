@@ -556,7 +556,8 @@ class UserModel {
   /// Prefers the Cloud Function–managed stored field; falls back to computing
   /// from accountStatus for documents that haven't been backfilled yet.
   bool get isDiscoverable =>
-      _storedDiscoverable ?? (accountStatus == null || accountStatus == 'active');
+      _storedDiscoverable ??
+      (accountStatus == null || accountStatus == 'active');
 
   /// Whether the account is temporarily deactivated (paused or incognito).
   bool get isDeactivated =>

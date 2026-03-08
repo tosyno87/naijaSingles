@@ -64,10 +64,8 @@ void main() {
         bio: 'Cooking enthusiast who travels',
       );
 
-      final scoreAB =
-          CompatibilityEngine.calculateCompatibility(user1, user2);
-      final scoreBA =
-          CompatibilityEngine.calculateCompatibility(user2, user1);
+      final scoreAB = CompatibilityEngine.calculateCompatibility(user1, user2);
+      final scoreBA = CompatibilityEngine.calculateCompatibility(user2, user1);
 
       expect(scoreAB, closeTo(scoreBA, 0.001));
     });

@@ -70,7 +70,9 @@ class SplashState extends State<Splash> {
               log('Timeout fallback: User authenticated, navigating to main screen');
               unawaited(
                 Navigator.pushReplacementNamed(
-                    context, RouteName.mainNavigation),
+                  context,
+                  RouteName.mainNavigation,
+                ),
               );
               return;
             } else {
@@ -78,7 +80,9 @@ class SplashState extends State<Splash> {
               log('Timeout fallback: Navigating to welcome screen');
               unawaited(
                 Navigator.pushReplacementNamed(
-                    context, RouteName.welcomeScreen),
+                  context,
+                  RouteName.welcomeScreen,
+                ),
               );
               return;
             }
@@ -99,7 +103,8 @@ class SplashState extends State<Splash> {
       if (mounted && !_hasNavigated) {
         _hasNavigated = true;
         unawaited(
-            Navigator.pushReplacementNamed(context, RouteName.welcomeScreen));
+          Navigator.pushReplacementNamed(context, RouteName.welcomeScreen),
+        );
       }
     }
   }
@@ -132,13 +137,21 @@ class SplashState extends State<Splash> {
           if (state is AuthenticatedState) {
             _hasNavigated = true;
             log('User authenticated in listener: ${state.user.uid}');
-            unawaited(Navigator.pushReplacementNamed(
-                context, RouteName.mainNavigation));
+            unawaited(
+              Navigator.pushReplacementNamed(
+                context,
+                RouteName.mainNavigation,
+              ),
+            );
           } else if (state is UnauthenticatedState) {
             _hasNavigated = true;
             log('User not authenticated in listener - going to welcome');
-            unawaited(Navigator.pushReplacementNamed(
-                context, RouteName.welcomeScreen));
+            unawaited(
+              Navigator.pushReplacementNamed(
+                context,
+                RouteName.welcomeScreen,
+              ),
+            );
           } else if (state is AuthFailed) {
             _hasNavigated = true;
             log('Authentication failed in listener: ${state.message}');
@@ -148,8 +161,12 @@ class SplashState extends State<Splash> {
                   content: Text('Authentication error: ${state.message}'),
                 ),
               );
-              unawaited(Navigator.pushReplacementNamed(
-                  context, RouteName.welcomeScreen));
+              unawaited(
+                Navigator.pushReplacementNamed(
+                  context,
+                  RouteName.welcomeScreen,
+                ),
+              );
             }
           }
           // If still loading or initial state, wait for _checkAuthAndNavigate to handle it
@@ -217,7 +234,8 @@ class SplashState extends State<Splash> {
                     strokeWidth: 2.5,
                     valueColor: AlwaysStoppedAnimation<Color>(
                       primaryGreen.withValues(
-                          alpha: 0.6), // Soft green, not too prominent
+                        alpha: 0.6,
+                      ), // Soft green, not too prominent
                     ),
                   ),
                 ),

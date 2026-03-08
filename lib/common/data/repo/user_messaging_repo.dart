@@ -131,19 +131,17 @@ class UserMessagingRepo {
     return blockList;
   }
 
-  static Stream<QuerySnapshot> query(UserModel currentUser, int perPage) {
-    return db
-        .collection('chats')
-        .where('users', arrayContains: currentUser.id)
-        .where(
-          'unmatched',
-          isEqualTo: false,
-        )
-        .orderBy('time', descending: true)
-        .limit(perPage)
-        .snapshots();
-    //??'lastMessage.time',
-  }
+  static Stream<QuerySnapshot> query(UserModel currentUser, int perPage) =>
+      db
+          .collection('chats')
+          .where('users', arrayContains: currentUser.id)
+          .where(
+            'unmatched',
+            isEqualTo: false,
+          )
+          .orderBy('time', descending: true)
+          .limit(perPage)
+          .snapshots();
 
   static Future<UserModel> getChatUserDetails({required String userId}) async {
     UserModel? user;
@@ -151,8 +149,7 @@ class UserMessagingRepo {
     final result = await db.collection('users').doc(userId).get();
 
     if (result.exists) {
-      user = UserModel.fromDocument(result);
-      return user;
+      return UserModel.fromDocument(result);
     }
 
     // log("user ${user.toString()}");

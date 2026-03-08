@@ -48,9 +48,7 @@ class _EnhancedBioScreenState extends State<EnhancedBioScreen> {
                 'A great bio helps you stand out. Keep it genuine.',
                 style: OnboardingTheme.subtitleStyle,
               ),
-
               const SizedBox(height: OnboardingTheme.subtitleToField),
-
               TextField(
                 controller: _bioController,
                 style: OnboardingTheme.fieldTextStyle.copyWith(height: 1.5),
@@ -70,7 +68,6 @@ class _EnhancedBioScreenState extends State<EnhancedBioScreen> {
                       .add(OnboardingBioUpdated(value));
                 },
               ),
-
               const SizedBox(height: OnboardingTheme.fieldToBottom),
             ],
           ),

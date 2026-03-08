@@ -2,6 +2,7 @@ import 'dart:math';
 
 import 'package:flutter/foundation.dart';
 
+import '../../../../common/utils/app_logger.dart';
 import '../../../../common/utils/distance.dart' as geo;
 import '../../../../models/user_model.dart';
 import '../../../../services/cached_user_service.dart';
@@ -33,7 +34,7 @@ class SmartMatchService {
   }) async =>
       PerformanceMonitor.measure('smart_match_get_users', () async {
         try {
-          debugPrint('🧠 Getting smart matches for ${currentUser.name}');
+          AppLogger.debug('Getting smart matches for ${currentUser.name}');
 
           // Get users from cache or Firestore
           final userResult = await _cachedUserService.getCachedUsers(
@@ -42,7 +43,7 @@ class SmartMatchService {
           );
 
           if (!userResult.isSuccess || userResult.items.isEmpty) {
-            debugPrint('❌ Failed to get users for smart matching');
+            AppLogger.debug('Failed to get users for smart matching');
             return SmartMatchResult.error('Failed to load users');
           }
 
@@ -60,8 +61,8 @@ class SmartMatchService {
             pageSize,
           );
 
-          debugPrint(
-            '✅ Smart matching complete: ${orderedUsers.length} users ordered',
+          AppLogger.debug(
+            'Smart matching complete: ${orderedUsers.length} users ordered',
           );
 
           return SmartMatchResult.success(
@@ -72,7 +73,7 @@ class SmartMatchService {
                 orderedUsers.where((uc) => uc.isHighCompatibility).length,
           );
         } on Object catch (e) {
-          debugPrint('❌ Error in smart matching: $e');
+          AppLogger.error('Error in smart matching', error: e);
           return SmartMatchResult.error(e.toString());
         }
       });
@@ -84,8 +85,8 @@ class SmartMatchService {
     String mode,
   ) async =>
       PerformanceMonitor.measure('compatibility_calculation', () async {
-        debugPrint(
-          '🎯 Calculating compatibility for ${targetUsers.length} users',
+        AppLogger.debug(
+          'Calculating compatibility for ${targetUsers.length} users',
         );
 
         final results = <UserCompatibility>[];
@@ -112,8 +113,8 @@ class SmartMatchService {
             results.where((r) => r.isMediumCompatibility).length;
         final lowCount = results.where((r) => r.isLowCompatibility).length;
 
-        debugPrint(
-          '📊 Compatibility distribution: High: $highCount, Medium: $mediumCount, Low: $lowCount',
+        AppLogger.debug(
+          'Compatibility distribution: High: $highCount, Medium: $mediumCount, Low: $lowCount',
         );
 
         return results;
@@ -126,14 +127,13 @@ class SmartMatchService {
     int pageSize,
   ) async =>
       PerformanceMonitor.measure('smart_ordering', () async {
-        debugPrint('🔄 Applying smart ordering algorithm');
+        AppLogger.debug('Applying smart ordering algorithm');
 
         // Sort by compatibility score descending (best-match-first)
         final sortedByCompatibility =
             List<UserCompatibility>.from(compatibilityResults)
               ..sort(
-                (a, b) =>
-                    b.compatibilityScore.compareTo(a.compatibilityScore),
+                (a, b) => b.compatibilityScore.compareTo(a.compatibilityScore),
               );
 
         // Pin the top-N users in strict score order so heuristic
@@ -158,7 +158,7 @@ class SmartMatchService {
         // Take only the requested page size
         final finalList = combined.take(pageSize).toList();
 
-        debugPrint('✅ Smart ordering complete: ${finalList.length} users');
+        AppLogger.debug('Smart ordering complete: ${finalList.length} users');
         _logOrderingResults(finalList);
 
         return finalList;
@@ -199,7 +199,7 @@ class SmartMatchService {
       remaining.remove(nextUser);
     }
 
-    debugPrint('🎨 Applied diversity filter: ${diversifiedList.length} users');
+    AppLogger.debug('Applied diversity filter: ${diversifiedList.length} users');
     return diversifiedList;
   }
 
@@ -241,8 +241,8 @@ class SmartMatchService {
       }
     }
 
-    debugPrint(
-      '⚡ Applied activity boost: ${recentlyActive.length} recently active users prioritized',
+    AppLogger.debug(
+      'Applied activity boost: ${recentlyActive.length} recently active users prioritized',
     );
     return boostedList;
   }
@@ -306,8 +306,8 @@ class SmartMatchService {
       }
     }
 
-    debugPrint(
-      '📍 Applied location clustering: ${nearbyUsers.length} nearby users prioritized',
+    AppLogger.debug(
+      'Applied location clustering: ${nearbyUsers.length} nearby users prioritized',
     );
     return clusteredList;
   }
@@ -331,19 +331,19 @@ class SmartMatchService {
       return;
     }
 
-    debugPrint('📋 Smart ordering results:');
+    AppLogger.debug('Smart ordering results:');
     for (int i = 0; i < min(10, users.length); i++) {
       final user = users[i];
       final emoji = user.isHighCompatibility
           ? '🔥'
           : (user.isMediumCompatibility ? '👍' : '👌');
-      debugPrint(
+      AppLogger.debug(
         '   ${i + 1}. $emoji ${user.user.name} (${user.compatibilityPercentage})',
       );
     }
 
     if (users.length > 10) {
-      debugPrint('   ... and ${users.length - 10} more users');
+      AppLogger.debug('   ... and ${users.length - 10} more users');
     }
   }
 
@@ -354,7 +354,7 @@ class SmartMatchService {
     int pageSize = 20,
   }) async {
     try {
-      debugPrint('📄 Getting more smart matches');
+      AppLogger.debug('Getting more smart matches');
 
       // Get more users from paginated service
       final moreUsersResult = await _cachedUserService.getMoreUsers(
@@ -381,7 +381,7 @@ class SmartMatchService {
 
       return newSmartResult;
     } on Object catch (e) {
-      debugPrint('❌ Error getting more optimized users: $e');
+      AppLogger.error('Error getting more optimized users', error: e);
       return SmartMatchResult.error(e.toString());
     }
   }
@@ -400,8 +400,8 @@ class SmartMatchService {
     int maxUsers = 50,
   }) async {
     try {
-      debugPrint(
-        '🔥 Getting high compatibility users (min: ${(minCompatibility * 100).toStringAsFixed(1)}%)',
+      AppLogger.debug(
+        'Getting high compatibility users (min: ${(minCompatibility * 100).toStringAsFixed(1)}%)',
       );
 
       // Get all available users
@@ -425,8 +425,8 @@ class SmartMatchService {
           .take(maxUsers)
           .toList();
 
-      debugPrint(
-        '✅ Found ${highCompatibilityUsers.length} high compatibility users',
+      AppLogger.debug(
+        'Found ${highCompatibilityUsers.length} high compatibility users',
       );
 
       return SmartMatchResult.success(
@@ -437,7 +437,7 @@ class SmartMatchService {
         highCompatibilityCount: highCompatibilityUsers.length,
       );
     } on Object catch (e) {
-      debugPrint('❌ Error getting high compatibility users: $e');
+      AppLogger.error('Error getting high compatibility users', error: e);
       return SmartMatchResult.error(e.toString());
     }
   }
@@ -447,7 +447,7 @@ class SmartMatchService {
     UserModel currentUser,
   ) async {
     try {
-      debugPrint('📊 Analyzing matching patterns for ${currentUser.name}');
+      AppLogger.debug('Analyzing matching patterns for ${currentUser.name}');
 
       // Get sample of users for analysis
       final usersResult = await _cachedUserService.getCachedUsers(
@@ -494,7 +494,7 @@ class SmartMatchService {
             _generateRecommendations(currentUser, compatibilityResults),
       );
     } on Object catch (e) {
-      debugPrint('❌ Error analyzing matching patterns: $e');
+      AppLogger.error('Error analyzing matching patterns', error: e);
       return MatchingAnalysis.empty();
     }
   }

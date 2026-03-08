@@ -370,7 +370,9 @@ class _OnboardingStepBioState extends State<OnboardingStepBio> {
                                 focusedBorder: OutlineInputBorder(
                                   borderRadius: BorderRadius.circular(12),
                                   borderSide: const BorderSide(
-                                      color: deepGreen, width: 2),
+                                    color: deepGreen,
+                                    width: 2,
+                                  ),
                                 ),
                                 errorBorder: OutlineInputBorder(
                                   borderRadius: BorderRadius.circular(12),
@@ -582,7 +584,9 @@ class _OnboardingStepBioState extends State<OnboardingStepBio> {
                                 focusedBorder: OutlineInputBorder(
                                   borderRadius: BorderRadius.circular(12),
                                   borderSide: const BorderSide(
-                                      color: deepGreen, width: 2),
+                                    color: deepGreen,
+                                    width: 2,
+                                  ),
                                 ),
                                 errorBorder: OutlineInputBorder(
                                   borderRadius: BorderRadius.circular(12),
@@ -594,14 +598,17 @@ class _OnboardingStepBioState extends State<OnboardingStepBio> {
                                   vertical: 16,
                                 ),
                                 suffixIcon: IconButton(
-                                  icon: const Icon(Icons.my_location,
-                                      color: deepGreen),
+                                  icon: const Icon(
+                                    Icons.my_location,
+                                    color: deepGreen,
+                                  ),
                                   onPressed: () {
                                     // Location picker functionality would go here
                                     ScaffoldMessenger.of(context).showSnackBar(
                                       const SnackBar(
                                         content: Text(
-                                            'Location detection coming soon!'),
+                                          'Location detection coming soon!',
+                                        ),
                                         duration: Duration(seconds: 2),
                                       ),
                                     );
@@ -696,7 +703,9 @@ class _OnboardingStepBioState extends State<OnboardingStepBio> {
                                 focusedBorder: OutlineInputBorder(
                                   borderRadius: BorderRadius.circular(12),
                                   borderSide: const BorderSide(
-                                      color: deepGreen, width: 2),
+                                    color: deepGreen,
+                                    width: 2,
+                                  ),
                                 ),
                                 errorBorder: OutlineInputBorder(
                                   borderRadius: BorderRadius.circular(12),
@@ -738,8 +747,11 @@ class _OnboardingStepBioState extends State<OnboardingStepBio> {
                               // Validate form
                               if (_validateFields()) {
                                 final bloc = context.read<OnboardingBloc>();
-                                bloc.add(OnboardingFullNameUpdated(
-                                    _nameController.text.trim()));
+                                bloc.add(
+                                  OnboardingFullNameUpdated(
+                                    _nameController.text.trim(),
+                                  ),
+                                );
 
                                 if (_selectedAge != null) {
                                   final now = DateTime.now();
@@ -759,8 +771,11 @@ class _OnboardingStepBioState extends State<OnboardingStepBio> {
                                   ),
                                 );
 
-                                bloc.add(OnboardingBioUpdated(
-                                    _bioController.text.trim()));
+                                bloc.add(
+                                  OnboardingBioUpdated(
+                                    _bioController.text.trim(),
+                                  ),
+                                );
 
                                 // Proceed to next step
                                 unawaited(HapticFeedback.mediumImpact());

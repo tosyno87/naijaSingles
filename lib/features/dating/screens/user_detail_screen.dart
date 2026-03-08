@@ -340,7 +340,8 @@ class _UserDetailScreenState extends State<UserDetailScreen> {
                       color: afropeepGreen.withValues(alpha: 0.1),
                       borderRadius: BorderRadius.circular(16),
                       border: Border.all(
-                          color: afropeepGreen.withValues(alpha: 0.3)),
+                        color: afropeepGreen.withValues(alpha: 0.3),
+                      ),
                     ),
                     child: Text(
                       '🇳🇬 ${widget.user.nationality}',
@@ -361,7 +362,8 @@ class _UserDetailScreenState extends State<UserDetailScreen> {
                       color: afropeepGreen.withValues(alpha: 0.1),
                       borderRadius: BorderRadius.circular(16),
                       border: Border.all(
-                          color: afropeepGreen.withValues(alpha: 0.3)),
+                        color: afropeepGreen.withValues(alpha: 0.3),
+                      ),
                     ),
                     child: Text(
                       '🏛️ ${widget.user.tribe}',

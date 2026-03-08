@@ -19,8 +19,10 @@ void main() {
     test('should return "Location TBD" for placeholder patterns', () {
       expect(LocationFormatter.formatLocation('TBA'), 'Location TBD');
       expect(LocationFormatter.formatLocation('TBD'), 'Location TBD');
-      expect(LocationFormatter.formatLocation('To be announced'), 'Location TBD');
-      expect(LocationFormatter.formatLocation('To be determined'), 'Location TBD');
+      expect(
+          LocationFormatter.formatLocation('To be announced'), 'Location TBD');
+      expect(
+          LocationFormatter.formatLocation('To be determined'), 'Location TBD');
       expect(LocationFormatter.formatLocation('location'), 'Location TBD');
       expect(LocationFormatter.formatLocation('address'), 'Location TBD');
     });
@@ -31,10 +33,12 @@ void main() {
     });
 
     test('should detect malformed locations with excessive repetition', () {
-      expect(LocationFormatter.formatLocation('abc, def, abc, def'), 'Location TBD');
-      // Note: "test, test, test, other" has 2 unique words out of 4 (50%), 
+      expect(LocationFormatter.formatLocation('abc, def, abc, def'),
+          'Location TBD');
+      // Note: "test, test, test, other" has 2 unique words out of 4 (50%),
       // which doesn't meet the < 50% threshold, so it's considered valid
-      expect(LocationFormatter.formatLocation('test, test, test'), 'Location TBD');
+      expect(
+          LocationFormatter.formatLocation('test, test, test'), 'Location TBD');
       expect(LocationFormatter.formatLocation('a, a, a, a'), 'Location TBD');
     });
 
@@ -66,4 +70,3 @@ void main() {
     });
   });
 }
-

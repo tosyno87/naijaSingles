@@ -9,9 +9,9 @@ import 'paginated_user_service.dart';
 /// Cached user service that provides intelligent caching for user data
 /// Reduces Firestore reads and improves app performance
 class CachedUserService {
-  static const Duration CACHE_DURATION = Duration(minutes: 15);
-  static const Duration PROFILE_CACHE_DURATION = Duration(hours: 1);
-  static const int MAX_CACHE_SIZE = 100; // Maximum users to cache
+  static const Duration cacheDuration = Duration(minutes: 15);
+  static const Duration profileCacheDuration = Duration(hours: 1);
+  static const int maxCacheSize = 100; // Maximum users to cache
 
   // In-memory cache
   static final Map<String, List<UserModel>> _userListCache = {};
@@ -20,10 +20,10 @@ class CachedUserService {
   static final Map<String, DateTime> _profileTimestamps = {};
 
   // Persistent cache keys
-  static const String _USER_LIST_CACHE_KEY = 'cached_user_list';
-  static const String _USER_LIST_TIMESTAMP_KEY = 'user_list_timestamp';
-  static const String _PROFILE_CACHE_PREFIX = 'cached_profile_';
-  static const String _PROFILE_TIMESTAMP_PREFIX = 'profile_timestamp_';
+  static const String _userListCacheKey = 'cached_user_list';
+  static const String _userListTimestampKey = 'user_list_timestamp';
+  static const String _profileCachePrefix = 'cached_profile_';
+  static const String _profileTimestampPrefix = 'profile_timestamp_';
 
   final PaginatedUserService _paginatedUserService = PaginatedUserService();
 
@@ -126,11 +126,11 @@ class CachedUserService {
       // Persistent cache
       final prefs = await SharedPreferences.getInstance();
       await prefs.setString(
-        '$_PROFILE_CACHE_PREFIX${user.id}',
+        '$_profileCachePrefix${user.id}',
         jsonEncode(user.toMap()),
       );
       await prefs.setInt(
-        '$_PROFILE_TIMESTAMP_PREFIX${user.id}',
+        '$_profileTimestampPrefix${user.id}',
         DateTime.now().millisecondsSinceEpoch,
       );
 
@@ -151,13 +151,13 @@ class CachedUserService {
 
       // Check persistent cache
       final prefs = await SharedPreferences.getInstance();
-      final cachedData = prefs.getString('$_PROFILE_CACHE_PREFIX$userId');
-      final timestamp = prefs.getInt('$_PROFILE_TIMESTAMP_PREFIX$userId');
+      final cachedData = prefs.getString('$_profileCachePrefix$userId');
+      final timestamp = prefs.getInt('$_profileTimestampPrefix$userId');
 
       if (cachedData != null && timestamp != null) {
         final cacheAge = DateTime.now().millisecondsSinceEpoch - timestamp;
 
-        if (cacheAge < PROFILE_CACHE_DURATION.inMilliseconds) {
+        if (cacheAge < profileCacheDuration.inMilliseconds) {
           final userData = jsonDecode(cachedData) as Map<String, dynamic>;
           final user = UserModel.fromMap(userData, userId);
 
@@ -193,10 +193,10 @@ class CachedUserService {
       final keys = prefs.getKeys();
 
       for (final key in keys) {
-        if (key.startsWith(_USER_LIST_CACHE_KEY) ||
-            key.startsWith(_PROFILE_CACHE_PREFIX) ||
-            key.startsWith(_PROFILE_TIMESTAMP_PREFIX) ||
-            key == _USER_LIST_TIMESTAMP_KEY) {
+        if (key.startsWith(_userListCacheKey) ||
+            key.startsWith(_profileCachePrefix) ||
+            key.startsWith(_profileTimestampPrefix) ||
+            key == _userListTimestampKey) {
           await prefs.remove(key);
         }
       }
@@ -215,7 +215,7 @@ class CachedUserService {
       // Clear expired in-memory user list cache
       final expiredKeys = <String>[];
       _cacheTimestamps.forEach((key, timestamp) {
-        if (now.difference(timestamp) > CACHE_DURATION) {
+        if (now.difference(timestamp) > cacheDuration) {
           expiredKeys.add(key);
         }
       });
@@ -228,7 +228,7 @@ class CachedUserService {
       // Clear expired profile cache
       final expiredProfileKeys = <String>[];
       _profileTimestamps.forEach((key, timestamp) {
-        if (now.difference(timestamp) > PROFILE_CACHE_DURATION) {
+        if (now.difference(timestamp) > profileCacheDuration) {
           expiredProfileKeys.add(key);
         }
       });
@@ -269,18 +269,18 @@ class CachedUserService {
       // Check in-memory cache first
       if (_cacheTimestamps.containsKey(cacheKey)) {
         final cacheAge = DateTime.now().difference(_cacheTimestamps[cacheKey]!);
-        if (cacheAge < CACHE_DURATION) {
+        if (cacheAge < cacheDuration) {
           return true;
         }
       }
 
       // Check persistent cache
       final prefs = await SharedPreferences.getInstance();
-      final timestamp = prefs.getInt('${_USER_LIST_TIMESTAMP_KEY}_$cacheKey');
+      final timestamp = prefs.getInt('${_userListTimestampKey}_$cacheKey');
 
       if (timestamp != null) {
         final cacheAge = DateTime.now().millisecondsSinceEpoch - timestamp;
-        return cacheAge < CACHE_DURATION.inMilliseconds;
+        return cacheAge < cacheDuration.inMilliseconds;
       }
 
       return false;
@@ -295,7 +295,7 @@ class CachedUserService {
     if (!_profileTimestamps.containsKey(userId)) return false;
 
     final cacheAge = DateTime.now().difference(_profileTimestamps[userId]!);
-    return cacheAge < PROFILE_CACHE_DURATION;
+    return cacheAge < profileCacheDuration;
   }
 
   /// Get cached user list
@@ -308,7 +308,7 @@ class CachedUserService {
 
       // Check persistent cache
       final prefs = await SharedPreferences.getInstance();
-      final cachedData = prefs.getString('${_USER_LIST_CACHE_KEY}_$cacheKey');
+      final cachedData = prefs.getString('${_userListCacheKey}_$cacheKey');
 
       if (cachedData != null) {
         final List<dynamic> userListData = jsonDecode(cachedData);
@@ -338,7 +338,7 @@ class CachedUserService {
   Future<void> _cacheUserList(String cacheKey, List<UserModel> users) async {
     try {
       // Limit cache size
-      final usersToCache = users.take(MAX_CACHE_SIZE).toList();
+      final usersToCache = users.take(maxCacheSize).toList();
 
       // In-memory cache
       _userListCache[cacheKey] = usersToCache;
@@ -349,11 +349,11 @@ class CachedUserService {
       final userListData = usersToCache.map((user) => user.toMap()).toList();
 
       await prefs.setString(
-        '${_USER_LIST_CACHE_KEY}_$cacheKey',
+        '${_userListCacheKey}_$cacheKey',
         jsonEncode(userListData),
       );
       await prefs.setInt(
-        '${_USER_LIST_TIMESTAMP_KEY}_$cacheKey',
+        '${_userListTimestampKey}_$cacheKey',
         DateTime.now().millisecondsSinceEpoch,
       );
     } on Object catch (e) {

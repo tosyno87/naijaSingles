@@ -273,7 +273,7 @@ class SwipeStackState extends State<SwipeStack>
     );
   }
 
-  void _onPandEnd(dynamic _) {
+  void _onPandEnd(_) {
     setState(() {});
     if (_progress < widget.threshold) {
       _goFirstPosition();

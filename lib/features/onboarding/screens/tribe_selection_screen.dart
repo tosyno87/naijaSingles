@@ -121,106 +121,110 @@ class _TribeSelectionScreenState extends State<TribeSelectionScreen> {
     _nationalitySearchController.text = '';
     _nationalityFilter = '';
 
-    unawaited(showModalBottomSheet<String>(
-      context: context,
-      isScrollControlled: true,
-      backgroundColor: OnboardingTheme.background,
-      shape: const RoundedRectangleBorder(
-        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
-      ),
-      builder: (ctx) => StatefulBuilder(
-        builder: (ctx, setSheetState) {
-          final filtered = _nationalityFilter.isEmpty
-              ? _countries
-              : _countries
-                  .where((n) => n
-                      .toLowerCase()
-                      .contains(_nationalityFilter.toLowerCase()))
-                  .toList();
+    unawaited(
+      showModalBottomSheet<String>(
+        context: context,
+        isScrollControlled: true,
+        backgroundColor: OnboardingTheme.background,
+        shape: const RoundedRectangleBorder(
+          borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+        ),
+        builder: (ctx) => StatefulBuilder(
+          builder: (ctx, setSheetState) {
+            final filtered = _nationalityFilter.isEmpty
+                ? _countries
+                : _countries
+                    .where(
+                      (n) => n
+                          .toLowerCase()
+                          .contains(_nationalityFilter.toLowerCase()),
+                    )
+                    .toList();
 
-          return DraggableScrollableSheet(
-            expand: false,
-            initialChildSize: 0.7,
-            maxChildSize: 0.9,
-            minChildSize: 0.5,
-            builder: (_, scrollController) => SafeArea(
-              child: Column(
-                children: [
-                  Container(
-                    margin: const EdgeInsets.only(top: 12, bottom: 8),
-                    width: 40,
-                    height: 4,
-                    decoration: BoxDecoration(
-                      color: Colors.grey.shade300,
-                      borderRadius: BorderRadius.circular(2),
-                    ),
-                  ),
-                  Padding(
-                    padding: const EdgeInsets.symmetric(
-                      horizontal: OnboardingTheme.horizontalPadding,
-                      vertical: 8,
-                    ),
-                    child: TextField(
-                      controller: _nationalitySearchController,
-                      autofocus: true,
-                      style: OnboardingTheme.fieldTextStyle,
-                      decoration: OnboardingTheme.fieldDecoration(
-                        hint: 'Search country...',
-                        prefix: const Icon(
-                          Icons.search,
-                          color: OnboardingTheme.primaryGreen,
-                        ),
+            return DraggableScrollableSheet(
+              expand: false,
+              initialChildSize: 0.7,
+              maxChildSize: 0.9,
+              minChildSize: 0.5,
+              builder: (_, scrollController) => SafeArea(
+                child: Column(
+                  children: [
+                    Container(
+                      margin: const EdgeInsets.only(top: 12, bottom: 8),
+                      width: 40,
+                      height: 4,
+                      decoration: BoxDecoration(
+                        color: Colors.grey.shade300,
+                        borderRadius: BorderRadius.circular(2),
                       ),
-                      onChanged: (value) {
-                        setSheetState(() {
-                          _nationalityFilter = value;
-                        });
-                      },
                     ),
-                  ),
-                  Expanded(
-                    child: ListView.builder(
-                      controller: scrollController,
-                      itemCount: filtered.length,
-                      itemBuilder: (_, i) {
-                        final nation = filtered[i];
-                        final isSelected = nation == _selectedNationality;
-                        return ListTile(
-                          title: Text(
-                            nation,
-                            style: OnboardingTheme.fieldTextStyle.copyWith(
-                              color: isSelected
-                                  ? OnboardingTheme.primaryGreen
-                                  : OnboardingTheme.fieldTextColor,
-                              fontWeight: isSelected
-                                  ? FontWeight.w700
-                                  : FontWeight.w500,
-                            ),
+                    Padding(
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: OnboardingTheme.horizontalPadding,
+                        vertical: 8,
+                      ),
+                      child: TextField(
+                        controller: _nationalitySearchController,
+                        autofocus: true,
+                        style: OnboardingTheme.fieldTextStyle,
+                        decoration: OnboardingTheme.fieldDecoration(
+                          hint: 'Search country...',
+                          prefix: const Icon(
+                            Icons.search,
+                            color: OnboardingTheme.primaryGreen,
                           ),
-                          trailing: isSelected
-                              ? const Icon(
-                                  Icons.check_circle,
-                                  color: OnboardingTheme.primaryGreen,
-                                )
-                              : null,
-                          onTap: () {
-                            Navigator.pop(ctx, nation);
-                          },
-                        );
-                      },
+                        ),
+                        onChanged: (value) {
+                          setSheetState(() {
+                            _nationalityFilter = value;
+                          });
+                        },
+                      ),
                     ),
-                  ),
-                ],
+                    Expanded(
+                      child: ListView.builder(
+                        controller: scrollController,
+                        itemCount: filtered.length,
+                        itemBuilder: (_, i) {
+                          final nation = filtered[i];
+                          final isSelected = nation == _selectedNationality;
+                          return ListTile(
+                            title: Text(
+                              nation,
+                              style: OnboardingTheme.fieldTextStyle.copyWith(
+                                color: isSelected
+                                    ? OnboardingTheme.primaryGreen
+                                    : OnboardingTheme.fieldTextColor,
+                                fontWeight: isSelected
+                                    ? FontWeight.w700
+                                    : FontWeight.w500,
+                              ),
+                            ),
+                            trailing: isSelected
+                                ? const Icon(
+                                    Icons.check_circle,
+                                    color: OnboardingTheme.primaryGreen,
+                                  )
+                                : null,
+                            onTap: () {
+                              Navigator.pop(ctx, nation);
+                            },
+                          );
+                        },
+                      ),
+                    ),
+                  ],
+                ),
               ),
-            ),
-          );
-        },
-      ),
-    ).then((selected) {
-      if (selected != null) {
-        _selectNationality(selected);
-      }
-    }));
+            );
+          },
+        ),
+      ).then((selected) {
+        if (selected != null) {
+          _selectNationality(selected);
+        }
+      }),
+    );
   }
 
   @override

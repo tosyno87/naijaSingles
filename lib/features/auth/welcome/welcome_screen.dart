@@ -50,7 +50,7 @@ class _WelcomeScreenState extends State<WelcomeScreen>
       vsync: this,
     )..repeat(reverse: true);
 
-    _kenBurnsScale = Tween<double>(begin: 1.0, end: 1.06).animate(
+    _kenBurnsScale = Tween<double>(begin: 1, end: 1.06).animate(
       CurvedAnimation(parent: _kenBurnsController, curve: Curves.easeInOut),
     );
     _kenBurnsTranslateY = Tween<double>(begin: 0, end: -14).animate(
@@ -289,7 +289,7 @@ class _WelcomeScreenState extends State<WelcomeScreen>
                           style: GoogleFonts.montserrat(
                             fontSize: 14,
                             fontWeight: FontWeight.w400,
-                            color: Color(0xB3FFFFFF),
+                            color: const Color(0xB3FFFFFF),
                             height: 1.4,
                           ),
                         ),
@@ -352,8 +352,7 @@ class _WelcomeScreenState extends State<WelcomeScreen>
                 Navigator.push(
                   context,
                   MaterialPageRoute(
-                    builder: (context) =>
-                        PhoneNumber(updatePhoneNumber: false),
+                    builder: (context) => PhoneNumber(updatePhoneNumber: false),
                   ),
                 ),
               ),
@@ -370,8 +369,7 @@ class _WelcomeScreenState extends State<WelcomeScreen>
                 Navigator.push(
                   context,
                   MaterialPageRoute(
-                    builder: (context) =>
-                        const SignInMethodSelectionScreen(),
+                    builder: (context) => const SignInMethodSelectionScreen(),
                   ),
                 ),
               ),
@@ -386,7 +384,7 @@ class _WelcomeScreenState extends State<WelcomeScreen>
     required String text,
     required VoidCallback onPressed,
   }) =>
-      Container(
+      DecoratedBox(
         decoration: BoxDecoration(
           gradient: AppColors.primaryGradient,
           borderRadius: BorderRadius.circular(28),

@@ -192,7 +192,8 @@ class _SelectMedia extends StatelessWidget {
                 TextButton.icon(
                   onPressed: () {
                     unawaited(
-                        getContentFromSource(context, ImageSource.camera));
+                      getContentFromSource(context, ImageSource.camera),
+                    );
                   },
                   icon: const Icon(
                     FontAwesomeIcons.cameraRetro,

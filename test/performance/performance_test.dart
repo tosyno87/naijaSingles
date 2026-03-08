@@ -9,21 +9,22 @@ void main() {
 
       // Create test users
       final users = List.generate(
-          100,
-          (index) => UserModel(
-                id: 'user_$index',
-                name: 'User $index',
-                age: 20 + (index % 30),
-                nationality: [
-                  'Nigeria',
-                  'Ghana',
-                  'Ethiopia',
-                  'Kenya',
-                ][index % 4],
-                tribe: ['Yoruba', 'Akan', 'Amhara', 'Kikuyu'][index % 4],
-                latitude: 33.7490 + (index * 0.01),
-                longitude: -84.3880 + (index * 0.01),
-              ),);
+        100,
+        (index) => UserModel(
+          id: 'user_$index',
+          name: 'User $index',
+          age: 20 + (index % 30),
+          nationality: [
+            'Nigeria',
+            'Ghana',
+            'Ethiopia',
+            'Kenya',
+          ][index % 4],
+          tribe: ['Yoruba', 'Akan', 'Amhara', 'Kikuyu'][index % 4],
+          latitude: 33.7490 + (index * 0.01),
+          longitude: -84.3880 + (index * 0.01),
+        ),
+      );
 
       final currentUser = users.first;
 
@@ -52,15 +53,20 @@ void main() {
 
       // Performance assertions
       expect(matches.length, greaterThan(0));
-      expect(matchingDuration.inMilliseconds,
-          lessThan(1000),); // Should complete in < 1 second
+      expect(
+        matchingDuration.inMilliseconds,
+        lessThan(1000),
+      ); // Should complete in < 1 second
 
       final totalDuration = DateTime.now().difference(startTime);
-      expect(totalDuration.inMilliseconds,
-          lessThan(2000),); // Total test should complete in < 2 seconds
+      expect(
+        totalDuration.inMilliseconds,
+        lessThan(2000),
+      ); // Total test should complete in < 2 seconds
 
       print(
-          '✅ Matching performance: ${matchingDuration.inMilliseconds}ms for ${users.length} users',);
+        '✅ Matching performance: ${matchingDuration.inMilliseconds}ms for ${users.length} users',
+      );
     });
 
     test('App startup performance', () async {
@@ -69,7 +75,8 @@ void main() {
 
       // Simulate app initialization
       await Future.delayed(
-          const Duration(milliseconds: 100),); // Simulate initialization
+        const Duration(milliseconds: 100),
+      ); // Simulate initialization
 
       final endTime = DateTime.now();
       final startupDuration = endTime.difference(startTime);
@@ -93,8 +100,11 @@ void main() {
         final startTime = DateTime.now();
 
         // Simulate photo upload
-        await Future.delayed(Duration(
-            milliseconds: size ~/ (1024 * 100),),); // Simulate upload time
+        await Future.delayed(
+          Duration(
+            milliseconds: size ~/ (1024 * 100),
+          ),
+        ); // Simulate upload time
 
         final endTime = DateTime.now();
         final uploadDuration = endTime.difference(startTime);
@@ -103,7 +113,8 @@ void main() {
         expect(uploadDuration.inMilliseconds, lessThan(10000)); // < 10 seconds
 
         print(
-            '✅ Photo upload performance (${size ~/ (1024 * 1024)}MB): ${uploadDuration.inMilliseconds}ms',);
+          '✅ Photo upload performance (${size ~/ (1024 * 1024)}MB): ${uploadDuration.inMilliseconds}ms',
+        );
       }
     });
 
@@ -121,7 +132,8 @@ void main() {
         final startTime = DateTime.now();
 
         // Simulate database query
-        await Future.delayed(const Duration(milliseconds: 50)); // Simulate query time
+        await Future.delayed(
+            const Duration(milliseconds: 50)); // Simulate query time
 
         final endTime = DateTime.now();
         final queryDuration = endTime.difference(startTime);
@@ -130,7 +142,8 @@ void main() {
         expect(queryDuration.inMilliseconds, lessThan(500)); // < 500ms
 
         print(
-            '✅ Database query performance ($queryType): ${queryDuration.inMilliseconds}ms',);
+          '✅ Database query performance ($queryType): ${queryDuration.inMilliseconds}ms',
+        );
       }
     });
 
@@ -140,25 +153,32 @@ void main() {
 
       // Create and process large data set
       final largeUserList = List.generate(
-          1000,
-          (index) => UserModel(
-                id: 'user_$index',
-                name: 'User $index',
-                age: 20 + (index % 30),
-                nationality: 'Nigeria',
-                tribe: 'Yoruba',
-                imageUrl: List.generate(
-                    5, (i) => 'https://example.com/photo_${index}_$i.jpg',),
-              ),);
+        1000,
+        (index) => UserModel(
+          id: 'user_$index',
+          name: 'User $index',
+          age: 20 + (index % 30),
+          nationality: 'Nigeria',
+          tribe: 'Yoruba',
+          imageUrl: List.generate(
+            5,
+            (i) => 'https://example.com/photo_${index}_$i.jpg',
+          ),
+        ),
+      );
 
       // Process users
-      final processedUsers = largeUserList.map((user) => UserModel(
-          id: user.id,
-          name: user.name,
-          age: user.age,
-          nationality: user.nationality,
-          tribe: user.tribe,
-        ),).toList();
+      final processedUsers = largeUserList
+          .map(
+            (user) => UserModel(
+              id: user.id,
+              name: user.name,
+              age: user.age,
+              nationality: user.nationality,
+              tribe: user.tribe,
+            ),
+          )
+          .toList();
 
       final finalMemory = _getMemoryUsage();
       final memoryIncrease = finalMemory - initialMemory;
@@ -167,7 +187,8 @@ void main() {
       expect(memoryIncrease, lessThan(50 * 1024 * 1024)); // < 50MB
 
       print(
-          '✅ Memory usage: ${memoryIncrease ~/ (1024 * 1024)}MB increase for 1000 users',);
+        '✅ Memory usage: ${memoryIncrease ~/ (1024 * 1024)}MB increase for 1000 users',
+      );
     });
 
     test('Network performance across US regions', () async {
@@ -193,7 +214,8 @@ void main() {
         expect(networkDuration.inMilliseconds, lessThan(2000)); // < 2 seconds
 
         print(
-            '✅ Network performance (${region['name']}): ${networkDuration.inMilliseconds}ms',);
+          '✅ Network performance (${region['name']}): ${networkDuration.inMilliseconds}ms',
+        );
       }
     });
 
@@ -211,7 +233,8 @@ void main() {
 
         // Simulate message sending
         await Future.delayed(
-            Duration(milliseconds: size ~/ 100),); // Simulate send time
+          Duration(milliseconds: size ~/ 100),
+        ); // Simulate send time
 
         final endTime = DateTime.now();
         final messageDuration = endTime.difference(startTime);
@@ -220,7 +243,8 @@ void main() {
         expect(messageDuration.inMilliseconds, lessThan(1000)); // < 1 second
 
         print(
-            '✅ Message latency ($size chars): ${messageDuration.inMilliseconds}ms',);
+          '✅ Message latency ($size chars): ${messageDuration.inMilliseconds}ms',
+        );
       }
     });
 
@@ -230,37 +254,38 @@ void main() {
 
       // Create users with different cultural backgrounds
       final users = List.generate(
-          500,
-          (index) => UserModel(
-                id: 'user_$index',
-                name: 'User $index',
-                nationality: [
-                  'Nigeria',
-                  'Ghana',
-                  'Ethiopia',
-                  'Kenya',
-                  'South Africa',
-                ][index % 5],
-                tribe: [
-                  'Yoruba',
-                  'Akan',
-                  'Amhara',
-                  'Kikuyu',
-                  'Zulu',
-                ][index % 5],
-                religion: [
-                  'Christian',
-                  'Muslim',
-                  'Traditional',
-                  'Other',
-                ][index % 4],
-                languages: [
-                  ['English', 'Yoruba'],
-                  ['English', 'Swahili'],
-                  ['English', 'Amharic'],
-                  ['English', 'French'],
-                ][index % 4],
-              ),);
+        500,
+        (index) => UserModel(
+          id: 'user_$index',
+          name: 'User $index',
+          nationality: [
+            'Nigeria',
+            'Ghana',
+            'Ethiopia',
+            'Kenya',
+            'South Africa',
+          ][index % 5],
+          tribe: [
+            'Yoruba',
+            'Akan',
+            'Amhara',
+            'Kikuyu',
+            'Zulu',
+          ][index % 5],
+          religion: [
+            'Christian',
+            'Muslim',
+            'Traditional',
+            'Other',
+          ][index % 4],
+          languages: [
+            ['English', 'Yoruba'],
+            ['English', 'Swahili'],
+            ['English', 'Amharic'],
+            ['English', 'French'],
+          ][index % 4],
+        ),
+      );
 
       // Test cultural filtering
       final filteredUsers = users.where((user) {
@@ -284,7 +309,8 @@ void main() {
       expect(filteredUsers.length, greaterThan(0));
 
       print(
-          '✅ Cultural filtering performance: ${filteringDuration.inMilliseconds}ms for ${users.length} users',);
+        '✅ Cultural filtering performance: ${filteringDuration.inMilliseconds}ms for ${users.length} users',
+      );
     });
 
     test('Subscription flow performance', () async {
@@ -302,7 +328,8 @@ void main() {
 
         // Simulate subscription step
         await Future.delayed(
-            const Duration(milliseconds: 200),); // Simulate processing time
+          const Duration(milliseconds: 200),
+        ); // Simulate processing time
 
         final endTime = DateTime.now();
         final stepDuration = endTime.difference(startTime);
@@ -328,7 +355,8 @@ void main() {
         final startTime = DateTime.now();
 
         // Simulate background task
-        await Future.delayed(const Duration(milliseconds: 100)); // Simulate task time
+        await Future.delayed(
+            const Duration(milliseconds: 100)); // Simulate task time
 
         final endTime = DateTime.now();
         final taskDuration = endTime.difference(startTime);

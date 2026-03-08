@@ -69,131 +69,133 @@ class PeopleCard extends StatelessWidget {
           child: InkWell(
             onTap: onTap,
             child: Stack(
-            fit: StackFit.expand,
-            children: [
-              if (_photoUrl != null)
-                CachedNetworkImage(
-                  imageUrl: _photoUrl!,
-                  fit: BoxFit.cover,
-                  placeholder: (_, __) => Container(
-                    color: AppColors.primaryGreen.withValues(alpha: 0.08),
-                  ),
-                  errorWidget: (_, __, ___) => Container(
-                    color: AppColors.primaryGreen.withValues(alpha: 0.08),
-                    child: const Icon(Icons.person, size: 48, color: Colors.white54),
-                  ),
-                )
-              else
-                Container(
-                  color: AppColors.primaryGreen.withValues(alpha: 0.15),
-                  child: const Icon(Icons.person, size: 48, color: Colors.white54),
-                ),
-
-              // Bottom gradient
-              Positioned.fill(
-                child: DecoratedBox(
-                  decoration: BoxDecoration(
-                    gradient: LinearGradient(
-                      begin: Alignment.topCenter,
-                      end: Alignment.bottomCenter,
-                      stops: const [0.5, 1.0],
-                      colors: [
-                        Colors.transparent,
-                        Colors.black.withValues(alpha: 0.75),
-                      ],
+              fit: StackFit.expand,
+              children: [
+                if (_photoUrl != null)
+                  CachedNetworkImage(
+                    imageUrl: _photoUrl!,
+                    fit: BoxFit.cover,
+                    placeholder: (_, __) => Container(
+                      color: AppColors.primaryGreen.withValues(alpha: 0.08),
                     ),
-                  ),
-                ),
-              ),
-
-              // Heart icon
-              Positioned(
-                top: 10,
-                right: 10,
-                child: Container(
-                  width: 32,
-                  height: 32,
-                  decoration: BoxDecoration(
-                    color: Colors.white.withValues(alpha: 0.9),
-                    shape: BoxShape.circle,
-                  ),
-                  child: const Icon(
-                    Icons.favorite,
-                    size: 16,
-                    color: Color(0xFFE8475F),
-                  ),
-                ),
-              ),
-
-              // Bottom info
-              Positioned(
-                left: 10,
-                right: 10,
-                bottom: 12,
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    Row(
-                      children: [
-                        Text(
-                          _flagEmoji,
-                          style: const TextStyle(fontSize: 14),
-                        ),
-                        const SizedBox(width: 4),
-                        if (user.age != null)
-                          Text(
-                            '${user.age}',
-                            style: GoogleFonts.montserrat(
-                              fontSize: 13,
-                              fontWeight: FontWeight.w600,
-                              color: Colors.white,
-                            ),
-                          ),
-                      ],
+                    errorWidget: (_, __, ___) => ColoredBox(
+                      color: AppColors.primaryGreen.withValues(alpha: 0.08),
+                      child: const Icon(Icons.person,
+                          size: 48, color: Colors.white54,),
                     ),
-                    const SizedBox(height: 2),
-                    Text(
-                      user.name ?? 'Unknown',
-                      style: GoogleFonts.montserrat(
-                        fontSize: 16,
-                        fontWeight: FontWeight.w700,
-                        color: Colors.white,
-                      ),
-                      maxLines: 1,
-                      overflow: TextOverflow.ellipsis,
-                    ),
-                    if (_subtitle.isNotEmpty) ...[
-                      const SizedBox(height: 2),
-                      Row(
-                        children: [
-                          const Icon(
-                            Icons.location_on,
-                            size: 12,
-                            color: Colors.white70,
-                          ),
-                          const SizedBox(width: 2),
-                          Expanded(
-                            child: Text(
-                              _subtitle,
-                              style: GoogleFonts.montserrat(
-                                fontSize: 12,
-                                fontWeight: FontWeight.w400,
-                                color: Colors.white70,
-                              ),
-                              maxLines: 1,
-                              overflow: TextOverflow.ellipsis,
-                            ),
-                          ),
+                  )
+                else
+                  ColoredBox(
+                    color: AppColors.primaryGreen.withValues(alpha: 0.15),
+                    child: const Icon(Icons.person,
+                        size: 48, color: Colors.white54,),
+                  ),
+
+                // Bottom gradient
+                Positioned.fill(
+                  child: DecoratedBox(
+                    decoration: BoxDecoration(
+                      gradient: LinearGradient(
+                        begin: Alignment.topCenter,
+                        end: Alignment.bottomCenter,
+                        stops: const [0.5, 1.0],
+                        colors: [
+                          Colors.transparent,
+                          Colors.black.withValues(alpha: 0.75),
                         ],
                       ),
-                    ],
-                  ],
+                    ),
+                  ),
                 ),
-              ),
-            ],
+
+                // Heart icon
+                Positioned(
+                  top: 10,
+                  right: 10,
+                  child: Container(
+                    width: 32,
+                    height: 32,
+                    decoration: BoxDecoration(
+                      color: Colors.white.withValues(alpha: 0.9),
+                      shape: BoxShape.circle,
+                    ),
+                    child: const Icon(
+                      Icons.favorite,
+                      size: 16,
+                      color: Color(0xFFE8475F),
+                    ),
+                  ),
+                ),
+
+                // Bottom info
+                Positioned(
+                  left: 10,
+                  right: 10,
+                  bottom: 12,
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Row(
+                        children: [
+                          Text(
+                            _flagEmoji,
+                            style: const TextStyle(fontSize: 14),
+                          ),
+                          const SizedBox(width: 4),
+                          if (user.age != null)
+                            Text(
+                              '${user.age}',
+                              style: GoogleFonts.montserrat(
+                                fontSize: 13,
+                                fontWeight: FontWeight.w600,
+                                color: Colors.white,
+                              ),
+                            ),
+                        ],
+                      ),
+                      const SizedBox(height: 2),
+                      Text(
+                        user.name ?? 'Unknown',
+                        style: GoogleFonts.montserrat(
+                          fontSize: 16,
+                          fontWeight: FontWeight.w700,
+                          color: Colors.white,
+                        ),
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                      if (_subtitle.isNotEmpty) ...[
+                        const SizedBox(height: 2),
+                        Row(
+                          children: [
+                            const Icon(
+                              Icons.location_on,
+                              size: 12,
+                              color: Colors.white70,
+                            ),
+                            const SizedBox(width: 2),
+                            Expanded(
+                              child: Text(
+                                _subtitle,
+                                style: GoogleFonts.montserrat(
+                                  fontSize: 12,
+                                  fontWeight: FontWeight.w400,
+                                  color: Colors.white70,
+                                ),
+                                maxLines: 1,
+                                overflow: TextOverflow.ellipsis,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ],
+                    ],
+                  ),
+                ),
+              ],
+            ),
           ),
-        ),
         ),
       );
 }

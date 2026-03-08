@@ -15,7 +15,7 @@ import '../../../user/ui/widgets/user_info.dart';
 
 class ChatMessageRead {
   static List<Widget> messagesIsRead(
-    dynamic documentSnapshot,
+    documentSnapshot,
     UserModel second,
     UserModel sender,
     BuildContext context,

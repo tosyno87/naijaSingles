@@ -300,7 +300,8 @@ class _StreetViewButtonWigdetState extends State<StreetViewButtonWigdet> {
                                   child: Text(
                                     'Apply'.tr().toString(),
                                     style: const TextStyle(
-                                        color: AppColors.primaryGreen),
+                                      color: AppColors.primaryGreen,
+                                    ),
                                   ),
                                 )
                               else if (selectedOption == 'Only' &&
@@ -322,7 +323,8 @@ class _StreetViewButtonWigdetState extends State<StreetViewButtonWigdet> {
                                   child: Text(
                                     'Apply'.tr().toString(),
                                     style: const TextStyle(
-                                        color: AppColors.primaryGreen),
+                                      color: AppColors.primaryGreen,
+                                    ),
                                   ),
                                 ),
                             ],

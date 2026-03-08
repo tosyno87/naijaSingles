@@ -189,7 +189,8 @@ class ChatPageState extends State<ChatPage> {
                                 child: Text(
                                   'No'.tr().toString(),
                                   style: const TextStyle(
-                                      color: AppColors.primaryGreen),
+                                    color: AppColors.primaryGreen,
+                                  ),
                                 ),
                               ),
                               TextButton(
@@ -256,7 +257,8 @@ class ChatPageState extends State<ChatPage> {
                                 child: Text(
                                   'Yes'.tr().toString(),
                                   style: const TextStyle(
-                                      color: AppColors.primaryGreen),
+                                    color: AppColors.primaryGreen,
+                                  ),
                                 ),
                               ),
                             ],
@@ -314,7 +316,8 @@ class ChatPageState extends State<ChatPage> {
                             child: Text(
                               'No'.tr().toString(),
                               style: const TextStyle(
-                                  color: AppColors.primaryGreen),
+                                color: AppColors.primaryGreen,
+                              ),
                             ),
                           ),
                           TextButton(
@@ -352,7 +355,8 @@ class ChatPageState extends State<ChatPage> {
                             child: Text(
                               'Yes'.tr().toString(),
                               style: const TextStyle(
-                                  color: AppColors.primaryGreen),
+                                color: AppColors.primaryGreen,
+                              ),
                             ),
                           ),
                         ],

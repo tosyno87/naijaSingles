@@ -98,7 +98,8 @@ class ModeSpecificFilteringService {
   /// would trigger a Firestore duplicate-condition assertion.
   static Query _applyFriendshipFilters(Query query, UserModel currentUser) {
     debugPrint(
-        '🤝 Applying friendship-specific filters (age handled by base query)');
+      '🤝 Applying friendship-specific filters (age handled by base query)',
+    );
     return query;
   }
 
@@ -106,7 +107,8 @@ class ModeSpecificFilteringService {
   /// Age range is already applied by _buildOptimizedQuery.
   static Query _applyNetworkingFilters(Query query, UserModel currentUser) {
     debugPrint(
-        '💼 Applying networking-specific filters (age handled by base query)');
+      '💼 Applying networking-specific filters (age handled by base query)',
+    );
     return query;
   }
 

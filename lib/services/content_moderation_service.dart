@@ -350,7 +350,7 @@ class ContentModerationService {
     }
 
     // Check if any word appears more than 3 times
-    return wordCounts.values.any((count) => count > 3);
+    return wordCounts.values.any((n) => n > 3);
   }
 
   /// Check for all caps

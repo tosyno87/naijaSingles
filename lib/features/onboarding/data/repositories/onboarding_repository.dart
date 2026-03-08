@@ -169,12 +169,12 @@ class OnboardingRepository {
       'showGender': d.interestedIn,
       'ageRange': {
         'min': d.ageRange[0].toString(),
-        'max': d.ageRange[1].toString()
+        'max': d.ageRange[1].toString(),
       },
       'userGender': d.gender,
       'age_range': {
         'min': d.ageRange[0].toString(),
-        'max': d.ageRange[1].toString()
+        'max': d.ageRange[1].toString(),
       },
       'maximum_distance': d.maxDistance,
       'maxDistance': d.maxDistance,

@@ -951,8 +951,10 @@ class _AccountDeletionScreenState extends State<AccountDeletionScreen> {
           actions: [
             TextButton(
               onPressed: () => Navigator.pop(ctx),
-              child: Text('Cancel',
-                  style: GoogleFonts.montserrat(color: textSecondary)),
+              child: Text(
+                'Cancel',
+                style: GoogleFonts.montserrat(color: textSecondary),
+              ),
             ),
             ElevatedButton(
               onPressed: _isSendingReauthCode
@@ -967,10 +969,14 @@ class _AccountDeletionScreenState extends State<AccountDeletionScreen> {
                       width: 20,
                       height: 20,
                       child: CircularProgressIndicator(
-                          strokeWidth: 2, color: Colors.white),
+                        strokeWidth: 2,
+                        color: Colors.white,
+                      ),
                     )
-                  : Text('Send code',
-                      style: GoogleFonts.montserrat(color: Colors.white)),
+                  : Text(
+                      'Send code',
+                      style: GoogleFonts.montserrat(color: Colors.white),
+                    ),
             ),
           ],
         ),
@@ -981,9 +987,11 @@ class _AccountDeletionScreenState extends State<AccountDeletionScreen> {
   Future<void> _sendReauthCode(User user) async {
     final phone = user.phoneNumber?.trim();
     if (phone == null || phone.isEmpty) {
-      if (mounted)
+      if (mounted) {
         _showSnackBar(
-            'Phone number not found. Please sign out and sign back in.');
+          'Phone number not found. Please sign out and sign back in.',
+        );
+      }
       return;
     }
     setState(() => _isSendingReauthCode = true);
@@ -998,8 +1006,9 @@ class _AccountDeletionScreenState extends State<AccountDeletionScreen> {
             await _performDeletionAfterReauth(user);
           } on Object catch (e) {
             log('❌ Re-auth verificationCompleted error: $e');
-            if (mounted)
+            if (mounted) {
               _showSnackBar('Verification failed. Please try again.');
+            }
           }
         },
         codeSent: (String verificationId, int? resendToken) {
@@ -1041,7 +1050,9 @@ class _AccountDeletionScreenState extends State<AccountDeletionScreen> {
           title: Text(
             'Enter verification code',
             style: GoogleFonts.montserrat(
-                fontWeight: FontWeight.w600, color: textPrimary),
+              fontWeight: FontWeight.w600,
+              color: textPrimary,
+            ),
           ),
           content: Column(
             mainAxisSize: MainAxisSize.min,
@@ -1073,8 +1084,10 @@ class _AccountDeletionScreenState extends State<AccountDeletionScreen> {
           actions: [
             TextButton(
               onPressed: () => Navigator.pop(ctx),
-              child: Text('Cancel',
-                  style: GoogleFonts.montserrat(color: textSecondary)),
+              child: Text(
+                'Cancel',
+                style: GoogleFonts.montserrat(color: textSecondary),
+              ),
             ),
             ElevatedButton(
               onPressed: () async {
@@ -1096,13 +1109,16 @@ class _AccountDeletionScreenState extends State<AccountDeletionScreen> {
                 } on Object catch (e) {
                   log('❌ Re-auth OTP error: $e');
                   setState(() => _isDeleting = false);
-                  if (mounted)
+                  if (mounted) {
                     _showSnackBar('Invalid or expired code. Please try again.');
+                  }
                 }
               },
               style: ElevatedButton.styleFrom(backgroundColor: primaryColor),
-              child: Text('Verify and delete',
-                  style: GoogleFonts.montserrat(color: Colors.white)),
+              child: Text(
+                'Verify and delete',
+                style: GoogleFonts.montserrat(color: Colors.white),
+              ),
             ),
           ],
         ),
@@ -1128,8 +1144,9 @@ class _AccountDeletionScreenState extends State<AccountDeletionScreen> {
       log('❌ Error in _performDeletionAfterReauth: $e');
       AccountDeletionScope.inProgress = false;
       setState(() => _isDeleting = false);
-      if (mounted)
+      if (mounted) {
         _showSnackBar('Failed to complete deletion. Please try again.');
+      }
     }
   }
 
@@ -1215,8 +1232,11 @@ class _AccountDeletionScreenState extends State<AccountDeletionScreen> {
                   color: errorColor.withValues(alpha: 0.1),
                   shape: BoxShape.circle,
                 ),
-                child: const Icon(Icons.delete_forever,
-                    color: errorColor, size: 40),
+                child: const Icon(
+                  Icons.delete_forever,
+                  color: errorColor,
+                  size: 40,
+                ),
               ),
               const SizedBox(height: 16),
               Text(
@@ -1251,8 +1271,11 @@ class _AccountDeletionScreenState extends State<AccountDeletionScreen> {
                 ),
                 child: Row(
                   children: [
-                    const Icon(Icons.warning_amber_rounded,
-                        color: errorColor, size: 20),
+                    const Icon(
+                      Icons.warning_amber_rounded,
+                      color: errorColor,
+                      size: 20,
+                    ),
                     const SizedBox(width: 8),
                     Expanded(
                       child: Text(
@@ -1287,13 +1310,16 @@ class _AccountDeletionScreenState extends State<AccountDeletionScreen> {
                   foregroundColor: Colors.white,
                   padding: const EdgeInsets.symmetric(vertical: 12),
                   shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(12)),
+                    borderRadius: BorderRadius.circular(12),
+                  ),
                   elevation: 0,
                 ),
                 child: Text(
                   'Got it',
                   style: GoogleFonts.montserrat(
-                      fontWeight: FontWeight.w600, fontSize: 16),
+                    fontWeight: FontWeight.w600,
+                    fontSize: 16,
+                  ),
                 ),
               ),
             ),

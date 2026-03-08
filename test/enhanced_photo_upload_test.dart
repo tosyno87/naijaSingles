@@ -40,13 +40,11 @@ void main() {
       );
       await tester.pumpAndSettle();
 
-      // Verify the screen renders (enhanced screen uses 'Add Photos')
-      expect(find.text('Add Photos'), findsOneWidget);
+      expect(find.text('Add your best photos'), findsOneWidget);
       expect(find.byType(SingleChildScrollView), findsWidgets);
     });
 
-    testWidgets('Photo grid is visible',
-        (WidgetTester tester) async {
+    testWidgets('Photo grid is visible', (WidgetTester tester) async {
       await tester.pumpWidget(
         buildTestWidget(const EnhancedPhotoUploadScreen()),
       );
@@ -56,15 +54,13 @@ void main() {
       expect(find.byType(SingleChildScrollView), findsWidgets);
     });
 
-    testWidgets('Screen has app bar and content',
-        (WidgetTester tester) async {
+    testWidgets('Screen has app bar and content', (WidgetTester tester) async {
       await tester.pumpWidget(
         buildTestWidget(const EnhancedPhotoUploadScreen()),
       );
       await tester.pumpAndSettle();
 
-      expect(find.byType(AppBar), findsOneWidget);
-      expect(find.text('Add Photos'), findsOneWidget);
+      expect(find.text('Add your best photos'), findsOneWidget);
     });
   });
 

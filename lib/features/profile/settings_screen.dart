@@ -77,10 +77,12 @@ class _SettingsScreenState extends State<SettingsScreen> {
                   title: 'Edit Profile',
                   subtitle: 'Update your photos and info',
                   onTap: () {
-                    unawaited(Navigator.pushNamed(
-                      context,
-                      RouteName.editProfileScreen,
-                    ),);
+                    unawaited(
+                      Navigator.pushNamed(
+                        context,
+                        RouteName.editProfileScreen,
+                      ),
+                    );
                   },
                 ),
                 if (_canManagePassword) ...[
@@ -770,8 +772,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                               Navigator.push(
                                 context,
                                 MaterialPageRoute(
-                                  builder: (_) =>
-                                      const AccountDeletionScreen(),
+                                  builder: (_) => const AccountDeletionScreen(),
                                 ),
                               ),
                             );

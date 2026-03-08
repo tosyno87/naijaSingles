@@ -203,8 +203,7 @@ class _GroupChatScreenState extends State<GroupChatScreen> {
                   );
                 }
 
-                final currentUid =
-                    FirebaseAuth.instance.currentUser?.uid;
+                final currentUid = FirebaseAuth.instance.currentUser?.uid;
 
                 return ListView.builder(
                   reverse: true,
@@ -232,9 +231,7 @@ class _GroupChatScreenState extends State<GroupChatScreen> {
                         backgroundColor: AppColors.primaryGreenLight,
                         child: Text(
                           message.senderId.isNotEmpty
-                              ? message.senderId
-                                  .substring(0, 1)
-                                  .toUpperCase()
+                              ? message.senderId.substring(0, 1).toUpperCase()
                               : '?',
                           style: const TextStyle(
                             color: Colors.white,

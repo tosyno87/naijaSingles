@@ -322,16 +322,16 @@ class EventAnalyticsService {
       }
 
       final totalViews =
-          userAnalytics.fold(0, (sum, analytics) => sum + analytics.totalViews);
+          userAnalytics.fold(0, (acc, analytics) => acc + analytics.totalViews);
       final totalRSVPs =
-          userAnalytics.fold(0, (sum, analytics) => sum + analytics.totalRSVPs);
+          userAnalytics.fold(0, (acc, analytics) => acc + analytics.totalRSVPs);
       final totalShares = userAnalytics.fold(
         0,
-        (sum, analytics) => sum + analytics.totalShares,
+        (acc, analytics) => acc + analytics.totalShares,
       );
-      final averageConversionRate = userAnalytics.fold(
-            0.0,
-            (sum, analytics) => sum + analytics.conversionRate,
+      final averageConversionRate = userAnalytics.fold<double>(
+            0,
+            (acc, analytics) => acc + analytics.conversionRate,
           ) /
           userAnalytics.length;
       final topPerformingEvent =

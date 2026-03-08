@@ -8,10 +8,13 @@ import 'package:flutter_test/flutter_test.dart';
 /// producing sub-pixel diffs (~0.3 %). A 0.5 % threshold absorbs these while
 /// still catching real visual regressions.
 Future<void> testExecutable(Future<void> Function() testMain) async {
-  goldenFileComparator = _TolerantLocalFileComparator(
-    Uri.parse('test'),
-    tolerance: 0.005,
-  );
+  final existing = goldenFileComparator;
+  if (existing is LocalFileComparator) {
+    goldenFileComparator = _TolerantLocalFileComparator(
+      existing.basedir,
+      tolerance: 0.005,
+    );
+  }
   await testMain();
 }
 

@@ -214,8 +214,11 @@ class _LanguageSettingsScreenState extends State<LanguageSettingsScreen> {
                 ),
                 child: Row(
                   children: [
-                    const Icon(Icons.info_outline,
-                        color: primaryColor, size: 20),
+                    const Icon(
+                      Icons.info_outline,
+                      color: primaryColor,
+                      size: 20,
+                    ),
                     const SizedBox(width: 8),
                     Expanded(
                       child: Text(

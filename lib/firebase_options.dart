@@ -174,7 +174,8 @@ class FirebaseEmulators {
         unawaited(FirebaseAuth.instance.useAuthEmulator('localhost', 9099));
 
         unawaited(
-            FirebaseStorage.instance.useStorageEmulator('localhost', 9199));
+          FirebaseStorage.instance.useStorageEmulator('localhost', 9199),
+        );
 
         debugPrint('🔥 Connected to Firebase emulators');
       } on Object catch (e) {

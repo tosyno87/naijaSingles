@@ -172,9 +172,7 @@ class _PrivacySettingsScreenState extends State<PrivacySettingsScreen> {
             ),
             const SizedBox(height: 12),
             _buildCommunicationSection(),
-
             const SizedBox(height: 28),
-
             _buildSectionHeader(
               Icons.visibility_outlined,
               'Activity Status',
@@ -182,9 +180,7 @@ class _PrivacySettingsScreenState extends State<PrivacySettingsScreen> {
             ),
             const SizedBox(height: 12),
             _buildActivitySection(),
-
             const SizedBox(height: 28),
-
             _buildSectionHeader(
               Icons.person_outline_rounded,
               'Profile Visibility',
@@ -192,9 +188,7 @@ class _PrivacySettingsScreenState extends State<PrivacySettingsScreen> {
             ),
             const SizedBox(height: 12),
             _buildProfileVisibilitySection(),
-
             const SizedBox(height: 28),
-
             _buildSectionHeader(
               Icons.location_on_outlined,
               'Location Privacy',
@@ -202,10 +196,8 @@ class _PrivacySettingsScreenState extends State<PrivacySettingsScreen> {
             ),
             const SizedBox(height: 12),
             _buildLocationPrivacySection(),
-
             const SizedBox(height: 28),
             _buildPrivacySummary(),
-
             const SizedBox(height: 100),
           ],
         ),
@@ -321,8 +313,7 @@ class _PrivacySettingsScreenState extends State<PrivacySettingsScreen> {
             'Only matched users can message you',
             _settings.allowMessagesFromMatches,
             (value) => setState(() {
-              _settings =
-                  _settings.copyWith(allowMessagesFromMatches: value);
+              _settings = _settings.copyWith(allowMessagesFromMatches: value);
             }),
           ),
         ],

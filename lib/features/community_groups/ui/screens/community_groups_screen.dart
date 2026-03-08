@@ -120,7 +120,7 @@ class _CommunityGroupsScreenState extends State<CommunityGroupsScreen> {
         floatingActionButton: FloatingActionButton.extended(
           heroTag: 'community_groups_fab',
           onPressed: () {
-            // TODO: Navigate to create group screen
+            // TODO(dev): Navigate to create group screen
             ScaffoldMessenger.of(context).showSnackBar(
               const SnackBar(
                 content: Text('Create Group feature coming soon!'),

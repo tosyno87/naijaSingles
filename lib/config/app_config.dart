@@ -42,6 +42,7 @@ String get googleMapsKey {
   }
   return key;
 }
+
 //for support to user add you mail
 const adminMail = 'support@naijasingles.com';
 // add bucket id from firebase or google-services-json

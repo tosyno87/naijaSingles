@@ -190,7 +190,7 @@ class UserEventService {
       final eventById = <String, EnhancedEventModel>{};
       for (final doc in [
         ...createdByQuerySnapshot.docs,
-        ...creatorQuerySnapshot.docs
+        ...creatorQuerySnapshot.docs,
       ]) {
         final event = EnhancedEventModel.fromFirestoreJson(
           doc.data() as Map<String, dynamic>,

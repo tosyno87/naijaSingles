@@ -362,8 +362,8 @@ class ProductsState extends State<Products> {
                                                                         .first
                                                                         .billingPeriod
                                                                         .split(
-                                                                        '',
-                                                                      )[1] ??
+                                                                      '',
+                                                                    )[1] ??
                                                                     '',
                                                             price:
                                                                 product.price,
@@ -382,27 +382,29 @@ class ProductsState extends State<Products> {
                                         ),
                                       ),
                                       if (selectedProduct != null)
-                                        Builder(builder: (context) {
-                                          final product = selectedProduct;
-                                          if (product == null) {
-                                            return const SizedBox.shrink();
-                                          }
-                                          return Center(
-                                            child: ListTile(
-                                              title: Text(
-                                                product.title,
-                                                textAlign: TextAlign.center,
+                                        Builder(
+                                          builder: (context) {
+                                            final product = selectedProduct;
+                                            if (product == null) {
+                                              return const SizedBox.shrink();
+                                            }
+                                            return Center(
+                                              child: ListTile(
+                                                title: Text(
+                                                  product.title,
+                                                  textAlign: TextAlign.center,
+                                                ),
+                                                subtitle: Text(
+                                                  product.description,
+                                                  textAlign: TextAlign.center,
+                                                ),
+                                                trailing: Text(
+                                                  '${state.result.indexOf(product) + 1}/${state.result.length}',
+                                                ),
                                               ),
-                                              subtitle: Text(
-                                                product.description,
-                                                textAlign: TextAlign.center,
-                                              ),
-                                              trailing: Text(
-                                                '${state.result.indexOf(product) + 1}/${state.result.length}',
-                                              ),
-                                            ),
-                                          );
-                                        })
+                                            );
+                                          },
+                                        )
                                       else
                                         Center(
                                           child: ListTile(

@@ -159,7 +159,8 @@ class _PrivacyMigrationScreenState extends State<PrivacyMigrationScreen> {
                 ),
                 borderRadius: BorderRadius.circular(16),
                 border: Border.all(
-                    color: AppColors.primaryGreen.withValues(alpha: 0.3)),
+                  color: AppColors.primaryGreen.withValues(alpha: 0.3),
+                ),
               ),
               child: Column(
                 children: [

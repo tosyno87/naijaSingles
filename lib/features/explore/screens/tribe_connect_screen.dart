@@ -7,6 +7,7 @@ import 'package:google_fonts/google_fonts.dart';
 
 import '../../../common/constants/app_colors.dart';
 import '../../../common/data/repo/user_search_repo.dart';
+import '../../../common/widgets/state_views/state_views.dart';
 import '../../../models/user_model.dart';
 import '../../../services/super_like_service.dart';
 import '../widgets/hinge_profile_card.dart';
@@ -33,10 +34,12 @@ class _TribeConnectScreenState extends State<TribeConnectScreen> {
   bool _isRefreshing = false;
 
   List<UserModel> get _availableUsers => widget.users
-      .where((user) =>
-          user.id != null &&
-          user.id!.isNotEmpty &&
-          !_processedUserIds.contains(user.id))
+      .where(
+        (user) =>
+            user.id != null &&
+            user.id!.isNotEmpty &&
+            !_processedUserIds.contains(user.id),
+      )
       .toList();
 
   UserModel? get _currentProfile =>
@@ -93,62 +96,12 @@ class _TribeConnectScreenState extends State<TribeConnectScreen> {
     );
   }
 
-  Widget _buildEmptyState() => Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            _buildEmptyStateIcon(),
-            const SizedBox(height: 24),
-            Text(
-              'No More Profiles',
-              style: GoogleFonts.montserrat(
-                fontSize: 24,
-                fontWeight: FontWeight.w600,
-                color: AppColors.textPrimary,
-              ),
-            ),
-            const SizedBox(height: 12),
-            Text(
-              'You\'ve seen all available profiles in your area.\nCheck back later for new connections!',
-              style: GoogleFonts.montserrat(
-                fontSize: 16,
-                fontWeight: FontWeight.w400,
-                color: AppColors.textSecondary,
-              ),
-              textAlign: TextAlign.center,
-            ),
-            const SizedBox(height: 32),
-            ElevatedButton(
-              onPressed: _isRefreshing ? null : _refreshUsers,
-              style: ElevatedButton.styleFrom(
-                backgroundColor: AppColors.primaryGreen,
-                foregroundColor: Colors.white,
-                disabledBackgroundColor: AppColors.primaryGreen.withAlpha(120),
-                padding:
-                    const EdgeInsets.symmetric(horizontal: 32, vertical: 16),
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(24),
-                ),
-              ),
-              child: _isRefreshing
-                  ? const SizedBox(
-                      height: 20,
-                      width: 20,
-                      child: CircularProgressIndicator(
-                        strokeWidth: 2,
-                        color: Colors.white,
-                      ),
-                    )
-                  : Text(
-                      'Refresh',
-                      style: GoogleFonts.montserrat(
-                        fontSize: 16,
-                        fontWeight: FontWeight.w600,
-                      ),
-                    ),
-            ),
-          ],
-        ),
+  Widget _buildEmptyState() => AppEmptyView(
+        title: 'No More Profiles',
+        subtitle: 'You\'ve seen all available profiles. Check back later!',
+        icon: Icons.explore_off,
+        actionLabel: 'Refresh',
+        onAction: _isRefreshing ? null : _refreshUsers,
       );
 
   Widget _buildToolbarIcon(IconData icon) => Container(
@@ -177,33 +130,6 @@ class _TribeConnectScreenState extends State<TribeConnectScreen> {
         ),
       );
 
-  Widget _buildEmptyStateIcon() => Container(
-        width: 92,
-        height: 92,
-        decoration: BoxDecoration(
-          borderRadius: BorderRadius.circular(28),
-          gradient: const LinearGradient(
-            colors: [Color(0xFF0F9D58), Color(0xFF007A39)],
-            begin: Alignment.topLeft,
-            end: Alignment.bottomRight,
-          ),
-          boxShadow: [
-            BoxShadow(
-              color: const Color(0xFF0F9D58).withValues(alpha: 0.28),
-              blurRadius: 18,
-              offset: const Offset(0, 8),
-            ),
-          ],
-        ),
-        child: const Center(
-          child: FaIcon(
-            FontAwesomeIcons.userGroup,
-            size: 38,
-            color: Colors.white,
-          ),
-        ),
-      );
-
   Future<void> _refreshUsers() async {
     setState(() {
       _isRefreshing = true;
@@ -227,7 +153,7 @@ class _TribeConnectScreenState extends State<TribeConnectScreen> {
         builder: (context) => _ConnectFilterSheet(
           currentUser: widget.currentUser,
           onApply: () async {
-            setState(() => _processedUserIds.clear());
+            setState(_processedUserIds.clear);
             await widget.onFiltersApplied?.call();
           },
         ),
@@ -277,7 +203,10 @@ class _TribeConnectScreenState extends State<TribeConnectScreen> {
   Future<void> _handleSuperLike(UserModel user) async {
     final uid = user.id;
     final currentUid = widget.currentUser.id;
-    if (uid == null || uid.isEmpty || currentUid == null || currentUid.isEmpty) {
+    if (uid == null ||
+        uid.isEmpty ||
+        currentUid == null ||
+        currentUid.isEmpty) {
       return;
     }
 
@@ -285,8 +214,9 @@ class _TribeConnectScreenState extends State<TribeConnectScreen> {
       setState(() => _processedUserIds.add(uid));
 
       final fromUser = widget.currentUser;
-      final firstPhoto =
-          (fromUser.imageUrl?.isNotEmpty ?? false) ? fromUser.imageUrl![0] : null;
+      final firstPhoto = (fromUser.imageUrl?.isNotEmpty ?? false)
+          ? fromUser.imageUrl![0]
+          : null;
 
       final result = await _superLikeService.sendSuperLike(
         fromUserId: currentUid,

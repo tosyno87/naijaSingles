@@ -344,7 +344,7 @@ class GroupInfoModal extends StatelessWidget {
           _buildSettingRow(
             icon: Icons.person_add,
             label: 'Member Approval',
-            value: 'Not required', // TODO: Add to model
+            value: 'Not required', // TODO(dev): Add to model
             valueColor: Colors.green,
           ),
         ],
@@ -411,7 +411,7 @@ class GroupInfoModal extends StatelessWidget {
                 child: _buildStatCard(
                   icon: Icons.chat_bubble,
                   label: 'Messages',
-                  value: '0', // TODO: Add message count
+                  value: '0', // TODO(dev): Add message count
                   color: Colors.blue,
                 ),
               ),

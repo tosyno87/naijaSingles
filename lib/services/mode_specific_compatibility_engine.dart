@@ -103,8 +103,7 @@ class ModeSpecificCompatibilityEngine {
     MatchConfig config,
   ) {
     final w = config.networkingWeights;
-    final professionalScore =
-        _calculateProfessionalCompatibility(user1, user2);
+    final professionalScore = _calculateProfessionalCompatibility(user1, user2);
     final industryScore = _calculateIndustryCompatibility(user1, user2);
     final locationScore = _calculateLocationScore(user1, user2, config);
     final completenessScore = _calculateCompletenessScore(user1, user2);
@@ -157,7 +156,8 @@ class ModeSpecificCompatibilityEngine {
       if (distanceMiles <= perfect) {
         return 1;
       } else if (distanceMiles <= decay) {
-        return 1.0 - ((distanceMiles - perfect) / (decay - perfect)) * (1.0 - floor);
+        return 1.0 -
+            ((distanceMiles - perfect) / (decay - perfect)) * (1.0 - floor);
       } else {
         return floor;
       }
@@ -252,10 +252,9 @@ class ModeSpecificCompatibilityEngine {
           user1.tribe!.isNotEmpty &&
           user2.tribe != null &&
           user2.tribe!.isNotEmpty) {
-        totalScore +=
-            user1.tribe!.toLowerCase() == user2.tribe!.toLowerCase()
-                ? 1.0
-                : 0.4;
+        totalScore += user1.tribe!.toLowerCase() == user2.tribe!.toLowerCase()
+            ? 1.0
+            : 0.4;
         dimensions++;
       }
 
@@ -264,10 +263,10 @@ class ModeSpecificCompatibilityEngine {
           user1.nationality!.isNotEmpty &&
           user2.nationality != null &&
           user2.nationality!.isNotEmpty) {
-        totalScore += user1.nationality!.toLowerCase() ==
-                user2.nationality!.toLowerCase()
-            ? 1.0
-            : 0.5;
+        totalScore +=
+            user1.nationality!.toLowerCase() == user2.nationality!.toLowerCase()
+                ? 1.0
+                : 0.5;
         dimensions++;
       }
 
@@ -309,10 +308,10 @@ class ModeSpecificCompatibilityEngine {
           user1.education!.isNotEmpty &&
           user2.education != null &&
           user2.education!.isNotEmpty) {
-        totalScore += user1.education!.toLowerCase() ==
-                user2.education!.toLowerCase()
-            ? 1.0
-            : 0.5;
+        totalScore +=
+            user1.education!.toLowerCase() == user2.education!.toLowerCase()
+                ? 1.0
+                : 0.5;
         dimensions++;
       }
 
@@ -417,8 +416,9 @@ class ModeSpecificCompatibilityEngine {
       }
 
       final jaccard = intersection.length / union.length;
-      final sharedBoost =
-          intersection.length >= 3 ? 0.2 : (intersection.length >= 2 ? 0.1 : 0.0);
+      final sharedBoost = intersection.length >= 3
+          ? 0.2
+          : (intersection.length >= 2 ? 0.1 : 0.0);
 
       return (jaccard + sharedBoost).clamp(0.0, 1.0);
     } on Object catch (e) {
@@ -537,7 +537,8 @@ class ModeSpecificCompatibilityEngine {
         final w = config.datingWeights;
         return {
           'age': _calculateAgeCompatibility(user1, user2) * w.age,
-          'location': _calculateLocationScore(user1, user2, config) * w.location,
+          'location':
+              _calculateLocationScore(user1, user2, config) * w.location,
           'lifestyle':
               _calculateLifestyleCompatibility(user1, user2) * w.lifestyle,
           'interest': _calculateInterestScore(user1, user2) * w.interest,
@@ -549,7 +550,8 @@ class ModeSpecificCompatibilityEngine {
         return {
           'social': _calculateSocialCompatibility(user1, user2) * w.social,
           'interest': _calculateInterestScore(user1, user2) * w.interest,
-          'location': _calculateLocationScore(user1, user2, config) * w.location,
+          'location':
+              _calculateLocationScore(user1, user2, config) * w.location,
           'age': _calculateAgeCompatibility(user1, user2) * w.age,
           'completeness':
               _calculateCompletenessScore(user1, user2) * w.completeness,
@@ -557,12 +559,12 @@ class ModeSpecificCompatibilityEngine {
       case 'Networking':
         final w = config.networkingWeights;
         return {
-          'professional':
-              _calculateProfessionalCompatibility(user1, user2) *
-                  w.professional,
+          'professional': _calculateProfessionalCompatibility(user1, user2) *
+              w.professional,
           'industry':
               _calculateIndustryCompatibility(user1, user2) * w.industry,
-          'location': _calculateLocationScore(user1, user2, config) * w.location,
+          'location':
+              _calculateLocationScore(user1, user2, config) * w.location,
           'completeness':
               _calculateCompletenessScore(user1, user2) * w.completeness,
         };

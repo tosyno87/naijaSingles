@@ -522,7 +522,7 @@ class DashedBorderPainter extends CustomPainter {
       ..style = PaintingStyle.stroke;
 
     // Draw top line
-    _drawDashedLine(canvas, paint, const Offset(0, 0), Offset(size.width, 0));
+    _drawDashedLine(canvas, paint, Offset.zero, Offset(size.width, 0));
 
     // Draw right line
     _drawDashedLine(
@@ -541,7 +541,7 @@ class DashedBorderPainter extends CustomPainter {
     );
 
     // Draw left line
-    _drawDashedLine(canvas, paint, Offset(0, size.height), const Offset(0, 0));
+    _drawDashedLine(canvas, paint, Offset(0, size.height), Offset.zero);
   }
 
   void _drawDashedLine(Canvas canvas, Paint paint, Offset start, Offset end) {

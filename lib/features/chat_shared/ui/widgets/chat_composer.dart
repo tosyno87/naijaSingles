@@ -91,8 +91,7 @@ class ChatComposer extends StatelessWidget {
                   maxLines: maxLines,
                   minLines: 1,
                   textCapitalization: TextCapitalization.sentences,
-                  textInputAction:
-                      submitOnEnter ? TextInputAction.send : null,
+                  textInputAction: submitOnEnter ? TextInputAction.send : null,
                   onSubmitted: submitOnEnter ? (_) => onSend() : null,
                 ),
               ),

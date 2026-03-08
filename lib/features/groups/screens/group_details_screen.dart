@@ -187,7 +187,7 @@ class _GroupDetailsScreenState extends State<GroupDetailsScreen> {
               itemCount: 3, // Show 3 shimmer messages
               itemBuilder: (context, index) => MessageShimmer(
                 isCurrentUser:
-                    index % 2 == 0, // Alternate between user and other
+                    index.isEven, // Alternate between user and other
               ),
             );
           }

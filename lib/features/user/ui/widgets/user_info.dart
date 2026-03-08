@@ -169,8 +169,10 @@ class _InfoState extends State<Info> {
                           if (widget.user.editInfo!['job_title'] != null)
                             ListTile(
                               dense: true,
-                              leading: const Icon(Icons.work,
-                                  color: AppColors.primaryGreen),
+                              leading: const Icon(
+                                Icons.work,
+                                color: AppColors.primaryGreen,
+                              ),
                               title: Text(
                                 "${widget.user.editInfo!['job_title'].toString().trim()} ${widget.user.editInfo!['company'] != null ? 'at ${widget.user.editInfo!['company'].toString().trim()}' : ''}",
                                 style: const TextStyle(
@@ -185,8 +187,10 @@ class _InfoState extends State<Info> {
                           if (widget.user.editInfo!['university'] != null)
                             ListTile(
                               dense: true,
-                              leading: const Icon(Icons.stars,
-                                  color: AppColors.primaryGreen),
+                              leading: const Icon(
+                                Icons.stars,
+                                color: AppColors.primaryGreen,
+                              ),
                               title: Text(
                                 widget.user.editInfo!['university']
                                     .toString()
@@ -203,8 +207,10 @@ class _InfoState extends State<Info> {
                           if (widget.user.editInfo!['living_in'] != null)
                             ListTile(
                               dense: true,
-                              leading: const Icon(Icons.home,
-                                  color: AppColors.primaryGreen),
+                              leading: const Icon(
+                                Icons.home,
+                                color: AppColors.primaryGreen,
+                              ),
                               title: const Text(
                                 'Living in ',
                                 style: TextStyle(

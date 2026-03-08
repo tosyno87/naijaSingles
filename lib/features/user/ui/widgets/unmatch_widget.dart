@@ -30,7 +30,9 @@ class UnMatcheWidget extends StatelessWidget {
               title: Text(
                 'Unmatch'.tr().toString(),
                 style: const TextStyle(
-                    fontSize: 18, color: AppColors.primaryGreen),
+                  fontSize: 18,
+                  color: AppColors.primaryGreen,
+                ),
               ),
               content: Text(
                 'Do you want to unmatch with'

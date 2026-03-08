@@ -214,12 +214,14 @@ class EventSearchService {
 
   /// Filter events by tags
   List<EventModel> _filterByTags(List<EventModel> events, List<String> tags) =>
-      events.where((event) {
-        // Check if event has any of the specified tags
-        return tags.any(
-          (tag) => event.category.toLowerCase().contains(tag.toLowerCase()),
-        );
-      }).toList();
+      events
+          .where(
+            (event) => tags.any(
+              (tag) =>
+                  event.category.toLowerCase().contains(tag.toLowerCase()),
+            ),
+          )
+          .toList();
 
   /// Score events based on user interests
   List<ScoredEvent> _scoreEventsByInterests(

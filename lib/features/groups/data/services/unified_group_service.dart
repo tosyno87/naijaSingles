@@ -509,7 +509,9 @@ class UnifiedGroupService {
       final groups = snapshot.docs
           .map(
             (doc) => UnifiedGroup.fromMap(
-                doc.id, doc.data() as Map<String, dynamic>),
+              doc.id,
+              doc.data() as Map<String, dynamic>,
+            ),
           )
           .toList();
 

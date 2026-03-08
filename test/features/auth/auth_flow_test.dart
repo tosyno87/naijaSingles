@@ -140,6 +140,9 @@ void main() {
           profilePhotos: [File('dummy.jpg'), ...List<File?>.filled(8, null)],
           locationName: 'London, UK',
           nationality: 'Ghana',
+          interestedIn: '',
+          lookingFor: '',
+          relationshipIntent: '',
         );
 
     testWidgets(

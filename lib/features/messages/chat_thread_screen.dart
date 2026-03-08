@@ -1141,61 +1141,62 @@ class _ChatThreadScreenState extends State<ChatThreadScreen> {
       }
     }
 
-    unawaited(showDialog(
-      context: context,
-      barrierDismissible: false,
-      builder: (dialogContext) {
-        dialogNav = Navigator.of(dialogContext);
-        dialogOpen = true;
-        if (dismissPending) {
-          WidgetsBinding.instance.addPostFrameCallback((_) {
-            if (dialogOpen && dialogNav != null && dialogNav!.mounted) {
-              dialogNav!.pop();
-              dialogOpen = false;
-              dismissPending = false;
-            }
-          });
-        }
-        return AlertDialog(
-          backgroundColor: Colors.white,
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(20),
-          ),
-          contentPadding: const EdgeInsets.all(32),
-          content: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Container(
-                width: 50,
-                height: 50,
-                padding: const EdgeInsets.all(12),
-                decoration: BoxDecoration(
-                  color: AppColors.primaryGreen.withValues(alpha: 0.1),
-                  shape: BoxShape.circle,
+    unawaited(
+      showDialog(
+        context: context,
+        barrierDismissible: false,
+        builder: (dialogContext) {
+          dialogNav = Navigator.of(dialogContext);
+          dialogOpen = true;
+          if (dismissPending) {
+            WidgetsBinding.instance.addPostFrameCallback((_) {
+              if (dialogOpen && dialogNav != null && dialogNav!.mounted) {
+                dialogNav!.pop();
+                dialogOpen = false;
+                dismissPending = false;
+              }
+            });
+          }
+          return AlertDialog(
+            backgroundColor: Colors.white,
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(20),
+            ),
+            contentPadding: const EdgeInsets.all(32),
+            content: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Container(
+                  width: 50,
+                  height: 50,
+                  padding: const EdgeInsets.all(12),
+                  decoration: BoxDecoration(
+                    color: AppColors.primaryGreen.withValues(alpha: 0.1),
+                    shape: BoxShape.circle,
+                  ),
+                  child: const CircularProgressIndicator(
+                    strokeWidth: 3,
+                    valueColor:
+                        AlwaysStoppedAnimation<Color>(AppColors.primaryGreen),
+                  ),
                 ),
-                child: const CircularProgressIndicator(
-                  strokeWidth: 3,
-                  valueColor:
-                      AlwaysStoppedAnimation<Color>(AppColors.primaryGreen),
+                const SizedBox(height: 20),
+                Text(
+                  'Blocking user...',
+                  style: GoogleFonts.montserrat(
+                    fontSize: 16,
+                    fontWeight: FontWeight.w500,
+                    color: const Color(0xFF2D3748),
+                  ),
                 ),
-              ),
-              const SizedBox(height: 20),
-              Text(
-                'Blocking user...',
-                style: GoogleFonts.montserrat(
-                  fontSize: 16,
-                  fontWeight: FontWeight.w500,
-                  color: const Color(0xFF2D3748),
-                ),
-              ),
-            ],
-          ),
-        );
-      },
-    ).then((_) {
-      dialogOpen = false;
-      dismissPending = false;
-    }),
+              ],
+            ),
+          );
+        },
+      ).then((_) {
+        dialogOpen = false;
+        dismissPending = false;
+      }),
     );
 
     try {

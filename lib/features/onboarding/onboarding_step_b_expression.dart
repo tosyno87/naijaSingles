@@ -251,10 +251,13 @@ class _OnboardingStepBExpressionState extends State<OnboardingStepBExpression>
                                           updatedGenres.remove(genre);
                                         }
                                         context.read<OnboardingBloc>().add(
-                                            OnboardingGenresUpdated(
-                                                updatedGenres));
+                                              OnboardingGenresUpdated(
+                                                updatedGenres,
+                                              ),
+                                            );
                                         unawaited(
-                                            HapticFeedback.selectionClick());
+                                          HapticFeedback.selectionClick(),
+                                        );
                                       },
                                       backgroundColor: Colors.white,
                                       selectedColor: deepGreen,
@@ -306,7 +309,8 @@ class _OnboardingStepBExpressionState extends State<OnboardingStepBExpression>
                                   ),
                                   const SizedBox(width: 8),
                                   _buildSectionTitle(
-                                      'What\'s your fashion style?'),
+                                    'What\'s your fashion style?',
+                                  ),
                                 ],
                               ),
                               const SizedBox(height: 16),
@@ -346,7 +350,9 @@ class _OnboardingStepBExpressionState extends State<OnboardingStepBExpression>
                                   focusedBorder: OutlineInputBorder(
                                     borderRadius: BorderRadius.circular(12),
                                     borderSide: const BorderSide(
-                                        color: deepGreen, width: 2),
+                                      color: deepGreen,
+                                      width: 2,
+                                    ),
                                   ),
                                   contentPadding: const EdgeInsets.symmetric(
                                     horizontal: 16,
@@ -355,8 +361,10 @@ class _OnboardingStepBExpressionState extends State<OnboardingStepBExpression>
                                 ),
                                 onChanged: (value) {
                                   context.read<OnboardingBloc>().add(
-                                      OnboardingFashionStyleUpdated(
-                                          value.trim()));
+                                        OnboardingFashionStyleUpdated(
+                                          value.trim(),
+                                        ),
+                                      );
                                 },
                               ),
                             ],
@@ -432,7 +440,9 @@ class _OnboardingStepBExpressionState extends State<OnboardingStepBExpression>
                                   focusedBorder: OutlineInputBorder(
                                     borderRadius: BorderRadius.circular(12),
                                     borderSide: const BorderSide(
-                                        color: deepGreen, width: 2),
+                                      color: deepGreen,
+                                      width: 2,
+                                    ),
                                   ),
                                   contentPadding: const EdgeInsets.symmetric(
                                     horizontal: 16,
@@ -441,8 +451,10 @@ class _OnboardingStepBExpressionState extends State<OnboardingStepBExpression>
                                 ),
                                 onChanged: (value) {
                                   context.read<OnboardingBloc>().add(
-                                      OnboardingWeekendVibeUpdated(
-                                          value.trim()));
+                                        OnboardingWeekendVibeUpdated(
+                                          value.trim(),
+                                        ),
+                                      );
                                 },
                               ),
                             ],

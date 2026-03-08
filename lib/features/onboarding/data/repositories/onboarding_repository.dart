@@ -25,9 +25,6 @@ class OnboardingRepository {
         .set(essentialData, SetOptions(merge: true));
 
     await FirebaseFirestore.instance.collection('users').doc(userId).update({
-      'onboardingCompleted': true,
-      'profileSetupComplete': true,
-      'isProfileComplete': true,
       'updatedAt': FieldValue.serverTimestamp(),
     });
 
@@ -152,7 +149,6 @@ class OnboardingRepository {
       'drinkingPreference': d.drinkingPreference,
       'smokingPreference': d.smokingPreference,
       'lastActive': DateTime.now().toIso8601String(),
-      'isProfileComplete': true,
       'isBlocked': false,
       'isPremium': false,
       'createdAt': DateTime.now().toIso8601String(),
@@ -191,8 +187,12 @@ class OnboardingRepository {
       'locationName': d.locationName,
       'latitude': d.latitude ?? 6.5244,
       'longitude': d.longitude ?? 3.3792,
+      // Canonical flag + legacy synonyms. All three must be set so the
+      // Firestore security rule isLockedIdentityFieldUpdate() activates
+      // regardless of which flag name a query or rule references.
       'onboardingCompleted': true,
       'profileSetupComplete': true,
+      'isProfileComplete': true,
     };
   }
 }

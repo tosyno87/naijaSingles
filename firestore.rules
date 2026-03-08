@@ -22,6 +22,11 @@ service cloud.firestore {
              );
     }
 
+    // Canonical flag: onboardingCompleted.  Legacy synonyms
+    // (profileSetupComplete, isProfileComplete) are kept for backward
+    // compatibility with documents created before flag names were unified.
+    // All new writes must set onboardingCompleted; the OR ensures existing
+    // documents still trigger the identity lock.
     function isLockedIdentityFieldUpdate() {
       return (resource.data.onboardingCompleted == true ||
               resource.data.profileSetupComplete == true ||

@@ -12,6 +12,12 @@
 .swiftpm/
 migrate_working_dir/
 
+# SonarQube
+.scannerwork/
+
+# Temporary / generated previews
+tmp/
+
 # Environment variables and secrets
 .env
 .env.local

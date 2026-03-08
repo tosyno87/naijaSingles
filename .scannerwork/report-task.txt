@@ -1,7 +1,0 @@
-organization=tosyno87
-projectKey=tosyno87_naijaSingles
-serverUrl=https://sonarcloud.io
-serverVersion=8.0.0.82479
-dashboardUrl=https://sonarcloud.io/dashboard?id=tosyno87_naijaSingles
-ceTaskId=AZy-7WAaRCab3rNhbC7A
-ceTaskUrl=https://sonarcloud.io/api/ce/task?id=AZy-7WAaRCab3rNhbC7A

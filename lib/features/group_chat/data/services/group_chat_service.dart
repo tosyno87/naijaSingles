@@ -169,6 +169,8 @@ class GroupChatService {
             'adminIds': <String>[],
             'memberCount': 0,
             'isActive': false,
+            'updatedAt': FieldValue.serverTimestamp(),
+            'lastActivityAt': FieldValue.serverTimestamp(),
           });
           return;
         }
@@ -179,6 +181,8 @@ class GroupChatService {
           'memberIds': nextMembers,
           'memberCount': nextMembers.length,
           'adminIds': nextAdmins,
+          'updatedAt': FieldValue.serverTimestamp(),
+          'lastActivityAt': FieldValue.serverTimestamp(),
         };
 
         if (creatorId == currentUserId) {

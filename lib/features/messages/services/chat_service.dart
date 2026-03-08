@@ -216,8 +216,10 @@ class ChatService {
             );
             // Continue with empty otherUserId
           } on Object catch (e) {
-            AppLogger.error('Unexpected error getting thread document',
-                error: e);
+            AppLogger.error(
+              'Unexpected error getting thread document',
+              error: e,
+            );
             // Continue with empty otherUserId
           }
 
@@ -251,8 +253,9 @@ class ChatService {
           return true;
         } on FirebaseException catch (e) {
           AppLogger.error(
-              'Firebase error sending message: ${e.code} - ${e.message}',
-              error: e);
+            'Firebase error sending message: ${e.code} - ${e.message}',
+            error: e,
+          );
 
           // Handle specific security rule violations
           if (e.code == 'permission-denied') {
@@ -551,8 +554,10 @@ class ChatService {
                   unread: false,
                 );
               } on Object catch (e) {
-                AppLogger.error('Unexpected error processing individual thread',
-                    error: e);
+                AppLogger.error(
+                  'Unexpected error processing individual thread',
+                  error: e,
+                );
                 return MessageThreadInfo(
                   threadId: doc.id,
                   otherUserId: '',
@@ -626,8 +631,10 @@ class ChatService {
       );
       return false;
     } on Object catch (e) {
-      AppLogger.error('Unexpected error checking if users are matched',
-          error: e);
+      AppLogger.error(
+        'Unexpected error checking if users are matched',
+        error: e,
+      );
       return false;
     }
   }
@@ -822,8 +829,10 @@ class ChatService {
         error: e,
       );
     } on Object catch (e) {
-      AppLogger.error('Unexpected error removing from matches collection',
-          error: e);
+      AppLogger.error(
+        'Unexpected error removing from matches collection',
+        error: e,
+      );
     }
   }
 
@@ -911,8 +920,10 @@ class ChatService {
         error: e,
       );
     } on Object catch (e) {
-      AppLogger.error('Unexpected error removing from user subcollections',
-          error: e);
+      AppLogger.error(
+        'Unexpected error removing from user subcollections',
+        error: e,
+      );
     }
   }
 
@@ -934,8 +945,10 @@ class ChatService {
           error: e,
         );
       } on Object catch (e) {
-        AppLogger.warning('Could not remove like $userId2 -> $userId1',
-            error: e);
+        AppLogger.warning(
+          'Could not remove like $userId2 -> $userId1',
+          error: e,
+        );
       }
 
       // Remove user1 from user2's LikedBy collection
@@ -953,8 +966,10 @@ class ChatService {
           error: e,
         );
       } on Object catch (e) {
-        AppLogger.warning('Could not remove like $userId1 -> $userId2',
-            error: e);
+        AppLogger.warning(
+          'Could not remove like $userId1 -> $userId2',
+          error: e,
+        );
       }
     } on FirebaseException catch (e) {
       AppLogger.error(

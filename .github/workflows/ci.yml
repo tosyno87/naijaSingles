@@ -74,7 +74,10 @@ jobs:
 
     - name: Enforce analyzer threshold
       run: |
-        COUNT=$(flutter analyze --no-fatal-infos 2>&1 | grep -oP '^\d+ issues? found' | grep -oP '^\d+' || echo "0")
+        set +e
+        OUTPUT=$(flutter analyze --no-fatal-infos 2>&1)
+        set -e
+        COUNT=$(echo "$OUTPUT" | grep -oE '[0-9]+ issues? found' | grep -oE '^[0-9]+' || echo "0")
         echo "Analyzer issues: $COUNT"
         if [ "$COUNT" -gt 50 ]; then
           echo "::error::Analyzer issue count ($COUNT) exceeds threshold (50)"

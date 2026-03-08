@@ -208,8 +208,10 @@ class SuperLikeService {
         nextResetTime: _getNextResetTime(),
       );
     } on FirebaseException catch (e) {
-      AppLogger.error('Firebase error checking super like eligibility',
-          error: e);
+      AppLogger.error(
+        'Firebase error checking super like eligibility',
+        error: e,
+      );
       return SuperLikeEligibility(
         canSend: false,
         reason: 'Error checking eligibility',
@@ -217,8 +219,10 @@ class SuperLikeService {
         nextResetTime: _getNextResetTime(),
       );
     } on Object catch (e) {
-      AppLogger.error('Unexpected error checking super like eligibility',
-          error: e);
+      AppLogger.error(
+        'Unexpected error checking super like eligibility',
+        error: e,
+      );
       return SuperLikeEligibility(
         canSend: false,
         reason: 'Error checking eligibility',
@@ -254,12 +258,16 @@ class SuperLikeService {
       _setCachedDailyCount(userId, count);
       return count;
     } on FirebaseException catch (e) {
-      AppLogger.error('Firebase error getting daily super like count',
-          error: e);
+      AppLogger.error(
+        'Firebase error getting daily super like count',
+        error: e,
+      );
       return 0;
     } on Object catch (e) {
-      AppLogger.error('Unexpected error getting daily super like count',
-          error: e);
+      AppLogger.error(
+        'Unexpected error getting daily super like count',
+        error: e,
+      );
       return 0;
     }
   }
@@ -279,15 +287,20 @@ class SuperLikeService {
               querySnapshot.docs.map(SuperLike.fromDocument).toList();
 
           AppLogger.debug(
-              'Found ${superLikes.length} super likes for user $userId');
+            'Found ${superLikes.length} super likes for user $userId',
+          );
           return superLikes;
         } on FirebaseException catch (e) {
-          AppLogger.error('Firebase error getting received super likes',
-              error: e);
+          AppLogger.error(
+            'Firebase error getting received super likes',
+            error: e,
+          );
           return [];
         } on Object catch (e) {
-          AppLogger.error('Unexpected error getting received super likes',
-              error: e);
+          AppLogger.error(
+            'Unexpected error getting received super likes',
+            error: e,
+          );
           return [];
         }
       });
@@ -306,14 +319,17 @@ class SuperLikeService {
               querySnapshot.docs.map(SuperLike.fromDocument).toList();
 
           AppLogger.debug(
-              'Found ${superLikes.length} sent super likes for user $userId');
+            'Found ${superLikes.length} sent super likes for user $userId',
+          );
           return superLikes;
         } on FirebaseException catch (e) {
           AppLogger.error('Firebase error getting sent super likes', error: e);
           return [];
         } on Object catch (e) {
-          AppLogger.error('Unexpected error getting sent super likes',
-              error: e);
+          AppLogger.error(
+            'Unexpected error getting sent super likes',
+            error: e,
+          );
           return [];
         }
       });
@@ -327,7 +343,8 @@ class SuperLikeService {
       PerformanceMonitor.measure('respond_to_super_like', () async {
         try {
           AppLogger.debug(
-              'Responding to super like: $superLikeId (like: $isLike)');
+            'Responding to super like: $superLikeId (like: $isLike)',
+          );
 
           final superLikeDoc =
               await _superLikesCollection.doc(superLikeId).get();
@@ -385,8 +402,10 @@ class SuperLikeService {
           AppLogger.error('Firebase error responding to super like', error: e);
           return SuperLikeResponse.failed('Error: ${e.toString()}');
         } on Object catch (e) {
-          AppLogger.error('Unexpected error responding to super like',
-              error: e);
+          AppLogger.error(
+            'Unexpected error responding to super like',
+            error: e,
+          );
           return SuperLikeResponse.failed('Error: ${e.toString()}');
         }
       });
@@ -397,7 +416,8 @@ class SuperLikeService {
   /// which avoids Firestore rule limitations on cross-user writes.
   void _logNotificationDelegation(String toUserId) {
     AppLogger.debug(
-        'Super-like notification for $toUserId delegated to Cloud Function');
+      'Super-like notification for $toUserId delegated to Cloud Function',
+    );
   }
 
   /// Check for instant match when super like is sent
@@ -543,14 +563,19 @@ class SuperLikeService {
       if (expiredQuery.docs.isNotEmpty) {
         await batch.commit();
         AppLogger.debug(
-            'Cleaned up ${expiredQuery.docs.length} expired super like highlights');
+          'Cleaned up ${expiredQuery.docs.length} expired super like highlights',
+        );
       }
     } on FirebaseException catch (e) {
-      AppLogger.error('Firebase error cleaning up expired highlights',
-          error: e);
+      AppLogger.error(
+        'Firebase error cleaning up expired highlights',
+        error: e,
+      );
     } on Object catch (e) {
-      AppLogger.error('Unexpected error cleaning up expired highlights',
-          error: e);
+      AppLogger.error(
+        'Unexpected error cleaning up expired highlights',
+        error: e,
+      );
     }
   }
 }

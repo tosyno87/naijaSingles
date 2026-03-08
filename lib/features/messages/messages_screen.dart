@@ -80,7 +80,7 @@ class _MessagesScreenState extends State<MessagesScreen> {
       _chatService.getChatThreadsStream();
 
   Widget _buildLoadingState() =>
-      AppLoadingView(message: 'Loading conversations...');
+      const AppLoadingView(message: 'Loading conversations...');
 
   Widget _buildErrorState(String error) => AppErrorView(
         title: 'Error loading messages',

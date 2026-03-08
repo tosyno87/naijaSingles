@@ -370,18 +370,17 @@ class GroupChatService {
   }
 
   /// Get group messages
-  Stream<List<GroupMessage>> getGroupMessages(String groupId) =>
-      _firestore
-          .collection('unifiedGroups')
-          .doc(groupId)
-          .collection('messages')
-          .orderBy('timestamp', descending: true)
-          .snapshots()
-          .map(
-            (snapshot) => snapshot.docs
-                .map((doc) => GroupMessage.fromMap(doc.id, doc.data()))
-                .toList(),
-          );
+  Stream<List<GroupMessage>> getGroupMessages(String groupId) => _firestore
+      .collection('unifiedGroups')
+      .doc(groupId)
+      .collection('messages')
+      .orderBy('timestamp', descending: true)
+      .snapshots()
+      .map(
+        (snapshot) => snapshot.docs
+            .map((doc) => GroupMessage.fromMap(doc.id, doc.data()))
+            .toList(),
+      );
 
   /// Get user's groups
   Stream<List<GroupChat>> getUserGroups() {

@@ -438,7 +438,8 @@ void main() {
       expect(welcomeText, findsOneWidget);
     });
 
-    testWidgets('Text scaling at 200% does not overflow', (WidgetTester tester) async {
+    testWidgets('Text scaling at 200% does not overflow',
+        (WidgetTester tester) async {
       await tester.pumpWidget(
         MediaQuery(
           data: const MediaQueryData(textScaler: TextScaler.linear(2.0)),
@@ -507,7 +508,8 @@ void main() {
       expect(iconSize.height, greaterThanOrEqualTo(48));
     });
 
-    testWidgets('Shared state views have Semantics', (WidgetTester tester) async {
+    testWidgets('Shared state views have Semantics',
+        (WidgetTester tester) async {
       await tester.pumpWidget(
         MaterialApp(
           home: Scaffold(

@@ -755,6 +755,5 @@ class _MemberManagementScreenState extends State<MemberManagementScreen>
     return widget.group.creatorId == currentUserId;
   }
 
-  String _getUserDisplayName(String userId) =>
-      'User ${userId.substring(0, 8)}';
+  String _getUserDisplayName(String userId) => 'User ${userId.substring(0, 8)}';
 }

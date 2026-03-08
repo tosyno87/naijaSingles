@@ -199,7 +199,8 @@ class SmartMatchService {
       remaining.remove(nextUser);
     }
 
-    AppLogger.debug('Applied diversity filter: ${diversifiedList.length} users');
+    AppLogger.debug(
+        'Applied diversity filter: ${diversifiedList.length} users');
     return diversifiedList;
   }
 

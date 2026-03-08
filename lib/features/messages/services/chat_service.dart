@@ -180,95 +180,98 @@ class ChatService {
         try {
           if (currentUserId == null) return false;
 
-      // Validate message content locally first
-      if (text.trim().isEmpty) {
-        throw Exception('Message cannot be empty.');
-      }
+          // Validate message content locally first
+          if (text.trim().isEmpty) {
+            throw Exception('Message cannot be empty.');
+          }
 
-      if (text.length > 1000) {
-        throw Exception(
-          'Message is too long. Please keep messages under 1000 characters.',
-        );
-      }
-
-      // Reference to the messages subcollection
-      final messagesRef =
-          _chatThreadsCollection.doc(threadId).collection('messages');
-
-      // Get the thread document to find the other user's ID
-      String otherUserId = '';
-      try {
-        final threadDoc = await _chatThreadsCollection.doc(threadId).get();
-        if (threadDoc.exists) {
-          final data = threadDoc.data() as Map<String, dynamic>?;
-          if (data != null && data.containsKey('userIds')) {
-            final userIds = List<String>.from(data['userIds']);
-            otherUserId = userIds.firstWhere(
-              (id) => id != currentUserId,
-              orElse: () => '',
+          if (text.length > 1000) {
+            throw Exception(
+              'Message is too long. Please keep messages under 1000 characters.',
             );
           }
+
+          // Reference to the messages subcollection
+          final messagesRef =
+              _chatThreadsCollection.doc(threadId).collection('messages');
+
+          // Get the thread document to find the other user's ID
+          String otherUserId = '';
+          try {
+            final threadDoc = await _chatThreadsCollection.doc(threadId).get();
+            if (threadDoc.exists) {
+              final data = threadDoc.data() as Map<String, dynamic>?;
+              if (data != null && data.containsKey('userIds')) {
+                final userIds = List<String>.from(data['userIds']);
+                otherUserId = userIds.firstWhere(
+                  (id) => id != currentUserId,
+                  orElse: () => '',
+                );
+              }
+            }
+          } on FirebaseException catch (e) {
+            AppLogger.error(
+              'Firebase error getting thread document: ${e.code} - ${e.message}',
+              error: e,
+            );
+            // Continue with empty otherUserId
+          } on Object catch (e) {
+            AppLogger.error('Unexpected error getting thread document',
+                error: e);
+            // Continue with empty otherUserId
+          }
+
+          // Create message data
+          final messageData = {
+            'senderId': currentUserId,
+            'text': text.trim(),
+            'timestamp': FieldValue.serverTimestamp(),
+            'read': false,
+          };
+
+          // Add the message
+          await messagesRef.add(messageData);
+
+          // Update the thread with last message info
+          final updateData = {
+            'lastMessage': messageData,
+            'lastMessageText': text.trim(),
+            'lastMessageSenderId': currentUserId,
+            'lastUpdated': FieldValue.serverTimestamp(),
+            'unreadCount.$currentUserId': 0,
+          };
+
+          // Only update the other user's unread count if we found their ID
+          if (otherUserId.isNotEmpty) {
+            updateData['unreadCount.$otherUserId'] = FieldValue.increment(1);
+          }
+
+          await _chatThreadsCollection.doc(threadId).update(updateData);
+
+          return true;
+        } on FirebaseException catch (e) {
+          AppLogger.error(
+              'Firebase error sending message: ${e.code} - ${e.message}',
+              error: e);
+
+          // Handle specific security rule violations
+          if (e.code == 'permission-denied') {
+            if (e.message?.contains('text.size()') ?? false) {
+              throw Exception(
+                'Message is too long. Please keep messages under 1000 characters.',
+              );
+            } else if (e.message?.contains('isUserBlocked') ?? false) {
+              throw Exception('This conversation is no longer available.');
+            } else {
+              throw Exception('Unable to send message. Please try again.');
+            }
+          }
+
+          throw Exception('Failed to send message: ${e.message}');
+        } on Object catch (e) {
+          AppLogger.error('Error sending message', error: e);
+          return false;
         }
-      } on FirebaseException catch (e) {
-        AppLogger.error(
-          'Firebase error getting thread document: ${e.code} - ${e.message}',
-          error: e,
-        );
-        // Continue with empty otherUserId
-      } on Object catch (e) {
-        AppLogger.error('Unexpected error getting thread document', error: e);
-        // Continue with empty otherUserId
-      }
-
-      // Create message data
-      final messageData = {
-        'senderId': currentUserId,
-        'text': text.trim(),
-        'timestamp': FieldValue.serverTimestamp(),
-        'read': false,
-      };
-
-      // Add the message
-      await messagesRef.add(messageData);
-
-      // Update the thread with last message info
-      final updateData = {
-        'lastMessage': messageData,
-        'lastMessageText': text.trim(),
-        'lastMessageSenderId': currentUserId,
-        'lastUpdated': FieldValue.serverTimestamp(),
-        'unreadCount.$currentUserId': 0,
-      };
-
-      // Only update the other user's unread count if we found their ID
-      if (otherUserId.isNotEmpty) {
-        updateData['unreadCount.$otherUserId'] = FieldValue.increment(1);
-      }
-
-      await _chatThreadsCollection.doc(threadId).update(updateData);
-
-      return true;
-    } on FirebaseException catch (e) {
-      AppLogger.error('Firebase error sending message: ${e.code} - ${e.message}', error: e);
-
-      // Handle specific security rule violations
-      if (e.code == 'permission-denied') {
-        if (e.message?.contains('text.size()') ?? false) {
-          throw Exception(
-            'Message is too long. Please keep messages under 1000 characters.',
-          );
-        } else if (e.message?.contains('isUserBlocked') ?? false) {
-          throw Exception('This conversation is no longer available.');
-        } else {
-          throw Exception('Unable to send message. Please try again.');
-        }
-      }
-
-      throw Exception('Failed to send message: ${e.message}');
-    } on Object catch (e) {
-      AppLogger.error('Error sending message', error: e);
-      return false;
-    }
       });
 
   // Mark messages as read
@@ -548,7 +551,8 @@ class ChatService {
                   unread: false,
                 );
               } on Object catch (e) {
-                AppLogger.error('Unexpected error processing individual thread', error: e);
+                AppLogger.error('Unexpected error processing individual thread',
+                    error: e);
                 return MessageThreadInfo(
                   threadId: doc.id,
                   otherUserId: '',
@@ -622,7 +626,8 @@ class ChatService {
       );
       return false;
     } on Object catch (e) {
-      AppLogger.error('Unexpected error checking if users are matched', error: e);
+      AppLogger.error('Unexpected error checking if users are matched',
+          error: e);
       return false;
     }
   }
@@ -817,7 +822,8 @@ class ChatService {
         error: e,
       );
     } on Object catch (e) {
-      AppLogger.error('Unexpected error removing from matches collection', error: e);
+      AppLogger.error('Unexpected error removing from matches collection',
+          error: e);
     }
   }
 
@@ -905,7 +911,8 @@ class ChatService {
         error: e,
       );
     } on Object catch (e) {
-      AppLogger.error('Unexpected error removing from user subcollections', error: e);
+      AppLogger.error('Unexpected error removing from user subcollections',
+          error: e);
     }
   }
 
@@ -927,7 +934,8 @@ class ChatService {
           error: e,
         );
       } on Object catch (e) {
-        AppLogger.warning('Could not remove like $userId2 -> $userId1', error: e);
+        AppLogger.warning('Could not remove like $userId2 -> $userId1',
+            error: e);
       }
 
       // Remove user1 from user2's LikedBy collection
@@ -945,7 +953,8 @@ class ChatService {
           error: e,
         );
       } on Object catch (e) {
-        AppLogger.warning('Could not remove like $userId1 -> $userId2', error: e);
+        AppLogger.warning('Could not remove like $userId1 -> $userId2',
+            error: e);
       }
     } on FirebaseException catch (e) {
       AppLogger.error(

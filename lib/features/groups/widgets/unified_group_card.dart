@@ -356,8 +356,11 @@ class UnifiedGroupCard extends StatelessWidget {
           _buildAvatarStack(),
           if (_activeThisWeek) ...[
             const SizedBox(width: 12),
-            const Icon(Icons.bolt_rounded,
-                size: 14, color: AppColors.primaryGreen,),
+            const Icon(
+              Icons.bolt_rounded,
+              size: 14,
+              color: AppColors.primaryGreen,
+            ),
             const SizedBox(width: 2),
             Flexible(
               child: Text(

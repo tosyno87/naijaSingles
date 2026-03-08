@@ -94,7 +94,8 @@ class DiscoveryService {
         return [];
       }
     } on Object catch (e) {
-      AppLogger.error('Error in getUsersForDiscovery', error: e, stackTrace: StackTrace.current);
+      AppLogger.error('Error in getUsersForDiscovery',
+          error: e, stackTrace: StackTrace.current);
 
       // Fallback to unified method if privacy-aware fails
       try {
@@ -212,7 +213,8 @@ class DiscoveryService {
           );
           continue;
         } on Object catch (e) {
-          AppLogger.warning('Error loading traditional match ${doc.id}', error: e);
+          AppLogger.warning('Error loading traditional match ${doc.id}',
+              error: e);
           continue;
         }
       }
@@ -315,7 +317,8 @@ class DiscoveryService {
       );
       return false;
     } on Object catch (e) {
-      AppLogger.error('Unexpected error in migrateAndRefreshDiscovery', error: e);
+      AppLogger.error('Unexpected error in migrateAndRefreshDiscovery',
+          error: e);
       return false;
     }
   }
@@ -331,7 +334,8 @@ class DiscoveryService {
       );
       return false;
     } on Object catch (e) {
-      AppLogger.error('Unexpected error checking if user data is filtered', error: e);
+      AppLogger.error('Unexpected error checking if user data is filtered',
+          error: e);
       return false;
     }
   }
@@ -362,7 +366,8 @@ class DiscoveryService {
       );
       return null;
     } on Object catch (e) {
-      AppLogger.error('Unexpected error getting privacy-aware user data', error: e);
+      AppLogger.error('Unexpected error getting privacy-aware user data',
+          error: e);
       return null;
     }
   }
@@ -688,7 +693,8 @@ class DiscoveryService {
           .limit(20);
 
       return query.snapshots().asyncMap((snapshot) async {
-        AppLogger.debug('Real-time stream update: ${snapshot.docs.length} users');
+        AppLogger.debug(
+            'Real-time stream update: ${snapshot.docs.length} users');
 
         final List<UserModel> users = [];
         final List<String> checkedUserIds = await _getCheckedUserIds(userId);
@@ -756,7 +762,8 @@ class DiscoveryService {
           }
         }
 
-        AppLogger.debug('Real-time stream processed: ${users.length} valid users');
+        AppLogger.debug(
+            'Real-time stream processed: ${users.length} valid users');
         return users;
       });
     } on FirebaseException catch (e) {
@@ -796,7 +803,8 @@ class DiscoveryService {
       }
 
       return query.snapshots().asyncMap((snapshot) async {
-        AppLogger.debug('Paginated stream update: ${snapshot.docs.length} users');
+        AppLogger.debug(
+            'Paginated stream update: ${snapshot.docs.length} users');
 
         final List<UserModel> users = [];
         final List<String> checkedUserIds = await _getCheckedUserIds(userId);
@@ -858,12 +866,14 @@ class DiscoveryService {
             );
             continue;
           } on Object catch (e) {
-            AppLogger.warning('Error processing paginated user ${doc.id}', error: e);
+            AppLogger.warning('Error processing paginated user ${doc.id}',
+                error: e);
             continue;
           }
         }
 
-        AppLogger.debug('Paginated stream processed: ${users.length} valid users');
+        AppLogger.debug(
+            'Paginated stream processed: ${users.length} valid users');
         return users;
       });
     } on FirebaseException catch (e) {
@@ -887,7 +897,8 @@ class DiscoveryService {
       final userId = currentUser.id;
       if (userId == null) return Stream.value([]);
 
-      AppLogger.debug('Starting nearby users stream (radius: ${radiusMiles}mi)');
+      AppLogger.debug(
+          'Starting nearby users stream (radius: ${radiusMiles}mi)');
 
       final Query query = _firestore
           .collection('users')
@@ -941,7 +952,8 @@ class DiscoveryService {
             );
             continue;
           } on Object catch (e) {
-            AppLogger.warning('Error processing nearby user ${doc.id}', error: e);
+            AppLogger.warning('Error processing nearby user ${doc.id}',
+                error: e);
             continue;
           }
         }

@@ -73,8 +73,11 @@ class DiscoverCommunityCard extends StatelessWidget {
                       const SizedBox(height: 4),
                       Row(
                         children: [
-                          const Icon(Icons.people,
-                              size: 12, color: Colors.white60,),
+                          const Icon(
+                            Icons.people,
+                            size: 12,
+                            color: Colors.white60,
+                          ),
                           const SizedBox(width: 4),
                           Text(
                             '${group.memberCount} members',

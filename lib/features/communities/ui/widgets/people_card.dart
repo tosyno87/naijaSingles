@@ -80,15 +80,21 @@ class PeopleCard extends StatelessWidget {
                     ),
                     errorWidget: (_, __, ___) => ColoredBox(
                       color: AppColors.primaryGreen.withValues(alpha: 0.08),
-                      child: const Icon(Icons.person,
-                          size: 48, color: Colors.white54,),
+                      child: const Icon(
+                        Icons.person,
+                        size: 48,
+                        color: Colors.white54,
+                      ),
                     ),
                   )
                 else
                   ColoredBox(
                     color: AppColors.primaryGreen.withValues(alpha: 0.15),
-                    child: const Icon(Icons.person,
-                        size: 48, color: Colors.white54,),
+                    child: const Icon(
+                      Icons.person,
+                      size: 48,
+                      color: Colors.white54,
+                    ),
                   ),
 
                 // Bottom gradient

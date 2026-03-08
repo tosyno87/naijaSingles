@@ -186,8 +186,7 @@ class _GroupDetailsScreenState extends State<GroupDetailsScreen> {
               padding: const EdgeInsets.symmetric(vertical: 8),
               itemCount: 3, // Show 3 shimmer messages
               itemBuilder: (context, index) => MessageShimmer(
-                isCurrentUser:
-                    index.isEven, // Alternate between user and other
+                isCurrentUser: index.isEven, // Alternate between user and other
               ),
             );
           }

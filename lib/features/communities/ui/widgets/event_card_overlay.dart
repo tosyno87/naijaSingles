@@ -161,8 +161,11 @@ class EventCardOverlay extends StatelessWidget {
                         const SizedBox(height: 2),
                         Row(
                           children: [
-                            const Icon(Icons.location_on,
-                                size: 12, color: Colors.white54,),
+                            const Icon(
+                              Icons.location_on,
+                              size: 12,
+                              color: Colors.white54,
+                            ),
                             const SizedBox(width: 2),
                             Expanded(
                               child: Text(

@@ -131,17 +131,16 @@ class UserMessagingRepo {
     return blockList;
   }
 
-  static Stream<QuerySnapshot> query(UserModel currentUser, int perPage) =>
-      db
-          .collection('chats')
-          .where('users', arrayContains: currentUser.id)
-          .where(
-            'unmatched',
-            isEqualTo: false,
-          )
-          .orderBy('time', descending: true)
-          .limit(perPage)
-          .snapshots();
+  static Stream<QuerySnapshot> query(UserModel currentUser, int perPage) => db
+      .collection('chats')
+      .where('users', arrayContains: currentUser.id)
+      .where(
+        'unmatched',
+        isEqualTo: false,
+      )
+      .orderBy('time', descending: true)
+      .limit(perPage)
+      .snapshots();
 
   static Future<UserModel> getChatUserDetails({required String userId}) async {
     UserModel? user;

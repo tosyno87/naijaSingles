@@ -144,17 +144,16 @@ class ValidationService {
   }
 
   /// Sanitize text input
-  static String sanitizeText(String text) =>
-      text
-          .trim()
-          .replaceAll(
-            RegExp(r'\s+'),
-            ' ',
-          )
-          .replaceAll(
-            RegExp(r'[^\w\s\-]'),
-            '',
-          );
+  static String sanitizeText(String text) => text
+      .trim()
+      .replaceAll(
+        RegExp(r'\s+'),
+        ' ',
+      )
+      .replaceAll(
+        RegExp(r'[^\w\s\-]'),
+        '',
+      );
 
   /// Check if group name is available (placeholder for future implementation)
   static Future<bool> isGroupNameAvailable(String groupName) async {

@@ -142,7 +142,9 @@ class OnboardingTheme {
         focusedBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(fieldRadius),
           borderSide: const BorderSide(
-              color: focusBorder, width: fieldFocusBorderWidth,),
+            color: focusBorder,
+            width: fieldFocusBorderWidth,
+          ),
         ),
         errorBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(fieldRadius),
@@ -151,7 +153,9 @@ class OnboardingTheme {
         focusedErrorBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(fieldRadius),
           borderSide: const BorderSide(
-              color: Colors.redAccent, width: fieldFocusBorderWidth,),
+            color: Colors.redAccent,
+            width: fieldFocusBorderWidth,
+          ),
         ),
         errorStyle: GoogleFonts.montserrat(
           fontSize: 13,

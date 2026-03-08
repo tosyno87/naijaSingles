@@ -252,7 +252,8 @@ void main() {
 
       final restored = UserPrivacySettings.fromMap(settings.toMap());
 
-      expect(restored.allowMessagesFromMatches, settings.allowMessagesFromMatches);
+      expect(
+          restored.allowMessagesFromMatches, settings.allowMessagesFromMatches);
       expect(restored.showOnlineStatus, settings.showOnlineStatus);
       expect(restored.showLastActive, settings.showLastActive);
       expect(restored.showTribe, settings.showTribe);

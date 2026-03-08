@@ -200,7 +200,8 @@ class _OnboardingStepCValuesState extends State<OnboardingStepCValues>
                                     }
                                     context.read<OnboardingBloc>().add(
                                           OnboardingValuesUpdated(
-                                              updatedValues,),
+                                            updatedValues,
+                                          ),
                                         );
                                     unawaited(HapticFeedback.selectionClick());
                                   },

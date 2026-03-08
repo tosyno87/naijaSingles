@@ -217,8 +217,7 @@ class EventSearchService {
       events
           .where(
             (event) => tags.any(
-              (tag) =>
-                  event.category.toLowerCase().contains(tag.toLowerCase()),
+              (tag) => event.category.toLowerCase().contains(tag.toLowerCase()),
             ),
           )
           .toList();

@@ -498,13 +498,11 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
         }
       }
 
-      // Create user data map
+      // Create user data map — exclude identity fields that the server
+      // locks after onboarding so we never trip the Firestore rule or
+      // risk a format-mismatch comparison blocking a legitimate save.
       final Map<String, dynamic> userData = {
-        'name': _nameController.text.trim(),
         'bio': _bioController.text.trim(),
-        'gender': _selectedGender,
-        'dateOfBirth': _selectedDOB?.toIso8601String(),
-        'age': _age,
         'tribe': _selectedTribe == 'Other'
             ? _otherTribeController.text.trim()
             : _selectedTribe,
@@ -523,6 +521,13 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
         },
         'lastUpdated': DateTime.now().toIso8601String(),
       };
+
+      if (!_hasCompletedOnboarding) {
+        userData['name'] = _nameController.text.trim();
+        userData['gender'] = _selectedGender;
+        userData['dateOfBirth'] = _selectedDOB?.toIso8601String();
+        userData['age'] = _age;
+      }
 
       // Update Firestore
       saveStage = 'update_firestore';

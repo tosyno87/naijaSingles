@@ -1,4 +1,5 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import '../../../common/utils/firestore_helpers.dart';
 
 class CulturalStory {
   const CulturalStory({
@@ -36,8 +37,8 @@ class CulturalStory {
       likesCount: data['likesCount'] ?? 0,
       commentsCount: data['commentsCount'] ?? 0,
       likedBy: List<String>.from(data['likedBy'] ?? []),
-      createdAt: (data['createdAt'] as Timestamp).toDate(),
-      updatedAt: (data['updatedAt'] as Timestamp).toDate(),
+      createdAt: parseDateTime(data['createdAt']),
+      updatedAt: parseDateTime(data['updatedAt']),
       isPublished: data['isPublished'] ?? true,
     );
   }
@@ -110,7 +111,7 @@ class LanguageExchange {
       isInPerson: data['isInPerson'] ?? false,
       description: data['description'] ?? '',
       interests: List<String>.from(data['interests'] ?? []),
-      createdAt: (data['createdAt'] as Timestamp).toDate(),
+      createdAt: parseDateTime(data['createdAt']),
       isActive: data['isActive'] ?? true,
     );
   }

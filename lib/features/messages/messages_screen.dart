@@ -8,6 +8,7 @@ import 'package:flutter/services.dart';
 import 'package:google_fonts/google_fonts.dart';
 
 import '../../common/constants/app_colors.dart';
+import '../../common/utils/firestore_helpers.dart';
 import '../../models/user_model.dart'; // Import UserModel
 import '../dating/screens/user_detail_screen.dart'; // Import for profile viewing
 import '../explore/explore_screen.dart'; // Import ExploreScreen directly
@@ -143,8 +144,7 @@ class _MessagesScreenState extends State<MessagesScreen> {
               otherUserName: otherUserName,
               lastMessage: data['lastMessageText'] ?? 'Say hello!',
               lastMessageSenderId: data['lastMessageSenderId'],
-              timestamp: (data['lastUpdated'] as Timestamp?)?.toDate() ??
-                  DateTime.now(),
+              timestamp: parseDateTime(data['lastUpdated']),
               unread: unread,
               avatarUrl: avatarUrl,
             ),
@@ -354,12 +354,7 @@ class _MessagesScreenState extends State<MessagesScreen> {
                 offset: const Offset(0, 3),
               ),
             ],
-            border: thread.unread
-                ? Border.all(
-                    color: primaryColor.withValues(alpha: 0.3),
-                    width: 1.5,
-                  )
-                : null,
+            border: null,
           ),
           child: Material(
             color: Colors.transparent,
@@ -383,10 +378,8 @@ class _MessagesScreenState extends State<MessagesScreen> {
                             decoration: BoxDecoration(
                               shape: BoxShape.circle,
                               border: Border.all(
-                                color: thread.unread
-                                    ? primaryColor
-                                    : Colors.grey.shade300,
-                                width: thread.unread ? 2.5 : 1,
+                                color: Colors.grey.shade300,
+                                width: 1,
                               ),
                             ),
                             child: CircleAvatar(
@@ -404,26 +397,6 @@ class _MessagesScreenState extends State<MessagesScreen> {
                                       color: Colors.grey.shade500,
                                     )
                                   : null,
-                            ),
-                          ),
-                        ),
-
-                        // Profile view indicator
-                        Positioned(
-                          bottom: 0,
-                          right: 0,
-                          child: Container(
-                            width: 20,
-                            height: 20,
-                            decoration: BoxDecoration(
-                              color: primaryColor,
-                              shape: BoxShape.circle,
-                              border: Border.all(color: Colors.white, width: 2),
-                            ),
-                            child: const Icon(
-                              Icons.visibility,
-                              color: Colors.white,
-                              size: 12,
                             ),
                           ),
                         ),
@@ -457,29 +430,16 @@ class _MessagesScreenState extends State<MessagesScreen> {
                                 child: GestureDetector(
                                   onTap: () =>
                                       _viewUserProfile(thread.otherUserId),
-                                  child: Row(
-                                    children: [
-                                      Flexible(
-                                        child: Text(
-                                          thread.otherUserName,
-                                          style: GoogleFonts.montserrat(
-                                            fontSize: 17,
-                                            fontWeight: thread.unread
-                                                ? FontWeight.bold
-                                                : FontWeight.w600,
-                                            color: textPrimary,
-                                          ),
-                                          overflow: TextOverflow.ellipsis,
-                                        ),
-                                      ),
-                                      const SizedBox(width: 4),
-                                      Icon(
-                                        Icons.info_outline,
-                                        size: 16,
-                                        color:
-                                            primaryColor.withValues(alpha: 0.7),
-                                      ),
-                                    ],
+                                  child: Text(
+                                    thread.otherUserName,
+                                    style: GoogleFonts.montserrat(
+                                      fontSize: 17,
+                                      fontWeight: thread.unread
+                                          ? FontWeight.bold
+                                          : FontWeight.w600,
+                                      color: textPrimary,
+                                    ),
+                                    overflow: TextOverflow.ellipsis,
                                   ),
                                 ),
                               ),

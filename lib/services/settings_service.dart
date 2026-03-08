@@ -2,6 +2,8 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/foundation.dart';
 
+import '../common/utils/firestore_helpers.dart';
+
 /// Service for managing user settings, blocked users, and preferences
 class SettingsService {
   static final FirebaseFirestore _firestore = FirebaseFirestore.instance;
@@ -53,9 +55,7 @@ class SettingsService {
                 .get();
 
             final blockData = blockDoc.data();
-            final blockedAt =
-                (blockData?['blockedAt'] as Timestamp?)?.toDate() ??
-                    DateTime.now();
+            final blockedAt = parseDateTime(blockData?['blockedAt']);
 
             blockedUsers.add(
               BlockedUser(
@@ -132,7 +132,21 @@ class SettingsService {
         );
       } on Object catch (e) {
         debugPrint('⚠️ Could not remove from liked/checked lists: $e');
-        // Continue with blocking even if this fails
+      }
+
+      // Delete the chat thread between the two users so the UX promise
+      // ("delete this conversation") is fulfilled.
+      final threadQuery = await _firestore
+          .collection('chatThreads')
+          .where('userIds', arrayContains: userId)
+          .get();
+
+      for (final threadDoc in threadQuery.docs) {
+        final threadUsers =
+            List<String>.from(threadDoc.data()['userIds'] ?? []);
+        if (threadUsers.contains(blockedUserId)) {
+          batch.delete(threadDoc.reference);
+        }
       }
 
       await batch.commit();

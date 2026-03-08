@@ -2,6 +2,7 @@ import 'dart:async';
 import 'dart:developer';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import '../../../../common/utils/firestore_helpers.dart';
 import '../../../../models/group_join_exception.dart';
 import '../../../../services/content_moderation_service.dart';
 
@@ -1255,8 +1256,8 @@ class UnifiedGroupService {
       }
 
       // Check if invitation has expired
-      final expiresAt = invitationData['expiresAt'] as Timestamp?;
-      if (expiresAt != null && expiresAt.toDate().isBefore(DateTime.now())) {
+      final expiresAt = parseDateTimeOrNull(invitationData['expiresAt']);
+      if (expiresAt != null && expiresAt.isBefore(DateTime.now())) {
         throw Exception('This invitation has expired');
       }
 
@@ -1445,13 +1446,10 @@ class UnifiedGroup {
         isPublic: data['isPublic'] ?? true,
         enableChat: data['enableChat'] ?? true,
         isActive: data['isActive'] ?? true,
-        createdAt:
-            (data['createdAt'] as Timestamp?)?.toDate() ?? DateTime.now(),
-        updatedAt:
-            (data['updatedAt'] as Timestamp?)?.toDate() ?? DateTime.now(),
-        lastActivityAt:
-            (data['lastActivityAt'] as Timestamp?)?.toDate() ?? DateTime.now(),
-        lastMessageAt: (data['lastMessageAt'] as Timestamp?)?.toDate(),
+        createdAt: parseDateTime(data['createdAt']),
+        updatedAt: parseDateTime(data['updatedAt']),
+        lastActivityAt: parseDateTime(data['lastActivityAt']),
+        lastMessageAt: parseDateTimeOrNull(data['lastMessageAt']),
         lastMessageText: data['lastMessageText'],
         lastMessageSenderId: data['lastMessageSenderId'],
       );
@@ -1577,8 +1575,7 @@ class GroupMessage {
         mediaUrl: data['mediaUrl'],
         mediaType: data['mediaType'],
         replyToMessageId: data['replyToMessageId'],
-        timestamp:
-            (data['timestamp'] as Timestamp?)?.toDate() ?? DateTime.now(),
+        timestamp: parseDateTime(data['timestamp']),
         isRead: data['isRead'] ?? false,
         readBy: List<String>.from(data['readBy'] ?? []),
       );

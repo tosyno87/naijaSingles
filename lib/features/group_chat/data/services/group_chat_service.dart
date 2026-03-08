@@ -1,6 +1,7 @@
 import 'dart:developer';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import '../../../../common/utils/firestore_helpers.dart';
 import '../../../groups/data/services/unified_group_service.dart'
     as unified;
 
@@ -644,10 +645,8 @@ class GroupChat {
         memberIds: List<String>.from(data['memberIds'] ?? []),
         memberCount: data['memberCount'] ?? 0,
         isActive: data['isActive'] ?? true,
-        createdAt:
-            (data['createdAt'] as Timestamp?)?.toDate() ?? DateTime.now(),
-        lastMessageAt:
-            (data['lastMessageAt'] as Timestamp?)?.toDate() ?? DateTime.now(),
+        createdAt: parseDateTime(data['createdAt']),
+        lastMessageAt: parseDateTime(data['lastMessageAt']),
         lastMessageText: data['lastMessageText'] ?? '',
         lastMessageSenderId: data['lastMessageSenderId'] ?? '',
       );
@@ -709,8 +708,7 @@ class GroupMessage {
         mediaUrl: data['mediaUrl'],
         mediaType: data['mediaType'],
         replyToMessageId: data['replyToMessageId'],
-        timestamp:
-            (data['timestamp'] as Timestamp?)?.toDate() ?? DateTime.now(),
+        timestamp: parseDateTime(data['timestamp']),
         isRead: data['isRead'] ?? false,
         readBy: List<String>.from(data['readBy'] ?? []),
       );

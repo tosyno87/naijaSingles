@@ -2,6 +2,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/foundation.dart';
 
+import '../../../common/utils/firestore_helpers.dart';
 import '../message_model.dart';
 
 class ChatService {
@@ -290,28 +291,57 @@ class ChatService {
     }
   }
 
-  // Stream of messages for a specific thread
-  Stream<List<Message>> getMessagesStream(String threadId) =>
-      _chatThreadsCollection
-          .doc(threadId)
-          .collection('messages')
-          .orderBy('timestamp', descending: false)
-          .snapshots()
-          .map(
-            (snapshot) => snapshot.docs.map((doc) {
-              final data = doc.data();
-              return Message(
-                id: doc.id,
-                senderId: data['senderId'] ?? '',
-                text: data['text'] ?? '',
-                timestamp: (data['timestamp'] as Timestamp?)?.toDate() ??
-                    DateTime.now(),
-                isRead: data['read'] ?? false,
-              );
-            }).toList(),
-          );
+  /// Stream of messages for a specific thread.
+  ///
+  /// When a user has cleared the chat, only messages sent *after* the
+  /// `clearedAt.<uid>` timestamp on the thread document are returned.
+  Stream<List<Message>> getMessagesStream(String threadId) {
+    final uid = currentUserId;
 
-  // Stream of all chat threads for current user with enhanced error handling
+    return _chatThreadsCollection
+        .doc(threadId)
+        .collection('messages')
+        .orderBy('timestamp', descending: false)
+        .snapshots()
+        .asyncMap((snapshot) async {
+      DateTime? clearedAt;
+      if (uid != null) {
+        try {
+          final threadDoc =
+              await _chatThreadsCollection.doc(threadId).get();
+          final threadData = threadDoc.data() as Map<String, dynamic>?;
+          final clearedAtMap =
+              threadData?['clearedAt'] as Map<String, dynamic>?;
+          final raw = clearedAtMap?[uid];
+          if (raw is Timestamp) {
+            clearedAt = raw.toDate();
+          } else if (raw is String) {
+            clearedAt = DateTime.tryParse(raw);
+          }
+        } on Object catch (e) {
+          debugPrint('Error fetching clearedAt for thread $threadId: $e');
+        }
+      }
+
+      return snapshot.docs.map((doc) {
+        final data = doc.data();
+        return Message(
+          id: doc.id,
+          senderId: data['senderId'] ?? '',
+          text: data['text'] ?? '',
+          timestamp: parseDateTime(data['timestamp']),
+          isRead: data['read'] ?? false,
+        );
+      }).where((msg) {
+        if (clearedAt == null) return true;
+        return msg.timestamp.isAfter(clearedAt);
+      }).toList();
+    });
+  }
+
+  // Stream of all chat threads for current user with enhanced error handling.
+  // Threads involving blocked users are filtered out as defense in depth
+  // (the block flow also deletes the thread document).
   Stream<List<MessageThreadInfo>> getChatThreadsStream() {
     if (currentUserId == null) {
       return Stream.value([]);
@@ -323,27 +353,33 @@ class ChatService {
         .snapshots()
         .handleError((error) {
       debugPrint('Error in getChatThreadsStream: $error');
-      // Return empty list on error to prevent UI crashes
       return [];
-    }).map((snapshot) {
+    }).asyncMap((snapshot) async {
       try {
+        // Fetch blocked user IDs so we can hide their threads even if the
+        // thread document was not yet deleted (race condition / legacy data).
+        final blockedSnapshot = await _firestore
+            .collection('users')
+            .doc(currentUserId)
+            .collection('blockedlist')
+            .get();
+        final blockedIds =
+            blockedSnapshot.docs.map((doc) => doc.id).toSet();
+
         return snapshot.docs
             .map((doc) {
               try {
                 final data = doc.data() as Map<String, dynamic>;
 
-                // Find the other user's ID
                 final userIds = List<String>.from(data['userIds'] ?? []);
                 final otherUserId = userIds.firstWhere(
                   (id) => id != currentUserId,
                   orElse: () => '',
                 );
 
-                // Get user names
                 final userNames = data['userNames'] as Map<String, dynamic>?;
                 final otherUserName = userNames?[otherUserId] ?? 'User';
 
-                // Get unread count for current user
                 final unreadCount =
                     data['unreadCount'] as Map<String, dynamic>?;
                 final unread = (unreadCount?[currentUserId] ?? 0) > 0;
@@ -354,15 +390,13 @@ class ChatService {
                   otherUserName: otherUserName,
                   lastMessage: data['lastMessageText'] ?? 'Say hello!',
                   lastMessageSenderId: data['lastMessageSenderId'],
-                  timestamp: (data['lastUpdated'] as Timestamp?)?.toDate() ??
-                      DateTime.now(),
+                  timestamp: parseDateTime(data['lastUpdated']),
                   unread: unread,
                 );
               } on FirebaseException catch (e) {
                 debugPrint(
                   'Firebase error processing individual thread: ${e.code} - ${e.message}',
                 );
-                // Return a placeholder thread to avoid breaking the entire list
                 return MessageThreadInfo(
                   threadId: doc.id,
                   otherUserId: '',
@@ -373,7 +407,6 @@ class ChatService {
                 );
               } on Object catch (e) {
                 debugPrint('Unexpected error processing individual thread: $e');
-                // Return a placeholder thread to avoid breaking the entire list
                 return MessageThreadInfo(
                   threadId: doc.id,
                   otherUserId: '',
@@ -384,7 +417,9 @@ class ChatService {
                 );
               }
             })
-            .where((thread) => thread.otherUserId.isNotEmpty)
+            .where((thread) =>
+                thread.otherUserId.isNotEmpty &&
+                !blockedIds.contains(thread.otherUserId))
             .toList();
       } on FirebaseException catch (e) {
         debugPrint(

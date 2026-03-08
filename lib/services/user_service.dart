@@ -1,6 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import '../common/utils/app_logger.dart';
+import '../common/utils/firestore_helpers.dart';
 
 /// Service for managing user data and profiles
 class UserService {
@@ -148,8 +149,8 @@ class UserProfile {
         displayName: map['displayName'] ?? 'Unknown User',
         email: map['email'],
         avatarUrl: map['avatarUrl'],
-        createdAt: (map['createdAt'] as Timestamp?)?.toDate() ?? DateTime.now(),
-        updatedAt: (map['updatedAt'] as Timestamp?)?.toDate() ?? DateTime.now(),
+        createdAt: parseDateTime(map['createdAt']),
+        updatedAt: parseDateTime(map['updatedAt']),
         preferences: map['preferences'] as Map<String, dynamic>?,
       );
   final String id;

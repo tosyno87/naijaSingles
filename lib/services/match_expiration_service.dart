@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/foundation.dart';
+import '../common/utils/firestore_helpers.dart';
 import '../features/match/models/match_model.dart';
 import 'performance_monitor.dart';
 
@@ -219,9 +220,9 @@ class MatchExpirationService {
           }
 
           final matchData = matchDoc.data() as Map<String, dynamic>;
-          final currentExpiry = matchData['expiresAt'] as Timestamp?;
-          final newExpiry = currentExpiry != null
-              ? Timestamp.fromDate(currentExpiry.toDate().add(extension))
+          final currentExpiryDt = parseDateTimeOrNull(matchData['expiresAt']);
+          final newExpiry = currentExpiryDt != null
+              ? Timestamp.fromDate(currentExpiryDt.add(extension))
               : Timestamp.fromDate(
                   DateTime.now().add(MATCH_EXPIRY_DURATION).add(extension),
                 );

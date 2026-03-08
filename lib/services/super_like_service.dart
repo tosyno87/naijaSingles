@@ -1,6 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/foundation.dart';
 
+import '../common/utils/firestore_helpers.dart';
 import '../features/match/data/services/likes_service.dart';
 import '../features/match/data/services/match_service.dart';
 import 'performance_monitor.dart';
@@ -601,12 +602,12 @@ class SuperLike {
       fromUserName: data['fromUserName'] ?? '',
       fromUserImageUrl: data['fromUserImageUrl'] ?? '',
       toUserName: data['toUserName'] ?? '',
-      timestamp: (data['timestamp'] as Timestamp?)?.toDate() ?? DateTime.now(),
+      timestamp: parseDateTime(data['timestamp']),
       isActive: data['isActive'] ?? false,
       responded: data['responded'] ?? false,
       responseType: data['responseType'],
-      respondedAt: (data['respondedAt'] as Timestamp?)?.toDate(),
-      highlightUntil: (data['highlightUntil'] as Timestamp?)?.toDate(),
+      respondedAt: parseDateTimeOrNull(data['respondedAt']),
+      highlightUntil: parseDateTimeOrNull(data['highlightUntil']),
     );
   }
   final String id;

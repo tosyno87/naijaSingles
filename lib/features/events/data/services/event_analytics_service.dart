@@ -1,5 +1,6 @@
 import 'dart:developer';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import '../../../../common/utils/firestore_helpers.dart';
 
 class EventAnalytics {
   const EventAnalytics({
@@ -27,7 +28,7 @@ class EventAnalytics {
         topLocations: List<String>.from(json['topLocations'] ?? []),
         topAgeGroups: List<String>.from(json['topAgeGroups'] ?? []),
         conversionRate: (json['conversionRate'] ?? 0.0).toDouble(),
-        lastUpdated: (json['lastUpdated'] as Timestamp).toDate(),
+        lastUpdated: parseDateTime(json['lastUpdated']),
       );
   final String eventId;
   final int totalViews;
@@ -240,7 +241,7 @@ class EventAnalyticsService {
         topLocations: List<String>.from(data['topLocations'] ?? []),
         topAgeGroups: List<String>.from(data['topAgeGroups'] ?? []),
         conversionRate: conversionRate,
-        lastUpdated: (data['lastUpdated'] as Timestamp).toDate(),
+        lastUpdated: parseDateTime(data['lastUpdated']),
       );
     } on Object catch (e) {
       log('Error getting event analytics: $e', name: 'EventAnalyticsService');

@@ -1,5 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/foundation.dart';
+import '../common/utils/firestore_helpers.dart';
 
 /// Model representing a cultural group in the app
 class GroupModel {
@@ -39,8 +40,8 @@ class GroupModel {
         culturalInfo: data['culturalInfo'] as Map<String, dynamic>?,
         isPublic: data['isPublic'] ?? true,
         maxMembers: data['maxMembers'] ?? 100,
-        createdAt: (data['createdAt'] as Timestamp).toDate(),
-        updatedAt: (data['updatedAt'] as Timestamp).toDate(),
+        createdAt: parseDateTime(data['createdAt']),
+        updatedAt: parseDateTime(data['updatedAt']),
         location: data['location'],
         tags: List<String>.from(data['tags'] ?? []),
         settings: data['settings'] as Map<String, dynamic>?,

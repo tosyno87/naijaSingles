@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/foundation.dart';
+import '../common/utils/firestore_helpers.dart';
 import 'performance_monitor.dart';
 
 /// Undo service that allows users to reverse their last PASS action only
@@ -468,7 +469,7 @@ class SwipeAction {
         (d) => d.toString() == data['direction'],
         orElse: () => SwipeDirection.left,
       ),
-      timestamp: (data['timestamp'] as Timestamp?)?.toDate() ?? DateTime.now(),
+      timestamp: parseDateTime(data['timestamp']),
       matchId: data['matchId'],
       canUndo: data['canUndo'] ?? false,
     );

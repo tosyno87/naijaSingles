@@ -1,5 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
+import '../../common/utils/firestore_helpers.dart';
 
 /// Model class for app notifications
 class AppNotification {
@@ -23,7 +24,7 @@ class AppNotification {
       id: doc.id,
       title: data['title'] ?? '',
       message: data['message'] ?? '',
-      timestamp: (data['timestamp'] as Timestamp?)?.toDate() ?? DateTime.now(),
+      timestamp: parseDateTime(data['timestamp']),
       type: data['type'] ?? 'general',
       avatarUrl: data['avatarUrl'],
       isRead: data['isRead'] ?? false,

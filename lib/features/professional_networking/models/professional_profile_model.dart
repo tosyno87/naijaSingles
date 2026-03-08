@@ -1,4 +1,5 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import '../../../common/utils/firestore_helpers.dart';
 
 class ProfessionalProfile {
   const ProfessionalProfile({
@@ -52,8 +53,8 @@ class ProfessionalProfile {
       isAvailableForMentorship: data['isAvailableForMentorship'] ?? false,
       isSeekingMentorship: data['isSeekingMentorship'] ?? false,
       mentorshipAreas: List<String>.from(data['mentorshipAreas'] ?? []),
-      createdAt: (data['createdAt'] as Timestamp).toDate(),
-      updatedAt: (data['updatedAt'] as Timestamp).toDate(),
+      createdAt: parseDateTime(data['createdAt']),
+      updatedAt: parseDateTime(data['updatedAt']),
       isVerified: data['isVerified'] ?? false,
       connectionsCount: data['connectionsCount'] ?? 0,
       connectionIds: List<String>.from(data['connectionIds'] ?? []),
@@ -140,13 +141,9 @@ class MentorshipRequest {
       area: data['area'] ?? '',
       message: data['message'] ?? '',
       status: data['status'] ?? 'Pending',
-      createdAt: (data['createdAt'] as Timestamp).toDate(),
-      respondedAt: data['respondedAt'] != null
-          ? (data['respondedAt'] as Timestamp).toDate()
-          : null,
-      completedAt: data['completedAt'] != null
-          ? (data['completedAt'] as Timestamp).toDate()
-          : null,
+      createdAt: parseDateTime(data['createdAt']),
+      respondedAt: parseDateTimeOrNull(data['respondedAt']),
+      completedAt: parseDateTimeOrNull(data['completedAt']),
       feedback: data['feedback'],
     );
   }

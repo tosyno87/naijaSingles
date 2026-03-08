@@ -23,7 +23,9 @@ service cloud.firestore {
     }
 
     function isLockedIdentityFieldUpdate() {
-      return resource.data.onboardingCompleted == true &&
+      return (resource.data.onboardingCompleted == true ||
+              resource.data.profileSetupComplete == true ||
+              resource.data.isProfileComplete == true) &&
              (
                request.resource.data.name != resource.data.name ||
                request.resource.data.dateOfBirth != resource.data.dateOfBirth

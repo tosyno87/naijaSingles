@@ -1,4 +1,5 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import '../../../common/utils/firestore_helpers.dart';
 
 class CommunityGroup {
   // ['Technology', 'Music', 'Food', 'Language']
@@ -39,8 +40,8 @@ class CommunityGroup {
       isPublic: data['isPublic'] ?? true,
       isVerified: data['isVerified'] ?? false,
       rules: Map<String, dynamic>.from(data['rules'] ?? {}),
-      createdAt: (data['createdAt'] as Timestamp).toDate(),
-      updatedAt: (data['updatedAt'] as Timestamp).toDate(),
+      createdAt: parseDateTime(data['createdAt']),
+      updatedAt: parseDateTime(data['updatedAt']),
       memberCount: data['memberCount'] ?? 0,
       tags: List<String>.from(data['tags'] ?? []),
     );

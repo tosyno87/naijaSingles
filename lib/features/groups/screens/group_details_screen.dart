@@ -7,6 +7,7 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 
 import '../../../common/constants/app_colors.dart';
+import '../../../common/utils/firestore_helpers.dart';
 import '../../../models/group_join_exception.dart';
 import '../../../services/group_unread_service.dart';
 import '../../../services/user_service.dart';
@@ -288,8 +289,7 @@ class _GroupDetailsScreenState extends State<GroupDetailsScreen> {
                 senderName: messageData['senderId'] == currentUserId
                     ? (FirebaseAuth.instance.currentUser?.displayName ?? 'You')
                     : (messageData['senderName'] ?? 'Unknown'),
-                timestamp: (messageData['timestamp'] as Timestamp?)?.toDate() ??
-                    DateTime.now(),
+                timestamp: parseDateTime(messageData['timestamp']),
                 isCurrentUser: messageData['senderId'] == currentUserId,
               );
             },

@@ -7,10 +7,14 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:google_fonts/google_fonts.dart';
 
-import '../../common/constants/app_colors.dart'; // Import MVP colors
-import '../../models/user_model.dart'; // Import UserModel
-import '../../services/settings_service.dart'; // Import settings service for blocking
-import '../dating/screens/user_detail_screen.dart'; // Import for profile viewing
+import '../../common/constants/app_colors.dart';
+import '../../models/user_model.dart';
+import '../../services/settings_service.dart';
+import '../chat_shared/models/chat_message_view_model.dart';
+import '../chat_shared/ui/widgets/chat_bubble.dart';
+import '../chat_shared/ui/widgets/chat_composer.dart';
+import '../chat_shared/ui/widgets/chat_state_views.dart';
+import '../dating/screens/user_detail_screen.dart';
 import 'message_model.dart';
 import 'services/chat_service.dart';
 
@@ -82,7 +86,9 @@ class _ChatThreadScreenState extends State<ChatThreadScreen> {
 
   Future<void> _sendMessage() async {
     final text = _messageController.text.trim();
-    if (text.isEmpty) return;
+    if (text.isEmpty) {
+      return;
+    }
 
     // Validate message length locally
     if (text.length > 1000) {
@@ -227,54 +233,23 @@ class _ChatThreadScreenState extends State<ChatThreadScreen> {
               stream: _chatService.getMessagesStream(widget.threadId),
               builder: (context, snapshot) {
                 if (snapshot.connectionState == ConnectionState.waiting) {
-                  return const Center(child: CircularProgressIndicator());
+                  return const ChatLoadingView();
                 }
 
                 if (snapshot.hasError) {
-                  return Center(
-                    child: Text(
-                      'Error loading messages',
-                      style: GoogleFonts.montserrat(color: Colors.red),
-                    ),
+                  return const ChatErrorView(
+                    message: 'Error loading messages',
                   );
                 }
 
                 final messages = snapshot.data ?? [];
 
                 if (messages.isEmpty) {
-                  return Center(
-                    child: Column(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        Icon(
-                          Icons.chat_bubble_outline,
-                          size: 64,
-                          color: Colors.grey[400],
-                        ),
-                        const SizedBox(height: 16),
-                        Text(
-                          'No messages yet',
-                          style: GoogleFonts.montserrat(
-                            fontSize: 16,
-                            color: Colors.grey[600],
-                          ),
-                        ),
-                        const SizedBox(height: 8),
-                        Text(
-                          'Say hi to ${widget.userName}!',
-                          style: GoogleFonts.montserrat(
-                            // Use Montserrat for MVP
-                            fontSize: 14,
-                            color:
-                                AppColors.primaryGreen, // Use MVP primary color
-                          ),
-                        ),
-                      ],
-                    ),
+                  return ChatEmptyView(
+                    subtitle: 'Say hi to ${widget.userName}!',
                   );
                 }
 
-                // Scroll to bottom when new messages arrive
                 WidgetsBinding.instance.addPostFrameCallback((_) {
                   _scrollToBottom();
                 });
@@ -288,18 +263,28 @@ class _ChatThreadScreenState extends State<ChatThreadScreen> {
                     final message = messages[index];
                     final isMe = message.senderId == _currentUserId;
 
-                    // Group messages by date
                     final showDateSeparator = index == 0 ||
                         !_isSameDay(
                           messages[index].timestamp,
                           messages[index - 1].timestamp,
                         );
 
+                    final vm = ChatMessageViewModel(
+                      id: message.id,
+                      text: message.text,
+                      timestamp: message.timestamp,
+                      senderId: message.senderId,
+                      isOwnMessage: isMe,
+                      senderAvatarUrl: isMe ? null : widget.avatarUrl,
+                      isRead: message.isRead,
+                      showReadReceipt: true,
+                    );
+
                     return Column(
                       children: [
                         if (showDateSeparator)
                           _buildDateSeparator(message.timestamp),
-                        _buildMessageBubble(message, isMe),
+                        ChatBubble(message: vm),
                       ],
                     );
                   },
@@ -308,88 +293,12 @@ class _ChatThreadScreenState extends State<ChatThreadScreen> {
             ),
           ),
 
-          // Message input
-          Container(
-            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-            decoration: BoxDecoration(
-              color: Colors.white,
-              boxShadow: [
-                BoxShadow(
-                  color: Colors.black.withValues(alpha: 0.05),
-                  blurRadius: 10,
-                  offset: const Offset(0, -2),
-                ),
-              ],
-            ),
-            child: SafeArea(
-              child: Row(
-                children: [
-                  // Emoji button
-                  IconButton(
-                    icon: const Icon(
-                      Icons.emoji_emotions_outlined,
-                      color: Colors.grey,
-                    ),
-                    onPressed: _showEmojiPicker,
-                  ),
-                  Expanded(
-                    child: Container(
-                      constraints: const BoxConstraints(maxHeight: 120),
-                      child: TextField(
-                        controller: _messageController,
-                        decoration: InputDecoration(
-                          hintText: 'Type a message...',
-                          hintStyle: GoogleFonts.montserrat(
-                            fontSize: 14,
-                            color: Colors.grey[500],
-                          ),
-                          border: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(24),
-                            borderSide: BorderSide.none,
-                          ),
-                          filled: true,
-                          fillColor: Colors.grey[100],
-                          contentPadding: const EdgeInsets.symmetric(
-                            horizontal: 16,
-                            vertical: 12,
-                          ),
-                        ),
-                        style: GoogleFonts.montserrat(
-                          fontSize: 14,
-                          color: Colors.black87,
-                        ),
-                        maxLines: 4,
-                        minLines: 1,
-                        textCapitalization: TextCapitalization.sentences,
-                        onChanged: (value) {
-                          // No additional logic needed - text state is handled by listener
-                        },
-                      ),
-                    ),
-                  ),
-                  const SizedBox(width: 8),
-                  // Animated send button
-                  AnimatedContainer(
-                    duration: const Duration(milliseconds: 200),
-                    width: 48,
-                    height: 48,
-                    decoration: BoxDecoration(
-                      color:
-                          _hasText ? AppColors.primaryGreen : Colors.grey[300],
-                      shape: BoxShape.circle,
-                    ),
-                    child: IconButton(
-                      onPressed: _hasText ? _sendMessage : null,
-                      icon: const Icon(
-                        Icons.send,
-                        color: Colors.white,
-                        size: 20,
-                      ),
-                    ),
-                  ),
-                ],
-              ),
-            ),
+          ChatComposer(
+            controller: _messageController,
+            onSend: _sendMessage,
+            hasText: _hasText,
+            showEmojiButton: true,
+            onEmojiTap: _showEmojiPicker,
           ),
         ],
       ),
@@ -420,113 +329,6 @@ class _ChatThreadScreenState extends State<ChatThreadScreen> {
           ],
         ),
       );
-
-  // Message bubble
-  Widget _buildMessageBubble(Message message, bool isMe) => Padding(
-        padding: const EdgeInsets.only(bottom: 16),
-        child: Row(
-          mainAxisAlignment:
-              isMe ? MainAxisAlignment.end : MainAxisAlignment.start,
-          crossAxisAlignment: CrossAxisAlignment.end,
-          children: [
-            if (!isMe) ...[
-              CircleAvatar(
-                radius: 16,
-                backgroundColor: Colors.grey.shade200,
-                backgroundImage: widget.avatarUrl != null
-                    ? NetworkImage(widget.avatarUrl ?? '')
-                    : null,
-                onBackgroundImageError:
-                    widget.avatarUrl != null ? (_, __) {} : null,
-                child: widget.avatarUrl == null
-                    ? Icon(
-                        Icons.person,
-                        size: 16,
-                        color: Colors.grey[600],
-                      )
-                    : null,
-              ),
-              const SizedBox(width: 8),
-            ],
-            Flexible(
-              child: Container(
-                padding:
-                    const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-                decoration: BoxDecoration(
-                  color: isMe ? AppColors.primaryGreen : Colors.white,
-                  borderRadius: BorderRadius.only(
-                    topLeft: const Radius.circular(20),
-                    topRight: const Radius.circular(20),
-                    bottomLeft: isMe
-                        ? const Radius.circular(20)
-                        : const Radius.circular(4),
-                    bottomRight: isMe
-                        ? const Radius.circular(4)
-                        : const Radius.circular(20),
-                  ),
-                  boxShadow: [
-                    BoxShadow(
-                      color: Colors.black.withValues(alpha: 0.08),
-                      blurRadius: 8,
-                      offset: const Offset(0, 2),
-                    ),
-                  ],
-                ),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      message.text,
-                      style: GoogleFonts.montserrat(
-                        fontSize: 15,
-                        color: isMe ? Colors.white : Colors.black87,
-                        height: 1.4,
-                      ),
-                    ),
-                    const SizedBox(height: 6),
-                    Row(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        Text(
-                          _formatTime(message.timestamp),
-                          style: GoogleFonts.montserrat(
-                            fontSize: 11,
-                            color: isMe
-                                ? Colors.white.withValues(alpha: 0.8)
-                                : Colors.grey[500],
-                          ),
-                        ),
-                        if (isMe) ...[
-                          const SizedBox(width: 4),
-                          Icon(
-                            message.isRead ? Icons.done_all : Icons.done,
-                            size: 14,
-                            color: message.isRead
-                                ? Colors.blue[300]
-                                : Colors.white.withValues(alpha: 0.8),
-                          ),
-                        ],
-                      ],
-                    ),
-                  ],
-                ),
-              ),
-            ),
-          ],
-        ),
-      );
-
-  // Format time for message bubbles
-  String _formatTime(DateTime timestamp) {
-    final hour = timestamp.hour > 12
-        ? timestamp.hour - 12
-        : timestamp.hour == 0
-            ? 12
-            : timestamp.hour;
-    final period = timestamp.hour >= 12 ? 'PM' : 'AM';
-    final minute = timestamp.minute.toString().padLeft(2, '0');
-    return '$hour:$minute $period';
-  }
 
   // Format date for separators
   String _formatDate(DateTime date) {
@@ -674,7 +476,8 @@ class _ChatThreadScreenState extends State<ChatThreadScreen> {
                 mainAxisSize: MainAxisSize.min,
                 children: [
                   const CircularProgressIndicator(
-                      color: AppColors.primaryGreen),
+                    color: AppColors.primaryGreen,
+                  ),
                   const SizedBox(height: 16),
                   Text(
                     'Loading profile...',
@@ -697,9 +500,13 @@ class _ChatThreadScreenState extends State<ChatThreadScreen> {
           .get();
 
       // Close loading dialog
-      if (mounted) Navigator.pop(context);
+      if (mounted) {
+        Navigator.pop(context);
+      }
 
-      if (!mounted) return;
+      if (!mounted) {
+        return;
+      }
 
       if (userDoc.exists) {
         final userData = userDoc.data() as Map<String, dynamic>;
@@ -740,10 +547,14 @@ class _ChatThreadScreenState extends State<ChatThreadScreen> {
       }
     } on Object catch (e) {
       // Close loading dialog if still open
-      if (mounted) Navigator.pop(context);
+      if (mounted) {
+        Navigator.pop(context);
+      }
 
       log('Error loading user profile: $e');
-      if (!mounted) return;
+      if (!mounted) {
+        return;
+      }
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Text(
@@ -949,56 +760,201 @@ class _ChatThreadScreenState extends State<ChatThreadScreen> {
     );
   }
 
-  // Show report user dialog
+  // Show report user dialog with reason picker
   void _showReportUserDialog() {
+    String? selectedReason;
+    final reasons = [
+      'Harassment',
+      'Spam',
+      'Fake profile',
+      'Inappropriate content',
+      'Other',
+    ];
+
     unawaited(
       showDialog(
         context: context,
-        builder: (context) => AlertDialog(
-          shape:
-              RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-          title: Text(
-            'Report ${widget.userName}?',
-            style: GoogleFonts.montserrat(
-              fontWeight: FontWeight.bold,
-              color: AppColors.textPrimary,
+        builder: (context) => StatefulBuilder(
+          builder: (context, setDialogState) => AlertDialog(
+            backgroundColor: Colors.white,
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(20),
+            ),
+            contentPadding: const EdgeInsets.all(24),
+            content: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Container(
+                  width: 60,
+                  height: 60,
+                  decoration: BoxDecoration(
+                    color: Colors.orange.withValues(alpha: 0.1),
+                    shape: BoxShape.circle,
+                  ),
+                  child: const Icon(
+                    Icons.report,
+                    color: Colors.orange,
+                    size: 30,
+                  ),
+                ),
+                const SizedBox(height: 20),
+                Text(
+                  'Report ${widget.userName}?',
+                  style: GoogleFonts.montserrat(
+                    fontSize: 20,
+                    fontWeight: FontWeight.w600,
+                    color: const Color(0xFF2D3748),
+                  ),
+                  textAlign: TextAlign.center,
+                ),
+                const SizedBox(height: 12),
+                Text(
+                  'Help us keep the community safe by selecting a reason.',
+                  style: GoogleFonts.montserrat(
+                    fontSize: 14,
+                    color: const Color(0xFF718096),
+                    height: 1.5,
+                  ),
+                  textAlign: TextAlign.center,
+                ),
+                const SizedBox(height: 20),
+                ...reasons.map(
+                  (reason) => Padding(
+                    padding: const EdgeInsets.only(bottom: 8),
+                    child: InkWell(
+                      onTap: () =>
+                          setDialogState(() => selectedReason = reason),
+                      borderRadius: BorderRadius.circular(12),
+                      child: Container(
+                        width: double.infinity,
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 16,
+                          vertical: 12,
+                        ),
+                        decoration: BoxDecoration(
+                          borderRadius: BorderRadius.circular(12),
+                          border: Border.all(
+                            color: selectedReason == reason
+                                ? Colors.orange
+                                : Colors.grey.shade300,
+                            width: selectedReason == reason ? 2 : 1,
+                          ),
+                          color: selectedReason == reason
+                              ? Colors.orange.withValues(alpha: 0.05)
+                              : Colors.white,
+                        ),
+                        child: Text(
+                          reason,
+                          style: GoogleFonts.montserrat(
+                            fontSize: 14,
+                            fontWeight: selectedReason == reason
+                                ? FontWeight.w600
+                                : FontWeight.normal,
+                            color: const Color(0xFF2D3748),
+                          ),
+                        ),
+                      ),
+                    ),
+                  ),
+                ),
+                const SizedBox(height: 16),
+                Row(
+                  children: [
+                    Expanded(
+                      child: OutlinedButton(
+                        onPressed: () => Navigator.pop(context),
+                        style: OutlinedButton.styleFrom(
+                          padding: const EdgeInsets.symmetric(vertical: 14),
+                          side: BorderSide(color: Colors.grey.shade300),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(12),
+                          ),
+                        ),
+                        child: Text(
+                          'Cancel',
+                          style: GoogleFonts.montserrat(
+                            color: Colors.grey[600],
+                            fontWeight: FontWeight.w600,
+                          ),
+                        ),
+                      ),
+                    ),
+                    const SizedBox(width: 12),
+                    Expanded(
+                      child: ElevatedButton(
+                        onPressed: selectedReason == null
+                            ? null
+                            : () {
+                                Navigator.pop(context);
+                                unawaited(_submitReport(selectedReason!));
+                              },
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: Colors.orange,
+                          disabledBackgroundColor: Colors.grey.shade300,
+                          padding: const EdgeInsets.symmetric(vertical: 14),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(12),
+                          ),
+                        ),
+                        child: Text(
+                          'Report',
+                          style: GoogleFonts.montserrat(
+                            color: Colors.white,
+                            fontWeight: FontWeight.w600,
+                          ),
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ],
             ),
           ),
-          content: Text(
-            'Help us keep the community safe by reporting inappropriate behavior.',
-            style: GoogleFonts.montserrat(
-              color: AppColors.textSecondary,
-              height: 1.4,
-            ),
-          ),
-          actions: [
-            TextButton(
-              onPressed: () => Navigator.pop(context),
-              child: Text(
-                'Cancel',
-                style: GoogleFonts.montserrat(
-                  color: Colors.grey[600],
-                  fontWeight: FontWeight.w600,
-                ),
-              ),
-            ),
-            TextButton(
-              onPressed: () {
-                Navigator.pop(context);
-                _showComingSoonSnackBar('Report feature coming soon!');
-              },
-              child: Text(
-                'Report',
-                style: GoogleFonts.montserrat(
-                  color: Colors.orange,
-                  fontWeight: FontWeight.w600,
-                ),
-              ),
-            ),
-          ],
         ),
       ),
     );
+  }
+
+  Future<void> _submitReport(String reason) async {
+    final currentUserId = FirebaseAuth.instance.currentUser?.uid;
+    final otherUserId = widget.otherUserId;
+    if (currentUserId == null || otherUserId == null) {
+      return;
+    }
+
+    try {
+      await FirebaseFirestore.instance.collection('reports').add({
+        'reporterId': currentUserId,
+        'reportedUserId': otherUserId,
+        'reason': reason,
+        'timestamp': FieldValue.serverTimestamp(),
+        'context': 'chat_thread',
+        'threadId': widget.threadId,
+      });
+
+      if (!mounted) {
+        return;
+      }
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(
+            'Report submitted. We\'ll review it shortly.',
+            style: GoogleFonts.montserrat(color: Colors.white),
+          ),
+          backgroundColor: Colors.green,
+          behavior: SnackBarBehavior.floating,
+          shape:
+              RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+          margin: const EdgeInsets.all(16),
+        ),
+      );
+    } on Object catch (e) {
+      debugPrint('Error submitting report: $e');
+      if (!mounted) {
+        return;
+      }
+      _showErrorSnackBar('Failed to submit report. Please try again.');
+    }
   }
 
   // Show clear chat dialog
@@ -1007,67 +963,141 @@ class _ChatThreadScreenState extends State<ChatThreadScreen> {
       showDialog(
         context: context,
         builder: (context) => AlertDialog(
-          shape:
-              RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-          title: Text(
-            'Clear Chat History?',
-            style: GoogleFonts.montserrat(
-              fontWeight: FontWeight.bold,
-              color: AppColors.textPrimary,
-            ),
+          backgroundColor: Colors.white,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(20),
           ),
-          content: Text(
-            'This will delete all messages in this conversation. This action cannot be undone.',
-            style: GoogleFonts.montserrat(
-              color: AppColors.textSecondary,
-              height: 1.4,
-            ),
-          ),
-          actions: [
-            TextButton(
-              onPressed: () => Navigator.pop(context),
-              child: Text(
-                'Cancel',
-                style: GoogleFonts.montserrat(
-                  color: Colors.grey[600],
-                  fontWeight: FontWeight.w600,
+          contentPadding: const EdgeInsets.all(24),
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Container(
+                width: 60,
+                height: 60,
+                decoration: BoxDecoration(
+                  color: Colors.red.withValues(alpha: 0.1),
+                  shape: BoxShape.circle,
                 ),
-              ),
-            ),
-            TextButton(
-              onPressed: () {
-                Navigator.pop(context);
-                _showComingSoonSnackBar('Clear chat feature coming soon!');
-              },
-              child: Text(
-                'Clear',
-                style: GoogleFonts.montserrat(
+                child: const Icon(
+                  Icons.clear_all,
                   color: Colors.red,
-                  fontWeight: FontWeight.w600,
+                  size: 30,
                 ),
               ),
-            ),
-          ],
+              const SizedBox(height: 20),
+              Text(
+                'Clear Chat History?',
+                style: GoogleFonts.montserrat(
+                  fontSize: 20,
+                  fontWeight: FontWeight.w600,
+                  color: const Color(0xFF2D3748),
+                ),
+                textAlign: TextAlign.center,
+              ),
+              const SizedBox(height: 16),
+              Text(
+                'Messages will be hidden from your view. This cannot be undone.',
+                style: GoogleFonts.montserrat(
+                  fontSize: 14,
+                  color: const Color(0xFF718096),
+                  height: 1.5,
+                ),
+                textAlign: TextAlign.center,
+              ),
+              const SizedBox(height: 24),
+              Row(
+                children: [
+                  Expanded(
+                    child: OutlinedButton(
+                      onPressed: () => Navigator.pop(context),
+                      style: OutlinedButton.styleFrom(
+                        padding: const EdgeInsets.symmetric(vertical: 14),
+                        side: BorderSide(color: Colors.grey.shade300),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(12),
+                        ),
+                      ),
+                      child: Text(
+                        'Cancel',
+                        style: GoogleFonts.montserrat(
+                          color: Colors.grey[600],
+                          fontWeight: FontWeight.w600,
+                        ),
+                      ),
+                    ),
+                  ),
+                  const SizedBox(width: 12),
+                  Expanded(
+                    child: ElevatedButton(
+                      onPressed: () {
+                        Navigator.pop(context);
+                        unawaited(_clearChat());
+                      },
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: Colors.red,
+                        padding: const EdgeInsets.symmetric(vertical: 14),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(12),
+                        ),
+                      ),
+                      child: Text(
+                        'Clear',
+                        style: GoogleFonts.montserrat(
+                          color: Colors.white,
+                          fontWeight: FontWeight.w600,
+                        ),
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ],
+          ),
         ),
       ),
     );
   }
 
-  // Show coming soon snackbar
-  void _showComingSoonSnackBar(String message) {
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Text(
-          message,
-          style: GoogleFonts.montserrat(color: Colors.white),
+  /// Soft-delete: stamp `clearedAt` on the thread so the client hides older
+  /// messages. We cannot hard-delete the other user's messages because
+  /// Firestore rules restrict delete to the message sender.
+  Future<void> _clearChat() async {
+    final currentUserId = FirebaseAuth.instance.currentUser?.uid;
+    if (currentUserId == null) {
+      return;
+    }
+
+    try {
+      await FirebaseFirestore.instance
+          .collection('chatThreads')
+          .doc(widget.threadId)
+          .update({
+        'clearedAt.$currentUserId': FieldValue.serverTimestamp(),
+      });
+
+      if (!mounted) {
+        return;
+      }
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(
+            'Chat history cleared.',
+            style: GoogleFonts.montserrat(color: Colors.white),
+          ),
+          backgroundColor: Colors.green,
+          behavior: SnackBarBehavior.floating,
+          shape:
+              RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+          margin: const EdgeInsets.all(16),
         ),
-        backgroundColor: AppColors.primaryGreen,
-        behavior: SnackBarBehavior.floating,
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(8),
-        ),
-      ),
-    );
+      );
+    } on Object catch (e) {
+      debugPrint('Error clearing chat: $e');
+      if (!mounted) {
+        return;
+      }
+      _showErrorSnackBar('Failed to clear chat. Please try again.');
+    }
   }
 
   // Show error snackbar
@@ -1091,121 +1121,153 @@ class _ChatThreadScreenState extends State<ChatThreadScreen> {
   Future<void> _blockUser() async {
     final currentUserId = FirebaseAuth.instance.currentUser?.uid;
     final otherUserId = widget.otherUserId;
-    if (otherUserId == null || currentUserId == null) return;
+    if (otherUserId == null || currentUserId == null) {
+      return;
+    }
 
-    // Show MVP-styled loading dialog
-    await showDialog(
+    // Track the dialog's navigator so we dismiss the correct route even
+    // if the timing is tight.
+    NavigatorState? dialogNav;
+    bool dialogOpen = false;
+    bool dismissPending = false;
+
+    void tryDismissDialog() {
+      if (dialogOpen && dialogNav != null && dialogNav!.mounted) {
+        dialogNav!.pop();
+        dialogOpen = false;
+        dismissPending = false;
+      } else {
+        dismissPending = true;
+      }
+    }
+
+    unawaited(showDialog(
       context: context,
       barrierDismissible: false,
-      builder: (context) => AlertDialog(
-        backgroundColor: Colors.white,
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(20),
-        ),
-        contentPadding: const EdgeInsets.all(32),
-        content: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            // Loading indicator with MVP primary color
-            Container(
-              width: 50,
-              height: 50,
-              padding: const EdgeInsets.all(12),
-              decoration: BoxDecoration(
-                color: AppColors.primaryGreen.withValues(alpha: 0.1),
-                shape: BoxShape.circle,
+      builder: (dialogContext) {
+        dialogNav = Navigator.of(dialogContext);
+        dialogOpen = true;
+        if (dismissPending) {
+          WidgetsBinding.instance.addPostFrameCallback((_) {
+            if (dialogOpen && dialogNav != null && dialogNav!.mounted) {
+              dialogNav!.pop();
+              dialogOpen = false;
+              dismissPending = false;
+            }
+          });
+        }
+        return AlertDialog(
+          backgroundColor: Colors.white,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(20),
+          ),
+          contentPadding: const EdgeInsets.all(32),
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Container(
+                width: 50,
+                height: 50,
+                padding: const EdgeInsets.all(12),
+                decoration: BoxDecoration(
+                  color: AppColors.primaryGreen.withValues(alpha: 0.1),
+                  shape: BoxShape.circle,
+                ),
+                child: const CircularProgressIndicator(
+                  strokeWidth: 3,
+                  valueColor:
+                      AlwaysStoppedAnimation<Color>(AppColors.primaryGreen),
+                ),
               ),
-              child: const CircularProgressIndicator(
-                strokeWidth: 3,
-                valueColor:
-                    AlwaysStoppedAnimation<Color>(AppColors.primaryGreen),
+              const SizedBox(height: 20),
+              Text(
+                'Blocking user...',
+                style: GoogleFonts.montserrat(
+                  fontSize: 16,
+                  fontWeight: FontWeight.w500,
+                  color: const Color(0xFF2D3748),
+                ),
               ),
-            ),
-            const SizedBox(height: 20),
-            Text(
-              'Blocking user...',
-              style: GoogleFonts.montserrat(
-                fontSize: 16,
-                fontWeight: FontWeight.w500,
-                color: const Color(0xFF2D3748),
-              ),
-            ),
-          ],
-        ),
-      ),
+            ],
+          ),
+        );
+      },
+    ).then((_) {
+      dialogOpen = false;
+      dismissPending = false;
+    }),
     );
 
     try {
-      // Block the user using settings service
       final success = await SettingsService.blockUser(
         currentUserId,
         otherUserId,
         reason: 'Blocked from chat',
       );
 
-      if (mounted) {
-        Navigator.pop(context); // Close loading dialog
+      if (!mounted) {
+        return;
+      }
+      tryDismissDialog();
 
-        if (success) {
-          // Show MVP-styled success message
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(
-              content: Container(
-                padding: const EdgeInsets.symmetric(vertical: 4),
-                child: Row(
-                  children: [
-                    Container(
-                      width: 24,
-                      height: 24,
-                      decoration: const BoxDecoration(
+      if (success) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Container(
+              padding: const EdgeInsets.symmetric(vertical: 4),
+              child: Row(
+                children: [
+                  Container(
+                    width: 24,
+                    height: 24,
+                    decoration: const BoxDecoration(
+                      color: Colors.white,
+                      shape: BoxShape.circle,
+                    ),
+                    child: const Icon(
+                      Icons.check,
+                      color: Colors.green,
+                      size: 16,
+                    ),
+                  ),
+                  const SizedBox(width: 12),
+                  Expanded(
+                    child: Text(
+                      '${widget.userName} has been blocked',
+                      style: GoogleFonts.montserrat(
                         color: Colors.white,
-                        shape: BoxShape.circle,
-                      ),
-                      child: const Icon(
-                        Icons.check,
-                        color: Colors.green,
-                        size: 16,
+                        fontWeight: FontWeight.w500,
                       ),
                     ),
-                    const SizedBox(width: 12),
-                    Expanded(
-                      child: Text(
-                        '${widget.userName} has been blocked',
-                        style: GoogleFonts.montserrat(
-                          color: Colors.white,
-                          fontWeight: FontWeight.w500,
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
+                  ),
+                ],
               ),
-              backgroundColor: Colors.green,
-              behavior: SnackBarBehavior.floating,
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(12),
-              ),
-              margin: const EdgeInsets.all(16),
-              duration: const Duration(seconds: 3),
             ),
-          );
+            backgroundColor: Colors.green,
+            behavior: SnackBarBehavior.floating,
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(12),
+            ),
+            margin: const EdgeInsets.all(16),
+            duration: const Duration(seconds: 3),
+          ),
+        );
 
-          // Navigate back to messages list after a short delay
-          Future.delayed(const Duration(seconds: 1), () {
-            if (mounted) {
-              Navigator.pop(context); // Go back to messages list
-            }
-          });
-        } else {
-          _showErrorSnackBar('Failed to block user. Please try again.');
-        }
+        Future.delayed(const Duration(seconds: 1), () {
+          if (mounted) {
+            Navigator.pop(context);
+          }
+        });
+      } else {
+        _showErrorSnackBar('Failed to block user. Please try again.');
       }
     } on Object catch (e) {
       debugPrint('Error blocking user: $e');
-      if (mounted) {
-        Navigator.pop(context); // Close loading dialog
-        _showErrorSnackBar('An error occurred while blocking the user.');
+      if (!mounted) {
+        return;
       }
+      tryDismissDialog();
+      _showErrorSnackBar('An error occurred while blocking the user.');
     }
   }
 }

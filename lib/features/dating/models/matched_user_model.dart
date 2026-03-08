@@ -1,4 +1,5 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import '../../../common/utils/firestore_helpers.dart';
 import '../../../models/user_model.dart';
 
 /// Model representing a potential match for dating/friendship/networking
@@ -43,7 +44,7 @@ class MatchedUser {
       religion: data['religion'],
       education: data['education'],
       lookingFor: data['lookingFor'],
-      lastSeen: (data['lastSeen'] as Timestamp?)?.toDate(),
+      lastSeen: parseDateTimeOrNull(data['lastSeen']),
       latitude: data['latitude']?.toDouble(),
       longitude: data['longitude']?.toDouble(),
       isOnline: data['isOnline'],

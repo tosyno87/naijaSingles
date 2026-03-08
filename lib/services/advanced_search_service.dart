@@ -1,6 +1,7 @@
 import 'dart:developer';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import '../common/utils/firestore_helpers.dart';
 import '../models/user_model.dart';
 
 /// Industry-standard advanced search service
@@ -346,8 +347,7 @@ class AdvancedSearchService {
           id: doc.id,
           name: data['name'] ?? '',
           criteria: SearchCriteria.fromMap(data['criteria'] ?? {}),
-          createdAt:
-              (data['createdAt'] as Timestamp?)?.toDate() ?? DateTime.now(),
+          createdAt: parseDateTime(data['createdAt']),
         );
       }).toList();
     } on Object catch (e) {
@@ -395,8 +395,7 @@ class AdvancedSearchService {
           id: doc.id,
           query: data['query'] ?? '',
           resultCount: data['resultCount'] ?? 0,
-          searchedAt:
-              (data['searchedAt'] as Timestamp?)?.toDate() ?? DateTime.now(),
+          searchedAt: parseDateTime(data['searchedAt']),
         );
       }).toList();
     } on Object catch (e) {

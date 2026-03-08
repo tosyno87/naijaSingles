@@ -1,4 +1,5 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import '../../../common/utils/firestore_helpers.dart';
 
 class LikeModel {
   LikeModel({
@@ -14,7 +15,7 @@ class LikeModel {
     return LikeModel(
       from: data['from'] ?? '',
       to: data['to'] ?? '',
-      timestamp: (data['timestamp'] as Timestamp?)?.toDate() ?? DateTime.now(),
+      timestamp: parseDateTime(data['timestamp']),
     );
   }
   final String from;

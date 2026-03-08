@@ -7,6 +7,8 @@ import 'package:google_fonts/google_fonts.dart';
 import '../../common/bloc/theme/theme_bloc.dart';
 import '../../common/bloc/user/user_bloc.dart';
 import '../../common/constants/app_colors.dart';
+import '../../common/constants/app_spacing.dart';
+import '../../common/widgets/state_views/state_views.dart';
 import '../../services/settings_service.dart';
 
 class BlockedUsersScreen extends StatefulWidget {
@@ -125,6 +127,9 @@ class _BlockedUsersScreenState extends State<BlockedUsersScreen> {
               style: ElevatedButton.styleFrom(
                 backgroundColor: AppColors.primaryGreen,
                 foregroundColor: Colors.white,
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(AppSpacing.buttonRadius),
+                ),
               ),
               child: Text(
                 'Unblock',
@@ -163,73 +168,20 @@ class _BlockedUsersScreenState extends State<BlockedUsersScreen> {
         centerTitle: true,
       ),
       body: _isLoading
-          ? const Center(child: CircularProgressIndicator())
+          ? const AppLoadingView(message: 'Loading blocked users...')
           : _blockedUsers.isEmpty
-              ? _buildEmptyState(isDarkMode)
+              ? _buildEmptyState()
               : _buildBlockedUsersList(isDarkMode),
     );
   }
 
-  Widget _buildEmptyState(bool isDarkMode) => Center(
-        child: Padding(
-          padding: const EdgeInsets.all(32),
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              Icon(
-                Icons.block,
-                size: 80,
-                color: Colors.grey[400],
-              ),
-              const SizedBox(height: 24),
-              Text(
-                'No Blocked Users',
-                style: GoogleFonts.montserrat(
-                  fontSize: 24,
-                  fontWeight: FontWeight.w600,
-                  color: isDarkMode ? Colors.white : Colors.black,
-                ),
-              ),
-              const SizedBox(height: 12),
-              Text(
-                'You haven\'t blocked anyone yet. Blocked users won\'t be able to see your profile or message you.',
-                textAlign: TextAlign.center,
-                style: GoogleFonts.montserrat(
-                  fontSize: 16,
-                  color: Colors.grey[600],
-                  height: 1.5,
-                ),
-              ),
-              const SizedBox(height: 32),
-              Container(
-                padding: const EdgeInsets.all(16),
-                decoration: BoxDecoration(
-                  color: AppColors.primaryGreen.withValues(alpha: 0.1),
-                  borderRadius: BorderRadius.circular(12),
-                ),
-                child: Row(
-                  children: [
-                    const Icon(
-                      Icons.info_outline,
-                      color: AppColors.primaryGreen,
-                      size: 20,
-                    ),
-                    const SizedBox(width: 12),
-                    Expanded(
-                      child: Text(
-                        'To block someone, go to their profile and tap the block button.',
-                        style: GoogleFonts.montserrat(
-                          fontSize: 14,
-                          color: AppColors.primaryGreen,
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-            ],
-          ),
-        ),
+  Widget _buildEmptyState() => AppEmptyView(
+        title: 'No Blocked Users',
+        subtitle:
+            'You haven\'t blocked anyone yet. Blocked users won\'t be able to see your profile or message you.',
+        icon: Icons.block,
+        actionLabel: 'Refresh',
+        onAction: _loadBlockedUsers,
       );
 
   Widget _buildBlockedUsersList(bool isDarkMode) => Column(
@@ -237,20 +189,20 @@ class _BlockedUsersScreenState extends State<BlockedUsersScreen> {
           // Header info
           Container(
             width: double.infinity,
-            margin: const EdgeInsets.all(16),
-            padding: const EdgeInsets.all(16),
+            margin: AppSpacing.cardPadding,
+            padding: AppSpacing.cardPadding,
             decoration: BoxDecoration(
               color: isDarkMode ? Colors.grey[900] : Colors.grey[100],
-              borderRadius: BorderRadius.circular(12),
+              borderRadius: BorderRadius.circular(AppSpacing.buttonRadius),
             ),
             child: Row(
               children: [
                 const Icon(
                   Icons.info_outline,
                   color: AppColors.primaryGreen,
-                  size: 20,
+                  size: AppSpacing.iconSm,
                 ),
-                const SizedBox(width: 12),
+                const SizedBox(width: AppSpacing.sm + AppSpacing.xs),
                 Expanded(
                   child: Text(
                     'Blocked users can\'t see your profile or message you. You can unblock them anytime.',
@@ -266,7 +218,7 @@ class _BlockedUsersScreenState extends State<BlockedUsersScreen> {
 
           // Blocked users count
           Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 16),
+            padding: const EdgeInsets.symmetric(horizontal: AppSpacing.md),
             child: Align(
               alignment: Alignment.centerLeft,
               child: Text(
@@ -280,12 +232,12 @@ class _BlockedUsersScreenState extends State<BlockedUsersScreen> {
             ),
           ),
 
-          const SizedBox(height: 16),
+          const SizedBox(height: AppSpacing.md),
 
           // Blocked users list
           Expanded(
             child: ListView.builder(
-              padding: const EdgeInsets.symmetric(horizontal: 16),
+              padding: const EdgeInsets.symmetric(horizontal: AppSpacing.md),
               itemCount: _blockedUsers.length,
               itemBuilder: (context, index) {
                 final user = _blockedUsers[index];
@@ -300,16 +252,16 @@ class _BlockedUsersScreenState extends State<BlockedUsersScreen> {
     final timeAgo = _getTimeAgo(user.blockedAt);
 
     return Container(
-      margin: const EdgeInsets.only(bottom: 12),
+      margin: const EdgeInsets.only(bottom: AppSpacing.sm + AppSpacing.xs),
       decoration: BoxDecoration(
         color: isDarkMode ? Colors.grey[900] : Colors.white,
-        borderRadius: BorderRadius.circular(16),
+        borderRadius: BorderRadius.circular(AppSpacing.cardRadius),
         border: Border.all(
           color: isDarkMode ? Colors.grey.shade800 : Colors.grey.shade200,
         ),
       ),
       child: Padding(
-        padding: const EdgeInsets.all(16),
+        padding: AppSpacing.cardPadding,
         child: Row(
           children: [
             // Profile image
@@ -335,7 +287,7 @@ class _BlockedUsersScreenState extends State<BlockedUsersScreen> {
                   : null,
             ),
 
-            const SizedBox(width: 16),
+            const SizedBox(width: AppSpacing.md),
 
             // User info
             Expanded(
@@ -350,7 +302,7 @@ class _BlockedUsersScreenState extends State<BlockedUsersScreen> {
                       color: isDarkMode ? Colors.white : Colors.black,
                     ),
                   ),
-                  const SizedBox(height: 4),
+                  const SizedBox(height: AppSpacing.xs),
                   Text(
                     'Blocked $timeAgo',
                     style: GoogleFonts.montserrat(
@@ -360,7 +312,7 @@ class _BlockedUsersScreenState extends State<BlockedUsersScreen> {
                   ),
                   if (user.reason.isNotEmpty && user.reason != 'User blocked')
                     Padding(
-                      padding: const EdgeInsets.only(top: 4),
+                      padding: const EdgeInsets.only(top: AppSpacing.xs),
                       child: Text(
                         'Reason: ${user.reason}',
                         style: GoogleFonts.montserrat(
@@ -379,10 +331,12 @@ class _BlockedUsersScreenState extends State<BlockedUsersScreen> {
               onPressed: () => _unblockUser(user),
               style: TextButton.styleFrom(
                 foregroundColor: AppColors.primaryGreen,
-                padding:
-                    const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                padding: const EdgeInsets.symmetric(
+                  horizontal: AppSpacing.md,
+                  vertical: AppSpacing.sm,
+                ),
                 shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(8),
+                  borderRadius: BorderRadius.circular(AppSpacing.sm),
                   side: const BorderSide(color: AppColors.primaryGreen),
                 ),
               ),
@@ -406,7 +360,7 @@ class _BlockedUsersScreenState extends State<BlockedUsersScreen> {
         backgroundColor: isError ? Colors.red : Colors.green,
         behavior: SnackBarBehavior.floating,
         shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(8),
+          borderRadius: BorderRadius.circular(AppSpacing.sm),
         ),
       ),
     );

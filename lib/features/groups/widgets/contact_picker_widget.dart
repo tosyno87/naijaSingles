@@ -1,7 +1,7 @@
 import 'dart:async';
 
-import 'package:contacts_service/contacts_service.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_contacts/flutter_contacts.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:permission_handler/permission_handler.dart';
 
@@ -14,7 +14,6 @@ import '../../../services/contact_invitation_service.dart';
 /// - Email invitation option
 /// - Search functionality
 /// - Permission handling
-/// - Industry-standard UI
 class ContactPickerWidget extends StatefulWidget {
   const ContactPickerWidget({
     required this.groupName,
@@ -113,8 +112,10 @@ class _ContactPickerWidgetState extends State<ContactPickerWidget> {
         _filteredContacts = _contacts;
       } else {
         _filteredContacts = _contacts.where((contact) {
-          final name = contact.displayName?.toLowerCase() ?? '';
-          final phone = contact.phones?.first.value?.toLowerCase() ?? '';
+          final name = contact.displayName.toLowerCase();
+          final phone = contact.phones.isNotEmpty
+              ? contact.phones.first.number.toLowerCase()
+              : '';
           return name.contains(query.toLowerCase()) ||
               phone.contains(query.toLowerCase());
         }).toList();
@@ -145,7 +146,6 @@ class _ContactPickerWidgetState extends State<ContactPickerWidget> {
 
     final invitations = <Map<String, dynamic>>[];
 
-    // Process selected contacts
     for (final contact in _selectedContacts) {
       final invitationData = _contactService.createInvitationData(
         contact: contact,
@@ -156,18 +156,7 @@ class _ContactPickerWidgetState extends State<ContactPickerWidget> {
       invitations.add(invitationData);
     }
 
-    // Process email invitation if enabled
     if (_showEmailOption && _emailController.text.isNotEmpty) {
-      if (!_contactService.isValidEmail(_emailController.text)) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text('Please enter a valid email address'),
-            backgroundColor: Colors.red,
-          ),
-        );
-        return;
-      }
-
       invitations.add({
         'contactName': _emailController.text.split('@')[0],
         'email': _emailController.text,
@@ -339,7 +328,6 @@ class _ContactPickerWidgetState extends State<ContactPickerWidget> {
         ),
         body: Column(
           children: [
-            // Search bar
             Container(
               padding: const EdgeInsets.all(16),
               child: TextField(
@@ -361,8 +349,6 @@ class _ContactPickerWidgetState extends State<ContactPickerWidget> {
                 ),
               ),
             ),
-
-            // Email invitation option
             Container(
               padding: const EdgeInsets.symmetric(horizontal: 16),
               child: Row(
@@ -387,8 +373,6 @@ class _ContactPickerWidgetState extends State<ContactPickerWidget> {
                 ],
               ),
             ),
-
-            // Email input field
             if (_showEmailOption)
               Container(
                 padding: const EdgeInsets.symmetric(horizontal: 16),
@@ -412,8 +396,6 @@ class _ContactPickerWidgetState extends State<ContactPickerWidget> {
                   ),
                 ),
               ),
-
-            // Custom message field
             Container(
               padding: const EdgeInsets.all(16),
               child: TextField(
@@ -433,8 +415,6 @@ class _ContactPickerWidgetState extends State<ContactPickerWidget> {
                 ),
               ),
             ),
-
-            // Contacts list
             Expanded(
               child: _isLoading
                   ? const Center(child: CircularProgressIndicator())
@@ -464,7 +444,9 @@ class _ContactPickerWidgetState extends State<ContactPickerWidget> {
                                     ),
                                   ),
                                   title: Text(
-                                    contact.displayName ?? 'Unknown',
+                                    contact.displayName.isNotEmpty
+                                        ? contact.displayName
+                                        : 'Unknown',
                                     style: GoogleFonts.montserrat(
                                       fontWeight: FontWeight.w500,
                                       color: AppColors.textPrimary,

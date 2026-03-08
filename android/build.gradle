@@ -11,6 +11,20 @@ subprojects {
 }
 subprojects {
     project.evaluationDependsOn(":app")
+
+    project.plugins.withId("com.android.library") {
+        project.android {
+            if (namespace == null) {
+                def manifest = file("${project.projectDir}/src/main/AndroidManifest.xml")
+                if (manifest.exists()) {
+                    namespace = new XmlSlurper()
+                        .parse(manifest)
+                        .@package
+                        .text()
+                }
+            }
+        }
+    }
 }
 
 tasks.register("clean", Delete) {

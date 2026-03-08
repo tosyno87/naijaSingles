@@ -69,6 +69,9 @@ jobs:
     - name: Install dependencies
       run: flutter pub get
 
+    - name: Run conversation quality metrics tests
+      run: flutter test --no-pub test/features/messages/services/conversation_quality_metrics_test.dart
+
     - name: Run golden tests (fail on skipped)
       run: |
         flutter test test/golden --reporter expanded > /tmp/golden.out 2>&1

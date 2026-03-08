@@ -7,6 +7,8 @@ import 'package:google_fonts/google_fonts.dart';
 import '../../common/bloc/theme/theme_bloc.dart';
 import '../../common/bloc/user/user_bloc.dart';
 import '../../common/constants/app_colors.dart';
+import '../../common/constants/app_spacing.dart';
+import '../../common/widgets/state_views/state_views.dart';
 import '../../services/settings_service.dart';
 
 class NotificationSettingsScreen extends StatefulWidget {
@@ -150,7 +152,7 @@ class _NotificationSettingsScreenState
         backgroundColor: isError ? Colors.red : Colors.green,
         behavior: SnackBarBehavior.floating,
         shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(8),
+          borderRadius: BorderRadius.circular(AppSpacing.sm),
         ),
       ),
     );
@@ -183,67 +185,40 @@ class _NotificationSettingsScreenState
         centerTitle: true,
       ),
       body: _isLoading
-          ? const Center(child: CircularProgressIndicator())
+          ? const AppLoadingView(message: 'Loading settings...')
           : _settings == null
-              ? _buildErrorState(isDarkMode)
+              ? _buildErrorState()
               : _buildSettingsContent(isDarkMode),
     );
   }
 
-  Widget _buildErrorState(bool isDarkMode) => Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Icon(
-              Icons.error_outline,
-              size: 64,
-              color: Colors.grey[400],
-            ),
-            const SizedBox(height: 16),
-            Text(
-              'Failed to load settings',
-              style: GoogleFonts.montserrat(
-                fontSize: 18,
-                color: isDarkMode ? Colors.white : Colors.black,
-              ),
-            ),
-            const SizedBox(height: 16),
-            ElevatedButton(
-              onPressed: _loadNotificationSettings,
-              style: ElevatedButton.styleFrom(
-                backgroundColor: AppColors.primaryGreen,
-                foregroundColor: Colors.white,
-              ),
-              child: Text(
-                'Retry',
-                style: GoogleFonts.montserrat(),
-              ),
-            ),
-          ],
-        ),
+  Widget _buildErrorState() => AppErrorView(
+        title: 'Failed to load settings',
+        message: 'Please try again.',
+        onRetry: _loadNotificationSettings,
       );
 
   Widget _buildSettingsContent(bool isDarkMode) => SingleChildScrollView(
-        padding: const EdgeInsets.all(16),
+        padding: AppSpacing.pagePadding,
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             // Header info
             Container(
               width: double.infinity,
-              padding: const EdgeInsets.all(16),
+              padding: AppSpacing.cardPadding,
               decoration: BoxDecoration(
                 color: AppColors.primaryGreen.withValues(alpha: 0.1),
-                borderRadius: BorderRadius.circular(12),
+                borderRadius: BorderRadius.circular(AppSpacing.buttonRadius),
               ),
               child: Row(
                 children: [
                   const Icon(
                     Icons.notifications_active,
                     color: AppColors.primaryGreen,
-                    size: 24,
+                    size: AppSpacing.iconMd,
                   ),
-                  const SizedBox(width: 12),
+                  const SizedBox(width: AppSpacing.sm + AppSpacing.xs),
                   Expanded(
                     child: Text(
                       'Control when and how you receive notifications from Afropeep.',
@@ -257,11 +232,11 @@ class _NotificationSettingsScreenState
               ),
             ),
 
-            const SizedBox(height: 24),
+            const SizedBox(height: AppSpacing.lg),
 
             // Push Notifications Section
             _buildSectionHeader('Push Notifications', isDarkMode),
-            const SizedBox(height: 12),
+            const SizedBox(height: AppSpacing.sm + AppSpacing.xs),
 
             _buildSettingTile(
               title: 'New Matches',
@@ -306,11 +281,11 @@ class _NotificationSettingsScreenState
               isDarkMode: isDarkMode,
             ),
 
-            const SizedBox(height: 24),
+            const SizedBox(height: AppSpacing.lg),
 
             // Sound & Vibration Section
             _buildSectionHeader('Sound & Vibration', isDarkMode),
-            const SizedBox(height: 12),
+            const SizedBox(height: AppSpacing.sm + AppSpacing.xs),
 
             _buildSettingTile(
               title: 'Sound',
@@ -332,11 +307,11 @@ class _NotificationSettingsScreenState
               isDarkMode: isDarkMode,
             ),
 
-            const SizedBox(height: 24),
+            const SizedBox(height: AppSpacing.lg),
 
             // Quiet Hours Section
             _buildSectionHeader('Quiet Hours', isDarkMode),
-            const SizedBox(height: 12),
+            const SizedBox(height: AppSpacing.sm + AppSpacing.xs),
 
             _buildSettingTile(
               title: 'Enable Quiet Hours',
@@ -349,7 +324,7 @@ class _NotificationSettingsScreenState
             ),
 
             if (_settings!.quietHoursEnabled) ...[
-              const SizedBox(height: 12),
+              const SizedBox(height: AppSpacing.sm + AppSpacing.xs),
               _buildTimeSetting(
                 title: 'Start Time',
                 time: _settings!.quietHoursStart,
@@ -364,7 +339,7 @@ class _NotificationSettingsScreenState
               ),
             ],
 
-            const SizedBox(height: 32),
+            const SizedBox(height: AppSpacing.xl),
 
             // Save indicator
             if (_isSaving)
@@ -373,11 +348,11 @@ class _NotificationSettingsScreenState
                   mainAxisSize: MainAxisSize.min,
                   children: [
                     const SizedBox(
-                      width: 16,
-                      height: 16,
+                      width: AppSpacing.md,
+                      height: AppSpacing.md,
                       child: CircularProgressIndicator(strokeWidth: 2),
                     ),
-                    const SizedBox(width: 12),
+                    const SizedBox(width: AppSpacing.sm + AppSpacing.xs),
                     Text(
                       'Saving...',
                       style: GoogleFonts.montserrat(
@@ -409,10 +384,10 @@ class _NotificationSettingsScreenState
     required bool isDarkMode,
   }) =>
       Container(
-        margin: const EdgeInsets.only(bottom: 8),
+        margin: const EdgeInsets.only(bottom: AppSpacing.sm),
         decoration: BoxDecoration(
           color: isDarkMode ? Colors.grey[900] : Colors.grey[50],
-          borderRadius: BorderRadius.circular(12),
+          borderRadius: BorderRadius.circular(AppSpacing.buttonRadius),
         ),
         child: SwitchListTile(
           title: Text(
@@ -447,10 +422,10 @@ class _NotificationSettingsScreenState
     required bool isDarkMode,
   }) =>
       Container(
-        margin: const EdgeInsets.only(bottom: 8),
+        margin: const EdgeInsets.only(bottom: AppSpacing.sm),
         decoration: BoxDecoration(
           color: isDarkMode ? Colors.grey[900] : Colors.grey[50],
-          borderRadius: BorderRadius.circular(12),
+          borderRadius: BorderRadius.circular(AppSpacing.buttonRadius),
         ),
         child: ListTile(
           title: Text(
@@ -472,7 +447,7 @@ class _NotificationSettingsScreenState
                   fontWeight: FontWeight.w500,
                 ),
               ),
-              const SizedBox(width: 8),
+              const SizedBox(width: AppSpacing.sm),
               Icon(
                 Icons.chevron_right,
                 color: Colors.grey[600],

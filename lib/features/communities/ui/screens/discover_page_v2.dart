@@ -428,8 +428,8 @@ class _DiscoverPageV2State extends State<DiscoverPageV2> {
 
   List<_DiscoverBlock> _composeBlocks() {
     return const <_DiscoverBlock>[
-      _DiscoverBlock.trendingEvent,
       _DiscoverBlock.peopleYouMayLike,
+      _DiscoverBlock.trendingEvent,
       _DiscoverBlock.communities,
       _DiscoverBlock.happeningThisWeek,
       _DiscoverBlock.stats,

@@ -47,16 +47,6 @@
       "queryScope": "COLLECTION",
       "fields": [
         {
-          "fieldPath": "phoneNumber",
-          "order": "ASCENDING"
-        }
-      ]
-    },
-    {
-      "collectionGroup": "users",
-      "queryScope": "COLLECTION",
-      "fields": [
-        {
           "fieldPath": "age",
           "order": "ASCENDING"
         },
@@ -298,6 +288,20 @@
         },
         {
           "fieldPath": "rsvpDate",
+          "order": "DESCENDING"
+        }
+      ]
+    },
+    {
+      "collectionGroup": "notifications",
+      "queryScope": "COLLECTION",
+      "fields": [
+        {
+          "fieldPath": "userId",
+          "order": "ASCENDING"
+        },
+        {
+          "fieldPath": "timestamp",
           "order": "DESCENDING"
         }
       ]

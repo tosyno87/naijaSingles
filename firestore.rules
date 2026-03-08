@@ -389,8 +389,14 @@ service cloud.firestore {
                    request.auth.uid == resource.data.userId;
     }
 
-    // Notification Settings collection
+    // Notification Settings collection (camelCase legacy)
     match /notificationSettings/{userId} {
+      allow read, write: if request.auth != null && 
+                          request.auth.uid == userId;
+    }
+
+    // Notification Settings collection (snake_case – used by current client)
+    match /notification_settings/{userId} {
       allow read, write: if request.auth != null && 
                           request.auth.uid == userId;
     }

@@ -13,12 +13,14 @@ class HingeProfileCard extends StatefulWidget {
     required this.user,
     this.onConnect,
     this.onPass,
+    this.onSuperLike,
     super.key,
   });
 
   final UserModel user;
   final VoidCallback? onConnect;
   final VoidCallback? onPass;
+  final VoidCallback? onSuperLike;
 
   @override
   State<HingeProfileCard> createState() => _HingeProfileCardState();
@@ -504,52 +506,59 @@ class _HingeProfileCardState extends State<HingeProfileCard> {
         child: Row(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            // Pass button - circular, minimalistic
-            Material(
-              color: Colors.white,
-              shape: const CircleBorder(
-                side: BorderSide(color: AppColors.textSecondary, width: 1.5),
+            // Pass button
+            _buildCircleAction(
+              onTap: widget.onPass,
+              fillColor: Colors.white,
+              border: const BorderSide(
+                color: AppColors.textSecondary,
+                width: 1.5,
               ),
-              child: InkWell(
-                onTap: widget.onPass,
-                customBorder: const CircleBorder(),
-                child: Container(
-                  width: 56,
-                  height: 56,
-                  decoration: const BoxDecoration(
-                    shape: BoxShape.circle,
-                  ),
-                  child: const Icon(
-                    Icons.close,
-                    color: AppColors.textSecondary,
-                    size: 24,
-                  ),
-                ),
-              ),
+              icon: Icons.close,
+              iconColor: AppColors.textSecondary,
+              size: 56,
             ),
-            const SizedBox(width: 24),
-            // Connect button - circular, minimalistic
-            Material(
-              color: AppColors.primaryGreen,
-              shape: const CircleBorder(),
-              child: InkWell(
-                onTap: widget.onConnect,
-                customBorder: const CircleBorder(),
-                child: Container(
-                  width: 56,
-                  height: 56,
-                  decoration: const BoxDecoration(
-                    shape: BoxShape.circle,
-                  ),
-                  child: const Icon(
-                    Icons.favorite,
-                    color: Colors.white,
-                    size: 24,
-                  ),
-                ),
-              ),
+            const SizedBox(width: 20),
+            // Super Like button
+            _buildCircleAction(
+              onTap: widget.onSuperLike,
+              fillColor: const Color(0xFF2196F3),
+              icon: Icons.star_rounded,
+              iconColor: Colors.white,
+              size: 48,
+            ),
+            const SizedBox(width: 20),
+            // Connect / Like button
+            _buildCircleAction(
+              onTap: widget.onConnect,
+              fillColor: AppColors.primaryGreen,
+              icon: Icons.favorite,
+              iconColor: Colors.white,
+              size: 56,
             ),
           ],
+        ),
+      );
+
+  Widget _buildCircleAction({
+    required VoidCallback? onTap,
+    required Color fillColor,
+    required IconData icon,
+    required Color iconColor,
+    required double size,
+    BorderSide border = BorderSide.none,
+  }) =>
+      Material(
+        color: fillColor,
+        shape: CircleBorder(side: border),
+        child: InkWell(
+          onTap: onTap,
+          customBorder: const CircleBorder(),
+          child: SizedBox(
+            width: size,
+            height: size,
+            child: Icon(icon, color: iconColor, size: size * 0.43),
+          ),
         ),
       );
 

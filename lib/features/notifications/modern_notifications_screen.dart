@@ -97,7 +97,12 @@ class _ModernNotificationsScreenState extends State<ModernNotificationsScreen>
         return _notifications.where((n) => n.type == 'message').toList();
       case 'likes':
         return _notifications
-            .where((n) => n.type == 'like' || n.type == 'superLike')
+            .where(
+              (n) =>
+                  n.type == 'like' ||
+                  n.type == 'superLike' ||
+                  n.type == 'super_like',
+            )
             .toList();
       default:
         return _notifications;
@@ -355,7 +360,12 @@ class _ModernNotificationsScreenState extends State<ModernNotificationsScreen>
         return _notifications.where((n) => n.type == 'message').length;
       case 'likes':
         return _notifications
-            .where((n) => n.type == 'like' || n.type == 'superLike')
+            .where(
+              (n) =>
+                  n.type == 'like' ||
+                  n.type == 'superLike' ||
+                  n.type == 'super_like',
+            )
             .length;
       default:
         return _notifications.length;
@@ -672,6 +682,7 @@ class _ModernNotificationsScreenState extends State<ModernNotificationsScreen>
       case 'like':
         return 'LIKE';
       case 'superLike':
+      case 'super_like':
         return 'SUPER LIKE';
       case 'view':
         return 'VIEW';

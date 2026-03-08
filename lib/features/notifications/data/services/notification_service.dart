@@ -294,6 +294,7 @@ class NotificationService {
         await _navigateToProfile(data);
         break;
       case 'super_like':
+      case 'superLike':
         await _navigateToProfile(data);
         break;
       default:
@@ -448,14 +449,23 @@ class NotificationService {
         .orderBy('timestamp', descending: true)
         .limit(50)
         .snapshots()
-        .listen((snapshot) {
-      final notifications =
-          snapshot.docs.map(AppNotification.fromFirestore).toList();
-      _notificationsController.add(notifications);
+        .listen(
+      (snapshot) {
+        final notifications =
+            snapshot.docs.map(AppNotification.fromFirestore).toList();
+        _notificationsController.add(notifications);
 
-      final unreadCount = notifications.where((n) => !n.isRead).length;
-      _unreadCountController.add(unreadCount);
-    });
+        final unreadCount = notifications.where((n) => !n.isRead).length;
+        _unreadCountController.add(unreadCount);
+      },
+      onError: (Object error) {
+        debugPrint(
+          '⚠️ Notification listener error (index may be missing): $error',
+        );
+        _notificationsController.add([]);
+        _unreadCountController.add(0);
+      },
+    );
   }
 
   /// Stream of notifications (instance-based API)

@@ -2,6 +2,7 @@ import 'dart:math';
 
 import 'package:flutter/foundation.dart';
 
+import '../../../../common/utils/distance.dart' as geo;
 import '../../../../models/user_model.dart';
 import '../../../../services/cached_user_service.dart';
 import '../../../../services/mode_specific_compatibility_engine.dart';
@@ -12,10 +13,14 @@ import '../../../match/data/services/compatibility_engine.dart';
 /// Smart match service that provides intelligent user ordering and discovery
 /// Implements Priority 2: Enhanced Matching Algorithm
 class SmartMatchService {
-  static const int DIVERSITY_WINDOW_SIZE = 5; // Apply diversity every 5 users
-  static const double HIGH_COMPATIBILITY_THRESHOLD = 0.7;
-  static const double MEDIUM_COMPATIBILITY_THRESHOLD = 0.5;
-  static const int MAX_CONSECUTIVE_HIGH_MATCHES = 3;
+  static const int diversityWindowSize = 5;
+  static const double highCompatibilityThreshold = 0.7;
+  static const double mediumCompatibilityThreshold = 0.5;
+  static const int maxConsecutiveHighMatches = 3;
+
+  /// Top-N users are always kept in strict score order and placed first,
+  /// so heuristic interleaving never demotes the best matches.
+  static const int topNPinned = 3;
 
   final CachedUserService _cachedUserService = CachedUserService();
 
@@ -123,12 +128,22 @@ class SmartMatchService {
       PerformanceMonitor.measure('smart_ordering', () async {
         debugPrint('🔄 Applying smart ordering algorithm');
 
-        // Start with compatibility-sorted list
+        // Sort by compatibility score descending (best-match-first)
         final sortedByCompatibility =
-            List<UserCompatibility>.from(compatibilityResults);
+            List<UserCompatibility>.from(compatibilityResults)
+              ..sort(
+                (a, b) =>
+                    b.compatibilityScore.compareTo(a.compatibilityScore),
+              );
+
+        // Pin the top-N users in strict score order so heuristic
+        // interleaving never demotes the best matches.
+        final pinnedCount = min(topNPinned, sortedByCompatibility.length);
+        final pinned = sortedByCompatibility.sublist(0, pinnedCount);
+        final rest = sortedByCompatibility.sublist(pinnedCount);
 
         // Apply diversity algorithm to prevent monotony
-        final diversifiedList = _applyDiversityFilter(sortedByCompatibility);
+        final diversifiedList = _applyDiversityFilter(rest);
 
         // Apply boost for recently active users
         final boostedList = _applyActivityBoost(diversifiedList);
@@ -137,8 +152,11 @@ class SmartMatchService {
         final clusteredList =
             _applyLocationClustering(currentUser, boostedList);
 
+        // Re-combine: pinned top-N first, then heuristically ordered remainder
+        final combined = [...pinned, ...clusteredList];
+
         // Take only the requested page size
-        final finalList = clusteredList.take(pageSize).toList();
+        final finalList = combined.take(pageSize).toList();
 
         debugPrint('✅ Smart ordering complete: ${finalList.length} users');
         _logOrderingResults(finalList);
@@ -148,7 +166,7 @@ class SmartMatchService {
 
   /// Apply diversity filter to prevent showing too many similar users consecutively
   List<UserCompatibility> _applyDiversityFilter(List<UserCompatibility> users) {
-    if (users.length <= DIVERSITY_WINDOW_SIZE) {
+    if (users.length <= diversityWindowSize) {
       return users; // No need for diversity with small lists
     }
 
@@ -161,7 +179,7 @@ class SmartMatchService {
       UserCompatibility? nextUser;
 
       // If we have too many consecutive high matches, prefer medium/low matches
-      if (consecutiveHighMatches >= MAX_CONSECUTIVE_HIGH_MATCHES) {
+      if (consecutiveHighMatches >= maxConsecutiveHighMatches) {
         nextUser = remaining.firstWhere(
           (user) => !user.isHighCompatibility,
           orElse: () => remaining.first,
@@ -229,30 +247,39 @@ class SmartMatchService {
     return boostedList;
   }
 
+  static const double _nearbyThresholdMiles = 31; // ~50 km
+
   /// Apply location-based clustering to group nearby users
   List<UserCompatibility> _applyLocationClustering(
     UserModel currentUser,
     List<UserCompatibility> users,
   ) {
     if (currentUser.coordinates == null || currentUser.coordinates!.isEmpty) {
-      return users; // No clustering without location data
+      return users;
     }
 
-    // Separate users by distance
+    final lat1 = currentUser.coordinates!['latitude'] as double?;
+    final lng1 = currentUser.coordinates!['longitude'] as double?;
+    if (lat1 == null || lng1 == null) {
+      return users;
+    }
+
     final nearbyUsers = <UserCompatibility>[];
     final distantUsers = <UserCompatibility>[];
 
     for (final userComp in users) {
       final user = userComp.user;
       if (user.coordinates != null && user.coordinates!.isNotEmpty) {
-        // This would use the distance calculation from compatibility engine
-        // For now, we'll use a simple heuristic
-        final locationScore =
-            CompatibilityEngine.calculateCompatibility(currentUser, user);
+        final lat2 = user.coordinates!['latitude'] as double?;
+        final lng2 = user.coordinates!['longitude'] as double?;
 
-        // If location contributes significantly to the score, consider it nearby
-        if (locationScore > 0.6) {
-          nearbyUsers.add(userComp);
+        if (lat2 != null && lng2 != null) {
+          final distanceMiles = geo.calculateDistance(lat1, lng1, lat2, lng2);
+          if (distanceMiles <= _nearbyThresholdMiles) {
+            nearbyUsers.add(userComp);
+          } else {
+            distantUsers.add(userComp);
+          }
         } else {
           distantUsers.add(userComp);
         }
@@ -287,7 +314,9 @@ class SmartMatchService {
 
   /// Calculate average compatibility score
   double _calculateAverageCompatibility(List<UserCompatibility> users) {
-    if (users.isEmpty) return 0;
+    if (users.isEmpty) {
+      return 0;
+    }
 
     final totalScore = users.fold<double>(
       0,
@@ -298,7 +327,9 @@ class SmartMatchService {
 
   /// Log ordering results for debugging
   void _logOrderingResults(List<UserCompatibility> users) {
-    if (!kDebugMode) return;
+    if (!kDebugMode) {
+      return;
+    }
 
     debugPrint('📋 Smart ordering results:');
     for (int i = 0; i < min(10, users.length); i++) {
@@ -365,7 +396,7 @@ class SmartMatchService {
   /// Get users filtered by compatibility threshold
   Future<SmartMatchResult> getHighCompatibilityUsers({
     required UserModel currentUser,
-    double minCompatibility = HIGH_COMPATIBILITY_THRESHOLD,
+    double minCompatibility = highCompatibilityThreshold,
     int maxUsers = 50,
   }) async {
     try {

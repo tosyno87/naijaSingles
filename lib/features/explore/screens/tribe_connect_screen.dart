@@ -8,6 +8,7 @@ import 'package:google_fonts/google_fonts.dart';
 import '../../../common/constants/app_colors.dart';
 import '../../../common/data/repo/user_search_repo.dart';
 import '../../../models/user_model.dart';
+import '../../../services/super_like_service.dart';
 import '../widgets/hinge_profile_card.dart';
 import '../widgets/match_confirmation_modal.dart';
 
@@ -28,6 +29,7 @@ class TribeConnectScreen extends StatefulWidget {
 
 class _TribeConnectScreenState extends State<TribeConnectScreen> {
   final Set<String> _processedUserIds = <String>{};
+  final SuperLikeService _superLikeService = SuperLikeService();
   bool _isRefreshing = false;
 
   List<UserModel> get _availableUsers => widget.users
@@ -86,6 +88,7 @@ class _TribeConnectScreenState extends State<TribeConnectScreen> {
         user: currentProfile,
         onConnect: () => _handleConnect(currentProfile),
         onPass: () => _handlePass(currentProfile),
+        onSuperLike: () => _handleSuperLike(currentProfile),
       ),
     );
   }
@@ -271,6 +274,51 @@ class _TribeConnectScreenState extends State<TribeConnectScreen> {
     }
   }
 
+  Future<void> _handleSuperLike(UserModel user) async {
+    final uid = user.id;
+    final currentUid = widget.currentUser.id;
+    if (uid == null || uid.isEmpty || currentUid == null || currentUid.isEmpty) {
+      return;
+    }
+
+    try {
+      setState(() => _processedUserIds.add(uid));
+
+      final fromUser = widget.currentUser;
+      final firstPhoto =
+          (fromUser.imageUrl?.isNotEmpty ?? false) ? fromUser.imageUrl![0] : null;
+
+      final result = await _superLikeService.sendSuperLike(
+        fromUserId: currentUid,
+        toUserId: uid,
+        fromUserName: fromUser.name,
+        fromUserImageUrl: firstPhoto,
+        toUserName: user.name,
+      );
+
+      if (!mounted) {
+        return;
+      }
+
+      if (result.isSuccess) {
+        if (result.isInstantMatch) {
+          _showMatchConfirmation(user);
+        } else {
+          _showSuperLikeConfirmation(user);
+        }
+      } else {
+        setState(() => _processedUserIds.remove(uid));
+        _showError(result.error ?? 'Could not send Super Like.');
+        return;
+      }
+
+      _advanceProfile();
+    } on Object {
+      setState(() => _processedUserIds.remove(uid));
+      _showError('Failed to send Super Like. Please try again.');
+    }
+  }
+
   void _advanceProfile() {
     Future.delayed(const Duration(milliseconds: 200), () {
       if (mounted) setState(() {});
@@ -314,6 +362,20 @@ class _TribeConnectScreenState extends State<TribeConnectScreen> {
         content: Text('Passed on ${user.name}'),
         backgroundColor: Colors.grey[600],
         duration: const Duration(seconds: 2),
+        behavior: SnackBarBehavior.floating,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(12),
+        ),
+      ),
+    );
+  }
+
+  void _showSuperLikeConfirmation(UserModel user) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text('Super Liked ${user.name}! ⭐'),
+        backgroundColor: const Color(0xFF2196F3),
+        duration: const Duration(seconds: 3),
         behavior: SnackBarBehavior.floating,
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(12),

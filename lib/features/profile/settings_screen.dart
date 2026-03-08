@@ -39,7 +39,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
       _auth.currentUser?.providerData.any((p) => p.providerId == 'password') ??
       false;
   bool get _hasAccountEmail =>
-      _auth.currentUser?.email?.trim().isNotEmpty == true;
+      _auth.currentUser?.email?.trim().isNotEmpty ?? false;
   bool get _canManagePassword => _isPasswordProviderUser || _hasAccountEmail;
 
   @override
@@ -78,7 +78,9 @@ class _SettingsScreenState extends State<SettingsScreen> {
                   subtitle: 'Update your photos and info',
                   onTap: () {
                     unawaited(Navigator.pushNamed(
-                        context, RouteName.editProfileScreen));
+                      context,
+                      RouteName.editProfileScreen,
+                    ),);
                   },
                 ),
                 if (_canManagePassword) ...[
@@ -667,149 +669,195 @@ class _SettingsScreenState extends State<SettingsScreen> {
   }
 
   void _showDeleteConfirmation() {
-    Navigator.pop(context); // Close first dialog
+    Navigator.pop(context);
+    final controller = TextEditingController();
 
     unawaited(
       showDialog(
         context: context,
-        builder: (context) => AlertDialog(
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(16),
-          ),
-          title: Text(
-            'Final Confirmation',
-            style: GoogleFonts.montserrat(
-              fontSize: 20,
-              fontWeight: FontWeight.bold,
-              color: Colors.red.shade700,
-            ),
-          ),
-          content: Text(
-            'Type "DELETE" to confirm account deletion:',
-            style: GoogleFonts.montserrat(
-              fontSize: 16,
-              color: textSecondary,
-            ),
-          ),
-          actions: [
-            // Cancel button
-            Padding(
-              padding: const EdgeInsets.only(right: 8),
-              child: TextButton(
-                onPressed: () => Navigator.pop(context),
-                style: TextButton.styleFrom(
-                  foregroundColor: textSecondary,
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(12),
-                  ),
-                  padding:
-                      const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-                ),
-                child: Text(
-                  'Cancel',
-                  style: GoogleFonts.montserrat(
-                    fontSize: 14,
-                    fontWeight: FontWeight.w600,
-                    color: textSecondary,
-                  ),
+        builder: (dialogContext) => StatefulBuilder(
+          builder: (dialogContext, setDialogState) {
+            final confirmed = controller.text == 'DELETE';
+            return AlertDialog(
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(16),
+              ),
+              title: Text(
+                'Final Confirmation',
+                style: GoogleFonts.montserrat(
+                  fontSize: 20,
+                  fontWeight: FontWeight.bold,
+                  color: Colors.red.shade700,
                 ),
               ),
-            ),
-            // Confirm Delete button - Fixed layout
-            Padding(
-              padding: const EdgeInsets.only(left: 8),
-              child: ElevatedButton(
-                onPressed: () {
-                  Navigator.pop(context);
-                  unawaited(
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder: (_) => const AccountDeletionScreen(),
+              content: Column(
+                mainAxisSize: MainAxisSize.min,
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    'Type "DELETE" to confirm account deletion:',
+                    style: GoogleFonts.montserrat(
+                      fontSize: 16,
+                      color: textSecondary,
+                    ),
+                  ),
+                  const SizedBox(height: 12),
+                  TextField(
+                    controller: controller,
+                    autofocus: true,
+                    onChanged: (_) => setDialogState(() {}),
+                    style: GoogleFonts.montserrat(
+                      fontSize: 16,
+                      color: textPrimary,
+                    ),
+                    decoration: InputDecoration(
+                      hintText: 'DELETE',
+                      hintStyle: GoogleFonts.montserrat(
+                        fontSize: 16,
+                        color: textSecondary.withValues(alpha: 0.4),
+                      ),
+                      border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(12),
+                        borderSide: BorderSide(color: Colors.red.shade200),
+                      ),
+                      focusedBorder: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(12),
+                        borderSide: BorderSide(
+                          color: Colors.red.shade400,
+                          width: 2,
+                        ),
+                      ),
+                      contentPadding: const EdgeInsets.symmetric(
+                        horizontal: 16,
+                        vertical: 12,
                       ),
                     ),
-                  );
-                },
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: Colors.red.shade600,
-                  foregroundColor: Colors.white,
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(12),
                   ),
-                  elevation: 2,
-                  padding:
-                      const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-                  minimumSize:
-                      const Size(120, 44), // Wider for "Confirm Delete"
-                ),
-                child: Text(
-                  'Confirm Delete',
-                  style: GoogleFonts.montserrat(
-                    fontSize: 13, // Smaller to fit the longer text
-                    fontWeight: FontWeight.w600,
-                    color: Colors.white,
-                  ),
-                  textAlign: TextAlign.center,
-                ),
+                ],
               ),
-            ),
-          ],
+              actions: [
+                Padding(
+                  padding: const EdgeInsets.only(right: 8),
+                  child: TextButton(
+                    onPressed: () => Navigator.pop(dialogContext),
+                    style: TextButton.styleFrom(
+                      foregroundColor: textSecondary,
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 16,
+                        vertical: 12,
+                      ),
+                    ),
+                    child: Text(
+                      'Cancel',
+                      style: GoogleFonts.montserrat(
+                        fontSize: 14,
+                        fontWeight: FontWeight.w600,
+                        color: textSecondary,
+                      ),
+                    ),
+                  ),
+                ),
+                Padding(
+                  padding: const EdgeInsets.only(left: 8),
+                  child: ElevatedButton(
+                    onPressed: confirmed
+                        ? () {
+                            Navigator.pop(dialogContext);
+                            unawaited(
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (_) =>
+                                      const AccountDeletionScreen(),
+                                ),
+                              ),
+                            );
+                          }
+                        : null,
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: Colors.red.shade600,
+                      foregroundColor: Colors.white,
+                      disabledBackgroundColor: Colors.red.shade200,
+                      disabledForegroundColor: Colors.white70,
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                      elevation: confirmed ? 2 : 0,
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 16,
+                        vertical: 12,
+                      ),
+                      minimumSize: const Size(120, 44),
+                    ),
+                    child: Text(
+                      'Confirm Delete',
+                      style: GoogleFonts.montserrat(
+                        fontSize: 13,
+                        fontWeight: FontWeight.w600,
+                        color: Colors.white,
+                      ),
+                      textAlign: TextAlign.center,
+                    ),
+                  ),
+                ),
+              ],
+            );
+          },
         ),
       ),
     );
   }
 
   Future<void> _performSignOut() async {
-    try {
-      // Close dialog
-      Navigator.pop(context);
+    Navigator.pop(context);
 
-      // Capture references before async gap
-      final userBloc = context.read<UserBloc>();
-      final navigator = Navigator.of(context);
+    final userBloc = context.read<UserBloc>();
+    final navigator = Navigator.of(context);
 
-      // Show loading (not awaited — work continues while dialog is visible)
-      unawaited(
-        showDialog(
-          context: context,
-          barrierDismissible: false,
-          builder: (dialogCtx) => Center(
-            child: Container(
-              padding: const EdgeInsets.all(24),
-              decoration: BoxDecoration(
-                color: Colors.white,
-                borderRadius: BorderRadius.circular(16),
-                boxShadow: [
-                  BoxShadow(
-                    color: Colors.black.withValues(alpha: 0.1),
-                    blurRadius: 10,
-                    offset: const Offset(0, 4),
-                  ),
-                ],
+    final loadingRoute = DialogRoute<void>(
+      context: context,
+      barrierDismissible: false,
+      builder: (dialogCtx) => Center(
+        child: Container(
+          padding: const EdgeInsets.all(24),
+          decoration: BoxDecoration(
+            color: Colors.white,
+            borderRadius: BorderRadius.circular(16),
+            boxShadow: [
+              BoxShadow(
+                color: Colors.black.withValues(alpha: 0.1),
+                blurRadius: 10,
+                offset: const Offset(0, 4),
               ),
-              child: Column(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  const CircularProgressIndicator(
-                    color: primaryColor,
-                    strokeWidth: 3,
-                  ),
-                  const SizedBox(height: 20),
-                  Text(
-                    'Signing out...',
-                    style: GoogleFonts.montserrat(
-                      fontSize: 16,
-                      fontWeight: FontWeight.w500,
-                      color: textPrimary,
-                    ),
-                  ),
-                ],
+            ],
+          ),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              const CircularProgressIndicator(
+                color: primaryColor,
+                strokeWidth: 3,
               ),
-            ),
+              const SizedBox(height: 20),
+              Text(
+                'Signing out...',
+                style: GoogleFonts.montserrat(
+                  fontSize: 16,
+                  fontWeight: FontWeight.w500,
+                  color: textPrimary,
+                ),
+              ),
+            ],
           ),
         ),
-      );
+      ),
+    );
+    unawaited(navigator.push(loadingRoute));
 
+    try {
       try {
         userBloc.add(const UserDataUpdated(null));
         userBloc.add(const UserListenStopped());
@@ -821,8 +869,12 @@ class _SettingsScreenState extends State<SettingsScreen> {
 
       await Future.delayed(const Duration(milliseconds: 100));
 
-      if (!mounted) return;
-      navigator.pop();
+      if (!mounted) {
+        return;
+      }
+      if (loadingRoute.isActive) {
+        navigator.removeRoute(loadingRoute);
+      }
 
       if (mounted) {
         await navigator.pushNamedAndRemoveUntil(
@@ -832,8 +884,12 @@ class _SettingsScreenState extends State<SettingsScreen> {
       }
     } on Object catch (e) {
       log('Error signing out: $e');
-      if (!mounted) return;
-      Navigator.pop(context);
+      if (!mounted) {
+        return;
+      }
+      if (loadingRoute.isActive) {
+        navigator.removeRoute(loadingRoute);
+      }
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Text(
@@ -868,7 +924,9 @@ class _SettingsScreenState extends State<SettingsScreen> {
   Future<void> _showSetPasswordDialog() async {
     final email = _auth.currentUser?.email;
     if (email == null || email.trim().isEmpty) {
-      if (!mounted) return;
+      if (!mounted) {
+        return;
+      }
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
           content: Text('No email found for this account.'),
@@ -879,7 +937,9 @@ class _SettingsScreenState extends State<SettingsScreen> {
 
     try {
       await _auth.sendPasswordResetEmail(email: email);
-      if (!mounted) return;
+      if (!mounted) {
+        return;
+      }
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Text(
@@ -891,7 +951,9 @@ class _SettingsScreenState extends State<SettingsScreen> {
         ),
       );
     } on FirebaseAuthException catch (e) {
-      if (!mounted) return;
+      if (!mounted) {
+        return;
+      }
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Text(
@@ -902,8 +964,10 @@ class _SettingsScreenState extends State<SettingsScreen> {
           behavior: SnackBarBehavior.floating,
         ),
       );
-    } catch (_) {
-      if (!mounted) return;
+    } on Object catch (_) {
+      if (!mounted) {
+        return;
+      }
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Text(

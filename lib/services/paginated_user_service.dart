@@ -2,12 +2,13 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/foundation.dart';
 
+import '../common/utils/distance.dart' as geo;
 import '../models/user_model.dart';
 
 /// Paginated user service for efficient user loading and discovery
 class PaginatedUserService {
-  static const int PAGE_SIZE = 20;
-  static const int MAX_DISTANCE_KM = 100;
+  static const int defaultPageSize = 20;
+  static const int maxDistanceFallbackMiles = 100;
 
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
   final FirebaseAuth _auth = FirebaseAuth.instance;
@@ -23,7 +24,7 @@ class PaginatedUserService {
   Future<PaginatedResult<UserModel>> getUsers({
     required UserModel currentUser,
     DocumentSnapshot? lastDocument,
-    int pageSize = PAGE_SIZE,
+    int pageSize = defaultPageSize,
     String? intentFilter, // Add intent filter parameter
   }) async {
     try {
@@ -67,10 +68,14 @@ class PaginatedUserService {
           final user = UserModel.fromMap(userData, doc.id);
           debugPrint('✅ Created UserModel for: ${user.name}');
 
-          // Apply intent filter if specified
+          // Apply intent filter if specified.
+          // 'Mixed' means "All of the Above": a Mixed filter shows everyone,
+          // and a specific filter also admits Mixed users (mirrors discovery).
           if (intentFilter != null && intentFilter.isNotEmpty) {
             final userIntent = user.lookingFor ?? 'Dating';
-            if (userIntent != intentFilter) {
+            if (intentFilter != 'Mixed' &&
+                userIntent != intentFilter &&
+                userIntent != 'Mixed') {
               debugPrint(
                 '🎯 Skipping user ${user.name} - intent mismatch (user: $userIntent, filter: $intentFilter)',
               );
@@ -78,12 +83,17 @@ class PaginatedUserService {
             }
           }
 
-          // Apply distance filter if location is available
-          // Temporarily disable distance filter for testing
-          users.add(user);
-          debugPrint(
-            '✅ Added user to results: ${user.name} (intent: ${user.lookingFor})',
-          );
+          // Apply distance filter when both users have coordinates
+          if (isWithinDistance(currentUser, user)) {
+            users.add(user);
+            debugPrint(
+              '✅ Added user to results: ${user.name} (intent: ${user.lookingFor})',
+            );
+          } else {
+            debugPrint(
+              '📏 Skipping user ${user.name} - beyond max distance',
+            );
+          }
         } on Object catch (e) {
           debugPrint('❌ Error processing user ${doc.id}: $e');
           continue;
@@ -124,10 +134,15 @@ class PaginatedUserService {
     debugPrint('   - ageRangeMin: ${currentUser.ageRangeMin}');
     debugPrint('   - ageRangeMax: ${currentUser.ageRangeMax}');
 
-    // Temporarily disable gender filtering to test
-    debugPrint('🔍 TEMPORARILY DISABLING GENDER FILTERING FOR DEBUGGING');
-    debugPrint('   - Current user showGender: ${currentUser.showGender}');
-    debugPrint('   - Current user gender: ${currentUser.gender}');
+    // Gender filtering based on user preference.
+    // showGender stores preference vocabulary ('men', 'women', 'everyone')
+    // while userGender stores identity vocabulary ('Male', 'Female', …).
+    // Map across before querying; 'everyone' skips the filter entirely.
+    final genderQuery = mapGenderPreference(currentUser.showGender);
+    if (genderQuery != null) {
+      query = query.where('userGender', isEqualTo: genderQuery);
+      debugPrint('🔍 Filtering by gender: $genderQuery');
+    }
 
     // Filter by age range
     if (currentUser.ageRangeMin != null && currentUser.ageRangeMax != null) {
@@ -202,6 +217,60 @@ class PaginatedUserService {
     }
   }
 
+  /// Check if a target user is within the current user's distance preference.
+  /// Returns true if either user lacks coordinates (don't penalize missing data).
+  @visibleForTesting
+  static bool isWithinDistance(UserModel currentUser, UserModel targetUser) {
+    if (currentUser.coordinates == null ||
+        currentUser.coordinates!.isEmpty ||
+        targetUser.coordinates == null ||
+        targetUser.coordinates!.isEmpty) {
+      return true;
+    }
+
+    final lat1 = currentUser.coordinates!['latitude'] as double?;
+    final lng1 = currentUser.coordinates!['longitude'] as double?;
+    final lat2 = targetUser.coordinates!['latitude'] as double?;
+    final lng2 = targetUser.coordinates!['longitude'] as double?;
+
+    if (lat1 == null || lng1 == null || lat2 == null || lng2 == null) {
+      return true;
+    }
+
+    final distanceMiles = geo.calculateDistance(lat1, lng1, lat2, lng2);
+    // maxDistance is stored in miles (onboarding UI presents miles);
+    // calculateDistance also returns miles — compare directly.
+    final maxMiles = currentUser.maxDistance ?? maxDistanceFallbackMiles;
+
+    return distanceMiles <= maxMiles;
+  }
+
+  /// Maps the preference vocabulary stored in [showGender] ('men', 'women',
+  /// 'everyone') to the identity vocabulary stored in the `userGender`
+  /// Firestore field ('Male', 'Female', …).
+  /// Returns `null` when no server-side filter should be applied.
+  @visibleForTesting
+  static String? mapGenderPreference(String? pref) {
+    if (pref == null || pref.isEmpty) {
+      return null;
+    }
+    switch (pref.toLowerCase()) {
+      case 'men':
+      case 'male':
+        return 'Male';
+      case 'women':
+      case 'female':
+        return 'Female';
+      case 'everyone':
+      case 'all':
+        return null;
+      default:
+        // If the value already matches a stored identity (e.g. 'Non-binary'),
+        // pass it through unchanged.
+        return pref;
+    }
+  }
+
   /// Refresh user data (clear cache and fetch fresh data)
   Future<PaginatedResult<UserModel>> refreshUsers(UserModel currentUser) async {
     debugPrint('🔄 Refreshing user data');
@@ -231,7 +300,9 @@ class PaginatedUserService {
     DocumentSnapshot? lastDocument,
   }) async {
     try {
-      if (lastDocument == null) return true;
+      if (lastDocument == null) {
+        return true;
+      }
 
       final query = _buildUserQuery(currentUser)
           .startAfterDocument(lastDocument)

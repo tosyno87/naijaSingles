@@ -139,16 +139,20 @@ class PrivacyAwareUserSearchRepo {
             continue;
           }
 
-          // Get privacy-filtered user data
-          final filteredUserData =
-              await _privacyService.getFilteredUserData(userId);
-          if (filteredUserData == null) {
-            continue; // Skip if no data available
+          // Use document data already returned by the list query.
+          // Re-fetching via getFilteredUserData would hit the stricter
+          // per-document `get` rule and fail with permission-denied.
+          final rawData = doc.data() as Map<String, dynamic>?;
+          if (rawData == null || rawData.isEmpty) {
+            continue;
           }
 
-          // Create UserModel from filtered data
+          // Apply default privacy masks (e.g. hide sexualOrientation)
+          // while preserving operational fields like lat/lng and photos.
+          final filteredData = _privacyService.filterForDiscovery(rawData);
+
           final UserModel user =
-              await _createUserModelFromFilteredData(filteredUserData, userId);
+              await _createUserModelFromFilteredData(filteredData, userId);
 
           // Calculate distance if location is available
           if (user.latitude != null &&
@@ -310,25 +314,28 @@ class PrivacyAwareUserSearchRepo {
       showMyAge: data['showMyAge'] ?? true,
       latitude: latitude,
       longitude: longitude,
-      imageUrl: data['photos'] is List
-          ? List<String>.from(
-              (data['photos'] as List)
-                  .map((e) => e?.toString() ?? '')
-                  .where((url) => url.toString().isNotEmpty),
-            )
-          : data['Pictures'] is List
-              ? List<String>.from(
-                  (data['Pictures'] as List)
-                      .map((e) => e?.toString() ?? '')
-                      .where((url) => url.toString().isNotEmpty),
-                )
-              : [],
+      imageUrl: _extractPhotos(data),
       isBlocked: data['isBlocked'] ?? false,
       lookingFor: data['lookingFor']?.toString() ?? 'Dating',
       bio: data['bio']?.toString(),
       accountStatus: data['accountStatus']?.toString(),
       sexualOrientation: data['sexualOrientation'],
     );
+  }
+
+  /// Resolve photo URLs from the multiple field names used across the schema.
+  static List<String> _extractPhotos(Map<String, dynamic> data) {
+    for (final key in ['photos', 'Pictures', 'imageUrl']) {
+      final value = data[key];
+      if (value is List && value.isNotEmpty) {
+        return List<String>.from(
+          value
+              .map((e) => e?.toString() ?? '')
+              .where((url) => url.isNotEmpty),
+        );
+      }
+    }
+    return [];
   }
 
   /// Get location-based users using GeoHash (privacy-aware)
@@ -370,28 +377,31 @@ class PrivacyAwareUserSearchRepo {
 
           for (var doc in snapshot.docs) {
             try {
-              if (doc.id == currentUser.id) continue;
+              if (doc.id == currentUser.id) {
+                continue;
+              }
+              final rawData = doc.data() as Map<String, dynamic>?;
+              if (rawData == null || rawData.isEmpty) {
+                continue;
+              }
               final filteredData =
-                  await _privacyService.getFilteredUserData(doc.id);
-              if (filteredData != null) {
-                final user = await _createUserModelFromFilteredData(
-                  filteredData,
-                  doc.id,
+                  _privacyService.filterForDiscovery(rawData);
+              final user = await _createUserModelFromFilteredData(
+                filteredData,
+                doc.id,
+              );
+
+              if (user.latitude != null && user.longitude != null) {
+                final actualDistance = distance.calculateDistance(
+                  currentUser.latitude!,
+                  currentUser.longitude!,
+                  user.latitude!,
+                  user.longitude!,
                 );
 
-                // Calculate actual distance
-                if (user.latitude != null && user.longitude != null) {
-                  final actualDistance = distance.calculateDistance(
-                    currentUser.latitude!,
-                    currentUser.longitude!,
-                    user.latitude!,
-                    user.longitude!,
-                  );
-
-                  if (actualDistance <= radiusMiles) {
-                    user.distanceBW = actualDistance.round();
-                    nearbyUsers.add(user);
-                  }
+                if (actualDistance <= radiusMiles) {
+                  user.distanceBW = actualDistance.round();
+                  nearbyUsers.add(user);
                 }
               }
             } on Object catch (e) {

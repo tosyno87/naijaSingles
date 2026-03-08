@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/foundation.dart';
@@ -6,12 +8,18 @@ import '../../../common/utils/firestore_helpers.dart';
 import '../message_model.dart';
 
 class ChatService {
-  final FirebaseFirestore _firestore = FirebaseFirestore.instance;
-  final FirebaseAuth _auth = FirebaseAuth.instance;
+  ChatService({
+    FirebaseFirestore? firestore,
+    FirebaseAuth? auth,
+  })  : _firestore = firestore ?? FirebaseFirestore.instance,
+        _auth = auth ?? FirebaseAuth.instance,
+        _chatThreadsCollection =
+            (firestore ?? FirebaseFirestore.instance).collection('chatThreads');
 
-  // Collection references
-  final CollectionReference _chatThreadsCollection =
-      FirebaseFirestore.instance.collection('chatThreads');
+  final FirebaseFirestore _firestore;
+  final FirebaseAuth _auth;
+
+  final CollectionReference _chatThreadsCollection;
 
   // Get current user ID
   String? get currentUserId => _auth.currentUser?.uid;
@@ -295,48 +303,148 @@ class ChatService {
   ///
   /// When a user has cleared the chat, only messages sent *after* the
   /// `clearedAt.<uid>` timestamp on the thread document are returned.
+  ///
+  /// The thread document (which holds `clearedAt`) is observed via its own
+  /// snapshot listener rather than fetched on every message emission. Because
+  /// `clearedAt` changes extremely rarely, the `.distinct()` filter ensures
+  /// re-filtering only happens when the value actually changes.
   Stream<List<Message>> getMessagesStream(String threadId) {
     final uid = currentUserId;
 
-    return _chatThreadsCollection
+    final messagesQuery = _chatThreadsCollection
         .doc(threadId)
         .collection('messages')
-        .orderBy('timestamp', descending: false)
+        .orderBy('timestamp', descending: false);
+
+    if (uid == null) {
+      return messagesQuery.snapshots().map(
+        (snapshot) => snapshot.docs.map((doc) {
+          final data = doc.data();
+          return Message(
+            id: doc.id,
+            senderId: data['senderId'] ?? '',
+            text: data['text'] ?? '',
+            timestamp: parseDateTime(data['timestamp']),
+            isRead: data['read'] ?? false,
+          );
+        }).toList(),
+      );
+    }
+
+    final clearedAtStream = _chatThreadsCollection
+        .doc(threadId)
         .snapshots()
-        .asyncMap((snapshot) async {
-      DateTime? clearedAt;
-      if (uid != null) {
-        try {
-          final threadDoc =
-              await _chatThreadsCollection.doc(threadId).get();
-          final threadData = threadDoc.data() as Map<String, dynamic>?;
+        .map((snap) {
+          final data = snap.data() as Map<String, dynamic>?;
           final clearedAtMap =
-              threadData?['clearedAt'] as Map<String, dynamic>?;
+              data?['clearedAt'] as Map<String, dynamic>?;
+          final raw = clearedAtMap?[uid];
+          if (raw is Timestamp) {
+            return raw.toDate();
+          }
+          if (raw is String) {
+            return DateTime.tryParse(raw);
+          }
+          return null;
+        })
+        .distinct();
+
+    final controller = StreamController<List<Message>>();
+    DateTime? clearedAt;
+    List<Message>? latestMessages;
+    bool clearedAtReady = false;
+
+    void emitFiltered() {
+      if (latestMessages == null || !clearedAtReady || controller.isClosed) {
+        return;
+      }
+      final filtered = clearedAt == null
+          ? latestMessages!
+          : latestMessages!
+              .where((m) => m.timestamp.isAfter(clearedAt!))
+              .toList();
+      controller.add(filtered);
+    }
+
+    // One-shot fallback: if the real-time listener fails before delivering
+    // a first value, attempt a single get() so the privacy invariant is
+    // preserved. Only degrades to unfiltered when Firestore is truly
+    // unreachable.
+    void fetchClearedAtFallback() {
+      if (clearedAtReady || controller.isClosed) {
+        return;
+      }
+      unawaited(
+        _chatThreadsCollection.doc(threadId).get().then<void>((doc) {
+          if (clearedAtReady || controller.isClosed) {
+            return;
+          }
+          final data = doc.data() as Map<String, dynamic>?;
+          final clearedAtMap =
+              data?['clearedAt'] as Map<String, dynamic>?;
           final raw = clearedAtMap?[uid];
           if (raw is Timestamp) {
             clearedAt = raw.toDate();
           } else if (raw is String) {
             clearedAt = DateTime.tryParse(raw);
           }
-        } on Object catch (e) {
-          debugPrint('Error fetching clearedAt for thread $threadId: $e');
-        }
-      }
+          clearedAtReady = true;
+          emitFiltered();
+        }, onError: (Object fallbackError) {
+          debugPrint(
+            'Fallback clearedAt fetch failed for thread $threadId: '
+            '$fallbackError',
+          );
+          if (!clearedAtReady && !controller.isClosed) {
+            clearedAtReady = true;
+            emitFiltered();
+          }
+        },),
+      );
+    }
 
-      return snapshot.docs.map((doc) {
-        final data = doc.data();
-        return Message(
-          id: doc.id,
-          senderId: data['senderId'] ?? '',
-          text: data['text'] ?? '',
-          timestamp: parseDateTime(data['timestamp']),
-          isRead: data['read'] ?? false,
+    final threadSub = clearedAtStream.listen(
+      (value) {
+        clearedAt = value;
+        clearedAtReady = true;
+        emitFiltered();
+      },
+      onError: (Object e) {
+        debugPrint(
+          'Error listening to clearedAt for thread $threadId: $e',
         );
-      }).where((msg) {
-        if (clearedAt == null) return true;
-        return msg.timestamp.isAfter(clearedAt);
-      }).toList();
-    });
+        fetchClearedAtFallback();
+      },
+      onDone: fetchClearedAtFallback,
+    );
+
+    final msgSub = messagesQuery.snapshots().listen(
+      (snapshot) {
+        latestMessages = snapshot.docs.map((doc) {
+          final data = doc.data();
+          return Message(
+            id: doc.id,
+            senderId: data['senderId'] ?? '',
+            text: data['text'] ?? '',
+            timestamp: parseDateTime(data['timestamp']),
+            isRead: data['read'] ?? false,
+          );
+        }).toList();
+        emitFiltered();
+      },
+      onError: (Object e) {
+        if (!controller.isClosed) {
+          controller.addError(e);
+        }
+      },
+    );
+
+    controller.onCancel = () async {
+      await Future.wait([threadSub.cancel(), msgSub.cancel()]);
+      await controller.close();
+    };
+
+    return controller.stream;
   }
 
   // Stream of all chat threads for current user with enhanced error handling.

@@ -1,6 +1,8 @@
 import 'dart:developer';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import '../../../groups/data/services/unified_group_service.dart'
+    as unified;
 
 /// Industry-standard group chat service
 /// Features:
@@ -132,104 +134,13 @@ class GroupChatService {
     }
   }
 
-  /// Leave a group chat
-  Future<void> leaveGroup(String groupId) async {
-    try {
-      log('👥 Leaving group: $groupId');
-
-      final currentUserId = _auth.currentUser?.uid;
-      if (currentUserId == null) {
-        throw Exception('User not authenticated');
-      }
-
-      final groupRef = _firestore.collection('unifiedGroups').doc(groupId);
-      var enableChat = false;
-      await _firestore.runTransaction((transaction) async {
-        final groupDoc = await transaction.get(groupRef);
-        if (!groupDoc.exists) {
-          throw Exception('Group not found');
-        }
-
-        final groupData = groupDoc.data() as Map<String, dynamic>;
-        enableChat = groupData['enableChat'] == true;
-        final existingMembers = List<String>.from(groupData['memberIds'] ?? []);
-        if (!existingMembers.contains(currentUserId)) {
-          throw Exception('User is not a member of this group');
-        }
-
-        final updatedMembers = existingMembers.toSet()..remove(currentUserId);
-        final updatedAdmins = List<String>.from(groupData['adminIds'] ?? [])
-            .toSet()
-          ..remove(currentUserId);
-        final creatorId = groupData['creatorId'] as String?;
-
-        if (updatedMembers.isEmpty) {
-          transaction.update(groupRef, {
-            'memberIds': <String>[],
-            'adminIds': <String>[],
-            'memberCount': 0,
-            'isActive': false,
-            'updatedAt': FieldValue.serverTimestamp(),
-            'lastActivityAt': FieldValue.serverTimestamp(),
-          });
-          return;
-        }
-
-        final nextMembers = updatedMembers.toList();
-        final nextAdmins = updatedAdmins.toList();
-        final updateData = <String, dynamic>{
-          'memberIds': nextMembers,
-          'memberCount': nextMembers.length,
-          'adminIds': nextAdmins,
-          'updatedAt': FieldValue.serverTimestamp(),
-          'lastActivityAt': FieldValue.serverTimestamp(),
-        };
-
-        if (creatorId == currentUserId) {
-          final newCreatorId =
-              nextAdmins.isNotEmpty ? nextAdmins.first : nextMembers.first;
-          if (!nextAdmins.contains(newCreatorId)) {
-            nextAdmins.add(newCreatorId);
-            updateData['adminIds'] = nextAdmins;
-          }
-          updateData['creatorId'] = newCreatorId;
-        }
-
-        transaction.update(groupRef, updateData);
-      });
-
-      // Write a best-effort system message after leave only when chat is enabled.
-      if (enableChat) {
-        try {
-          await _firestore
-              .collection('unifiedGroups')
-              .doc(groupId)
-              .collection('messages')
-              .add({
-            'groupId': groupId,
-            'senderId': currentUserId,
-            'text': 'left the group',
-            'messageType': MessageType.system.name,
-            'timestamp': FieldValue.serverTimestamp(),
-            'isRead': false,
-            'readBy': [currentUserId],
-          });
-          await _firestore.collection('unifiedGroups').doc(groupId).update({
-            'lastMessageAt': FieldValue.serverTimestamp(),
-            'lastMessageText': 'left the group',
-            'lastMessageSenderId': currentUserId,
-          });
-        } on Object catch (messageError) {
-          log('⚠️ Leave message skipped for group $groupId: $messageError');
-        }
-      }
-
-      log('✅ Successfully left group: $groupId');
-    } on Object catch (e) {
-      log('❌ Error leaving group: $e');
-      rethrow;
-    }
-  }
+  /// Leave a group chat.
+  ///
+  /// Delegates to [unified.UnifiedGroupService] which owns the canonical
+  /// leave-group transaction (member removal, admin succession, system
+  /// message, and timestamp bookkeeping).
+  Future<void> leaveGroup(String groupId) =>
+      unified.UnifiedGroupService().leaveGroup(groupId);
 
   /// Invite users to group
   Future<void> inviteUsersToGroup(String groupId, List<String> userIds) async {

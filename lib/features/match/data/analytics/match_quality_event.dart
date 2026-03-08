@@ -6,6 +6,7 @@ enum MatchQualityEventType {
   match,
   conversationStart,
   latency,
+  conversationQuality,
 }
 
 enum MatchQualityActionType {
@@ -25,6 +26,8 @@ class MatchQualityEvent {
     this.scoreSnapshot,
     this.distanceBucket,
     this.latencyMs,
+    this.experimentId,
+    this.variantId,
     this.metadata,
   });
 
@@ -37,6 +40,8 @@ class MatchQualityEvent {
   final Map<String, double>? scoreSnapshot;
   final String? distanceBucket;
   final int? latencyMs;
+  final String? experimentId;
+  final String? variantId;
   final Map<String, dynamic>? metadata;
 
   Map<String, dynamic> toMap() => {
@@ -49,6 +54,8 @@ class MatchQualityEvent {
         'scoreSnapshot': scoreSnapshot,
         'distanceBucket': distanceBucket,
         'latencyMs': latencyMs,
+        'experimentId': experimentId,
+        'variantId': variantId,
         'metadata': metadata,
       }..removeWhere((key, value) => value == null);
 }

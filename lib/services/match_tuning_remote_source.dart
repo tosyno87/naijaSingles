@@ -28,9 +28,22 @@ class MatchTuningRemoteSource {
   final String documentId;
   final String payloadField;
 
+  Future<Map<String, dynamic>?> loadRawDocument() async {
+    try {
+      return await (_fetcher ?? _fetchFromFirestore)();
+    } on Object catch (e, st) {
+      AppLogger.warning(
+        'Failed to load raw Firestore match tuning document',
+        error: e,
+        stackTrace: st,
+      );
+      return null;
+    }
+  }
+
   Future<Map<String, dynamic>?> load() async {
     try {
-      final raw = await (_fetcher ?? _fetchFromFirestore)();
+      final raw = await loadRawDocument();
       if (raw == null || raw.isEmpty) {
         return null;
       }

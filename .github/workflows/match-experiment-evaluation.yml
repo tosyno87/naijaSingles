@@ -1,0 +1,93 @@
+name: Match Experiment Evaluation
+
+on:
+  workflow_dispatch:
+    inputs:
+      input_path:
+        description: Path to experiment metrics input JSON
+        required: true
+        default: reports/match_experiment_input.json
+        type: string
+      output_path:
+        description: Path to write evaluation output JSON
+        required: true
+        default: reports/match_experiment_report.json
+        type: string
+      fail_on:
+        description: Fail workflow when decision matches this value
+        required: true
+        default: rollback
+        type: choice
+        options:
+          - promote
+          - hold
+          - rollback
+  schedule:
+    - cron: '0 14 * * 1'
+
+jobs:
+  evaluate:
+    name: Evaluate Experiment Guardrails
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5
+
+      - name: Setup Flutter
+        uses: subosito/flutter-action@fd55f4c5af5b953cc57a2be44cb082c8f6635e8e
+        with:
+          flutter-version: '3.35.5'
+          channel: 'stable'
+          cache: true
+
+      - name: Install dependencies
+        run: flutter pub get
+
+      - name: Resolve parameters
+        id: params
+        shell: bash
+        run: |
+          if [[ "${{ github.event_name }}" == "workflow_dispatch" ]]; then
+            echo "input_path=${{ inputs.input_path }}" >> "$GITHUB_OUTPUT"
+            echo "output_path=${{ inputs.output_path }}" >> "$GITHUB_OUTPUT"
+            echo "fail_on=${{ inputs.fail_on }}" >> "$GITHUB_OUTPUT"
+          else
+            echo "input_path=reports/match_experiment_input.json" >> "$GITHUB_OUTPUT"
+            echo "output_path=reports/match_experiment_report.json" >> "$GITHUB_OUTPUT"
+            echo "fail_on=rollback" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Validate input file exists
+        shell: bash
+        run: |
+          INPUT="${{ steps.params.outputs.input_path }}"
+          if [[ ! -f "$INPUT" ]]; then
+            echo "::error::Experiment input file not found: $INPUT"
+            exit 1
+          fi
+
+      - name: Build guardrail report
+        shell: bash
+        run: |
+          dart run tool/match_experiment_report.dart \
+            --input "${{ steps.params.outputs.input_path }}" \
+            --output "${{ steps.params.outputs.output_path }}" \
+            --fail-on "${{ steps.params.outputs.fail_on }}"
+
+      - name: Append decision summary
+        shell: bash
+        run: |
+          REPORT="${{ steps.params.outputs.output_path }}"
+          DECISION=$(jq -r '.decision // "unknown"' "$REPORT")
+          echo "## Match Experiment Evaluation" >> "$GITHUB_STEP_SUMMARY"
+          echo "" >> "$GITHUB_STEP_SUMMARY"
+          echo "- Input: \`${{ steps.params.outputs.input_path }}\`" >> "$GITHUB_STEP_SUMMARY"
+          echo "- Output: \`${{ steps.params.outputs.output_path }}\`" >> "$GITHUB_STEP_SUMMARY"
+          echo "- Fail-on: \`${{ steps.params.outputs.fail_on }}\`" >> "$GITHUB_STEP_SUMMARY"
+          echo "- Decision: \`$DECISION\`" >> "$GITHUB_STEP_SUMMARY"
+
+      - name: Upload evaluation artifact
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        with:
+          name: match-experiment-evaluation
+          path: ${{ steps.params.outputs.output_path }}

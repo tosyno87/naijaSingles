@@ -1,6 +1,7 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:naijasingles/features/match/data/analytics/match_quality_event.dart';
 import 'package:naijasingles/features/match/data/analytics/match_quality_reporter.dart';
+import 'package:naijasingles/services/match_experiment_assignment.dart';
 
 void main() {
   group('MatchQualityReporter', () {
@@ -169,6 +170,144 @@ void main() {
       expect(events[5].metadata?['operation'], 'thread_open');
       expect(events[0].userIdHash, isNot('u1'));
       expect(events[0].candidateIdHash, isNot('c1'));
+    });
+
+    test('enriches events with experiment assignment metadata', () async {
+      final writes = <List<MatchQualityEvent>>[];
+      final reporter = MatchQualityReporter(
+        now: () => DateTime(2026, 3, 8, 12),
+        batchSize: 10,
+        flushInterval: const Duration(days: 1),
+        writer: (events) async =>
+            writes.add(List<MatchQualityEvent>.from(events)),
+        experimentResolver: (_) async => const MatchExperimentAssignment(
+          experimentId: 'exp_match_1',
+          variantId: 'distance_decay_v1',
+          isControl: false,
+        ),
+      );
+
+      await reporter.recordMatch(
+        userId: 'u1',
+        candidateId: 'c1',
+        mode: 'Dating',
+      );
+      await reporter.flush();
+
+      expect(writes, hasLength(1));
+      final event = writes.single.single;
+      expect(event.experimentId, 'exp_match_1');
+      expect(event.variantId, 'distance_decay_v1');
+    });
+
+    test('records conversation quality metrics payload', () async {
+      final writes = <List<MatchQualityEvent>>[];
+      final reporter = MatchQualityReporter(
+        now: () => DateTime(2026, 3, 8, 12),
+        batchSize: 10,
+        flushInterval: const Duration(days: 1),
+        writer: (events) async =>
+            writes.add(List<MatchQualityEvent>.from(events)),
+      );
+
+      await reporter.recordConversationQuality(
+        userId: 'u1',
+        mode: 'Dating',
+        conversationDepth: 6,
+        responseRate: 0.75,
+        medianReplyDelayMs: 120000,
+      );
+      await reporter.flush();
+
+      expect(writes, hasLength(1));
+      final event = writes.single.single;
+      expect(event.type, MatchQualityEventType.conversationQuality);
+      expect(event.metadata?['conversationDepth'], 6);
+      expect(event.metadata?['responseRate'], 0.75);
+      expect(event.metadata?['medianReplyDelayMs'], 120000);
+    });
+
+    test('continues recording when experiment resolver throws', () async {
+      final writes = <List<MatchQualityEvent>>[];
+      final reporter = MatchQualityReporter(
+        now: () => DateTime(2026, 3, 8, 12),
+        batchSize: 10,
+        flushInterval: const Duration(days: 1),
+        writer: (events) async =>
+            writes.add(List<MatchQualityEvent>.from(events)),
+        experimentResolver: (_) async => throw StateError('resolver down'),
+      );
+
+      await reporter.recordAction(
+        userId: 'u1',
+        candidateId: 'c1',
+        mode: 'Dating',
+        actionType: MatchQualityActionType.connect,
+      );
+      await reporter.flush();
+
+      expect(writes, hasLength(1));
+      final event = writes.single.single;
+      expect(event.type, MatchQualityEventType.action);
+      expect(event.experimentId, isNull);
+      expect(event.variantId, isNull);
+    });
+
+    test('records without experiment metadata when resolver returns null',
+        () async {
+      final writes = <List<MatchQualityEvent>>[];
+      final reporter = MatchQualityReporter(
+        now: () => DateTime(2026, 3, 8, 12),
+        batchSize: 10,
+        flushInterval: const Duration(days: 1),
+        writer: (events) async =>
+            writes.add(List<MatchQualityEvent>.from(events)),
+        experimentResolver: (_) async => null,
+      );
+
+      await reporter.recordMatch(
+        userId: 'u1',
+        candidateId: 'c1',
+        mode: 'Dating',
+      );
+      await reporter.flush();
+
+      expect(writes, hasLength(1));
+      final event = writes.single.single;
+      expect(event.type, MatchQualityEventType.match);
+      expect(event.experimentId, isNull);
+      expect(event.variantId, isNull);
+    });
+
+    test('recordLatency with null userId skips experiment resolution',
+        () async {
+      final writes = <List<MatchQualityEvent>>[];
+      var resolverCalls = 0;
+      final reporter = MatchQualityReporter(
+        now: () => DateTime(2026, 3, 8, 12),
+        batchSize: 10,
+        flushInterval: const Duration(days: 1),
+        writer: (events) async =>
+            writes.add(List<MatchQualityEvent>.from(events)),
+        experimentResolver: (_) async {
+          resolverCalls++;
+          return null;
+        },
+      );
+
+      await reporter.recordLatency(
+        operation: 'discover_load',
+        latencyMs: 90,
+        mode: 'Dating',
+      );
+      await reporter.flush();
+
+      expect(resolverCalls, 0);
+      expect(writes, hasLength(1));
+      final event = writes.single.single;
+      expect(event.userIdHash, 'anonymous');
+      expect(event.experimentId, isNull);
+      expect(event.variantId, isNull);
     });
 
     test('dispose cancels scheduled timer flush', () async {

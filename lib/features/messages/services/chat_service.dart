@@ -8,6 +8,7 @@ import '../../../common/utils/firestore_helpers.dart';
 import '../../../features/match/data/analytics/match_quality_reporter.dart';
 import '../../../services/performance_monitor.dart';
 import '../message_model.dart';
+import 'conversation_quality_metrics.dart';
 
 class ChatService {
   ChatService({
@@ -369,6 +370,7 @@ class ChatService {
     final uid = currentUserId;
     final threadOpenTimer = Stopwatch()..start();
     var openLatencyTracked = false;
+    var qualityTracked = false;
 
     final messagesQuery = _chatThreadsCollection
         .doc(threadId)
@@ -406,8 +408,32 @@ class ChatService {
 
     final controller = StreamController<List<Message>>();
     DateTime? clearedAt;
+    String? otherUserId;
     List<Message>? latestMessages;
     bool clearedAtReady = false;
+
+    unawaited(
+      _chatThreadsCollection.doc(threadId).get().then<void>(
+        (doc) {
+          final data = doc.data() as Map<String, dynamic>?;
+          final userIds = (data?['userIds'] as List<dynamic>?)
+              ?.map((id) => id.toString())
+              .toList(growable: false);
+          if (userIds != null) {
+            otherUserId = userIds.firstWhere(
+              (id) => id != uid,
+              orElse: () => '',
+            );
+          }
+        },
+        onError: (Object e) {
+          AppLogger.warning(
+            'Unable to resolve thread participants for quality event',
+            error: e,
+          );
+        },
+      ),
+    );
 
     void emitFiltered() {
       if (latestMessages == null || !clearedAtReady || controller.isClosed) {
@@ -501,6 +527,24 @@ class ChatService {
             isRead: data['read'] ?? false,
           );
         }).toList();
+        if (!qualityTracked && latestMessages!.length >= 2) {
+          qualityTracked = true;
+          final quality = calculateConversationQualityMetrics(
+            latestMessages!,
+            currentUserId: uid,
+          );
+          unawaited(
+            MatchQualityReporter.instance.recordConversationQuality(
+              userId: uid,
+              // TODO(product-excellence): source mode from thread metadata.
+              mode: 'Dating',
+              conversationDepth: quality.conversationDepth,
+              responseRate: quality.responseRate,
+              medianReplyDelayMs: quality.medianReplyDelayMs,
+              candidateId: otherUserId,
+            ),
+          );
+        }
         emitFiltered();
       },
       onError: (Object e) {

@@ -55,7 +55,10 @@ class SmartMatchService {
           }
 
           // Calculate compatibility scores for all users
-          final matchConfig = await _matchConfigProvider.getCurrentConfig();
+          final matchConfig =
+              await _matchConfigProvider.getCurrentConfigForUser(
+            currentUser.id,
+          );
           final compatibilityResults = await _calculateCompatibilityScores(
             currentUser,
             userResult.items,
@@ -426,7 +429,9 @@ class SmartMatchService {
         return SmartMatchResult.error('Failed to load users');
       }
 
-      final matchConfig = await _matchConfigProvider.getCurrentConfig();
+      final matchConfig = await _matchConfigProvider.getCurrentConfigForUser(
+        currentUser.id,
+      );
 
       // Calculate compatibility and filter
       final compatibilityResults = await _calculateCompatibilityScores(
@@ -474,7 +479,9 @@ class SmartMatchService {
         return MatchingAnalysis.empty();
       }
 
-      final matchConfig = await _matchConfigProvider.getCurrentConfig();
+      final matchConfig = await _matchConfigProvider.getCurrentConfigForUser(
+        currentUser.id,
+      );
 
       // Calculate compatibility scores
       final compatibilityResults = await _calculateCompatibilityScores(

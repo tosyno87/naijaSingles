@@ -12,7 +12,7 @@ class UserDOB extends StatefulWidget {
   final Map<String, dynamic> userData;
 
   @override
-  _UserDOBState createState() => _UserDOBState();
+  State<UserDOB> createState() => _UserDOBState();
 }
 
 class _UserDOBState extends State<UserDOB> {

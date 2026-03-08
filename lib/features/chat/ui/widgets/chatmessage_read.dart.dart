@@ -15,11 +15,12 @@ import '../../../user/ui/widgets/user_info.dart';
 
 class ChatMessageRead {
   static List<Widget> messagesIsRead(
-    documentSnapshot,
+    Object? documentSnapshot,
     UserModel second,
     UserModel sender,
     BuildContext context,
   ) {
+    final dynamic snapshot = documentSnapshot;
     final isDarkMode = context.watch<ThemeBloc>().isDarkMode;
     return <Widget>[
       Column(
@@ -52,7 +53,7 @@ class ChatMessageRead {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: <Widget>[
             Container(
-              child: documentSnapshot.data()!['image_url'] != ''
+              child: snapshot.data()!['image_url'] != ''
                   ? InkWell(
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.end,
@@ -70,20 +71,17 @@ class ChatMessageRead {
                             child: CustomCNImage(
                               height: MediaQuery.of(context).size.height * .65,
                               width: MediaQuery.of(context).size.width * .9,
-                              imageUrl:
-                                  documentSnapshot.data()!['image_url'] ?? '',
+                              imageUrl: snapshot.data()!['image_url'] ?? '',
                             ),
                           ),
                           Padding(
                             padding: const EdgeInsets.only(right: 10),
                             child: Text(
-                              documentSnapshot.data()!['time'] != null
+                              snapshot.data()!['time'] != null
                                   ? DateFormat.yMMMd('en_US')
                                       .add_jm()
                                       .format(
-                                        documentSnapshot
-                                            .data()!['time']
-                                            .toDate(),
+                                        snapshot.data()!['time'].toDate(),
                                       )
                                       .toString()
                                   : '',
@@ -101,7 +99,7 @@ class ChatMessageRead {
                           Navigator.pushNamed(
                             context,
                             RouteName.largeImageScreen,
-                            arguments: documentSnapshot.get('image_url'),
+                            arguments: snapshot.get('image_url'),
                           ),
                         );
                       },
@@ -111,7 +109,7 @@ class ChatMessageRead {
                         unawaited(
                           Clipboard.setData(
                             ClipboardData(
-                              text: documentSnapshot.data()!['text'],
+                              text: snapshot.data()!['text'],
                             ),
                           ),
                         );
@@ -137,7 +135,7 @@ class ChatMessageRead {
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: <Widget>[
                             Text(
-                              documentSnapshot.data()!['text'],
+                              snapshot.data()!['text'],
                               style: TextStyle(
                                 color:
                                     isDarkMode ? Colors.white : Colors.black87,
@@ -149,13 +147,11 @@ class ChatMessageRead {
                               mainAxisAlignment: MainAxisAlignment.end,
                               children: <Widget>[
                                 Text(
-                                  documentSnapshot.data()!['time'] != null
+                                  snapshot.data()!['time'] != null
                                       ? DateFormat.MMMd('en_US')
                                           .add_jm()
                                           .format(
-                                            documentSnapshot
-                                                .data()!['time']
-                                                .toDate(),
+                                            snapshot.data()!['time'].toDate(),
                                           )
                                           .toString()
                                       : '',

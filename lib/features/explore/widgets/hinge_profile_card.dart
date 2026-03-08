@@ -89,7 +89,7 @@ class _HingeProfileCardState extends State<HingeProfileCard> {
     );
   }
 
-  List<String> _extractPhotos(imageUrl) {
+  List<String> _extractPhotos(Object? imageUrl) {
     if (imageUrl == null) return [];
     if (imageUrl is! List) return [];
     if (imageUrl.isEmpty) return [];

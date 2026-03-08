@@ -6,7 +6,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:swipable_stack/swipable_stack.dart';
 
 import '../../../../common/bloc/theme/theme_bloc.dart';
-import '../../../../common/constants/app_colors.dart';
+import '../../../../common/widgets/state_views/state_views.dart';
 import '../../../../models/user_model.dart';
 import '../../../home/controllers/home_controller.dart';
 import '../../../match/ui/widget/match_dialog_new.dart';
@@ -32,8 +32,7 @@ class SwipeCardList extends StatefulWidget {
 class _SwipeCardListState extends State<SwipeCardList> {
   @override
   Widget build(BuildContext context) {
-    final themeBloc = context.watch<ThemeBloc>();
-    final isDarkMode = themeBloc.isDarkMode;
+    context.watch<ThemeBloc>();
     return BlocListener<SwipeBloc, SwipeblocState>(
       listener: (context, swipeState) {
         if (swipeState is SwipeMatchCreatedState) {
@@ -52,26 +51,20 @@ class _SwipeCardListState extends State<SwipeCardList> {
         builder: (context, state) {
           if (state is SearchUserLoadingState) {
             widget.stackController?.dispose();
-            return const Center(
-              child: CircularProgressIndicator(
-                valueColor: AlwaysStoppedAnimation(AppColors.primaryGreen),
-              ),
-            );
+            return const AppLoadingView(message: 'Loading profiles...');
           }
 
           if (state is SearchUserFailedState) {
-            return Center(
-              child: Text(
-                'Error to load data.'.tr().toString(),
-                textAlign: TextAlign.center,
-                style: TextStyle(
-                  color: isDarkMode ? Colors.white : Colors.black54,
-                  fontStyle: FontStyle.normal,
-                  letterSpacing: 1,
-                  decoration: TextDecoration.none,
-                  fontSize: 18,
-                ),
-              ),
+            return AppErrorView(
+              title: 'Unable to load profiles',
+              message: 'Error to load data.'.tr().toString(),
+              onRetry: () {
+                context.read<SearchUserBloc>().add(
+                      LoadUserEvent(
+                        currentUser: widget.controller.currentUser,
+                      ),
+                    );
+              },
             );
           }
 
@@ -81,60 +74,19 @@ class _SwipeCardListState extends State<SwipeCardList> {
               height: MediaQuery.of(context).size.height * .78,
               width: MediaQuery.of(context).size.width,
               child: state.users.isEmpty
-                  ? Align(
-                      child: Column(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: <Widget>[
-                          Padding(
-                            padding: const EdgeInsets.all(8),
-                            child: CircleAvatar(
-                              backgroundColor: Colors.grey[200],
-                              radius: 50,
-                              child: Padding(
-                                padding: const EdgeInsets.all(10),
-                                child: Image.asset(
-                                  'asset/images/logo.png',
-                                  fit: BoxFit.contain,
-                                  color: AppColors.primaryGreen,
-                                ),
+                  ? AppEmptyView(
+                      title: "There's no one new around you.".tr().toString(),
+                      subtitle:
+                          'Try expanding your distance or refreshing discovery.',
+                      icon: Icons.explore_off,
+                      actionLabel: 'Refresh',
+                      onAction: () {
+                        context.read<SearchUserBloc>().add(
+                              LoadUserEvent(
+                                currentUser: widget.controller.currentUser,
                               ),
-                            ),
-                          ),
-                          Text(
-                            "There's no one new around you.".tr().toString(),
-                            textAlign: TextAlign.center,
-                            style: TextStyle(
-                              color: isDarkMode ? Colors.white : Colors.black54,
-                              fontStyle: FontStyle.normal,
-                              letterSpacing: 1,
-                              decoration: TextDecoration.none,
-                              fontSize: 20,
-                            ),
-                          ),
-                          const SizedBox(height: 8),
-                          Text(
-                            'Try expanding your distance or refreshing discovery.',
-                            textAlign: TextAlign.center,
-                            style: TextStyle(
-                              color:
-                                  isDarkMode ? Colors.white70 : Colors.black45,
-                              fontSize: 14,
-                            ),
-                          ),
-                          const SizedBox(height: 14),
-                          OutlinedButton(
-                            onPressed: () {
-                              context.read<SearchUserBloc>().add(
-                                    LoadUserEvent(
-                                      currentUser:
-                                          widget.controller.currentUser,
-                                    ),
-                                  );
-                            },
-                            child: const Text('Refresh'),
-                          ),
-                        ],
-                      ),
+                            );
+                      },
                     )
                   : UsersList(
                       onswiped: (int index, SwipeDirection dir) {

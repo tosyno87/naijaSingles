@@ -44,6 +44,23 @@ class MatchConfig {
 
   /// Minimum location score applied beyond [locationDecayMiles].
   final double locationFloorScore;
+
+  MatchConfig copyWith({
+    ModeWeights? datingWeights,
+    ModeWeights? friendshipWeights,
+    ModeWeights? networkingWeights,
+    double? locationPerfectMiles,
+    double? locationDecayMiles,
+    double? locationFloorScore,
+  }) =>
+      MatchConfig(
+        datingWeights: datingWeights ?? this.datingWeights,
+        friendshipWeights: friendshipWeights ?? this.friendshipWeights,
+        networkingWeights: networkingWeights ?? this.networkingWeights,
+        locationPerfectMiles: locationPerfectMiles ?? this.locationPerfectMiles,
+        locationDecayMiles: locationDecayMiles ?? this.locationDecayMiles,
+        locationFloorScore: locationFloorScore ?? this.locationFloorScore,
+      );
 }
 
 /// Per-factor weights for a given relationship mode.
@@ -70,4 +87,25 @@ class ModeWeights {
   final double social;
   final double professional;
   final double industry;
+
+  ModeWeights copyWith({
+    double? age,
+    double? location,
+    double? lifestyle,
+    double? interest,
+    double? completeness,
+    double? social,
+    double? professional,
+    double? industry,
+  }) =>
+      ModeWeights(
+        age: age ?? this.age,
+        location: location ?? this.location,
+        lifestyle: lifestyle ?? this.lifestyle,
+        interest: interest ?? this.interest,
+        completeness: completeness ?? this.completeness,
+        social: social ?? this.social,
+        professional: professional ?? this.professional,
+        industry: industry ?? this.industry,
+      );
 }

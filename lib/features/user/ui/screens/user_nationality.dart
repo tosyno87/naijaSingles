@@ -11,7 +11,7 @@ class UserNationality extends StatefulWidget {
   final Map<String, dynamic> userData;
 
   @override
-  _UserNationalityState createState() => _UserNationalityState();
+  State<UserNationality> createState() => _UserNationalityState();
 }
 
 class _UserNationalityState extends State<UserNationality> {

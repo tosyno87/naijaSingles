@@ -48,7 +48,8 @@ class _WelcomeScreenState extends State<WelcomeScreen>
     _kenBurnsController = AnimationController(
       duration: const Duration(seconds: 12),
       vsync: this,
-    )..repeat(reverse: true);
+    );
+    unawaited(_kenBurnsController.repeat(reverse: true));
 
     _kenBurnsScale = Tween<double>(begin: 1, end: 1.06).animate(
       CurvedAnimation(parent: _kenBurnsController, curve: Curves.easeInOut),
@@ -84,9 +85,11 @@ class _WelcomeScreenState extends State<WelcomeScreen>
     );
 
     if (mounted) unawaited(_textController.forward());
-    Future.delayed(const Duration(milliseconds: 120), () {
-      if (mounted) unawaited(_buttonController.forward());
-    });
+    unawaited(
+      Future<void>.delayed(const Duration(milliseconds: 120), () {
+        if (mounted) unawaited(_buttonController.forward());
+      }),
+    );
   }
 
   @override
@@ -144,8 +147,13 @@ class _WelcomeScreenState extends State<WelcomeScreen>
             builder: (context, child) => Transform(
               alignment: Alignment.center,
               transform: Matrix4.identity()
-                ..scale(_kenBurnsScale.value, _kenBurnsScale.value)
-                ..translate(0.0, _kenBurnsTranslateY.value),
+                ..scaleByDouble(
+                  _kenBurnsScale.value,
+                  _kenBurnsScale.value,
+                  1,
+                  1,
+                )
+                ..translateByDouble(0, _kenBurnsTranslateY.value, 0, 1),
               child: child,
             ),
             child: ColorFiltered(

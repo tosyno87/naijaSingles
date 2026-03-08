@@ -1,10 +1,12 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:flutter/foundation.dart';
 import '../../../common/utils/firestore_helpers.dart';
 import '../../../models/user_model.dart';
 
 /// Model representing a potential match for dating/friendship/networking
+@immutable
 class MatchedUser {
-  MatchedUser({
+  const MatchedUser({
     required this.id,
     required this.name,
     required this.age,
@@ -62,9 +64,9 @@ class MatchedUser {
             : 'assets/images/placeholder_profile.jpg',
         tribe: user.tribe,
         profession: user.profession ?? user.job_title,
-        personality: [], // Would need to be added to UserModel
+        personality: const [], // Would need to be added to UserModel
         bio: user.bio ?? '',
-        interests: [], // Would need to be added to UserModel
+        interests: const [], // Would need to be added to UserModel
         religion: user.religion,
         education: user.education,
         lookingFor: user.lookingFor,

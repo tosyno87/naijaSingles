@@ -5,6 +5,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 
 import '../../../common/utils/app_logger.dart';
 import '../../../common/utils/firestore_helpers.dart';
+import '../../../features/match/data/analytics/match_quality_reporter.dart';
 import '../../../services/performance_monitor.dart';
 import '../message_model.dart';
 
@@ -197,6 +198,8 @@ class ChatService {
 
           // Get the thread document to find the other user's ID
           String otherUserId = '';
+          DateTime? threadCreatedAt;
+          bool isConversationStart = false;
           try {
             final threadDoc = await _chatThreadsCollection.doc(threadId).get();
             if (threadDoc.exists) {
@@ -208,6 +211,8 @@ class ChatService {
                   orElse: () => '',
                 );
               }
+              threadCreatedAt = parseDateTime(data?['createdAt']);
+              isConversationStart = data?['lastMessageSenderId'] == null;
             }
           } on FirebaseException catch (e) {
             AppLogger.error(
@@ -249,6 +254,22 @@ class ChatService {
           }
 
           await _chatThreadsCollection.doc(threadId).update(updateData);
+
+          if (isConversationStart && otherUserId.isNotEmpty) {
+            final createdAt = threadCreatedAt ?? DateTime.now();
+            final within24Hours =
+                DateTime.now().difference(createdAt).inHours <= 24;
+            // TODO(product-excellence): store conversation mode on chatThreads
+            // so conversation analytics are not hardcoded to 'Dating'.
+            unawaited(
+              MatchQualityReporter.instance.recordConversationStart(
+                userId: currentUserId!,
+                candidateId: otherUserId,
+                mode: 'Dating',
+                within24Hours: within24Hours,
+              ),
+            );
+          }
 
           return true;
         } on FirebaseException catch (e) {
@@ -346,6 +367,8 @@ class ChatService {
   /// re-filtering only happens when the value actually changes.
   Stream<List<Message>> getMessagesStream(String threadId) {
     final uid = currentUserId;
+    final threadOpenTimer = Stopwatch()..start();
+    var openLatencyTracked = false;
 
     final messagesQuery = _chatThreadsCollection
         .doc(threadId)
@@ -455,6 +478,19 @@ class ChatService {
 
     final msgSub = messagesQuery.snapshots().listen(
       (snapshot) {
+        if (!openLatencyTracked) {
+          openLatencyTracked = true;
+          threadOpenTimer.stop();
+          unawaited(
+            MatchQualityReporter.instance.recordLatency(
+              operation: 'thread_open',
+              latencyMs: threadOpenTimer.elapsedMilliseconds,
+              // TODO(product-excellence): source mode from thread metadata.
+              mode: 'Dating',
+              userId: uid,
+            ),
+          );
+        }
         latestMessages = snapshot.docs.map((doc) {
           final data = doc.data();
           return Message(

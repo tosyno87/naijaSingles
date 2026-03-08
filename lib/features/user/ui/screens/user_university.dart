@@ -8,7 +8,7 @@ class UniversityPage extends StatefulWidget {
   const UniversityPage({super.key});
 
   @override
-  _UniversityPage createState() => _UniversityPage();
+  State<UniversityPage> createState() => _UniversityPage();
 }
 
 class _UniversityPage extends State<UniversityPage> {

@@ -3,8 +3,9 @@ import 'package:flutter/foundation.dart';
 import '../common/utils/firestore_helpers.dart';
 
 /// Model representing a cultural group in the app
+@immutable
 class GroupModel {
-  GroupModel({
+  const GroupModel({
     required this.name,
     required this.description,
     required this.category,

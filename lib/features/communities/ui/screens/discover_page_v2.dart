@@ -9,7 +9,9 @@ import 'package:google_fonts/google_fonts.dart';
 
 import '../../../../common/bloc/user/user_bloc.dart';
 import '../../../../common/constants/app_colors.dart';
+import '../../../../common/constants/app_spacing.dart';
 import '../../../../common/routes/route_name.dart';
+import '../../../../common/widgets/state_views/state_views.dart';
 import '../../../../models/user_model.dart';
 import '../../../discovery/data/services/discovery_service.dart';
 import '../../../events/data/models/event_model.dart';
@@ -390,7 +392,7 @@ class _DiscoverPageV2State extends State<DiscoverPageV2> {
   }
 
   Widget _buildSubtitleRow() => Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 24),
+        padding: const EdgeInsets.symmetric(horizontal: AppSpacing.lg),
         child: Row(
           children: [
             Expanded(
@@ -404,13 +406,13 @@ class _DiscoverPageV2State extends State<DiscoverPageV2> {
                 ),
               ),
             ),
-            const SizedBox(width: 12),
+            const SizedBox(width: AppSpacing.sm + 4),
             Material(
               color: AppColors.primaryGreen.withValues(alpha: 0.08),
-              borderRadius: BorderRadius.circular(12),
+              borderRadius: BorderRadius.circular(AppSpacing.buttonRadius),
               child: InkWell(
                 onTap: _showFilterSheet,
-                borderRadius: BorderRadius.circular(12),
+                borderRadius: BorderRadius.circular(AppSpacing.buttonRadius),
                 child: const SizedBox(
                   width: 44,
                   height: 44,
@@ -942,43 +944,11 @@ class _DiscoverPageV2State extends State<DiscoverPageV2> {
   }) =>
       Padding(
         padding: EdgeInsets.symmetric(horizontal: horizontalPadding),
-        child: Container(
-          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 20),
-          decoration: BoxDecoration(
-            color: Colors.white,
-            borderRadius: BorderRadius.circular(16),
-            border: Border.all(color: Colors.grey.shade200),
-          ),
-          child: Row(
-            children: [
-              Icon(
-                Icons.info_outline_rounded,
-                size: 20,
-                color: Colors.grey.shade400,
-              ),
-              const SizedBox(width: 10),
-              Expanded(
-                child: Text(
-                  message,
-                  style: GoogleFonts.montserrat(
-                    fontSize: 14,
-                    color: AppColors.textSecondary,
-                  ),
-                ),
-              ),
-              TextButton(
-                onPressed: onRetry,
-                child: Text(
-                  'Retry',
-                  style: GoogleFonts.montserrat(
-                    fontSize: 14,
-                    fontWeight: FontWeight.w600,
-                    color: AppColors.primaryGreen,
-                  ),
-                ),
-              ),
-            ],
-          ),
+        child: AppErrorView(
+          title: 'Could not load section',
+          message: message,
+          onRetry: onRetry,
+          icon: Icons.info_outline_rounded,
         ),
       );
 
@@ -991,51 +961,11 @@ class _DiscoverPageV2State extends State<DiscoverPageV2> {
   }) =>
       Padding(
         padding: EdgeInsets.symmetric(horizontal: horizontalPadding),
-        child: Container(
-          width: double.infinity,
-          padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 28),
-          decoration: BoxDecoration(
-            color: Colors.white,
-            borderRadius: BorderRadius.circular(16),
-            border: Border.all(color: Colors.grey.shade100),
-          ),
-          child: Column(
-            children: [
-              Icon(icon, size: 40, color: Colors.grey.shade300),
-              const SizedBox(height: 12),
-              Text(
-                message,
-                style: GoogleFonts.montserrat(
-                  fontSize: 14,
-                  fontWeight: FontWeight.w500,
-                  color: AppColors.textSecondary,
-                ),
-                textAlign: TextAlign.center,
-              ),
-              const SizedBox(height: 16),
-              SizedBox(
-                height: 40,
-                child: OutlinedButton(
-                  onPressed: onAction,
-                  style: OutlinedButton.styleFrom(
-                    foregroundColor: AppColors.primaryGreen,
-                    side: const BorderSide(color: AppColors.primaryGreen),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(20),
-                    ),
-                    padding: const EdgeInsets.symmetric(horizontal: 20),
-                  ),
-                  child: Text(
-                    actionLabel,
-                    style: GoogleFonts.montserrat(
-                      fontSize: 13,
-                      fontWeight: FontWeight.w600,
-                    ),
-                  ),
-                ),
-              ),
-            ],
-          ),
+        child: AppEmptyView(
+          title: message,
+          icon: icon,
+          actionLabel: actionLabel,
+          onAction: onAction,
         ),
       );
 
@@ -1049,83 +979,12 @@ class _DiscoverPageV2State extends State<DiscoverPageV2> {
       Semantics(
         button: true,
         label: '$message — $actionLabel',
-        child: Material(
-          color: Colors.grey.shade200,
-          borderRadius: BorderRadius.circular(24),
-          clipBehavior: Clip.antiAlias,
-          child: InkWell(
-            onTap: onAction,
-            child: SizedBox(
-              height: height,
-              width: double.infinity,
-              child: Stack(
-                fit: StackFit.expand,
-                children: [
-                  Image.asset(
-                    assetPath,
-                    fit: BoxFit.cover,
-                    alignment: Alignment.topCenter,
-                    errorBuilder: (_, __, ___) => Container(
-                      color: AppColors.primaryGreen.withValues(alpha: 0.15),
-                    ),
-                  ),
-                  DecoratedBox(
-                    decoration: BoxDecoration(
-                      gradient: LinearGradient(
-                        begin: Alignment.topCenter,
-                        end: Alignment.bottomCenter,
-                        colors: [
-                          Colors.black.withValues(alpha: 0.10),
-                          Colors.black.withValues(alpha: 0.65),
-                        ],
-                      ),
-                    ),
-                  ),
-                  Positioned(
-                    left: 20,
-                    right: 20,
-                    bottom: 20,
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        Text(
-                          message,
-                          style: GoogleFonts.montserrat(
-                            fontSize: 16,
-                            fontWeight: FontWeight.w600,
-                            color: Colors.white,
-                          ),
-                        ),
-                        const SizedBox(height: 12),
-                        SizedBox(
-                          height: 36,
-                          child: OutlinedButton(
-                            onPressed: onAction,
-                            style: OutlinedButton.styleFrom(
-                              foregroundColor: Colors.white,
-                              side: const BorderSide(color: Colors.white70),
-                              shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(18),
-                              ),
-                              padding:
-                                  const EdgeInsets.symmetric(horizontal: 16),
-                            ),
-                            child: Text(
-                              actionLabel,
-                              style: GoogleFonts.montserrat(
-                                fontSize: 13,
-                                fontWeight: FontWeight.w600,
-                              ),
-                            ),
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                ],
-              ),
-            ),
+        child: SizedBox(
+          height: height,
+          child: AppEmptyView(
+            title: message,
+            actionLabel: actionLabel,
+            onAction: onAction,
           ),
         ),
       );

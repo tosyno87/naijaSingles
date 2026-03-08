@@ -192,7 +192,7 @@ class IndustryStandardImageService {
       }
 
       // Check if file exists and is readable
-      if (!await imageFile.exists()) {
+      if (!imageFile.existsSync()) {
         debugPrint('Image file does not exist');
         return false;
       }

@@ -1,8 +1,10 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:flutter/foundation.dart';
 import '../../../common/utils/firestore_helpers.dart';
 
+@immutable
 class MatchModel {
-  MatchModel({
+  const MatchModel({
     required this.id,
     required this.users,
     required this.matchedAt,

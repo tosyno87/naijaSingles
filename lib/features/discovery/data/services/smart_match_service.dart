@@ -6,6 +6,8 @@ import '../../../../common/utils/app_logger.dart';
 import '../../../../common/utils/distance.dart' as geo;
 import '../../../../models/user_model.dart';
 import '../../../../services/cached_user_service.dart';
+import '../../../../services/match_config.dart';
+import '../../../../services/match_config_provider.dart';
 import '../../../../services/mode_specific_compatibility_engine.dart';
 import '../../../../services/paginated_user_service.dart' show PaginatedResult;
 import '../../../../services/performance_monitor.dart';
@@ -14,6 +16,10 @@ import '../../../match/data/services/compatibility_engine.dart';
 /// Smart match service that provides intelligent user ordering and discovery
 /// Implements Priority 2: Enhanced Matching Algorithm
 class SmartMatchService {
+  SmartMatchService({MatchConfigProvider? matchConfigProvider})
+      : _matchConfigProvider =
+            matchConfigProvider ?? MatchConfigProvider.instance;
+
   static const int diversityWindowSize = 5;
   static const double highCompatibilityThreshold = 0.7;
   static const double mediumCompatibilityThreshold = 0.5;
@@ -24,6 +30,7 @@ class SmartMatchService {
   static const int topNPinned = 3;
 
   final CachedUserService _cachedUserService = CachedUserService();
+  final MatchConfigProvider _matchConfigProvider;
 
   /// Get optimized user list with compatibility scoring and smart ordering
   Future<SmartMatchResult> getOptimizedUserList({
@@ -48,10 +55,12 @@ class SmartMatchService {
           }
 
           // Calculate compatibility scores for all users
+          final matchConfig = await _matchConfigProvider.getCurrentConfig();
           final compatibilityResults = await _calculateCompatibilityScores(
             currentUser,
             userResult.items,
             mode,
+            matchConfig,
           );
 
           // Apply smart ordering algorithm
@@ -83,6 +92,7 @@ class SmartMatchService {
     UserModel currentUser,
     List<UserModel> targetUsers,
     String mode,
+    MatchConfig matchConfig,
   ) async =>
       PerformanceMonitor.measure('compatibility_calculation', () async {
         AppLogger.debug(
@@ -97,6 +107,7 @@ class SmartMatchService {
             currentUser,
             user,
             mode,
+            config: matchConfig,
           );
 
           results.add(
@@ -415,11 +426,14 @@ class SmartMatchService {
         return SmartMatchResult.error('Failed to load users');
       }
 
+      final matchConfig = await _matchConfigProvider.getCurrentConfig();
+
       // Calculate compatibility and filter
       final compatibilityResults = await _calculateCompatibilityScores(
         currentUser,
         allUsersResult.items,
         'Dating', // Default mode for this method
+        matchConfig,
       );
 
       final highCompatibilityUsers = compatibilityResults
@@ -460,11 +474,14 @@ class SmartMatchService {
         return MatchingAnalysis.empty();
       }
 
+      final matchConfig = await _matchConfigProvider.getCurrentConfig();
+
       // Calculate compatibility scores
       final compatibilityResults = await _calculateCompatibilityScores(
         currentUser,
         usersResult.items.take(100).toList(), // Analyze first 100 users
         'Dating', // Default mode for this method
+        matchConfig,
       );
 
       // Analyze patterns

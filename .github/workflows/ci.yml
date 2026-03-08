@@ -68,10 +68,16 @@ jobs:
         
     - name: Install dependencies
       run: flutter pub get
-      
-    - name: Run static analysis
-      run: flutter analyze --no-fatal-infos
 
+    - name: Run golden tests (fail on skipped)
+      run: |
+        flutter test test/golden --reporter expanded > /tmp/golden.out 2>&1
+        cat /tmp/golden.out
+        if grep -Ei "skipped" /tmp/golden.out >/dev/null; then
+          echo "::error::Golden tests contain skipped cases"
+          exit 1
+        fi
+      
     - name: Enforce analyzer threshold
       run: |
         set +e
@@ -79,11 +85,11 @@ jobs:
         set -e
         COUNT=$(echo "$OUTPUT" | grep -oE '[0-9]+ issues? found' | grep -oE '^[0-9]+' || echo "0")
         echo "Analyzer issues: $COUNT"
-        if [ "$COUNT" -gt 50 ]; then
-          echo "::error::Analyzer issue count ($COUNT) exceeds threshold (50)"
+        if [ "$COUNT" -gt 0 ]; then
+          echo "::error::Analyzer issue count ($COUNT) exceeds threshold (0)"
           exit 1
         fi
-        echo "Analyzer issues within budget ($COUNT <= 50)"
+        echo "Analyzer issues within budget ($COUNT <= 0)"
 
     - name: Check code formatting
       run: dart format --output=none --set-exit-if-changed .
@@ -374,4 +380,3 @@ jobs:
           echo "## Release Blocked" >> $GITHUB_STEP_SUMMARY
           echo "One or more required gates failed. Fix issues before merging." >> $GITHUB_STEP_SUMMARY
         fi
-

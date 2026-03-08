@@ -11,7 +11,7 @@ class SexualOrientation extends StatefulWidget {
   const SexualOrientation({super.key});
 
   @override
-  _SexualOrientationState createState() => _SexualOrientationState();
+  State<SexualOrientation> createState() => _SexualOrientationState();
 }
 
 class _SexualOrientationState extends State<SexualOrientation> {

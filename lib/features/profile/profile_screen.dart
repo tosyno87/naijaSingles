@@ -9,6 +9,7 @@ import 'package:google_fonts/google_fonts.dart';
 
 import '../../common/constants/app_colors.dart';
 import '../../common/routes/route_name.dart';
+import '../../common/widgets/state_views/state_views.dart';
 
 import 'edit_profile_screen.dart';
 import 'privacy_settings_screen.dart';
@@ -58,6 +59,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
   // Listen to Firestore changes for automatic updates (e.g., after photo upload)
   void _listenToUserData() {
     try {
+      unawaited(_userDataSubscription?.cancel());
       final user = _auth.currentUser;
       if (user != null) {
         _userDataSubscription =
@@ -184,41 +186,48 @@ class _ProfileScreenState extends State<ProfileScreen> {
           ],
         ),
         body: _isLoading
-            ? const Center(
-                child: CircularProgressIndicator(color: primaryColor),
-              )
-            : SafeArea(
-                child: SingleChildScrollView(
-                  // Remove padding for seamless Hinge-style layout
-                  padding: EdgeInsets.zero,
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      // Hinge-style large photo section (full width, no padding)
-                      _buildHingePhotoSection(),
+            ? const AppLoadingView(message: 'Loading profile...')
+            : _userData == null
+                ? AppEmptyView(
+                    title: 'Profile unavailable',
+                    subtitle:
+                        'We could not load your profile details right now.',
+                    icon: Icons.person_off_outlined,
+                    actionLabel: 'Retry',
+                    onAction: _listenToUserData,
+                  )
+                : SafeArea(
+                    child: SingleChildScrollView(
+                      // Remove padding for seamless Hinge-style layout
+                      padding: EdgeInsets.zero,
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          // Hinge-style large photo section (full width, no padding)
+                          _buildHingePhotoSection(),
 
-                      // Profile header (name, age, location) - integrated with photos
-                      _buildHingeProfileHeader(),
+                          // Profile header (name, age, location) - integrated with photos
+                          _buildHingeProfileHeader(),
 
-                      // About section - seamless
-                      _buildHingeAboutSection(),
+                          // About section - seamless
+                          _buildHingeAboutSection(),
 
-                      // Details section - seamless
-                      _buildHingeDetailsSection(),
+                          // Details section - seamless
+                          _buildHingeDetailsSection(),
 
-                      // Interests section - seamless
-                      _buildHingeInterestsSection(),
+                          // Interests section - seamless
+                          _buildHingeInterestsSection(),
 
-                      // Edit button with padding
-                      Padding(
-                        padding: const EdgeInsets.all(20),
-                        child: _buildEditButton(),
+                          // Edit button with padding
+                          Padding(
+                            padding: const EdgeInsets.all(20),
+                            child: _buildEditButton(),
+                          ),
+                          const SizedBox(height: 32),
+                        ],
                       ),
-                      const SizedBox(height: 32),
-                    ],
+                    ),
                   ),
-                ),
-              ),
       );
 
   Widget _buildEditButton() => SizedBox(

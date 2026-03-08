@@ -395,7 +395,7 @@ class UserEventService {
         }
 
         final file = File(imagePath);
-        if (!await file.exists()) {
+        if (!file.existsSync()) {
           log('❌ Image file not found: $imagePath', name: 'UserEventService');
           continue;
         }

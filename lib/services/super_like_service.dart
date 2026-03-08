@@ -1,7 +1,11 @@
+import 'dart:async';
+
 import 'package:cloud_firestore/cloud_firestore.dart';
 
 import '../common/utils/app_logger.dart';
 import '../common/utils/firestore_helpers.dart';
+import '../features/match/data/analytics/match_quality_event.dart';
+import '../features/match/data/analytics/match_quality_reporter.dart';
 import '../features/match/data/services/likes_service.dart';
 import '../features/match/data/services/match_service.dart';
 import 'performance_monitor.dart';
@@ -59,8 +63,10 @@ class SuperLikeService {
     String? fromUserName,
     String? fromUserImageUrl,
     String? toUserName,
+    String mode = 'unknown',
   }) async =>
       PerformanceMonitor.measure('send_super_like', () async {
+        final superLikeTimer = Stopwatch()..start();
         try {
           AppLogger.debug('Sending super like: $fromUserId → $toUserId');
 
@@ -167,6 +173,24 @@ class SuperLikeService {
               await _checkForInstantMatch(fromUserId, toUserId);
           AppLogger.debug('Super like sent: ${superLikeRef.id}');
 
+          unawaited(
+            MatchQualityReporter.instance.recordAction(
+              userId: fromUserId,
+              candidateId: toUserId,
+              mode: mode,
+              actionType: MatchQualityActionType.superLike,
+            ),
+          );
+          if (instantMatch != null) {
+            unawaited(
+              MatchQualityReporter.instance.recordMatch(
+                userId: fromUserId,
+                candidateId: toUserId,
+                mode: mode,
+              ),
+            );
+          }
+
           return SuperLikeResult.success(
             superLikeId: superLikeRef.id,
             isInstantMatch: instantMatch != null,
@@ -178,6 +202,17 @@ class SuperLikeService {
         } on Object catch (e) {
           AppLogger.error('Unexpected error sending super like', error: e);
           return SuperLikeResult.failed('Error: ${e.toString()}');
+        } finally {
+          superLikeTimer.stop();
+          unawaited(
+            MatchQualityReporter.instance.recordLatency(
+              operation: 'super_like_send',
+              latencyMs: superLikeTimer.elapsedMilliseconds,
+              mode: mode,
+              userId: fromUserId,
+              candidateId: toUserId,
+            ),
+          );
         }
       });
 

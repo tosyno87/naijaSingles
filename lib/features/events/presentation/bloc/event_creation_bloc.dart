@@ -1,7 +1,9 @@
+// ignore_for_file: avoid_positional_boolean_parameters
+
 import 'dart:async';
 import 'dart:developer';
-import 'package:bloc/bloc.dart';
 import 'package:equatable/equatable.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import '../../data/models/enhanced_event_model.dart';
 import '../../data/services/user_event_service.dart';
 

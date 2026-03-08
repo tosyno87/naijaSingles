@@ -90,74 +90,22 @@ class _MessagesScreenState extends State<MessagesScreen> {
       );
 
   Widget _buildEmptyState() => Center(
-        child: Padding(
-          padding: const EdgeInsets.all(32),
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              Container(
-                padding: const EdgeInsets.all(24),
-                decoration: BoxDecoration(
-                  color: primaryColor.withValues(alpha: 0.1),
-                  shape: BoxShape.circle,
-                ),
-                child: const Icon(
-                  Icons.chat_bubble_outline,
-                  size: 64,
-                  color: primaryColor,
+        child: AppEmptyView(
+          title: 'No messages yet',
+          subtitle:
+              'Start matching with people to begin conversations and make meaningful connections.',
+          icon: Icons.chat_bubble_outline,
+          actionLabel: 'Start Matching',
+          onAction: () {
+            unawaited(
+              Navigator.of(context).push(
+                MaterialPageRoute(
+                  builder: (context) =>
+                      const ExploreScreen(showBackButton: true),
                 ),
               ),
-              const SizedBox(height: 24),
-              Text(
-                'No messages yet',
-                style: GoogleFonts.montserrat(
-                  fontSize: 24,
-                  fontWeight: FontWeight.bold,
-                  color: textPrimary,
-                ),
-              ),
-              const SizedBox(height: 12),
-              Text(
-                'Start matching with people to begin conversations and make meaningful connections.',
-                textAlign: TextAlign.center,
-                style: GoogleFonts.montserrat(
-                  fontSize: 16,
-                  color: textSecondary,
-                  height: 1.5,
-                ),
-              ),
-              const SizedBox(height: 32),
-              ElevatedButton(
-                onPressed: () {
-                  unawaited(
-                    Navigator.of(context).push(
-                      MaterialPageRoute(
-                        builder: (context) =>
-                            const ExploreScreen(showBackButton: true),
-                      ),
-                    ),
-                  );
-                },
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: primaryColor,
-                  foregroundColor: Colors.white,
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(16),
-                  ),
-                  padding:
-                      const EdgeInsets.symmetric(horizontal: 32, vertical: 16),
-                  elevation: 2,
-                ),
-                child: Text(
-                  'Start Matching',
-                  style: GoogleFonts.montserrat(
-                    fontSize: 16,
-                    fontWeight: FontWeight.w600,
-                  ),
-                ),
-              ),
-            ],
-          ),
+            );
+          },
         ),
       );
 

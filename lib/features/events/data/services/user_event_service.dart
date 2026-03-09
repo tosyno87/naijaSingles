@@ -20,7 +20,7 @@ class UserEventService {
       _firestore.collection('event_moderation');
 
   bool _isOwnedByCurrentUser(EnhancedEventModel event, String userId) =>
-      event.ownerUserId == userId;
+      event.isOwnedBy(userId);
 
   /// Create a new user-generated event
   Future<String> createEvent(EventCreationData data) async {

@@ -143,6 +143,15 @@ class EnhancedEventModel extends Equatable {
 
   bool get isPublished => status == EventStatus.published;
   String? get ownerUserId => createdByUserId ?? creatorId;
+
+  /// Mirrors Firestore `isEventOwner` OR-logic: the user is considered the
+  /// owner when *either* stored creator field matches, not just the first
+  /// non-null one. This prevents client/server ownership divergence when a
+  /// document contains both fields with different values.
+  bool isOwnedBy(String userId) =>
+      (createdByUserId != null && createdByUserId == userId) ||
+      (creatorId != null && creatorId == userId);
+
   bool get isVisible => isPublished && endDate.isAfter(DateTime.now());
   bool get isActive => isVisible;
   bool get isDraft => status == EventStatus.draft;

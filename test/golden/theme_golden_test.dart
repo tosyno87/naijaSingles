@@ -1,12 +1,8 @@
-import 'dart:io';
-
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 import 'package:naijasingles/common/constants/app_colors.dart';
 import 'package:naijasingles/common/constants/theme.dart';
-
-final bool _isCI = Platform.environment.containsKey('CI');
 
 /// Golden tests for the AfroPeep design system.
 ///
@@ -127,8 +123,7 @@ void main() {
                     ),
                     Chip(
                       label: const Text('Error'),
-                      backgroundColor:
-                          AppColors.error.withValues(alpha: 0.15),
+                      backgroundColor: AppColors.error.withValues(alpha: 0.15),
                     ),
                   ],
                 ),
@@ -172,7 +167,6 @@ void main() {
           matchesGoldenFile('goldens/light_theme_swatch.png'),
         );
       },
-      skip: _isCI,
     );
 
     testWidgets(
@@ -184,7 +178,6 @@ void main() {
           matchesGoldenFile('goldens/dark_theme_swatch.png'),
         );
       },
-      skip: _isCI,
     );
   });
 
@@ -277,4 +270,3 @@ void main() {
     });
   });
 }
-

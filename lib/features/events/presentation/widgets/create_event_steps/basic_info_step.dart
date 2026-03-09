@@ -487,7 +487,9 @@ class _BasicInfoStepState extends State<BasicInfoStep> {
                     focusedBorder: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(12),
                       borderSide: const BorderSide(
-                          color: AppColors.primaryGreen, width: 2),
+                        color: AppColors.primaryGreen,
+                        width: 2,
+                      ),
                     ),
                     contentPadding: const EdgeInsets.all(16),
                   ),

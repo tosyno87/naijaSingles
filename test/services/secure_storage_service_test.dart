@@ -180,8 +180,7 @@ void main() {
       test('should store and retrieve refresh token', () async {
         const refreshToken = 'refresh_token_12345';
 
-        final storeResult =
-            await secureStorage.storeRefreshToken(refreshToken);
+        final storeResult = await secureStorage.storeRefreshToken(refreshToken);
         expect(storeResult, isTrue);
 
         final retrievedToken = await secureStorage.getRefreshToken();

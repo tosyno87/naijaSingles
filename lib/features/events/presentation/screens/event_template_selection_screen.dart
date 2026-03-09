@@ -92,7 +92,9 @@ class EventTemplateSelectionScreen extends StatelessWidget {
                   onPressed: () => _navigateToCreateEvent(context, null),
                   style: OutlinedButton.styleFrom(
                     side: const BorderSide(
-                        color: AppColors.primaryGreen, width: 2),
+                      color: AppColors.primaryGreen,
+                      width: 2,
+                    ),
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(16),
                     ),

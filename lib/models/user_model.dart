@@ -5,6 +5,8 @@ import 'dart:convert';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/foundation.dart';
 
+import '../common/utils/firestore_helpers.dart';
+
 class UserModel {
   UserModel({
     this.living_in,
@@ -200,11 +202,8 @@ class UserModel {
             safeGetNested<String>('editInfo', 'drinkingStatus', ''),
         smokingStatus: safeGet<String>('smokingStatus') ??
             safeGetNested<String>('editInfo', 'smokingStatus', ''),
-        lastSeen: data.containsKey('lastSeen') && data['lastSeen'] is Timestamp
-            ? (data['lastSeen'] as Timestamp).toDate()
-            : data.containsKey('lastActive') && data['lastActive'] is Timestamp
-                ? (data['lastActive'] as Timestamp).toDate()
-                : null,
+        lastSeen: parseDateTimeOrNull(data['lastSeen']) ??
+            parseDateTimeOrNull(data['lastActive']),
         lookingFor: safeGet<String>('lookingFor') ??
             safeGetNested<String>('editInfo', 'lookingFor', 'Dating'),
         // Cultural fields
@@ -222,10 +221,7 @@ class UserModel {
         // Account status fields
         accountStatus: safeGet<String>('accountStatus', 'active'),
         storedDiscoverable: safeGet<bool>('isDiscoverable'),
-        deactivatedAt: data.containsKey('deactivatedAt') &&
-                data['deactivatedAt'] is Timestamp
-            ? (data['deactivatedAt'] as Timestamp).toDate()
-            : null,
+        deactivatedAt: parseDateTimeOrNull(data['deactivatedAt']),
         deactivationReason: safeGet<String>('deactivationReason'),
       );
     } on Object catch (e) {
@@ -560,7 +556,8 @@ class UserModel {
   /// Prefers the Cloud Function–managed stored field; falls back to computing
   /// from accountStatus for documents that haven't been backfilled yet.
   bool get isDiscoverable =>
-      _storedDiscoverable ?? (accountStatus == null || accountStatus == 'active');
+      _storedDiscoverable ??
+      (accountStatus == null || accountStatus == 'active');
 
   /// Whether the account is temporarily deactivated (paused or incognito).
   bool get isDeactivated =>

@@ -9,7 +9,9 @@ import 'package:google_fonts/google_fonts.dart';
 
 import '../../../../common/bloc/user/user_bloc.dart';
 import '../../../../common/constants/app_colors.dart';
+import '../../../../common/constants/app_spacing.dart';
 import '../../../../common/routes/route_name.dart';
+import '../../../../common/widgets/state_views/state_views.dart';
 import '../../../../models/user_model.dart';
 import '../../../discovery/data/services/discovery_service.dart';
 import '../../../events/data/models/event_model.dart';
@@ -158,7 +160,7 @@ class _DiscoverPageV2State extends State<DiscoverPageV2> {
             e.location.name,
           ].where((s) => s != null).join(' ').toLowerCase();
 
-          return locationTokens.any((token) => haystack.contains(token));
+          return locationTokens.any(haystack.contains);
         }).toList();
 
         if (filtered.isEmpty) {
@@ -390,7 +392,7 @@ class _DiscoverPageV2State extends State<DiscoverPageV2> {
   }
 
   Widget _buildSubtitleRow() => Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 24),
+        padding: const EdgeInsets.symmetric(horizontal: AppSpacing.lg),
         child: Row(
           children: [
             Expanded(
@@ -404,13 +406,13 @@ class _DiscoverPageV2State extends State<DiscoverPageV2> {
                 ),
               ),
             ),
-            const SizedBox(width: 12),
+            const SizedBox(width: AppSpacing.sm + 4),
             Material(
               color: AppColors.primaryGreen.withValues(alpha: 0.08),
-              borderRadius: BorderRadius.circular(12),
+              borderRadius: BorderRadius.circular(AppSpacing.buttonRadius),
               child: InkWell(
                 onTap: _showFilterSheet,
-                borderRadius: BorderRadius.circular(12),
+                borderRadius: BorderRadius.circular(AppSpacing.buttonRadius),
                 child: const SizedBox(
                   width: 44,
                   height: 44,
@@ -426,15 +428,13 @@ class _DiscoverPageV2State extends State<DiscoverPageV2> {
         ),
       );
 
-  List<_DiscoverBlock> _composeBlocks() {
-    return const <_DiscoverBlock>[
-      _DiscoverBlock.trendingEvent,
-      _DiscoverBlock.peopleYouMayLike,
-      _DiscoverBlock.communities,
-      _DiscoverBlock.happeningThisWeek,
-      _DiscoverBlock.stats,
-    ];
-  }
+  List<_DiscoverBlock> _composeBlocks() => const <_DiscoverBlock>[
+        _DiscoverBlock.peopleYouMayLike,
+        _DiscoverBlock.trendingEvent,
+        _DiscoverBlock.communities,
+        _DiscoverBlock.happeningThisWeek,
+        _DiscoverBlock.stats,
+      ];
 
   List<Widget> _buildMixedDiscoverFeed() {
     final blocks = _composeBlocks();
@@ -494,8 +494,11 @@ class _DiscoverPageV2State extends State<DiscoverPageV2> {
       return const DiscoverSkeletonCard(height: 260);
     }
     if (_eventsError != null) {
-      return _buildInlineError(_eventsError!, _loadEvents,
-          horizontalPadding: 0);
+      return _buildInlineError(
+        _eventsError!,
+        _loadEvents,
+        horizontalPadding: 0,
+      );
     }
     if (_events.isEmpty) {
       return _buildImageEmpty(
@@ -622,12 +625,12 @@ class _DiscoverPageV2State extends State<DiscoverPageV2> {
     final sectionEvents = events ?? _events;
 
     if (_eventsLoading) {
-      return Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 24),
+      return const Padding(
+        padding: EdgeInsets.symmetric(horizontal: 24),
         child: Row(
           children: [
             Expanded(child: DiscoverSkeletonCard(height: 200)),
-            const SizedBox(width: 12),
+            SizedBox(width: 12),
             Expanded(child: DiscoverSkeletonCard(height: 200)),
           ],
         ),
@@ -652,7 +655,8 @@ class _DiscoverPageV2State extends State<DiscoverPageV2> {
     final pairs = <List<EventModel>>[];
     for (var i = 0; i < sectionEvents.length; i += 2) {
       pairs.add(
-          sectionEvents.sublist(i, (i + 2).clamp(0, sectionEvents.length)));
+        sectionEvents.sublist(i, (i + 2).clamp(0, sectionEvents.length)),
+      );
     }
 
     return Padding(
@@ -789,8 +793,11 @@ class _DiscoverPageV2State extends State<DiscoverPageV2> {
       return const DiscoverSkeletonCard(height: 200);
     }
     if (_communitiesError != null) {
-      return _buildInlineError(_communitiesError!, _loadCommunities,
-          horizontalPadding: 0);
+      return _buildInlineError(
+        _communitiesError!,
+        _loadCommunities,
+        horizontalPadding: 0,
+      );
     }
     if (_communities.isEmpty) {
       return _buildImageEmpty(
@@ -803,7 +810,7 @@ class _DiscoverPageV2State extends State<DiscoverPageV2> {
     }
 
     final totalMembers =
-        _communities.fold<int>(0, (sum, g) => sum + g.memberCount);
+        _communities.fold<int>(0, (acc, g) => acc + g.memberCount);
 
     return Semantics(
       button: true,
@@ -875,8 +882,7 @@ class _DiscoverPageV2State extends State<DiscoverPageV2> {
                             shape: RoundedRectangleBorder(
                               borderRadius: BorderRadius.circular(18),
                             ),
-                            padding:
-                                const EdgeInsets.symmetric(horizontal: 16),
+                            padding: const EdgeInsets.symmetric(horizontal: 16),
                           ),
                           child: Text(
                             'Browse all',
@@ -898,7 +904,7 @@ class _DiscoverPageV2State extends State<DiscoverPageV2> {
     );
   }
 
-  Widget _communityFallbackBg() => Container(
+  Widget _communityFallbackBg() => DecoratedBox(
         decoration: BoxDecoration(
           gradient: LinearGradient(
             begin: Alignment.topLeft,
@@ -938,43 +944,11 @@ class _DiscoverPageV2State extends State<DiscoverPageV2> {
   }) =>
       Padding(
         padding: EdgeInsets.symmetric(horizontal: horizontalPadding),
-        child: Container(
-          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 20),
-          decoration: BoxDecoration(
-            color: Colors.white,
-            borderRadius: BorderRadius.circular(16),
-            border: Border.all(color: Colors.grey.shade200),
-          ),
-          child: Row(
-            children: [
-              Icon(
-                Icons.info_outline_rounded,
-                size: 20,
-                color: Colors.grey.shade400,
-              ),
-              const SizedBox(width: 10),
-              Expanded(
-                child: Text(
-                  message,
-                  style: GoogleFonts.montserrat(
-                    fontSize: 14,
-                    color: AppColors.textSecondary,
-                  ),
-                ),
-              ),
-              TextButton(
-                onPressed: onRetry,
-                child: Text(
-                  'Retry',
-                  style: GoogleFonts.montserrat(
-                    fontSize: 14,
-                    fontWeight: FontWeight.w600,
-                    color: AppColors.primaryGreen,
-                  ),
-                ),
-              ),
-            ],
-          ),
+        child: AppErrorView(
+          title: 'Could not load section',
+          message: message,
+          onRetry: onRetry,
+          icon: Icons.info_outline_rounded,
         ),
       );
 
@@ -987,51 +961,11 @@ class _DiscoverPageV2State extends State<DiscoverPageV2> {
   }) =>
       Padding(
         padding: EdgeInsets.symmetric(horizontal: horizontalPadding),
-        child: Container(
-          width: double.infinity,
-          padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 28),
-          decoration: BoxDecoration(
-            color: Colors.white,
-            borderRadius: BorderRadius.circular(16),
-            border: Border.all(color: Colors.grey.shade100),
-          ),
-          child: Column(
-            children: [
-              Icon(icon, size: 40, color: Colors.grey.shade300),
-              const SizedBox(height: 12),
-              Text(
-                message,
-                style: GoogleFonts.montserrat(
-                  fontSize: 14,
-                  fontWeight: FontWeight.w500,
-                  color: AppColors.textSecondary,
-                ),
-                textAlign: TextAlign.center,
-              ),
-              const SizedBox(height: 16),
-              SizedBox(
-                height: 40,
-                child: OutlinedButton(
-                  onPressed: onAction,
-                  style: OutlinedButton.styleFrom(
-                    foregroundColor: AppColors.primaryGreen,
-                    side: const BorderSide(color: AppColors.primaryGreen),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(20),
-                    ),
-                    padding: const EdgeInsets.symmetric(horizontal: 20),
-                  ),
-                  child: Text(
-                    actionLabel,
-                    style: GoogleFonts.montserrat(
-                      fontSize: 13,
-                      fontWeight: FontWeight.w600,
-                    ),
-                  ),
-                ),
-              ),
-            ],
-          ),
+        child: AppEmptyView(
+          title: message,
+          icon: icon,
+          actionLabel: actionLabel,
+          onAction: onAction,
         ),
       );
 
@@ -1045,83 +979,12 @@ class _DiscoverPageV2State extends State<DiscoverPageV2> {
       Semantics(
         button: true,
         label: '$message — $actionLabel',
-        child: Material(
-          color: Colors.grey.shade200,
-          borderRadius: BorderRadius.circular(24),
-          clipBehavior: Clip.antiAlias,
-          child: InkWell(
-            onTap: onAction,
-            child: SizedBox(
-              height: height,
-              width: double.infinity,
-              child: Stack(
-                fit: StackFit.expand,
-                children: [
-                  Image.asset(
-                    assetPath,
-                    fit: BoxFit.cover,
-                    alignment: Alignment.topCenter,
-                    errorBuilder: (_, __, ___) => Container(
-                      color: AppColors.primaryGreen.withValues(alpha: 0.15),
-                    ),
-                  ),
-                  DecoratedBox(
-                    decoration: BoxDecoration(
-                      gradient: LinearGradient(
-                        begin: Alignment.topCenter,
-                        end: Alignment.bottomCenter,
-                        colors: [
-                          Colors.black.withValues(alpha: 0.10),
-                          Colors.black.withValues(alpha: 0.65),
-                        ],
-                      ),
-                    ),
-                  ),
-                  Positioned(
-                    left: 20,
-                    right: 20,
-                    bottom: 20,
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        Text(
-                          message,
-                          style: GoogleFonts.montserrat(
-                            fontSize: 16,
-                            fontWeight: FontWeight.w600,
-                            color: Colors.white,
-                          ),
-                        ),
-                        const SizedBox(height: 12),
-                        SizedBox(
-                          height: 36,
-                          child: OutlinedButton(
-                            onPressed: onAction,
-                            style: OutlinedButton.styleFrom(
-                              foregroundColor: Colors.white,
-                              side: const BorderSide(color: Colors.white70),
-                              shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(18),
-                              ),
-                              padding:
-                                  const EdgeInsets.symmetric(horizontal: 16),
-                            ),
-                            child: Text(
-                              actionLabel,
-                              style: GoogleFonts.montserrat(
-                                fontSize: 13,
-                                fontWeight: FontWeight.w600,
-                              ),
-                            ),
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                ],
-              ),
-            ),
+        child: SizedBox(
+          height: height,
+          child: AppEmptyView(
+            title: message,
+            actionLabel: actionLabel,
+            onAction: onAction,
           ),
         ),
       );

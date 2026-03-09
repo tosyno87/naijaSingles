@@ -133,23 +133,29 @@ class OnboardingTheme {
         suffixIcon: suffix,
         border: OutlineInputBorder(
           borderRadius: BorderRadius.circular(fieldRadius),
-          borderSide: const BorderSide(color: fieldBorder, width: fieldBorderWidth),
+          borderSide: const BorderSide(color: fieldBorder),
         ),
         enabledBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(fieldRadius),
-          borderSide: const BorderSide(color: fieldBorder, width: fieldBorderWidth),
+          borderSide: const BorderSide(color: fieldBorder),
         ),
         focusedBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(fieldRadius),
-          borderSide: const BorderSide(color: focusBorder, width: fieldFocusBorderWidth),
+          borderSide: const BorderSide(
+            color: focusBorder,
+            width: fieldFocusBorderWidth,
+          ),
         ),
         errorBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(fieldRadius),
-          borderSide: const BorderSide(color: Colors.redAccent, width: fieldBorderWidth),
+          borderSide: const BorderSide(color: Colors.redAccent),
         ),
         focusedErrorBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(fieldRadius),
-          borderSide: const BorderSide(color: Colors.redAccent, width: fieldFocusBorderWidth),
+          borderSide: const BorderSide(
+            color: Colors.redAccent,
+            width: fieldFocusBorderWidth,
+          ),
         ),
         errorStyle: GoogleFonts.montserrat(
           fontSize: 13,
@@ -190,8 +196,6 @@ class OnboardingTheme {
   // ---------------------------------------------------------------------------
   static const LinearGradient buttonGradient = LinearGradient(
     colors: [primaryGreen, gradientEnd],
-    begin: Alignment.centerLeft,
-    end: Alignment.centerRight,
   );
 
   // ---------------------------------------------------------------------------

@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:google_fonts/google_fonts.dart';
 
+import '../../../common/data/countries.dart';
 import '../bloc/onboarding_bloc.dart';
 import '../onboarding_theme.dart';
 
@@ -16,6 +17,7 @@ class TribeSelectionScreen extends StatefulWidget {
 
 class _TribeSelectionScreenState extends State<TribeSelectionScreen> {
   String? _selectedNationality;
+  String? _selectedRace;
   String? _selectedTribe;
   final TextEditingController _otherTribeController = TextEditingController();
   final TextEditingController _nationalitySearchController =
@@ -23,59 +25,18 @@ class _TribeSelectionScreenState extends State<TribeSelectionScreen> {
   bool _showOtherField = false;
   String _nationalityFilter = '';
 
-  final List<String> _nationalities = [
-    'Nigeria',
-    'Ghana',
-    'Kenya',
-    'South Africa',
-    'Ethiopia',
-    'Tanzania',
-    'Uganda',
-    'Zimbabwe',
-    'Senegal',
-    'Cameroon',
-    'Ivory Coast',
-    'Morocco',
-    'Egypt',
-    'Tunisia',
-    'Algeria',
-    'Sudan',
-    'Mozambique',
-    'Angola',
-    'Madagascar',
-    'Mali',
-    'Burkina Faso',
-    'Niger',
-    'Malawi',
-    'Zambia',
-    'Somalia',
-    'Guinea',
-    'Benin',
-    'Burundi',
-    'Togo',
-    'Eritrea',
-    'Sierra Leone',
-    'Libya',
-    'Rwanda',
-    'Chad',
-    'Central African Republic',
-    'Mauritania',
-    'Namibia',
-    'Botswana',
-    'Gabon',
-    'Gambia',
-    'Lesotho',
-    'Guinea-Bissau',
-    'Equatorial Guinea',
-    'Mauritius',
-    'Eswatini',
-    'Djibouti',
-    'Comoros',
-    'Cabo Verde',
-    'São Tomé and Príncipe',
-    'Seychelles',
-    'African Diaspora',
+  final List<String> _countries = AppCountries.all;
+
+  final List<String> _raceOptions = [
+    'Black or African',
+    'White',
+    'Asian',
+    'Native American or Alaska Native',
+    'Native Hawaiian or Pacific Islander',
+    'Middle Eastern or North African',
+    'Mixed',
     'Other',
+    'Prefer not to say',
   ];
 
   final List<String> _mainTribes = [
@@ -102,6 +63,9 @@ class _TribeSelectionScreenState extends State<TribeSelectionScreen> {
       if (data != null) {
         if (data.nationality != null && data.nationality!.isNotEmpty) {
           setState(() => _selectedNationality = data.nationality);
+        }
+        if (data.race.isNotEmpty) {
+          setState(() => _selectedRace = data.race);
         }
 
         if (data.tribe.isNotEmpty) {
@@ -146,110 +110,121 @@ class _TribeSelectionScreenState extends State<TribeSelectionScreen> {
     });
   }
 
+  void _selectRace(String? race) {
+    setState(() => _selectedRace = race);
+    if (race != null) {
+      context.read<OnboardingBloc>().add(OnboardingRaceUpdated(race));
+    }
+  }
+
   void _showNationalitySearch() {
     _nationalitySearchController.text = '';
     _nationalityFilter = '';
 
-    unawaited(showModalBottomSheet<String>(
-      context: context,
-      isScrollControlled: true,
-      backgroundColor: OnboardingTheme.background,
-      shape: const RoundedRectangleBorder(
-        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
-      ),
-      builder: (ctx) => StatefulBuilder(
-        builder: (ctx, setSheetState) {
-          final filtered = _nationalityFilter.isEmpty
-              ? _nationalities
-              : _nationalities
-                  .where((n) => n
-                      .toLowerCase()
-                      .contains(_nationalityFilter.toLowerCase()))
-                  .toList();
+    unawaited(
+      showModalBottomSheet<String>(
+        context: context,
+        isScrollControlled: true,
+        backgroundColor: OnboardingTheme.background,
+        shape: const RoundedRectangleBorder(
+          borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+        ),
+        builder: (ctx) => StatefulBuilder(
+          builder: (ctx, setSheetState) {
+            final filtered = _nationalityFilter.isEmpty
+                ? _countries
+                : _countries
+                    .where(
+                      (n) => n
+                          .toLowerCase()
+                          .contains(_nationalityFilter.toLowerCase()),
+                    )
+                    .toList();
 
-          return DraggableScrollableSheet(
-            expand: false,
-            initialChildSize: 0.7,
-            maxChildSize: 0.9,
-            minChildSize: 0.5,
-            builder: (_, scrollController) => SafeArea(
-              child: Column(
-                children: [
-                  Container(
-                    margin: const EdgeInsets.only(top: 12, bottom: 8),
-                    width: 40,
-                    height: 4,
-                    decoration: BoxDecoration(
-                      color: Colors.grey.shade300,
-                      borderRadius: BorderRadius.circular(2),
-                    ),
-                  ),
-                  Padding(
-                    padding: const EdgeInsets.symmetric(
-                      horizontal: OnboardingTheme.horizontalPadding,
-                      vertical: 8,
-                    ),
-                    child: TextField(
-                      controller: _nationalitySearchController,
-                      autofocus: true,
-                      style: OnboardingTheme.fieldTextStyle,
-                      decoration: OnboardingTheme.fieldDecoration(
-                        hint: 'Search nationality...',
-                        prefix: const Icon(
-                          Icons.search,
-                          color: OnboardingTheme.primaryGreen,
-                        ),
+            return DraggableScrollableSheet(
+              expand: false,
+              initialChildSize: 0.7,
+              maxChildSize: 0.9,
+              minChildSize: 0.5,
+              builder: (_, scrollController) => SafeArea(
+                child: Column(
+                  children: [
+                    Container(
+                      margin: const EdgeInsets.only(top: 12, bottom: 8),
+                      width: 40,
+                      height: 4,
+                      decoration: BoxDecoration(
+                        color: Colors.grey.shade300,
+                        borderRadius: BorderRadius.circular(2),
                       ),
-                      onChanged: (value) {
-                        setSheetState(() {
-                          _nationalityFilter = value;
-                        });
-                      },
                     ),
-                  ),
-                  Expanded(
-                    child: ListView.builder(
-                      controller: scrollController,
-                      itemCount: filtered.length,
-                      itemBuilder: (_, i) {
-                        final nation = filtered[i];
-                        final isSelected = nation == _selectedNationality;
-                        return ListTile(
-                          title: Text(
-                            nation,
-                            style: OnboardingTheme.fieldTextStyle.copyWith(
-                              color: isSelected
-                                  ? OnboardingTheme.primaryGreen
-                                  : OnboardingTheme.fieldTextColor,
-                              fontWeight: isSelected
-                                  ? FontWeight.w700
-                                  : FontWeight.w500,
-                            ),
+                    Padding(
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: OnboardingTheme.horizontalPadding,
+                        vertical: 8,
+                      ),
+                      child: TextField(
+                        controller: _nationalitySearchController,
+                        autofocus: true,
+                        style: OnboardingTheme.fieldTextStyle,
+                        decoration: OnboardingTheme.fieldDecoration(
+                          hint: 'Search country...',
+                          prefix: const Icon(
+                            Icons.search,
+                            color: OnboardingTheme.primaryGreen,
                           ),
-                          trailing: isSelected
-                              ? const Icon(
-                                  Icons.check_circle,
-                                  color: OnboardingTheme.primaryGreen,
-                                )
-                              : null,
-                          onTap: () {
-                            Navigator.pop(ctx, nation);
-                          },
-                        );
-                      },
+                        ),
+                        onChanged: (value) {
+                          setSheetState(() {
+                            _nationalityFilter = value;
+                          });
+                        },
+                      ),
                     ),
-                  ),
-                ],
+                    Expanded(
+                      child: ListView.builder(
+                        controller: scrollController,
+                        itemCount: filtered.length,
+                        itemBuilder: (_, i) {
+                          final nation = filtered[i];
+                          final isSelected = nation == _selectedNationality;
+                          return ListTile(
+                            title: Text(
+                              nation,
+                              style: OnboardingTheme.fieldTextStyle.copyWith(
+                                color: isSelected
+                                    ? OnboardingTheme.primaryGreen
+                                    : OnboardingTheme.fieldTextColor,
+                                fontWeight: isSelected
+                                    ? FontWeight.w700
+                                    : FontWeight.w500,
+                              ),
+                            ),
+                            trailing: isSelected
+                                ? const Icon(
+                                    Icons.check_circle,
+                                    color: OnboardingTheme.primaryGreen,
+                                  )
+                                : null,
+                            onTap: () {
+                              Navigator.pop(ctx, nation);
+                            },
+                          );
+                        },
+                      ),
+                    ),
+                  ],
+                ),
               ),
-            ),
-          );
-        },
-      ),
-    ).then((selected) {
-      if (selected != null) {
-        _selectNationality(selected);
-      }
-    }));
+            );
+          },
+        ),
+      ).then((selected) {
+        if (selected != null) {
+          _selectNationality(selected);
+        }
+      }),
+    );
   }
 
   @override
@@ -266,7 +241,7 @@ class _TribeSelectionScreenState extends State<TribeSelectionScreen> {
 
               const SizedBox(height: OnboardingTheme.subtitleToField),
 
-              Text('Nationality *', style: OnboardingTheme.sectionLabelStyle),
+              Text('Country *', style: OnboardingTheme.sectionLabelStyle),
               const SizedBox(height: OnboardingTheme.labelToField),
 
               // Searchable nationality selector
@@ -287,7 +262,7 @@ class _TribeSelectionScreenState extends State<TribeSelectionScreen> {
                     children: [
                       Expanded(
                         child: Text(
-                          _selectedNationality ?? 'Search and select nationality',
+                          _selectedNationality ?? 'Search and select country',
                           style: _selectedNationality != null
                               ? OnboardingTheme.fieldTextStyle
                               : GoogleFonts.montserrat(
@@ -310,8 +285,67 @@ class _TribeSelectionScreenState extends State<TribeSelectionScreen> {
 
               Row(
                 children: [
+                  Text('Race', style: OnboardingTheme.sectionLabelStyle),
+                  const SizedBox(width: 8),
                   Text(
-                    'Tribe or Ethnic Group',
+                    '(Optional)',
+                    style: OnboardingTheme.helperStyle.copyWith(
+                      fontStyle: FontStyle.italic,
+                    ),
+                  ),
+                ],
+              ),
+              const SizedBox(height: OnboardingTheme.labelToField),
+              Container(
+                constraints: const BoxConstraints(
+                  minHeight: OnboardingTheme.fieldHeight,
+                ),
+                padding: const EdgeInsets.symmetric(
+                  horizontal: OnboardingTheme.fieldContentPadding,
+                ),
+                decoration: OnboardingTheme.dropdownDecoration(
+                  hasFocus: _selectedRace != null,
+                ),
+                child: DropdownButtonHideUnderline(
+                  child: DropdownButton<String>(
+                    value: _selectedRace,
+                    hint: Text(
+                      'Select your race (optional)',
+                      style: GoogleFonts.montserrat(
+                        color: OnboardingTheme.subtitleColor,
+                        fontSize: 16,
+                      ),
+                    ),
+                    isExpanded: true,
+                    icon: const Icon(
+                      Icons.arrow_drop_down,
+                      color: OnboardingTheme.primaryGreen,
+                      size: OnboardingTheme.fieldIconSize,
+                    ),
+                    dropdownColor: OnboardingTheme.background,
+                    borderRadius: BorderRadius.circular(
+                      OnboardingTheme.fieldRadius,
+                    ),
+                    style: OnboardingTheme.fieldTextStyle,
+                    items: _raceOptions
+                        .map(
+                          (String race) => DropdownMenuItem<String>(
+                            value: race,
+                            child: Text(race),
+                          ),
+                        )
+                        .toList(),
+                    onChanged: _selectRace,
+                  ),
+                ),
+              ),
+
+              const SizedBox(height: OnboardingTheme.fieldToSection),
+
+              Row(
+                children: [
+                  Text(
+                    'Tribe',
                     style: OnboardingTheme.sectionLabelStyle,
                   ),
                   const SizedBox(width: 8),

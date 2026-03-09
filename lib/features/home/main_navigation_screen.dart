@@ -94,10 +94,12 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
           .log('⚠️ User not authenticated - redirecting to welcome screen');
       _hasCheckedRegistration = true;
       if (mounted) {
-        unawaited(Navigator.of(context).pushNamedAndRemoveUntil(
-          RouteName.welcomeScreen,
-          (route) => false,
-        ));
+        unawaited(
+          Navigator.of(context).pushNamedAndRemoveUntil(
+            RouteName.welcomeScreen,
+            (route) => false,
+          ),
+        );
       }
       return;
     }
@@ -182,20 +184,24 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
       );
       AccountDeletionScope.inProgress = false;
       if (mounted) {
-        unawaited(Navigator.of(context).pushNamedAndRemoveUntil(
-          RouteName.welcomeScreen,
-          (route) => false,
-        ));
+        unawaited(
+          Navigator.of(context).pushNamedAndRemoveUntil(
+            RouteName.welcomeScreen,
+            (route) => false,
+          ),
+        );
       }
     } else {
       developer.log(
         '⚠️ Authenticated user has incomplete profile - redirecting to onboarding',
       );
       if (mounted) {
-        unawaited(Navigator.of(context).pushNamedAndRemoveUntil(
-          RouteName.onboarding,
-          (route) => false,
-        ));
+        unawaited(
+          Navigator.of(context).pushNamedAndRemoveUntil(
+            RouteName.onboarding,
+            (route) => false,
+          ),
+        );
       }
     }
   }
@@ -375,7 +381,9 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
                     right: 16,
                     child: Container(
                       padding: const EdgeInsets.symmetric(
-                          horizontal: 12, vertical: 6),
+                        horizontal: 12,
+                        vertical: 6,
+                      ),
                       decoration: BoxDecoration(
                         color: AppColors.primaryGreen.withValues(alpha: 0.9),
                         borderRadius: BorderRadius.circular(20),
@@ -420,8 +428,11 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
                       heroTag: 'analysis_fab',
                       mini: true,
                       backgroundColor: Colors.blue.withValues(alpha: 0.8),
-                      child: const Icon(Icons.analytics,
-                          color: Colors.white, size: 16),
+                      child: const Icon(
+                        Icons.analytics,
+                        color: Colors.white,
+                        size: 16,
+                      ),
                       onPressed: () => _runUserAnalysis(context),
                     ),
                   ),
@@ -455,26 +466,34 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
         items: [
           BottomNavigationBarItem(
             icon: _buildPremiumNavIcon(FontAwesomeIcons.heart),
-            activeIcon: _buildPremiumNavIcon(FontAwesomeIcons.solidHeart,
-                isActive: true),
+            activeIcon: _buildPremiumNavIcon(
+              FontAwesomeIcons.solidHeart,
+              isActive: true,
+            ),
             label: 'Connect',
           ),
           BottomNavigationBarItem(
             icon: _buildPremiumNavIcon(FontAwesomeIcons.compass),
-            activeIcon: _buildPremiumNavIcon(FontAwesomeIcons.solidCompass,
-                isActive: true),
+            activeIcon: _buildPremiumNavIcon(
+              FontAwesomeIcons.solidCompass,
+              isActive: true,
+            ),
             label: 'Discover',
           ),
           BottomNavigationBarItem(
             icon: _buildPremiumNavIcon(FontAwesomeIcons.comment),
-            activeIcon: _buildPremiumNavIcon(FontAwesomeIcons.solidComment,
-                isActive: true),
+            activeIcon: _buildPremiumNavIcon(
+              FontAwesomeIcons.solidComment,
+              isActive: true,
+            ),
             label: 'Messages',
           ),
           BottomNavigationBarItem(
             icon: _buildPremiumNavIcon(FontAwesomeIcons.user),
-            activeIcon: _buildPremiumNavIcon(FontAwesomeIcons.solidUser,
-                isActive: true),
+            activeIcon: _buildPremiumNavIcon(
+              FontAwesomeIcons.solidUser,
+              isActive: true,
+            ),
             label: 'Profile',
           ),
         ],

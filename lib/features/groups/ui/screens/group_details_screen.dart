@@ -3,7 +3,7 @@
 // This file uses the legacy GroupModel/GroupService. The canonical version
 // uses UnifiedGroup/UnifiedGroupService with richer features (notifications,
 // reporting, member invites, etc.).
-// TODO: Migrate callers (groups_screen.dart) to the canonical version,
+// TODO(dev): Migrate callers (groups_screen.dart) to the canonical version,
 // then delete this file.
 import 'dart:async';
 
@@ -221,10 +221,10 @@ class _GroupDetailsScreenState extends State<GroupDetailsScreen>
               onSelected: (value) {
                 switch (value) {
                   case 'edit':
-                    // TODO: Navigate to edit group screen
+                    // TODO(dev): Navigate to edit group screen
                     break;
                   case 'settings':
-                    // TODO: Navigate to group settings
+                    // TODO(dev): Navigate to group settings
                     break;
                   case 'delete':
                     _showDeleteDialog();
@@ -458,7 +458,7 @@ class _GroupDetailsScreenState extends State<GroupDetailsScreen>
             Expanded(
               child: ElevatedButton.icon(
                 onPressed: () {
-                  // TODO: Navigate to group chat
+                  // TODO(dev): Navigate to group chat
                   ScaffoldMessenger.of(context).showSnackBar(
                     const SnackBar(
                       content: Text('Group chat coming soon!'),
@@ -762,7 +762,7 @@ class _GroupDetailsScreenState extends State<GroupDetailsScreen>
   }
 
   void _removeMember(String userId) {
-    // TODO: Implement remove member functionality
+    // TODO(dev): Implement remove member functionality
     ScaffoldMessenger.of(context).showSnackBar(
       const SnackBar(
         content: Text('Remove member functionality coming soon!'),
@@ -792,8 +792,7 @@ class _GroupDetailsScreenState extends State<GroupDetailsScreen>
                 final navigator = Navigator.of(context);
                 final scaffoldMessenger = ScaffoldMessenger.of(context);
                 Navigator.pop(context);
-                final success =
-                    await _groupService.deleteGroup(groupId);
+                final success = await _groupService.deleteGroup(groupId);
                 if (success) {
                   navigator.pop();
                   scaffoldMessenger.showSnackBar(

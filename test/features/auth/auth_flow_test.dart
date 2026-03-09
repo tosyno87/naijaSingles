@@ -136,20 +136,18 @@ void main() {
     OnboardingData _completedRequiredPages() => OnboardingData(
           fullName: 'Test User',
           dateOfBirth: DateTime(1995, 5, 15),
-          gender: 'male',
+          gender: 'Male',
           profilePhotos: [File('dummy.jpg'), ...List<File?>.filled(8, null)],
           locationName: 'London, UK',
           nationality: 'Ghana',
+          interestedIn: '',
+          lookingFor: '',
+          relationshipIntent: '',
         );
 
     testWidgets(
-      'Skip on page 4 (Bio) advances to page 5 instead of completing',
+      'Page 4 (Bio) has no skip and requires minimum bio length to proceed',
       (WidgetTester tester) async {
-        // Suppress non-fatal assertion from TribeSelectionScreen dropdown
-        // (pre-existing issue, unrelated to skip logic)
-        final errors = <FlutterErrorDetails>[];
-        FlutterError.onError = (details) => errors.add(details);
-
         final bloc = TestableOnboardingBloc(
           repository: mockRepo,
           userBloc: mockUserBloc,
@@ -165,55 +163,151 @@ void main() {
           await tester.pumpAndSettle();
         }
 
-        // Now on page 4 — Bio (optional). "Skip" and page title visible.
+        // Now on page 4 — Bio is required.
         expect(find.text('Tell Your Story'), findsOneWidget);
-        expect(find.text('Skip'), findsOneWidget);
+        expect(find.text('Skip'), findsNothing);
 
-        // Tap Skip — should advance to page 5, NOT complete onboarding
-        await tester.tap(find.text('Skip'));
+        // Cannot proceed without minimum bio length.
+        expect(
+            tester
+                .widget<ElevatedButton>(find.byType(ElevatedButton))
+                .onPressed,
+            isNull);
+
+        await tester.enterText(
+          find.byType(TextField),
+          'This is a valid onboarding bio with enough characters.',
+        );
         await tester.pumpAndSettle();
 
-        // Verify we landed on page 5 (Interests), still in onboarding
+        // Next becomes available and advances to interests.
+        await tester.tap(find.text('Next'));
+        await tester.pumpAndSettle();
         expect(find.text('Your Interests'), findsOneWidget);
-        expect(find.text('Skip'), findsOneWidget);
+        expect(find.text('Skip'), findsNothing);
       },
     );
 
     testWidgets(
-      'Skip on page 5 (Interests) advances to page 6 (required Preferences)',
+      'Page 5 (Interests) has no skip and requires minimum interest selection',
       (WidgetTester tester) async {
-        final errors = <FlutterErrorDetails>[];
-        FlutterError.onError = (details) => errors.add(details);
-
         final bloc = TestableOnboardingBloc(
           repository: mockRepo,
           userBloc: mockUserBloc,
         );
-        bloc.seedState(OnboardingLoaded(_completedRequiredPages()));
+        final seededData = _completedRequiredPages().copyWith(
+          bio: 'This is a valid onboarding bio with enough characters.',
+        );
+        bloc.seedState(OnboardingLoaded(seededData));
 
         await tester.pumpWidget(buildOnboarding(bloc));
         await tester.pumpAndSettle();
 
-        // Navigate through pages 0→3, then skip 4 and 5
+        // Navigate through pages 0→4 with valid bio.
         for (int i = 0; i < 4; i++) {
           await tester.tap(find.text('Next'));
           await tester.pumpAndSettle();
         }
-        await tester.tap(find.text('Skip'));
+        await tester.tap(find.text('Next'));
         await tester.pumpAndSettle();
 
-        // Now on page 5 — skip it
+        // Now on page 5 — no skip and Next disabled until enough interests selected.
         expect(find.text('Your Interests'), findsOneWidget);
-        await tester.tap(find.text('Skip'));
+        expect(find.text('Skip'), findsNothing);
+        expect(
+            tester
+                .widget<ElevatedButton>(find.byType(ElevatedButton))
+                .onPressed,
+            isNull);
+
+        await tester.tap(find.text('Photography'));
+        await tester.pumpAndSettle();
+        await tester.tap(find.text('Drawing'));
+        await tester.pumpAndSettle();
+        await tester.tap(find.text('Painting'));
+        await tester.pumpAndSettle();
+
+        await tester.tap(find.text('Next'));
         await tester.pumpAndSettle();
 
         // Should land on page 6 — Dating Preferences (required).
-        // The title appears in both the AppBar and the page content,
-        // so we check for at least one match.
         expect(find.text('Dating Preferences'), findsWidgets);
-        // Skip should NOT appear on required page 6
         expect(find.text('Skip'), findsNothing);
       },
     );
+
+    testWidgets('Page 6 (Preferences) requires interestedIn selection',
+        (WidgetTester tester) async {
+      final bloc = TestableOnboardingBloc(
+        repository: mockRepo,
+        userBloc: mockUserBloc,
+      );
+      final seededData = _completedRequiredPages().copyWith(
+        bio: 'This is a valid onboarding bio with enough characters.',
+        interests: const ['Photography', 'Drawing', 'Painting'],
+      );
+      bloc.seedState(OnboardingLoaded(seededData));
+
+      await tester.pumpWidget(buildOnboarding(bloc));
+      await tester.pumpAndSettle();
+
+      // Navigate to page 6.
+      for (int i = 0; i < 6; i++) {
+        await tester.tap(find.text('Next'));
+        await tester.pumpAndSettle();
+      }
+
+      expect(find.text('Dating Preferences'), findsWidgets);
+      expect(
+          tester.widget<ElevatedButton>(find.byType(ElevatedButton)).onPressed,
+          isNull);
+
+      bloc.add(const OnboardingInterestedInUpdated('everyone'));
+      await tester.pumpAndSettle();
+
+      expect(
+          tester.widget<ElevatedButton>(find.byType(ElevatedButton)).onPressed,
+          isNotNull);
+    });
+
+    testWidgets('Page 7 requires lookingFor and relationshipIntent',
+        (WidgetTester tester) async {
+      final bloc = TestableOnboardingBloc(
+        repository: mockRepo,
+        userBloc: mockUserBloc,
+      );
+      final seededData = _completedRequiredPages().copyWith(
+        bio: 'This is a valid onboarding bio with enough characters.',
+        interests: const ['Photography', 'Drawing', 'Painting'],
+        interestedIn: 'everyone',
+      );
+      bloc.seedState(OnboardingLoaded(seededData));
+
+      await tester.pumpWidget(buildOnboarding(bloc));
+      await tester.pumpAndSettle();
+
+      // Navigate to page 7.
+      for (int i = 0; i < 7; i++) {
+        await tester.tap(find.text('Next'));
+        await tester.pumpAndSettle();
+      }
+
+      expect(find.text('Tell us more about you'), findsOneWidget);
+      expect(
+          tester.widget<ElevatedButton>(find.byType(ElevatedButton)).onPressed,
+          isNull);
+
+      bloc.add(const OnboardingLookingForUpdated('Dating'));
+      await tester.pumpAndSettle();
+      expect(
+          tester.widget<ElevatedButton>(find.byType(ElevatedButton)).onPressed,
+          isNull);
+
+      bloc.add(const OnboardingRelationshipIntentUpdated('Serious'));
+      await tester.pumpAndSettle();
+      expect(
+          tester.widget<ElevatedButton>(find.byType(ElevatedButton)).onPressed,
+          isNotNull);
+    });
   });
 }

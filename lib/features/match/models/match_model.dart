@@ -1,7 +1,10 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:flutter/foundation.dart';
+import '../../../common/utils/firestore_helpers.dart';
 
+@immutable
 class MatchModel {
-  MatchModel({
+  const MatchModel({
     required this.id,
     required this.users,
     required this.matchedAt,
@@ -16,9 +19,8 @@ class MatchModel {
     return MatchModel(
       id: doc.id,
       users: List<String>.from(data['users'] ?? []),
-      matchedAt: (data['matchedAt'] as Timestamp?)?.toDate() ??
-          (data['timestamp'] as Timestamp?)?.toDate() ??
-          DateTime.now(),
+      matchedAt: parseDateTimeOrNull(data['matchedAt']) ??
+          parseDateTime(data['timestamp']),
       matchStatus: data['matchStatus'] ?? 'matched',
       chatThreadId: data['chatThreadId'],
     );

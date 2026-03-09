@@ -2,6 +2,8 @@ import 'dart:developer';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 
+import '../common/utils/firestore_helpers.dart';
+
 /// Industry-standard content moderation service
 /// Features:
 /// - Text content filtering
@@ -317,8 +319,7 @@ class ContentModerationService {
                   ?.map((issue) => ModerationIssue.fromMap(issue))
                   .toList() ??
               [],
-          moderatedAt:
-              (data['moderatedAt'] as Timestamp?)?.toDate() ?? DateTime.now(),
+          moderatedAt: parseDateTime(data['moderatedAt']),
         );
       }).toList();
     } on Object catch (e) {
@@ -349,7 +350,7 @@ class ContentModerationService {
     }
 
     // Check if any word appears more than 3 times
-    return wordCounts.values.any((count) => count > 3);
+    return wordCounts.values.any((n) => n > 3);
   }
 
   /// Check for all caps

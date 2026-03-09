@@ -199,7 +199,8 @@ class CompactPrivacyMigrationPrompt extends StatelessWidget {
             color: AppColors.primaryGreen.withValues(alpha: 0.1),
             borderRadius: BorderRadius.circular(12),
             border: Border.all(
-                color: AppColors.primaryGreen.withValues(alpha: 0.3)),
+              color: AppColors.primaryGreen.withValues(alpha: 0.3),
+            ),
           ),
           child: Row(
             children: [

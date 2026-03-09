@@ -5,7 +5,10 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 
-import '../../../common/utils/app_logger.dart';
+import '../../common/constants/app_colors.dart';
+import '../../common/constants/app_spacing.dart';
+import '../../common/utils/app_logger.dart';
+import '../../common/widgets/state_views/state_views.dart';
 
 /// Screen to verify all onboarding data is properly saved and accessible
 class OnboardingDataVerificationScreen extends StatefulWidget {
@@ -23,6 +26,7 @@ class _OnboardingDataVerificationScreenState
 
   Map<String, dynamic>? _userData;
   bool _isLoading = true;
+  String? _loadError;
   final List<String> _missingFields = [];
   final List<String> _presentFields = [];
 
@@ -53,63 +57,88 @@ class _OnboardingDataVerificationScreenState
   }
 
   Future<void> _loadAndVerifyUserData() async {
+    if (mounted) {
+      setState(() {
+        _isLoading = true;
+        _loadError = null;
+      });
+    }
     try {
       final user = _auth.currentUser;
-      if (user != null) {
-        AppLogger.debug('🔍 Loading user data for verification: ${user.uid}');
-        final doc = await _firestore.collection('users').doc(user.uid).get();
+      if (user == null) {
+        if (!mounted) return;
+        setState(() {
+          _isLoading = false;
+          _userData = null;
+          _loadError = 'No authenticated user found.';
+        });
+        return;
+      }
 
-        if (doc.exists) {
-          final data = doc.data()!;
+      AppLogger.debug('🔍 Loading user data for verification: ${user.uid}');
+      final doc = await _firestore.collection('users').doc(user.uid).get();
 
-          // Verify which fields are present
-          _presentFields.clear();
-          _missingFields.clear();
+      if (!mounted) return;
+      if (doc.exists) {
+        final data = doc.data()!;
 
-          for (String field in _expectedFields) {
-            if (data.containsKey(field) && data[field] != null) {
-              // Check if field has meaningful data
-              final value = data[field];
-              bool hasData = false;
+        // Verify which fields are present
+        _presentFields.clear();
+        _missingFields.clear();
 
-              if (value is String) {
-                hasData = value.isNotEmpty;
-              } else if (value is List) {
-                hasData = value.isNotEmpty;
-              } else if (value is Map) {
-                hasData = value.isNotEmpty;
-              } else if (value is num) {
-                hasData = value > 0;
-              } else {
-                hasData = true; // Other types considered present
-              }
+        for (final field in _expectedFields) {
+          if (data.containsKey(field) && data[field] != null) {
+            // Check if field has meaningful data
+            final value = data[field];
+            var hasData = false;
 
-              if (hasData) {
-                _presentFields.add(field);
-              } else {
-                _missingFields.add('$field (empty)');
-              }
+            if (value is String) {
+              hasData = value.isNotEmpty;
+            } else if (value is List) {
+              hasData = value.isNotEmpty;
+            } else if (value is Map) {
+              hasData = value.isNotEmpty;
+            } else if (value is num) {
+              hasData = value > 0;
             } else {
-              _missingFields.add('$field (missing)');
+              hasData = true; // Other types considered present
             }
+
+            if (hasData) {
+              _presentFields.add(field);
+            } else {
+              _missingFields.add('$field (empty)');
+            }
+          } else {
+            _missingFields.add('$field (missing)');
           }
-
-          setState(() {
-            _userData = data;
-            _isLoading = false;
-          });
-
-          AppLogger.info('✅ Data verification complete');
-          AppLogger.debug('   Present fields: $_presentFields');
-          AppLogger.debug('   Missing fields: $_missingFields');
-        } else {
-          AppLogger.warning('❌ No user document found');
-          setState(() => _isLoading = false);
         }
+
+        setState(() {
+          _userData = data;
+          _isLoading = false;
+          _loadError = null;
+        });
+
+        AppLogger.info('✅ Data verification complete');
+        AppLogger.debug('   Present fields: $_presentFields');
+        AppLogger.debug('   Missing fields: $_missingFields');
+      } else {
+        AppLogger.warning('❌ No user document found');
+        setState(() {
+          _userData = null;
+          _isLoading = false;
+          _loadError = null;
+        });
       }
     } on Object catch (e) {
       AppLogger.error('❌ Error loading user data', error: e);
-      setState(() => _isLoading = false);
+      if (!mounted) return;
+      setState(() {
+        _isLoading = false;
+        _userData = null;
+        _loadError = 'Failed to load onboarding data.';
+      });
     }
   }
 
@@ -124,64 +153,85 @@ class _OnboardingDataVerificationScreenState
               color: Colors.white,
             ),
           ),
-          backgroundColor: const Color(0xFF008037),
+          backgroundColor: AppColors.primaryGreen,
           elevation: 0,
         ),
         body: _isLoading
-            ? const Center(child: CircularProgressIndicator())
-            : SingleChildScrollView(
-                padding: const EdgeInsets.all(16),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    // Summary Card
-                    _buildSummaryCard(),
-
-                    const SizedBox(height: 16),
-
-                    // Present Fields Card
-                    _buildPresentFieldsCard(),
-
-                    const SizedBox(height: 16),
-
-                    // Missing Fields Card
-                    _buildMissingFieldsCard(),
-
-                    const SizedBox(height: 16),
-
-                    // Raw Data Card
-                    _buildRawDataCard(),
-
-                    const SizedBox(height: 32),
-
-                    // Refresh Button
-                    SizedBox(
-                      width: double.infinity,
-                      child: ElevatedButton(
-                        onPressed: () {
-                          setState(() => _isLoading = true);
+            ? const AppLoadingView(message: 'Loading onboarding data...')
+            : _loadError != null
+                ? AppErrorView(
+                    title: 'Unable to verify onboarding data',
+                    message: _loadError!,
+                    onRetry: () {
+                      unawaited(_loadAndVerifyUserData());
+                    },
+                  )
+                : _userData == null
+                    ? AppEmptyView(
+                        title: 'No Onboarding Data Found',
+                        subtitle: 'This user has no onboarding document yet.',
+                        icon: Icons.description_outlined,
+                        actionLabel: 'Refresh',
+                        onAction: () {
                           unawaited(_loadAndVerifyUserData());
                         },
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor: const Color(0xFF008037),
-                          padding: const EdgeInsets.symmetric(vertical: 16),
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(12),
-                          ),
-                        ),
-                        child: Text(
-                          'Refresh Data',
-                          style: GoogleFonts.montserrat(
-                            fontSize: 16,
-                            fontWeight: FontWeight.w600,
-                            color: Colors.white,
-                          ),
+                      )
+                    : SingleChildScrollView(
+                        padding: AppSpacing.pagePadding,
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            // Summary Card
+                            _buildSummaryCard(),
+
+                            const SizedBox(height: AppSpacing.md),
+
+                            // Present Fields Card
+                            _buildPresentFieldsCard(),
+
+                            const SizedBox(height: AppSpacing.md),
+
+                            // Missing Fields Card
+                            _buildMissingFieldsCard(),
+
+                            const SizedBox(height: AppSpacing.md),
+
+                            // Raw Data Card
+                            _buildRawDataCard(),
+
+                            const SizedBox(height: AppSpacing.xl),
+
+                            // Refresh Button
+                            SizedBox(
+                              width: double.infinity,
+                              child: ElevatedButton(
+                                onPressed: () {
+                                  unawaited(_loadAndVerifyUserData());
+                                },
+                                style: ElevatedButton.styleFrom(
+                                  backgroundColor: AppColors.primaryGreen,
+                                  padding: const EdgeInsets.symmetric(
+                                    vertical: AppSpacing.md,
+                                  ),
+                                  shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(
+                                      AppSpacing.buttonRadius,
+                                    ),
+                                  ),
+                                ),
+                                child: Text(
+                                  'Refresh Data',
+                                  style: GoogleFonts.montserrat(
+                                    fontSize: 16,
+                                    fontWeight: FontWeight.w600,
+                                    color: Colors.white,
+                                  ),
+                                ),
+                              ),
+                            ),
+                          ],
                         ),
                       ),
-                    ),
-                  ],
-                ),
-              ),
       );
 
   Widget _buildSummaryCard() {
@@ -191,7 +241,7 @@ class _OnboardingDataVerificationScreenState
 
     return Card(
       child: Padding(
-        padding: const EdgeInsets.all(16),
+        padding: AppSpacing.cardPadding,
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
@@ -202,7 +252,7 @@ class _OnboardingDataVerificationScreenState
                 fontWeight: FontWeight.w600,
               ),
             ),
-            const SizedBox(height: 16),
+            const SizedBox(height: AppSpacing.md),
 
             // Progress bar
             LinearProgressIndicator(
@@ -217,7 +267,7 @@ class _OnboardingDataVerificationScreenState
               ),
             ),
 
-            const SizedBox(height: 8),
+            const SizedBox(height: AppSpacing.sm),
 
             Text(
               '${completionPercentage.toStringAsFixed(1)}% Complete',
@@ -232,7 +282,7 @@ class _OnboardingDataVerificationScreenState
               ),
             ),
 
-            const SizedBox(height: 8),
+            const SizedBox(height: AppSpacing.sm),
 
             Text(
               '${_presentFields.length} of ${_expectedFields.length} fields present',
@@ -249,14 +299,18 @@ class _OnboardingDataVerificationScreenState
 
   Widget _buildPresentFieldsCard() => Card(
         child: Padding(
-          padding: const EdgeInsets.all(16),
+          padding: AppSpacing.cardPadding,
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Row(
                 children: [
-                  const Icon(Icons.check_circle, color: Colors.green, size: 20),
-                  const SizedBox(width: 8),
+                  const Icon(
+                    Icons.check_circle,
+                    color: Colors.green,
+                    size: AppSpacing.iconSm,
+                  ),
+                  const SizedBox(width: AppSpacing.sm),
                   Text(
                     'Present Fields (${_presentFields.length})',
                     style: GoogleFonts.montserrat(
@@ -267,7 +321,7 @@ class _OnboardingDataVerificationScreenState
                   ),
                 ],
               ),
-              const SizedBox(height: 12),
+              const SizedBox(height: AppSpacing.sm + AppSpacing.xs),
               if (_presentFields.isEmpty)
                 Text(
                   'No fields found',
@@ -279,8 +333,8 @@ class _OnboardingDataVerificationScreenState
                 )
               else
                 Wrap(
-                  spacing: 8,
-                  runSpacing: 4,
+                  spacing: AppSpacing.sm,
+                  runSpacing: AppSpacing.xs,
                   children: _presentFields
                       .map(
                         (field) => Chip(
@@ -301,14 +355,18 @@ class _OnboardingDataVerificationScreenState
 
   Widget _buildMissingFieldsCard() => Card(
         child: Padding(
-          padding: const EdgeInsets.all(16),
+          padding: AppSpacing.cardPadding,
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Row(
                 children: [
-                  const Icon(Icons.error, color: Colors.red, size: 20),
-                  const SizedBox(width: 8),
+                  const Icon(
+                    Icons.error,
+                    color: Colors.red,
+                    size: AppSpacing.iconSm,
+                  ),
+                  const SizedBox(width: AppSpacing.sm),
                   Text(
                     'Missing Fields (${_missingFields.length})',
                     style: GoogleFonts.montserrat(
@@ -319,7 +377,7 @@ class _OnboardingDataVerificationScreenState
                   ),
                 ],
               ),
-              const SizedBox(height: 12),
+              const SizedBox(height: AppSpacing.sm + AppSpacing.xs),
               if (_missingFields.isEmpty)
                 Text(
                   'All expected fields are present! 🎉',
@@ -331,8 +389,8 @@ class _OnboardingDataVerificationScreenState
                 )
               else
                 Wrap(
-                  spacing: 8,
-                  runSpacing: 4,
+                  spacing: AppSpacing.sm,
+                  runSpacing: AppSpacing.xs,
                   children: _missingFields
                       .map(
                         (field) => Chip(
@@ -353,7 +411,7 @@ class _OnboardingDataVerificationScreenState
 
   Widget _buildRawDataCard() => Card(
         child: Padding(
-          padding: const EdgeInsets.all(16),
+          padding: AppSpacing.cardPadding,
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
@@ -364,7 +422,7 @@ class _OnboardingDataVerificationScreenState
                   fontWeight: FontWeight.w600,
                 ),
               ),
-              const SizedBox(height: 12),
+              const SizedBox(height: AppSpacing.sm + AppSpacing.xs),
               if (_userData == null)
                 Text(
                   'No data available',
@@ -408,7 +466,7 @@ class _OnboardingDataVerificationScreenState
       );
 
   Widget _buildDataRow(String label, value) => Padding(
-        padding: const EdgeInsets.symmetric(vertical: 4),
+        padding: const EdgeInsets.symmetric(vertical: AppSpacing.xs),
         child: Row(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [

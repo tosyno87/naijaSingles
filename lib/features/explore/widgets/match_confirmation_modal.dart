@@ -86,17 +86,19 @@ class _MatchConfirmationModalState extends State<MatchConfirmationModal>
         Navigator.pop(context);
 
         // Navigate to chat thread
-        unawaited(Navigator.push(
-          context,
-          MaterialPageRoute(
-            builder: (_) => ChatThreadScreen(
-              threadId: threadId,
-              userName: widget.matchedUserName,
-              avatarUrl: widget.matchedUserImageUrl,
-              otherUserId: widget.matchedUserId,
+        unawaited(
+          Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (_) => ChatThreadScreen(
+                threadId: threadId,
+                userName: widget.matchedUserName,
+                avatarUrl: widget.matchedUserImageUrl,
+                otherUserId: widget.matchedUserId,
+              ),
             ),
           ),
-        ));
+        );
       } else {
         // Show error
         if (!mounted) return;

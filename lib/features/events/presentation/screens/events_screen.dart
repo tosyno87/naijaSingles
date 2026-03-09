@@ -9,6 +9,7 @@ import 'package:pull_to_refresh/pull_to_refresh.dart';
 
 import '../../../../common/constants/app_colors.dart';
 import '../../../../common/routes/route_name.dart';
+import '../../../../common/widgets/state_views/state_views.dart';
 import '../../data/models/event_model.dart';
 import '../../data/repositories/events_repository.dart';
 import '../../data/services/events_firestore_service.dart';
@@ -17,8 +18,6 @@ import '../bloc/events_bloc.dart';
 import '../bloc/rsvp_bloc.dart';
 import '../widgets/advanced_search_dialog.dart';
 import '../widgets/event_card.dart';
-import '../widgets/events_empty_state.dart';
-import '../widgets/events_error_state.dart';
 import '../widgets/events_loading_shimmer.dart';
 
 class EventsScreen extends StatefulWidget {
@@ -149,8 +148,12 @@ class _EventsScreenState extends State<EventsScreen> {
               child: FloatingActionButton(
                 heroTag: 'events_screen_fab',
                 onPressed: () {
-                  unawaited(Navigator.pushNamed(
-                      context, RouteName.eventTemplateSelection));
+                  unawaited(
+                    Navigator.pushNamed(
+                      context,
+                      RouteName.eventTemplateSelection,
+                    ),
+                  );
                 },
                 backgroundColor: AppColors.primaryGreen,
                 foregroundColor: Colors.white,
@@ -302,7 +305,7 @@ class _EventsScreenState extends State<EventsScreen> {
       'Business',
       'Community',
       'Social',
-      'Cultural'
+      'Cultural',
     ];
 
     return Container(
@@ -542,7 +545,8 @@ class _EventsScreenState extends State<EventsScreen> {
 
   void _navigateToEventDetails(EventModel event) {
     unawaited(
-        Navigator.pushNamed(context, RouteName.eventDetails, arguments: event));
+      Navigator.pushNamed(context, RouteName.eventDetails, arguments: event),
+    );
   }
 
   Widget _buildEventsList() => BlocConsumer<EventsBloc, EventsState>(
@@ -577,10 +581,9 @@ class _EventsScreenState extends State<EventsScreen> {
           }
 
           if (state is EventsError && state.isNetworkError) {
-            return EventsErrorState(
+            return AppErrorView(
               title: 'Connection Error'.tr(),
               message: state.message,
-              icon: Icons.wifi_off,
               onRetry: () {
                 _eventsBloc?.add(const LoadEventsEvent(forceRefresh: true));
               },
@@ -588,10 +591,9 @@ class _EventsScreenState extends State<EventsScreen> {
           }
 
           if (state is EventsError) {
-            return EventsErrorState(
+            return AppErrorView(
               title: 'Something went wrong'.tr(),
               message: state.message,
-              icon: Icons.error_outline,
               onRetry: () {
                 _eventsBloc?.add(const LoadEventsEvent(forceRefresh: true));
               },
@@ -604,24 +606,35 @@ class _EventsScreenState extends State<EventsScreen> {
 
           if (state is EventsLoaded) {
             if (state.events.isEmpty) {
-              return EventsEmptyState(
-                hasActiveFilters: _currentFilter.hasActiveFilters ||
-                    _searchController.text.isNotEmpty,
-                onClearFilters: () {
-                  setState(() {
-                    _currentFilter = const EventFilter();
-                    _searchController.clear();
-                  });
-                  _eventsBloc?.add(ClearSearchEvent());
-                },
-                onCreateEvent: () {
-                  unawaited(
-                    Navigator.pushNamed(
-                      context,
-                      RouteName.eventTemplateSelection,
-                    ),
-                  );
-                },
+              final hasActiveFilters = _currentFilter.hasActiveFilters ||
+                  _searchController.text.isNotEmpty;
+              return AppEmptyView(
+                title: 'No Events Found'.tr(),
+                subtitle: hasActiveFilters
+                    ? 'Try adjusting your search or filters to find more events'
+                        .tr()
+                    : 'Be the first to create an event and start bringing people together!'
+                        .tr(),
+                icon: Icons.event_available,
+                actionLabel: hasActiveFilters
+                    ? 'Clear Filters'.tr()
+                    : 'Create Event'.tr(),
+                onAction: hasActiveFilters
+                    ? () {
+                        setState(() {
+                          _currentFilter = const EventFilter();
+                          _searchController.clear();
+                        });
+                        _eventsBloc?.add(ClearSearchEvent());
+                      }
+                    : () {
+                        unawaited(
+                          Navigator.pushNamed(
+                            context,
+                            RouteName.eventTemplateSelection,
+                          ),
+                        );
+                      },
               );
             }
 

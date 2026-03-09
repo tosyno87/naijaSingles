@@ -23,7 +23,7 @@ class NotificationService {
       FlutterLocalNotificationsPlugin();
 
   static bool _initialized = false;
-  static GlobalKey<NavigatorState>? _navigatorKey;
+  static GlobalKey<NavigatorState>? navigatorKey;
 
   // Instance-based API (for IndustryNotificationService compatibility)
   String? _currentUserId;
@@ -33,11 +33,6 @@ class NotificationService {
       StreamController<List<AppNotification>>.broadcast();
   final StreamController<int> _unreadCountController =
       StreamController<int>.broadcast();
-
-  /// Set navigator key for navigation
-  static void setNavigatorKey(GlobalKey<NavigatorState> navigatorKey) {
-    _navigatorKey = navigatorKey;
-  }
 
   /// Initialize the notification service - Static API
   static Future<void> initialize() async {
@@ -70,8 +65,10 @@ class NotificationService {
         if (_instance._currentUserId != null) {
           _instance._startNotificationListener();
         } else {
-          unawaited(_instance._notificationsSubscription?.cancel() ??
-              Future<void>.value());
+          unawaited(
+            _instance._notificationsSubscription?.cancel() ??
+                Future<void>.value(),
+          );
           _instance._notificationsController.add([]);
           _instance._unreadCountController.add(0);
         }
@@ -294,6 +291,7 @@ class NotificationService {
         await _navigateToProfile(data);
         break;
       case 'super_like':
+      case 'superLike':
         await _navigateToProfile(data);
         break;
       default:
@@ -351,7 +349,7 @@ class NotificationService {
   static Future<void> _navigateToMatch(Map<String, dynamic> data) async {
     debugPrint('🎉 Navigating to match: ${data['matchedUserName']}');
 
-    final context = _navigatorKey?.currentContext;
+    final context = navigatorKey?.currentContext;
     if (context != null) {
       // Navigate to match confirmation screen or chat
       await Navigator.pushNamed(
@@ -372,7 +370,7 @@ class NotificationService {
   static Future<void> _navigateToChat(Map<String, dynamic> data) async {
     debugPrint('💬 Navigating to chat: ${data['threadId']}');
 
-    final context = _navigatorKey?.currentContext;
+    final context = navigatorKey?.currentContext;
     if (context != null) {
       // Navigate to specific chat thread
       await Navigator.pushNamed(
@@ -396,7 +394,7 @@ class NotificationService {
       '👤 Navigating to profile: ${data['likerName'] ?? data['senderName']}',
     );
 
-    final context = _navigatorKey?.currentContext;
+    final context = navigatorKey?.currentContext;
     if (context != null) {
       // Navigate to user profile
       await Navigator.pushNamed(
@@ -448,14 +446,23 @@ class NotificationService {
         .orderBy('timestamp', descending: true)
         .limit(50)
         .snapshots()
-        .listen((snapshot) {
-      final notifications =
-          snapshot.docs.map(AppNotification.fromFirestore).toList();
-      _notificationsController.add(notifications);
+        .listen(
+      (snapshot) {
+        final notifications =
+            snapshot.docs.map(AppNotification.fromFirestore).toList();
+        _notificationsController.add(notifications);
 
-      final unreadCount = notifications.where((n) => !n.isRead).length;
-      _unreadCountController.add(unreadCount);
-    });
+        final unreadCount = notifications.where((n) => !n.isRead).length;
+        _unreadCountController.add(unreadCount);
+      },
+      onError: (Object error) {
+        debugPrint(
+          '⚠️ Notification listener error (index may be missing): $error',
+        );
+        _notificationsController.add([]);
+        _unreadCountController.add(0);
+      },
+    );
   }
 
   /// Stream of notifications (instance-based API)

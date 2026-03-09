@@ -4,6 +4,8 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 
 import '../../common/constants/app_colors.dart';
+import '../../common/constants/app_spacing.dart';
+import '../../common/widgets/state_views/state_views.dart';
 import '../../services/privacy_migration_service.dart';
 import 'privacy_settings_screen.dart';
 
@@ -19,6 +21,7 @@ class _PrivacyMigrationScreenState extends State<PrivacyMigrationScreen> {
 
   bool _isLoading = false;
   bool _isMigrating = false;
+  String? _loadError;
   Map<String, dynamic>? _migrationStatus;
 
   @override
@@ -30,19 +33,22 @@ class _PrivacyMigrationScreenState extends State<PrivacyMigrationScreen> {
   Future<void> _checkMigrationStatus() async {
     setState(() {
       _isLoading = true;
+      _loadError = null;
     });
 
     try {
       final status = await _migrationService.getMigrationStatus();
+      if (!mounted) return;
       setState(() {
         _migrationStatus = status;
         _isLoading = false;
       });
     } on Object {
+      if (!mounted) return;
       setState(() {
         _isLoading = false;
+        _loadError = 'Failed to check migration status';
       });
-      _showErrorSnackBar('Failed to check migration status');
     }
   }
 
@@ -70,35 +76,45 @@ class _PrivacyMigrationScreenState extends State<PrivacyMigrationScreen> {
       } else {
         _showErrorSnackBar('Migration failed. Please try again.');
       }
-    } on Object catch (e) {
-      _showErrorSnackBar('Error during migration: ${e.toString()}');
+    } on Object {
+      if (mounted) {
+        _showErrorSnackBar('Migration failed. Please try again.');
+      }
     } finally {
-      setState(() {
-        _isMigrating = false;
-      });
+      if (mounted) {
+        setState(() {
+          _isMigrating = false;
+        });
+      }
     }
   }
 
   void _showSuccessSnackBar(String message) {
+    if (!mounted) return;
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
         content:
             Text(message, style: GoogleFonts.montserrat(color: Colors.white)),
         backgroundColor: AppColors.primaryGreen,
         behavior: SnackBarBehavior.floating,
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(AppSpacing.sm),
+        ),
       ),
     );
   }
 
   void _showErrorSnackBar(String message) {
+    if (!mounted) return;
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
         content:
             Text(message, style: GoogleFonts.montserrat(color: Colors.white)),
         backgroundColor: Colors.red,
         behavior: SnackBarBehavior.floating,
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(AppSpacing.sm),
+        ),
       ),
     );
   }
@@ -125,8 +141,14 @@ class _PrivacyMigrationScreenState extends State<PrivacyMigrationScreen> {
         ),
       ),
       body: _isLoading
-          ? const Center(child: CircularProgressIndicator())
-          : _buildContent(),
+          ? const AppLoadingView(message: 'Loading migration status...')
+          : _loadError != null
+              ? AppErrorView(
+                  title: 'Unable to load privacy update',
+                  message: _loadError!,
+                  onRetry: _checkMigrationStatus,
+                )
+              : _buildContent(),
     );
   }
 
@@ -141,13 +163,13 @@ class _PrivacyMigrationScreenState extends State<PrivacyMigrationScreen> {
   }
 
   Widget _buildMigrationNeededContent() => SingleChildScrollView(
-        padding: const EdgeInsets.all(16),
+        padding: AppSpacing.pagePadding,
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             // Header
             Container(
-              padding: const EdgeInsets.all(20),
+              padding: const EdgeInsets.all(AppSpacing.md + AppSpacing.xs),
               decoration: BoxDecoration(
                 gradient: LinearGradient(
                   colors: [
@@ -157,9 +179,10 @@ class _PrivacyMigrationScreenState extends State<PrivacyMigrationScreen> {
                   begin: Alignment.topLeft,
                   end: Alignment.bottomRight,
                 ),
-                borderRadius: BorderRadius.circular(16),
+                borderRadius: BorderRadius.circular(AppSpacing.cardRadius),
                 border: Border.all(
-                    color: AppColors.primaryGreen.withValues(alpha: 0.3)),
+                  color: AppColors.primaryGreen.withValues(alpha: 0.3),
+                ),
               ),
               child: Column(
                 children: [
@@ -168,7 +191,7 @@ class _PrivacyMigrationScreenState extends State<PrivacyMigrationScreen> {
                     size: 48,
                     color: AppColors.primaryGreen,
                   ),
-                  const SizedBox(height: 16),
+                  const SizedBox(height: AppSpacing.md),
                   Text(
                     'Enhanced Privacy Protection',
                     style: GoogleFonts.montserrat(
@@ -178,7 +201,7 @@ class _PrivacyMigrationScreenState extends State<PrivacyMigrationScreen> {
                     ),
                     textAlign: TextAlign.center,
                   ),
-                  const SizedBox(height: 8),
+                  const SizedBox(height: AppSpacing.sm),
                   Text(
                     'We\'ve upgraded our privacy system to give you better control over your personal information.',
                     style: GoogleFonts.montserrat(
@@ -191,40 +214,40 @@ class _PrivacyMigrationScreenState extends State<PrivacyMigrationScreen> {
               ),
             ),
 
-            const SizedBox(height: 24),
+            const SizedBox(height: AppSpacing.lg),
 
             // What's New Section
             _buildSectionHeader('What\'s New'),
-            const SizedBox(height: 16),
+            const SizedBox(height: AppSpacing.md),
             _buildFeatureCard(
               Icons.visibility_outlined,
               'Profile Visibility Controls',
               'Choose what information others can see about you - age, tribe, orientation, and more.',
             ),
-            const SizedBox(height: 12),
+            const SizedBox(height: AppSpacing.sm + AppSpacing.xs),
             _buildFeatureCard(
               Icons.location_on_outlined,
               'Location Privacy',
               'Control how precise your location appears to others with high, medium, or low precision settings.',
             ),
-            const SizedBox(height: 12),
+            const SizedBox(height: AppSpacing.sm + AppSpacing.xs),
             _buildFeatureCard(
               Icons.message_outlined,
               'Communication Controls',
               'Decide who can message you - matches only, or include users who liked you.',
             ),
-            const SizedBox(height: 12),
+            const SizedBox(height: AppSpacing.sm + AppSpacing.xs),
             _buildFeatureCard(
               Icons.shield_outlined,
               'Enhanced Security',
               'Your sensitive data is now stored separately and protected with advanced security rules.',
             ),
 
-            const SizedBox(height: 24),
+            const SizedBox(height: AppSpacing.lg),
 
             // What Happens Section
             _buildSectionHeader('What Happens During Migration'),
-            const SizedBox(height: 16),
+            const SizedBox(height: AppSpacing.md),
             _buildInfoCard(
               'Your profile data will be reorganized for better privacy protection. This process:',
               [
@@ -235,19 +258,19 @@ class _PrivacyMigrationScreenState extends State<PrivacyMigrationScreen> {
               ],
             ),
 
-            const SizedBox(height: 24),
+            const SizedBox(height: AppSpacing.lg),
 
             // Migration Button
             SizedBox(
               width: double.infinity,
-              height: 56,
+              height: AppSpacing.xxl + AppSpacing.sm,
               child: ElevatedButton(
                 onPressed: _isMigrating ? null : _startMigration,
                 style: ElevatedButton.styleFrom(
                   backgroundColor: AppColors.primaryGreen,
                   foregroundColor: Colors.white,
                   shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(16),
+                    borderRadius: BorderRadius.circular(AppSpacing.cardRadius),
                   ),
                   elevation: 3,
                 ),
@@ -256,15 +279,15 @@ class _PrivacyMigrationScreenState extends State<PrivacyMigrationScreen> {
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
                           const SizedBox(
-                            width: 20,
-                            height: 20,
+                            width: AppSpacing.md + AppSpacing.xs,
+                            height: AppSpacing.md + AppSpacing.xs,
                             child: CircularProgressIndicator(
                               strokeWidth: 2,
                               valueColor:
                                   AlwaysStoppedAnimation<Color>(Colors.white),
                             ),
                           ),
-                          const SizedBox(width: 12),
+                          const SizedBox(width: AppSpacing.sm + AppSpacing.xs),
                           Text(
                             'Migrating...',
                             style: GoogleFonts.montserrat(
@@ -284,7 +307,7 @@ class _PrivacyMigrationScreenState extends State<PrivacyMigrationScreen> {
               ),
             ),
 
-            const SizedBox(height: 16),
+            const SizedBox(height: AppSpacing.md),
 
             // Skip Button
             TextButton(
@@ -298,13 +321,13 @@ class _PrivacyMigrationScreenState extends State<PrivacyMigrationScreen> {
               ),
             ),
 
-            const SizedBox(height: 32),
+            const SizedBox(height: AppSpacing.xl),
           ],
         ),
       );
 
   Widget _buildAlreadyMigratedContent() => Padding(
-        padding: const EdgeInsets.all(16),
+        padding: AppSpacing.pagePadding,
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
@@ -313,7 +336,7 @@ class _PrivacyMigrationScreenState extends State<PrivacyMigrationScreen> {
               size: 80,
               color: AppColors.primaryGreen,
             ),
-            const SizedBox(height: 24),
+            const SizedBox(height: AppSpacing.lg),
             Text(
               'Privacy Settings Updated',
               style: GoogleFonts.montserrat(
@@ -323,7 +346,7 @@ class _PrivacyMigrationScreenState extends State<PrivacyMigrationScreen> {
               ),
               textAlign: TextAlign.center,
             ),
-            const SizedBox(height: 16),
+            const SizedBox(height: AppSpacing.md),
             Text(
               'Your profile has been updated with enhanced privacy protection. You can now control what information others can see about you.',
               style: GoogleFonts.montserrat(
@@ -332,10 +355,10 @@ class _PrivacyMigrationScreenState extends State<PrivacyMigrationScreen> {
               ),
               textAlign: TextAlign.center,
             ),
-            const SizedBox(height: 32),
+            const SizedBox(height: AppSpacing.xl),
             SizedBox(
               width: double.infinity,
-              height: 56,
+              height: AppSpacing.xxl + AppSpacing.sm,
               child: ElevatedButton(
                 onPressed: () {
                   unawaited(
@@ -351,7 +374,7 @@ class _PrivacyMigrationScreenState extends State<PrivacyMigrationScreen> {
                   backgroundColor: AppColors.primaryGreen,
                   foregroundColor: Colors.white,
                   shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(16),
+                    borderRadius: BorderRadius.circular(AppSpacing.cardRadius),
                   ),
                   elevation: 3,
                 ),
@@ -379,14 +402,14 @@ class _PrivacyMigrationScreenState extends State<PrivacyMigrationScreen> {
 
   Widget _buildFeatureCard(IconData icon, String title, String description) =>
       Container(
-        padding: const EdgeInsets.all(16),
+        padding: AppSpacing.cardPadding,
         decoration: BoxDecoration(
           color: AppColors.cardColor,
-          borderRadius: BorderRadius.circular(12),
+          borderRadius: BorderRadius.circular(AppSpacing.buttonRadius),
           boxShadow: [
             BoxShadow(
               color: Colors.black.withValues(alpha: 0.05),
-              blurRadius: 10,
+              blurRadius: AppSpacing.sm + AppSpacing.xs / 2,
               offset: const Offset(0, 2),
             ),
           ],
@@ -394,10 +417,10 @@ class _PrivacyMigrationScreenState extends State<PrivacyMigrationScreen> {
         child: Row(
           children: [
             Container(
-              padding: const EdgeInsets.all(12),
+              padding: const EdgeInsets.all(AppSpacing.sm + AppSpacing.xs),
               decoration: BoxDecoration(
                 color: AppColors.primaryGreen.withValues(alpha: 0.1),
-                borderRadius: BorderRadius.circular(8),
+                borderRadius: BorderRadius.circular(AppSpacing.sm),
               ),
               child: Icon(
                 icon,
@@ -405,7 +428,7 @@ class _PrivacyMigrationScreenState extends State<PrivacyMigrationScreen> {
                 size: 24,
               ),
             ),
-            const SizedBox(width: 16),
+            const SizedBox(width: AppSpacing.md),
             Expanded(
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
@@ -418,7 +441,7 @@ class _PrivacyMigrationScreenState extends State<PrivacyMigrationScreen> {
                       color: AppColors.textPrimary,
                     ),
                   ),
-                  const SizedBox(height: 4),
+                  const SizedBox(height: AppSpacing.xs),
                   Text(
                     description,
                     style: GoogleFonts.montserrat(
@@ -434,14 +457,14 @@ class _PrivacyMigrationScreenState extends State<PrivacyMigrationScreen> {
       );
 
   Widget _buildInfoCard(String title, List<String> points) => Container(
-        padding: const EdgeInsets.all(16),
+        padding: AppSpacing.cardPadding,
         decoration: BoxDecoration(
           color: AppColors.cardColor,
-          borderRadius: BorderRadius.circular(12),
+          borderRadius: BorderRadius.circular(AppSpacing.buttonRadius),
           boxShadow: [
             BoxShadow(
               color: Colors.black.withValues(alpha: 0.05),
-              blurRadius: 10,
+              blurRadius: AppSpacing.sm + AppSpacing.xs / 2,
               offset: const Offset(0, 2),
             ),
           ],
@@ -456,23 +479,25 @@ class _PrivacyMigrationScreenState extends State<PrivacyMigrationScreen> {
                 color: AppColors.textPrimary,
               ),
             ),
-            const SizedBox(height: 12),
+            const SizedBox(height: AppSpacing.sm + AppSpacing.xs),
             ...points.map(
               (point) => Padding(
-                padding: const EdgeInsets.only(bottom: 8),
+                padding: const EdgeInsets.only(bottom: AppSpacing.sm),
                 child: Row(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Container(
-                      margin: const EdgeInsets.only(top: 6),
-                      width: 6,
-                      height: 6,
+                      margin: const EdgeInsets.only(
+                        top: AppSpacing.sm - AppSpacing.xs / 2,
+                      ),
+                      width: AppSpacing.sm - AppSpacing.xs / 2,
+                      height: AppSpacing.sm - AppSpacing.xs / 2,
                       decoration: const BoxDecoration(
                         color: AppColors.primaryGreen,
                         shape: BoxShape.circle,
                       ),
                     ),
-                    const SizedBox(width: 12),
+                    const SizedBox(width: AppSpacing.sm + AppSpacing.xs),
                     Expanded(
                       child: Text(
                         point,

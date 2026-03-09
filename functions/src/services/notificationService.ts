@@ -226,9 +226,12 @@ export class NotificationService {
       // Log successful notification
       await this.logNotificationAnalytics(recipient.id, NotificationType.SUPER_LIKE, NotificationStatus.SENT);
 
-      // Store in-app notification
+      // Store in-app notification — use 'superLike' (camelCase) to match
+      // what the Flutter UI filters/renders on in ModernNotificationsScreen.
+      // Note: the FCM push data.type above uses 'super_like' for Android
+      // channel routing; the two values are reconciled on the client side.
       await this.storeInAppNotification(recipient.id, {
-        type: 'super_like',
+        type: 'superLike',
         title: '⭐ Super Like!',
         message: `${sender.name || 'Someone special'} super liked you!`,
         avatarUrl: this.getFirstPhoto(sender),
@@ -311,26 +314,38 @@ export class NotificationService {
   }
 
   /**
-   * Store in-app notification
+   * Store in-app notification in both the user subcollection (legacy/static API)
+   * and the top-level /notifications collection (modern instance API).
+   * The top-level collection is what ModernNotificationsScreen reads via
+   * `.where('userId', isEqualTo: currentUserId)`.
    */
   private async storeInAppNotification(userId: string, notificationData: Partial<NotificationData>): Promise<void> {
     try {
-      const notificationRef = this.db
+      const payload = {
+        ...notificationData,
+        userId,
+        timestamp: admin.firestore.FieldValue.serverTimestamp(),
+        isRead: false,
+      };
+
+      const batch = this.db.batch();
+
+      // Legacy path — /users/{userId}/notifications (static API)
+      const subcollRef = this.db
         .collection('users')
         .doc(userId)
         .collection('notifications')
         .doc();
+      batch.set(subcollRef, { ...payload, id: subcollRef.id });
 
-      await notificationRef.set({
-        ...notificationData,
-        id: notificationRef.id,
-        timestamp: admin.firestore.FieldValue.serverTimestamp(),
-        isRead: false,
-      });
+      // Modern path — top-level /notifications (instance API)
+      const topLevelRef = this.db.collection('notifications').doc();
+      batch.set(topLevelRef, { ...payload, id: topLevelRef.id });
 
-      console.log(`✅ In-app notification stored for user ${userId}`);
+      await batch.commit();
 
-      // Log notification analytics
+      console.log(`✅ In-app notification stored for user ${userId} (both paths)`);
+
       await this.logNotificationAnalytics(userId, notificationData.type as NotificationType, NotificationStatus.STORED);
     } catch (error) {
       console.error(`❌ Error storing in-app notification for ${userId}:`, error);

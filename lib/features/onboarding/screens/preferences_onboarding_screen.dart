@@ -14,7 +14,7 @@ class PreferencesOnboardingScreen extends StatefulWidget {
 
 class _PreferencesOnboardingScreenState
     extends State<PreferencesOnboardingScreen> {
-  String _selectedInterestedIn = 'everyone';
+  String _selectedInterestedIn = '';
   RangeValues _ageRange = const RangeValues(18, 50);
   double _maxDistance = 50;
 
@@ -46,25 +46,24 @@ class _PreferencesOnboardingScreenState
                 'Help us find your perfect match',
                 style: OnboardingTheme.subtitleStyle,
               ),
-
               const SizedBox(height: OnboardingTheme.subtitleToField),
-
-              Text("I'm interested in", style: OnboardingTheme.sectionLabelStyle),
+              Text(
+                "I'm interested in",
+                style: OnboardingTheme.sectionLabelStyle,
+              ),
               const SizedBox(height: OnboardingTheme.labelToField),
               _buildInterestedInOptions(),
-
               const SizedBox(height: OnboardingTheme.fieldToSection),
-
-              Text('Maximum Distance', style: OnboardingTheme.sectionLabelStyle),
+              Text(
+                'Maximum Distance',
+                style: OnboardingTheme.sectionLabelStyle,
+              ),
               const SizedBox(height: OnboardingTheme.labelToField),
               _buildDistanceSlider(),
-
               const SizedBox(height: OnboardingTheme.fieldToSection),
-
               Text('Age Range', style: OnboardingTheme.sectionLabelStyle),
               const SizedBox(height: OnboardingTheme.labelToField),
               _buildAgeRangeSlider(),
-
               const SizedBox(height: OnboardingTheme.fieldToBottom),
             ],
           ),

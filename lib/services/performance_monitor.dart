@@ -1,5 +1,6 @@
 import 'dart:async';
-import 'package:flutter/foundation.dart';
+
+import '../common/utils/app_logger.dart';
 
 /// Performance monitoring service to track optimization improvements
 /// Helps measure the impact of performance optimizations
@@ -9,23 +10,26 @@ class PerformanceMonitor {
   static final Map<String, int> _operationCounts = {};
 
   // Performance thresholds (in milliseconds)
-  static const int USER_LIST_LOAD_THRESHOLD = 2000; // 2 seconds
-  static const int MATCH_DETECTION_THRESHOLD = 1000; // 1 second
-  static const int CACHE_ACCESS_THRESHOLD = 100; // 100ms
+  static const int userListLoadThreshold = 2000;
+  static const int matchDetectionThreshold = 1000;
+  static const int cacheAccessThreshold = 100;
+  static const int sendMessageThreshold = 200;
+  static const int chatThreadsLoadThreshold = 300;
+  static const int superLikeThreshold = 1000;
 
   /// Start timing an operation
   static void startTimer(String operationName) {
     final stopwatch = Stopwatch()..start();
     _activeTimers[operationName] = stopwatch;
 
-    debugPrint('⏱️ Started timer for: $operationName');
+    AppLogger.debug('Started timer for: $operationName');
   }
 
   /// Stop timing an operation and record the result
   static int stopTimer(String operationName) {
     final stopwatch = _activeTimers[operationName];
     if (stopwatch == null) {
-      debugPrint('❌ No active timer found for: $operationName');
+      AppLogger.warning('No active timer found for: $operationName');
       return 0;
     }
 
@@ -54,33 +58,34 @@ class PerformanceMonitor {
     return elapsedMs;
   }
 
-  /// Log performance with appropriate level based on thresholds
   static void _logPerformance(String operationName, int elapsedMs) {
     final threshold = _getThreshold(operationName);
-    final emoji = elapsedMs <= threshold ? '✅' : '⚠️';
-    final status = elapsedMs <= threshold ? 'GOOD' : 'SLOW';
-
-    debugPrint('$emoji $operationName completed in ${elapsedMs}ms [$status]');
 
     if (elapsedMs > threshold) {
-      debugPrint(
-        '   ⚠️ Exceeded threshold of ${threshold}ms by ${elapsedMs - threshold}ms',
+      AppLogger.warning(
+        '$operationName exceeded budget: ${elapsedMs}ms '
+        '(threshold: ${threshold}ms, over by ${elapsedMs - threshold}ms)',
       );
+    } else {
+      AppLogger.debug('$operationName completed in ${elapsedMs}ms');
     }
   }
 
-  /// Get performance threshold for operation
   static int _getThreshold(String operationName) {
-    if (operationName.toLowerCase().contains('user_list') ||
-        operationName.toLowerCase().contains('get_users')) {
-      return USER_LIST_LOAD_THRESHOLD;
-    } else if (operationName.toLowerCase().contains('match') ||
-        operationName.toLowerCase().contains('like')) {
-      return MATCH_DETECTION_THRESHOLD;
-    } else if (operationName.toLowerCase().contains('cache')) {
-      return CACHE_ACCESS_THRESHOLD;
+    final name = operationName.toLowerCase();
+    if (name.contains('send_message')) return sendMessageThreshold;
+    if (name.contains('chat_threads') || name.contains('thread_load')) {
+      return chatThreadsLoadThreshold;
     }
-    return 1000; // Default 1 second
+    if (name.contains('super_like')) return superLikeThreshold;
+    if (name.contains('user_list') || name.contains('get_users')) {
+      return userListLoadThreshold;
+    }
+    if (name.contains('match') || name.contains('like')) {
+      return matchDetectionThreshold;
+    }
+    if (name.contains('cache')) return cacheAccessThreshold;
+    return 1000;
   }
 
   /// Record a Firestore operation
@@ -103,8 +108,8 @@ class PerformanceMonitor {
           (_operationCounts[writeKey] ?? 0) + writeCount;
     }
 
-    debugPrint(
-      '📊 Firestore $operationType: reads=${readCount ?? 0}, writes=${writeCount ?? 0}',
+    AppLogger.debug(
+      'Firestore $operationType: reads=${readCount ?? 0}, writes=${writeCount ?? 0}',
     );
   }
 
@@ -206,7 +211,7 @@ class PerformanceMonitor {
     _activeTimers.clear();
     _performanceHistory.clear();
     _operationCounts.clear();
-    debugPrint('🗑️ Performance monitoring data cleared');
+    AppLogger.debug('Performance monitoring data cleared');
   }
 
   /// Measure execution time of a function
@@ -221,7 +226,7 @@ class PerformanceMonitor {
       return result;
     } on Object catch (e) {
       stopTimer(operationName);
-      debugPrint('❌ Error in measured operation $operationName: $e');
+      AppLogger.error('Error in measured operation $operationName', error: e);
       rethrow;
     }
   }
@@ -235,7 +240,10 @@ class PerformanceMonitor {
       return result;
     } on Object catch (e) {
       stopTimer(operationName);
-      debugPrint('❌ Error in measured sync operation $operationName: $e');
+      AppLogger.error(
+        'Error in measured sync operation $operationName',
+        error: e,
+      );
       rethrow;
     }
   }

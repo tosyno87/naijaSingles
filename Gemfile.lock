@@ -100,7 +100,7 @@ GEM
     ethon (0.15.0)
       ffi (>= 1.15.0)
     excon (0.112.0)
-    faraday (1.10.4)
+    faraday (1.10.5)
       faraday-em_http (~> 1.0)
       faraday-em_synchrony (~> 1.0)
       faraday-excon (~> 1.1)
@@ -119,7 +119,7 @@ GEM
     faraday-em_synchrony (1.0.1)
     faraday-excon (1.1.0)
     faraday-httpclient (1.0.1)
-    faraday-multipart (1.1.1)
+    faraday-multipart (1.2.0)
       multipart-post (~> 2.0)
     faraday-net_http (1.0.2)
     faraday-net_http_persistent (1.2.0)
@@ -330,6 +330,7 @@ PLATFORMS
 DEPENDENCIES
   activesupport (>= 6.1.7.5)
   cocoapods (>= 1.15.0)
+  faraday (>= 1.10.5, < 2.0)
   fastlane
   rubocop
   rubocop-performance

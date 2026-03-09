@@ -27,6 +27,7 @@ class OnboardingBloc extends Bloc<OnboardingEvent, OnboardingState> {
     on<OnboardingDateOfBirthUpdated>(_onDateOfBirthUpdated);
     on<OnboardingGenderUpdated>(_onGenderUpdated);
     on<OnboardingTribeUpdated>(_onTribeUpdated);
+    on<OnboardingRaceUpdated>(_onRaceUpdated);
     on<OnboardingBioUpdated>(_onBioUpdated);
     on<OnboardingInterestAdded>(_onInterestAdded);
     on<OnboardingInterestRemoved>(_onInterestRemoved);
@@ -111,6 +112,15 @@ class OnboardingBloc extends Bloc<OnboardingEvent, OnboardingState> {
     final data = _data(emit);
     if (data == null) return;
     emit(OnboardingLoaded(data.copyWith(tribe: e.tribe)));
+  }
+
+  void _onRaceUpdated(
+    OnboardingRaceUpdated e,
+    Emitter<OnboardingState> emit,
+  ) {
+    final data = _data(emit);
+    if (data == null) return;
+    emit(OnboardingLoaded(data.copyWith(race: e.race)));
   }
 
   void _onBioUpdated(OnboardingBioUpdated e, Emitter<OnboardingState> emit) {

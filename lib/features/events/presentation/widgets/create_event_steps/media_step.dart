@@ -662,8 +662,10 @@ class _MediaStepState extends State<MediaStep> {
             mainAxisSize: MainAxisSize.min,
             children: [
               ListTile(
-                leading: const Icon(Icons.photo_library,
-                    color: AppColors.primaryGreen),
+                leading: const Icon(
+                  Icons.photo_library,
+                  color: AppColors.primaryGreen,
+                ),
                 title: Text('Gallery', style: GoogleFonts.montserrat()),
                 onTap: () => Navigator.pop(context, ImageSource.gallery),
               ),

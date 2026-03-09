@@ -568,7 +568,7 @@ class _ReorderableWrapState extends State<ReorderableWrap> {
           return Container(
             key: ValueKey('reorderable_$index'),
             margin: EdgeInsets.only(
-              right: (index % 2 == 0) ? widget.spacing : 0,
+              right: index.isEven ? widget.spacing : 0,
               bottom: widget.runSpacing,
             ),
             width:

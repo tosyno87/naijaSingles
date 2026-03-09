@@ -25,9 +25,6 @@ class OnboardingRepository {
         .set(essentialData, SetOptions(merge: true));
 
     await FirebaseFirestore.instance.collection('users').doc(userId).update({
-      'onboardingCompleted': true,
-      'profileSetupComplete': true,
-      'isProfileComplete': true,
       'updatedAt': FieldValue.serverTimestamp(),
     });
 
@@ -126,6 +123,7 @@ class OnboardingRepository {
       'dateOfBirth': d.dateOfBirth?.toIso8601String(),
       'age': d.age,
       'gender': d.gender,
+      'race': d.race,
       'tribe': d.tribe,
       'bio': d.bio,
       'interests': d.interests,
@@ -151,12 +149,16 @@ class OnboardingRepository {
       'drinkingPreference': d.drinkingPreference,
       'smokingPreference': d.smokingPreference,
       'lastActive': DateTime.now().toIso8601String(),
-      'isProfileComplete': true,
       'isBlocked': false,
       'isPremium': false,
       'createdAt': DateTime.now().toIso8601String(),
       'updatedAt': DateTime.now().toIso8601String(),
-      'editInfo': {'userGender': d.gender, 'userName': d.fullName},
+      'editInfo': {
+        'userGender': d.gender,
+        'userName': d.fullName,
+        'race': d.race,
+        'tribe': d.tribe,
+      },
       'preferences': {
         'interestedIn': d.interestedIn,
         'ageRange': d.ageRange,
@@ -167,12 +169,12 @@ class OnboardingRepository {
       'showGender': d.interestedIn,
       'ageRange': {
         'min': d.ageRange[0].toString(),
-        'max': d.ageRange[1].toString()
+        'max': d.ageRange[1].toString(),
       },
       'userGender': d.gender,
       'age_range': {
         'min': d.ageRange[0].toString(),
-        'max': d.ageRange[1].toString()
+        'max': d.ageRange[1].toString(),
       },
       'maximum_distance': d.maxDistance,
       'maxDistance': d.maxDistance,
@@ -185,8 +187,12 @@ class OnboardingRepository {
       'locationName': d.locationName,
       'latitude': d.latitude ?? 6.5244,
       'longitude': d.longitude ?? 3.3792,
+      // Canonical flag + legacy synonyms. All three must be set so the
+      // Firestore security rule isLockedIdentityFieldUpdate() activates
+      // regardless of which flag name a query or rule references.
       'onboardingCompleted': true,
       'profileSetupComplete': true,
+      'isProfileComplete': true,
     };
   }
 }

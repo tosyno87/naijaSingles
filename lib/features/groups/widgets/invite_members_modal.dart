@@ -59,8 +59,9 @@ class _InviteMembersModalState extends State<InviteMembersModal> {
       final memberIds = widget.group.memberIds;
 
       final filteredResults = results
-          .where((user) =>
-              user.id != currentUserId && !memberIds.contains(user.id))
+          .where(
+            (user) => user.id != currentUserId && !memberIds.contains(user.id),
+          )
           .toList();
 
       setState(() {

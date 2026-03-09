@@ -6,6 +6,8 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import '../../common/constants/app_colors.dart';
+import '../../common/constants/app_spacing.dart';
+import '../../common/widgets/state_views/state_views.dart';
 
 class LanguageSettingsScreen extends StatefulWidget {
   const LanguageSettingsScreen({super.key});
@@ -15,13 +17,12 @@ class LanguageSettingsScreen extends StatefulWidget {
 }
 
 class _LanguageSettingsScreenState extends State<LanguageSettingsScreen> {
-  // New Afropeep theme colors
-  static const Color primaryColor = Color(0xFF008037); // Deep green
-  static const Color cardColor = Colors.white; // White cards with shadows
-  static const Color successColor = Color(0xFF4CAF50); // Green for success
-  static const Color textPrimary = Color(0xFF3E1F0D); // Deep brown
-  static const Color textSecondary = Color(0xFF666666); // Medium gray
-  static const Color textLight = Color(0xFF999999); // Light gray
+  static const Color primaryColor = AppColors.primaryGreen;
+  static const Color cardColor = AppColors.cardColor;
+  static const Color successColor = Color(0xFF4CAF50);
+  static const Color textPrimary = AppColors.textPrimary;
+  static const Color textSecondary = AppColors.textSecondary;
+  static const Color textLight = Color(0xFF999999);
 
   String _selectedLanguage = 'en';
   bool _isLoading = true;
@@ -125,7 +126,7 @@ class _LanguageSettingsScreenState extends State<LanguageSettingsScreen> {
             backgroundColor: successColor,
             behavior: SnackBarBehavior.floating,
             shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(8),
+              borderRadius: BorderRadius.circular(AppSpacing.sm),
             ),
           ),
         );
@@ -148,7 +149,7 @@ class _LanguageSettingsScreenState extends State<LanguageSettingsScreen> {
             backgroundColor: Colors.red,
             behavior: SnackBarBehavior.floating,
             shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(8),
+              borderRadius: BorderRadius.circular(AppSpacing.sm),
             ),
           ),
         );
@@ -163,10 +164,11 @@ class _LanguageSettingsScreenState extends State<LanguageSettingsScreen> {
         barrierDismissible: false,
         builder: (context) => AlertDialog(
           backgroundColor: cardColor,
-          shape:
-              RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(AppSpacing.chipRadius),
+          ),
           elevation: 8,
-          contentPadding: const EdgeInsets.all(24),
+          contentPadding: const EdgeInsets.all(AppSpacing.lg),
           title: Column(
             children: [
               Container(
@@ -179,7 +181,7 @@ class _LanguageSettingsScreenState extends State<LanguageSettingsScreen> {
                 child:
                     const Icon(Icons.language, color: primaryColor, size: 30),
               ),
-              const SizedBox(height: 16),
+              const SizedBox(height: AppSpacing.md),
               Text(
                 'Language Changed',
                 style: GoogleFonts.montserrat(
@@ -202,21 +204,24 @@ class _LanguageSettingsScreenState extends State<LanguageSettingsScreen> {
                 ),
                 textAlign: TextAlign.center,
               ),
-              const SizedBox(height: 16),
+              const SizedBox(height: AppSpacing.md),
               Container(
-                padding: const EdgeInsets.all(12),
+                padding: const EdgeInsets.all(AppSpacing.buttonRadius),
                 decoration: BoxDecoration(
                   color: primaryColor.withValues(alpha: 0.05),
-                  borderRadius: BorderRadius.circular(12),
+                  borderRadius: BorderRadius.circular(AppSpacing.buttonRadius),
                   border: Border.all(
                     color: primaryColor.withValues(alpha: 0.2),
                   ),
                 ),
                 child: Row(
                   children: [
-                    const Icon(Icons.info_outline,
-                        color: primaryColor, size: 20),
-                    const SizedBox(width: 8),
+                    const Icon(
+                      Icons.info_outline,
+                      color: primaryColor,
+                      size: 20,
+                    ),
+                    const SizedBox(width: AppSpacing.sm),
                     Expanded(
                       child: Text(
                         'Full localization support is coming soon!',
@@ -240,9 +245,12 @@ class _LanguageSettingsScreenState extends State<LanguageSettingsScreen> {
                 style: ElevatedButton.styleFrom(
                   backgroundColor: primaryColor,
                   foregroundColor: Colors.white,
-                  padding: const EdgeInsets.symmetric(vertical: 12),
+                  padding: const EdgeInsets.symmetric(
+                    vertical: AppSpacing.buttonRadius,
+                  ),
                   shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(12),
+                    borderRadius:
+                        BorderRadius.circular(AppSpacing.buttonRadius),
                   ),
                   elevation: 0,
                 ),
@@ -256,7 +264,12 @@ class _LanguageSettingsScreenState extends State<LanguageSettingsScreen> {
               ),
             ),
           ],
-          actionsPadding: const EdgeInsets.fromLTRB(24, 0, 24, 24),
+          actionsPadding: const EdgeInsets.fromLTRB(
+            AppSpacing.lg,
+            0,
+            AppSpacing.lg,
+            AppSpacing.lg,
+          ),
         ),
       ),
     );
@@ -283,23 +296,23 @@ class _LanguageSettingsScreenState extends State<LanguageSettingsScreen> {
           centerTitle: true,
         ),
         body: _isLoading
-            ? _buildLoadingState()
+            ? const AppLoadingView()
             : SingleChildScrollView(
-                padding: const EdgeInsets.all(16),
+                padding: AppSpacing.pagePadding,
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     // Header Section
                     _buildHeaderSection(),
-                    const SizedBox(height: 24),
+                    const SizedBox(height: AppSpacing.lg),
 
                     // Available Languages
                     _buildAvailableLanguagesSection(),
-                    const SizedBox(height: 24),
+                    const SizedBox(height: AppSpacing.lg),
 
                     // Coming Soon Languages
                     _buildComingSoonLanguagesSection(),
-                    const SizedBox(height: 24),
+                    const SizedBox(height: AppSpacing.lg),
 
                     // Language Info
                     _buildLanguageInfoSection(),
@@ -308,31 +321,11 @@ class _LanguageSettingsScreenState extends State<LanguageSettingsScreen> {
               ),
       );
 
-  Widget _buildLoadingState() => Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            const CircularProgressIndicator(
-              color: primaryColor,
-              strokeWidth: 3,
-            ),
-            const SizedBox(height: 16),
-            Text(
-              'Loading language settings...',
-              style: GoogleFonts.montserrat(
-                fontSize: 16,
-                color: textSecondary,
-              ),
-            ),
-          ],
-        ),
-      );
-
   Widget _buildHeaderSection() => Container(
         padding: const EdgeInsets.all(20),
         decoration: BoxDecoration(
           color: cardColor,
-          borderRadius: BorderRadius.circular(16),
+          borderRadius: BorderRadius.circular(AppSpacing.cardRadius),
           boxShadow: [
             BoxShadow(
               color: Colors.black.withValues(alpha: 0.06),
@@ -356,7 +349,7 @@ class _LanguageSettingsScreenState extends State<LanguageSettingsScreen> {
                 color: primaryColor,
               ),
             ),
-            const SizedBox(height: 16),
+            const SizedBox(height: AppSpacing.md),
             Text(
               'Choose Your Language',
               style: GoogleFonts.montserrat(
@@ -366,7 +359,7 @@ class _LanguageSettingsScreenState extends State<LanguageSettingsScreen> {
               ),
               textAlign: TextAlign.center,
             ),
-            const SizedBox(height: 8),
+            const SizedBox(height: AppSpacing.sm),
             Text(
               'Select your preferred language for the Afropeep app. We support multiple Nigerian languages to make your experience more comfortable.',
               style: GoogleFonts.montserrat(
@@ -395,7 +388,7 @@ class _LanguageSettingsScreenState extends State<LanguageSettingsScreen> {
             color: textPrimary,
           ),
         ),
-        const SizedBox(height: 12),
+        const SizedBox(height: AppSpacing.buttonRadius),
         ...availableLanguages
             .map((language) => _buildLanguageCard(language, true)),
       ],
@@ -419,7 +412,7 @@ class _LanguageSettingsScreenState extends State<LanguageSettingsScreen> {
             color: textPrimary,
           ),
         ),
-        const SizedBox(height: 12),
+        const SizedBox(height: AppSpacing.buttonRadius),
         ...comingSoonLanguages
             .map((language) => _buildLanguageCard(language, false)),
       ],
@@ -430,10 +423,10 @@ class _LanguageSettingsScreenState extends State<LanguageSettingsScreen> {
     final isSelected = _selectedLanguage == language['code'];
 
     return Container(
-      margin: const EdgeInsets.only(bottom: 12),
+      margin: const EdgeInsets.only(bottom: AppSpacing.buttonRadius),
       decoration: BoxDecoration(
         color: cardColor,
-        borderRadius: BorderRadius.circular(12),
+        borderRadius: BorderRadius.circular(AppSpacing.buttonRadius),
         border: Border.all(
           color: isSelected ? primaryColor : Colors.grey.shade200,
           width: isSelected ? 2 : 1,
@@ -450,9 +443,9 @@ class _LanguageSettingsScreenState extends State<LanguageSettingsScreen> {
         color: Colors.transparent,
         child: InkWell(
           onTap: isAvailable ? () => _changeLanguage(language['code']) : null,
-          borderRadius: BorderRadius.circular(12),
+          borderRadius: BorderRadius.circular(AppSpacing.buttonRadius),
           child: Padding(
-            padding: const EdgeInsets.all(16),
+            padding: AppSpacing.cardPadding,
             child: Row(
               children: [
                 // Flag
@@ -474,7 +467,7 @@ class _LanguageSettingsScreenState extends State<LanguageSettingsScreen> {
                     ),
                   ),
                 ),
-                const SizedBox(width: 16),
+                const SizedBox(width: AppSpacing.md),
 
                 // Language Info
                 Expanded(
@@ -489,7 +482,7 @@ class _LanguageSettingsScreenState extends State<LanguageSettingsScreen> {
                           color: isAvailable ? textPrimary : textLight,
                         ),
                       ),
-                      const SizedBox(height: 4),
+                      const SizedBox(height: AppSpacing.xs),
                       Text(
                         language['nativeName'],
                         style: GoogleFonts.montserrat(
@@ -498,7 +491,7 @@ class _LanguageSettingsScreenState extends State<LanguageSettingsScreen> {
                         ),
                       ),
                       if (!isAvailable) ...[
-                        const SizedBox(height: 8),
+                        const SizedBox(height: AppSpacing.sm),
                         Container(
                           padding: const EdgeInsets.symmetric(
                             horizontal: 8,
@@ -506,7 +499,7 @@ class _LanguageSettingsScreenState extends State<LanguageSettingsScreen> {
                           ),
                           decoration: BoxDecoration(
                             color: Colors.orange.withValues(alpha: 0.1),
-                            borderRadius: BorderRadius.circular(8),
+                            borderRadius: BorderRadius.circular(AppSpacing.sm),
                           ),
                           child: Text(
                             'Coming Soon',
@@ -567,10 +560,10 @@ class _LanguageSettingsScreenState extends State<LanguageSettingsScreen> {
   }
 
   Widget _buildLanguageInfoSection() => Container(
-        padding: const EdgeInsets.all(16),
+        padding: AppSpacing.cardPadding,
         decoration: BoxDecoration(
           color: primaryColor.withValues(alpha: 0.05),
-          borderRadius: BorderRadius.circular(12),
+          borderRadius: BorderRadius.circular(AppSpacing.buttonRadius),
           border: Border.all(color: primaryColor.withValues(alpha: 0.2)),
         ),
         child: Column(
@@ -579,7 +572,7 @@ class _LanguageSettingsScreenState extends State<LanguageSettingsScreen> {
             Row(
               children: [
                 const Icon(Icons.info_outline, color: primaryColor, size: 20),
-                const SizedBox(width: 8),
+                const SizedBox(width: AppSpacing.sm),
                 Text(
                   'Language Support',
                   style: GoogleFonts.montserrat(
@@ -590,7 +583,7 @@ class _LanguageSettingsScreenState extends State<LanguageSettingsScreen> {
                 ),
               ],
             ),
-            const SizedBox(height: 12),
+            const SizedBox(height: AppSpacing.buttonRadius),
             _buildInfoItem(
               '🇳🇬 Nigerian languages are prioritized for local users',
             ),
@@ -606,7 +599,7 @@ class _LanguageSettingsScreenState extends State<LanguageSettingsScreen> {
       );
 
   Widget _buildInfoItem(String text) => Padding(
-        padding: const EdgeInsets.only(bottom: 4),
+        padding: const EdgeInsets.only(bottom: AppSpacing.xs),
         child: Text(
           text,
           style: GoogleFonts.montserrat(

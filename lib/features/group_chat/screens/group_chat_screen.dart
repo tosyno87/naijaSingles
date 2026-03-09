@@ -5,6 +5,10 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 
 import '../../../common/constants/app_colors.dart';
+import '../../../common/widgets/state_views/state_views.dart';
+import '../../chat_shared/models/chat_message_view_model.dart';
+import '../../chat_shared/ui/widgets/chat_bubble.dart';
+import '../../chat_shared/ui/widgets/chat_composer.dart';
 import '../data/services/group_chat_service.dart';
 
 /// Group chat screen for displaying and managing group conversations
@@ -24,15 +28,25 @@ class _GroupChatScreenState extends State<GroupChatScreen> {
   final TextEditingController _messageController = TextEditingController();
   GroupChat? _group;
   bool _isLoading = true;
+  bool _hasText = false;
 
   @override
   void initState() {
     super.initState();
+    _messageController.addListener(_onTextChanged);
     unawaited(_loadGroupDetails());
+  }
+
+  void _onTextChanged() {
+    final hasText = _messageController.text.trim().isNotEmpty;
+    if (hasText != _hasText) {
+      setState(() => _hasText = hasText);
+    }
   }
 
   @override
   void dispose() {
+    _messageController.removeListener(_onTextChanged);
     _messageController.dispose();
     super.dispose();
   }
@@ -59,7 +73,9 @@ class _GroupChatScreenState extends State<GroupChatScreen> {
 
   Future<void> _sendMessage() async {
     final text = _messageController.text.trim();
-    if (text.isEmpty) return;
+    if (text.isEmpty) {
+      return;
+    }
 
     try {
       _messageController.clear();
@@ -99,7 +115,7 @@ class _GroupChatScreenState extends State<GroupChatScreen> {
           ),
         ),
         body: const Center(
-          child: CircularProgressIndicator(color: AppColors.primaryGreen),
+          child: AppLoadingView(message: 'Loading group chat...'),
         ),
       );
     }
@@ -119,8 +135,12 @@ class _GroupChatScreenState extends State<GroupChatScreen> {
             ),
           ),
         ),
-        body: const Center(
-          child: Text('Group not found'),
+        body: AppEmptyView(
+          title: 'Group Not Found',
+          subtitle: 'This group may have been removed or is unavailable.',
+          icon: Icons.group_off_outlined,
+          actionLabel: 'Go Back',
+          onAction: () => Navigator.pop(context),
         ),
       );
     }
@@ -170,244 +190,78 @@ class _GroupChatScreenState extends State<GroupChatScreen> {
               stream: _groupChatService.getGroupMessages(widget.groupId),
               builder: (context, snapshot) {
                 if (snapshot.connectionState == ConnectionState.waiting) {
-                  return const Center(child: CircularProgressIndicator());
+                  return const AppLoadingView(message: 'Loading messages...');
                 }
 
                 if (snapshot.hasError) {
-                  return Center(
-                    child: Text('Error: ${snapshot.error}'),
+                  return AppErrorView(
+                    title: 'Unable to load messages',
+                    message: '${snapshot.error}',
+                    onRetry: () => setState(() {}),
                   );
                 }
 
                 final messages = snapshot.data ?? [];
                 if (messages.isEmpty) {
-                  return Center(
-                    child: Column(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        Icon(
-                          Icons.chat_bubble_outline,
-                          size: 64,
-                          color: Colors.grey[400],
-                        ),
-                        const SizedBox(height: 16),
-                        Text(
-                          'No messages yet',
-                          style: GoogleFonts.montserrat(
-                            fontSize: 18,
-                            color: Colors.grey[600],
-                          ),
-                        ),
-                        const SizedBox(height: 8),
-                        Text(
-                          'Start the conversation!',
-                          style: GoogleFonts.montserrat(
-                            fontSize: 14,
-                            color: Colors.grey[500],
-                          ),
-                        ),
-                      ],
-                    ),
+                  return const AppEmptyView(
+                    title: 'No Messages Yet',
+                    subtitle: 'Start the conversation!',
+                    icon: Icons.chat_bubble_outline,
                   );
                 }
+
+                final currentUid = FirebaseAuth.instance.currentUser?.uid;
 
                 return ListView.builder(
                   reverse: true,
                   itemCount: messages.length,
                   itemBuilder: (context, index) {
                     final message = messages[index];
-                    return _buildMessageBubble(message);
+                    final isOwn = message.senderId == currentUid;
+
+                    final vm = ChatMessageViewModel(
+                      id: message.id,
+                      text: message.text,
+                      timestamp: message.timestamp,
+                      senderId: message.senderId,
+                      isOwnMessage: isOwn,
+                      isSystemMessage:
+                          message.messageType == MessageType.system,
+                      senderName: isOwn ? null : message.senderId,
+                    );
+
+                    return ChatBubble(
+                      message: vm,
+                      useTailRadius: false,
+                      avatarFallback: CircleAvatar(
+                        radius: 16,
+                        backgroundColor: AppColors.primaryGreenLight,
+                        child: Text(
+                          message.senderId.isNotEmpty
+                              ? message.senderId.substring(0, 1).toUpperCase()
+                              : '?',
+                          style: const TextStyle(
+                            color: Colors.white,
+                            fontSize: 12,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                      ),
+                    );
                   },
                 );
               },
             ),
           ),
-          // Message input
-          _buildMessageInput(),
+          ChatComposer(
+            controller: _messageController,
+            onSend: _sendMessage,
+            hasText: _hasText,
+            submitOnEnter: true,
+          ),
         ],
       ),
     );
-  }
-
-  Widget _buildMessageBubble(GroupMessage message) {
-    final isSystemMessage = message.messageType == MessageType.system;
-    final isCurrentUser =
-        message.senderId == FirebaseAuth.instance.currentUser?.uid;
-
-    if (isSystemMessage) {
-      return Container(
-        margin: const EdgeInsets.symmetric(vertical: 4, horizontal: 16),
-        child: Center(
-          child: Container(
-            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-            decoration: BoxDecoration(
-              color: Colors.grey[200],
-              borderRadius: BorderRadius.circular(12),
-            ),
-            child: Text(
-              message.text,
-              style: GoogleFonts.montserrat(
-                fontSize: 12,
-                color: Colors.grey[600],
-                fontStyle: FontStyle.italic,
-              ),
-            ),
-          ),
-        ),
-      );
-    }
-
-    return Container(
-      margin: const EdgeInsets.symmetric(vertical: 4, horizontal: 16),
-      child: Row(
-        mainAxisAlignment:
-            isCurrentUser ? MainAxisAlignment.end : MainAxisAlignment.start,
-        children: [
-          if (!isCurrentUser) ...[
-            CircleAvatar(
-              radius: 16,
-              backgroundColor: AppColors.primaryGreenLight,
-              child: Text(
-                message.senderId.substring(0, 1).toUpperCase(),
-                style: const TextStyle(
-                  color: Colors.white,
-                  fontSize: 12,
-                  fontWeight: FontWeight.bold,
-                ),
-              ),
-            ),
-            const SizedBox(width: 8),
-          ],
-          Flexible(
-            child: Container(
-              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
-              decoration: BoxDecoration(
-                color: isCurrentUser
-                    ? AppColors.primaryGreenLight
-                    : Colors.grey[200],
-                borderRadius: BorderRadius.circular(18),
-              ),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  if (!isCurrentUser)
-                    Text(
-                      message
-                          .senderId, // In real app, you'd get the user's name
-                      style: GoogleFonts.montserrat(
-                        fontSize: 12,
-                        fontWeight: FontWeight.w600,
-                        color: Colors.grey[600],
-                      ),
-                    ),
-                  Text(
-                    message.text,
-                    style: GoogleFonts.montserrat(
-                      fontSize: 14,
-                      color: isCurrentUser ? Colors.white : Colors.black87,
-                    ),
-                  ),
-                  const SizedBox(height: 4),
-                  Text(
-                    _formatTime(message.timestamp),
-                    style: GoogleFonts.montserrat(
-                      fontSize: 10,
-                      color: isCurrentUser ? Colors.white70 : Colors.grey[500],
-                    ),
-                  ),
-                ],
-              ),
-            ),
-          ),
-          if (isCurrentUser) ...[
-            const SizedBox(width: 8),
-            const CircleAvatar(
-              radius: 16,
-              backgroundColor: AppColors.primaryGreenLight,
-              child: Icon(
-                Icons.person,
-                color: Colors.white,
-                size: 16,
-              ),
-            ),
-          ],
-        ],
-      ),
-    );
-  }
-
-  Widget _buildMessageInput() => Container(
-        padding: const EdgeInsets.all(16),
-        decoration: BoxDecoration(
-          color: Colors.white,
-          boxShadow: [
-            BoxShadow(
-              color: Colors.grey.withValues(alpha: 0.1),
-              blurRadius: 4,
-              offset: const Offset(0, -2),
-            ),
-          ],
-        ),
-        child: Row(
-          children: [
-            Expanded(
-              child: DecoratedBox(
-                decoration: BoxDecoration(
-                  color: Colors.grey[100],
-                  borderRadius: BorderRadius.circular(24),
-                ),
-                child: TextField(
-                  controller: _messageController,
-                  decoration: InputDecoration(
-                    hintText: 'Type a message...',
-                    hintStyle: GoogleFonts.montserrat(
-                      color: Colors.grey[500],
-                    ),
-                    border: InputBorder.none,
-                    contentPadding: const EdgeInsets.symmetric(
-                      horizontal: 16,
-                      vertical: 12,
-                    ),
-                  ),
-                  maxLines: null,
-                  textInputAction: TextInputAction.send,
-                  onSubmitted: (_) => _sendMessage(),
-                ),
-              ),
-            ),
-            const SizedBox(width: 8),
-            GestureDetector(
-              onTap: _sendMessage,
-              child: Container(
-                padding: const EdgeInsets.all(12),
-                decoration: const BoxDecoration(
-                  color: AppColors.primaryGreen,
-                  shape: BoxShape.circle,
-                ),
-                child: const Icon(
-                  Icons.send,
-                  color: Colors.white,
-                  size: 20,
-                ),
-              ),
-            ),
-          ],
-        ),
-      );
-
-  String _formatTime(DateTime timestamp) {
-    final now = DateTime.now();
-    final difference = now.difference(timestamp);
-
-    if (difference.inDays > 0) {
-      return '${difference.inDays}d ago';
-    } else if (difference.inHours > 0) {
-      return '${difference.inHours}h ago';
-    } else if (difference.inMinutes > 0) {
-      return '${difference.inMinutes}m ago';
-    } else {
-      return 'Just now';
-    }
   }
 
   void _showGroupInfo() {

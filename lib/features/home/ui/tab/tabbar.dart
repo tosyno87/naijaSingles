@@ -34,7 +34,7 @@ Future<void> _firebaseMessagingBackgroundHandler(RemoteMessage message) async {
 // lib/features/home/main_navigation_screen.dart for standard navigation.
 // Tabbar is kept temporarily because change_language_widget.dart and
 // in_app_purchase_repo.dart depend on isPaymentSuccess / currentUserId params.
-// TODO: Move payment-success dialog to a service or overlay, then migrate all
+// TODO(dev): Move payment-success dialog to a service or overlay, then migrate all
 // remaining callers to MainNavigationScreen and delete this file.
 class Tabbar extends StatefulWidget {
   const Tabbar({super.key, this.isPaymentSuccess, this.currentUserId});
@@ -75,42 +75,44 @@ class TabbarState extends State<Tabbar> with WidgetsBindingObserver {
     if (widget.isPaymentSuccess != null && widget.isPaymentSuccess!) {
       WidgetsBinding.instance.addPostFrameCallback((_) async {
         final isDarkMode = context.read<ThemeBloc>().isDarkMode;
-        unawaited(showDialog(
-          context: context,
-          builder: (BuildContext context) => AlertDialog(
-            backgroundColor:
-                isDarkMode ? AppColors.darkCard : AppColors.backgroundColor,
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(20),
-            ),
-            title: const Icon(
-              Icons.check_circle,
-              color: Colors.green,
-              size: 60,
-            ),
-            content: Text(
-              'Payment Successful!',
-              textAlign: TextAlign.center,
-              style: TextStyle(
-                fontSize: 18,
-                fontWeight: FontWeight.bold,
-                color: isDarkMode ? Colors.white : Colors.black,
+        unawaited(
+          showDialog(
+            context: context,
+            builder: (BuildContext context) => AlertDialog(
+              backgroundColor:
+                  isDarkMode ? AppColors.darkCard : AppColors.backgroundColor,
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(20),
               ),
-            ),
-            actions: [
-              TextButton(
-                onPressed: () => Navigator.of(context).pop(),
-                child: const Text(
-                  'OK',
-                  style: TextStyle(
-                    color: Colors.green,
-                    fontWeight: FontWeight.bold,
-                  ),
+              title: const Icon(
+                Icons.check_circle,
+                color: Colors.green,
+                size: 60,
+              ),
+              content: Text(
+                'Payment Successful!',
+                textAlign: TextAlign.center,
+                style: TextStyle(
+                  fontSize: 18,
+                  fontWeight: FontWeight.bold,
+                  color: isDarkMode ? Colors.white : Colors.black,
                 ),
               ),
-            ],
+              actions: [
+                TextButton(
+                  onPressed: () => Navigator.of(context).pop(),
+                  child: const Text(
+                    'OK',
+                    style: TextStyle(
+                      color: Colors.green,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                ),
+              ],
+            ),
           ),
-        ));
+        );
       });
     }
   }
@@ -121,7 +123,8 @@ class TabbarState extends State<Tabbar> with WidgetsBindingObserver {
     unawaited(_subscription.cancel());
     unawaited(_onMessageSubscription?.cancel() ?? Future<void>.value());
     unawaited(
-        _onMessageOpenedAppSubscription?.cancel() ?? Future<void>.value());
+      _onMessageOpenedAppSubscription?.cancel() ?? Future<void>.value(),
+    );
     super.dispose();
   }
 
@@ -177,17 +180,21 @@ class TabbarState extends State<Tabbar> with WidgetsBindingObserver {
       if (message.data['type'] != 'Call') {
         if (!context.mounted) return;
         if (message.data['type'] == 'message') {
-          unawaited(Navigator.pushNamed(
-            context,
-            RouteName.tabScreen,
-            arguments: 'messages',
-          ));
+          unawaited(
+            Navigator.pushNamed(
+              context,
+              RouteName.tabScreen,
+              arguments: 'messages',
+            ),
+          );
         } else {
-          unawaited(Navigator.pushNamed(
-            context,
-            RouteName.tabScreen,
-            arguments: 'notification',
-          ));
+          unawaited(
+            Navigator.pushNamed(
+              context,
+              RouteName.tabScreen,
+              arguments: 'notification',
+            ),
+          );
         }
       }
     });

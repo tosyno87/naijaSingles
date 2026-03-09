@@ -295,7 +295,7 @@ class _MessageBoxState extends State<MessageBox> {
         ),
         child: Card(
           elevation: 10,
-          margin: const EdgeInsets.all(0),
+          margin: EdgeInsets.zero,
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(40),
           ),
@@ -305,7 +305,7 @@ class _MessageBoxState extends State<MessageBox> {
               border: Border.all(color: AppColors.secondaryColor),
               borderRadius: BorderRadius.circular(40),
             ),
-            margin: const EdgeInsets.symmetric(),
+            margin: EdgeInsets.zero,
             child: Row(
               children: <Widget>[
                 IconButton(

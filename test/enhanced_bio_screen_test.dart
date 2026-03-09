@@ -66,15 +66,14 @@ void main() {
       final bioField = find.byType(TextField);
       expect(bioField, findsOneWidget);
 
-      await tester.enterText(bioField,
-          'This is my test bio with enough characters.');
+      await tester.enterText(
+          bioField, 'This is my test bio with enough characters.');
       await tester.pump();
 
       expect(find.textContaining('This is my test bio'), findsOneWidget);
     });
 
-    testWidgets('Bio text field is editable',
-        (WidgetTester tester) async {
+    testWidgets('Bio text field is editable', (WidgetTester tester) async {
       await tester.pumpWidget(
         buildTestWidget(const EnhancedBioScreen()),
       );

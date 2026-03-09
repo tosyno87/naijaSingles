@@ -83,7 +83,6 @@ class UnifiedGroupCard extends StatelessWidget {
               CachedNetworkImage(
                 imageUrl: group.imageUrl!,
                 fit: BoxFit.cover,
-                alignment: Alignment.center,
                 placeholder: (_, __) => _buildBannerFallback(),
                 errorWidget: (_, __, ___) => _buildBannerFallback(),
               )
@@ -225,7 +224,7 @@ class UnifiedGroupCard extends StatelessWidget {
                   child: Row(
                     mainAxisSize: MainAxisSize.min,
                     children: [
-                      Icon(
+                      const Icon(
                         Icons.chat_bubble_rounded,
                         size: 12,
                         color: AppColors.primaryGreen,
@@ -313,8 +312,11 @@ class UnifiedGroupCard extends StatelessWidget {
               const SizedBox(height: 4),
               Row(
                 children: [
-                  Icon(Icons.location_on_outlined,
-                      size: 13, color: Colors.grey.shade400),
+                  Icon(
+                    Icons.location_on_outlined,
+                    size: 13,
+                    color: Colors.grey.shade400,
+                  ),
                   const SizedBox(width: 3),
                   Flexible(
                     child: Text(
@@ -354,7 +356,11 @@ class UnifiedGroupCard extends StatelessWidget {
           _buildAvatarStack(),
           if (_activeThisWeek) ...[
             const SizedBox(width: 12),
-            Icon(Icons.bolt_rounded, size: 14, color: AppColors.primaryGreen),
+            const Icon(
+              Icons.bolt_rounded,
+              size: 14,
+              color: AppColors.primaryGreen,
+            ),
             const SizedBox(width: 2),
             Flexible(
               child: Text(
@@ -380,9 +386,8 @@ class UnifiedGroupCard extends StatelessWidget {
     final remaining = group.memberCount - shown;
     const diameter = 24.0;
     const overlap = 8.0;
-    final stackWidth = shown > 0
-        ? diameter + (shown - 1) * (diameter - overlap)
-        : 0.0;
+    final stackWidth =
+        shown > 0 ? diameter + (shown - 1) * (diameter - overlap) : 0.0;
 
     return Row(
       mainAxisSize: MainAxisSize.min,
@@ -406,11 +411,13 @@ class UnifiedGroupCard extends StatelessWidget {
                     child: CircleAvatar(
                       radius: (diameter - 4) / 2,
                       backgroundColor: _typeColor.withValues(alpha: 0.3),
-                      backgroundImage:
-                          url != null ? NetworkImage(url) : null,
+                      backgroundImage: url != null ? NetworkImage(url) : null,
                       child: url == null
-                          ? Icon(Icons.person, size: 12,
-                              color: _typeColor)
+                          ? Icon(
+                              Icons.person,
+                              size: 12,
+                              color: _typeColor,
+                            )
                           : null,
                     ),
                   ),
@@ -419,8 +426,11 @@ class UnifiedGroupCard extends StatelessWidget {
             ),
           )
         else
-          Icon(Icons.people_outline_rounded,
-              size: 16, color: Colors.grey.shade500),
+          Icon(
+            Icons.people_outline_rounded,
+            size: 16,
+            color: Colors.grey.shade500,
+          ),
         const SizedBox(width: 6),
         Text(
           remaining > 0 && shown > 0

@@ -387,7 +387,8 @@ void main() {
       expect(model.hashCode, model.hashCode);
     });
 
-    test('hashCode uses list identity — different list instances may differ', () {
+    test('hashCode uses list identity — different list instances may differ',
+        () {
       final users = ['userA', 'userB'];
       final a = MatchModel(
         id: 'match1',
@@ -508,7 +509,8 @@ void main() {
       expect(model.users, ['z_user', 'a_user', 'm_user']);
     });
 
-    test('uses DateTime.now fallback when both matchedAt and timestamp are null',
+    test(
+        'uses DateTime.now fallback when both matchedAt and timestamp are null',
         () async {
       final fakeFirestore = FakeFirebaseFirestore();
       final before = DateTime.now();
@@ -522,7 +524,8 @@ void main() {
       final model = MatchModel.fromDocument(doc);
       final after = DateTime.now();
 
-      expect(model.matchedAt.isAfter(before.subtract(const Duration(seconds: 1))),
+      expect(
+          model.matchedAt.isAfter(before.subtract(const Duration(seconds: 1))),
           isTrue);
       expect(model.matchedAt.isBefore(after.add(const Duration(seconds: 1))),
           isTrue);

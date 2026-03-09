@@ -178,8 +178,9 @@ class _CreateGroupScreenState extends State<CreateGroupScreen>
               icon: Icon(
                 _currentStep > 0 ? Icons.arrow_back : Icons.close,
               ),
-              onPressed:
-                  _currentStep > 0 ? _previousStep : () => unawaited(_onClose()),
+              onPressed: _currentStep > 0
+                  ? _previousStep
+                  : () => unawaited(_onClose()),
             ),
             title: Text(
               'Create Community',
@@ -198,8 +199,7 @@ class _CreateGroupScreenState extends State<CreateGroupScreen>
                 child: PageView(
                   controller: _pageController,
                   physics: const NeverScrollableScrollPhysics(),
-                  onPageChanged: (page) =>
-                      setState(() => _currentStep = page),
+                  onPageChanged: (page) => setState(() => _currentStep = page),
                   children: [
                     _buildBasicsStep(),
                     _buildAudienceStep(),
@@ -241,8 +241,7 @@ class _CreateGroupScreenState extends State<CreateGroupScreen>
                   _stepLabels[i],
                   style: GoogleFonts.montserrat(
                     fontSize: 12,
-                    fontWeight:
-                        isActive ? FontWeight.w600 : FontWeight.w500,
+                    fontWeight: isActive ? FontWeight.w600 : FontWeight.w500,
                     color: isActive || isCompleted
                         ? AppColors.primaryGreen
                         : AppColors.textSecondary,
@@ -451,8 +450,7 @@ class _CreateGroupScreenState extends State<CreateGroupScreen>
             bottom: 14,
             right: 14,
             child: Container(
-              padding:
-                  const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
+              padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
               decoration: BoxDecoration(
                 color: Colors.white.withValues(alpha: 0.92),
                 borderRadius: BorderRadius.circular(20),
@@ -574,9 +572,8 @@ class _CreateGroupScreenState extends State<CreateGroupScreen>
                       Icon(
                         _getGroupTypeIcon(type),
                         size: 16,
-                        color: isSelected
-                            ? Colors.white
-                            : AppColors.textSecondary,
+                        color:
+                            isSelected ? Colors.white : AppColors.textSecondary,
                       ),
                       const SizedBox(width: 8),
                       Text(
@@ -584,9 +581,8 @@ class _CreateGroupScreenState extends State<CreateGroupScreen>
                         style: GoogleFonts.montserrat(
                           fontSize: 13,
                           fontWeight: FontWeight.w600,
-                          color: isSelected
-                              ? Colors.white
-                              : AppColors.textPrimary,
+                          color:
+                              isSelected ? Colors.white : AppColors.textPrimary,
                         ),
                       ),
                     ],
@@ -638,8 +634,7 @@ class _CreateGroupScreenState extends State<CreateGroupScreen>
                 ),
               ),
               style: TextButton.styleFrom(
-                padding:
-                    const EdgeInsets.symmetric(horizontal: 4, vertical: 0),
+                padding: const EdgeInsets.symmetric(horizontal: 4),
                 visualDensity: VisualDensity.compact,
               ),
             ),
@@ -685,8 +680,7 @@ class _CreateGroupScreenState extends State<CreateGroupScreen>
                   Padding(
                     padding: const EdgeInsets.fromLTRB(20, 16, 20, 8),
                     child: TextField(
-                      onChanged: (v) =>
-                          setSheetState(() => searchQuery = v),
+                      onChanged: (v) => setSheetState(() => searchQuery = v),
                       decoration: InputDecoration(
                         hintText: 'Search community types...',
                         hintStyle: GoogleFonts.montserrat(
@@ -715,8 +709,7 @@ class _CreateGroupScreenState extends State<CreateGroupScreen>
                   Expanded(
                     child: ListView.builder(
                       controller: scrollController,
-                      padding:
-                          const EdgeInsets.symmetric(horizontal: 8),
+                      padding: const EdgeInsets.symmetric(horizontal: 8),
                       itemCount: filtered.length,
                       itemBuilder: (context, i) {
                         final type = filtered[i];
@@ -877,8 +870,7 @@ class _CreateGroupScreenState extends State<CreateGroupScreen>
                   backgroundColor:
                       AppColors.primaryGreen.withValues(alpha: 0.08),
                   side: BorderSide(
-                    color:
-                        AppColors.primaryGreen.withValues(alpha: 0.25),
+                    color: AppColors.primaryGreen.withValues(alpha: 0.25),
                   ),
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(16),
@@ -1023,8 +1015,8 @@ class _CreateGroupScreenState extends State<CreateGroupScreen>
                             child: Icon(
                               Icons.image_outlined,
                               size: 28,
-                              color: AppColors.primaryGreen
-                                  .withValues(alpha: 0.4),
+                              color:
+                                  AppColors.primaryGreen.withValues(alpha: 0.4),
                             ),
                           ),
                         ),
@@ -1235,8 +1227,7 @@ class _CreateGroupScreenState extends State<CreateGroupScreen>
         ),
         focusedBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(16),
-          borderSide:
-              const BorderSide(color: AppColors.primaryGreen, width: 2),
+          borderSide: const BorderSide(color: AppColors.primaryGreen, width: 2),
         ),
         errorBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(16),
@@ -1254,8 +1245,7 @@ class _CreateGroupScreenState extends State<CreateGroupScreen>
   // ANIMATIONS
   // ===========================================================================
 
-  double _shakeOffset(double v) =>
-      sin(v * pi * 6) * 6 * (1 - v);
+  double _shakeOffset(double v) => sin(v * pi * 6) * 6 * (1 - v);
 
   // ===========================================================================
   // ACTIONS
@@ -1268,21 +1258,25 @@ class _CreateGroupScreenState extends State<CreateGroupScreen>
       return;
     }
     if (_currentStep < 2) {
-      unawaited(_pageController.animateToPage(
-        _currentStep + 1,
-        duration: const Duration(milliseconds: 300),
-        curve: Curves.easeOutCubic,
-      ));
+      unawaited(
+        _pageController.animateToPage(
+          _currentStep + 1,
+          duration: const Duration(milliseconds: 300),
+          curve: Curves.easeOutCubic,
+        ),
+      );
     }
   }
 
   void _previousStep() {
     if (_currentStep > 0) {
-      unawaited(_pageController.animateToPage(
-        _currentStep - 1,
-        duration: const Duration(milliseconds: 300),
-        curve: Curves.easeOutCubic,
-      ));
+      unawaited(
+        _pageController.animateToPage(
+          _currentStep - 1,
+          duration: const Duration(milliseconds: 300),
+          curve: Curves.easeOutCubic,
+        ),
+      );
     }
   }
 
@@ -1326,7 +1320,7 @@ class _CreateGroupScreenState extends State<CreateGroupScreen>
         ],
       ),
     );
-    if (discard == true && mounted) {
+    if ((discard ?? false) && mounted) {
       Navigator.pop(context);
     }
   }
@@ -1357,8 +1351,7 @@ class _CreateGroupScreenState extends State<CreateGroupScreen>
               ),
               const SizedBox(height: 16),
               ListTile(
-                leading:
-                    const Icon(Icons.photo_library_outlined, size: 22),
+                leading: const Icon(Icons.photo_library_outlined, size: 22),
                 title: Text(
                   'Choose from Gallery',
                   style: GoogleFonts.montserrat(fontSize: 14),
@@ -1366,8 +1359,7 @@ class _CreateGroupScreenState extends State<CreateGroupScreen>
                 onTap: () => Navigator.pop(ctx, ImageSource.gallery),
               ),
               ListTile(
-                leading:
-                    const Icon(Icons.camera_alt_outlined, size: 22),
+                leading: const Icon(Icons.camera_alt_outlined, size: 22),
                 title: Text(
                   'Take Photo',
                   style: GoogleFonts.montserrat(fontSize: 14),
@@ -1376,7 +1368,7 @@ class _CreateGroupScreenState extends State<CreateGroupScreen>
               ),
               if (_selectedImage != null)
                 ListTile(
-                  leading: Icon(
+                  leading: const Icon(
                     Icons.delete_outline,
                     size: 22,
                     color: AppColors.error,
@@ -1437,8 +1429,8 @@ class _CreateGroupScreenState extends State<CreateGroupScreen>
                 _pendingInvitations = invitations;
                 _selectedMembers.clear();
                 for (final inv in invitations) {
-                  final name = inv['contactName'] as String? ??
-                      inv['email'] as String?;
+                  final name =
+                      inv['contactName'] as String? ?? inv['email'] as String?;
                   if (name != null && name.isNotEmpty) {
                     _selectedMembers.add(name);
                   }
@@ -1481,9 +1473,8 @@ class _CreateGroupScreenState extends State<CreateGroupScreen>
       inv['groupId'] = groupId;
       inv['groupName'] = groupName;
       final message = inv['message'] as String? ?? '';
-      final name = inv['contactName'] as String? ??
-          inv['email'] as String? ??
-          'Unknown';
+      final name =
+          inv['contactName'] as String? ?? inv['email'] as String? ?? 'Unknown';
 
       bool ok;
       if (inv['invitationType'] == 'phone') {
@@ -1503,10 +1494,8 @@ class _CreateGroupScreenState extends State<CreateGroupScreen>
 
     final results = await Future.wait(futures);
 
-    final failedNames = results
-        .where((r) => !r.success)
-        .map((r) => r.name)
-        .toList();
+    final failedNames =
+        results.where((r) => !r.success).map((r) => r.name).toList();
     final sentCount = results.length - failedNames.length;
 
     AppLogger.info(
@@ -1647,8 +1636,7 @@ class _CreateGroupScreenState extends State<CreateGroupScreen>
               Navigator.pushReplacement(
                 context,
                 MaterialPageRoute(
-                  builder: (context) =>
-                      GroupChatScreen(groupId: group.id),
+                  builder: (context) => GroupChatScreen(groupId: group.id),
                 ),
               ),
             );

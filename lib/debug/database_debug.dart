@@ -177,6 +177,8 @@ class DatabaseDebug {
           'longitude': 3.3792,
           'lastActive': FieldValue.serverTimestamp(),
           'createdAt': FieldValue.serverTimestamp(),
+          'onboardingCompleted': true,
+          'profileSetupComplete': true,
           'isProfileComplete': true,
         },
         {
@@ -188,6 +190,8 @@ class DatabaseDebug {
           'longitude': 3.3087,
           'lastActive': FieldValue.serverTimestamp(),
           'createdAt': FieldValue.serverTimestamp(),
+          'onboardingCompleted': true,
+          'profileSetupComplete': true,
           'isProfileComplete': true,
         },
         {
@@ -199,6 +203,8 @@ class DatabaseDebug {
           'longitude': 3.3903,
           'lastActive': FieldValue.serverTimestamp(),
           'createdAt': FieldValue.serverTimestamp(),
+          'onboardingCompleted': true,
+          'profileSetupComplete': true,
           'isProfileComplete': true,
         },
         {
@@ -210,6 +216,8 @@ class DatabaseDebug {
           'longitude': 3.3515,
           'lastActive': FieldValue.serverTimestamp(),
           'createdAt': FieldValue.serverTimestamp(),
+          'onboardingCompleted': true,
+          'profileSetupComplete': true,
           'isProfileComplete': true,
         },
         {
@@ -221,6 +229,8 @@ class DatabaseDebug {
           'longitude': 3.3211,
           'lastActive': FieldValue.serverTimestamp(),
           'createdAt': FieldValue.serverTimestamp(),
+          'onboardingCompleted': true,
+          'profileSetupComplete': true,
           'isProfileComplete': true,
         },
       ];

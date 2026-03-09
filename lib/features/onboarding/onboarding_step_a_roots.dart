@@ -173,7 +173,9 @@ class _OnboardingStepARootsState extends State<OnboardingStepARoots> {
                       children: [
                         Container(
                           padding: const EdgeInsets.symmetric(
-                              horizontal: 12, vertical: 6),
+                            horizontal: 12,
+                            vertical: 6,
+                          ),
                           decoration: BoxDecoration(
                             color: deepGreen.withValues(alpha: 0.1),
                             borderRadius: BorderRadius.circular(20),
@@ -237,7 +239,8 @@ class _OnboardingStepARootsState extends State<OnboardingStepARoots> {
                         children: [
                           // Tribe input
                           _buildSectionTitle(
-                              'What is your tribe or ethnic group?'),
+                            'What is your tribe or ethnic group?',
+                          ),
                           const SizedBox(height: 12),
 
                           // Dropdown for tribe selection
@@ -299,7 +302,9 @@ class _OnboardingStepARootsState extends State<OnboardingStepARoots> {
                               focusedBorder: OutlineInputBorder(
                                 borderRadius: BorderRadius.circular(12),
                                 borderSide: const BorderSide(
-                                    color: deepGreen, width: 2),
+                                  color: deepGreen,
+                                  width: 2,
+                                ),
                               ),
                               contentPadding: const EdgeInsets.symmetric(
                                 horizontal: 16,
@@ -312,8 +317,10 @@ class _OnboardingStepARootsState extends State<OnboardingStepARoots> {
                               color: Colors.black87,
                             ),
                             dropdownColor: Colors.white,
-                            icon: const Icon(Icons.arrow_drop_down,
-                                color: deepGreen),
+                            icon: const Icon(
+                              Icons.arrow_drop_down,
+                              color: deepGreen,
+                            ),
                             isExpanded: true,
                           ),
 
@@ -348,7 +355,9 @@ class _OnboardingStepARootsState extends State<OnboardingStepARoots> {
                                 focusedBorder: OutlineInputBorder(
                                   borderRadius: BorderRadius.circular(12),
                                   borderSide: const BorderSide(
-                                      color: deepGreen, width: 2),
+                                    color: deepGreen,
+                                    width: 2,
+                                  ),
                                 ),
                                 contentPadding: const EdgeInsets.symmetric(
                                   horizontal: 16,
@@ -408,7 +417,8 @@ class _OnboardingStepARootsState extends State<OnboardingStepARoots> {
                                           updatedLanguages.remove(language);
                                           context.read<OnboardingBloc>().add(
                                                 OnboardingLanguagesUpdated(
-                                                    updatedLanguages),
+                                                  updatedLanguages,
+                                                ),
                                               );
                                         });
                                       },
@@ -448,8 +458,10 @@ class _OnboardingStepARootsState extends State<OnboardingStepARoots> {
                                     ];
                                     updatedLanguages.add(value);
                                     context.read<OnboardingBloc>().add(
-                                        OnboardingLanguagesUpdated(
-                                            updatedLanguages));
+                                          OnboardingLanguagesUpdated(
+                                            updatedLanguages,
+                                          ),
+                                        );
 
                                     // Reset dropdown after selection
                                     _selectedLanguage = null;
@@ -493,7 +505,9 @@ class _OnboardingStepARootsState extends State<OnboardingStepARoots> {
                               focusedBorder: OutlineInputBorder(
                                 borderRadius: BorderRadius.circular(12),
                                 borderSide: const BorderSide(
-                                    color: deepGreen, width: 2),
+                                  color: deepGreen,
+                                  width: 2,
+                                ),
                               ),
                               contentPadding: const EdgeInsets.symmetric(
                                 horizontal: 16,
@@ -506,8 +520,10 @@ class _OnboardingStepARootsState extends State<OnboardingStepARoots> {
                               color: Colors.black87,
                             ),
                             dropdownColor: Colors.white,
-                            icon: const Icon(Icons.arrow_drop_down,
-                                color: deepGreen),
+                            icon: const Icon(
+                              Icons.arrow_drop_down,
+                              color: deepGreen,
+                            ),
                             isExpanded: true,
                           ),
 
@@ -535,12 +551,14 @@ class _OnboardingStepARootsState extends State<OnboardingStepARoots> {
                                       border: OutlineInputBorder(
                                         borderRadius: BorderRadius.circular(12),
                                         borderSide: BorderSide(
-                                            color: Colors.grey[400]!),
+                                          color: Colors.grey[400]!,
+                                        ),
                                       ),
                                       enabledBorder: OutlineInputBorder(
                                         borderRadius: BorderRadius.circular(12),
                                         borderSide: BorderSide(
-                                            color: Colors.grey[400]!),
+                                          color: Colors.grey[400]!,
+                                        ),
                                       ),
                                       focusedBorder: OutlineInputBorder(
                                         borderRadius: BorderRadius.circular(12),
@@ -579,7 +597,8 @@ class _OnboardingStepARootsState extends State<OnboardingStepARoots> {
                                           updatedLanguages.add(customLanguage);
                                           context.read<OnboardingBloc>().add(
                                                 OnboardingLanguagesUpdated(
-                                                    updatedLanguages),
+                                                  updatedLanguages,
+                                                ),
                                               );
                                         }
 
@@ -597,7 +616,8 @@ class _OnboardingStepARootsState extends State<OnboardingStepARoots> {
                                       borderRadius: BorderRadius.circular(12),
                                     ),
                                     padding: const EdgeInsets.symmetric(
-                                        vertical: 14),
+                                      vertical: 14,
+                                    ),
                                   ),
                                   child: Text(
                                     'Add',
@@ -640,7 +660,8 @@ class _OnboardingStepARootsState extends State<OnboardingStepARoots> {
                               option: option,
                               isSelected: data.intent == option['value'],
                               onTap: () => context.read<OnboardingBloc>().add(
-                                  OnboardingIntentUpdated(option['value'])),
+                                    OnboardingIntentUpdated(option['value']),
+                                  ),
                               deepGreen: deepGreen,
                             ),
                           ),

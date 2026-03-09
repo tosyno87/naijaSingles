@@ -61,7 +61,7 @@ export interface Like {
 
 export interface NotificationData {
   id: string;
-  type: 'match' | 'message' | 'super_like' | 'like';
+  type: 'match' | 'message' | 'super_like' | 'superLike' | 'like';
   title: string;
   message: string;
   avatarUrl?: string;

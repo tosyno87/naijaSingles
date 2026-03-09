@@ -119,7 +119,8 @@ class ChangeThemeButtonWidget extends StatelessWidget {
                             child: Text(
                               'Apply'.tr().toString(),
                               style: const TextStyle(
-                                  color: AppColors.primaryGreen),
+                                color: AppColors.primaryGreen,
+                              ),
                             ),
                             onPressed: () {
                               context

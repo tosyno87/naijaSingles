@@ -14,7 +14,6 @@ class AutoLoginService {
   );
   static const String _testPassword = String.fromEnvironment(
     'TEST_PASSWORD',
-    defaultValue: '',
   );
 
   /// Automatically sign in a test user for development

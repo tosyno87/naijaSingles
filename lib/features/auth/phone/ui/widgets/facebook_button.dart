@@ -43,7 +43,7 @@ class FaceBookButton extends StatelessWidget {
                         end: Alignment.bottomLeft,
                         colors: [
                           AppColors.primaryGreen,
-                          AppColors.primaryGreenDark
+                          AppColors.primaryGreenDark,
                         ],
                       ),
               ),

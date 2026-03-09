@@ -83,11 +83,7 @@ class _FirebaseCallbackHandlerState extends State<_FirebaseCallbackHandler> {
   }
 
   @override
-  Widget build(BuildContext context) {
-    // Return completely transparent/empty widget
-    // This ensures no visual flash occurs
-    return const SizedBox.shrink();
-  }
+  Widget build(BuildContext context) => const SizedBox.shrink();
 }
 
 abstract class AppRouter {
@@ -428,10 +424,8 @@ abstract class AppRouter {
           transitionDuration: Duration.zero,
           reverseTransitionDuration: Duration.zero,
           opaque: false, // Make route transparent
-          pageBuilder: (context, animation, secondaryAnimation) {
-            // Return an empty transparent widget that immediately pops
-            return const _FirebaseCallbackHandler();
-          },
+          pageBuilder: (context, animation, secondaryAnimation) =>
+              const _FirebaseCallbackHandler(),
         );
       }
     }

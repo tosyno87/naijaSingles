@@ -146,7 +146,8 @@ class UpdateLocationState extends State<UpdateLocation> {
                                 child: Text(
                                   'No'.tr().toString(),
                                   style: const TextStyle(
-                                      color: AppColors.primaryGreen),
+                                    color: AppColors.primaryGreen,
+                                  ),
                                 ),
                               ),
                               TextButton(
@@ -173,7 +174,8 @@ class UpdateLocationState extends State<UpdateLocation> {
                                 child: Text(
                                   'Yes'.tr().toString(),
                                   style: const TextStyle(
-                                      color: AppColors.primaryGreen),
+                                    color: AppColors.primaryGreen,
+                                  ),
                                 ),
                               ),
                             ],

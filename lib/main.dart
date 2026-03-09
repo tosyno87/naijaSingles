@@ -78,6 +78,7 @@ Future<void> main() async {
   // App Check (non-blocking — failures must not poison Storage)
   try {
     await FirebaseAppCheck.instance.activate(
+      // ignore: deprecated_member_use
       appleProvider:
           kDebugMode ? AppleProvider.debug : AppleProvider.deviceCheck,
     );
@@ -260,14 +261,13 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     // Set navigator key for notification service
-    NotificationService.setNavigatorKey(navigatorKey);
+    NotificationService.navigatorKey = navigatorKey;
 
     return BlocBuilder<ThemeBloc, ThemeState>(
       builder: (context, themeState) {
         // Get theme mode from BLoC state
-        final isDarkMode = themeState is ThemeLoaded
-            ? themeState.isDarkMode
-            : false; // Default to light mode if not loaded
+        final isDarkMode = themeState is ThemeLoaded &&
+            themeState.isDarkMode; // Default to light mode if not loaded
 
         return MaterialApp(
           navigatorKey: navigatorKey, // Add navigator key

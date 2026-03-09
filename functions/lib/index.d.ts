@@ -23,5 +23,4 @@ export declare const onUserWritten: import("firebase-functions/core").CloudFunct
 }>>;
 export declare const createTestUsers: import("firebase-functions/v2/https").HttpsFunction;
 export declare const healthCheck: import("firebase-functions/v2/https").HttpsFunction;
-export declare const backfillDiscoverable: import("firebase-functions/v2/https").HttpsFunction;
 //# sourceMappingURL=index.d.ts.map

@@ -6,6 +6,8 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:image_picker/image_picker.dart';
 
+import '../common/utils/firestore_helpers.dart';
+
 /// Industry-standard media sharing service for chat
 /// Features:
 /// - Image sharing with compression
@@ -521,7 +523,7 @@ class MediaMessage {
         caption: map['caption'],
         fileSize: map['fileSize'] ?? 0,
         duration: map['duration']?.toDouble(),
-        timestamp: (map['timestamp'] as Timestamp?)?.toDate() ?? DateTime.now(),
+        timestamp: parseDateTime(map['timestamp']),
         isRead: map['isRead'] ?? false,
         readBy: List<String>.from(map['readBy'] ?? []),
       );

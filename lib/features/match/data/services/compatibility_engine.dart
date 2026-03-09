@@ -7,17 +7,17 @@ import '../../../../models/user_model.dart';
 /// Implements Priority 2: Enhanced Matching Algorithm
 class CompatibilityEngine {
   // Scoring weights (must sum to 1.0)
-  static const double AGE_WEIGHT = 0.25; // 25%
-  static const double LOCATION_WEIGHT = 0.30; // 30%
-  static const double INTEREST_WEIGHT = 0.20; // 20%
-  static const double ACTIVITY_WEIGHT = 0.15; // 15%
-  static const double COMPLETENESS_WEIGHT = 0.10; // 10%
+  static const double ageWeight = 0.25; // 25%
+  static const double locationWeight = 0.30; // 30%
+  static const double interestWeight = 0.20; // 20%
+  static const double activityWeight = 0.15; // 15%
+  static const double completenessWeight = 0.10; // 10%
 
   // Scoring parameters
-  static const int IDEAL_AGE_DIFFERENCE = 3; // Years
-  static const int MAX_AGE_DIFFERENCE = 10; // Years
-  static const double MAX_DISTANCE_MILES = 31; // Miles (converted from 50km)
-  static const int ACTIVITY_THRESHOLD_DAYS = 7; // Days
+  static const int idealAgeDifference = 3; // Years
+  static const int maxAgeDifference = 10; // Years
+  static const double maxDistanceMiles = 31; // Miles (converted from 50km)
+  static const int activityThresholdDays = 7; // Days
 
   /// Calculate overall compatibility score between two users
   /// Returns a score between 0.0 (no compatibility) and 1.0 (perfect match)
@@ -27,23 +27,23 @@ class CompatibilityEngine {
 
       // Age compatibility (25%)
       final ageScore = _calculateAgeCompatibility(user1, user2);
-      totalScore += ageScore * AGE_WEIGHT;
+      totalScore += ageScore * ageWeight;
 
       // Location proximity (30%)
       final locationScore = _calculateLocationScore(user1, user2);
-      totalScore += locationScore * LOCATION_WEIGHT;
+      totalScore += locationScore * locationWeight;
 
       // Interest matching (20%)
       final interestScore = _calculateInterestScore(user1, user2);
-      totalScore += interestScore * INTEREST_WEIGHT;
+      totalScore += interestScore * interestWeight;
 
       // Activity level (15%)
       final activityScore = _calculateActivityScore(user1, user2);
-      totalScore += activityScore * ACTIVITY_WEIGHT;
+      totalScore += activityScore * activityWeight;
 
       // Profile completeness (10%)
       final completenessScore = _calculateCompletenessScore(user1, user2);
-      totalScore += completenessScore * COMPLETENESS_WEIGHT;
+      totalScore += completenessScore * completenessWeight;
 
       // Ensure score is within bounds
       totalScore = totalScore.clamp(0.0, 1.0);
@@ -69,12 +69,12 @@ class CompatibilityEngine {
       final age2 = user2.age ?? 25;
       final ageDifference = (age1 - age2).abs();
 
-      if (ageDifference <= IDEAL_AGE_DIFFERENCE) {
+      if (ageDifference <= idealAgeDifference) {
         return 1;
-      } else if (ageDifference <= MAX_AGE_DIFFERENCE) {
+      } else if (ageDifference <= maxAgeDifference) {
         final score = 1.0 -
-            ((ageDifference - IDEAL_AGE_DIFFERENCE) /
-                    (MAX_AGE_DIFFERENCE - IDEAL_AGE_DIFFERENCE)) *
+            ((ageDifference - idealAgeDifference) /
+                    (maxAgeDifference - idealAgeDifference)) *
                 0.7;
         return score.clamp(0.3, 1.0);
       } else {
@@ -109,9 +109,9 @@ class CompatibilityEngine {
 
       if (distanceKm <= 3.1) {
         return 1;
-      } else if (distanceKm <= MAX_DISTANCE_MILES) {
+      } else if (distanceKm <= maxDistanceMiles) {
         final score =
-            1.0 - ((distanceKm - 3.1) / (MAX_DISTANCE_MILES - 3.1)) * 0.8;
+            1.0 - ((distanceKm - 3.1) / (maxDistanceMiles - 3.1)) * 0.8;
         return score.clamp(0.2, 1.0);
       } else {
         return 0.1;
@@ -214,9 +214,9 @@ class CompatibilityEngine {
           DateTime.now().difference(user.lastSeen!).inDays;
       if (daysSinceLastSeen <= 1) {
         activityScore += 0.4;
-      } else if (daysSinceLastSeen <= ACTIVITY_THRESHOLD_DAYS) {
+      } else if (daysSinceLastSeen <= activityThresholdDays) {
         activityScore +=
-            0.3 - (daysSinceLastSeen / ACTIVITY_THRESHOLD_DAYS) * 0.2;
+            0.3 - (daysSinceLastSeen / activityThresholdDays) * 0.2;
       }
     }
 
@@ -309,11 +309,11 @@ class CompatibilityEngine {
     final activityScore = _calculateActivityScore(user1, user2);
     final completenessScore = _calculateCompletenessScore(user1, user2);
 
-    final totalScore = (ageScore * AGE_WEIGHT) +
-        (locationScore * LOCATION_WEIGHT) +
-        (interestScore * INTEREST_WEIGHT) +
-        (activityScore * ACTIVITY_WEIGHT) +
-        (completenessScore * COMPLETENESS_WEIGHT);
+    final totalScore = (ageScore * ageWeight) +
+        (locationScore * locationWeight) +
+        (interestScore * interestWeight) +
+        (activityScore * activityWeight) +
+        (completenessScore * completenessWeight);
 
     return CompatibilityBreakdown(
       totalScore: totalScore,

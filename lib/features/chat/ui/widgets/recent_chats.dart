@@ -147,7 +147,7 @@ class _RecentChatsState extends State<RecentChats> {
                 : ListView.builder(
                     shrinkWrap: true,
                     controller: widget.scrollController,
-                    padding: const EdgeInsets.all(0),
+                    padding: EdgeInsets.zero,
                     itemCount: chats.length + 1,
                     itemBuilder: (context, index) {
                       if (index == chats.length) {
@@ -250,7 +250,7 @@ class _RecentChatsState extends State<RecentChats> {
         }
 
         return Padding(
-          padding: const EdgeInsets.all(0),
+          padding: EdgeInsets.zero,
           child: Center(
             child: Text(
               'No recent chat found'.tr().toString(),

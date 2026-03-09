@@ -1,4 +1,5 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import '../../../common/utils/firestore_helpers.dart';
 
 class LikedUser {
   LikedUser({
@@ -13,7 +14,7 @@ class LikedUser {
     return LikedUser(
       currentUserId: data['currentUserId'] ?? '',
       likedUserId: data['likedUserId'] ?? '',
-      timestamp: (data['timestamp'] as Timestamp).toDate(),
+      timestamp: parseDateTime(data['timestamp']),
     );
   }
   final String currentUserId;

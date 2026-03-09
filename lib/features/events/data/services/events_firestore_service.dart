@@ -47,6 +47,7 @@ class EventsFirestoreService {
   }) async {
     try {
       Query query = _eventsCollection
+          .where('status', isEqualTo: 'published')
           .where(
             'startDate',
             isGreaterThanOrEqualTo: startDate ?? DateTime.now(),
@@ -71,6 +72,8 @@ class EventsFirestoreService {
               doc.id,
             ),
           )
+          // Defense-in-depth: keep client-side protection for legacy data drift.
+          .where((event) => event.status == EventStatus.published)
           .toList();
 
       log(
@@ -309,6 +312,7 @@ class EventsFirestoreService {
       // Note: Firestore doesn't support full-text search natively
       // This is a basic implementation - consider using Algolia or similar for production
       final querySnapshot = await _eventsCollection
+          .where('status', isEqualTo: 'published')
           .where('name', isGreaterThanOrEqualTo: query)
           .where('name', isLessThanOrEqualTo: '$query\uf8ff')
           .limit(20)
@@ -321,6 +325,8 @@ class EventsFirestoreService {
               doc.id,
             ),
           )
+          // Defense-in-depth: keep a client-side check in case of legacy data drift.
+          .where((event) => event.status == EventStatus.published)
           .toList();
     } on Object catch (e) {
       log('Error searching events: $e', name: 'EventsFirestoreService');
@@ -336,6 +342,7 @@ class EventsFirestoreService {
     try {
       final querySnapshot = await _eventsCollection
           .where('category', isEqualTo: category)
+          .where('status', isEqualTo: 'published')
           .where('startDate', isGreaterThanOrEqualTo: DateTime.now())
           .orderBy('startDate')
           .limit(limit)
@@ -348,6 +355,7 @@ class EventsFirestoreService {
               doc.id,
             ),
           )
+          .where((event) => event.status == EventStatus.published)
           .toList();
     } on Object catch (e) {
       log(

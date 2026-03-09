@@ -4,6 +4,8 @@ import 'dart:io';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 
+import '../common/utils/firestore_helpers.dart';
+
 /// Industry-standard profile verification service
 /// Features:
 /// - Photo verification with AI detection
@@ -348,7 +350,7 @@ class ProfileVerificationService {
           ),
           message: data['message'] ?? '',
           score: data['score']?.toDouble() ?? 0.0,
-          verifiedAt: (data['verifiedAt'] as Timestamp?)?.toDate(),
+          verifiedAt: parseDateTimeOrNull(data['verifiedAt']),
           documentUrl: data['documentUrl'],
           platform: data['platform'],
           username: data['username'],
@@ -499,7 +501,7 @@ class ProfileVerificationService {
         ),
         message: data['message'] ?? '',
         score: data['score']?.toDouble() ?? 0.0,
-        verifiedAt: (data['verifiedAt'] as Timestamp?)?.toDate(),
+        verifiedAt: parseDateTimeOrNull(data['verifiedAt']),
         documentUrl: data['documentUrl'],
         platform: data['platform'],
         username: data['username'],
@@ -533,8 +535,8 @@ class ProfileVerificationService {
     if (verifications.isEmpty) return 0;
 
     final totalScore = verifications.values.fold<double>(
-      0.0,
-      (sum, v) => sum + v.score,
+      0,
+      (acc, v) => acc + v.score,
     );
     return totalScore / verifications.length;
   }

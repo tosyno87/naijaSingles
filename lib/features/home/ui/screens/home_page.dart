@@ -77,7 +77,7 @@ class _HomepageState extends State<Homepage>
         ? int.parse(widget.items['free_swipes'])
         : 10;
     final bool exceedSwipes =
-        !widget.isPurchased ? controller.swipedCount >= freeSwipe : false;
+        !widget.isPurchased && controller.swipedCount >= freeSwipe;
 
     return Scaffold(
       backgroundColor: Theme.of(context).primaryColor,

@@ -181,7 +181,8 @@ class _GroupReportModalState extends State<GroupReportModal> {
                           color: Colors.orange.withValues(alpha: 0.1),
                           borderRadius: BorderRadius.circular(8),
                           border: Border.all(
-                              color: Colors.orange.withValues(alpha: 0.3)),
+                            color: Colors.orange.withValues(alpha: 0.3),
+                          ),
                         ),
                         child: Row(
                           children: [

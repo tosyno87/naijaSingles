@@ -86,115 +86,119 @@ class EventCardOverlay extends StatelessWidget {
             child: InkWell(
               onTap: onTap,
               child: Stack(
-            fit: StackFit.expand,
-            children: [
-              if (event.imageUrl != null && event.imageUrl!.isNotEmpty)
-                CachedNetworkImage(
-                  imageUrl: event.imageUrl!,
-                  fit: BoxFit.cover,
-                  placeholder: (_, __) => _buildAssetFallback(),
-                  errorWidget: (_, __, ___) => _buildAssetFallback(),
-                )
-              else
-                _buildAssetFallback(),
+                fit: StackFit.expand,
+                children: [
+                  if (event.imageUrl != null && event.imageUrl!.isNotEmpty)
+                    CachedNetworkImage(
+                      imageUrl: event.imageUrl!,
+                      fit: BoxFit.cover,
+                      placeholder: (_, __) => _buildAssetFallback(),
+                      errorWidget: (_, __, ___) => _buildAssetFallback(),
+                    )
+                  else
+                    _buildAssetFallback(),
 
-              // Dark gradient overlay
-              Positioned.fill(
-                child: DecoratedBox(
-                  decoration: BoxDecoration(
-                    gradient: LinearGradient(
-                      begin: Alignment.topCenter,
-                      end: Alignment.bottomCenter,
-                      stops: const [0.35, 1.0],
-                      colors: [
-                        Colors.transparent,
-                        Colors.black.withValues(alpha: 0.80),
-                      ],
-                    ),
-                  ),
-                ),
-              ),
-
-              // Category icon badge
-              Positioned(
-                right: 12,
-                bottom: 56,
-                child: Container(
-                  width: 36,
-                  height: 36,
-                  decoration: BoxDecoration(
-                    color: _categoryColor,
-                    borderRadius: BorderRadius.circular(10),
-                  ),
-                  child: Icon(_categoryIcon, size: 20, color: Colors.white),
-                ),
-              ),
-
-              // Bottom info
-              Positioned(
-                left: 14,
-                right: 56,
-                bottom: 14,
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    Text(
-                      event.name,
-                      style: GoogleFonts.montserrat(
-                        fontSize: 16,
-                        fontWeight: FontWeight.w700,
-                        color: Colors.white,
-                      ),
-                      maxLines: 2,
-                      overflow: TextOverflow.ellipsis,
-                    ),
-                    const SizedBox(height: 4),
-                    Text(
-                      _formattedDate,
-                      style: GoogleFonts.montserrat(
-                        fontSize: 12,
-                        fontWeight: FontWeight.w500,
-                        color: Colors.white70,
+                  // Dark gradient overlay
+                  Positioned.fill(
+                    child: DecoratedBox(
+                      decoration: BoxDecoration(
+                        gradient: LinearGradient(
+                          begin: Alignment.topCenter,
+                          end: Alignment.bottomCenter,
+                          stops: const [0.35, 1.0],
+                          colors: [
+                            Colors.transparent,
+                            Colors.black.withValues(alpha: 0.80),
+                          ],
+                        ),
                       ),
                     ),
-                    const SizedBox(height: 2),
-                    Row(
+                  ),
+
+                  // Category icon badge
+                  Positioned(
+                    right: 12,
+                    bottom: 56,
+                    child: Container(
+                      width: 36,
+                      height: 36,
+                      decoration: BoxDecoration(
+                        color: _categoryColor,
+                        borderRadius: BorderRadius.circular(10),
+                      ),
+                      child: Icon(_categoryIcon, size: 20, color: Colors.white),
+                    ),
+                  ),
+
+                  // Bottom info
+                  Positioned(
+                    left: 14,
+                    right: 56,
+                    bottom: 14,
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      mainAxisSize: MainAxisSize.min,
                       children: [
-                        const Icon(Icons.location_on, size: 12, color: Colors.white54),
-                        const SizedBox(width: 2),
-                        Expanded(
-                          child: Text(
-                            _locationLabel,
-                            style: GoogleFonts.montserrat(
-                              fontSize: 12,
-                              fontWeight: FontWeight.w400,
-                              color: Colors.white70,
-                            ),
-                            maxLines: 1,
-                            overflow: TextOverflow.ellipsis,
+                        Text(
+                          event.name,
+                          style: GoogleFonts.montserrat(
+                            fontSize: 16,
+                            fontWeight: FontWeight.w700,
+                            color: Colors.white,
+                          ),
+                          maxLines: 2,
+                          overflow: TextOverflow.ellipsis,
+                        ),
+                        const SizedBox(height: 4),
+                        Text(
+                          _formattedDate,
+                          style: GoogleFonts.montserrat(
+                            fontSize: 12,
+                            fontWeight: FontWeight.w500,
+                            color: Colors.white70,
                           ),
                         ),
-                        if (event.attendeeCount > 0) ...[
-                          const SizedBox(width: 8),
-                          Text(
-                            '${event.attendeeCount} going',
-                            style: GoogleFonts.montserrat(
-                              fontSize: 11,
-                              fontWeight: FontWeight.w500,
-                              color: Colors.white60,
+                        const SizedBox(height: 2),
+                        Row(
+                          children: [
+                            const Icon(
+                              Icons.location_on,
+                              size: 12,
+                              color: Colors.white54,
                             ),
-                          ),
-                        ],
+                            const SizedBox(width: 2),
+                            Expanded(
+                              child: Text(
+                                _locationLabel,
+                                style: GoogleFonts.montserrat(
+                                  fontSize: 12,
+                                  fontWeight: FontWeight.w400,
+                                  color: Colors.white70,
+                                ),
+                                maxLines: 1,
+                                overflow: TextOverflow.ellipsis,
+                              ),
+                            ),
+                            if (event.attendeeCount > 0) ...[
+                              const SizedBox(width: 8),
+                              Text(
+                                '${event.attendeeCount} going',
+                                style: GoogleFonts.montserrat(
+                                  fontSize: 11,
+                                  fontWeight: FontWeight.w500,
+                                  color: Colors.white60,
+                                ),
+                              ),
+                            ],
+                          ],
+                        ),
                       ],
                     ),
-                  ],
-                ),
+                  ),
+                ],
               ),
-            ],
+            ),
           ),
-        ),
-        ),
         ),
       );
 
@@ -208,7 +212,7 @@ class EventCardOverlay extends StatelessWidget {
         ),
       );
 
-  Widget _buildFallbackBg() => Container(
+  Widget _buildFallbackBg() => DecoratedBox(
         decoration: BoxDecoration(
           gradient: LinearGradient(
             begin: Alignment.topLeft,

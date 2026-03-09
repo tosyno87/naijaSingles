@@ -5,32 +5,32 @@ import 'package:naijasingles/services/super_like_service.dart';
 
 void main() {
   group('SuperLikeService constants', () {
-    test('FREE_SUPER_LIKES_PER_DAY is 1', () {
-      expect(SuperLikeService.FREE_SUPER_LIKES_PER_DAY, 1);
+    test('freeSuperLikesPerDay is 1', () {
+      expect(SuperLikeService.freeSuperLikesPerDay, 1);
     });
 
-    test('PREMIUM_SUPER_LIKES_PER_DAY is 5', () {
-      expect(SuperLikeService.PREMIUM_SUPER_LIKES_PER_DAY, 5);
+    test('premiumSuperLikesPerDay is 5', () {
+      expect(SuperLikeService.premiumSuperLikesPerDay, 5);
     });
 
-    test('SUPER_LIKE_COOLDOWN is 24 hours', () {
+    test('superLikeCooldown is 24 hours', () {
       expect(
-        SuperLikeService.SUPER_LIKE_COOLDOWN,
+        SuperLikeService.superLikeCooldown,
         const Duration(hours: 24),
       );
     });
 
-    test('SUPER_LIKE_HIGHLIGHT_DURATION is 3 days', () {
+    test('superLikeHighlightDuration is 3 days', () {
       expect(
-        SuperLikeService.SUPER_LIKE_HIGHLIGHT_DURATION,
+        SuperLikeService.superLikeHighlightDuration,
         const Duration(days: 3),
       );
     });
 
     test('premium limit is strictly greater than free limit', () {
       expect(
-        SuperLikeService.PREMIUM_SUPER_LIKES_PER_DAY,
-        greaterThan(SuperLikeService.FREE_SUPER_LIKES_PER_DAY),
+        SuperLikeService.premiumSuperLikesPerDay,
+        greaterThan(SuperLikeService.freeSuperLikesPerDay),
       );
     });
   });
@@ -266,7 +266,7 @@ void main() {
 
         expect(
           stats.dailyLimit,
-          SuperLikeService.FREE_SUPER_LIKES_PER_DAY,
+          SuperLikeService.freeSuperLikesPerDay,
         );
       });
 
@@ -275,7 +275,7 @@ void main() {
 
         expect(
           stats.remainingToday,
-          SuperLikeService.FREE_SUPER_LIKES_PER_DAY,
+          SuperLikeService.freeSuperLikesPerDay,
         );
         expect(stats.canSendMore, isTrue);
       });

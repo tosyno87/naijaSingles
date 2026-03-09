@@ -1,3 +1,5 @@
+// ignore_for_file: avoid_positional_boolean_parameters
+
 part of 'user_bloc.dart';
 
 /// Base class for user events

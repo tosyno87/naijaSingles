@@ -1,6 +1,8 @@
 import 'dart:developer';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import '../../../../common/utils/firestore_helpers.dart';
+import '../../../groups/data/services/unified_group_service.dart' as unified;
 
 /// Industry-standard group chat service
 /// Features:
@@ -132,39 +134,13 @@ class GroupChatService {
     }
   }
 
-  /// Leave a group chat
-  Future<void> leaveGroup(String groupId) async {
-    try {
-      log('👥 Leaving group: $groupId');
-
-      final currentUserId = _auth.currentUser?.uid;
-      if (currentUserId == null) {
-        throw Exception('User not authenticated');
-      }
-
-      // Remove user from group members
-      log('🔍 Attempting to leave group: $groupId');
-      log('🔍 Current user: $currentUserId');
-
-      await _firestore.collection('unifiedGroups').doc(groupId).update({
-        'memberIds': FieldValue.arrayRemove([currentUserId]),
-        'adminIds': FieldValue.arrayRemove([currentUserId]),
-        'memberCount': FieldValue.increment(-1),
-      });
-
-      // Send leave message
-      await _sendGroupMessage(
-        groupId: groupId,
-        text: 'left the group',
-        messageType: MessageType.system,
-      );
-
-      log('✅ Successfully left group: $groupId');
-    } on Object catch (e) {
-      log('❌ Error leaving group: $e');
-      rethrow;
-    }
-  }
+  /// Leave a group chat.
+  ///
+  /// Delegates to [unified.UnifiedGroupService] which owns the canonical
+  /// leave-group transaction (member removal, admin succession, system
+  /// message, and timestamp bookkeeping).
+  Future<void> leaveGroup(String groupId) =>
+      unified.UnifiedGroupService().leaveGroup(groupId);
 
   /// Invite users to group
   Future<void> inviteUsersToGroup(String groupId, List<String> userIds) async {
@@ -394,20 +370,17 @@ class GroupChatService {
   }
 
   /// Get group messages
-  Stream<List<GroupMessage>> getGroupMessages(String groupId) {
-    // Use unifiedGroups collection since that's where our groups are stored
-    return _firestore
-        .collection('unifiedGroups')
-        .doc(groupId)
-        .collection('messages')
-        .orderBy('timestamp', descending: true)
-        .snapshots()
-        .map(
-          (snapshot) => snapshot.docs
-              .map((doc) => GroupMessage.fromMap(doc.id, doc.data()))
-              .toList(),
-        );
-  }
+  Stream<List<GroupMessage>> getGroupMessages(String groupId) => _firestore
+      .collection('unifiedGroups')
+      .doc(groupId)
+      .collection('messages')
+      .orderBy('timestamp', descending: true)
+      .snapshots()
+      .map(
+        (snapshot) => snapshot.docs
+            .map((doc) => GroupMessage.fromMap(doc.id, doc.data()))
+            .toList(),
+      );
 
   /// Get user's groups
   Stream<List<GroupChat>> getUserGroups() {
@@ -668,10 +641,8 @@ class GroupChat {
         memberIds: List<String>.from(data['memberIds'] ?? []),
         memberCount: data['memberCount'] ?? 0,
         isActive: data['isActive'] ?? true,
-        createdAt:
-            (data['createdAt'] as Timestamp?)?.toDate() ?? DateTime.now(),
-        lastMessageAt:
-            (data['lastMessageAt'] as Timestamp?)?.toDate() ?? DateTime.now(),
+        createdAt: parseDateTime(data['createdAt']),
+        lastMessageAt: parseDateTime(data['lastMessageAt']),
         lastMessageText: data['lastMessageText'] ?? '',
         lastMessageSenderId: data['lastMessageSenderId'] ?? '',
       );
@@ -733,8 +704,7 @@ class GroupMessage {
         mediaUrl: data['mediaUrl'],
         mediaType: data['mediaType'],
         replyToMessageId: data['replyToMessageId'],
-        timestamp:
-            (data['timestamp'] as Timestamp?)?.toDate() ?? DateTime.now(),
+        timestamp: parseDateTime(data['timestamp']),
         isRead: data['isRead'] ?? false,
         readBy: List<String>.from(data['readBy'] ?? []),
       );

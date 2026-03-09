@@ -1,3 +1,5 @@
+// ignore_for_file: one_member_abstracts
+
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter_facebook_auth/flutter_facebook_auth.dart';
 

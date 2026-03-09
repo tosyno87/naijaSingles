@@ -7,6 +7,9 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 
 import '../../../common/constants/app_colors.dart';
+import '../../../common/constants/app_spacing.dart';
+import '../../../common/utils/firestore_helpers.dart';
+import '../../../common/widgets/state_views/state_views.dart';
 import '../../../models/group_join_exception.dart';
 import '../../../services/group_unread_service.dart';
 import '../../../services/user_service.dart';
@@ -96,7 +99,7 @@ class _GroupDetailsScreenState extends State<GroupDetailsScreen> {
       );
 
   Widget _buildChatHeader() => Container(
-        padding: const EdgeInsets.all(16),
+        padding: AppSpacing.cardPadding,
         decoration: BoxDecoration(
           color: Colors.white,
           boxShadow: [
@@ -114,7 +117,8 @@ class _GroupDetailsScreenState extends State<GroupDetailsScreen> {
               backgroundColor: AppColors.primaryGreen.withValues(alpha: 0.2),
               child: widget.group.imageUrl != null
                   ? ClipRRect(
-                      borderRadius: BorderRadius.circular(20),
+                      borderRadius:
+                          BorderRadius.circular(AppSpacing.chipRadius),
                       child: CachedNetworkImage(
                         imageUrl: widget.group.imageUrl!,
                         fit: BoxFit.cover,
@@ -124,14 +128,14 @@ class _GroupDetailsScreenState extends State<GroupDetailsScreen> {
                         errorWidget: (context, url, error) => const Icon(
                           Icons.group,
                           color: AppColors.primaryGreen,
-                          size: 20,
+                          size: AppSpacing.iconSm,
                         ),
                       ),
                     )
                   : const Icon(
                       Icons.group,
                       color: AppColors.primaryGreen,
-                      size: 20,
+                      size: AppSpacing.iconSm,
                     ),
             ),
             const SizedBox(width: 12),
@@ -182,77 +186,25 @@ class _GroupDetailsScreenState extends State<GroupDetailsScreen> {
           if (snapshot.connectionState == ConnectionState.waiting) {
             return ListView.builder(
               controller: _scrollController,
-              padding: const EdgeInsets.symmetric(vertical: 8),
+              padding: const EdgeInsets.symmetric(vertical: AppSpacing.sm),
               itemCount: 3, // Show 3 shimmer messages
               itemBuilder: (context, index) => MessageShimmer(
-                isCurrentUser:
-                    index % 2 == 0, // Alternate between user and other
+                isCurrentUser: index.isEven, // Alternate between user and other
               ),
             );
           }
 
           if (snapshot.hasError) {
-            return Center(
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Icon(
-                    Icons.error_outline,
-                    size: 64,
-                    color: Colors.grey[400],
-                  ),
-                  const SizedBox(height: 16),
-                  Text(
-                    'Error loading messages',
-                    style: GoogleFonts.montserrat(
-                      fontSize: 16,
-                      color: Colors.grey[600],
-                    ),
-                  ),
-                  const SizedBox(height: 8),
-                  Text(
-                    '${snapshot.error}',
-                    style: GoogleFonts.montserrat(
-                      fontSize: 12,
-                      color: Colors.grey[500],
-                    ),
-                    textAlign: TextAlign.center,
-                  ),
-                ],
-              ),
-            );
+            return const AppErrorView(message: 'Unable to load messages');
           }
 
           final messages = snapshot.data?.docs ?? [];
 
           if (messages.isEmpty) {
-            return Center(
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Icon(
-                    Icons.chat_bubble_outline,
-                    size: 64,
-                    color: Colors.grey[400],
-                  ),
-                  const SizedBox(height: 16),
-                  Text(
-                    'No messages yet',
-                    style: GoogleFonts.montserrat(
-                      fontSize: 18,
-                      color: Colors.grey[600],
-                    ),
-                  ),
-                  const SizedBox(height: 8),
-                  Text(
-                    'Start the conversation!',
-                    style: GoogleFonts.montserrat(
-                      fontSize: 14,
-                      color: Colors.grey[500],
-                    ),
-                  ),
-                ],
-              ),
+            return const AppEmptyView(
+              title: 'No messages yet',
+              subtitle: 'Start the conversation!',
+              icon: Icons.chat_bubble_outline,
             );
           }
 
@@ -273,7 +225,7 @@ class _GroupDetailsScreenState extends State<GroupDetailsScreen> {
 
           return ListView.builder(
             controller: _scrollController,
-            padding: const EdgeInsets.symmetric(vertical: 8),
+            padding: const EdgeInsets.symmetric(vertical: AppSpacing.sm),
             itemCount: messages.length,
             itemBuilder: (context, index) {
               final messageDoc = messages[index];
@@ -288,8 +240,7 @@ class _GroupDetailsScreenState extends State<GroupDetailsScreen> {
                 senderName: messageData['senderId'] == currentUserId
                     ? (FirebaseAuth.instance.currentUser?.displayName ?? 'You')
                     : (messageData['senderName'] ?? 'Unknown'),
-                timestamp: (messageData['timestamp'] as Timestamp?)?.toDate() ??
-                    DateTime.now(),
+                timestamp: parseDateTime(messageData['timestamp']),
                 isCurrentUser: messageData['senderId'] == currentUserId,
               );
             },
@@ -298,7 +249,7 @@ class _GroupDetailsScreenState extends State<GroupDetailsScreen> {
       );
 
   Widget _buildMessageInput() => Container(
-        padding: const EdgeInsets.all(16),
+        padding: AppSpacing.cardPadding,
         decoration: BoxDecoration(
           color: Colors.white,
           boxShadow: [
@@ -332,7 +283,7 @@ class _GroupDetailsScreenState extends State<GroupDetailsScreen> {
                     borderSide: const BorderSide(color: AppColors.primaryGreen),
                   ),
                   contentPadding: const EdgeInsets.symmetric(
-                    horizontal: 16,
+                    horizontal: AppSpacing.md,
                     vertical: 12,
                   ),
                 ),
@@ -344,7 +295,7 @@ class _GroupDetailsScreenState extends State<GroupDetailsScreen> {
                 },
               ),
             ),
-            const SizedBox(width: 8),
+            const SizedBox(width: AppSpacing.sm),
             DecoratedBox(
               decoration: BoxDecoration(
                 color: AppColors.primaryGreen,
@@ -394,11 +345,11 @@ class _GroupDetailsScreenState extends State<GroupDetailsScreen> {
 
       _messageController.clear();
       setState(() {}); // Update send button state
-    } on Object catch (e) {
+    } on Object catch (_) {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text('Failed to send message: $e'),
+          const SnackBar(
+            content: Text('Failed to send message. Please try again.'),
             backgroundColor: AppColors.error,
           ),
         );
@@ -433,7 +384,7 @@ class _GroupDetailsScreenState extends State<GroupDetailsScreen> {
           child: Column(
             children: [
               _buildGroupAvatar(),
-              const SizedBox(height: 16),
+              const SizedBox(height: AppSpacing.md),
               Text(
                 widget.group.name,
                 style: GoogleFonts.montserrat(
@@ -443,7 +394,7 @@ class _GroupDetailsScreenState extends State<GroupDetailsScreen> {
                 ),
                 textAlign: TextAlign.center,
               ),
-              const SizedBox(height: 8),
+              const SizedBox(height: AppSpacing.sm),
               Text(
                 widget.group.description,
                 style: GoogleFonts.montserrat(
@@ -454,7 +405,7 @@ class _GroupDetailsScreenState extends State<GroupDetailsScreen> {
                 maxLines: 3,
                 overflow: TextOverflow.ellipsis,
               ),
-              const SizedBox(height: 16),
+              const SizedBox(height: AppSpacing.md),
               _buildGroupStats(),
             ],
           ),
@@ -468,7 +419,7 @@ class _GroupDetailsScreenState extends State<GroupDetailsScreen> {
           height: 100,
           decoration: BoxDecoration(
             color: Colors.white.withValues(alpha: 0.2),
-            borderRadius: BorderRadius.circular(20),
+            borderRadius: BorderRadius.circular(AppSpacing.chipRadius),
             border: Border.all(
               color: Colors.white.withValues(alpha: 0.3),
               width: 2,
@@ -527,9 +478,9 @@ class _GroupDetailsScreenState extends State<GroupDetailsScreen> {
           Icon(
             icon,
             color: Colors.white.withValues(alpha: 0.8),
-            size: 20,
+            size: AppSpacing.iconSm,
           ),
-          const SizedBox(height: 4),
+          const SizedBox(height: AppSpacing.xs),
           Text(
             value,
             style: GoogleFonts.montserrat(
@@ -549,11 +500,11 @@ class _GroupDetailsScreenState extends State<GroupDetailsScreen> {
       );
 
   Widget _buildGroupInfo() => Container(
-        margin: const EdgeInsets.all(16),
+        margin: AppSpacing.pagePadding,
         padding: const EdgeInsets.all(20),
         decoration: BoxDecoration(
           color: Colors.white,
-          borderRadius: BorderRadius.circular(16),
+          borderRadius: BorderRadius.circular(AppSpacing.cardRadius),
           boxShadow: [
             BoxShadow(
               color: Colors.grey.withValues(alpha: 0.1),
@@ -573,7 +524,7 @@ class _GroupDetailsScreenState extends State<GroupDetailsScreen> {
                 color: Colors.black87,
               ),
             ),
-            const SizedBox(height: 16),
+            const SizedBox(height: AppSpacing.md),
             _buildInfoRow(
               icon: Icons.location_on,
               label: 'Location',
@@ -613,7 +564,7 @@ class _GroupDetailsScreenState extends State<GroupDetailsScreen> {
           Icon(
             icon,
             color: AppColors.primaryGreen,
-            size: 20,
+            size: AppSpacing.iconSm,
           ),
           const SizedBox(width: 12),
           Expanded(
@@ -643,11 +594,11 @@ class _GroupDetailsScreenState extends State<GroupDetailsScreen> {
       );
 
   Widget _buildMemberSection() => Container(
-        margin: const EdgeInsets.symmetric(horizontal: 16),
+        margin: const EdgeInsets.symmetric(horizontal: AppSpacing.md),
         padding: const EdgeInsets.all(20),
         decoration: BoxDecoration(
           color: Colors.white,
-          borderRadius: BorderRadius.circular(16),
+          borderRadius: BorderRadius.circular(AppSpacing.cardRadius),
           boxShadow: [
             BoxShadow(
               color: Colors.grey.withValues(alpha: 0.1),
@@ -679,7 +630,7 @@ class _GroupDetailsScreenState extends State<GroupDetailsScreen> {
                 ),
               ],
             ),
-            const SizedBox(height: 16),
+            const SizedBox(height: AppSpacing.md),
             _buildMemberList(),
           ],
         ),
@@ -694,7 +645,7 @@ class _GroupDetailsScreenState extends State<GroupDetailsScreen> {
       children: [
         ...displayMembers.map(_buildMemberTile),
         if (hasMoreMembers) ...[
-          const SizedBox(height: 8),
+          const SizedBox(height: AppSpacing.sm),
           TextButton(
             onPressed: _showAllMembers,
             child: Text(
@@ -760,7 +711,7 @@ class _GroupDetailsScreenState extends State<GroupDetailsScreen> {
                       const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
                   decoration: BoxDecoration(
                     color: AppColors.primaryGreen,
-                    borderRadius: BorderRadius.circular(8),
+                    borderRadius: BorderRadius.circular(AppSpacing.sm),
                   ),
                   child: Text(
                     'CREATOR',
@@ -772,13 +723,13 @@ class _GroupDetailsScreenState extends State<GroupDetailsScreen> {
                   ),
                 ),
               if (isAdmin && !isCreator) ...[
-                const SizedBox(width: 4),
+                const SizedBox(width: AppSpacing.xs),
                 Container(
                   padding:
                       const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
                   decoration: BoxDecoration(
                     color: Colors.blue,
-                    borderRadius: BorderRadius.circular(8),
+                    borderRadius: BorderRadius.circular(AppSpacing.sm),
                   ),
                   child: Text(
                     'ADMIN',
@@ -797,7 +748,7 @@ class _GroupDetailsScreenState extends State<GroupDetailsScreen> {
                   icon: const Icon(
                     Icons.remove_circle_outline,
                     color: Colors.red,
-                    size: 20,
+                    size: AppSpacing.iconSm,
                   ),
                   onPressed: () =>
                       _showRemoveMemberConfirmation(memberId, displayName),
@@ -816,7 +767,7 @@ class _GroupDetailsScreenState extends State<GroupDetailsScreen> {
     }
 
     return Container(
-      margin: const EdgeInsets.all(16),
+      margin: AppSpacing.pagePadding,
       child: Column(
         children: [
           if (widget.group.enableChat) ...[
@@ -852,7 +803,7 @@ class _GroupDetailsScreenState extends State<GroupDetailsScreen> {
   }
 
   Widget _buildJoinButton() => Container(
-        margin: const EdgeInsets.all(16),
+        margin: AppSpacing.pagePadding,
         child: _buildPrimaryButton(
           text: 'Join Group',
           icon: Icons.group_add,
@@ -869,7 +820,7 @@ class _GroupDetailsScreenState extends State<GroupDetailsScreen> {
         width: double.infinity,
         decoration: BoxDecoration(
           gradient: AppColors.primaryGradient,
-          borderRadius: BorderRadius.circular(12),
+          borderRadius: BorderRadius.circular(AppSpacing.buttonRadius),
           boxShadow: [
             BoxShadow(
               color: Colors.grey.withValues(alpha: 0.2),
@@ -882,14 +833,14 @@ class _GroupDetailsScreenState extends State<GroupDetailsScreen> {
           color: Colors.transparent,
           child: InkWell(
             onTap: onPressed,
-            borderRadius: BorderRadius.circular(12),
+            borderRadius: BorderRadius.circular(AppSpacing.buttonRadius),
             child: Padding(
-              padding: const EdgeInsets.symmetric(vertical: 16),
+              padding: const EdgeInsets.symmetric(vertical: AppSpacing.md),
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  Icon(icon, color: Colors.white, size: 20),
-                  const SizedBox(width: 8),
+                  Icon(icon, color: Colors.white, size: AppSpacing.iconSm),
+                  const SizedBox(width: AppSpacing.sm),
                   Text(
                     text,
                     style: GoogleFonts.montserrat(
@@ -913,21 +864,25 @@ class _GroupDetailsScreenState extends State<GroupDetailsScreen> {
       DecoratedBox(
         decoration: BoxDecoration(
           color: Colors.white,
-          borderRadius: BorderRadius.circular(12),
+          borderRadius: BorderRadius.circular(AppSpacing.buttonRadius),
           border: Border.all(color: AppColors.primaryGreen, width: 2),
         ),
         child: Material(
           color: Colors.transparent,
           child: InkWell(
             onTap: onPressed,
-            borderRadius: BorderRadius.circular(12),
+            borderRadius: BorderRadius.circular(AppSpacing.buttonRadius),
             child: Padding(
-              padding: const EdgeInsets.symmetric(vertical: 16),
+              padding: const EdgeInsets.symmetric(vertical: AppSpacing.md),
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  Icon(icon, color: AppColors.primaryGreen, size: 20),
-                  const SizedBox(width: 8),
+                  Icon(
+                    icon,
+                    color: AppColors.primaryGreen,
+                    size: AppSpacing.iconSm,
+                  ),
+                  const SizedBox(width: AppSpacing.sm),
                   Text(
                     text,
                     style: GoogleFonts.montserrat(
@@ -951,21 +906,21 @@ class _GroupDetailsScreenState extends State<GroupDetailsScreen> {
       DecoratedBox(
         decoration: BoxDecoration(
           color: Colors.white,
-          borderRadius: BorderRadius.circular(12),
+          borderRadius: BorderRadius.circular(AppSpacing.buttonRadius),
           border: Border.all(color: Colors.red, width: 2),
         ),
         child: Material(
           color: Colors.transparent,
           child: InkWell(
             onTap: onPressed,
-            borderRadius: BorderRadius.circular(12),
+            borderRadius: BorderRadius.circular(AppSpacing.buttonRadius),
             child: Padding(
-              padding: const EdgeInsets.symmetric(vertical: 16),
+              padding: const EdgeInsets.symmetric(vertical: AppSpacing.md),
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  Icon(icon, color: Colors.red, size: 20),
-                  const SizedBox(width: 8),
+                  Icon(icon, color: Colors.red, size: AppSpacing.iconSm),
+                  const SizedBox(width: AppSpacing.sm),
                   Text(
                     text,
                     style: GoogleFonts.montserrat(
@@ -1021,11 +976,11 @@ class _GroupDetailsScreenState extends State<GroupDetailsScreen> {
         );
         Navigator.pop(context, true); // Return true to indicate group was left
       }
-    } on Object catch (e) {
+    } on Object catch (_) {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text('Failed to leave group: $e'),
+          const SnackBar(
+            content: Text('Failed to leave group. Please try again.'),
             backgroundColor: AppColors.error,
           ),
         );
@@ -1188,7 +1143,7 @@ class _GroupDetailsScreenState extends State<GroupDetailsScreen> {
                   fontWeight: FontWeight.bold,
                 ),
               ),
-              const SizedBox(height: 16),
+              const SizedBox(height: AppSpacing.md),
               Expanded(
                 child: ListView.builder(
                   itemCount: widget.group.memberIds.length,
@@ -1228,15 +1183,15 @@ class _GroupDetailsScreenState extends State<GroupDetailsScreen> {
               if (widget.group.imageUrl != null) ...[
                 ListTile(
                   leading: Container(
-                    padding: const EdgeInsets.all(8),
+                    padding: const EdgeInsets.all(AppSpacing.sm),
                     decoration: BoxDecoration(
                       color: AppColors.primaryGreen.withValues(alpha: 0.1),
-                      borderRadius: BorderRadius.circular(8),
+                      borderRadius: BorderRadius.circular(AppSpacing.sm),
                     ),
                     child: const Icon(
                       Icons.visibility,
                       color: AppColors.primaryGreen,
-                      size: 24,
+                      size: AppSpacing.iconMd,
                     ),
                   ),
                   title: Text(
@@ -1261,15 +1216,15 @@ class _GroupDetailsScreenState extends State<GroupDetailsScreen> {
               if (widget.isMember && _canEditGroup()) ...[
                 ListTile(
                   leading: Container(
-                    padding: const EdgeInsets.all(8),
+                    padding: const EdgeInsets.all(AppSpacing.sm),
                     decoration: BoxDecoration(
                       color: AppColors.primaryGreen.withValues(alpha: 0.1),
-                      borderRadius: BorderRadius.circular(8),
+                      borderRadius: BorderRadius.circular(AppSpacing.sm),
                     ),
                     child: const Icon(
                       Icons.edit,
                       color: AppColors.primaryGreen,
-                      size: 24,
+                      size: AppSpacing.iconMd,
                     ),
                   ),
                   title: Text(
@@ -1289,15 +1244,15 @@ class _GroupDetailsScreenState extends State<GroupDetailsScreen> {
               ],
               ListTile(
                 leading: Container(
-                  padding: const EdgeInsets.all(8),
+                  padding: const EdgeInsets.all(AppSpacing.sm),
                   decoration: BoxDecoration(
                     color: Colors.grey.withValues(alpha: 0.1),
-                    borderRadius: BorderRadius.circular(8),
+                    borderRadius: BorderRadius.circular(AppSpacing.sm),
                   ),
                   child: Icon(
                     Icons.close,
                     color: Colors.grey[600],
-                    size: 24,
+                    size: AppSpacing.iconMd,
                   ),
                 ),
                 title: Text(
@@ -1412,11 +1367,11 @@ class _GroupDetailsScreenState extends State<GroupDetailsScreen> {
         // Refresh the screen
         setState(() {});
       }
-    } on Object catch (e) {
+    } on Object catch (_) {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text('Failed to remove member: $e'),
+          const SnackBar(
+            content: Text('Failed to remove member. Please try again.'),
             backgroundColor: AppColors.error,
           ),
         );

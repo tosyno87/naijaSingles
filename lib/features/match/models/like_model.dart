@@ -1,7 +1,10 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:flutter/foundation.dart';
+import '../../../common/utils/firestore_helpers.dart';
 
+@immutable
 class LikeModel {
-  LikeModel({
+  const LikeModel({
     required this.from,
     required this.to,
     required this.timestamp,
@@ -14,7 +17,7 @@ class LikeModel {
     return LikeModel(
       from: data['from'] ?? '',
       to: data['to'] ?? '',
-      timestamp: (data['timestamp'] as Timestamp?)?.toDate() ?? DateTime.now(),
+      timestamp: parseDateTime(data['timestamp']),
     );
   }
   final String from;

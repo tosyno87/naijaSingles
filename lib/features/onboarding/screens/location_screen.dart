@@ -266,9 +266,7 @@ class _LocationScreenState extends State<LocationScreen> {
                 'This helps us connect you with people nearby',
                 style: OnboardingTheme.subtitleStyle,
               ),
-
               const SizedBox(height: OnboardingTheme.subtitleToField),
-
               SizedBox(
                 width: double.infinity,
                 height: OnboardingTheme.buttonHeight,
@@ -306,65 +304,66 @@ class _LocationScreenState extends State<LocationScreen> {
                   ),
                 ),
               ),
-
               const SizedBox(height: OnboardingTheme.fieldToSection),
-
               if (_currentLocation != null) ...[
-                Builder(builder: (context) {
-                  final location = _currentLocation;
-                  if (location == null) return const SizedBox.shrink();
-                  return Container(
-                    width: double.infinity,
-                    padding: const EdgeInsets.all(
-                      OnboardingTheme.fieldContentPadding,
-                    ),
-                    decoration: BoxDecoration(
-                      color: OnboardingTheme.primaryGreen.withValues(alpha: 0.08),
-                      borderRadius: BorderRadius.circular(
-                        OnboardingTheme.fieldRadius,
+                Builder(
+                  builder: (context) {
+                    final location = _currentLocation;
+                    if (location == null) return const SizedBox.shrink();
+                    return Container(
+                      width: double.infinity,
+                      padding: const EdgeInsets.all(
+                        OnboardingTheme.fieldContentPadding,
                       ),
-                      border: Border.all(
-                        color:
-                            OnboardingTheme.primaryGreen.withValues(alpha: 0.3),
-                      ),
-                    ),
-                    child: Row(
-                      children: [
-                        const Icon(
-                          Icons.location_on,
-                          color: OnboardingTheme.primaryGreen,
-                          size: OnboardingTheme.fieldIconSize,
+                      decoration: BoxDecoration(
+                        color: OnboardingTheme.primaryGreen
+                            .withValues(alpha: 0.08),
+                        borderRadius: BorderRadius.circular(
+                          OnboardingTheme.fieldRadius,
                         ),
-                        const SizedBox(width: 12),
-                        Expanded(
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Text(
-                                'Your Location',
-                                style: OnboardingTheme.helperStyle,
-                              ),
-                              Text(
-                                location,
-                                style: OnboardingTheme.fieldTextStyle.copyWith(
-                                  fontWeight: FontWeight.w600,
-                                ),
-                              ),
-                            ],
+                        border: Border.all(
+                          color: OnboardingTheme.primaryGreen
+                              .withValues(alpha: 0.3),
+                        ),
+                      ),
+                      child: Row(
+                        children: [
+                          const Icon(
+                            Icons.location_on,
+                            color: OnboardingTheme.primaryGreen,
+                            size: OnboardingTheme.fieldIconSize,
                           ),
-                        ),
-                        const Icon(
-                          Icons.check_circle,
-                          color: OnboardingTheme.primaryGreen,
-                          size: OnboardingTheme.fieldIconSize,
-                        ),
-                      ],
-                    ),
-                  );
-                }),
+                          const SizedBox(width: 12),
+                          Expanded(
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text(
+                                  'Your Location',
+                                  style: OnboardingTheme.helperStyle,
+                                ),
+                                Text(
+                                  location,
+                                  style:
+                                      OnboardingTheme.fieldTextStyle.copyWith(
+                                    fontWeight: FontWeight.w600,
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                          const Icon(
+                            Icons.check_circle,
+                            color: OnboardingTheme.primaryGreen,
+                            size: OnboardingTheme.fieldIconSize,
+                          ),
+                        ],
+                      ),
+                    );
+                  },
+                ),
                 const SizedBox(height: OnboardingTheme.fieldToSection),
               ],
-
               Container(
                 padding: const EdgeInsets.all(
                   OnboardingTheme.fieldContentPadding,

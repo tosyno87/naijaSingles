@@ -98,10 +98,8 @@ class LocationService {
     double lon1,
     double lat2,
     double lon2,
-  ) {
-    return Geolocator.distanceBetween(lat1, lon1, lat2, lon2) /
-        1000; // Convert to km
-  }
+  ) =>
+      Geolocator.distanceBetween(lat1, lon1, lat2, lon2) / 1000;
 
   /// Calculate distance between user location and event location
   static double? calculateDistanceToEvent(

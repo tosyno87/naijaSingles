@@ -52,8 +52,7 @@ class _EnhancedPhotoUploadScreenState extends State<EnhancedPhotoUploadScreen> {
       );
 
   Widget _buildContent(BuildContext context, List<File?> uploadedPhotos) {
-    final photoCount =
-        uploadedPhotos.where((p) => p != null).length;
+    final photoCount = uploadedPhotos.where((p) => p != null).length;
 
     return OnboardingTheme.constrainedContent(
       child: SingleChildScrollView(
@@ -76,7 +75,6 @@ class _EnhancedPhotoUploadScreenState extends State<EnhancedPhotoUploadScreen> {
               ),
             ),
             const SizedBox(height: OnboardingTheme.subtitleToField),
-
             Wrap(
               spacing: 12,
               runSpacing: 12,
@@ -102,7 +100,6 @@ class _EnhancedPhotoUploadScreenState extends State<EnhancedPhotoUploadScreen> {
                 );
               }),
             ),
-
             const SizedBox(height: OnboardingTheme.fieldToBottom),
           ],
         ),
@@ -141,21 +138,22 @@ class _EnhancedPhotoUploadScreenState extends State<EnhancedPhotoUploadScreen> {
                     height: double.infinity,
                   )
                 else
-                  Center(
+                  const Center(
                     child: Icon(
                       Icons.add_photo_alternate,
                       size: 48,
                       color: OnboardingTheme.fieldBorder,
                     ),
                   ),
-
                 if (isMainPhoto && photo != null)
                   Positioned(
                     top: 8,
                     left: 8,
                     child: Container(
                       padding: const EdgeInsets.symmetric(
-                          horizontal: 8, vertical: 4),
+                        horizontal: 8,
+                        vertical: 4,
+                      ),
                       decoration: BoxDecoration(
                         color: OnboardingTheme.primaryGreen,
                         borderRadius: BorderRadius.circular(12),
@@ -177,7 +175,6 @@ class _EnhancedPhotoUploadScreenState extends State<EnhancedPhotoUploadScreen> {
                       ),
                     ),
                   ),
-
                 if (photo != null)
                   Positioned(
                     top: 8,
@@ -344,8 +341,7 @@ class _EnhancedPhotoUploadScreenState extends State<EnhancedPhotoUploadScreen> {
                         mainAxisSize: MainAxisSize.min,
                         children: [
                           Container(
-                            margin:
-                                const EdgeInsets.only(top: 12, bottom: 8),
+                            margin: const EdgeInsets.only(top: 12, bottom: 8),
                             width: 40,
                             height: 4,
                             decoration: BoxDecoration(

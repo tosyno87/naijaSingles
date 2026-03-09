@@ -285,8 +285,12 @@ class _PhoneNumberState extends State<PhoneNumber> {
                       ),
                       GestureDetector(
                         onTap: () {
-                          unawaited(Navigator.pushReplacementNamed(
-                              context, '/welcome'));
+                          unawaited(
+                            Navigator.pushReplacementNamed(
+                              context,
+                              '/welcome',
+                            ),
+                          );
                         },
                         child: Text(
                           'Sign Up',

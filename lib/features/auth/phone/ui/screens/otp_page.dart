@@ -93,17 +93,19 @@ class _OtpPageState extends State<OtpPage> {
       if (otpController == null) {
         return;
       }
-      unawaited(otpController.startListenUserConsent(
-        (code) {
-          log('code is $code');
-          final exp = RegExp(r'(\d{6})');
-          log("code is final  ${exp.stringMatch(code ?? '')}");
-          return exp.stringMatch(code ?? '') ?? '';
-        },
-        strategies: [
-          // SampleStrategy(),
-        ],
-      ));
+      unawaited(
+        otpController.startListenUserConsent(
+          (code) {
+            log('code is $code');
+            final exp = RegExp(r'(\d{6})');
+            log("code is final  ${exp.stringMatch(code ?? '')}");
+            return exp.stringMatch(code ?? '') ?? '';
+          },
+          strategies: [
+            // SampleStrategy(),
+          ],
+        ),
+      );
     } on Object catch (e) {
       log('⚠️ Error initializing OTP interactor: $e');
       // On error, controller will be null and app will use regular TextField
@@ -549,10 +551,12 @@ class _OtpPageState extends State<OtpPage> {
                         } else if (state is PhoneupdateSuccess) {
                           if (!_hasNavigated && context.mounted) {
                             _hasNavigated = true;
-                            unawaited(Navigator.pushReplacementNamed(
-                              context,
-                              RouteName.mainNavigation,
-                            ));
+                            unawaited(
+                              Navigator.pushReplacementNamed(
+                                context,
+                                RouteName.mainNavigation,
+                              ),
+                            );
                           }
                         } else if (state is PhoneAuthError) {
                           CustomSnackbar.showSnackBarSimple(

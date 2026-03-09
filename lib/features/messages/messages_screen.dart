@@ -2,12 +2,12 @@ import 'dart:async';
 import 'dart:developer';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:google_fonts/google_fonts.dart';
 
 import '../../common/constants/app_colors.dart';
+import '../../common/widgets/state_views/state_views.dart';
 import '../../models/user_model.dart'; // Import UserModel
 import '../dating/screens/user_detail_screen.dart'; // Import for profile viewing
 import '../explore/explore_screen.dart'; // Import ExploreScreen directly
@@ -25,7 +25,6 @@ class MessagesScreen extends StatefulWidget {
 class _MessagesScreenState extends State<MessagesScreen> {
   final ChatService _chatService = ChatService();
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
-  final FirebaseAuth _auth = FirebaseAuth.instance;
 
   // Afropeep MVP Color Scheme
   static const Color primaryColor = Color(0xFF008037); // Deep green
@@ -55,7 +54,7 @@ class _MessagesScreenState extends State<MessagesScreen> {
           centerTitle: true,
         ),
         body: StreamBuilder<List<MessageThreadInfo>>(
-          stream: _getChatThreadsStreamWithUserData(),
+          stream: _getChatThreadsStream(),
           builder: (context, snapshot) {
             if (snapshot.connectionState == ConnectionState.waiting) {
               return _buildLoadingState();
@@ -77,239 +76,36 @@ class _MessagesScreenState extends State<MessagesScreen> {
         ),
       );
 
-  // Enhanced stream that includes user data (with fallback for missing index)
-  Stream<List<MessageThreadInfo>> _getChatThreadsStreamWithUserData() {
-    final currentUserId = _auth.currentUser?.uid;
-    if (currentUserId == null) {
-      return Stream.value([]);
-    }
+  Stream<List<MessageThreadInfo>> _getChatThreadsStream() =>
+      _chatService.getChatThreadsStream();
 
-    // Use a simpler query that doesn't require a composite index
-    // We'll sort in memory instead of using orderBy
-    return FirebaseFirestore.instance
-        .collection('chatThreads')
-        .where('userIds', arrayContains: currentUserId)
-        .snapshots()
-        .asyncMap((snapshot) async {
-      final List<MessageThreadInfo> threads = [];
+  Widget _buildLoadingState() =>
+      const AppLoadingView(message: 'Loading conversations...');
 
-      for (var doc in snapshot.docs) {
-        try {
-          final data = doc.data();
-
-          // Find the other user's ID
-          final userIds = List<String>.from(data['userIds'] ?? []);
-          final otherUserId = userIds.firstWhere(
-            (id) => id != currentUserId,
-            orElse: () => '',
-          );
-
-          if (otherUserId.isEmpty) continue;
-
-          // Try to fetch the other user's profile. If the read is denied
-          // (e.g., paused/incognito user blocked by Firestore rules), fall
-          // back to cached data from the chat thread document so threads
-          // remain visible.
-          String otherUserName = 'User';
-          String? avatarUrl;
-          try {
-            final otherUserDoc =
-                await _firestore.collection('users').doc(otherUserId).get();
-
-            if (otherUserDoc.exists) {
-              final userData = otherUserDoc.data();
-              otherUserName = userData?['name'] ?? 'User';
-
-              final photos = userData?['photos'] as List<dynamic>?;
-              if (photos != null && photos.isNotEmpty) {
-                avatarUrl = photos.first as String?;
-              }
-            }
-          } on Exception catch (_) {
-            // Profile read denied (paused/incognito). Use the cached name
-            // stored on the chat thread document at match-creation time.
-            final userNames = data['userNames'] as Map<String, dynamic>?;
-            otherUserName = userNames?[otherUserId] as String? ?? 'User';
-          }
-
-          // Get unread count for current user
-          final unreadCount = data['unreadCount'] as Map<String, dynamic>?;
-          final unread = (unreadCount?[currentUserId] ?? 0) > 0;
-
-          threads.add(
-            MessageThreadInfo(
-              threadId: doc.id,
-              otherUserId: otherUserId,
-              otherUserName: otherUserName,
-              lastMessage: data['lastMessageText'] ?? 'Say hello!',
-              lastMessageSenderId: data['lastMessageSenderId'],
-              timestamp: (data['lastUpdated'] as Timestamp?)?.toDate() ??
-                  DateTime.now(),
-              unread: unread,
-              avatarUrl: avatarUrl,
-            ),
-          );
-        } on Object catch (e) {
-          log('Error processing thread: $e');
-          continue;
-        }
-      }
-
-      // Sort by timestamp in memory (since we can't use orderBy without index)
-      threads.sort((a, b) => b.timestamp.compareTo(a.timestamp));
-
-      return threads;
-    }).handleError((error) {
-      log('Error in _getChatThreadsStreamWithUserData: $error');
-      return <MessageThreadInfo>[];
-    });
-  }
-
-  Widget _buildLoadingState() => Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            const CircularProgressIndicator(
-              color: primaryColor,
-              strokeWidth: 3,
-            ),
-            const SizedBox(height: 16),
-            Text(
-              'Loading conversations...',
-              style: GoogleFonts.montserrat(
-                fontSize: 16,
-                color: textSecondary,
-              ),
-            ),
-          ],
-        ),
-      );
-
-  Widget _buildErrorState(String error) => Center(
-        child: Padding(
-          padding: const EdgeInsets.all(24),
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              Icon(
-                Icons.error_outline,
-                size: 64,
-                color: Colors.red.shade400,
-              ),
-              const SizedBox(height: 16),
-              Text(
-                'Error loading messages',
-                style: GoogleFonts.montserrat(
-                  fontSize: 20,
-                  fontWeight: FontWeight.w600,
-                  color: textPrimary,
-                ),
-              ),
-              const SizedBox(height: 8),
-              Text(
-                'Please check your connection and try again',
-                textAlign: TextAlign.center,
-                style: GoogleFonts.montserrat(
-                  fontSize: 14,
-                  color: textSecondary,
-                ),
-              ),
-              const SizedBox(height: 24),
-              ElevatedButton(
-                onPressed: () {
-                  setState(() {}); // Trigger rebuild
-                },
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: primaryColor,
-                  foregroundColor: Colors.white,
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(12),
-                  ),
-                  padding:
-                      const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
-                ),
-                child: Text(
-                  'Retry',
-                  style: GoogleFonts.montserrat(
-                    fontSize: 16,
-                    fontWeight: FontWeight.w600,
-                  ),
-                ),
-              ),
-            ],
-          ),
-        ),
+  Widget _buildErrorState(String error) => AppErrorView(
+        title: 'Error loading messages',
+        onRetry: () {
+          setState(() {});
+        },
       );
 
   Widget _buildEmptyState() => Center(
-        child: Padding(
-          padding: const EdgeInsets.all(32),
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              Container(
-                padding: const EdgeInsets.all(24),
-                decoration: BoxDecoration(
-                  color: primaryColor.withValues(alpha: 0.1),
-                  shape: BoxShape.circle,
-                ),
-                child: const Icon(
-                  Icons.chat_bubble_outline,
-                  size: 64,
-                  color: primaryColor,
+        child: AppEmptyView(
+          title: 'No messages yet',
+          subtitle:
+              'Start matching with people to begin conversations and make meaningful connections.',
+          icon: Icons.chat_bubble_outline,
+          actionLabel: 'Start Matching',
+          onAction: () {
+            unawaited(
+              Navigator.of(context).push(
+                MaterialPageRoute(
+                  builder: (context) =>
+                      const ExploreScreen(showBackButton: true),
                 ),
               ),
-              const SizedBox(height: 24),
-              Text(
-                'No messages yet',
-                style: GoogleFonts.montserrat(
-                  fontSize: 24,
-                  fontWeight: FontWeight.bold,
-                  color: textPrimary,
-                ),
-              ),
-              const SizedBox(height: 12),
-              Text(
-                'Start matching with people to begin conversations and make meaningful connections.',
-                textAlign: TextAlign.center,
-                style: GoogleFonts.montserrat(
-                  fontSize: 16,
-                  color: textSecondary,
-                  height: 1.5,
-                ),
-              ),
-              const SizedBox(height: 32),
-              ElevatedButton(
-                onPressed: () {
-                  unawaited(
-                    Navigator.of(context).push(
-                      MaterialPageRoute(
-                        builder: (context) =>
-                            const ExploreScreen(showBackButton: true),
-                      ),
-                    ),
-                  );
-                },
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: primaryColor,
-                  foregroundColor: Colors.white,
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(16),
-                  ),
-                  padding:
-                      const EdgeInsets.symmetric(horizontal: 32, vertical: 16),
-                  elevation: 2,
-                ),
-                child: Text(
-                  'Start Matching',
-                  style: GoogleFonts.montserrat(
-                    fontSize: 16,
-                    fontWeight: FontWeight.w600,
-                  ),
-                ),
-              ),
-            ],
-          ),
+            );
+          },
         ),
       );
 
@@ -354,12 +150,6 @@ class _MessagesScreenState extends State<MessagesScreen> {
                 offset: const Offset(0, 3),
               ),
             ],
-            border: thread.unread
-                ? Border.all(
-                    color: primaryColor.withValues(alpha: 0.3),
-                    width: 1.5,
-                  )
-                : null,
           ),
           child: Material(
             color: Colors.transparent,
@@ -383,10 +173,7 @@ class _MessagesScreenState extends State<MessagesScreen> {
                             decoration: BoxDecoration(
                               shape: BoxShape.circle,
                               border: Border.all(
-                                color: thread.unread
-                                    ? primaryColor
-                                    : Colors.grey.shade300,
-                                width: thread.unread ? 2.5 : 1,
+                                color: Colors.grey.shade300,
                               ),
                             ),
                             child: CircleAvatar(
@@ -404,26 +191,6 @@ class _MessagesScreenState extends State<MessagesScreen> {
                                       color: Colors.grey.shade500,
                                     )
                                   : null,
-                            ),
-                          ),
-                        ),
-
-                        // Profile view indicator
-                        Positioned(
-                          bottom: 0,
-                          right: 0,
-                          child: Container(
-                            width: 20,
-                            height: 20,
-                            decoration: BoxDecoration(
-                              color: primaryColor,
-                              shape: BoxShape.circle,
-                              border: Border.all(color: Colors.white, width: 2),
-                            ),
-                            child: const Icon(
-                              Icons.visibility,
-                              color: Colors.white,
-                              size: 12,
                             ),
                           ),
                         ),
@@ -457,29 +224,16 @@ class _MessagesScreenState extends State<MessagesScreen> {
                                 child: GestureDetector(
                                   onTap: () =>
                                       _viewUserProfile(thread.otherUserId),
-                                  child: Row(
-                                    children: [
-                                      Flexible(
-                                        child: Text(
-                                          thread.otherUserName,
-                                          style: GoogleFonts.montserrat(
-                                            fontSize: 17,
-                                            fontWeight: thread.unread
-                                                ? FontWeight.bold
-                                                : FontWeight.w600,
-                                            color: textPrimary,
-                                          ),
-                                          overflow: TextOverflow.ellipsis,
-                                        ),
-                                      ),
-                                      const SizedBox(width: 4),
-                                      Icon(
-                                        Icons.info_outline,
-                                        size: 16,
-                                        color:
-                                            primaryColor.withValues(alpha: 0.7),
-                                      ),
-                                    ],
+                                  child: Text(
+                                    thread.otherUserName,
+                                    style: GoogleFonts.montserrat(
+                                      fontSize: 17,
+                                      fontWeight: thread.unread
+                                          ? FontWeight.bold
+                                          : FontWeight.w600,
+                                      color: textPrimary,
+                                    ),
+                                    overflow: TextOverflow.ellipsis,
                                   ),
                                 ),
                               ),
@@ -639,7 +393,8 @@ class _MessagesScreenState extends State<MessagesScreen> {
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(12),
                       side: BorderSide(
-                          color: textSecondary.withValues(alpha: 0.3)),
+                        color: textSecondary.withValues(alpha: 0.3),
+                      ),
                     ),
                   ),
                   child: Text(

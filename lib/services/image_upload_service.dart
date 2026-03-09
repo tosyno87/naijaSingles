@@ -54,8 +54,7 @@ class ImageUploadService {
       final contentType = _contentTypeForExtension(extension);
 
       // Generate unique filename if not provided
-      final String finalFileName =
-          fileName ??
+      final String finalFileName = fileName ??
           '${DateTime.now().millisecondsSinceEpoch}'
               '${extension.isNotEmpty ? extension : '.jpg'}';
 
@@ -200,57 +199,56 @@ class ImageUploadService {
     final ctx = navigatorKey.currentContext;
     if (ctx == null) return null;
     return showDialog<File>(
-        context: ctx,
-        builder: (BuildContext context) => AlertDialog(
-          title: const Text('Select Image'),
-          content: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              ListTile(
-                leading: const Icon(Icons.photo_library),
-                title: const Text('Gallery'),
-                onTap: () async {
-                  final File? image = await pickImage();
-                  if (!context.mounted) return;
-                  if (image != null && validateImage(image)) {
-                    Navigator.pop(context, image);
-                  } else if (image != null) {
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      const SnackBar(
-                        content: Text(
-                          'Invalid image. Please select a valid image file.',
-                        ),
-                        backgroundColor: Colors.red,
+      context: ctx,
+      builder: (BuildContext context) => AlertDialog(
+        title: const Text('Select Image'),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            ListTile(
+              leading: const Icon(Icons.photo_library),
+              title: const Text('Gallery'),
+              onTap: () async {
+                final File? image = await pickImage();
+                if (!context.mounted) return;
+                if (image != null && validateImage(image)) {
+                  Navigator.pop(context, image);
+                } else if (image != null) {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    const SnackBar(
+                      content: Text(
+                        'Invalid image. Please select a valid image file.',
                       ),
-                    );
-                  }
-                },
-              ),
-              ListTile(
-                leading: const Icon(Icons.camera_alt),
-                title: const Text('Camera'),
-                onTap: () async {
-                  final File? image =
-                      await pickImage(source: ImageSource.camera);
-                  if (!context.mounted) return;
-                  if (image != null && validateImage(image)) {
-                    Navigator.pop(context, image);
-                  } else if (image != null) {
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      const SnackBar(
-                        content: Text(
-                          'Invalid image. Please select a valid image file.',
-                        ),
-                        backgroundColor: Colors.red,
+                      backgroundColor: Colors.red,
+                    ),
+                  );
+                }
+              },
+            ),
+            ListTile(
+              leading: const Icon(Icons.camera_alt),
+              title: const Text('Camera'),
+              onTap: () async {
+                final File? image = await pickImage(source: ImageSource.camera);
+                if (!context.mounted) return;
+                if (image != null && validateImage(image)) {
+                  Navigator.pop(context, image);
+                } else if (image != null) {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    const SnackBar(
+                      content: Text(
+                        'Invalid image. Please select a valid image file.',
                       ),
-                    );
-                  }
-                },
-              ),
-            ],
-          ),
+                      backgroundColor: Colors.red,
+                    ),
+                  );
+                }
+              },
+            ),
+          ],
         ),
-      );
+      ),
+    );
   }
 }
 

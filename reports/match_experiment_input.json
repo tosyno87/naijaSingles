@@ -1,0 +1,32 @@
+{
+  "experimentId": "exp_match_1",
+  "baselineVariantId": "control",
+  "variantId": "distance_decay_v1",
+  "baseline": {
+    "connectToMatchRate": 0.2,
+    "matchToFirstMessageRate": 0.4,
+    "conversationRetention7dRate": 0.3,
+    "responseRate": 0.5,
+    "medianReplyDelayMs": 45000,
+    "conversationDepth": 6.0,
+    "sampleSize": 500
+  },
+  "variant": {
+    "connectToMatchRate": 0.22,
+    "matchToFirstMessageRate": 0.42,
+    "conversationRetention7dRate": 0.3,
+    "responseRate": 0.53,
+    "medianReplyDelayMs": 43000,
+    "conversationDepth": 6.4,
+    "sampleSize": 520
+  },
+  "guardrails": {
+    "minSampleSize": 200,
+    "minConnectToMatchLift": 0.01,
+    "minMatchToFirstMessageLift": 0.01,
+    "maxRetentionDrop": 0.0,
+    "minResponseRateLift": 0.01,
+    "minConversationDepthLift": 0.1,
+    "maxMedianReplyDelayIncreaseMs": 5000
+  }
+}

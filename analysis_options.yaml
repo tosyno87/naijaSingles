@@ -107,7 +107,7 @@ linter:
     avoid_returning_null_for_void: true
     
     # Code style (non-breaking)
-    always_put_control_body_on_new_line: true
+    always_put_control_body_on_new_line: false
     always_put_required_named_parameters_first: true
     annotate_overrides: true
     avoid_annotating_with_dynamic: true

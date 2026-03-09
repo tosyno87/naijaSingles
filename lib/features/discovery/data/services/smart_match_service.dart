@@ -2,8 +2,12 @@ import 'dart:math';
 
 import 'package:flutter/foundation.dart';
 
+import '../../../../common/utils/app_logger.dart';
+import '../../../../common/utils/distance.dart' as geo;
 import '../../../../models/user_model.dart';
 import '../../../../services/cached_user_service.dart';
+import '../../../../services/match_config.dart';
+import '../../../../services/match_config_provider.dart';
 import '../../../../services/mode_specific_compatibility_engine.dart';
 import '../../../../services/paginated_user_service.dart' show PaginatedResult;
 import '../../../../services/performance_monitor.dart';
@@ -12,12 +16,21 @@ import '../../../match/data/services/compatibility_engine.dart';
 /// Smart match service that provides intelligent user ordering and discovery
 /// Implements Priority 2: Enhanced Matching Algorithm
 class SmartMatchService {
-  static const int DIVERSITY_WINDOW_SIZE = 5; // Apply diversity every 5 users
-  static const double HIGH_COMPATIBILITY_THRESHOLD = 0.7;
-  static const double MEDIUM_COMPATIBILITY_THRESHOLD = 0.5;
-  static const int MAX_CONSECUTIVE_HIGH_MATCHES = 3;
+  SmartMatchService({MatchConfigProvider? matchConfigProvider})
+      : _matchConfigProvider =
+            matchConfigProvider ?? MatchConfigProvider.instance;
+
+  static const int diversityWindowSize = 5;
+  static const double highCompatibilityThreshold = 0.7;
+  static const double mediumCompatibilityThreshold = 0.5;
+  static const int maxConsecutiveHighMatches = 3;
+
+  /// Top-N users are always kept in strict score order and placed first,
+  /// so heuristic interleaving never demotes the best matches.
+  static const int topNPinned = 3;
 
   final CachedUserService _cachedUserService = CachedUserService();
+  final MatchConfigProvider _matchConfigProvider;
 
   /// Get optimized user list with compatibility scoring and smart ordering
   Future<SmartMatchResult> getOptimizedUserList({
@@ -28,7 +41,7 @@ class SmartMatchService {
   }) async =>
       PerformanceMonitor.measure('smart_match_get_users', () async {
         try {
-          debugPrint('🧠 Getting smart matches for ${currentUser.name}');
+          AppLogger.debug('Getting smart matches for ${currentUser.name}');
 
           // Get users from cache or Firestore
           final userResult = await _cachedUserService.getCachedUsers(
@@ -37,15 +50,20 @@ class SmartMatchService {
           );
 
           if (!userResult.isSuccess || userResult.items.isEmpty) {
-            debugPrint('❌ Failed to get users for smart matching');
+            AppLogger.debug('Failed to get users for smart matching');
             return SmartMatchResult.error('Failed to load users');
           }
 
           // Calculate compatibility scores for all users
+          final matchConfig =
+              await _matchConfigProvider.getCurrentConfigForUser(
+            currentUser.id,
+          );
           final compatibilityResults = await _calculateCompatibilityScores(
             currentUser,
             userResult.items,
             mode,
+            matchConfig,
           );
 
           // Apply smart ordering algorithm
@@ -55,8 +73,8 @@ class SmartMatchService {
             pageSize,
           );
 
-          debugPrint(
-            '✅ Smart matching complete: ${orderedUsers.length} users ordered',
+          AppLogger.debug(
+            'Smart matching complete: ${orderedUsers.length} users ordered',
           );
 
           return SmartMatchResult.success(
@@ -67,7 +85,7 @@ class SmartMatchService {
                 orderedUsers.where((uc) => uc.isHighCompatibility).length,
           );
         } on Object catch (e) {
-          debugPrint('❌ Error in smart matching: $e');
+          AppLogger.error('Error in smart matching', error: e);
           return SmartMatchResult.error(e.toString());
         }
       });
@@ -77,10 +95,11 @@ class SmartMatchService {
     UserModel currentUser,
     List<UserModel> targetUsers,
     String mode,
+    MatchConfig matchConfig,
   ) async =>
       PerformanceMonitor.measure('compatibility_calculation', () async {
-        debugPrint(
-          '🎯 Calculating compatibility for ${targetUsers.length} users',
+        AppLogger.debug(
+          'Calculating compatibility for ${targetUsers.length} users',
         );
 
         final results = <UserCompatibility>[];
@@ -91,6 +110,7 @@ class SmartMatchService {
             currentUser,
             user,
             mode,
+            config: matchConfig,
           );
 
           results.add(
@@ -107,8 +127,8 @@ class SmartMatchService {
             results.where((r) => r.isMediumCompatibility).length;
         final lowCount = results.where((r) => r.isLowCompatibility).length;
 
-        debugPrint(
-          '📊 Compatibility distribution: High: $highCount, Medium: $mediumCount, Low: $lowCount',
+        AppLogger.debug(
+          'Compatibility distribution: High: $highCount, Medium: $mediumCount, Low: $lowCount',
         );
 
         return results;
@@ -121,14 +141,23 @@ class SmartMatchService {
     int pageSize,
   ) async =>
       PerformanceMonitor.measure('smart_ordering', () async {
-        debugPrint('🔄 Applying smart ordering algorithm');
+        AppLogger.debug('Applying smart ordering algorithm');
 
-        // Start with compatibility-sorted list
+        // Sort by compatibility score descending (best-match-first)
         final sortedByCompatibility =
-            List<UserCompatibility>.from(compatibilityResults);
+            List<UserCompatibility>.from(compatibilityResults)
+              ..sort(
+                (a, b) => b.compatibilityScore.compareTo(a.compatibilityScore),
+              );
+
+        // Pin the top-N users in strict score order so heuristic
+        // interleaving never demotes the best matches.
+        final pinnedCount = min(topNPinned, sortedByCompatibility.length);
+        final pinned = sortedByCompatibility.sublist(0, pinnedCount);
+        final rest = sortedByCompatibility.sublist(pinnedCount);
 
         // Apply diversity algorithm to prevent monotony
-        final diversifiedList = _applyDiversityFilter(sortedByCompatibility);
+        final diversifiedList = _applyDiversityFilter(rest);
 
         // Apply boost for recently active users
         final boostedList = _applyActivityBoost(diversifiedList);
@@ -137,10 +166,13 @@ class SmartMatchService {
         final clusteredList =
             _applyLocationClustering(currentUser, boostedList);
 
-        // Take only the requested page size
-        final finalList = clusteredList.take(pageSize).toList();
+        // Re-combine: pinned top-N first, then heuristically ordered remainder
+        final combined = [...pinned, ...clusteredList];
 
-        debugPrint('✅ Smart ordering complete: ${finalList.length} users');
+        // Take only the requested page size
+        final finalList = combined.take(pageSize).toList();
+
+        AppLogger.debug('Smart ordering complete: ${finalList.length} users');
         _logOrderingResults(finalList);
 
         return finalList;
@@ -148,7 +180,7 @@ class SmartMatchService {
 
   /// Apply diversity filter to prevent showing too many similar users consecutively
   List<UserCompatibility> _applyDiversityFilter(List<UserCompatibility> users) {
-    if (users.length <= DIVERSITY_WINDOW_SIZE) {
+    if (users.length <= diversityWindowSize) {
       return users; // No need for diversity with small lists
     }
 
@@ -161,7 +193,7 @@ class SmartMatchService {
       UserCompatibility? nextUser;
 
       // If we have too many consecutive high matches, prefer medium/low matches
-      if (consecutiveHighMatches >= MAX_CONSECUTIVE_HIGH_MATCHES) {
+      if (consecutiveHighMatches >= maxConsecutiveHighMatches) {
         nextUser = remaining.firstWhere(
           (user) => !user.isHighCompatibility,
           orElse: () => remaining.first,
@@ -181,7 +213,9 @@ class SmartMatchService {
       remaining.remove(nextUser);
     }
 
-    debugPrint('🎨 Applied diversity filter: ${diversifiedList.length} users');
+    AppLogger.debug(
+      'Applied diversity filter: ${diversifiedList.length} users',
+    );
     return diversifiedList;
   }
 
@@ -223,11 +257,13 @@ class SmartMatchService {
       }
     }
 
-    debugPrint(
-      '⚡ Applied activity boost: ${recentlyActive.length} recently active users prioritized',
+    AppLogger.debug(
+      'Applied activity boost: ${recentlyActive.length} recently active users prioritized',
     );
     return boostedList;
   }
+
+  static const double _nearbyThresholdMiles = 31; // ~50 km
 
   /// Apply location-based clustering to group nearby users
   List<UserCompatibility> _applyLocationClustering(
@@ -235,24 +271,31 @@ class SmartMatchService {
     List<UserCompatibility> users,
   ) {
     if (currentUser.coordinates == null || currentUser.coordinates!.isEmpty) {
-      return users; // No clustering without location data
+      return users;
     }
 
-    // Separate users by distance
+    final lat1 = currentUser.coordinates!['latitude'] as double?;
+    final lng1 = currentUser.coordinates!['longitude'] as double?;
+    if (lat1 == null || lng1 == null) {
+      return users;
+    }
+
     final nearbyUsers = <UserCompatibility>[];
     final distantUsers = <UserCompatibility>[];
 
     for (final userComp in users) {
       final user = userComp.user;
       if (user.coordinates != null && user.coordinates!.isNotEmpty) {
-        // This would use the distance calculation from compatibility engine
-        // For now, we'll use a simple heuristic
-        final locationScore =
-            CompatibilityEngine.calculateCompatibility(currentUser, user);
+        final lat2 = user.coordinates!['latitude'] as double?;
+        final lng2 = user.coordinates!['longitude'] as double?;
 
-        // If location contributes significantly to the score, consider it nearby
-        if (locationScore > 0.6) {
-          nearbyUsers.add(userComp);
+        if (lat2 != null && lng2 != null) {
+          final distanceMiles = geo.calculateDistance(lat1, lng1, lat2, lng2);
+          if (distanceMiles <= _nearbyThresholdMiles) {
+            nearbyUsers.add(userComp);
+          } else {
+            distantUsers.add(userComp);
+          }
         } else {
           distantUsers.add(userComp);
         }
@@ -279,15 +322,17 @@ class SmartMatchService {
       }
     }
 
-    debugPrint(
-      '📍 Applied location clustering: ${nearbyUsers.length} nearby users prioritized',
+    AppLogger.debug(
+      'Applied location clustering: ${nearbyUsers.length} nearby users prioritized',
     );
     return clusteredList;
   }
 
   /// Calculate average compatibility score
   double _calculateAverageCompatibility(List<UserCompatibility> users) {
-    if (users.isEmpty) return 0;
+    if (users.isEmpty) {
+      return 0;
+    }
 
     final totalScore = users.fold<double>(
       0,
@@ -298,21 +343,23 @@ class SmartMatchService {
 
   /// Log ordering results for debugging
   void _logOrderingResults(List<UserCompatibility> users) {
-    if (!kDebugMode) return;
+    if (!kDebugMode) {
+      return;
+    }
 
-    debugPrint('📋 Smart ordering results:');
+    AppLogger.debug('Smart ordering results:');
     for (int i = 0; i < min(10, users.length); i++) {
       final user = users[i];
       final emoji = user.isHighCompatibility
           ? '🔥'
           : (user.isMediumCompatibility ? '👍' : '👌');
-      debugPrint(
+      AppLogger.debug(
         '   ${i + 1}. $emoji ${user.user.name} (${user.compatibilityPercentage})',
       );
     }
 
     if (users.length > 10) {
-      debugPrint('   ... and ${users.length - 10} more users');
+      AppLogger.debug('   ... and ${users.length - 10} more users');
     }
   }
 
@@ -323,7 +370,7 @@ class SmartMatchService {
     int pageSize = 20,
   }) async {
     try {
-      debugPrint('📄 Getting more smart matches');
+      AppLogger.debug('Getting more smart matches');
 
       // Get more users from paginated service
       final moreUsersResult = await _cachedUserService.getMoreUsers(
@@ -350,7 +397,7 @@ class SmartMatchService {
 
       return newSmartResult;
     } on Object catch (e) {
-      debugPrint('❌ Error getting more optimized users: $e');
+      AppLogger.error('Error getting more optimized users', error: e);
       return SmartMatchResult.error(e.toString());
     }
   }
@@ -365,12 +412,12 @@ class SmartMatchService {
   /// Get users filtered by compatibility threshold
   Future<SmartMatchResult> getHighCompatibilityUsers({
     required UserModel currentUser,
-    double minCompatibility = HIGH_COMPATIBILITY_THRESHOLD,
+    double minCompatibility = highCompatibilityThreshold,
     int maxUsers = 50,
   }) async {
     try {
-      debugPrint(
-        '🔥 Getting high compatibility users (min: ${(minCompatibility * 100).toStringAsFixed(1)}%)',
+      AppLogger.debug(
+        'Getting high compatibility users (min: ${(minCompatibility * 100).toStringAsFixed(1)}%)',
       );
 
       // Get all available users
@@ -382,11 +429,16 @@ class SmartMatchService {
         return SmartMatchResult.error('Failed to load users');
       }
 
+      final matchConfig = await _matchConfigProvider.getCurrentConfigForUser(
+        currentUser.id,
+      );
+
       // Calculate compatibility and filter
       final compatibilityResults = await _calculateCompatibilityScores(
         currentUser,
         allUsersResult.items,
         'Dating', // Default mode for this method
+        matchConfig,
       );
 
       final highCompatibilityUsers = compatibilityResults
@@ -394,8 +446,8 @@ class SmartMatchService {
           .take(maxUsers)
           .toList();
 
-      debugPrint(
-        '✅ Found ${highCompatibilityUsers.length} high compatibility users',
+      AppLogger.debug(
+        'Found ${highCompatibilityUsers.length} high compatibility users',
       );
 
       return SmartMatchResult.success(
@@ -406,7 +458,7 @@ class SmartMatchService {
         highCompatibilityCount: highCompatibilityUsers.length,
       );
     } on Object catch (e) {
-      debugPrint('❌ Error getting high compatibility users: $e');
+      AppLogger.error('Error getting high compatibility users', error: e);
       return SmartMatchResult.error(e.toString());
     }
   }
@@ -416,7 +468,7 @@ class SmartMatchService {
     UserModel currentUser,
   ) async {
     try {
-      debugPrint('📊 Analyzing matching patterns for ${currentUser.name}');
+      AppLogger.debug('Analyzing matching patterns for ${currentUser.name}');
 
       // Get sample of users for analysis
       final usersResult = await _cachedUserService.getCachedUsers(
@@ -427,11 +479,16 @@ class SmartMatchService {
         return MatchingAnalysis.empty();
       }
 
+      final matchConfig = await _matchConfigProvider.getCurrentConfigForUser(
+        currentUser.id,
+      );
+
       // Calculate compatibility scores
       final compatibilityResults = await _calculateCompatibilityScores(
         currentUser,
         usersResult.items.take(100).toList(), // Analyze first 100 users
         'Dating', // Default mode for this method
+        matchConfig,
       );
 
       // Analyze patterns
@@ -463,7 +520,7 @@ class SmartMatchService {
             _generateRecommendations(currentUser, compatibilityResults),
       );
     } on Object catch (e) {
-      debugPrint('❌ Error analyzing matching patterns: $e');
+      AppLogger.error('Error analyzing matching patterns', error: e);
       return MatchingAnalysis.empty();
     }
   }

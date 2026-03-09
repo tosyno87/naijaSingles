@@ -35,3 +35,7 @@
     java.lang.Object readResolve();
 }
 
+# Play Core (optional; used by Flutter embedding for deferred components only).
+# Avoid R8 "Missing class" errors when not using Play dynamic delivery.
+-dontwarn com.google.android.play.core.**
+

@@ -143,17 +143,13 @@ class UserMessagingRepo {
       .snapshots();
 
   static Future<UserModel> getChatUserDetails({required String userId}) async {
-    UserModel? user;
-
     final result = await db.collection('users').doc(userId).get();
 
     if (result.exists) {
       return UserModel.fromDocument(result);
     }
 
-    // log("user ${user.toString()}");
-
-    return user!;
+    throw StateError('User document not found for userId: $userId');
   }
 
   static Future<void> addTexttoDb(

@@ -228,8 +228,10 @@ export class NotificationService {
 
       // Store in-app notification — use 'superLike' (camelCase) to match
       // what the Flutter UI filters/renders on in ModernNotificationsScreen.
+      // Note: the FCM push data.type above uses 'super_like' for Android
+      // channel routing; the two values are reconciled on the client side.
       await this.storeInAppNotification(recipient.id, {
-        type: 'superLike' as any,
+        type: 'superLike',
         title: '⭐ Super Like!',
         message: `${sender.name || 'Someone special'} super liked you!`,
         avatarUrl: this.getFirstPhoto(sender),

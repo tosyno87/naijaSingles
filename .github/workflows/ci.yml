@@ -74,9 +74,12 @@ jobs:
 
     - name: Run golden tests (fail on skipped)
       run: |
-        flutter test test/golden --reporter expanded > /tmp/golden.out 2>&1
-        cat /tmp/golden.out
-        if grep -Ei "skipped" /tmp/golden.out >/dev/null; then
+        flutter test test/golden --reporter expanded 2>&1 | tee /tmp/golden.out
+        # Detect skipped tests using two independent signals so the check
+        # survives if Flutter changes the expanded reporter format:
+        #   1. Progress token ~N: (e.g. "+10 ~2:") — current format
+        #   2. Summary line "Some tests were skipped" — English fallback
+        if grep -E '~[1-9][0-9]*:|Some tests were skipped' /tmp/golden.out >/dev/null; then
           echo "::error::Golden tests contain skipped cases"
           exit 1
         fi

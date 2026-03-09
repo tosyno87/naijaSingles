@@ -1,7 +1,6 @@
 # Project Working Directory Rule
 
-For this project, always work from:
+Always work from the **repository root** (the directory containing `pubspec.yaml`).
 
-`/Users/babatundetosin/StudioProjects/naijaSingles`
-
-Do not use `/Users/babatundetosin/Documents/naijaSingles` as the primary working directory for future tasks unless explicitly asked.
+If you have multiple local clones, ensure you are using the correct one for the
+active task. Do not switch working directories mid-session unless explicitly asked.

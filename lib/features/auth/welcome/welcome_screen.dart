@@ -147,13 +147,12 @@ class _WelcomeScreenState extends State<WelcomeScreen>
             builder: (context, child) => Transform(
               alignment: Alignment.center,
               transform: Matrix4.identity()
-                ..scaleByDouble(
+                ..scale(
                   _kenBurnsScale.value,
                   _kenBurnsScale.value,
-                  1,
-                  1,
+                  1.0,
                 )
-                ..translateByDouble(0, _kenBurnsTranslateY.value, 0, 1),
+                ..translate(0.0, _kenBurnsTranslateY.value, 0.0),
               child: child,
             ),
             child: ColorFiltered(

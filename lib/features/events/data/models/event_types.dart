@@ -1,4 +1,3 @@
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:equatable/equatable.dart';
 
 import '../../../../common/utils/app_logger.dart';
@@ -73,52 +72,8 @@ EventType parseEventType(Object? typeValue) {
   return EventType.userGenerated;
 }
 
-/// Safely parses various date representations from Firestore.
-DateTime parseDateTime(Object? dateValue) {
-  if (dateValue == null) {
-    return DateTime.now();
-  }
-
-  if (dateValue is Timestamp) {
-    try {
-      return dateValue.toDate();
-    } on Exception {
-      return DateTime.now();
-    }
-  }
-
-  if (dateValue is DateTime) {
-    return dateValue;
-  }
-
-  if (dateValue is int) {
-    try {
-      return DateTime.fromMillisecondsSinceEpoch(dateValue);
-    } on Exception {
-      return DateTime.now();
-    }
-  }
-
-  if (dateValue is String) {
-    try {
-      return DateTime.parse(dateValue);
-    } on FormatException {
-      return DateTime.now();
-    }
-  }
-
-  if (dateValue is Map && dateValue.containsKey('millisecondsSinceEpoch')) {
-    try {
-      return DateTime.fromMillisecondsSinceEpoch(
-        dateValue['millisecondsSinceEpoch'] as int,
-      );
-    } on Exception {
-      return DateTime.now();
-    }
-  }
-
-  return DateTime.now();
-}
+// parseDateTime has been consolidated into
+// lib/common/utils/firestore_helpers.dart to avoid duplicates.
 
 class EventLocation extends Equatable {
   const EventLocation({

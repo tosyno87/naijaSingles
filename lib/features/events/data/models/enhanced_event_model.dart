@@ -1,6 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:equatable/equatable.dart';
 
+import '../../../../common/utils/firestore_helpers.dart';
 import 'event_types.dart';
 
 export 'event_types.dart';

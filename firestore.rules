@@ -770,6 +770,20 @@ service cloud.firestore {
                    request.auth.uid == resource.data.userId;
     }
 
+    // Match Quality Analytics — append-only from authenticated clients.
+    // Reads happen server-side via Admin SDK (Cloud Functions / aggregation).
+    match /matchQualityEvents/{eventId} {
+      allow create: if request.auth != null;
+      allow read, update, delete: if false;
+    }
+
+    // Runtime configuration — read-only for authenticated clients.
+    // Writes happen via Admin SDK (seed script / deploy tooling).
+    match /runtimeConfig/{docId} {
+      allow read: if request.auth != null;
+      allow write: if false;
+    }
+
     // Block any other access not explicitly allowed above
     match /{document=**} {
       allow read, write: if false;

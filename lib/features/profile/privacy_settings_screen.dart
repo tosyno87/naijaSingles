@@ -4,6 +4,8 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 
 import '../../common/constants/app_colors.dart';
+import '../../common/constants/app_spacing.dart';
+import '../../common/widgets/state_views/state_views.dart';
 import '../../services/user_privacy_service.dart';
 
 class PrivacySettingsScreen extends StatefulWidget {
@@ -18,6 +20,7 @@ class _PrivacySettingsScreenState extends State<PrivacySettingsScreen> {
   UserPrivacySettings _settings = const UserPrivacySettings();
   bool _isLoading = true;
   bool _isSaving = false;
+  String? _loadError;
 
   @override
   void initState() {
@@ -34,6 +37,7 @@ class _PrivacySettingsScreenState extends State<PrivacySettingsScreen> {
       setState(() {
         _settings = settings;
         _isLoading = false;
+        _loadError = null;
       });
     } on Object {
       if (!mounted) {
@@ -41,8 +45,8 @@ class _PrivacySettingsScreenState extends State<PrivacySettingsScreen> {
       }
       setState(() {
         _isLoading = false;
+        _loadError = 'Failed to load privacy settings';
       });
-      _showErrorSnackBar('Failed to load privacy settings');
     }
   }
 
@@ -82,7 +86,9 @@ class _PrivacySettingsScreenState extends State<PrivacySettingsScreen> {
             Text(message, style: GoogleFonts.montserrat(color: Colors.white)),
         backgroundColor: AppColors.primaryGreen,
         behavior: SnackBarBehavior.floating,
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(AppSpacing.sm),
+        ),
       ),
     );
   }
@@ -94,7 +100,9 @@ class _PrivacySettingsScreenState extends State<PrivacySettingsScreen> {
             Text(message, style: GoogleFonts.montserrat(color: Colors.white)),
         backgroundColor: Colors.red,
         behavior: SnackBarBehavior.floating,
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(AppSpacing.sm),
+        ),
       ),
     );
   }
@@ -120,13 +128,13 @@ class _PrivacySettingsScreenState extends State<PrivacySettingsScreen> {
           ),
           actions: [
             Padding(
-              padding: const EdgeInsets.only(right: 8),
+              padding: const EdgeInsets.only(right: AppSpacing.sm),
               child: _isSaving
                   ? const Padding(
-                      padding: EdgeInsets.all(12),
+                      padding: EdgeInsets.all(AppSpacing.sm + AppSpacing.xs),
                       child: SizedBox(
-                        width: 20,
-                        height: 20,
+                        width: AppSpacing.md + AppSpacing.xs,
+                        height: AppSpacing.md + AppSpacing.xs,
                         child: CircularProgressIndicator(
                           strokeWidth: 2,
                           color: AppColors.primaryGreen,
@@ -139,11 +147,12 @@ class _PrivacySettingsScreenState extends State<PrivacySettingsScreen> {
                         backgroundColor: AppColors.primaryGreen,
                         foregroundColor: Colors.white,
                         padding: const EdgeInsets.symmetric(
-                          horizontal: 20,
-                          vertical: 8,
+                          horizontal: AppSpacing.md + AppSpacing.xs,
+                          vertical: AppSpacing.sm,
                         ),
                         shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(20),
+                          borderRadius:
+                              BorderRadius.circular(AppSpacing.chipRadius),
                         ),
                         textStyle: GoogleFonts.montserrat(
                           fontWeight: FontWeight.w600,
@@ -156,12 +165,21 @@ class _PrivacySettingsScreenState extends State<PrivacySettingsScreen> {
           ],
         ),
         body: _isLoading
-            ? const Center(child: CircularProgressIndicator())
-            : _buildContent(),
+            ? const AppLoadingView(message: 'Loading privacy settings...')
+            : _loadError != null
+                ? AppErrorView(
+                    title: 'Couldn\'t load privacy settings',
+                    message: _loadError!,
+                    onRetry: _loadPrivacySettings,
+                  )
+                : _buildContent(),
       );
 
   Widget _buildContent() => SingleChildScrollView(
-        padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
+        padding: const EdgeInsets.symmetric(
+          horizontal: AppSpacing.md + AppSpacing.xs,
+          vertical: AppSpacing.md,
+        ),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
@@ -170,35 +188,35 @@ class _PrivacySettingsScreenState extends State<PrivacySettingsScreen> {
               'Communication',
               'Control who can message you',
             ),
-            const SizedBox(height: 12),
+            const SizedBox(height: AppSpacing.sm + AppSpacing.xs),
             _buildCommunicationSection(),
-            const SizedBox(height: 28),
+            const SizedBox(height: AppSpacing.lg + AppSpacing.xs),
             _buildSectionHeader(
               Icons.visibility_outlined,
               'Activity Status',
               'Manage your online presence visibility',
             ),
-            const SizedBox(height: 12),
+            const SizedBox(height: AppSpacing.sm + AppSpacing.xs),
             _buildActivitySection(),
-            const SizedBox(height: 28),
+            const SizedBox(height: AppSpacing.lg + AppSpacing.xs),
             _buildSectionHeader(
               Icons.person_outline_rounded,
               'Profile Visibility',
               'Choose what information others can see',
             ),
-            const SizedBox(height: 12),
+            const SizedBox(height: AppSpacing.sm + AppSpacing.xs),
             _buildProfileVisibilitySection(),
-            const SizedBox(height: 28),
+            const SizedBox(height: AppSpacing.lg + AppSpacing.xs),
             _buildSectionHeader(
               Icons.location_on_outlined,
               'Location Privacy',
               'Control how your location is shared',
             ),
-            const SizedBox(height: 12),
+            const SizedBox(height: AppSpacing.sm + AppSpacing.xs),
             _buildLocationPrivacySection(),
-            const SizedBox(height: 28),
+            const SizedBox(height: AppSpacing.lg + AppSpacing.xs),
             _buildPrivacySummary(),
-            const SizedBox(height: 100),
+            const SizedBox(height: AppSpacing.xxl * 2),
           ],
         ),
       );
@@ -211,14 +229,18 @@ class _PrivacySettingsScreenState extends State<PrivacySettingsScreen> {
       Row(
         children: [
           Container(
-            padding: const EdgeInsets.all(8),
+            padding: const EdgeInsets.all(AppSpacing.sm),
             decoration: BoxDecoration(
               color: AppColors.primaryGreen.withValues(alpha: 0.1),
-              borderRadius: BorderRadius.circular(10),
+              borderRadius: BorderRadius.circular(AppSpacing.buttonRadius),
             ),
-            child: Icon(icon, size: 20, color: AppColors.primaryGreen),
+            child: Icon(
+              icon,
+              size: AppSpacing.iconSm,
+              color: AppColors.primaryGreen,
+            ),
           ),
-          const SizedBox(width: 12),
+          const SizedBox(width: AppSpacing.sm + AppSpacing.xs),
           Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -232,7 +254,7 @@ class _PrivacySettingsScreenState extends State<PrivacySettingsScreen> {
                     letterSpacing: 0.2,
                   ),
                 ),
-                const SizedBox(height: 2),
+                const SizedBox(height: AppSpacing.xs / 2),
                 Text(
                   subtitle,
                   style: GoogleFonts.montserrat(
@@ -354,8 +376,8 @@ class _PrivacySettingsScreenState extends State<PrivacySettingsScreen> {
             height: 1,
             thickness: 0.5,
             color: AppColors.divider,
-            indent: 16,
-            endIndent: 16,
+            indent: AppSpacing.md,
+            endIndent: AppSpacing.md,
           ),
         );
       }
@@ -364,7 +386,7 @@ class _PrivacySettingsScreenState extends State<PrivacySettingsScreen> {
     return DecoratedBox(
       decoration: BoxDecoration(
         color: AppColors.cardColor,
-        borderRadius: BorderRadius.circular(16),
+        borderRadius: BorderRadius.circular(AppSpacing.cardRadius),
         border: Border.all(color: AppColors.border.withValues(alpha: 0.6)),
         boxShadow: [
           BoxShadow(
@@ -375,7 +397,7 @@ class _PrivacySettingsScreenState extends State<PrivacySettingsScreen> {
         ],
       ),
       child: ClipRRect(
-        borderRadius: BorderRadius.circular(16),
+        borderRadius: BorderRadius.circular(AppSpacing.cardRadius),
         child: Column(children: separated),
       ),
     );
@@ -392,7 +414,10 @@ class _PrivacySettingsScreenState extends State<PrivacySettingsScreen> {
         isDestructive ? Colors.red.shade600 : AppColors.primaryGreen;
 
     return SwitchListTile.adaptive(
-      contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 6),
+      contentPadding: const EdgeInsets.symmetric(
+        horizontal: AppSpacing.md,
+        vertical: AppSpacing.sm - AppSpacing.xs / 2,
+      ),
       title: Text(
         title,
         style: GoogleFonts.montserrat(
@@ -404,7 +429,7 @@ class _PrivacySettingsScreenState extends State<PrivacySettingsScreen> {
         ),
       ),
       subtitle: Padding(
-        padding: const EdgeInsets.only(top: 2),
+        padding: const EdgeInsets.only(top: AppSpacing.xs / 2),
         child: Text(
           subtitle,
           style: GoogleFonts.montserrat(
@@ -428,7 +453,7 @@ class _PrivacySettingsScreenState extends State<PrivacySettingsScreen> {
     final summary = _privacyService.getPrivacySummary(_settings);
 
     return Container(
-      padding: const EdgeInsets.all(16),
+      padding: AppSpacing.cardPadding,
       decoration: BoxDecoration(
         gradient: LinearGradient(
           colors: [
@@ -438,7 +463,7 @@ class _PrivacySettingsScreenState extends State<PrivacySettingsScreen> {
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
         ),
-        borderRadius: BorderRadius.circular(16),
+        borderRadius: BorderRadius.circular(AppSpacing.cardRadius),
         border: Border.all(
           color: AppColors.primaryGreen.withValues(alpha: 0.2),
         ),
@@ -449,10 +474,11 @@ class _PrivacySettingsScreenState extends State<PrivacySettingsScreen> {
           Row(
             children: [
               Container(
-                padding: const EdgeInsets.all(6),
+                padding:
+                    const EdgeInsets.all(AppSpacing.sm - AppSpacing.xs / 2),
                 decoration: BoxDecoration(
                   color: AppColors.primaryGreen.withValues(alpha: 0.15),
-                  borderRadius: BorderRadius.circular(8),
+                  borderRadius: BorderRadius.circular(AppSpacing.sm),
                 ),
                 child: const Icon(
                   Icons.shield_outlined,
@@ -460,7 +486,7 @@ class _PrivacySettingsScreenState extends State<PrivacySettingsScreen> {
                   size: 18,
                 ),
               ),
-              const SizedBox(width: 10),
+              const SizedBox(width: AppSpacing.sm + AppSpacing.xs / 2),
               Text(
                 'Privacy Summary',
                 style: GoogleFonts.montserrat(
@@ -471,7 +497,7 @@ class _PrivacySettingsScreenState extends State<PrivacySettingsScreen> {
               ),
             ],
           ),
-          const SizedBox(height: 12),
+          const SizedBox(height: AppSpacing.sm + AppSpacing.xs),
           Text(
             summary,
             style: GoogleFonts.montserrat(
@@ -480,7 +506,7 @@ class _PrivacySettingsScreenState extends State<PrivacySettingsScreen> {
               color: AppColors.textPrimary,
             ),
           ),
-          const SizedBox(height: 6),
+          const SizedBox(height: AppSpacing.sm - AppSpacing.xs / 2),
           Text(
             'You can update these settings at any time.',
             style: GoogleFonts.montserrat(

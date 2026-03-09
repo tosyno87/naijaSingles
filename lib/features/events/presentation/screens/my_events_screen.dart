@@ -10,6 +10,7 @@ import 'package:intl/intl.dart';
 import '../../../../common/constants/app_colors.dart';
 import '../../../../common/routes/route_name.dart';
 import '../../../../common/utils/app_logger.dart';
+import '../../../../common/widgets/state_views/state_views.dart';
 import '../../data/models/enhanced_event_model.dart';
 import '../../data/services/user_event_service.dart';
 import '../bloc/event_creation_bloc.dart';
@@ -458,93 +459,16 @@ class _MyEventsScreenState extends State<MyEventsScreen>
     );
   }
 
-  Widget _buildLoadingState() => Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Container(
-              width: 60,
-              height: 60,
-              decoration: BoxDecoration(
-                color: AppColors.primaryGreen.withValues(alpha: 0.1),
-                borderRadius: BorderRadius.circular(30),
-              ),
-              child: const Center(
-                child: CircularProgressIndicator(
-                  valueColor: AlwaysStoppedAnimation(AppColors.primaryGreen),
-                  strokeWidth: 3,
-                ),
-              ),
-            ),
-            const SizedBox(height: 24),
-            Text(
-              'Loading your events...',
-              style: GoogleFonts.montserrat(
-                fontSize: 16,
-                fontWeight: FontWeight.w500,
-                color: const Color(0xFF666666),
-              ),
-            ),
-          ],
-        ),
-      );
+  Widget _buildLoadingState() =>
+      const AppLoadingView(message: 'Loading your events...');
 
-  Widget _buildErrorState(String message) => Center(
-        child: Padding(
-          padding: const EdgeInsets.all(32),
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              const Icon(
-                Icons.error_outline,
-                size: 80,
-                color: Color(0xFF999999),
-              ),
-              const SizedBox(height: 24),
-              Text(
-                'Something went wrong',
-                style: GoogleFonts.montserrat(
-                  fontSize: 24,
-                  fontWeight: FontWeight.bold,
-                  color: const Color(0xFF333333),
-                ),
-              ),
-              const SizedBox(height: 12),
-              Text(
-                message,
-                style: GoogleFonts.montserrat(
-                  fontSize: 16,
-                  color: const Color(0xFF666666),
-                ),
-                textAlign: TextAlign.center,
-              ),
-              const SizedBox(height: 32),
-              ElevatedButton(
-                onPressed: () {
-                  context.read<EventCreationBloc>().add(
-                        LoadUserEventsEvent(_currentUserId!),
-                      );
-                },
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: AppColors.primaryGreen,
-                  foregroundColor: Colors.white,
-                  padding:
-                      const EdgeInsets.symmetric(horizontal: 32, vertical: 16),
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(12),
-                  ),
-                ),
-                child: Text(
-                  'Try Again',
-                  style: GoogleFonts.montserrat(
-                    fontSize: 16,
-                    fontWeight: FontWeight.w600,
-                  ),
-                ),
-              ),
-            ],
-          ),
-        ),
+  Widget _buildErrorState(String message) => AppErrorView(
+        message: message,
+        onRetry: () {
+          context.read<EventCreationBloc>().add(
+                LoadUserEventsEvent(_currentUserId!),
+              );
+        },
       );
 
   Widget _buildEmptyState({
@@ -553,142 +477,12 @@ class _MyEventsScreenState extends State<MyEventsScreen>
     required IconData icon,
     bool showCreateButton = false,
   }) =>
-      Center(
-        child: SingleChildScrollView(
-          padding: const EdgeInsets.all(32),
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              // Animated icon container
-              Container(
-                width: 120,
-                height: 120,
-                decoration: BoxDecoration(
-                  gradient: LinearGradient(
-                    begin: Alignment.topLeft,
-                    end: Alignment.bottomRight,
-                    colors: [
-                      AppColors.primaryGreen.withValues(alpha: 0.1),
-                      AppColors.primaryGreen.withValues(alpha: 0.05),
-                    ],
-                  ),
-                  borderRadius: BorderRadius.circular(60),
-                ),
-                child: Icon(
-                  icon,
-                  size: 60,
-                  color: AppColors.primaryGreen,
-                ),
-              ),
-              const SizedBox(height: 32),
-
-              Text(
-                title,
-                style: GoogleFonts.montserrat(
-                  fontSize: 24,
-                  fontWeight: FontWeight.bold,
-                  color: const Color(0xFF333333),
-                ),
-                textAlign: TextAlign.center,
-              ),
-              const SizedBox(height: 16),
-
-              Text(
-                message,
-                style: GoogleFonts.montserrat(
-                  fontSize: 16,
-                  color: const Color(0xFF666666),
-                  height: 1.5,
-                ),
-                textAlign: TextAlign.center,
-              ),
-
-              if (showCreateButton) ...[
-                const SizedBox(height: 40),
-
-                // Feature highlights
-                Container(
-                  padding: const EdgeInsets.all(20),
-                  decoration: BoxDecoration(
-                    color: const Color(0xFFF8F9FA),
-                    borderRadius: BorderRadius.circular(12),
-                    border: Border.all(
-                      color: AppColors.primaryGreen.withValues(alpha: 0.1),
-                    ),
-                  ),
-                  child: Column(
-                    children: [
-                      _buildFeatureHighlight(
-                        icon: Icons.people,
-                        text: 'Connect with your community',
-                      ),
-                      const SizedBox(height: 12),
-                      _buildFeatureHighlight(
-                        icon: Icons.location_on,
-                        text: 'Host events in your area',
-                      ),
-                      const SizedBox(height: 12),
-                      _buildFeatureHighlight(
-                        icon: Icons.favorite,
-                        text: 'Meet like-minded people',
-                      ),
-                    ],
-                  ),
-                ),
-
-                const SizedBox(height: 32),
-
-                ElevatedButton.icon(
-                  onPressed: _createNewEvent,
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: AppColors.primaryGreen,
-                    foregroundColor: Colors.white,
-                    padding: const EdgeInsets.symmetric(
-                      horizontal: 32,
-                      vertical: 16,
-                    ),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(12),
-                    ),
-                    elevation: 2,
-                  ),
-                  icon: const Icon(Icons.add, size: 20),
-                  label: Text(
-                    'Create Your First Event',
-                    style: GoogleFonts.montserrat(
-                      fontSize: 16,
-                      fontWeight: FontWeight.w600,
-                    ),
-                  ),
-                ),
-              ],
-            ],
-          ),
-        ),
-      );
-
-  Widget _buildFeatureHighlight({
-    required IconData icon,
-    required String text,
-  }) =>
-      Row(
-        children: [
-          Icon(
-            icon,
-            size: 16,
-            color: AppColors.primaryGreen,
-          ),
-          const SizedBox(width: 12),
-          Expanded(
-            child: Text(
-              text,
-              style: GoogleFonts.montserrat(
-                fontSize: 14,
-                color: const Color(0xFF666666),
-              ),
-            ),
-          ),
-        ],
+      AppEmptyView(
+        title: title,
+        subtitle: message,
+        icon: icon,
+        actionLabel: showCreateButton ? 'Create Your First Event' : null,
+        onAction: showCreateButton ? _createNewEvent : null,
       );
 
   Widget _buildAuthRequiredScreen() => Scaffold(

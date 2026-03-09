@@ -8,12 +8,12 @@ import 'package:flutter/services.dart';
 import 'package:google_fonts/google_fonts.dart';
 
 import '../../common/constants/app_colors.dart';
+import '../../common/widgets/state_views/state_views.dart';
 import '../../models/user_model.dart';
 import '../../services/settings_service.dart';
 import '../chat_shared/models/chat_message_view_model.dart';
 import '../chat_shared/ui/widgets/chat_bubble.dart';
 import '../chat_shared/ui/widgets/chat_composer.dart';
-import '../chat_shared/ui/widgets/chat_state_views.dart';
 import '../dating/screens/user_detail_screen.dart';
 import 'message_model.dart';
 import 'services/chat_service.dart';
@@ -233,20 +233,24 @@ class _ChatThreadScreenState extends State<ChatThreadScreen> {
               stream: _chatService.getMessagesStream(widget.threadId),
               builder: (context, snapshot) {
                 if (snapshot.connectionState == ConnectionState.waiting) {
-                  return const ChatLoadingView();
+                  return const AppLoadingView(message: 'Loading messages...');
                 }
 
                 if (snapshot.hasError) {
-                  return const ChatErrorView(
+                  return AppErrorView(
+                    title: 'Unable to load messages',
                     message: 'Error loading messages',
+                    onRetry: () => setState(() {}),
                   );
                 }
 
                 final messages = snapshot.data ?? [];
 
                 if (messages.isEmpty) {
-                  return ChatEmptyView(
+                  return AppEmptyView(
+                    title: 'No Messages Yet',
                     subtitle: 'Say hi to ${widget.userName}!',
+                    icon: Icons.chat_bubble_outline,
                   );
                 }
 

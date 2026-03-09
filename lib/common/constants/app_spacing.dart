@@ -11,6 +11,10 @@ class AppSpacing {
   static const double xl = 32;
   static const double xxl = 48;
 
+  /// Content inset used for section/card container padding (20px).
+  /// Covers the ~90 occurrences of EdgeInsets.all(20) across the codebase.
+  static const double contentInset = 20;
+
   static const double buttonRadius = 12;
   static const double cardRadius = 16;
   static const double chipRadius = 20;

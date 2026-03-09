@@ -8,6 +8,7 @@ import 'package:google_fonts/google_fonts.dart';
 
 import '../../common/bloc/user/user_bloc.dart';
 import '../../common/constants/app_colors.dart';
+import '../../common/constants/app_spacing.dart';
 import '../../common/routes/route_name.dart';
 import '../account_status/presentation/bloc/account_status_bloc.dart';
 import '../account_status/presentation/screens/account_status_screen.dart';
@@ -29,11 +30,10 @@ class SettingsScreen extends StatefulWidget {
 class _SettingsScreenState extends State<SettingsScreen> {
   final FirebaseAuth _auth = FirebaseAuth.instance;
 
-  // New Afropeep theme colors
-  static const Color primaryColor = Color(0xFF008037); // Deep green
-  static const Color cardColor = Colors.white; // White cards with shadows
-  static const Color textPrimary = Color(0xFF3E1F0D); // Deep brown
-  static const Color textSecondary = Color(0xFF666666); // Medium gray
+  static const Color primaryColor = AppColors.primaryGreen;
+  static const Color cardColor = AppColors.cardColor;
+  static const Color textPrimary = AppColors.textPrimary;
+  static const Color textSecondary = AppColors.textSecondary;
 
   bool get _isPasswordProviderUser =>
       _auth.currentUser?.providerData.any((p) => p.providerId == 'password') ??
@@ -69,7 +69,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
             children: [
               // Account Section
               _buildSectionHeader('Account'),
-              const SizedBox(height: 16),
+              const SizedBox(height: AppSpacing.md),
 
               _buildSettingsCard([
                 _buildSettingsItem(
@@ -102,11 +102,10 @@ class _SettingsScreenState extends State<SettingsScreen> {
                 ],
               ]),
 
-              const SizedBox(height: 32),
+              const SizedBox(height: AppSpacing.xl),
 
-              // Privacy & Safety Section
               _buildSectionHeader('Privacy & Safety'),
-              const SizedBox(height: 16),
+              const SizedBox(height: AppSpacing.md),
 
               _buildSettingsCard([
                 _buildSettingsItem(
@@ -150,11 +149,10 @@ class _SettingsScreenState extends State<SettingsScreen> {
                 ),
               ]),
 
-              const SizedBox(height: 32),
+              const SizedBox(height: AppSpacing.xl),
 
-              // App Settings Section
               _buildSectionHeader('App Settings'),
-              const SizedBox(height: 16),
+              const SizedBox(height: AppSpacing.md),
 
               _buildSettingsCard([
                 _buildSettingsItem(
@@ -200,11 +198,10 @@ class _SettingsScreenState extends State<SettingsScreen> {
                 ),
               ]),
 
-              const SizedBox(height: 32),
+              const SizedBox(height: AppSpacing.xl),
 
-              // Support Section
               _buildSectionHeader('Support'),
-              const SizedBox(height: 16),
+              const SizedBox(height: AppSpacing.md),
 
               _buildSettingsCard([
                 _buildSettingsItem(
@@ -240,9 +237,8 @@ class _SettingsScreenState extends State<SettingsScreen> {
 
               const SizedBox(height: 40),
 
-              // Sign Out Button - Robust solution with proper width constraints
               Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 16),
+                padding: const EdgeInsets.symmetric(horizontal: AppSpacing.md),
                 child: SizedBox(
                   width: double.infinity,
                   height: 56,
@@ -252,7 +248,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                       backgroundColor: Colors.white,
                       foregroundColor: Colors.red.shade700,
                       shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(20),
+                        borderRadius: BorderRadius.circular(AppSpacing.chipRadius),
                         side: BorderSide(color: Colors.red.shade300, width: 2),
                       ),
                       elevation: 2,
@@ -270,11 +266,10 @@ class _SettingsScreenState extends State<SettingsScreen> {
                 ),
               ),
 
-              const SizedBox(height: 16),
+              const SizedBox(height: AppSpacing.md),
 
-              // Take a Break / Pause Account — non-destructive alternative
               Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 16),
+                padding: const EdgeInsets.symmetric(horizontal: AppSpacing.md),
                 child: SizedBox(
                   width: double.infinity,
                   height: 56,
@@ -305,7 +300,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                       backgroundColor: Colors.white,
                       foregroundColor: AppColors.primaryGreen,
                       shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(20),
+                        borderRadius: BorderRadius.circular(AppSpacing.chipRadius),
                         side: const BorderSide(
                           color: AppColors.primaryGreen,
                           width: 2,
@@ -318,11 +313,10 @@ class _SettingsScreenState extends State<SettingsScreen> {
                 ),
               ),
 
-              const SizedBox(height: 16),
+              const SizedBox(height: AppSpacing.md),
 
-              // Delete Account Button - Robust solution with proper width constraints
               Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 16),
+                padding: const EdgeInsets.symmetric(horizontal: AppSpacing.md),
                 child: SizedBox(
                   width: double.infinity,
                   height: 56,
@@ -332,7 +326,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                       backgroundColor: Colors.white,
                       foregroundColor: Colors.red.shade700,
                       shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(20),
+                        borderRadius: BorderRadius.circular(AppSpacing.chipRadius),
                         side: BorderSide(color: Colors.red.shade300, width: 2),
                       ),
                       elevation: 2,
@@ -368,7 +362,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
   Widget _buildSettingsCard(List<Widget> children) => DecoratedBox(
         decoration: BoxDecoration(
           color: cardColor,
-          borderRadius: BorderRadius.circular(16),
+          borderRadius: BorderRadius.circular(AppSpacing.cardRadius),
           border: Border.all(
             color: primaryColor.withValues(alpha: 0.1),
           ),
@@ -394,9 +388,9 @@ class _SettingsScreenState extends State<SettingsScreen> {
         color: Colors.transparent,
         child: InkWell(
           onTap: onTap,
-          borderRadius: BorderRadius.circular(16),
+          borderRadius: BorderRadius.circular(AppSpacing.cardRadius),
           child: Padding(
-            padding: const EdgeInsets.all(16),
+            padding: AppSpacing.cardPadding,
             child: Row(
               children: [
                 Container(
@@ -412,7 +406,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                     size: 20,
                   ),
                 ),
-                const SizedBox(width: 16),
+                const SizedBox(width: AppSpacing.md),
                 Expanded(
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
@@ -460,7 +454,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
         builder: (context) => AlertDialog(
           backgroundColor: Colors.white,
           shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(20),
+            borderRadius: BorderRadius.circular(AppSpacing.chipRadius),
           ),
           title: Row(
             children: [
@@ -477,7 +471,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                   size: 20,
                 ),
               ),
-              const SizedBox(width: 16),
+              const SizedBox(width: AppSpacing.md),
               Text(
                 'Sign Out',
                 style: GoogleFonts.montserrat(
@@ -505,10 +499,10 @@ class _SettingsScreenState extends State<SettingsScreen> {
                 style: TextButton.styleFrom(
                   foregroundColor: textSecondary,
                   shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(12),
+                    borderRadius: BorderRadius.circular(AppSpacing.buttonRadius),
                   ),
                   padding:
-                      const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                      const EdgeInsets.symmetric(horizontal: AppSpacing.md, vertical: AppSpacing.buttonRadius),
                 ),
                 child: Text(
                   'Cancel',
@@ -520,16 +514,15 @@ class _SettingsScreenState extends State<SettingsScreen> {
                 ),
               ),
             ),
-            // Sign Out confirmation button - Fixed layout
             Padding(
-              padding: const EdgeInsets.only(left: 8),
+              padding: const EdgeInsets.only(left: AppSpacing.sm),
               child: ElevatedButton(
                 onPressed: _performSignOut,
                 style: ElevatedButton.styleFrom(
                   backgroundColor: Colors.red.shade600,
                   foregroundColor: Colors.white,
                   shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(12),
+                    borderRadius: BorderRadius.circular(AppSpacing.buttonRadius),
                   ),
                   elevation: 2,
                   padding: const EdgeInsets.symmetric(
@@ -563,7 +556,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
         builder: (context) => AlertDialog(
           backgroundColor: Colors.white,
           shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(16),
+            borderRadius: BorderRadius.circular(AppSpacing.cardRadius),
           ),
           title: Text(
             'Delete Account',
@@ -587,14 +580,12 @@ class _SettingsScreenState extends State<SettingsScreen> {
                       textPrimary, // Use textPrimary for high contrast against cardColor
                 ),
               ),
-              const SizedBox(height: 16),
-              // Bullet points with high contrast and better formatting
+              const SizedBox(height: AppSpacing.md),
               Container(
-                padding: const EdgeInsets.all(12),
+                padding: const EdgeInsets.all(AppSpacing.buttonRadius),
                 decoration: BoxDecoration(
-                  color:
-                      Colors.red.shade50, // Light red background for emphasis
-                  borderRadius: BorderRadius.circular(8),
+                  color: Colors.red.shade50,
+                  borderRadius: BorderRadius.circular(AppSpacing.sm),
                   border: Border.all(color: Colors.red.shade200),
                 ),
                 child: Text(
@@ -614,18 +605,17 @@ class _SettingsScreenState extends State<SettingsScreen> {
             ],
           ),
           actions: [
-            // Cancel button
             Padding(
-              padding: const EdgeInsets.only(right: 8),
+              padding: const EdgeInsets.only(right: AppSpacing.sm),
               child: TextButton(
                 onPressed: () => Navigator.pop(context),
                 style: TextButton.styleFrom(
                   foregroundColor: textSecondary,
                   shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(12),
+                    borderRadius: BorderRadius.circular(AppSpacing.buttonRadius),
                   ),
                   padding:
-                      const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                      const EdgeInsets.symmetric(horizontal: AppSpacing.md, vertical: AppSpacing.buttonRadius),
                 ),
                 child: Text(
                   'Cancel',
@@ -637,16 +627,15 @@ class _SettingsScreenState extends State<SettingsScreen> {
                 ),
               ),
             ),
-            // Delete button - Fixed layout
             Padding(
-              padding: const EdgeInsets.only(left: 8),
+              padding: const EdgeInsets.only(left: AppSpacing.sm),
               child: ElevatedButton(
                 onPressed: _showDeleteConfirmation,
                 style: ElevatedButton.styleFrom(
                   backgroundColor: Colors.red.shade600,
                   foregroundColor: Colors.white,
                   shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(12),
+                    borderRadius: BorderRadius.circular(AppSpacing.buttonRadius),
                   ),
                   elevation: 2,
                   padding:
@@ -682,7 +671,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
             final confirmed = controller.text == 'DELETE';
             return AlertDialog(
               shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(16),
+                borderRadius: BorderRadius.circular(AppSpacing.cardRadius),
               ),
               title: Text(
                 'Final Confirmation',
@@ -703,7 +692,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                       color: textSecondary,
                     ),
                   ),
-                  const SizedBox(height: 12),
+                  const SizedBox(height: AppSpacing.buttonRadius),
                   TextField(
                     controller: controller,
                     autofocus: true,
@@ -719,19 +708,19 @@ class _SettingsScreenState extends State<SettingsScreen> {
                         color: textSecondary.withValues(alpha: 0.4),
                       ),
                       border: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(12),
+                        borderRadius: BorderRadius.circular(AppSpacing.buttonRadius),
                         borderSide: BorderSide(color: Colors.red.shade200),
                       ),
                       focusedBorder: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(12),
+                        borderRadius: BorderRadius.circular(AppSpacing.buttonRadius),
                         borderSide: BorderSide(
                           color: Colors.red.shade400,
                           width: 2,
                         ),
                       ),
                       contentPadding: const EdgeInsets.symmetric(
-                        horizontal: 16,
-                        vertical: 12,
+                        horizontal: AppSpacing.md,
+                        vertical: AppSpacing.buttonRadius,
                       ),
                     ),
                   ),
@@ -739,17 +728,17 @@ class _SettingsScreenState extends State<SettingsScreen> {
               ),
               actions: [
                 Padding(
-                  padding: const EdgeInsets.only(right: 8),
+                  padding: const EdgeInsets.only(right: AppSpacing.sm),
                   child: TextButton(
                     onPressed: () => Navigator.pop(dialogContext),
                     style: TextButton.styleFrom(
                       foregroundColor: textSecondary,
                       shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(12),
+                        borderRadius: BorderRadius.circular(AppSpacing.buttonRadius),
                       ),
                       padding: const EdgeInsets.symmetric(
-                        horizontal: 16,
-                        vertical: 12,
+                        horizontal: AppSpacing.md,
+                        vertical: AppSpacing.buttonRadius,
                       ),
                     ),
                     child: Text(
@@ -763,7 +752,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                   ),
                 ),
                 Padding(
-                  padding: const EdgeInsets.only(left: 8),
+                  padding: const EdgeInsets.only(left: AppSpacing.sm),
                   child: ElevatedButton(
                     onPressed: confirmed
                         ? () {
@@ -784,7 +773,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                       disabledBackgroundColor: Colors.red.shade200,
                       disabledForegroundColor: Colors.white70,
                       shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(12),
+                        borderRadius: BorderRadius.circular(AppSpacing.buttonRadius),
                       ),
                       elevation: confirmed ? 2 : 0,
                       padding: const EdgeInsets.symmetric(
@@ -823,10 +812,10 @@ class _SettingsScreenState extends State<SettingsScreen> {
       barrierDismissible: false,
       builder: (dialogCtx) => Center(
         child: Container(
-          padding: const EdgeInsets.all(24),
+          padding: const EdgeInsets.all(AppSpacing.lg),
           decoration: BoxDecoration(
             color: Colors.white,
-            borderRadius: BorderRadius.circular(16),
+            borderRadius: BorderRadius.circular(AppSpacing.cardRadius),
             boxShadow: [
               BoxShadow(
                 color: Colors.black.withValues(alpha: 0.1),
@@ -903,9 +892,9 @@ class _SettingsScreenState extends State<SettingsScreen> {
           backgroundColor: Colors.red.shade600,
           behavior: SnackBarBehavior.floating,
           shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(12),
+            borderRadius: BorderRadius.circular(AppSpacing.buttonRadius),
           ),
-          margin: const EdgeInsets.all(16),
+          margin: AppSpacing.pagePadding,
         ),
       );
     }
@@ -992,7 +981,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
         context: context,
         builder: (context) => AlertDialog(
           shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(16),
+            borderRadius: BorderRadius.circular(AppSpacing.cardRadius),
           ),
           title: Text(
             'About Afropeep',
@@ -1014,7 +1003,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                   color: primaryColor,
                 ),
               ),
-              const SizedBox(height: 12),
+              const SizedBox(height: AppSpacing.buttonRadius),
               Text(
                 'Afropeep is a community platform built for Africans in the diaspora. '
                 'Connect with your people through friendships, shared culture, events, '
@@ -1025,7 +1014,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                   height: 1.5,
                 ),
               ),
-              const SizedBox(height: 16),
+              const SizedBox(height: AppSpacing.md),
               Text(
                 '© 2025 Afropeep. All rights reserved.',
                 style: GoogleFonts.montserrat(

@@ -18,13 +18,14 @@ import 'package:rflutter_alert/rflutter_alert.dart';
 import '../../../common/bloc/theme/theme_bloc.dart';
 import '../../../common/constants/adds.dart';
 import '../../../common/constants/app_colors.dart';
+import '../../../common/constants/app_spacing.dart';
 import '../../../common/constants/constants.dart';
 import '../../../common/data/repo/in_app_purchase_repo.dart';
 import '../../../common/utils/crousle_slider.dart';
 import '../../../common/utils/privacy_page.dart';
 import '../../../common/widgets/custom_button.dart';
 import '../../../common/widgets/custom_snackbar.dart';
-import '../../../common/widgets/hookup_circularbar.dart';
+import '../../../common/widgets/state_views/state_views.dart';
 import '../../../config/app_config.dart';
 import '../../../models/user_model.dart';
 import 'in_app_purchase/buy_products/buyproducts_bloc.dart';
@@ -171,14 +172,11 @@ class ProductsState extends State<Products> {
     return BlocBuilder<GetInAppProductsBloc, GetInAppProductsStates>(
       builder: (context, state) {
         if (state is GetInAppProductsLoadingState) {
-          return const Hookup4uBar();
+          return const AppLoadingView();
         } else if (state is GetInAppProductsFailedState) {
           return Scaffold(
-            body: Padding(
-              padding: const EdgeInsets.all(20),
-              child: Center(
-                child: Text(state.msg ?? ''),
-              ),
+            body: AppErrorView(
+              message: state.msg ?? 'Failed to load products',
             ),
           );
         } else if (state is GetInAppProductsSuccessState) {
@@ -222,7 +220,7 @@ class ProductsState extends State<Products> {
                     child: Card(
                       elevation: 2,
                       shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(20),
+                        borderRadius: BorderRadius.circular(AppSpacing.chipRadius),
                       ),
                       child: Column(
                         mainAxisAlignment: MainAxisAlignment.spaceAround,
@@ -264,13 +262,7 @@ class ProductsState extends State<Products> {
                           if (_isLoading)
                             SizedBox(
                               height: MediaQuery.of(context).size.width * .8,
-                              child: const Center(
-                                child: CircularProgressIndicator(
-                                  valueColor: AlwaysStoppedAnimation<Color>(
-                                    AppColors.primaryGreen,
-                                  ),
-                                ),
-                              ),
+                              child: const Center(child: AppLoadingView()),
                             )
                           else
                             state.result.isNotEmpty
@@ -426,12 +418,11 @@ class ProductsState extends State<Products> {
                                 : SizedBox(
                                     height:
                                         MediaQuery.of(context).size.width * .8,
-                                    child: Center(
-                                      child: Text(
-                                        'No active product found!!'
-                                            .tr()
-                                            .toString(),
-                                      ),
+                                    child: AppEmptyView(
+                                      title: 'No active product found!!'
+                                          .tr()
+                                          .toString(),
+                                      icon: Icons.shopping_bag_outlined,
                                     ),
                                   ),
                         ],
@@ -539,7 +530,7 @@ class ProductsState extends State<Products> {
                   //     : Container(),
 
                   Padding(
-                    padding: const EdgeInsets.all(8),
+                    padding: const EdgeInsets.all(AppSpacing.sm),
                     child: Row(
                       mainAxisAlignment: MainAxisAlignment.spaceAround,
                       children: <Widget>[
@@ -582,8 +573,9 @@ class ProductsState extends State<Products> {
           );
         }
         return Scaffold(
-          body: Center(
-            child: Text('No product Found'.tr().toString()),
+          body: AppEmptyView(
+            title: 'No product Found'.tr().toString(),
+            icon: Icons.shopping_bag_outlined,
           ),
         );
       },

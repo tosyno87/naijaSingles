@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 
 import '../../../../common/constants/app_colors.dart';
+import '../../../../common/constants/app_spacing.dart';
+import '../../../../common/widgets/state_views/state_views.dart';
 import '../../models/community_group_model.dart';
 import '../widgets/community_group_card.dart';
 import '../widgets/community_group_filter_bar.dart';
@@ -124,11 +126,11 @@ class _CommunityGroupsScreenState extends State<CommunityGroupsScreen> {
             ScaffoldMessenger.of(context).showSnackBar(
               const SnackBar(
                 content: Text('Create Group feature coming soon!'),
-                backgroundColor: Color(0xFF008037),
+                backgroundColor: AppColors.primaryGreen,
               ),
             );
           },
-          backgroundColor: const Color(0xFF008037),
+          backgroundColor: AppColors.primaryGreen,
           foregroundColor: Colors.white,
           icon: const Icon(Icons.group_add),
           label: Text(
@@ -154,15 +156,15 @@ class _CommunityGroupsScreenState extends State<CommunityGroupsScreen> {
                     style: GoogleFonts.montserrat(
                       fontSize: 28,
                       fontWeight: FontWeight.bold,
-                      color: const Color(0xFF333333),
+                      color: AppColors.textPrimary,
                     ),
                   ),
-                  const SizedBox(height: 4),
+                  const SizedBox(height: AppSpacing.xs),
                   Text(
                     'Join cultural, professional, and interest-based communities',
                     style: GoogleFonts.montserrat(
                       fontSize: 16,
-                      color: const Color(0xFF666666),
+                      color: AppColors.textSecondary,
                     ),
                   ),
                 ],
@@ -179,7 +181,7 @@ class _CommunityGroupsScreenState extends State<CommunityGroupsScreen> {
               },
               icon: Icon(
                 _isSearching ? Icons.close : Icons.search,
-                color: const Color(0xFF008037),
+                color: AppColors.primaryGreen,
               ),
             ),
           ],
@@ -196,14 +198,14 @@ class _CommunityGroupsScreenState extends State<CommunityGroupsScreen> {
         decoration: InputDecoration(
           hintText: 'Search groups...',
           hintStyle: GoogleFonts.montserrat(color: Colors.grey[500]),
-          prefixIcon: const Icon(Icons.search, color: Color(0xFF008037)),
+          prefixIcon: const Icon(Icons.search, color: AppColors.primaryGreen),
           border: OutlineInputBorder(
-            borderRadius: BorderRadius.circular(12),
+            borderRadius: BorderRadius.circular(AppSpacing.buttonRadius),
             borderSide: BorderSide(color: Colors.grey[300]!),
           ),
           focusedBorder: OutlineInputBorder(
-            borderRadius: BorderRadius.circular(12),
-            borderSide: const BorderSide(color: Color(0xFF008037), width: 2),
+            borderRadius: BorderRadius.circular(AppSpacing.buttonRadius),
+            borderSide: const BorderSide(color: AppColors.primaryGreen, width: 2),
           ),
           filled: true,
           fillColor: Colors.white,
@@ -234,34 +236,10 @@ class _CommunityGroupsScreenState extends State<CommunityGroupsScreen> {
     }).toList();
 
     if (filteredGroups.isEmpty) {
-      return Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Icon(
-              Icons.group_outlined,
-              size: 64,
-              color: Colors.grey[400],
-            ),
-            const SizedBox(height: 16),
-            Text(
-              'No groups found',
-              style: GoogleFonts.montserrat(
-                fontSize: 18,
-                fontWeight: FontWeight.w600,
-                color: Colors.grey[600],
-              ),
-            ),
-            const SizedBox(height: 8),
-            Text(
-              'Try adjusting your filters or create a new group',
-              style: GoogleFonts.montserrat(
-                fontSize: 14,
-                color: Colors.grey[500],
-              ),
-            ),
-          ],
-        ),
+      return const AppEmptyView(
+        title: 'No groups found',
+        subtitle: 'Try adjusting your filters or create a new group',
+        icon: Icons.group_outlined,
       );
     }
 
@@ -274,7 +252,7 @@ class _CommunityGroupsScreenState extends State<CommunityGroupsScreen> {
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
               content: Text('Joined ${filteredGroups[index].name}!'),
-              backgroundColor: const Color(0xFF008037),
+              backgroundColor: AppColors.primaryGreen,
             ),
           );
         },

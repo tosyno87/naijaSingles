@@ -7,8 +7,10 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 
 import '../../common/constants/app_colors.dart';
+import '../../common/constants/app_spacing.dart';
 import '../../common/routes/route_name.dart';
 import '../../common/widgets/custom_3d_icons.dart';
+import '../../common/widgets/state_views/state_views.dart';
 import '../../services/region_detection_service.dart';
 
 class CulturalProfileScreen extends StatefulWidget {
@@ -24,8 +26,7 @@ class _CulturalProfileScreenState extends State<CulturalProfileScreen> {
 
   Map<String, dynamic>? _userData;
   bool _isLoading = true;
-
-  // Using centralized app colors
+  bool _loadError = false;
 
   @override
   void initState() {
@@ -34,23 +35,36 @@ class _CulturalProfileScreenState extends State<CulturalProfileScreen> {
   }
 
   Future<void> _loadUserData() async {
+    setState(() {
+      _isLoading = true;
+      _loadError = false;
+    });
     try {
       final user = _auth.currentUser;
-      if (user != null) {
-        final doc = await _firestore.collection('users').doc(user.uid).get();
-        if (doc.exists) {
-          setState(() {
-            _userData = doc.data();
-            _isLoading = false;
-          });
-        } else {
-          setState(() => _isLoading = false);
-        }
+      if (user == null) {
+        if (!mounted) return;
+        setState(() {
+          _loadError = true;
+          _isLoading = false;
+        });
+        return;
+      }
+      final doc = await _firestore.collection('users').doc(user.uid).get();
+      if (!mounted) return;
+      if (doc.exists) {
+        setState(() {
+          _userData = doc.data();
+          _isLoading = false;
+        });
       } else {
         setState(() => _isLoading = false);
       }
     } on Object {
-      setState(() => _isLoading = false);
+      if (!mounted) return;
+      setState(() {
+        _loadError = true;
+        _isLoading = false;
+      });
     }
   }
 
@@ -77,10 +91,10 @@ class _CulturalProfileScreenState extends State<CulturalProfileScreen> {
           centerTitle: true,
           actions: [
             Container(
-              margin: const EdgeInsets.only(right: 16),
+              margin: const EdgeInsets.only(right: AppSpacing.md),
               decoration: BoxDecoration(
                 color: Colors.white.withValues(alpha: 0.2),
-                borderRadius: BorderRadius.circular(12),
+                borderRadius: BorderRadius.circular(AppSpacing.buttonRadius),
               ),
               child: IconButton(
                 icon: Custom3DIcons.edit(size: 20),
@@ -94,41 +108,37 @@ class _CulturalProfileScreenState extends State<CulturalProfileScreen> {
           ],
         ),
         body: _isLoading
-            ? const Center(
-                child: CircularProgressIndicator(color: AppColors.primaryGreen),
-              )
-            : SafeArea(
+            ? const AppLoadingView()
+            : _loadError
+                ? AppErrorView(
+                    message: 'Unable to load profile',
+                    onRetry: () => unawaited(_loadUserData()),
+                  )
+                : SafeArea(
                 child: SingleChildScrollView(
-                  padding: const EdgeInsets.all(16),
+                  padding: AppSpacing.pagePadding,
                   child: Column(
                     children: [
-                      // Cultural Identity Header
                       _buildCulturalIdentityHeader(),
-                      const SizedBox(height: 24),
+                      const SizedBox(height: AppSpacing.lg),
 
-                      // Cultural Heritage Badge
                       _buildCulturalHeritageBadge(),
                       const SizedBox(height: 20),
 
-                      // Community Involvement
                       _buildCommunityInvolvement(),
                       const SizedBox(height: 20),
 
-                      // Professional Networking
                       _buildProfessionalNetworking(),
                       const SizedBox(height: 20),
 
-                      // Cultural Interests & Skills
                       _buildCulturalInterests(),
                       const SizedBox(height: 20),
 
-                      // Connection Preferences
                       _buildConnectionPreferences(),
                       const SizedBox(height: 20),
 
-                      // Cultural Contributions
                       _buildCulturalContributions(),
-                      const SizedBox(height: 32),
+                      const SizedBox(height: AppSpacing.xl),
                     ],
                   ),
                 ),
@@ -141,10 +151,10 @@ class _CulturalProfileScreenState extends State<CulturalProfileScreen> {
     final mainPhoto = photos.isNotEmpty ? photos[0] : null;
 
     return Container(
-      padding: const EdgeInsets.all(24),
+      padding: const EdgeInsets.all(AppSpacing.lg),
       decoration: BoxDecoration(
         gradient: AppColors.primaryGradient,
-        borderRadius: BorderRadius.circular(24),
+        borderRadius: BorderRadius.circular(AppSpacing.lg),
         boxShadow: [
           BoxShadow(
             color: AppColors.primaryGreen.withValues(alpha: 0.3),
@@ -192,9 +202,7 @@ class _CulturalProfileScreenState extends State<CulturalProfileScreen> {
                     ),
             ),
           ),
-          const SizedBox(height: 16),
-
-          // Name and Cultural Badge
+          const SizedBox(height: AppSpacing.md),
           Text(
             name,
             style: GoogleFonts.montserrat(
@@ -204,14 +212,13 @@ class _CulturalProfileScreenState extends State<CulturalProfileScreen> {
             ),
             textAlign: TextAlign.center,
           ),
-          const SizedBox(height: 12),
+          const SizedBox(height: AppSpacing.buttonRadius),
 
-          // Nationality & Tribe
           Container(
-            padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
+            padding: const EdgeInsets.symmetric(horizontal: 20, vertical: AppSpacing.buttonRadius),
             decoration: BoxDecoration(
               color: Colors.white.withValues(alpha: 0.2),
-              borderRadius: BorderRadius.circular(24),
+              borderRadius: BorderRadius.circular(AppSpacing.lg),
               border: Border.all(
                 color: Colors.white.withValues(alpha: 0.3),
               ),
@@ -235,12 +242,11 @@ class _CulturalProfileScreenState extends State<CulturalProfileScreen> {
               ],
             ),
           ),
-          const SizedBox(height: 8),
+          const SizedBox(height: AppSpacing.sm),
 
-          // Tribe Badge
           if (_getTribeText().isNotEmpty)
             Container(
-              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+              padding: const EdgeInsets.symmetric(horizontal: AppSpacing.md, vertical: AppSpacing.sm),
               decoration: BoxDecoration(
                 color: Colors.white.withValues(alpha: 0.15),
                 borderRadius: BorderRadius.circular(20),
@@ -264,9 +270,8 @@ class _CulturalProfileScreenState extends State<CulturalProfileScreen> {
                 ],
               ),
             ),
-          const SizedBox(height: 12),
+          const SizedBox(height: AppSpacing.buttonRadius),
 
-          // Verification Status
           Row(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
@@ -299,7 +304,7 @@ class _CulturalProfileScreenState extends State<CulturalProfileScreen> {
             : 'Diaspora';
 
     return Container(
-      padding: const EdgeInsets.all(24),
+      padding: const EdgeInsets.all(AppSpacing.lg),
       decoration: BoxDecoration(
         color: AppColors.cardColor,
         borderRadius: BorderRadius.circular(20),
@@ -311,7 +316,7 @@ class _CulturalProfileScreenState extends State<CulturalProfileScreen> {
           Row(
             children: [
               Custom3DIcons.culture(),
-              const SizedBox(width: 12),
+              const SizedBox(width: AppSpacing.buttonRadius),
               Text(
                 'Nationality & Tribe',
                 style: GoogleFonts.montserrat(
@@ -322,34 +327,30 @@ class _CulturalProfileScreenState extends State<CulturalProfileScreen> {
               ),
             ],
           ),
-          const SizedBox(height: 16),
+          const SizedBox(height: AppSpacing.md),
 
-          // Nationality
           _buildInfoRow(
             'Nationality',
             nationality,
             Custom3DIcons.culture(size: 20),
           ),
-          const SizedBox(height: 12),
+          const SizedBox(height: AppSpacing.buttonRadius),
 
-          // Tribe
           if (tribe.isNotEmpty)
             _buildInfoRow(
               'Tribe',
               tribe,
               Custom3DIcons.traditions(size: 20),
             ),
-          if (tribe.isNotEmpty) const SizedBox(height: 12),
+          if (tribe.isNotEmpty) const SizedBox(height: AppSpacing.buttonRadius),
 
-          // Languages
           _buildInfoRow(
             'Languages',
             languages.join(', '),
             Custom3DIcons.translate(size: 20),
           ),
-          const SizedBox(height: 12),
+          const SizedBox(height: AppSpacing.buttonRadius),
 
-          // Location
           _buildInfoRow(
             'Location',
             location,
@@ -370,7 +371,7 @@ class _CulturalProfileScreenState extends State<CulturalProfileScreen> {
       padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
         color: AppColors.cardColor,
-        borderRadius: BorderRadius.circular(16),
+        borderRadius: BorderRadius.circular(AppSpacing.cardRadius),
         border: Border.all(
           color: AppColors.primaryGreen.withValues(alpha: 0.2),
         ),
@@ -388,7 +389,7 @@ class _CulturalProfileScreenState extends State<CulturalProfileScreen> {
           Row(
             children: [
               Custom3DIcons.groups(),
-              const SizedBox(width: 12),
+              const SizedBox(width: AppSpacing.buttonRadius),
               Text(
                 'Community Involvement',
                 style: GoogleFonts.montserrat(
@@ -399,14 +400,13 @@ class _CulturalProfileScreenState extends State<CulturalProfileScreen> {
               ),
             ],
           ),
-          const SizedBox(height: 16),
+          const SizedBox(height: AppSpacing.md),
 
-          // Community Role
           Container(
-            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+            padding: const EdgeInsets.symmetric(horizontal: AppSpacing.buttonRadius, vertical: 6),
             decoration: BoxDecoration(
               color: AppColors.primaryGreen.withValues(alpha: 0.1),
-              borderRadius: BorderRadius.circular(12),
+              borderRadius: BorderRadius.circular(AppSpacing.buttonRadius),
               border: Border.all(
                 color: AppColors.primaryGreen.withValues(alpha: 0.3),
               ),
@@ -420,9 +420,8 @@ class _CulturalProfileScreenState extends State<CulturalProfileScreen> {
               ),
             ),
           ),
-          const SizedBox(height: 16),
+          const SizedBox(height: AppSpacing.md),
 
-          // Stats
           Row(
             children: [
               Expanded(
@@ -457,7 +456,7 @@ class _CulturalProfileScreenState extends State<CulturalProfileScreen> {
       padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
         color: AppColors.cardColor,
-        borderRadius: BorderRadius.circular(16),
+        borderRadius: BorderRadius.circular(AppSpacing.cardRadius),
         border: Border.all(
           color: AppColors.primaryGreen.withValues(alpha: 0.2),
         ),
@@ -475,7 +474,7 @@ class _CulturalProfileScreenState extends State<CulturalProfileScreen> {
           Row(
             children: [
               Custom3DIcons.business(),
-              const SizedBox(width: 12),
+              const SizedBox(width: AppSpacing.buttonRadius),
               Text(
                 'Professional Profile',
                 style: GoogleFonts.montserrat(
@@ -485,13 +484,13 @@ class _CulturalProfileScreenState extends State<CulturalProfileScreen> {
                 ),
               ),
               if (isMentor) ...[
-                const SizedBox(width: 8),
+                const SizedBox(width: AppSpacing.sm),
                 Container(
                   padding:
-                      const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                      const EdgeInsets.symmetric(horizontal: AppSpacing.sm, vertical: AppSpacing.xs),
                   decoration: BoxDecoration(
                     color: AppColors.primaryGreen,
-                    borderRadius: BorderRadius.circular(8),
+                    borderRadius: BorderRadius.circular(AppSpacing.sm),
                   ),
                   child: Text(
                     'Mentor',
@@ -505,19 +504,19 @@ class _CulturalProfileScreenState extends State<CulturalProfileScreen> {
               ],
             ],
           ),
-          const SizedBox(height: 16),
+          const SizedBox(height: AppSpacing.md),
           _buildInfoRow(
             'Industry',
             industry,
             Custom3DIcons.work(size: 20),
           ),
-          const SizedBox(height: 12),
+          const SizedBox(height: AppSpacing.buttonRadius),
           _buildInfoRow(
             'Position',
             position,
             Custom3DIcons.skills(size: 20),
           ),
-          const SizedBox(height: 12),
+          const SizedBox(height: AppSpacing.buttonRadius),
           if (skills.isNotEmpty) ...[
             Text(
               'Skills',
@@ -527,21 +526,21 @@ class _CulturalProfileScreenState extends State<CulturalProfileScreen> {
                 color: AppColors.textPrimary,
               ),
             ),
-            const SizedBox(height: 8),
+            const SizedBox(height: AppSpacing.sm),
             Wrap(
-              spacing: 8,
-              runSpacing: 8,
+              spacing: AppSpacing.sm,
+              runSpacing: AppSpacing.sm,
               children: skills
                   .take(5)
                   .map(
                     (skill) => Container(
                       padding: const EdgeInsets.symmetric(
-                        horizontal: 12,
+                        horizontal: AppSpacing.buttonRadius,
                         vertical: 6,
                       ),
                       decoration: BoxDecoration(
                         color: AppColors.primaryGreen.withValues(alpha: 0.1),
-                        borderRadius: BorderRadius.circular(16),
+                        borderRadius: BorderRadius.circular(AppSpacing.cardRadius),
                         border: Border.all(
                           color: AppColors.primaryGreen.withValues(alpha: 0.3),
                         ),
@@ -573,7 +572,7 @@ class _CulturalProfileScreenState extends State<CulturalProfileScreen> {
       padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
         color: AppColors.cardColor,
-        borderRadius: BorderRadius.circular(16),
+        borderRadius: BorderRadius.circular(AppSpacing.cardRadius),
         border: Border.all(
           color: AppColors.primaryGreen.withValues(alpha: 0.2),
         ),
@@ -595,7 +594,7 @@ class _CulturalProfileScreenState extends State<CulturalProfileScreen> {
                 color: AppColors.primaryGreen,
                 size: 24,
               ),
-              const SizedBox(width: 12),
+              const SizedBox(width: AppSpacing.buttonRadius),
               Text(
                 'Cultural Interests',
                 style: GoogleFonts.montserrat(
@@ -606,7 +605,7 @@ class _CulturalProfileScreenState extends State<CulturalProfileScreen> {
               ),
             ],
           ),
-          const SizedBox(height: 16),
+          const SizedBox(height: AppSpacing.md),
           if (culturalInterests.isNotEmpty) ...[
             Text(
               'Cultural Activities',
@@ -616,20 +615,20 @@ class _CulturalProfileScreenState extends State<CulturalProfileScreen> {
                 color: AppColors.textPrimary,
               ),
             ),
-            const SizedBox(height: 8),
+            const SizedBox(height: AppSpacing.sm),
             Wrap(
-              spacing: 8,
-              runSpacing: 8,
+              spacing: AppSpacing.sm,
+              runSpacing: AppSpacing.sm,
               children: culturalInterests
                   .map(
                     (interest) => Container(
                       padding: const EdgeInsets.symmetric(
-                        horizontal: 12,
+                        horizontal: AppSpacing.buttonRadius,
                         vertical: 6,
                       ),
                       decoration: BoxDecoration(
                         color: AppColors.primaryGreen.withValues(alpha: 0.1),
-                        borderRadius: BorderRadius.circular(16),
+                        borderRadius: BorderRadius.circular(AppSpacing.cardRadius),
                         border: Border.all(
                           color: AppColors.primaryGreen.withValues(alpha: 0.3),
                         ),
@@ -646,7 +645,7 @@ class _CulturalProfileScreenState extends State<CulturalProfileScreen> {
                   )
                   .toList(),
             ),
-            const SizedBox(height: 16),
+            const SizedBox(height: AppSpacing.md),
           ],
           if (interests.isNotEmpty) ...[
             Text(
@@ -657,21 +656,21 @@ class _CulturalProfileScreenState extends State<CulturalProfileScreen> {
                 color: AppColors.textPrimary,
               ),
             ),
-            const SizedBox(height: 8),
+            const SizedBox(height: AppSpacing.sm),
             Wrap(
-              spacing: 8,
-              runSpacing: 8,
+              spacing: AppSpacing.sm,
+              runSpacing: AppSpacing.sm,
               children: interests
                   .take(8)
                   .map(
                     (interest) => Container(
                       padding: const EdgeInsets.symmetric(
-                        horizontal: 12,
+                        horizontal: AppSpacing.buttonRadius,
                         vertical: 6,
                       ),
                       decoration: BoxDecoration(
                         color: AppColors.textSecondary.withValues(alpha: 0.1),
-                        borderRadius: BorderRadius.circular(16),
+                        borderRadius: BorderRadius.circular(AppSpacing.cardRadius),
                         border: Border.all(
                           color: AppColors.textSecondary.withValues(alpha: 0.3),
                         ),
@@ -703,7 +702,7 @@ class _CulturalProfileScreenState extends State<CulturalProfileScreen> {
       padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
         color: AppColors.cardColor,
-        borderRadius: BorderRadius.circular(16),
+        borderRadius: BorderRadius.circular(AppSpacing.cardRadius),
         border: Border.all(
           color: AppColors.primaryGreen.withValues(alpha: 0.2),
         ),
@@ -725,7 +724,7 @@ class _CulturalProfileScreenState extends State<CulturalProfileScreen> {
                 color: AppColors.primaryGreen,
                 size: 24,
               ),
-              const SizedBox(width: 12),
+              const SizedBox(width: AppSpacing.buttonRadius),
               Text(
                 'Connection Preferences',
                 style: GoogleFonts.montserrat(
@@ -736,19 +735,19 @@ class _CulturalProfileScreenState extends State<CulturalProfileScreen> {
               ),
             ],
           ),
-          const SizedBox(height: 16),
+          const SizedBox(height: AppSpacing.md),
           _buildInfoRow(
             'Looking For',
             lookingFor,
             Custom3DIcons.search(size: 20),
           ),
-          const SizedBox(height: 12),
+          const SizedBox(height: AppSpacing.buttonRadius),
           _buildInfoRow(
             'Age Range',
             ageRangeText,
             Custom3DIcons.age(size: 20),
           ),
-          const SizedBox(height: 12),
+          const SizedBox(height: AppSpacing.buttonRadius),
           _buildInfoRow(
             'Max Distance',
             maxDistanceText,
@@ -769,7 +768,7 @@ class _CulturalProfileScreenState extends State<CulturalProfileScreen> {
       padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
         color: AppColors.cardColor,
-        borderRadius: BorderRadius.circular(16),
+        borderRadius: BorderRadius.circular(AppSpacing.cardRadius),
         border: Border.all(
           color: AppColors.primaryGreen.withValues(alpha: 0.2),
         ),
@@ -787,7 +786,7 @@ class _CulturalProfileScreenState extends State<CulturalProfileScreen> {
           Row(
             children: [
               Custom3DIcons.star(),
-              const SizedBox(width: 12),
+              const SizedBox(width: AppSpacing.buttonRadius),
               Text(
                 'Cultural Contributions',
                 style: GoogleFonts.montserrat(
@@ -834,7 +833,7 @@ class _CulturalProfileScreenState extends State<CulturalProfileScreen> {
   Widget _buildInfoRow(String label, String value, Widget icon) => Row(
         children: [
           icon,
-          const SizedBox(width: 12),
+          const SizedBox(width: AppSpacing.buttonRadius),
           Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -862,10 +861,10 @@ class _CulturalProfileScreenState extends State<CulturalProfileScreen> {
       );
 
   Widget _buildStatCard(String label, String value, Widget icon) => Container(
-        padding: const EdgeInsets.all(16),
+        padding: AppSpacing.cardPadding,
         decoration: BoxDecoration(
           color: AppColors.primaryGreen.withValues(alpha: 0.05),
-          borderRadius: BorderRadius.circular(12),
+          borderRadius: BorderRadius.circular(AppSpacing.buttonRadius),
           border: Border.all(
             color: AppColors.primaryGreen.withValues(alpha: 0.2),
           ),
@@ -873,7 +872,7 @@ class _CulturalProfileScreenState extends State<CulturalProfileScreen> {
         child: Column(
           children: [
             icon,
-            const SizedBox(height: 8),
+            const SizedBox(height: AppSpacing.sm),
             Text(
               value,
               style: GoogleFonts.montserrat(

@@ -5,9 +5,9 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 
 import '../../../common/constants/app_colors.dart';
+import '../../../common/widgets/state_views/state_views.dart';
 import '../../../services/group_unread_service.dart';
 import '../../../services/user_service.dart';
-import '../../communities/ui/widgets/discover_skeleton_card.dart';
 import '../../group_chat/screens/create_group_screen.dart';
 import '../data/services/unified_group_service.dart';
 import '../widgets/unified_group_card.dart';
@@ -35,6 +35,7 @@ class _UnifiedGroupsScreenState extends State<UnifiedGroupsScreen>
   Map<String, List<String?>> _memberAvatars = {};
   bool _isLoading = false;
   bool _isSearching = false;
+  String? _loadError;
   GroupType? _selectedType;
   Timer? _searchDebounce;
   int _requestVersion = 0;
@@ -73,7 +74,10 @@ class _UnifiedGroupsScreenState extends State<UnifiedGroupsScreen>
   Future<void> _loadGroups() async {
     if (!mounted) return;
     final version = ++_requestVersion;
-    setState(() => _isLoading = true);
+    setState(() {
+      _isLoading = true;
+      _loadError = null;
+    });
 
     try {
       final publicGroupsStream =
@@ -88,13 +92,17 @@ class _UnifiedGroupsScreenState extends State<UnifiedGroupsScreen>
         _groups = publicGroups;
         _userGroups = userGroups;
         _isLoading = false;
+        _loadError = null;
       });
 
       unawaited(_loadUnreadCounts(userGroups, version));
       unawaited(_loadMemberAvatars([...publicGroups, ...userGroups], version));
     } on Object catch (e) {
       if (!mounted || version != _requestVersion) return;
-      setState(() => _isLoading = false);
+      setState(() {
+        _isLoading = false;
+        _loadError = 'Error loading groups. Please try again.';
+      });
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Text('Error loading groups: $e'),
@@ -159,7 +167,10 @@ class _UnifiedGroupsScreenState extends State<UnifiedGroupsScreen>
 
     if (!mounted) return;
     final version = ++_requestVersion;
-    setState(() => _isSearching = true);
+    setState(() {
+      _isSearching = true;
+      _loadError = null;
+    });
 
     try {
       final searchResults = await _groupService.searchGroups(
@@ -171,10 +182,14 @@ class _UnifiedGroupsScreenState extends State<UnifiedGroupsScreen>
       setState(() {
         _groups = searchResults;
         _isSearching = false;
+        _loadError = null;
       });
     } on Object catch (e) {
       if (!mounted || version != _requestVersion) return;
-      setState(() => _isSearching = false);
+      setState(() {
+        _isSearching = false;
+        _loadError = 'Error searching groups. Please try again.';
+      });
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Text('Error searching groups: $e'),
@@ -331,32 +346,42 @@ class _UnifiedGroupsScreenState extends State<UnifiedGroupsScreen>
             ),
           ],
         ),
-        body: Column(
-          children: [
-            // Search Bar
-            _buildSearchBar(),
-
-            // Type Filter
-            _buildTypeFilter(),
-
-            const SizedBox(height: 12),
-
-            // Tab Bar
-            _buildTabBar(),
-
-            // Tab Content
-            Expanded(
-              child: TabBarView(
-                controller: _tabController,
+        body: _loadError != null &&
+                !_isLoading &&
+                !_isSearching &&
+                _groups.isEmpty &&
+                _userGroups.isEmpty
+            ? AppErrorView(
+                title: 'Unable to load communities',
+                message: _loadError!,
+                onRetry: _loadGroups,
+              )
+            : Column(
                 children: [
-                  _buildDiscoverTab(),
-                  _buildMyGroupsTab(),
-                  _buildCreatedTab(),
+                  // Search Bar
+                  _buildSearchBar(),
+
+                  // Type Filter
+                  _buildTypeFilter(),
+
+                  const SizedBox(height: 12),
+
+                  // Tab Bar
+                  _buildTabBar(),
+
+                  // Tab Content
+                  Expanded(
+                    child: TabBarView(
+                      controller: _tabController,
+                      children: [
+                        _buildDiscoverTab(),
+                        _buildMyGroupsTab(),
+                        _buildCreatedTab(),
+                      ],
+                    ),
+                  ),
                 ],
               ),
-            ),
-          ],
-        ),
       );
 
   Widget _buildSearchBar() => Container(
@@ -483,15 +508,8 @@ class _UnifiedGroupsScreenState extends State<UnifiedGroupsScreen>
         ),
       );
 
-  Widget _buildLoadingSkeleton() => ListView(
-        padding: const EdgeInsets.all(16),
-        children: List.generate(
-          4,
-          (_) => const Padding(
-            padding: EdgeInsets.only(bottom: 16),
-            child: DiscoverSkeletonCard(height: 200, radius: 20),
-          ),
-        ),
+  Widget _buildLoadingSkeleton() => const AppLoadingView(
+        message: 'Loading communities...',
       );
 
   Widget _buildDiscoverTab() {
@@ -501,16 +519,13 @@ class _UnifiedGroupsScreenState extends State<UnifiedGroupsScreen>
 
     if (_groups.isEmpty) {
       return _buildEmptyState(
-        icon: Icon(
-          Icons.group_outlined,
-          size: 64,
-          color: Colors.grey[400],
-        ),
+        icon: Icons.group_outlined,
         title: 'No Communities Found',
         subtitle: _isSearching
             ? 'Try adjusting your search terms to find communities that match your interests.'
             : 'Be the first to create a community and start building your network!',
-        actionButton: _isSearching ? null : _buildCreateButton(),
+        actionLabel: _isSearching ? null : 'Create Community',
+        onAction: _isSearching ? null : _navigateToCreateGroup,
       );
     }
 
@@ -535,37 +550,11 @@ class _UnifiedGroupsScreenState extends State<UnifiedGroupsScreen>
 
     if (_userGroups.isEmpty) {
       return _buildEmptyState(
-        icon: Icon(
-          Icons.group_outlined,
-          size: 64,
-          color: Colors.grey[400],
-        ),
+        icon: Icons.group_outlined,
         title: 'No Groups Joined',
         subtitle: 'Discover and join communities that match your interests!',
-        actionButton: SizedBox(
-          width: double.infinity,
-          child: ElevatedButton.icon(
-            onPressed: () {
-              _tabController.animateTo(0); // Switch to Discover tab
-            },
-            icon: const Icon(Icons.explore, size: 18),
-            label: Text(
-              'Discover Groups',
-              style: GoogleFonts.montserrat(
-                fontSize: 14,
-                fontWeight: FontWeight.w600,
-              ),
-            ),
-            style: ElevatedButton.styleFrom(
-              backgroundColor: AppColors.primaryGreen,
-              foregroundColor: Colors.white,
-              padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(12),
-              ),
-            ),
-          ),
-        ),
+        actionLabel: 'Discover Groups',
+        onAction: () => _tabController.animateTo(0),
       );
     }
 
@@ -598,15 +587,12 @@ class _UnifiedGroupsScreenState extends State<UnifiedGroupsScreen>
 
     if (createdGroups.isEmpty) {
       return _buildEmptyState(
-        icon: Icon(
-          Icons.group_outlined,
-          size: 64,
-          color: Colors.grey[400],
-        ),
+        icon: Icons.group_outlined,
         title: 'No Groups Created',
         subtitle:
             'Create your first community and start building your network!',
-        actionButton: _buildCreateButton(),
+        actionLabel: 'Create Community',
+        onAction: _navigateToCreateGroup,
       );
     }
 
@@ -624,85 +610,19 @@ class _UnifiedGroupsScreenState extends State<UnifiedGroupsScreen>
     );
   }
 
-  Widget _buildCreateButton() => SizedBox(
-        width: double.infinity,
-        child: ElevatedButton.icon(
-          onPressed: _navigateToCreateGroup,
-          icon: const Icon(Icons.add, size: 18),
-          label: Text(
-            'Create Community',
-            style: GoogleFonts.montserrat(
-              fontSize: 14,
-              fontWeight: FontWeight.w600,
-            ),
-          ),
-          style: ElevatedButton.styleFrom(
-            backgroundColor: AppColors.primaryGreen,
-            foregroundColor: Colors.white,
-            padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(12),
-            ),
-          ),
-        ),
-      );
-
   Widget _buildEmptyState({
-    required Widget icon,
+    required IconData icon,
     required String title,
     required String subtitle,
-    Widget? actionButton,
+    String? actionLabel,
+    VoidCallback? onAction,
   }) =>
-      Center(
-        child: Padding(
-          padding: const EdgeInsets.all(32),
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              Container(
-                width: 120,
-                height: 120,
-                decoration: BoxDecoration(
-                  color: Colors.grey[50],
-                  shape: BoxShape.circle,
-                  boxShadow: [
-                    BoxShadow(
-                      color: Colors.black.withValues(alpha: 0.05),
-                      blurRadius: 10,
-                      offset: const Offset(0, 2),
-                    ),
-                  ],
-                ),
-                child: Center(child: icon),
-              ),
-              const SizedBox(height: 32),
-              Text(
-                title,
-                style: GoogleFonts.montserrat(
-                  fontSize: 22,
-                  fontWeight: FontWeight.bold,
-                  color: AppColors.textPrimary,
-                ),
-              ),
-              const SizedBox(height: 16),
-              Text(
-                subtitle,
-                style: GoogleFonts.montserrat(
-                  fontSize: 16,
-                  fontWeight: FontWeight.w400,
-                  color: AppColors.textSecondary,
-                  height: 1.3,
-                  letterSpacing: 0.2,
-                ),
-                textAlign: TextAlign.center,
-              ),
-              if (actionButton != null) ...[
-                const SizedBox(height: 32),
-                actionButton,
-              ],
-            ],
-          ),
-        ),
+      AppEmptyView(
+        title: title,
+        subtitle: subtitle,
+        icon: icon,
+        actionLabel: actionLabel,
+        onAction: onAction,
       );
 
   String _getTypeLabel(GroupType type) {

@@ -5,10 +5,10 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 
 import '../../../common/constants/app_colors.dart';
+import '../../../common/widgets/state_views/state_views.dart';
 import '../../chat_shared/models/chat_message_view_model.dart';
 import '../../chat_shared/ui/widgets/chat_bubble.dart';
 import '../../chat_shared/ui/widgets/chat_composer.dart';
-import '../../chat_shared/ui/widgets/chat_state_views.dart';
 import '../data/services/group_chat_service.dart';
 
 /// Group chat screen for displaying and managing group conversations
@@ -115,7 +115,7 @@ class _GroupChatScreenState extends State<GroupChatScreen> {
           ),
         ),
         body: const Center(
-          child: CircularProgressIndicator(color: AppColors.primaryGreen),
+          child: AppLoadingView(message: 'Loading group chat...'),
         ),
       );
     }
@@ -135,8 +135,12 @@ class _GroupChatScreenState extends State<GroupChatScreen> {
             ),
           ),
         ),
-        body: const Center(
-          child: Text('Group not found'),
+        body: AppEmptyView(
+          title: 'Group Not Found',
+          subtitle: 'This group may have been removed or is unavailable.',
+          icon: Icons.group_off_outlined,
+          actionLabel: 'Go Back',
+          onAction: () => Navigator.pop(context),
         ),
       );
     }
@@ -186,20 +190,23 @@ class _GroupChatScreenState extends State<GroupChatScreen> {
               stream: _groupChatService.getGroupMessages(widget.groupId),
               builder: (context, snapshot) {
                 if (snapshot.connectionState == ConnectionState.waiting) {
-                  return const ChatLoadingView();
+                  return const AppLoadingView(message: 'Loading messages...');
                 }
 
                 if (snapshot.hasError) {
-                  return ChatErrorView(
-                    message: 'Error: ${snapshot.error}',
+                  return AppErrorView(
+                    title: 'Unable to load messages',
+                    message: '${snapshot.error}',
+                    onRetry: () => setState(() {}),
                   );
                 }
 
                 final messages = snapshot.data ?? [];
                 if (messages.isEmpty) {
-                  return ChatEmptyView(
+                  return const AppEmptyView(
+                    title: 'No Messages Yet',
                     subtitle: 'Start the conversation!',
-                    subtitleColor: Colors.grey[500],
+                    icon: Icons.chat_bubble_outline,
                   );
                 }
 

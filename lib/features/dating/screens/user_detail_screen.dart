@@ -4,6 +4,7 @@ import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import '../../../common/constants/app_colors.dart';
+import '../../../common/widgets/state_views/state_views.dart';
 import '../../../models/user_model.dart';
 import '../widgets/mode_specific_profile_sections.dart';
 
@@ -166,25 +167,12 @@ class _UserDetailScreenState extends State<UserDetailScreen> {
 
   Widget _buildPhotoSection(List<String> photos) {
     if (photos.isEmpty) {
-      return ColoredBox(
-        color: Colors.grey.shade200,
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Icon(
-              Icons.person,
-              size: 100,
-              color: Colors.grey.shade400,
-            ),
-            const SizedBox(height: 16),
-            Text(
-              'No photos available',
-              style: GoogleFonts.montserrat(
-                color: Colors.grey.shade600,
-                fontSize: 16,
-              ),
-            ),
-          ],
+      return const ColoredBox(
+        color: Color(0xFFF5F5F5),
+        child: AppEmptyView(
+          title: 'No Photos Available',
+          subtitle: 'This profile does not have photos yet.',
+          icon: Icons.person_outline,
         ),
       );
     }

@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
 import '../../../../common/bloc/user/user_bloc.dart';
+import '../../../../common/widgets/state_views/state_views.dart';
 import '../../bloc/diary_bloc.dart';
 import '../../data/diary_repository.dart';
 
@@ -69,10 +70,16 @@ class _DiaryFeedScreenState extends State<DiaryFeedScreen> {
             child: BlocBuilder<DiaryBloc, DiaryState>(
               builder: (context, state) {
                 if (state is DiaryLoading) {
-                  return const Center(child: CircularProgressIndicator());
+                  return const AppLoadingView(
+                    message: 'Loading diary entries...',
+                  );
                 } else if (state is DiaryLoaded) {
                   if (state.entries.isEmpty) {
-                    return Center(child: Text('No entries'.tr()));
+                    return AppEmptyView(
+                      title: 'No Entries Yet'.tr(),
+                      subtitle: 'Share your first diary entry.'.tr(),
+                      icon: Icons.menu_book_outlined,
+                    );
                   }
                   return ListView.builder(
                     itemCount: state.entries.length,
@@ -94,7 +101,13 @@ class _DiaryFeedScreenState extends State<DiaryFeedScreen> {
                     },
                   );
                 } else if (state is DiaryError) {
-                  return Center(child: Text(state.message));
+                  return AppErrorView(
+                    title: 'Unable to load diary'.tr(),
+                    message: state.message,
+                    onRetry: () {
+                      context.read<DiaryBloc>().add(LoadDiaryEntries());
+                    },
+                  );
                 }
                 return const SizedBox.shrink();
               },

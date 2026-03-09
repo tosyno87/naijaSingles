@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 
 import '../../common/constants/app_colors.dart';
+import '../../common/constants/app_spacing.dart';
 import '../../common/widgets/state_views/state_views.dart';
 import '../../features/notifications/data/services/notification_service.dart';
 import 'notification_model.dart';
@@ -143,12 +144,15 @@ class _ModernNotificationsScreenState extends State<ModernNotificationsScreen>
               ),
             ),
             if (_unreadCount > 0) ...[
-              const SizedBox(width: 8),
+              const SizedBox(width: AppSpacing.sm),
               Container(
-                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                padding: const EdgeInsets.symmetric(
+                  horizontal: AppSpacing.sm,
+                  vertical: AppSpacing.xs,
+                ),
                 decoration: BoxDecoration(
                   color: AppColors.primaryGreen,
-                  borderRadius: BorderRadius.circular(12),
+                  borderRadius: BorderRadius.circular(AppSpacing.buttonRadius),
                 ),
                 child: Text(
                   _unreadCount.toString(),
@@ -179,17 +183,17 @@ class _ModernNotificationsScreenState extends State<ModernNotificationsScreen>
       );
 
   Widget _buildLoadingState() => ListView.builder(
-        padding: const EdgeInsets.all(16),
+        padding: const EdgeInsets.all(AppSpacing.md),
         itemCount: 5,
         itemBuilder: (context, index) => _buildSkeletonCard(),
       );
 
   Widget _buildSkeletonCard() => Container(
-        margin: const EdgeInsets.only(bottom: 16),
-        padding: const EdgeInsets.all(16),
+        margin: const EdgeInsets.only(bottom: AppSpacing.md),
+        padding: const EdgeInsets.all(AppSpacing.md),
         decoration: BoxDecoration(
           color: Colors.white,
-          borderRadius: BorderRadius.circular(16),
+          borderRadius: BorderRadius.circular(AppSpacing.cardRadius),
           boxShadow: [
             BoxShadow(
               color: Colors.black.withValues(alpha: 0.05),
@@ -208,7 +212,7 @@ class _ModernNotificationsScreenState extends State<ModernNotificationsScreen>
                 shape: BoxShape.circle,
               ),
             ),
-            const SizedBox(width: 16),
+            const SizedBox(width: AppSpacing.md),
             Expanded(
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
@@ -218,10 +222,10 @@ class _ModernNotificationsScreenState extends State<ModernNotificationsScreen>
                     width: double.infinity,
                     decoration: BoxDecoration(
                       color: Colors.grey.shade300,
-                      borderRadius: BorderRadius.circular(8),
+                      borderRadius: BorderRadius.circular(AppSpacing.sm),
                     ),
                   ),
-                  const SizedBox(height: 8),
+                  const SizedBox(height: AppSpacing.sm),
                   Container(
                     height: 14,
                     width: 200,
@@ -252,7 +256,7 @@ class _ModernNotificationsScreenState extends State<ModernNotificationsScreen>
             child: FadeTransition(
               opacity: _fadeAnimation,
               child: ListView.builder(
-                padding: const EdgeInsets.all(16),
+                padding: const EdgeInsets.all(AppSpacing.md),
                 itemCount: _filteredNotifications.length,
                 itemBuilder: (context, index) {
                   final notification = _filteredNotifications[index];
@@ -268,7 +272,7 @@ class _ModernNotificationsScreenState extends State<ModernNotificationsScreen>
 
   Widget _buildFilterChips() => Container(
         height: 50,
-        padding: const EdgeInsets.symmetric(horizontal: 16),
+        padding: const EdgeInsets.symmetric(horizontal: AppSpacing.md),
         child: ListView.builder(
           scrollDirection: Axis.horizontal,
           itemCount: _filters.length,
@@ -278,14 +282,14 @@ class _ModernNotificationsScreenState extends State<ModernNotificationsScreen>
             final count = _getFilterCount(filter);
 
             return Padding(
-              padding: const EdgeInsets.only(right: 8),
+              padding: const EdgeInsets.only(right: AppSpacing.sm),
               child: FilterChip(
                 label: Row(
                   mainAxisSize: MainAxisSize.min,
                   children: [
                     Text(_getFilterLabel(filter)),
                     if (count > 0) ...[
-                      const SizedBox(width: 4),
+                      const SizedBox(width: AppSpacing.xs),
                       Container(
                         padding: const EdgeInsets.symmetric(
                           horizontal: 6,
@@ -381,7 +385,7 @@ class _ModernNotificationsScreenState extends State<ModernNotificationsScreen>
           background: Container(
             decoration: BoxDecoration(
               color: Colors.red,
-              borderRadius: BorderRadius.circular(16),
+              borderRadius: BorderRadius.circular(AppSpacing.cardRadius),
             ),
             alignment: Alignment.centerRight,
             padding: const EdgeInsets.only(right: 20),
@@ -394,7 +398,7 @@ class _ModernNotificationsScreenState extends State<ModernNotificationsScreen>
           secondaryBackground: Container(
             decoration: BoxDecoration(
               color: AppColors.primaryGreen,
-              borderRadius: BorderRadius.circular(16),
+              borderRadius: BorderRadius.circular(AppSpacing.cardRadius),
             ),
             alignment: Alignment.centerLeft,
             padding: const EdgeInsets.only(left: 20),
@@ -421,7 +425,7 @@ class _ModernNotificationsScreenState extends State<ModernNotificationsScreen>
           color: notification.isRead
               ? Colors.white
               : AppColors.primaryGreen.withValues(alpha: 0.05),
-          borderRadius: BorderRadius.circular(16),
+          borderRadius: BorderRadius.circular(AppSpacing.cardRadius),
           border: Border.all(
             color: notification.isRead
                 ? Colors.grey.shade200
@@ -439,22 +443,22 @@ class _ModernNotificationsScreenState extends State<ModernNotificationsScreen>
           color: Colors.transparent,
           child: InkWell(
             onTap: () => _handleNotificationTap(notification),
-            borderRadius: BorderRadius.circular(16),
+            borderRadius: BorderRadius.circular(AppSpacing.cardRadius),
             child: Padding(
-              padding: const EdgeInsets.all(16),
+              padding: const EdgeInsets.all(AppSpacing.md),
               child: Row(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   _buildNotificationAvatar(notification),
-                  const SizedBox(width: 16),
+                  const SizedBox(width: AppSpacing.md),
                   Expanded(
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         _buildNotificationHeader(notification),
-                        const SizedBox(height: 8),
+                        const SizedBox(height: AppSpacing.sm),
                         _buildNotificationMessage(notification),
-                        const SizedBox(height: 8),
+                        const SizedBox(height: AppSpacing.sm),
                         _buildNotificationFooter(notification),
                       ],
                     ),
@@ -545,10 +549,13 @@ class _ModernNotificationsScreenState extends State<ModernNotificationsScreen>
             ),
           ),
           Container(
-            padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+            padding: const EdgeInsets.symmetric(
+              horizontal: AppSpacing.sm,
+              vertical: AppSpacing.xs,
+            ),
             decoration: BoxDecoration(
               color: notification.typeColor.withValues(alpha: 0.1),
-              borderRadius: BorderRadius.circular(12),
+              borderRadius: BorderRadius.circular(AppSpacing.buttonRadius),
             ),
             child: Text(
               _getTypeLabel(notification.type),

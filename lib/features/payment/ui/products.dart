@@ -220,7 +220,8 @@ class ProductsState extends State<Products> {
                     child: Card(
                       elevation: 2,
                       shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(AppSpacing.chipRadius),
+                        borderRadius:
+                            BorderRadius.circular(AppSpacing.chipRadius),
                       ),
                       child: Column(
                         mainAxisAlignment: MainAxisAlignment.spaceAround,

@@ -248,7 +248,8 @@ class _SettingsScreenState extends State<SettingsScreen> {
                       backgroundColor: Colors.white,
                       foregroundColor: Colors.red.shade700,
                       shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(AppSpacing.chipRadius),
+                        borderRadius:
+                            BorderRadius.circular(AppSpacing.chipRadius),
                         side: BorderSide(color: Colors.red.shade300, width: 2),
                       ),
                       elevation: 2,
@@ -300,7 +301,8 @@ class _SettingsScreenState extends State<SettingsScreen> {
                       backgroundColor: Colors.white,
                       foregroundColor: AppColors.primaryGreen,
                       shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(AppSpacing.chipRadius),
+                        borderRadius:
+                            BorderRadius.circular(AppSpacing.chipRadius),
                         side: const BorderSide(
                           color: AppColors.primaryGreen,
                           width: 2,
@@ -326,7 +328,8 @@ class _SettingsScreenState extends State<SettingsScreen> {
                       backgroundColor: Colors.white,
                       foregroundColor: Colors.red.shade700,
                       shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(AppSpacing.chipRadius),
+                        borderRadius:
+                            BorderRadius.circular(AppSpacing.chipRadius),
                         side: BorderSide(color: Colors.red.shade300, width: 2),
                       ),
                       elevation: 2,
@@ -499,10 +502,13 @@ class _SettingsScreenState extends State<SettingsScreen> {
                 style: TextButton.styleFrom(
                   foregroundColor: textSecondary,
                   shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(AppSpacing.buttonRadius),
+                    borderRadius:
+                        BorderRadius.circular(AppSpacing.buttonRadius),
                   ),
-                  padding:
-                      const EdgeInsets.symmetric(horizontal: AppSpacing.md, vertical: AppSpacing.buttonRadius),
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: AppSpacing.md,
+                    vertical: AppSpacing.buttonRadius,
+                  ),
                 ),
                 child: Text(
                   'Cancel',
@@ -522,7 +528,8 @@ class _SettingsScreenState extends State<SettingsScreen> {
                   backgroundColor: Colors.red.shade600,
                   foregroundColor: Colors.white,
                   shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(AppSpacing.buttonRadius),
+                    borderRadius:
+                        BorderRadius.circular(AppSpacing.buttonRadius),
                   ),
                   elevation: 2,
                   padding: const EdgeInsets.symmetric(
@@ -612,10 +619,13 @@ class _SettingsScreenState extends State<SettingsScreen> {
                 style: TextButton.styleFrom(
                   foregroundColor: textSecondary,
                   shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(AppSpacing.buttonRadius),
+                    borderRadius:
+                        BorderRadius.circular(AppSpacing.buttonRadius),
                   ),
-                  padding:
-                      const EdgeInsets.symmetric(horizontal: AppSpacing.md, vertical: AppSpacing.buttonRadius),
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: AppSpacing.md,
+                    vertical: AppSpacing.buttonRadius,
+                  ),
                 ),
                 child: Text(
                   'Cancel',
@@ -635,7 +645,8 @@ class _SettingsScreenState extends State<SettingsScreen> {
                   backgroundColor: Colors.red.shade600,
                   foregroundColor: Colors.white,
                   shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(AppSpacing.buttonRadius),
+                    borderRadius:
+                        BorderRadius.circular(AppSpacing.buttonRadius),
                   ),
                   elevation: 2,
                   padding:
@@ -708,11 +719,13 @@ class _SettingsScreenState extends State<SettingsScreen> {
                         color: textSecondary.withValues(alpha: 0.4),
                       ),
                       border: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(AppSpacing.buttonRadius),
+                        borderRadius:
+                            BorderRadius.circular(AppSpacing.buttonRadius),
                         borderSide: BorderSide(color: Colors.red.shade200),
                       ),
                       focusedBorder: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(AppSpacing.buttonRadius),
+                        borderRadius:
+                            BorderRadius.circular(AppSpacing.buttonRadius),
                         borderSide: BorderSide(
                           color: Colors.red.shade400,
                           width: 2,
@@ -734,7 +747,8 @@ class _SettingsScreenState extends State<SettingsScreen> {
                     style: TextButton.styleFrom(
                       foregroundColor: textSecondary,
                       shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(AppSpacing.buttonRadius),
+                        borderRadius:
+                            BorderRadius.circular(AppSpacing.buttonRadius),
                       ),
                       padding: const EdgeInsets.symmetric(
                         horizontal: AppSpacing.md,
@@ -773,7 +787,8 @@ class _SettingsScreenState extends State<SettingsScreen> {
                       disabledBackgroundColor: Colors.red.shade200,
                       disabledForegroundColor: Colors.white70,
                       shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(AppSpacing.buttonRadius),
+                        borderRadius:
+                            BorderRadius.circular(AppSpacing.buttonRadius),
                       ),
                       elevation: confirmed ? 2 : 0,
                       padding: const EdgeInsets.symmetric(

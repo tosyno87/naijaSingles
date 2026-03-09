@@ -346,11 +346,13 @@ class _AccountDeletionScreenState extends State<AccountDeletionScreen> {
                   hintText: 'Please tell us more...',
                   hintStyle: GoogleFonts.montserrat(color: textLight),
                   border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(AppSpacing.buttonRadius),
+                    borderRadius:
+                        BorderRadius.circular(AppSpacing.buttonRadius),
                     borderSide: BorderSide(color: Colors.grey.shade300),
                   ),
                   focusedBorder: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(AppSpacing.buttonRadius),
+                    borderRadius:
+                        BorderRadius.circular(AppSpacing.buttonRadius),
                     borderSide: const BorderSide(color: primaryColor, width: 2),
                   ),
                   contentPadding: const EdgeInsets.all(AppSpacing.md),
@@ -461,8 +463,10 @@ class _AccountDeletionScreenState extends State<AccountDeletionScreen> {
                   borderRadius: BorderRadius.circular(AppSpacing.buttonRadius),
                   borderSide: const BorderSide(color: primaryColor, width: 2),
                 ),
-                contentPadding:
-                    const EdgeInsets.symmetric(horizontal: AppSpacing.md, vertical: AppSpacing.buttonRadius),
+                contentPadding: const EdgeInsets.symmetric(
+                  horizontal: AppSpacing.md,
+                  vertical: AppSpacing.buttonRadius,
+                ),
                 prefixIcon: const Icon(Icons.lock, color: primaryColor),
                 suffixIcon: IconButton(
                   icon: Icon(
@@ -549,9 +553,12 @@ class _AccountDeletionScreenState extends State<AccountDeletionScreen> {
                 style: OutlinedButton.styleFrom(
                   foregroundColor: primaryColor,
                   side: const BorderSide(color: primaryColor),
-                  padding: const EdgeInsets.symmetric(vertical: AppSpacing.buttonRadius),
+                  padding: const EdgeInsets.symmetric(
+                    vertical: AppSpacing.buttonRadius,
+                  ),
                   shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(AppSpacing.buttonRadius),
+                    borderRadius:
+                        BorderRadius.circular(AppSpacing.buttonRadius),
                   ),
                 ),
               ),
@@ -936,8 +943,9 @@ class _AccountDeletionScreenState extends State<AccountDeletionScreen> {
         barrierDismissible: false,
         builder: (ctx) => AlertDialog(
           backgroundColor: cardColor,
-          shape:
-              RoundedRectangleBorder(borderRadius: BorderRadius.circular(AppSpacing.cardRadius)),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(AppSpacing.cardRadius),
+          ),
           title: Text(
             'Re-authentication required',
             style: GoogleFonts.montserrat(
@@ -1046,8 +1054,9 @@ class _AccountDeletionScreenState extends State<AccountDeletionScreen> {
         barrierDismissible: false,
         builder: (ctx) => AlertDialog(
           backgroundColor: cardColor,
-          shape:
-              RoundedRectangleBorder(borderRadius: BorderRadius.circular(AppSpacing.cardRadius)),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(AppSpacing.cardRadius),
+          ),
           title: Text(
             'Enter verification code',
             style: GoogleFonts.montserrat(
@@ -1187,7 +1196,9 @@ class _AccountDeletionScreenState extends State<AccountDeletionScreen> {
             Text(message, style: GoogleFonts.montserrat(color: Colors.white)),
         backgroundColor: errorColor,
         behavior: SnackBarBehavior.floating,
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(AppSpacing.sm)),
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(AppSpacing.sm),
+        ),
       ),
     );
   }
@@ -1220,8 +1231,9 @@ class _AccountDeletionScreenState extends State<AccountDeletionScreen> {
         barrierDismissible: false,
         builder: (context) => AlertDialog(
           backgroundColor: cardColor,
-          shape:
-              RoundedRectangleBorder(borderRadius: BorderRadius.circular(AppSpacing.chipRadius)),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(AppSpacing.chipRadius),
+          ),
           elevation: 8,
           contentPadding: const EdgeInsets.all(AppSpacing.lg),
           title: Column(
@@ -1309,9 +1321,12 @@ class _AccountDeletionScreenState extends State<AccountDeletionScreen> {
                 style: ElevatedButton.styleFrom(
                   backgroundColor: primaryColor,
                   foregroundColor: Colors.white,
-                  padding: const EdgeInsets.symmetric(vertical: AppSpacing.buttonRadius),
+                  padding: const EdgeInsets.symmetric(
+                    vertical: AppSpacing.buttonRadius,
+                  ),
                   shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(AppSpacing.buttonRadius),
+                    borderRadius:
+                        BorderRadius.circular(AppSpacing.buttonRadius),
                   ),
                   elevation: 0,
                 ),
@@ -1325,7 +1340,12 @@ class _AccountDeletionScreenState extends State<AccountDeletionScreen> {
               ),
             ),
           ],
-          actionsPadding: const EdgeInsets.fromLTRB(AppSpacing.lg, 0, AppSpacing.lg, AppSpacing.lg),
+          actionsPadding: const EdgeInsets.fromLTRB(
+            AppSpacing.lg,
+            0,
+            AppSpacing.lg,
+            AppSpacing.lg,
+          ),
         ),
       ),
     );

@@ -117,7 +117,8 @@ class _GroupDetailsScreenState extends State<GroupDetailsScreen> {
               backgroundColor: AppColors.primaryGreen.withValues(alpha: 0.2),
               child: widget.group.imageUrl != null
                   ? ClipRRect(
-                      borderRadius: BorderRadius.circular(AppSpacing.chipRadius),
+                      borderRadius:
+                          BorderRadius.circular(AppSpacing.chipRadius),
                       child: CachedNetworkImage(
                         imageUrl: widget.group.imageUrl!,
                         fit: BoxFit.cover,
@@ -876,7 +877,11 @@ class _GroupDetailsScreenState extends State<GroupDetailsScreen> {
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  Icon(icon, color: AppColors.primaryGreen, size: AppSpacing.iconSm),
+                  Icon(
+                    icon,
+                    color: AppColors.primaryGreen,
+                    size: AppSpacing.iconSm,
+                  ),
                   const SizedBox(width: AppSpacing.sm),
                   Text(
                     text,

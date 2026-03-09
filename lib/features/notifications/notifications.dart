@@ -163,7 +163,8 @@ class NotificationsState extends State<Notifications> {
                         padding: const EdgeInsets.all(5),
                         child: DecoratedBox(
                           decoration: BoxDecoration(
-                            borderRadius: BorderRadius.circular(AppSpacing.chipRadius),
+                            borderRadius:
+                                BorderRadius.circular(AppSpacing.chipRadius),
                             color: !doc.get('isRead')
                                 ? isDarkMode
                                     ? Theme.of(context).scaffoldBackgroundColor

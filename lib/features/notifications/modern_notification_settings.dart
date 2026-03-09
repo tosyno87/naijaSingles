@@ -463,8 +463,10 @@ class _ModernNotificationSettingsState extends State<ModernNotificationSettings>
               style: ElevatedButton.styleFrom(
                 backgroundColor: AppColors.primaryGreen,
                 foregroundColor: Colors.white,
-                padding:
-                    const EdgeInsets.symmetric(horizontal: 20, vertical: AppSpacing.buttonRadius),
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 20,
+                  vertical: AppSpacing.buttonRadius,
+                ),
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(AppSpacing.sm),
                 ),

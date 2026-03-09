@@ -130,8 +130,10 @@ class _MemberManagementScreenState extends State<MemberManagementScreen>
             hintStyle: GoogleFonts.montserrat(color: Colors.grey[600]),
             prefixIcon: const Icon(Icons.search, color: AppColors.primaryGreen),
             border: InputBorder.none,
-            contentPadding:
-                const EdgeInsets.symmetric(horizontal: AppSpacing.md, vertical: 12),
+            contentPadding: const EdgeInsets.symmetric(
+              horizontal: AppSpacing.md,
+              vertical: 12,
+            ),
           ),
           onChanged: _onSearchChanged,
         ),
@@ -312,7 +314,8 @@ class _MemberManagementScreenState extends State<MemberManagementScreen>
                           ),
                           decoration: BoxDecoration(
                             color: Colors.amber,
-                            borderRadius: BorderRadius.circular(AppSpacing.buttonRadius),
+                            borderRadius:
+                                BorderRadius.circular(AppSpacing.buttonRadius),
                           ),
                           child: Text(
                             'CREATOR',
@@ -331,7 +334,8 @@ class _MemberManagementScreenState extends State<MemberManagementScreen>
                           ),
                           decoration: BoxDecoration(
                             color: AppColors.primaryGreen,
-                            borderRadius: BorderRadius.circular(AppSpacing.buttonRadius),
+                            borderRadius:
+                                BorderRadius.circular(AppSpacing.buttonRadius),
                           ),
                           child: Text(
                             'ADMIN',
@@ -464,7 +468,8 @@ class _MemberManagementScreenState extends State<MemberManagementScreen>
                     backgroundColor: AppColors.primaryGreen,
                     foregroundColor: Colors.white,
                     shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(AppSpacing.chipRadius),
+                      borderRadius:
+                          BorderRadius.circular(AppSpacing.chipRadius),
                     ),
                   ),
                   child: Text(

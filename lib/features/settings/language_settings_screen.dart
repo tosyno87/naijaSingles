@@ -164,8 +164,9 @@ class _LanguageSettingsScreenState extends State<LanguageSettingsScreen> {
         barrierDismissible: false,
         builder: (context) => AlertDialog(
           backgroundColor: cardColor,
-            shape:
-              RoundedRectangleBorder(borderRadius: BorderRadius.circular(AppSpacing.chipRadius)),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(AppSpacing.chipRadius),
+          ),
           elevation: 8,
           contentPadding: const EdgeInsets.all(AppSpacing.lg),
           title: Column(
@@ -244,9 +245,12 @@ class _LanguageSettingsScreenState extends State<LanguageSettingsScreen> {
                 style: ElevatedButton.styleFrom(
                   backgroundColor: primaryColor,
                   foregroundColor: Colors.white,
-                  padding: const EdgeInsets.symmetric(vertical: AppSpacing.buttonRadius),
+                  padding: const EdgeInsets.symmetric(
+                    vertical: AppSpacing.buttonRadius,
+                  ),
                   shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(AppSpacing.buttonRadius),
+                    borderRadius:
+                        BorderRadius.circular(AppSpacing.buttonRadius),
                   ),
                   elevation: 0,
                 ),
@@ -260,7 +264,12 @@ class _LanguageSettingsScreenState extends State<LanguageSettingsScreen> {
               ),
             ),
           ],
-          actionsPadding: const EdgeInsets.fromLTRB(AppSpacing.lg, 0, AppSpacing.lg, AppSpacing.lg),
+          actionsPadding: const EdgeInsets.fromLTRB(
+            AppSpacing.lg,
+            0,
+            AppSpacing.lg,
+            AppSpacing.lg,
+          ),
         ),
       ),
     );

@@ -205,7 +205,8 @@ class _CommunityGroupsScreenState extends State<CommunityGroupsScreen> {
           ),
           focusedBorder: OutlineInputBorder(
             borderRadius: BorderRadius.circular(AppSpacing.buttonRadius),
-            borderSide: const BorderSide(color: AppColors.primaryGreen, width: 2),
+            borderSide:
+                const BorderSide(color: AppColors.primaryGreen, width: 2),
           ),
           filled: true,
           fillColor: Colors.white,

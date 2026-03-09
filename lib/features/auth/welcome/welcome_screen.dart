@@ -6,6 +6,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:vector_math/vector_math_64.dart' show Vector3;
 
 import '../../../common/constants/app_colors.dart';
 import '../../../common/routes/route_name.dart';
@@ -147,12 +148,16 @@ class _WelcomeScreenState extends State<WelcomeScreen>
             builder: (context, child) => Transform(
               alignment: Alignment.center,
               transform: Matrix4.identity()
-                ..scale(
-                  _kenBurnsScale.value,
-                  _kenBurnsScale.value,
-                  1.0,
+                ..scaleByVector3(
+                  Vector3(
+                    _kenBurnsScale.value,
+                    _kenBurnsScale.value,
+                    1,
+                  ),
                 )
-                ..translate(0.0, _kenBurnsTranslateY.value, 0.0),
+                ..translateByVector3(
+                  Vector3(0, _kenBurnsTranslateY.value, 0),
+                ),
               child: child,
             ),
             child: ColorFiltered(

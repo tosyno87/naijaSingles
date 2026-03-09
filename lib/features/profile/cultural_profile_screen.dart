@@ -115,34 +115,28 @@ class _CulturalProfileScreenState extends State<CulturalProfileScreen> {
                     onRetry: () => unawaited(_loadUserData()),
                   )
                 : SafeArea(
-                child: SingleChildScrollView(
-                  padding: AppSpacing.pagePadding,
-                  child: Column(
-                    children: [
-                      _buildCulturalIdentityHeader(),
-                      const SizedBox(height: AppSpacing.lg),
-
-                      _buildCulturalHeritageBadge(),
-                      const SizedBox(height: 20),
-
-                      _buildCommunityInvolvement(),
-                      const SizedBox(height: 20),
-
-                      _buildProfessionalNetworking(),
-                      const SizedBox(height: 20),
-
-                      _buildCulturalInterests(),
-                      const SizedBox(height: 20),
-
-                      _buildConnectionPreferences(),
-                      const SizedBox(height: 20),
-
-                      _buildCulturalContributions(),
-                      const SizedBox(height: AppSpacing.xl),
-                    ],
+                    child: SingleChildScrollView(
+                      padding: AppSpacing.pagePadding,
+                      child: Column(
+                        children: [
+                          _buildCulturalIdentityHeader(),
+                          const SizedBox(height: AppSpacing.lg),
+                          _buildCulturalHeritageBadge(),
+                          const SizedBox(height: 20),
+                          _buildCommunityInvolvement(),
+                          const SizedBox(height: 20),
+                          _buildProfessionalNetworking(),
+                          const SizedBox(height: 20),
+                          _buildCulturalInterests(),
+                          const SizedBox(height: 20),
+                          _buildConnectionPreferences(),
+                          const SizedBox(height: 20),
+                          _buildCulturalContributions(),
+                          const SizedBox(height: AppSpacing.xl),
+                        ],
+                      ),
+                    ),
                   ),
-                ),
-              ),
       );
 
   Widget _buildCulturalIdentityHeader() {
@@ -215,7 +209,10 @@ class _CulturalProfileScreenState extends State<CulturalProfileScreen> {
           const SizedBox(height: AppSpacing.buttonRadius),
 
           Container(
-            padding: const EdgeInsets.symmetric(horizontal: 20, vertical: AppSpacing.buttonRadius),
+            padding: const EdgeInsets.symmetric(
+              horizontal: 20,
+              vertical: AppSpacing.buttonRadius,
+            ),
             decoration: BoxDecoration(
               color: Colors.white.withValues(alpha: 0.2),
               borderRadius: BorderRadius.circular(AppSpacing.lg),
@@ -246,7 +243,10 @@ class _CulturalProfileScreenState extends State<CulturalProfileScreen> {
 
           if (_getTribeText().isNotEmpty)
             Container(
-              padding: const EdgeInsets.symmetric(horizontal: AppSpacing.md, vertical: AppSpacing.sm),
+              padding: const EdgeInsets.symmetric(
+                horizontal: AppSpacing.md,
+                vertical: AppSpacing.sm,
+              ),
               decoration: BoxDecoration(
                 color: Colors.white.withValues(alpha: 0.15),
                 borderRadius: BorderRadius.circular(20),
@@ -328,14 +328,12 @@ class _CulturalProfileScreenState extends State<CulturalProfileScreen> {
             ],
           ),
           const SizedBox(height: AppSpacing.md),
-
           _buildInfoRow(
             'Nationality',
             nationality,
             Custom3DIcons.culture(size: 20),
           ),
           const SizedBox(height: AppSpacing.buttonRadius),
-
           if (tribe.isNotEmpty)
             _buildInfoRow(
               'Tribe',
@@ -343,14 +341,12 @@ class _CulturalProfileScreenState extends State<CulturalProfileScreen> {
               Custom3DIcons.traditions(size: 20),
             ),
           if (tribe.isNotEmpty) const SizedBox(height: AppSpacing.buttonRadius),
-
           _buildInfoRow(
             'Languages',
             languages.join(', '),
             Custom3DIcons.translate(size: 20),
           ),
           const SizedBox(height: AppSpacing.buttonRadius),
-
           _buildInfoRow(
             'Location',
             location,
@@ -401,9 +397,11 @@ class _CulturalProfileScreenState extends State<CulturalProfileScreen> {
             ],
           ),
           const SizedBox(height: AppSpacing.md),
-
           Container(
-            padding: const EdgeInsets.symmetric(horizontal: AppSpacing.buttonRadius, vertical: 6),
+            padding: const EdgeInsets.symmetric(
+              horizontal: AppSpacing.buttonRadius,
+              vertical: 6,
+            ),
             decoration: BoxDecoration(
               color: AppColors.primaryGreen.withValues(alpha: 0.1),
               borderRadius: BorderRadius.circular(AppSpacing.buttonRadius),
@@ -421,7 +419,6 @@ class _CulturalProfileScreenState extends State<CulturalProfileScreen> {
             ),
           ),
           const SizedBox(height: AppSpacing.md),
-
           Row(
             children: [
               Expanded(
@@ -486,8 +483,10 @@ class _CulturalProfileScreenState extends State<CulturalProfileScreen> {
               if (isMentor) ...[
                 const SizedBox(width: AppSpacing.sm),
                 Container(
-                  padding:
-                      const EdgeInsets.symmetric(horizontal: AppSpacing.sm, vertical: AppSpacing.xs),
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: AppSpacing.sm,
+                    vertical: AppSpacing.xs,
+                  ),
                   decoration: BoxDecoration(
                     color: AppColors.primaryGreen,
                     borderRadius: BorderRadius.circular(AppSpacing.sm),
@@ -540,7 +539,8 @@ class _CulturalProfileScreenState extends State<CulturalProfileScreen> {
                       ),
                       decoration: BoxDecoration(
                         color: AppColors.primaryGreen.withValues(alpha: 0.1),
-                        borderRadius: BorderRadius.circular(AppSpacing.cardRadius),
+                        borderRadius:
+                            BorderRadius.circular(AppSpacing.cardRadius),
                         border: Border.all(
                           color: AppColors.primaryGreen.withValues(alpha: 0.3),
                         ),
@@ -628,7 +628,8 @@ class _CulturalProfileScreenState extends State<CulturalProfileScreen> {
                       ),
                       decoration: BoxDecoration(
                         color: AppColors.primaryGreen.withValues(alpha: 0.1),
-                        borderRadius: BorderRadius.circular(AppSpacing.cardRadius),
+                        borderRadius:
+                            BorderRadius.circular(AppSpacing.cardRadius),
                         border: Border.all(
                           color: AppColors.primaryGreen.withValues(alpha: 0.3),
                         ),
@@ -670,7 +671,8 @@ class _CulturalProfileScreenState extends State<CulturalProfileScreen> {
                       ),
                       decoration: BoxDecoration(
                         color: AppColors.textSecondary.withValues(alpha: 0.1),
-                        borderRadius: BorderRadius.circular(AppSpacing.cardRadius),
+                        borderRadius:
+                            BorderRadius.circular(AppSpacing.cardRadius),
                         border: Border.all(
                           color: AppColors.textSecondary.withValues(alpha: 0.3),
                         ),

@@ -319,7 +319,9 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
         context: context,
         backgroundColor: Colors.white,
         shape: const RoundedRectangleBorder(
-          borderRadius: BorderRadius.vertical(top: Radius.circular(AppSpacing.chipRadius)),
+          borderRadius: BorderRadius.vertical(
+            top: Radius.circular(AppSpacing.chipRadius),
+          ),
         ),
         builder: (context) => Padding(
           padding: const EdgeInsets.all(20),
@@ -366,7 +368,10 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
         onTap: onTap,
         borderRadius: BorderRadius.circular(AppSpacing.buttonRadius),
         child: Container(
-          padding: const EdgeInsets.symmetric(vertical: AppSpacing.buttonRadius, horizontal: AppSpacing.lg),
+          padding: const EdgeInsets.symmetric(
+            vertical: AppSpacing.buttonRadius,
+            horizontal: AppSpacing.lg,
+          ),
           decoration: BoxDecoration(
             color: AppColors.backgroundColor,
             borderRadius: BorderRadius.circular(AppSpacing.buttonRadius),
@@ -668,8 +673,10 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                   }
                 },
                 elevation: isSelected ? 2 : 0,
-                padding:
-                    const EdgeInsets.symmetric(horizontal: AppSpacing.md, vertical: AppSpacing.sm),
+                padding: const EdgeInsets.symmetric(
+                  horizontal: AppSpacing.md,
+                  vertical: AppSpacing.sm,
+                ),
               );
             }).toList(),
           ),
@@ -704,7 +711,10 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
           }
         },
         child: Container(
-          padding: const EdgeInsets.symmetric(horizontal: AppSpacing.md, vertical: AppSpacing.md),
+          padding: const EdgeInsets.symmetric(
+            horizontal: AppSpacing.md,
+            vertical: AppSpacing.md,
+          ),
           decoration: BoxDecoration(
             color: Colors.white,
             borderRadius: BorderRadius.circular(AppSpacing.buttonRadius),
@@ -735,11 +745,14 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
               ),
               if (_selectedDOB != null) ...[
                 Container(
-                  padding:
-                      const EdgeInsets.symmetric(horizontal: AppSpacing.sm, vertical: 2),
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: AppSpacing.sm,
+                    vertical: 2,
+                  ),
                   decoration: BoxDecoration(
                     color: AppColors.primaryGreen.withValues(alpha: 0.1),
-                    borderRadius: BorderRadius.circular(AppSpacing.buttonRadius),
+                    borderRadius:
+                        BorderRadius.circular(AppSpacing.buttonRadius),
                   ),
                   child: Text(
                     '$_age years',
@@ -771,7 +784,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
             color: AppColors.textPrimary,
           ),
         ),
-          const SizedBox(height: AppSpacing.sm),
+        const SizedBox(height: AppSpacing.sm),
 
         DecoratedBox(
           decoration: BoxDecoration(
@@ -920,7 +933,10 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
               ),
             ),
             Container(
-              padding: const EdgeInsets.symmetric(horizontal: AppSpacing.sm, vertical: AppSpacing.xs),
+              padding: const EdgeInsets.symmetric(
+                horizontal: AppSpacing.sm,
+                vertical: AppSpacing.xs,
+              ),
               decoration: BoxDecoration(
                 color: AppColors.primaryGreen.withValues(alpha: 0.1),
                 borderRadius: BorderRadius.circular(AppSpacing.buttonRadius),
@@ -1005,213 +1021,226 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                 : Stack(
                     children: [
                       Form(
-                key: _formKey,
-                child: SingleChildScrollView(
-                  padding: AppSpacing.pagePadding,
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      // Photos section
-                      _buildSectionTitle('Profile Photos (Min. 3)'),
-                      const SizedBox(height: AppSpacing.sm),
-                      _buildPhotoGrid(),
-
-                      if (_photos.where((p) => p != null).length < 3)
-                        Padding(
-                          padding: const EdgeInsets.only(top: AppSpacing.sm),
-                          child: Text(
-                            'Please upload at least 3 photos',
-                            style: GoogleFonts.montserrat(
-                              color: errorColor,
-                              fontSize: 12,
-                            ),
-                          ),
-                        ),
-                      const SizedBox(height: AppSpacing.lg),
-
-                      _buildSectionTitle('Basic Information'),
-                      const SizedBox(height: AppSpacing.md),
-
-                      // Name field
-                      if (_hasCompletedOnboarding)
-                        _buildReadOnlyField(_nameController.text, Icons.person)
-                      else
-                        _buildTextField(
-                          controller: _nameController,
-                          labelText: 'Full Name',
-                          prefixIcon: Icons.person,
-                          validator: (value) {
-                            if (value == null || value.isEmpty) {
-                              return 'Please enter your name';
-                            }
-                            return null;
-                          },
-                        ),
-                      const SizedBox(height: AppSpacing.md),
-
-                      _buildBioField(),
-                      const SizedBox(height: AppSpacing.md),
-
-                      _buildSectionTitle('Gender'),
-                      const SizedBox(height: AppSpacing.sm),
-                      if (_hasCompletedOnboarding)
-                        _buildReadOnlyField(
-                          _selectedGender,
-                          Icons.person_outline,
-                        )
-                      else
-                        _buildGenderSelector(),
-                      const SizedBox(height: AppSpacing.lg),
-
-                      _buildSectionTitle('Date of Birth'),
-                      const SizedBox(height: AppSpacing.sm),
-                      if (_hasCompletedOnboarding)
-                        _buildReadOnlyField(
-                          _selectedDOB != null
-                              ? '${_selectedDOB!.day}/${_selectedDOB!.month}/${_selectedDOB!.year} ($_age years old)'
-                              : 'Not set',
-                          Icons.cake_outlined,
-                        )
-                      else
-                        _buildDateOfBirthSelector(),
-                      const SizedBox(height: AppSpacing.lg),
-
-                      _buildSectionTitle('Tribe/Ethnicity (Optional)'),
-                      const SizedBox(height: AppSpacing.sm),
-                      if (_hasCompletedOnboarding)
-                        _buildReadOnlyField(
-                          _selectedTribe == 'Other'
-                              ? _otherTribeController.text.isNotEmpty
-                                  ? _otherTribeController.text
-                                  : 'Other'
-                              : _selectedTribe ?? 'Not specified',
-                          Icons.people_outline,
-                        )
-                      else
-                        _buildTribeSelector(),
-                      const SizedBox(height: AppSpacing.lg),
-
-                      _buildSectionTitle('Height'),
-                      const SizedBox(height: AppSpacing.md),
-                      AfropeepHeightDropdown(
-                        initialHeightFtIn: _heightFtIn,
-                        initialHeightCm: _heightCm,
-                        onChanged: (heightFtIn, heightCm) {
-                          setState(() {
-                            _heightFtIn = heightFtIn;
-                            _heightCm = heightCm;
-                            _validateForm(); // Add form validation trigger
-                          });
-                        },
-                      ),
-                      const SizedBox(height: AppSpacing.lg),
-
-                      _buildSectionTitle('Preferences'),
-                      const SizedBox(height: AppSpacing.md),
-
-                      _buildInterestedInSelector(),
-                      const SizedBox(height: AppSpacing.md),
-
-                      _buildAgeRangeSelector(),
-                      const SizedBox(height: AppSpacing.xl),
-
-                      // Save button with better visibility and feedback
-                      Container(
-                        width: double.infinity,
-                        height: 56,
-                        decoration: BoxDecoration(
-                          borderRadius: BorderRadius.circular(AppSpacing.cardRadius),
-                          boxShadow: [
-                            BoxShadow(
-                              color: _formValid
-                                  ? AppColors.primaryGreen
-                                      .withValues(alpha: 0.3)
-                                  : Colors.grey.withValues(alpha: 0.2),
-                              blurRadius: 8,
-                              offset: const Offset(0, 4),
-                            ),
-                          ],
-                        ),
-                        child: ElevatedButton(
-                          onPressed: _formValid ? _saveProfile : null,
-                          style: ElevatedButton.styleFrom(
-                            backgroundColor: _formValid
-                                ? AppColors.primaryGreen
-                                : Colors.grey.shade400,
-                            disabledBackgroundColor: Colors.grey.shade400,
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(AppSpacing.cardRadius),
-                            ),
-                            elevation: 0, // Using custom shadow instead
-                          ),
-                          child: Row(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children: [
-                              Icon(
-                                _formValid ? Icons.save : Icons.lock,
-                                color: Colors.white,
-                                size: 20,
-                              ),
-                              const SizedBox(width: 8),
-                              Text(
-                                _formValid
-                                    ? 'Save Profile'
-                                    : 'Complete Required Fields',
-                                style: GoogleFonts.montserrat(
-                                  fontSize: 16,
-                                  fontWeight: FontWeight.w600,
-                                  color: Colors.white,
-                                ),
-                              ),
-                            ],
-                          ),
-                        ),
-                      ),
-
-                      // Form validation status
-                      if (!_formValid) ...[
-                        const SizedBox(height: AppSpacing.md),
-                        Container(
-                          padding: AppSpacing.cardPadding,
-                          decoration: BoxDecoration(
-                            color: Colors.orange.withValues(alpha: 0.1),
-                            borderRadius: BorderRadius.circular(AppSpacing.buttonRadius),
-                            border: Border.all(
-                              color: Colors.orange.withValues(alpha: 0.3),
-                            ),
-                          ),
+                        key: _formKey,
+                        child: SingleChildScrollView(
+                          padding: AppSpacing.pagePadding,
                           child: Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
-                              Row(
-                                children: [
-                                  Icon(
-                                    Icons.info_outline,
-                                    color: Colors.orange.shade700,
-                                    size: 20,
-                                  ),
-                                  const SizedBox(width: AppSpacing.sm),
-                                  Text(
-                                    'Complete these requirements to save:',
+                              // Photos section
+                              _buildSectionTitle('Profile Photos (Min. 3)'),
+                              const SizedBox(height: AppSpacing.sm),
+                              _buildPhotoGrid(),
+
+                              if (_photos.where((p) => p != null).length < 3)
+                                Padding(
+                                  padding:
+                                      const EdgeInsets.only(top: AppSpacing.sm),
+                                  child: Text(
+                                    'Please upload at least 3 photos',
                                     style: GoogleFonts.montserrat(
-                                      fontSize: 14,
-                                      fontWeight: FontWeight.w600,
-                                      color: Colors.orange.shade700,
+                                      color: errorColor,
+                                      fontSize: 12,
                                     ),
                                   ),
-                                ],
-                              ),
+                                ),
+                              const SizedBox(height: AppSpacing.lg),
+
+                              _buildSectionTitle('Basic Information'),
+                              const SizedBox(height: AppSpacing.md),
+
+                              // Name field
+                              if (_hasCompletedOnboarding)
+                                _buildReadOnlyField(
+                                  _nameController.text,
+                                  Icons.person,
+                                )
+                              else
+                                _buildTextField(
+                                  controller: _nameController,
+                                  labelText: 'Full Name',
+                                  prefixIcon: Icons.person,
+                                  validator: (value) {
+                                    if (value == null || value.isEmpty) {
+                                      return 'Please enter your name';
+                                    }
+                                    return null;
+                                  },
+                                ),
+                              const SizedBox(height: AppSpacing.md),
+
+                              _buildBioField(),
+                              const SizedBox(height: AppSpacing.md),
+
+                              _buildSectionTitle('Gender'),
                               const SizedBox(height: AppSpacing.sm),
-                              _buildValidationRequirements(),
+                              if (_hasCompletedOnboarding)
+                                _buildReadOnlyField(
+                                  _selectedGender,
+                                  Icons.person_outline,
+                                )
+                              else
+                                _buildGenderSelector(),
+                              const SizedBox(height: AppSpacing.lg),
+
+                              _buildSectionTitle('Date of Birth'),
+                              const SizedBox(height: AppSpacing.sm),
+                              if (_hasCompletedOnboarding)
+                                _buildReadOnlyField(
+                                  _selectedDOB != null
+                                      ? '${_selectedDOB!.day}/${_selectedDOB!.month}/${_selectedDOB!.year} ($_age years old)'
+                                      : 'Not set',
+                                  Icons.cake_outlined,
+                                )
+                              else
+                                _buildDateOfBirthSelector(),
+                              const SizedBox(height: AppSpacing.lg),
+
+                              _buildSectionTitle('Tribe/Ethnicity (Optional)'),
+                              const SizedBox(height: AppSpacing.sm),
+                              if (_hasCompletedOnboarding)
+                                _buildReadOnlyField(
+                                  _selectedTribe == 'Other'
+                                      ? _otherTribeController.text.isNotEmpty
+                                          ? _otherTribeController.text
+                                          : 'Other'
+                                      : _selectedTribe ?? 'Not specified',
+                                  Icons.people_outline,
+                                )
+                              else
+                                _buildTribeSelector(),
+                              const SizedBox(height: AppSpacing.lg),
+
+                              _buildSectionTitle('Height'),
+                              const SizedBox(height: AppSpacing.md),
+                              AfropeepHeightDropdown(
+                                initialHeightFtIn: _heightFtIn,
+                                initialHeightCm: _heightCm,
+                                onChanged: (heightFtIn, heightCm) {
+                                  setState(() {
+                                    _heightFtIn = heightFtIn;
+                                    _heightCm = heightCm;
+                                    _validateForm(); // Add form validation trigger
+                                  });
+                                },
+                              ),
+                              const SizedBox(height: AppSpacing.lg),
+
+                              _buildSectionTitle('Preferences'),
+                              const SizedBox(height: AppSpacing.md),
+
+                              _buildInterestedInSelector(),
+                              const SizedBox(height: AppSpacing.md),
+
+                              _buildAgeRangeSelector(),
+                              const SizedBox(height: AppSpacing.xl),
+
+                              // Save button with better visibility and feedback
+                              Container(
+                                width: double.infinity,
+                                height: 56,
+                                decoration: BoxDecoration(
+                                  borderRadius: BorderRadius.circular(
+                                    AppSpacing.cardRadius,
+                                  ),
+                                  boxShadow: [
+                                    BoxShadow(
+                                      color: _formValid
+                                          ? AppColors.primaryGreen
+                                              .withValues(alpha: 0.3)
+                                          : Colors.grey.withValues(alpha: 0.2),
+                                      blurRadius: 8,
+                                      offset: const Offset(0, 4),
+                                    ),
+                                  ],
+                                ),
+                                child: ElevatedButton(
+                                  onPressed: _formValid ? _saveProfile : null,
+                                  style: ElevatedButton.styleFrom(
+                                    backgroundColor: _formValid
+                                        ? AppColors.primaryGreen
+                                        : Colors.grey.shade400,
+                                    disabledBackgroundColor:
+                                        Colors.grey.shade400,
+                                    shape: RoundedRectangleBorder(
+                                      borderRadius: BorderRadius.circular(
+                                        AppSpacing.cardRadius,
+                                      ),
+                                    ),
+                                    elevation: 0, // Using custom shadow instead
+                                  ),
+                                  child: Row(
+                                    mainAxisAlignment: MainAxisAlignment.center,
+                                    children: [
+                                      Icon(
+                                        _formValid ? Icons.save : Icons.lock,
+                                        color: Colors.white,
+                                        size: 20,
+                                      ),
+                                      const SizedBox(width: 8),
+                                      Text(
+                                        _formValid
+                                            ? 'Save Profile'
+                                            : 'Complete Required Fields',
+                                        style: GoogleFonts.montserrat(
+                                          fontSize: 16,
+                                          fontWeight: FontWeight.w600,
+                                          color: Colors.white,
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                              ),
+
+                              // Form validation status
+                              if (!_formValid) ...[
+                                const SizedBox(height: AppSpacing.md),
+                                Container(
+                                  padding: AppSpacing.cardPadding,
+                                  decoration: BoxDecoration(
+                                    color: Colors.orange.withValues(alpha: 0.1),
+                                    borderRadius: BorderRadius.circular(
+                                      AppSpacing.buttonRadius,
+                                    ),
+                                    border: Border.all(
+                                      color:
+                                          Colors.orange.withValues(alpha: 0.3),
+                                    ),
+                                  ),
+                                  child: Column(
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
+                                    children: [
+                                      Row(
+                                        children: [
+                                          Icon(
+                                            Icons.info_outline,
+                                            color: Colors.orange.shade700,
+                                            size: 20,
+                                          ),
+                                          const SizedBox(width: AppSpacing.sm),
+                                          Text(
+                                            'Complete these requirements to save:',
+                                            style: GoogleFonts.montserrat(
+                                              fontSize: 14,
+                                              fontWeight: FontWeight.w600,
+                                              color: Colors.orange.shade700,
+                                            ),
+                                          ),
+                                        ],
+                                      ),
+                                      const SizedBox(height: AppSpacing.sm),
+                                      _buildValidationRequirements(),
+                                    ],
+                                  ),
+                                ),
+                              ],
+                              const SizedBox(height: AppSpacing.xl),
                             ],
                           ),
                         ),
-                      ],
-                      const SizedBox(height: AppSpacing.xl),
-                    ],
-                  ),
-                ),
-              ),
+                      ),
                       if (_isUploading)
                         ColoredBox(
                           color: Colors.black.withValues(alpha: 0.3),
@@ -1275,7 +1304,8 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                       fit: StackFit.expand,
                       children: [
                         ClipRRect(
-                          borderRadius: BorderRadius.circular(AppSpacing.buttonRadius),
+                          borderRadius:
+                              BorderRadius.circular(AppSpacing.buttonRadius),
                           child: photo is File
                               ? Image.file(
                                   photo,
@@ -1384,7 +1414,10 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
               }
             },
             elevation: isSelected ? 2 : 0,
-            padding: const EdgeInsets.symmetric(horizontal: AppSpacing.md, vertical: AppSpacing.sm),
+            padding: const EdgeInsets.symmetric(
+              horizontal: AppSpacing.md,
+              vertical: AppSpacing.sm,
+            ),
           );
         }).toList(),
       );
@@ -1393,24 +1426,26 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           DecoratedBox(
-          decoration: BoxDecoration(
-            color: Colors.white,
-            borderRadius: BorderRadius.circular(AppSpacing.buttonRadius),
-            border: Border.all(color: Colors.grey.shade300),
-            boxShadow: [
-              BoxShadow(
-                color: Colors.black.withValues(alpha: 0.05),
-                blurRadius: 4,
-                offset: const Offset(0, 2),
-              ),
-            ],
-          ),
-          child: DropdownButtonFormField<String>(
-            initialValue: _selectedTribe,
-            decoration: InputDecoration(
-              border: InputBorder.none,
-              contentPadding:
-                  const EdgeInsets.symmetric(horizontal: AppSpacing.md, vertical: AppSpacing.buttonRadius),
+            decoration: BoxDecoration(
+              color: Colors.white,
+              borderRadius: BorderRadius.circular(AppSpacing.buttonRadius),
+              border: Border.all(color: Colors.grey.shade300),
+              boxShadow: [
+                BoxShadow(
+                  color: Colors.black.withValues(alpha: 0.05),
+                  blurRadius: 4,
+                  offset: const Offset(0, 2),
+                ),
+              ],
+            ),
+            child: DropdownButtonFormField<String>(
+              initialValue: _selectedTribe,
+              decoration: InputDecoration(
+                border: InputBorder.none,
+                contentPadding: const EdgeInsets.symmetric(
+                  horizontal: AppSpacing.md,
+                  vertical: AppSpacing.buttonRadius,
+                ),
                 hintText: 'Select your tribe/ethnicity (optional)',
                 hintStyle: GoogleFonts.montserrat(color: Colors.grey.shade600),
                 prefixIcon:
@@ -1482,12 +1517,14 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                   color: AppColors.textPrimary,
                 ),
               ),
-            Container(
-              padding:
-                  const EdgeInsets.symmetric(horizontal: AppSpacing.buttonRadius, vertical: AppSpacing.xs),
-              decoration: BoxDecoration(
-                color: AppColors.primaryGreen.withValues(alpha: 0.1),
-                borderRadius: BorderRadius.circular(AppSpacing.cardRadius),
+              Container(
+                padding: const EdgeInsets.symmetric(
+                  horizontal: AppSpacing.buttonRadius,
+                  vertical: AppSpacing.xs,
+                ),
+                decoration: BoxDecoration(
+                  color: AppColors.primaryGreen.withValues(alpha: 0.1),
+                  borderRadius: BorderRadius.circular(AppSpacing.cardRadius),
                 ),
                 child: Text(
                   '${_ageRange.start.round()} - ${_ageRange.end.round()} years',

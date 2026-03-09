@@ -1,5 +1,5 @@
 name: naijasingles
-description: "A new Flutter project."
+description: "AfroPeep - Dating and social networking for Africans in the diaspora."
 # The following line prevents the package from being accidentally published to
 # pub.dev using `flutter pub publish`. This is preferred for private packages.
 publish_to: 'none' # Remove this line if you wish to publish to pub.dev
@@ -42,6 +42,7 @@ dependencies:
   cupertino_icons: ^1.0.8        # Updated to latest
   easy_localization: ^3.0.7+1    # Updated to latest
   equatable: ^2.0.7              # Updated to latest
+  firebase_app_check: ^0.4.1+5   # App Check for backend protection
   firebase_auth: ^6.0.1          # Updated to latest
   firebase_core: ^4.0.0         # Updated to latest
   firebase_crashlytics: ^5.0.1   # Crash reporting and analytics
@@ -71,7 +72,7 @@ dependencies:
   geolocator: ^14.0.2            # Added for GPS location
   geocoding: ^4.0.0              # Added for address lookup
   url_launcher: ^6.3.1           # Added for launching URLs and phone calls
-  contacts_service: ^0.6.3       # Added for phone contact access
+  flutter_contacts: ^1.1.9       # Phone contact access (replaces deprecated contacts_service)
   email_validator: ^3.0.0        # Added for email validation
   rflutter_alert: ^2.0.7         # Kept at 2.0.7
   otp_autofill: ^4.1.0           # Updated from 3.0.2
@@ -92,6 +93,7 @@ dependencies:
   flutter_svg: ^2.2.0
   timeago: ^3.7.1
   bloc_concurrency: ^0.3.0
+  vector_math: ^2.2.0              # Explicit dep for Matrix4 non-deprecated helpers (scaleByVector3, etc.)
   
   # Industry Standard Features Dependencies
   # local_auth: ^2.3.0                    # Biometric authentication (temporarily disabled due to intl conflict)
@@ -146,6 +148,8 @@ flutter:
     - asset/translation/
     - asset/images/
     - assets/images/
+    - assets/images/backgrounds/
+    - assets/images/placeholders/
     # .env is optional - only included if it exists (gitignored for security)
   # An image asset can refer to one or more resolution-specific "variants", see
   # https://flutter.dev/assets-and-images/#resolution-aware

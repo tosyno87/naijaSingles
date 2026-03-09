@@ -41,7 +41,7 @@ class CustomSnackbar {
             onPressed: () {
               try {
                 ScaffoldMessenger.of(context).clearSnackBars();
-              } catch (e) {
+              } on Object {
                 rethrow;
               }
             },

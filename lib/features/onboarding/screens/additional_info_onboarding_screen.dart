@@ -122,8 +122,8 @@ class _AdditionalInfoOnboardingScreenState
                 _heightCm = heightCm;
               });
               context.read<OnboardingBloc>().add(
-                OnboardingHeightFromDropdownUpdated(heightFtIn, heightCm),
-              );
+                    OnboardingHeightFromDropdownUpdated(heightFtIn, heightCm),
+                  );
             },
           ),
 
@@ -197,8 +197,8 @@ class _AdditionalInfoOnboardingScreenState
                   _lookingFor = value;
                 });
                 context.read<OnboardingBloc>().add(
-                  OnboardingLookingForUpdated(value),
-                );
+                      OnboardingLookingForUpdated(value),
+                    );
               },
               option['icon'],
             ),
@@ -224,8 +224,8 @@ class _AdditionalInfoOnboardingScreenState
                   _relationshipIntent = value;
                 });
                 context.read<OnboardingBloc>().add(
-                  OnboardingRelationshipIntentUpdated(value),
-                );
+                      OnboardingRelationshipIntentUpdated(value),
+                    );
               },
               option['icon'],
             ),

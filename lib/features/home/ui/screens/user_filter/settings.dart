@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:developer';
 
 import 'package:easy_localization/easy_localization.dart';
@@ -5,9 +6,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:share_plus/share_plus.dart';
 
-import '../../../../../common/constants/app_colors.dart';
 import '../../../../../common/bloc/streetview/streetview_bloc.dart';
 import '../../../../../common/bloc/theme/theme_bloc.dart';
+import '../../../../../common/constants/app_colors.dart';
 import '../../../../../common/routes/route_name.dart';
 import '../../../../../common/widgets/change_language_widget.dart';
 import '../../../../../common/widgets/custom_snackbar.dart';
@@ -245,10 +246,12 @@ class SettingPageState extends State<SettingPage> {
                               ],
                             ),
                             onTap: () {
-                              Navigator.pushNamed(
-                                context,
-                                RouteName.updatePhoneScreen,
-                                arguments: widget.currentUser,
+                              unawaited(
+                                Navigator.pushNamed(
+                                  context,
+                                  RouteName.updatePhoneScreen,
+                                  arguments: widget.currentUser,
+                                ),
                               );
                             },
                           ),
@@ -344,9 +347,12 @@ class SettingPageState extends State<SettingPage> {
                     TextButtonWidget(
                       text: 'Invite your friends',
                       onTap: () async {
-                        await SharePlus.instance.share(ShareParams(
-                          text: 'check out my website https://deligence.com', //Replace with your dynamic link and msg for invite users
-                        ));
+                        await SharePlus.instance.share(
+                          ShareParams(
+                            text:
+                                'check out my website https://deligence.com', //Replace with your dynamic link and msg for invite users
+                          ),
+                        );
                       },
                       icon: Icons.share_outlined,
                     ),
@@ -365,7 +371,7 @@ class SettingPageState extends State<SettingPage> {
                           height: 50,
                           width: 100,
                           child: Image.asset(
-                            'asset/hookup4u-Logo-BP.png',
+                            'asset/images/logo.png',
                             fit: BoxFit.contain,
                             color: isDarkMode
                                 ? Colors.white
@@ -439,10 +445,12 @@ class _ConnectionModeWidgetState extends State<_ConnectionModeWidget> {
                 (entry) => RadioListTile<String>(
                   title: Text(entry.value),
                   value: entry.key,
+                  // ignore: deprecated_member_use
                   groupValue: _selected,
                   activeColor: AppColors.primaryGreen,
                   contentPadding: EdgeInsets.zero,
                   dense: true,
+                  // ignore: deprecated_member_use
                   onChanged: (value) {
                     if (value == null) return;
                     setState(() => _selected = value);

@@ -17,7 +17,7 @@ class UserRepo {
           .doc(userId)
           .set({'editInfo': editInfo}, SetOptions(merge: true));
       log('User data updated successfully');
-    } catch (e) {
+    } on Object catch (e) {
       log('Failed to update user data: $e');
       rethrow;
     }
@@ -31,7 +31,7 @@ class UserRepo {
           .doc(userId)
           .set(changeValues, SetOptions(merge: true));
       log('User filter updated successfully');
-    } catch (e) {
+    } on Object catch (e) {
       log('Failed to update user filter: $e');
       rethrow;
     }
@@ -98,7 +98,7 @@ class UserRepo {
         },
       });
       log('street  filter updated successfully');
-    } catch (e) {
+    } on Object catch (e) {
       log('Failed to update user filter: $e');
       rethrow;
     }
@@ -129,7 +129,7 @@ class UserRepo {
           };
         }
       }
-    } catch (error) {
+    } on Object catch (error) {
       log('Error fetching data: $error');
     }
 

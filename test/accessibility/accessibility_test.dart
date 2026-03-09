@@ -12,25 +12,27 @@ void main() {
   group('Accessibility Tests', () {
     testWidgets('Screen reader compatibility', (WidgetTester tester) async {
       // Test that widgets have proper semantic labels
-      await tester.pumpWidget(MaterialApp(
-        home: Scaffold(
-          body: Column(
-            children: [
-              const Text('Welcome to Afropeep'),
-              ElevatedButton(
-                onPressed: () {},
-                child: const Text('Get Started'),
-              ),
-              const TextField(
-                decoration: InputDecoration(
-                  labelText: 'Enter your phone number',
-                  hintText: '+1 404 555 0123',
+      await tester.pumpWidget(
+        MaterialApp(
+          home: Scaffold(
+            body: Column(
+              children: [
+                const Text('Welcome to Afropeep'),
+                ElevatedButton(
+                  onPressed: () {},
+                  child: const Text('Get Started'),
                 ),
-              ),
-            ],
+                const TextField(
+                  decoration: InputDecoration(
+                    labelText: 'Enter your phone number',
+                    hintText: '+1 404 555 0123',
+                  ),
+                ),
+              ],
+            ),
           ),
         ),
-      ),);
+      );
 
       await tester.pumpAndSettle();
 
@@ -51,35 +53,37 @@ void main() {
 
     testWidgets('Voice-over navigation', (WidgetTester tester) async {
       // Test that navigation is accessible via voice-over
-      await tester.pumpWidget(MaterialApp(
-        home: Scaffold(
-          appBar: AppBar(title: const Text('Afropeep')),
-          body: Column(
-            children: [
-              ListTile(
-                title: const Text('Communities'),
-                subtitle: const Text('Connect with African communities'),
-                onTap: () {},
-              ),
-              ListTile(
-                title: const Text('Connect'),
-                subtitle: const Text('Find matches and friends'),
-                onTap: () {},
-              ),
-              ListTile(
-                title: const Text('Messages'),
-                subtitle: const Text('Chat with your matches'),
-                onTap: () {},
-              ),
-              ListTile(
-                title: const Text('Profile'),
-                subtitle: const Text('Manage your profile'),
-                onTap: () {},
-              ),
-            ],
+      await tester.pumpWidget(
+        MaterialApp(
+          home: Scaffold(
+            appBar: AppBar(title: const Text('Afropeep')),
+            body: Column(
+              children: [
+                ListTile(
+                  title: const Text('Communities'),
+                  subtitle: const Text('Connect with African communities'),
+                  onTap: () {},
+                ),
+                ListTile(
+                  title: const Text('Connect'),
+                  subtitle: const Text('Find matches and friends'),
+                  onTap: () {},
+                ),
+                ListTile(
+                  title: const Text('Messages'),
+                  subtitle: const Text('Chat with your matches'),
+                  onTap: () {},
+                ),
+                ListTile(
+                  title: const Text('Profile'),
+                  subtitle: const Text('Manage your profile'),
+                  onTap: () {},
+                ),
+              ],
+            ),
           ),
         ),
-      ),);
+      );
 
       await tester.pumpAndSettle();
 
@@ -100,36 +104,38 @@ void main() {
 
     testWidgets('Color contrast validation', (WidgetTester tester) async {
       // Test that colors have sufficient contrast
-      await tester.pumpWidget(MaterialApp(
-        theme: ThemeData(
-          primaryColor: const Color(0xFF008037), // Green theme
-          scaffoldBackgroundColor: Colors.white,
-          textTheme: const TextTheme(
-            bodyLarge: TextStyle(color: Colors.black),
-            bodyMedium: TextStyle(color: Colors.black87),
+      await tester.pumpWidget(
+        MaterialApp(
+          theme: ThemeData(
+            primaryColor: const Color(0xFF008037), // Green theme
+            scaffoldBackgroundColor: Colors.white,
+            textTheme: const TextTheme(
+              bodyLarge: TextStyle(color: Colors.black),
+              bodyMedium: TextStyle(color: Colors.black87),
+            ),
+          ),
+          home: const Scaffold(
+            body: Column(
+              children: [
+                ColoredBox(
+                  color: Color(0xFF008037),
+                  child: Text(
+                    'Green Background Text',
+                    style: TextStyle(color: Colors.white),
+                  ),
+                ),
+                ColoredBox(
+                  color: Colors.white,
+                  child: Text(
+                    'White Background Text',
+                    style: TextStyle(color: Colors.black),
+                  ),
+                ),
+              ],
+            ),
           ),
         ),
-        home: const Scaffold(
-          body: Column(
-            children: [
-              ColoredBox(
-                color: Color(0xFF008037),
-                child: Text(
-                  'Green Background Text',
-                  style: TextStyle(color: Colors.white),
-                ),
-              ),
-              ColoredBox(
-                color: Colors.white,
-                child: Text(
-                  'White Background Text',
-                  style: TextStyle(color: Colors.black),
-                ),
-              ),
-            ],
-          ),
-        ),
-      ),);
+      );
 
       await tester.pumpAndSettle();
 
@@ -144,26 +150,28 @@ void main() {
 
     testWidgets('Font size scaling', (WidgetTester tester) async {
       // Test that text scales properly
-      await tester.pumpWidget(const MaterialApp(
-        home: Scaffold(
-          body: Column(
-            children: [
-              Text(
-                'Welcome to Afropeep',
-                style: TextStyle(fontSize: 24),
-              ),
-              Text(
-                'Connect with African diaspora',
-                style: TextStyle(fontSize: 16),
-              ),
-              Text(
-                'Find meaningful relationships',
-                style: TextStyle(fontSize: 14),
-              ),
-            ],
+      await tester.pumpWidget(
+        const MaterialApp(
+          home: Scaffold(
+            body: Column(
+              children: [
+                Text(
+                  'Welcome to Afropeep',
+                  style: TextStyle(fontSize: 24),
+                ),
+                Text(
+                  'Connect with African diaspora',
+                  style: TextStyle(fontSize: 16),
+                ),
+                Text(
+                  'Find meaningful relationships',
+                  style: TextStyle(fontSize: 14),
+                ),
+              ],
+            ),
           ),
         ),
-      ),);
+      );
 
       await tester.pumpAndSettle();
 
@@ -179,38 +187,40 @@ void main() {
 
     testWidgets('Touch target size validation', (WidgetTester tester) async {
       // Test that touch targets are large enough
-      await tester.pumpWidget(MaterialApp(
-        home: Scaffold(
-          body: Column(
-            children: [
-              SizedBox(
-                width: 200,
-                height: 48,
-                child: ElevatedButton(
-                  onPressed: () {},
-                  child: const Text('Large Button'),
+      await tester.pumpWidget(
+        MaterialApp(
+          home: Scaffold(
+            body: Column(
+              children: [
+                SizedBox(
+                  width: 200,
+                  height: 48,
+                  child: ElevatedButton(
+                    onPressed: () {},
+                    child: const Text('Large Button'),
+                  ),
                 ),
-              ),
-              SizedBox(
-                width: 100,
-                height: 32,
-                child: TextButton(
-                  onPressed: () {},
-                  child: const Text('Small Button'),
+                SizedBox(
+                  width: 100,
+                  height: 32,
+                  child: TextButton(
+                    onPressed: () {},
+                    child: const Text('Small Button'),
+                  ),
                 ),
-              ),
-              SizedBox(
-                width: 44,
-                height: 44,
-                child: IconButton(
-                  onPressed: () {},
-                  icon: const Icon(Icons.menu),
+                SizedBox(
+                  width: 44,
+                  height: 44,
+                  child: IconButton(
+                    onPressed: () {},
+                    icon: const Icon(Icons.menu),
+                  ),
                 ),
-              ),
-            ],
+              ],
+            ),
           ),
         ),
-      ),);
+      );
 
       await tester.pumpAndSettle();
 
@@ -226,38 +236,40 @@ void main() {
 
     testWidgets('Keyboard navigation', (WidgetTester tester) async {
       // Test that forms can be navigated with keyboard
-      await tester.pumpWidget(MaterialApp(
-        home: Scaffold(
-          body: Form(
-            child: Column(
-              children: [
-                TextFormField(
-                  decoration: const InputDecoration(
-                    labelText: 'Name',
-                    hintText: 'Enter your name',
+      await tester.pumpWidget(
+        MaterialApp(
+          home: Scaffold(
+            body: Form(
+              child: Column(
+                children: [
+                  TextFormField(
+                    decoration: const InputDecoration(
+                      labelText: 'Name',
+                      hintText: 'Enter your name',
+                    ),
                   ),
-                ),
-                TextFormField(
-                  decoration: const InputDecoration(
-                    labelText: 'Email',
-                    hintText: 'Enter your email',
+                  TextFormField(
+                    decoration: const InputDecoration(
+                      labelText: 'Email',
+                      hintText: 'Enter your email',
+                    ),
                   ),
-                ),
-                TextFormField(
-                  decoration: const InputDecoration(
-                    labelText: 'Phone',
-                    hintText: 'Enter your phone number',
+                  TextFormField(
+                    decoration: const InputDecoration(
+                      labelText: 'Phone',
+                      hintText: 'Enter your phone number',
+                    ),
                   ),
-                ),
-                ElevatedButton(
-                  onPressed: () {},
-                  child: const Text('Submit'),
-                ),
-              ],
+                  ElevatedButton(
+                    onPressed: () {},
+                    child: const Text('Submit'),
+                  ),
+                ],
+              ),
             ),
           ),
         ),
-      ),);
+      );
 
       await tester.pumpAndSettle();
 
@@ -278,35 +290,38 @@ void main() {
 
     testWidgets('Cultural accessibility', (WidgetTester tester) async {
       // Test that cultural elements are accessible
-      await tester.pumpWidget(MaterialApp(
-        home: Scaffold(
-          body: Column(
-            children: [
-              const Text('Select your cultural background'),
-              DropdownButton<String>(
-                value: 'Nigeria',
-                items: const [
-                  DropdownMenuItem(value: 'Nigeria', child: Text('Nigeria')),
-                  DropdownMenuItem(value: 'Ghana', child: Text('Ghana')),
-                  DropdownMenuItem(value: 'Ethiopia', child: Text('Ethiopia')),
-                  DropdownMenuItem(value: 'Kenya', child: Text('Kenya')),
-                ],
-                onChanged: (value) {},
-              ),
-              const Text('Select your ethnicity'),
-              DropdownButton<String>(
-                value: 'Yoruba',
-                items: const [
-                  DropdownMenuItem(value: 'Yoruba', child: Text('Yoruba')),
-                  DropdownMenuItem(value: 'Igbo', child: Text('Igbo')),
-                  DropdownMenuItem(value: 'Hausa', child: Text('Hausa')),
-                ],
-                onChanged: (value) {},
-              ),
-            ],
+      await tester.pumpWidget(
+        MaterialApp(
+          home: Scaffold(
+            body: Column(
+              children: [
+                const Text('Select your cultural background'),
+                DropdownButton<String>(
+                  value: 'Nigeria',
+                  items: const [
+                    DropdownMenuItem(value: 'Nigeria', child: Text('Nigeria')),
+                    DropdownMenuItem(value: 'Ghana', child: Text('Ghana')),
+                    DropdownMenuItem(
+                        value: 'Ethiopia', child: Text('Ethiopia')),
+                    DropdownMenuItem(value: 'Kenya', child: Text('Kenya')),
+                  ],
+                  onChanged: (value) {},
+                ),
+                const Text('Select your ethnicity'),
+                DropdownButton<String>(
+                  value: 'Yoruba',
+                  items: const [
+                    DropdownMenuItem(value: 'Yoruba', child: Text('Yoruba')),
+                    DropdownMenuItem(value: 'Igbo', child: Text('Igbo')),
+                    DropdownMenuItem(value: 'Hausa', child: Text('Hausa')),
+                  ],
+                  onChanged: (value) {},
+                ),
+              ],
+            ),
           ),
         ),
-      ),);
+      );
 
       await tester.pumpAndSettle();
 
@@ -323,28 +338,30 @@ void main() {
 
     testWidgets('Error message accessibility', (WidgetTester tester) async {
       // Test that error messages are accessible
-      await tester.pumpWidget(MaterialApp(
-        home: Scaffold(
-          body: Column(
-            children: [
-              TextFormField(
-                decoration: const InputDecoration(
-                  labelText: 'Phone Number',
-                  errorText: 'Please enter a valid phone number',
+      await tester.pumpWidget(
+        MaterialApp(
+          home: Scaffold(
+            body: Column(
+              children: [
+                TextFormField(
+                  decoration: const InputDecoration(
+                    labelText: 'Phone Number',
+                    errorText: 'Please enter a valid phone number',
+                  ),
                 ),
-              ),
-              const Text(
-                'Error: Invalid input',
-                style: TextStyle(color: Colors.red),
-              ),
-              const Text(
-                'Please try again',
-                style: TextStyle(color: Colors.red),
-              ),
-            ],
+                const Text(
+                  'Error: Invalid input',
+                  style: TextStyle(color: Colors.red),
+                ),
+                const Text(
+                  'Please try again',
+                  style: TextStyle(color: Colors.red),
+                ),
+              ],
+            ),
           ),
         ),
-      ),);
+      );
 
       await tester.pumpAndSettle();
 
@@ -360,19 +377,22 @@ void main() {
 
     testWidgets('Loading state accessibility', (WidgetTester tester) async {
       // Test that loading states are accessible
-      await tester.pumpWidget(const MaterialApp(
-        home: Scaffold(
-          body: Column(
-            children: [
-              CircularProgressIndicator(),
-              Text('Loading your matches...'),
-              LinearProgressIndicator(
-                  value: 0.5,), // Fixed value to prevent infinite animation
-              Text('Uploading photos...'),
-            ],
+      await tester.pumpWidget(
+        const MaterialApp(
+          home: Scaffold(
+            body: Column(
+              children: [
+                CircularProgressIndicator(),
+                Text('Loading your matches...'),
+                LinearProgressIndicator(
+                  value: 0.5,
+                ), // Fixed value to prevent infinite animation
+                Text('Uploading photos...'),
+              ],
+            ),
           ),
         ),
-      ),);
+      );
 
       await tester
           .pump(); // Use pump() instead of pumpAndSettle() to avoid timeout
@@ -390,18 +410,20 @@ void main() {
 
     testWidgets('Multi-language accessibility', (WidgetTester tester) async {
       // Test that multi-language support is accessible
-      await tester.pumpWidget(const MaterialApp(
-        home: Scaffold(
-          body: Column(
-            children: [
-              Text('Welcome / Bawo / Ndewo'),
-              Text('Connect / Sopọ / Njikọ'),
-              Text('Messages / Oju-ọrọ / Ozi'),
-              Text('Profile / Profaili / Profaịlụ'),
-            ],
+      await tester.pumpWidget(
+        const MaterialApp(
+          home: Scaffold(
+            body: Column(
+              children: [
+                Text('Welcome / Bawo / Ndewo'),
+                Text('Connect / Sopọ / Njikọ'),
+                Text('Messages / Oju-ọrọ / Ozi'),
+                Text('Profile / Profaili / Profaịlụ'),
+              ],
+            ),
           ),
         ),
-      ),);
+      );
 
       await tester.pumpAndSettle();
 
@@ -416,54 +438,155 @@ void main() {
       expect(welcomeText, findsOneWidget);
     });
 
-    testWidgets('Image accessibility', (WidgetTester tester) async {
-      // Test that images have proper alt text
-      await tester.pumpWidget(MaterialApp(
-        home: Scaffold(
-          body: Column(
-            children: [
-              // Use Container with decoration instead of Image.asset for testing
-              Container(
-                width: 100,
-                height: 100,
-                decoration: BoxDecoration(
-                  color: Colors.blue,
-                  borderRadius: BorderRadius.circular(8),
-                ),
-                child: const Icon(
-                  Icons.image,
-                  semanticLabel: 'Afropeep Logo',
-                ),
-              ),
-              // Use Container instead of Image.network for testing
-              Container(
-                width: 100,
-                height: 100,
-                decoration: BoxDecoration(
-                  color: Colors.green,
-                  borderRadius: BorderRadius.circular(8),
-                ),
-                child: const Icon(
-                  Icons.photo,
-                  semanticLabel: 'User Profile Photo',
+    testWidgets('Text scaling at 200% does not overflow',
+        (WidgetTester tester) async {
+      await tester.pumpWidget(
+        MediaQuery(
+          data: const MediaQueryData(textScaler: TextScaler.linear(2.0)),
+          child: MaterialApp(
+            home: Scaffold(
+              body: SingleChildScrollView(
+                child: Column(
+                  children: [
+                    const Text('Welcome to Afropeep'),
+                    ElevatedButton(
+                      onPressed: () {},
+                      child: const Text('Get Started'),
+                    ),
+                    const TextField(
+                      decoration: InputDecoration(
+                        labelText: 'Enter your phone number',
+                      ),
+                    ),
+                  ],
                 ),
               ),
-              Container(
-                width: 100,
-                height: 100,
-                decoration: BoxDecoration(
-                  color: Colors.grey,
-                  borderRadius: BorderRadius.circular(50),
-                ),
-                child: const Icon(
-                  Icons.person,
-                  semanticLabel: 'Default Profile Picture',
-                ),
-              ),
-            ],
+            ),
           ),
         ),
-      ),);
+      );
+
+      await tester.pumpAndSettle();
+
+      expect(find.text('Welcome to Afropeep'), findsOneWidget);
+      expect(find.text('Get Started'), findsOneWidget);
+
+      expect(tester.takeException(), isNull);
+    });
+
+    testWidgets('Tap targets meet 48x48 minimum', (WidgetTester tester) async {
+      await tester.pumpWidget(
+        MaterialApp(
+          home: Scaffold(
+            body: Column(
+              children: [
+                ElevatedButton(
+                  onPressed: () {},
+                  child: const Text('Action'),
+                ),
+                IconButton(
+                  onPressed: () {},
+                  icon: const Icon(Icons.favorite),
+                ),
+              ],
+            ),
+          ),
+        ),
+      );
+
+      await tester.pumpAndSettle();
+
+      final elevatedButtons = find.byType(ElevatedButton);
+      expect(elevatedButtons, findsOneWidget);
+      final btnSize = tester.getSize(elevatedButtons);
+      expect(btnSize.height, greaterThanOrEqualTo(48));
+
+      final iconButtons = find.byType(IconButton);
+      expect(iconButtons, findsOneWidget);
+      final iconSize = tester.getSize(iconButtons);
+      expect(iconSize.width, greaterThanOrEqualTo(48));
+      expect(iconSize.height, greaterThanOrEqualTo(48));
+    });
+
+    testWidgets('Shared state views have Semantics',
+        (WidgetTester tester) async {
+      await tester.pumpWidget(
+        MaterialApp(
+          home: Scaffold(
+            body: Column(
+              children: [
+                Expanded(
+                  child: Semantics(
+                    label: 'Loading...',
+                    child: const Center(
+                      child: CircularProgressIndicator(),
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ),
+      );
+
+      await tester.pump();
+
+      final semantics = tester.getSemantics(
+        find.bySemanticsLabel('Loading...'),
+      );
+      expect(semantics.label, 'Loading...');
+    });
+
+    testWidgets('Image accessibility', (WidgetTester tester) async {
+      // Test that images have proper alt text
+      await tester.pumpWidget(
+        MaterialApp(
+          home: Scaffold(
+            body: Column(
+              children: [
+                // Use Container with decoration instead of Image.asset for testing
+                Container(
+                  width: 100,
+                  height: 100,
+                  decoration: BoxDecoration(
+                    color: Colors.blue,
+                    borderRadius: BorderRadius.circular(8),
+                  ),
+                  child: const Icon(
+                    Icons.image,
+                    semanticLabel: 'Afropeep Logo',
+                  ),
+                ),
+                // Use Container instead of Image.network for testing
+                Container(
+                  width: 100,
+                  height: 100,
+                  decoration: BoxDecoration(
+                    color: Colors.green,
+                    borderRadius: BorderRadius.circular(8),
+                  ),
+                  child: const Icon(
+                    Icons.photo,
+                    semanticLabel: 'User Profile Photo',
+                  ),
+                ),
+                Container(
+                  width: 100,
+                  height: 100,
+                  decoration: BoxDecoration(
+                    color: Colors.grey,
+                    borderRadius: BorderRadius.circular(50),
+                  ),
+                  child: const Icon(
+                    Icons.person,
+                    semanticLabel: 'Default Profile Picture',
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ),
+      );
 
       await tester.pumpAndSettle();
 

@@ -2,7 +2,7 @@
  * Match-related Cloud Function handlers
  */
 
-import * as functions from 'firebase-functions/v1';
+import {onDocumentCreated} from 'firebase-functions/v2/firestore';
 import * as admin from 'firebase-admin';
 import {UserService} from '../services/userService';
 import {NotificationService} from '../services/notificationService';
@@ -17,14 +17,11 @@ export class MatchHandlers {
     this.notificationService = new NotificationService();
   }
 
-  /**
-   * Handle match creation (Gen 1 - compatible with existing deployments)
-   */
-  onMatchCreated = functions.firestore
-    .document('matches/{matchId}')
-    .onCreate(async (snap: admin.firestore.QueryDocumentSnapshot, context: functions.EventContext) => {
+  onMatchCreated = onDocumentCreated('matches/{matchId}', async (event) => {
+      const snap = event.data;
+      if (!snap) return;
       const matchData = snap.data() as Match;
-      const matchId = context.params.matchId;
+      const matchId = event.params.matchId;
       
       console.log(`🎉 New match created: ${matchId}`, matchData);
       

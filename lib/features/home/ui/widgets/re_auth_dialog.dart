@@ -3,9 +3,9 @@ import 'dart:developer';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:pin_code_fields/pin_code_fields.dart';
-import 'package:flutter_bloc/flutter_bloc.dart';
 
 import '../../../../common/bloc/theme/theme_bloc.dart';
 import '../../../../common/bloc/user/user_bloc.dart';
@@ -144,7 +144,7 @@ Future<void> reauthenticateWithPhone({
       // Delete user account
       await deleteUserAndNavigateToLogin(auth, context);
     }
-  } catch (e) {
+  } on Object catch (e) {
     log('Error re-authenticating user: $e');
     if (context.mounted) {
       CustomSnackbar.showSnackBarSimple(
@@ -168,23 +168,20 @@ Future<void> deleteUserAndNavigateToLogin(
     // Delete user data from Firestore collections
     await PhoneAuthRepository().deleteUser(user!);
     await PhoneAuthRepository().signOut();
-    if (context.mounted) {
-      // Show success message
-      CustomSnackbar.showSnackBarSimple(
-        'Account deleted Successfully'.tr().toString(),
-        context,
-      );
-      final userBloc = context.read<UserBloc>();
-      Navigator.pushNamedAndRemoveUntil(
-        context,
-        RouteName.welcomeScreen,
-        (route) => false,
-      ).then((value) {
-        userBloc.add(const UserDataUpdated(null));
-        userBloc.add(const UserListenStopped());
-      });
-    }
-  } catch (e) {
+    if (!context.mounted) return;
+    CustomSnackbar.showSnackBarSimple(
+      'Account deleted Successfully'.tr().toString(),
+      context,
+    );
+    final userBloc = context.read<UserBloc>();
+    await Navigator.pushNamedAndRemoveUntil(
+      context,
+      RouteName.welcomeScreen,
+      (route) => false,
+    );
+    userBloc.add(const UserDataUpdated(null));
+    userBloc.add(const UserListenStopped());
+  } on Object catch (e) {
     log('Error deleting user account: $e');
     if (context.mounted) {
       CustomSnackbar.showSnackBarSimple(

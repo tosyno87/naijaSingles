@@ -32,29 +32,27 @@ class FireStoreClass {
       final UploadTask uploadTask = storageReference.putFile(file);
 
       try {
-        await uploadTask.then((p0) {
-          storageReference.getDownloadURL().then((fileURL) async {
-            try {
-              log('Updating profile picture with URL: $fileURL');
-              await firebaseFireStoreInstance
-                  .collection('users')
-                  .doc(currentUserId)
-                  .set(
-                {
-                  'Pictures': [fileURL],
-                },
-                SetOptions(merge: true),
-              );
-            } catch (e) {
-              log('Error updating Firestore with image URL: $e');
-            }
-          });
-        });
-      } catch (e) {
+        await uploadTask;
+        final fileURL = await storageReference.getDownloadURL();
+        try {
+          log('Updating profile picture with URL: $fileURL');
+          await firebaseFireStoreInstance
+              .collection('users')
+              .doc(currentUserId)
+              .set(
+            {
+              'Pictures': [fileURL],
+            },
+            SetOptions(merge: true),
+          );
+        } on Object catch (e) {
+          log('Error updating Firestore with image URL: $e');
+        }
+      } on Object catch (e) {
         log('Error in upload task: $e');
       }
       return uploadTask;
-    } catch (e) {
+    } on Object catch (e) {
       log('Error in uploadprofile: $e');
       return null;
     }
@@ -101,11 +99,11 @@ class FireStoreClass {
 
         log('Verification image uploaded: $downloadUrl');
         return downloadUrl;
-      } catch (e) {
+      } on Object catch (e) {
         log('Error in verification upload task: $e');
         return null;
       }
-    } catch (e) {
+    } on Object catch (e) {
       log('Error in uploadVerification: $e');
       return null;
     }
@@ -136,50 +134,49 @@ class FireStoreClass {
       final UploadTask uploadTask = storageReference.putFile(file);
 
       try {
-        await uploadTask.then((p0) {
-          storageReference.getDownloadURL().then((fileURL) async {
-            // Initialize Pictures array if it doesn't exist
-            final DocumentSnapshot userDoc = await firebaseFireStoreInstance
+        await uploadTask;
+        final fileURL = await storageReference.getDownloadURL();
+
+        // Initialize Pictures array if it doesn't exist
+        final DocumentSnapshot userDoc = await firebaseFireStoreInstance
+            .collection('users')
+            .doc(currentUser.id)
+            .get();
+
+        List<String> pictures = [];
+        if (userDoc.exists && userDoc.data() is Map<String, dynamic>) {
+          final Map<String, dynamic> userData =
+              userDoc.data() as Map<String, dynamic>;
+          if (userData.containsKey('Pictures') &&
+              userData['Pictures'] is List) {
+            pictures = List<String>.from(userData['Pictures']);
+          }
+        }
+
+        // Add new image URL
+        pictures.add(fileURL);
+
+        try {
+          if (checktype == 'profile') {
+            log('Updating profile picture with URL: $fileURL');
+            await firebaseFireStoreInstance
                 .collection('users')
                 .doc(currentUser.id)
-                .get();
-
-            List<String> pictures = [];
-            if (userDoc.exists && userDoc.data() is Map<String, dynamic>) {
-              final Map<String, dynamic> userData =
-                  userDoc.data() as Map<String, dynamic>;
-              if (userData.containsKey('Pictures') &&
-                  userData['Pictures'] is List) {
-                pictures = List<String>.from(userData['Pictures']);
-              }
-            }
-
-            // Add new image URL
-            pictures.add(fileURL);
-
-            try {
-              if (checktype == 'profile') {
-                log('Updating profile picture with URL: $fileURL');
-                await firebaseFireStoreInstance
-                    .collection('users')
-                    .doc(currentUser.id)
-                    .set({'Pictures': pictures}, SetOptions(merge: true));
-              } else {
-                await firebaseFireStoreInstance
-                    .collection('users')
-                    .doc(currentUser.id)
-                    .update({'Pictures': pictures});
-              }
-            } catch (e) {
-              log('Error updating Firestore with image URL: $e');
-            }
-          });
-        });
-      } catch (e) {
+                .set({'Pictures': pictures}, SetOptions(merge: true));
+          } else {
+            await firebaseFireStoreInstance
+                .collection('users')
+                .doc(currentUser.id)
+                .update({'Pictures': pictures});
+          }
+        } on Object catch (e) {
+          log('Error updating Firestore with image URL: $e');
+        }
+      } on Object catch (e) {
         log('Error in upload task: $e');
       }
       return uploadTask;
-    } catch (e) {
+    } on Object catch (e) {
       log('Error in uploadFile: $e');
       return null;
     }

@@ -262,7 +262,7 @@ class _OtpVerificationScreenState extends State<OtpVerificationScreen> {
                   MultiBlocListener(
                     listeners: [
                       BlocListener<PhoneAuthBloc, PhoneAuthState>(
-                        listener: (context, state) {
+                        listener: (context, state) async {
                           if (state is PhoneAuthError) {
                             CustomSnackbar.showSnackBarSimple(
                               state.error,
@@ -273,18 +273,18 @@ class _OtpVerificationScreenState extends State<OtpVerificationScreen> {
                               // Handle phone number update
                               Navigator.pop(context);
                               Navigator.pop(context);
+                              if (!context.mounted) return;
                               CustomSnackbar.showSnackBarSimple(
                                 'Phone number updated successfully',
                                 context,
                               );
                             } else {
-                              // Check if user is registered
-                              state.user?.getIdToken().then((value) {
-                                if (value != null) {
-                                  BlocProvider.of<RegistrationBloc>(context)
-                                      .add(CheckRegistration(token: value));
-                                }
-                              });
+                              final value = await state.user?.getIdToken();
+                              if (!context.mounted) return;
+                              if (value != null) {
+                                BlocProvider.of<RegistrationBloc>(context)
+                                    .add(CheckRegistration(token: value));
+                              }
                             }
                           }
                         },
@@ -292,18 +292,20 @@ class _OtpVerificationScreenState extends State<OtpVerificationScreen> {
                       BlocListener<RegistrationBloc, RegistrationStates>(
                         listener: (context, state) {
                           if (state is AlreadyRegistered) {
-                            // User already exists, go to main screen
-                            Navigator.pushNamedAndRemoveUntil(
-                              context,
-                              RouteName.mainNavigation,
-                              (route) => false,
+                            unawaited(
+                              Navigator.pushNamedAndRemoveUntil(
+                                context,
+                                RouteName.mainNavigation,
+                                (route) => false,
+                              ),
                             );
                           } else if (state is NewRegistration) {
-                            // New user, go to onboarding
-                            Navigator.pushNamedAndRemoveUntil(
-                              context,
-                              RouteName.onboarding,
-                              (route) => false,
+                            unawaited(
+                              Navigator.pushNamedAndRemoveUntil(
+                                context,
+                                RouteName.onboarding,
+                                (route) => false,
+                              ),
                             );
                           }
                         },

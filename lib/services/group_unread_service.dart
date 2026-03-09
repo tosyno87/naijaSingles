@@ -26,7 +26,7 @@ class GroupUnreadService {
         return doc.data()?['count'] ?? 0;
       }
       return 0;
-    } catch (e) {
+    } on Object catch (e) {
       log('Error getting unread count: $e');
       return 0;
     }
@@ -71,7 +71,7 @@ class GroupUnreadService {
       await batch.commit();
 
       log('✅ Marked group as read: $groupId');
-    } catch (e) {
+    } on Object catch (e) {
       log('❌ Error marking group as read: $e');
     }
   }
@@ -116,7 +116,7 @@ class GroupUnreadService {
       await batch.commit();
 
       log('✅ Incremented unread count for group: $groupId');
-    } catch (e) {
+    } on Object catch (e) {
       log('❌ Error incrementing unread count: $e');
     }
   }
@@ -151,7 +151,7 @@ class GroupUnreadService {
         total += (doc.data()['count'] ?? 0) as int;
       }
       return total;
-    } catch (e) {
+    } on Object catch (e) {
       log('Error getting total unread count: $e');
       return 0;
     }

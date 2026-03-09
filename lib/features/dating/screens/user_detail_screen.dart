@@ -1,6 +1,10 @@
+import 'dart:async';
+
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import '../../../common/constants/app_colors.dart';
+import '../../../common/widgets/state_views/state_views.dart';
 import '../../../models/user_model.dart';
 import '../widgets/mode_specific_profile_sections.dart';
 
@@ -163,25 +167,12 @@ class _UserDetailScreenState extends State<UserDetailScreen> {
 
   Widget _buildPhotoSection(List<String> photos) {
     if (photos.isEmpty) {
-      return ColoredBox(
-        color: Colors.grey.shade200,
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Icon(
-              Icons.person,
-              size: 100,
-              color: Colors.grey.shade400,
-            ),
-            const SizedBox(height: 16),
-            Text(
-              'No photos available',
-              style: GoogleFonts.montserrat(
-                color: Colors.grey.shade600,
-                fontSize: 16,
-              ),
-            ),
-          ],
+      return const ColoredBox(
+        color: Color(0xFFF5F5F5),
+        child: AppEmptyView(
+          title: 'No Photos Available',
+          subtitle: 'This profile does not have photos yet.',
+          icon: Icons.person_outline,
         ),
       );
     }
@@ -199,10 +190,19 @@ class _UserDetailScreenState extends State<UserDetailScreen> {
           },
           itemBuilder: (context, index) => GestureDetector(
             onTap: () => _showFullScreenPhoto(photos, index),
-            child: Image.network(
-              photos[index],
+            child: CachedNetworkImage(
+              imageUrl: photos[index],
               fit: BoxFit.cover,
-              errorBuilder: (context, error, stackTrace) => ColoredBox(
+              placeholder: (context, url) => ColoredBox(
+                color: Colors.grey.shade100,
+                child: const Center(
+                  child: CircularProgressIndicator(
+                    color: afropeepGreen,
+                    strokeWidth: 2,
+                  ),
+                ),
+              ),
+              errorWidget: (context, url, error) => ColoredBox(
                 color: Colors.grey.shade200,
                 child: Column(
                   mainAxisAlignment: MainAxisAlignment.center,
@@ -223,21 +223,6 @@ class _UserDetailScreenState extends State<UserDetailScreen> {
                   ],
                 ),
               ),
-              loadingBuilder: (context, child, loadingProgress) {
-                if (loadingProgress == null) return child;
-                return ColoredBox(
-                  color: Colors.grey.shade100,
-                  child: Center(
-                    child: CircularProgressIndicator(
-                      color: afropeepGreen,
-                      value: loadingProgress.expectedTotalBytes != null
-                          ? loadingProgress.cumulativeBytesLoaded /
-                              loadingProgress.expectedTotalBytes!
-                          : null,
-                    ),
-                  ),
-                );
-              },
             ),
           ),
         ),
@@ -342,7 +327,9 @@ class _UserDetailScreenState extends State<UserDetailScreen> {
                     decoration: BoxDecoration(
                       color: afropeepGreen.withValues(alpha: 0.1),
                       borderRadius: BorderRadius.circular(16),
-                      border: Border.all(color: afropeepGreen.withValues(alpha: 0.3)),
+                      border: Border.all(
+                        color: afropeepGreen.withValues(alpha: 0.3),
+                      ),
                     ),
                     child: Text(
                       '🇳🇬 ${widget.user.nationality}',
@@ -362,7 +349,9 @@ class _UserDetailScreenState extends State<UserDetailScreen> {
                     decoration: BoxDecoration(
                       color: afropeepGreen.withValues(alpha: 0.1),
                       borderRadius: BorderRadius.circular(16),
-                      border: Border.all(color: afropeepGreen.withValues(alpha: 0.3)),
+                      border: Border.all(
+                        color: afropeepGreen.withValues(alpha: 0.3),
+                      ),
                     ),
                     child: Text(
                       '🏛️ ${widget.user.tribe}',
@@ -408,7 +397,8 @@ class _UserDetailScreenState extends State<UserDetailScreen> {
                   decoration: BoxDecoration(
                     color: afropeepGreen.withValues(alpha: 0.1),
                     borderRadius: BorderRadius.circular(16),
-                    border: Border.all(color: afropeepGreen.withValues(alpha: 0.3)),
+                    border:
+                        Border.all(color: afropeepGreen.withValues(alpha: 0.3)),
                   ),
                   child: Text(
                     '${widget.user.distanceBW} miles away',
@@ -534,7 +524,8 @@ class _UserDetailScreenState extends State<UserDetailScreen> {
                   decoration: BoxDecoration(
                     color: afropeepGreen.withValues(alpha: 0.1),
                     borderRadius: BorderRadius.circular(20),
-                    border: Border.all(color: afropeepGreen.withValues(alpha: 0.3)),
+                    border:
+                        Border.all(color: afropeepGreen.withValues(alpha: 0.3)),
                   ),
                   child: Text(
                     interest,
@@ -654,11 +645,13 @@ class _UserDetailScreenState extends State<UserDetailScreen> {
       );
 
   void _showFullScreenPhoto(List<String> photos, int initialIndex) {
-    Navigator.of(context).push(
-      MaterialPageRoute(
-        builder: (context) => _FullScreenPhotoViewer(
-          photos: photos,
-          initialIndex: initialIndex,
+    unawaited(
+      Navigator.of(context).push(
+        MaterialPageRoute(
+          builder: (context) => _FullScreenPhotoViewer(
+            photos: photos,
+            initialIndex: initialIndex,
+          ),
         ),
       ),
     );
@@ -772,10 +765,13 @@ class _FullScreenPhotoViewerState extends State<_FullScreenPhotoViewer> {
                 minScale: 0.5,
                 maxScale: 3,
                 child: Center(
-                  child: Image.network(
-                    widget.photos[index],
+                  child: CachedNetworkImage(
+                    imageUrl: widget.photos[index],
                     fit: BoxFit.contain,
-                    errorBuilder: (context, error, stackTrace) => ColoredBox(
+                    placeholder: (context, url) => const Center(
+                      child: CircularProgressIndicator(strokeWidth: 2),
+                    ),
+                    errorWidget: (context, url, error) => ColoredBox(
                       color: Colors.grey.shade800,
                       child: Column(
                         mainAxisAlignment: MainAxisAlignment.center,

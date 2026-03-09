@@ -1,5 +1,6 @@
 import 'dart:developer';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import '../../../../common/utils/firestore_helpers.dart';
 
 class EventAnalytics {
   const EventAnalytics({
@@ -27,7 +28,7 @@ class EventAnalytics {
         topLocations: List<String>.from(json['topLocations'] ?? []),
         topAgeGroups: List<String>.from(json['topAgeGroups'] ?? []),
         conversionRate: (json['conversionRate'] ?? 0.0).toDouble(),
-        lastUpdated: (json['lastUpdated'] as Timestamp).toDate(),
+        lastUpdated: parseDateTime(json['lastUpdated']),
       );
   final String eventId;
   final int totalViews;
@@ -93,7 +94,7 @@ class EventAnalyticsService {
         'Event view tracked for event: $eventId, user: $userId',
         name: 'EventAnalyticsService',
       );
-    } catch (e) {
+    } on Object catch (e) {
       log('Error tracking event view: $e', name: 'EventAnalyticsService');
     }
   }
@@ -132,7 +133,7 @@ class EventAnalyticsService {
         'Event RSVP tracked for event: $eventId, user: $userId',
         name: 'EventAnalyticsService',
       );
-    } catch (e) {
+    } on Object catch (e) {
       log('Error tracking event RSVP: $e', name: 'EventAnalyticsService');
     }
   }
@@ -169,7 +170,7 @@ class EventAnalyticsService {
         'Event share tracked for event: $eventId, user: $userId, method: $shareMethod',
         name: 'EventAnalyticsService',
       );
-    } catch (e) {
+    } on Object catch (e) {
       log('Error tracking event share: $e', name: 'EventAnalyticsService');
     }
   }
@@ -206,7 +207,7 @@ class EventAnalyticsService {
         'Event click tracked for event: $eventId, user: $userId, type: $clickType',
         name: 'EventAnalyticsService',
       );
-    } catch (e) {
+    } on Object catch (e) {
       log('Error tracking event click: $e', name: 'EventAnalyticsService');
     }
   }
@@ -240,9 +241,9 @@ class EventAnalyticsService {
         topLocations: List<String>.from(data['topLocations'] ?? []),
         topAgeGroups: List<String>.from(data['topAgeGroups'] ?? []),
         conversionRate: conversionRate,
-        lastUpdated: (data['lastUpdated'] as Timestamp).toDate(),
+        lastUpdated: parseDateTime(data['lastUpdated']),
       );
-    } catch (e) {
+    } on Object catch (e) {
       log('Error getting event analytics: $e', name: 'EventAnalyticsService');
       return null;
     }
@@ -276,7 +277,7 @@ class EventAnalyticsService {
       analyticsList.sort((a, b) => b.totalViews.compareTo(a.totalViews));
 
       return analyticsList;
-    } catch (e) {
+    } on Object catch (e) {
       log(
         'Error getting user event analytics: $e',
         name: 'EventAnalyticsService',
@@ -295,7 +296,7 @@ class EventAnalyticsService {
           .get();
 
       return query.docs.map((doc) => doc.id).toList();
-    } catch (e) {
+    } on Object catch (e) {
       log(
         'Error getting trending event IDs: $e',
         name: 'EventAnalyticsService',
@@ -321,16 +322,16 @@ class EventAnalyticsService {
       }
 
       final totalViews =
-          userAnalytics.fold(0, (sum, analytics) => sum + analytics.totalViews);
+          userAnalytics.fold(0, (acc, analytics) => acc + analytics.totalViews);
       final totalRSVPs =
-          userAnalytics.fold(0, (sum, analytics) => sum + analytics.totalRSVPs);
+          userAnalytics.fold(0, (acc, analytics) => acc + analytics.totalRSVPs);
       final totalShares = userAnalytics.fold(
         0,
-        (sum, analytics) => sum + analytics.totalShares,
+        (acc, analytics) => acc + analytics.totalShares,
       );
-      final averageConversionRate = userAnalytics.fold(
-            0.0,
-            (sum, analytics) => sum + analytics.conversionRate,
+      final averageConversionRate = userAnalytics.fold<double>(
+            0,
+            (acc, analytics) => acc + analytics.conversionRate,
           ) /
           userAnalytics.length;
       final topPerformingEvent =
@@ -344,7 +345,7 @@ class EventAnalyticsService {
         'averageConversionRate': averageConversionRate,
         'topPerformingEvent': topPerformingEvent?.toJson(),
       };
-    } catch (e) {
+    } on Object catch (e) {
       log('Error getting analytics summary: $e', name: 'EventAnalyticsService');
       return {
         'totalEvents': 0,
@@ -386,7 +387,7 @@ class EventAnalyticsService {
         'User demographics updated for event: $eventId, user: $userId',
         name: 'EventAnalyticsService',
       );
-    } catch (e) {
+    } on Object catch (e) {
       log(
         'Error updating user demographics: $e',
         name: 'EventAnalyticsService',

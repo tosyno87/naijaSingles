@@ -7,13 +7,13 @@ import 'package:google_fonts/google_fonts.dart';
 
 import '../../../common/constants/app_colors.dart';
 import '../../../common/utils/app_logger.dart';
-import '../data/services/unified_group_service.dart'
-    show UnifiedGroupService, UnifiedGroup, GroupType;
 import '../../../services/image_upload_service.dart';
 import '../../../services/validation_service.dart';
 import '../../../widgets/group_avatar_picker.dart';
 import '../../../widgets/success_dialog.dart';
 import '../../../widgets/tag_input_widget.dart';
+import '../data/services/unified_group_service.dart'
+    show UnifiedGroupService, UnifiedGroup, GroupType;
 
 /// Screen for editing group settings (creator/admin only)
 class GroupSettingsScreen extends StatefulWidget {
@@ -121,15 +121,19 @@ class _GroupSettingsScreenState extends State<GroupSettingsScreen> {
       // Upload image if a new one is selected
       if (_selectedImage != null) {
         try {
+          final uid = FirebaseAuth.instance.currentUser?.uid;
+          if (uid == null || uid.isEmpty) {
+            throw Exception('You must be signed in to upload a group photo.');
+          }
           AppLogger.info('Uploading group image...');
           imageUrl = await _imageService.uploadImage(
             imageFile: _selectedImage!,
-            path: 'group_avatars',
+            path: 'users/$uid/group_avatars',
             fileName:
                 '${widget.group.id}_${DateTime.now().millisecondsSinceEpoch}.jpg',
           );
           AppLogger.info('Image uploaded successfully: $imageUrl');
-        } catch (e) {
+        } on Object catch (e) {
           AppLogger.error('Failed to upload image', error: e);
           if (mounted) {
             ScaffoldMessenger.of(context).showSnackBar(
@@ -152,7 +156,7 @@ class _GroupSettingsScreenState extends State<GroupSettingsScreen> {
         groupType = GroupType.values.firstWhere(
           (type) => type.name == _selectedType,
         );
-      } catch (e) {
+      } on Object catch (e) {
         AppLogger.error('Invalid group type: $_selectedType', error: e);
         // Keep existing type if invalid
       }
@@ -185,7 +189,7 @@ class _GroupSettingsScreenState extends State<GroupSettingsScreen> {
           },
         );
       }
-    } catch (e) {
+    } on Object catch (e) {
       AppLogger.error('Failed to save group settings', error: e);
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(

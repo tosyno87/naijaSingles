@@ -22,7 +22,10 @@ export declare class NotificationService {
      */
     sendLikeNotification(likedUser: User, liker: User): Promise<void>;
     /**
-     * Store in-app notification
+     * Store in-app notification in both the user subcollection (legacy/static API)
+     * and the top-level /notifications collection (modern instance API).
+     * The top-level collection is what ModernNotificationsScreen reads via
+     * `.where('userId', isEqualTo: currentUserId)`.
      */
     private storeInAppNotification;
     /**

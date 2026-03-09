@@ -62,7 +62,7 @@ class IndustryStandardImageService {
 
       // Optimize the image
       return await _optimizeImage(selectedImage, cropType);
-    } catch (e) {
+    } on Object catch (e) {
       debugPrint('Error in pickCropAndOptimizeImage: $e');
       return null;
     }
@@ -109,7 +109,7 @@ class IndustryStandardImageService {
       );
 
       return File(compressedFile.path);
-    } catch (e) {
+    } on Object catch (e) {
       debugPrint('Error optimizing image: $e');
       return imageFile; // Return original if optimization fails
     }
@@ -171,7 +171,7 @@ class IndustryStandardImageService {
       try {
         final optimizedImage = await _optimizeImage(imageFiles[i], cropType);
         optimizedImages.add(optimizedImage);
-      } catch (e) {
+      } on Object catch (e) {
         debugPrint('Error optimizing image ${i + 1}: $e');
         optimizedImages
             .add(imageFiles[i]); // Add original if optimization fails
@@ -192,7 +192,7 @@ class IndustryStandardImageService {
       }
 
       // Check if file exists and is readable
-      if (!await imageFile.exists()) {
+      if (!imageFile.existsSync()) {
         debugPrint('Image file does not exist');
         return false;
       }
@@ -205,7 +205,7 @@ class IndustryStandardImageService {
       }
 
       return true;
-    } catch (e) {
+    } on Object catch (e) {
       debugPrint('Error validating image: $e');
       return false;
     }
@@ -224,7 +224,7 @@ class IndustryStandardImageService {
         'filePath': imageFile.path,
         'isValid': await validateImage(imageFile),
       };
-    } catch (e) {
+    } on Object catch (e) {
       debugPrint('Error getting image metadata: $e');
       return {'error': e.toString()};
     }

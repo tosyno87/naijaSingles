@@ -1,7 +1,11 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:google_fonts/google_fonts.dart';
 import '../../common/constants/app_colors.dart';
+import '../../common/constants/app_spacing.dart';
+import '../../common/widgets/state_views/state_views.dart';
 import '../../features/notifications/data/services/notification_service.dart';
 import 'notification_model.dart';
 
@@ -37,7 +41,7 @@ class _ModernNotificationSettingsState extends State<ModernNotificationSettings>
   void initState() {
     super.initState();
     _setupAnimations();
-    _loadSettings();
+    unawaited(_loadSettings());
   }
 
   void _setupAnimations() {
@@ -62,7 +66,7 @@ class _ModernNotificationSettingsState extends State<ModernNotificationSettings>
       _isLoading = false;
     });
 
-    _animationController.forward();
+    unawaited(_animationController.forward());
   }
 
   Future<void> _updateSetting(AppNotificationSettings newSettings) async {
@@ -75,10 +79,10 @@ class _ModernNotificationSettingsState extends State<ModernNotificationSettings>
       });
 
       // Haptic feedback
-      HapticFeedback.lightImpact();
+      unawaited(HapticFeedback.lightImpact());
 
       _showSnackBar('Settings updated', isError: false);
-    } catch (e) {
+    } on Object {
       _showSnackBar('Failed to update settings', isError: true);
     } finally {
       setState(() => _isSaving = false);
@@ -95,7 +99,7 @@ class _ModernNotificationSettingsState extends State<ModernNotificationSettings>
   Widget build(BuildContext context) => Scaffold(
         backgroundColor: AppColors.backgroundColor,
         appBar: _buildAppBar(),
-        body: _isLoading ? _buildLoadingState() : _buildSettingsContent(),
+        body: _isLoading ? const AppLoadingView() : _buildSettingsContent(),
       );
 
   PreferredSizeWidget _buildAppBar() => AppBar(
@@ -117,7 +121,7 @@ class _ModernNotificationSettingsState extends State<ModernNotificationSettings>
         actions: [
           if (_isSaving)
             const Padding(
-              padding: EdgeInsets.all(16),
+              padding: EdgeInsets.all(AppSpacing.md),
               child: SizedBox(
                 width: 20,
                 height: 20,
@@ -131,25 +135,6 @@ class _ModernNotificationSettingsState extends State<ModernNotificationSettings>
         ],
       );
 
-  Widget _buildLoadingState() => Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            const CircularProgressIndicator(
-              valueColor: AlwaysStoppedAnimation<Color>(AppColors.primaryGreen),
-            ),
-            const SizedBox(height: 16),
-            Text(
-              'Loading settings...',
-              style: GoogleFonts.montserrat(
-                fontSize: 16,
-                color: AppColors.textSecondary,
-              ),
-            ),
-          ],
-        ),
-      );
-
   Widget _buildSettingsContent() {
     if (_settings == null) {
       return _buildErrorState();
@@ -158,30 +143,30 @@ class _ModernNotificationSettingsState extends State<ModernNotificationSettings>
     return FadeTransition(
       opacity: _fadeAnimation,
       child: SingleChildScrollView(
-        padding: const EdgeInsets.all(16),
+        padding: AppSpacing.pagePadding,
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             _buildHeaderCard(),
-            const SizedBox(height: 24),
+            const SizedBox(height: AppSpacing.lg),
             _buildSectionTitle('Push Notifications'),
-            const SizedBox(height: 16),
+            const SizedBox(height: AppSpacing.md),
             _buildNotificationToggles(),
-            const SizedBox(height: 32),
+            const SizedBox(height: AppSpacing.xl),
             _buildSectionTitle('Sound & Vibration'),
-            const SizedBox(height: 16),
+            const SizedBox(height: AppSpacing.md),
             _buildSoundVibrationToggles(),
-            const SizedBox(height: 32),
+            const SizedBox(height: AppSpacing.xl),
             _buildSectionTitle('Quiet Hours'),
-            const SizedBox(height: 16),
+            const SizedBox(height: AppSpacing.md),
             _buildQuietHoursSection(),
-            const SizedBox(height: 32),
+            const SizedBox(height: AppSpacing.xl),
             _buildSectionTitle('Notification Frequency'),
-            const SizedBox(height: 16),
+            const SizedBox(height: AppSpacing.md),
             _buildFrequencySection(),
-            const SizedBox(height: 32),
+            const SizedBox(height: AppSpacing.xl),
             _buildTestNotificationSection(),
-            const SizedBox(height: 32),
+            const SizedBox(height: AppSpacing.xl),
           ],
         ),
       ),
@@ -200,7 +185,7 @@ class _ModernNotificationSettingsState extends State<ModernNotificationSettings>
             begin: Alignment.topLeft,
             end: Alignment.bottomRight,
           ),
-          borderRadius: BorderRadius.circular(16),
+          borderRadius: BorderRadius.circular(AppSpacing.cardRadius),
           border: Border.all(
             color: AppColors.primaryGreen.withValues(alpha: 0.2),
           ),
@@ -208,10 +193,10 @@ class _ModernNotificationSettingsState extends State<ModernNotificationSettings>
         child: Row(
           children: [
             Container(
-              padding: const EdgeInsets.all(12),
+              padding: const EdgeInsets.all(AppSpacing.buttonRadius),
               decoration: BoxDecoration(
                 color: AppColors.primaryGreen.withValues(alpha: 0.1),
-                borderRadius: BorderRadius.circular(12),
+                borderRadius: BorderRadius.circular(AppSpacing.buttonRadius),
               ),
               child: const Icon(
                 Icons.notifications_active,
@@ -219,7 +204,7 @@ class _ModernNotificationSettingsState extends State<ModernNotificationSettings>
                 size: 24,
               ),
             ),
-            const SizedBox(width: 16),
+            const SizedBox(width: AppSpacing.md),
             Expanded(
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
@@ -232,7 +217,7 @@ class _ModernNotificationSettingsState extends State<ModernNotificationSettings>
                       color: AppColors.textPrimary,
                     ),
                   ),
-                  const SizedBox(height: 4),
+                  const SizedBox(height: AppSpacing.xs),
                   Text(
                     'Control when and how you receive notifications from Afropeep',
                     style: GoogleFonts.montserrat(
@@ -273,7 +258,8 @@ class _ModernNotificationSettingsState extends State<ModernNotificationSettings>
             icon: Icons.chat_bubble_outline,
             value: _settings!.messageNotifications,
             onChanged: (value) => _updateSetting(
-                _settings!.copyWith(messageNotifications: value)),
+              _settings!.copyWith(messageNotifications: value),
+            ),
           ),
           _buildSettingTile(
             title: 'Profile Likes',
@@ -327,7 +313,7 @@ class _ModernNotificationSettingsState extends State<ModernNotificationSettings>
                 _updateSetting(_settings!.copyWith(quietHoursEnabled: value)),
           ),
           if (_settings!.quietHoursEnabled) ...[
-            const SizedBox(height: 16),
+            const SizedBox(height: AppSpacing.md),
             _buildTimeSetting(
               title: 'Start Time',
               time: _settings!.quietHoursStart,
@@ -343,10 +329,10 @@ class _ModernNotificationSettingsState extends State<ModernNotificationSettings>
       );
 
   Widget _buildFrequencySection() => Container(
-        padding: const EdgeInsets.all(16),
+        padding: AppSpacing.cardPadding,
         decoration: BoxDecoration(
           color: Colors.white,
-          borderRadius: BorderRadius.circular(12),
+          borderRadius: BorderRadius.circular(AppSpacing.buttonRadius),
           border: Border.all(color: Colors.grey.shade200),
         ),
         child: Column(
@@ -358,7 +344,7 @@ class _ModernNotificationSettingsState extends State<ModernNotificationSettings>
                   color: AppColors.primaryGreen,
                   size: 20,
                 ),
-                const SizedBox(width: 12),
+                const SizedBox(width: AppSpacing.buttonRadius),
                 Expanded(
                   child: Text(
                     'Notification Frequency',
@@ -371,7 +357,7 @@ class _ModernNotificationSettingsState extends State<ModernNotificationSettings>
                 ),
               ],
             ),
-            const SizedBox(height: 12),
+            const SizedBox(height: AppSpacing.buttonRadius),
             Text(
               'Reduce notification frequency to avoid overwhelming you with updates',
               style: GoogleFonts.montserrat(
@@ -379,18 +365,18 @@ class _ModernNotificationSettingsState extends State<ModernNotificationSettings>
                 color: AppColors.textSecondary,
               ),
             ),
-            const SizedBox(height: 16),
+            const SizedBox(height: AppSpacing.md),
             Row(
               children: [
                 Expanded(
                   child: _buildFrequencyOption('Low', 'Fewer notifications'),
                 ),
-                const SizedBox(width: 12),
+                const SizedBox(width: AppSpacing.buttonRadius),
                 Expanded(
                   child:
                       _buildFrequencyOption('Medium', 'Balanced notifications'),
                 ),
-                const SizedBox(width: 12),
+                const SizedBox(width: AppSpacing.buttonRadius),
                 Expanded(
                   child: _buildFrequencyOption('High', 'All notifications'),
                 ),
@@ -401,10 +387,10 @@ class _ModernNotificationSettingsState extends State<ModernNotificationSettings>
       );
 
   Widget _buildFrequencyOption(String title, String subtitle) => Container(
-        padding: const EdgeInsets.all(12),
+        padding: const EdgeInsets.all(AppSpacing.buttonRadius),
         decoration: BoxDecoration(
           color: AppColors.primaryGreen.withValues(alpha: 0.1),
-          borderRadius: BorderRadius.circular(8),
+          borderRadius: BorderRadius.circular(AppSpacing.sm),
           border: Border.all(
             color: AppColors.primaryGreen.withValues(alpha: 0.3),
           ),
@@ -419,7 +405,7 @@ class _ModernNotificationSettingsState extends State<ModernNotificationSettings>
                 color: AppColors.primaryGreen,
               ),
             ),
-            const SizedBox(height: 4),
+            const SizedBox(height: AppSpacing.xs),
             Text(
               subtitle,
               style: GoogleFonts.montserrat(
@@ -433,10 +419,10 @@ class _ModernNotificationSettingsState extends State<ModernNotificationSettings>
       );
 
   Widget _buildTestNotificationSection() => Container(
-        padding: const EdgeInsets.all(16),
+        padding: AppSpacing.cardPadding,
         decoration: BoxDecoration(
           color: Colors.white,
-          borderRadius: BorderRadius.circular(12),
+          borderRadius: BorderRadius.circular(AppSpacing.buttonRadius),
           border: Border.all(color: Colors.grey.shade200),
         ),
         child: Column(
@@ -448,7 +434,7 @@ class _ModernNotificationSettingsState extends State<ModernNotificationSettings>
                   color: AppColors.primaryGreen,
                   size: 20,
                 ),
-                const SizedBox(width: 12),
+                const SizedBox(width: AppSpacing.buttonRadius),
                 Expanded(
                   child: Text(
                     'Test Notifications',
@@ -461,7 +447,7 @@ class _ModernNotificationSettingsState extends State<ModernNotificationSettings>
                 ),
               ],
             ),
-            const SizedBox(height: 12),
+            const SizedBox(height: AppSpacing.buttonRadius),
             Text(
               'Send a test notification to see how it will appear',
               style: GoogleFonts.montserrat(
@@ -469,7 +455,7 @@ class _ModernNotificationSettingsState extends State<ModernNotificationSettings>
                 color: AppColors.textSecondary,
               ),
             ),
-            const SizedBox(height: 16),
+            const SizedBox(height: AppSpacing.md),
             ElevatedButton.icon(
               onPressed: _sendTestNotification,
               icon: const Icon(Icons.send),
@@ -477,10 +463,12 @@ class _ModernNotificationSettingsState extends State<ModernNotificationSettings>
               style: ElevatedButton.styleFrom(
                 backgroundColor: AppColors.primaryGreen,
                 foregroundColor: Colors.white,
-                padding:
-                    const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 20,
+                  vertical: AppSpacing.buttonRadius,
+                ),
                 shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(8),
+                  borderRadius: BorderRadius.circular(AppSpacing.sm),
                 ),
               ),
             ),
@@ -496,10 +484,10 @@ class _ModernNotificationSettingsState extends State<ModernNotificationSettings>
     required ValueChanged<bool> onChanged,
   }) =>
       Container(
-        margin: const EdgeInsets.only(bottom: 12),
+        margin: const EdgeInsets.only(bottom: AppSpacing.buttonRadius),
         decoration: BoxDecoration(
           color: Colors.white,
-          borderRadius: BorderRadius.circular(12),
+          borderRadius: BorderRadius.circular(AppSpacing.buttonRadius),
           border: Border.all(color: Colors.grey.shade200),
           boxShadow: [
             BoxShadow(
@@ -526,10 +514,10 @@ class _ModernNotificationSettingsState extends State<ModernNotificationSettings>
             ),
           ),
           secondary: Container(
-            padding: const EdgeInsets.all(8),
+            padding: const EdgeInsets.all(AppSpacing.sm),
             decoration: BoxDecoration(
               color: AppColors.primaryGreen.withValues(alpha: 0.1),
-              borderRadius: BorderRadius.circular(8),
+              borderRadius: BorderRadius.circular(AppSpacing.sm),
             ),
             child: Icon(
               icon,
@@ -551,10 +539,10 @@ class _ModernNotificationSettingsState extends State<ModernNotificationSettings>
     required VoidCallback onTap,
   }) =>
       Container(
-        margin: const EdgeInsets.only(bottom: 12),
+        margin: const EdgeInsets.only(bottom: AppSpacing.buttonRadius),
         decoration: BoxDecoration(
           color: Colors.white,
-          borderRadius: BorderRadius.circular(12),
+          borderRadius: BorderRadius.circular(AppSpacing.buttonRadius),
           border: Border.all(color: Colors.grey.shade200),
         ),
         child: ListTile(
@@ -577,7 +565,7 @@ class _ModernNotificationSettingsState extends State<ModernNotificationSettings>
                   fontWeight: FontWeight.w500,
                 ),
               ),
-              const SizedBox(width: 8),
+              const SizedBox(width: AppSpacing.sm),
               Icon(
                 Icons.chevron_right,
                 color: Colors.grey.shade600,
@@ -588,38 +576,9 @@ class _ModernNotificationSettingsState extends State<ModernNotificationSettings>
         ),
       );
 
-  Widget _buildErrorState() => Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Icon(
-              Icons.error_outline,
-              size: 64,
-              color: Colors.grey.shade400,
-            ),
-            const SizedBox(height: 16),
-            Text(
-              'Failed to load settings',
-              style: GoogleFonts.montserrat(
-                fontSize: 18,
-                fontWeight: FontWeight.w600,
-                color: AppColors.textPrimary,
-              ),
-            ),
-            const SizedBox(height: 16),
-            ElevatedButton(
-              onPressed: _loadSettings,
-              style: ElevatedButton.styleFrom(
-                backgroundColor: AppColors.primaryGreen,
-                foregroundColor: Colors.white,
-              ),
-              child: Text(
-                'Retry',
-                style: GoogleFonts.montserrat(),
-              ),
-            ),
-          ],
-        ),
+  Widget _buildErrorState() => AppErrorView(
+        message: 'Failed to load notification settings',
+        onRetry: _loadSettings,
       );
 
   Future<void> _showTimePicker(bool isStartTime) async {
@@ -647,7 +606,7 @@ class _ModernNotificationSettingsState extends State<ModernNotificationSettings>
           ? _settings!.copyWith(quietHoursStart: timeString)
           : _settings!.copyWith(quietHoursEnd: timeString);
 
-      _updateSetting(newSettings);
+      await _updateSetting(newSettings);
     }
   }
 
@@ -671,8 +630,7 @@ class _ModernNotificationSettingsState extends State<ModernNotificationSettings>
   }
 
   void _sendTestNotification() {
-    // Send test notification
-    HapticFeedback.lightImpact();
+    unawaited(HapticFeedback.lightImpact());
     _showSnackBar('Test notification sent!', isError: false);
   }
 
@@ -683,7 +641,7 @@ class _ModernNotificationSettingsState extends State<ModernNotificationSettings>
         backgroundColor: isError ? Colors.red : AppColors.primaryGreen,
         behavior: SnackBarBehavior.floating,
         shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(8),
+          borderRadius: BorderRadius.circular(AppSpacing.sm),
         ),
       ),
     );

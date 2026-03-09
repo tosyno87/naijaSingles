@@ -2,8 +2,8 @@ import 'dart:async';
 import 'dart:developer';
 import 'dart:io';
 
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:equatable/equatable.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:image_picker/image_picker.dart';
@@ -27,6 +27,7 @@ class OnboardingBloc extends Bloc<OnboardingEvent, OnboardingState> {
     on<OnboardingDateOfBirthUpdated>(_onDateOfBirthUpdated);
     on<OnboardingGenderUpdated>(_onGenderUpdated);
     on<OnboardingTribeUpdated>(_onTribeUpdated);
+    on<OnboardingRaceUpdated>(_onRaceUpdated);
     on<OnboardingBioUpdated>(_onBioUpdated);
     on<OnboardingInterestAdded>(_onInterestAdded);
     on<OnboardingInterestRemoved>(_onInterestRemoved);
@@ -79,8 +80,11 @@ class OnboardingBloc extends Bloc<OnboardingEvent, OnboardingState> {
   ) {
     final data = _data(emit);
     if (data == null) return;
-    emit(OnboardingLoaded(
-        data.copyWith(fullName: e.fullName, userName: e.fullName)));
+    emit(
+      OnboardingLoaded(
+        data.copyWith(fullName: e.fullName, userName: e.fullName),
+      ),
+    );
   }
 
   void _onDateOfBirthUpdated(
@@ -93,17 +97,30 @@ class OnboardingBloc extends Bloc<OnboardingEvent, OnboardingState> {
   }
 
   void _onGenderUpdated(
-      OnboardingGenderUpdated e, Emitter<OnboardingState> emit) {
+    OnboardingGenderUpdated e,
+    Emitter<OnboardingState> emit,
+  ) {
     final data = _data(emit);
     if (data == null) return;
     emit(OnboardingLoaded(data.copyWith(gender: e.gender)));
   }
 
   void _onTribeUpdated(
-      OnboardingTribeUpdated e, Emitter<OnboardingState> emit) {
+    OnboardingTribeUpdated e,
+    Emitter<OnboardingState> emit,
+  ) {
     final data = _data(emit);
     if (data == null) return;
     emit(OnboardingLoaded(data.copyWith(tribe: e.tribe)));
+  }
+
+  void _onRaceUpdated(
+    OnboardingRaceUpdated e,
+    Emitter<OnboardingState> emit,
+  ) {
+    final data = _data(emit);
+    if (data == null) return;
+    emit(OnboardingLoaded(data.copyWith(race: e.race)));
   }
 
   void _onBioUpdated(OnboardingBioUpdated e, Emitter<OnboardingState> emit) {
@@ -144,7 +161,8 @@ class OnboardingBloc extends Bloc<OnboardingEvent, OnboardingState> {
     final data = _data(emit);
     if (data == null) return;
     emit(
-        OnboardingLoaded(data.copyWith(genres: e.genres, interests: e.genres)));
+      OnboardingLoaded(data.copyWith(genres: e.genres, interests: e.genres)),
+    );
   }
 
   void _onLanguagesUpdated(
@@ -252,8 +270,11 @@ class OnboardingBloc extends Bloc<OnboardingEvent, OnboardingState> {
   ) {
     final data = _data(emit);
     if (data == null) return;
-    emit(OnboardingLoaded(
-        data.copyWith(height: e.heightCm.toDouble(), heightUnit: 'cm')));
+    emit(
+      OnboardingLoaded(
+        data.copyWith(height: e.heightCm.toDouble(), heightUnit: 'cm'),
+      ),
+    );
   }
 
   void _onLookingForUpdated(
@@ -271,8 +292,11 @@ class OnboardingBloc extends Bloc<OnboardingEvent, OnboardingState> {
   ) {
     final data = _data(emit);
     if (data == null) return;
-    emit(OnboardingLoaded(
-        data.copyWith(relationshipIntent: e.relationshipIntent)));
+    emit(
+      OnboardingLoaded(
+        data.copyWith(relationshipIntent: e.relationshipIntent),
+      ),
+    );
   }
 
   void _onEducationUpdated(
@@ -326,11 +350,15 @@ class OnboardingBloc extends Bloc<OnboardingEvent, OnboardingState> {
   ) {
     final data = _data(emit);
     if (data == null) return;
-    emit(OnboardingLoaded(data.copyWith(
-      latitude: e.latitude,
-      longitude: e.longitude,
-      locationName: e.name,
-    )));
+    emit(
+      OnboardingLoaded(
+        data.copyWith(
+          latitude: e.latitude,
+          longitude: e.longitude,
+          locationName: e.name,
+        ),
+      ),
+    );
   }
 
   OnboardingData? _data(Emitter<OnboardingState> emit) {
@@ -403,6 +431,7 @@ class OnboardingBloc extends Bloc<OnboardingEvent, OnboardingState> {
       final selected =
           await BulkPhotoPickerService.pickMultiplePhotos(context: context);
       if (selected.isEmpty) return;
+      if (!context.mounted) return;
 
       final cropped = await BulkPhotoPickerService.cropSelectedPhotos(
         selectedPhotos: selected,
@@ -417,8 +446,11 @@ class OnboardingBloc extends Bloc<OnboardingEvent, OnboardingState> {
         if (firstEmpty == -1) break;
         photos[firstEmpty] = image;
       }
-      emit(OnboardingLoaded(
-          data.copyWith(profilePhotos: _compactPhotos(photos))));
+      emit(
+        OnboardingLoaded(
+          data.copyWith(profilePhotos: _compactPhotos(photos)),
+        ),
+      );
     } on Object catch (err) {
       log('❌ Bulk photo selection: $err');
     }
@@ -438,7 +470,8 @@ class OnboardingBloc extends Bloc<OnboardingEvent, OnboardingState> {
     photos.removeAt(e.index);
     photos.add(null);
     emit(
-        OnboardingLoaded(data.copyWith(profilePhotos: _compactPhotos(photos))));
+      OnboardingLoaded(data.copyWith(profilePhotos: _compactPhotos(photos))),
+    );
   }
 
   void _onProfilePhotosReordered(
@@ -452,12 +485,15 @@ class OnboardingBloc extends Bloc<OnboardingEvent, OnboardingState> {
     if (e.fromIndex < 0 ||
         e.fromIndex >= photos.length ||
         e.toIndex < 0 ||
-        e.toIndex >= photos.length) return;
+        e.toIndex >= photos.length) {
+      return;
+    }
 
     final photo = photos.removeAt(e.fromIndex);
     photos.insert(e.toIndex, photo);
     emit(
-        OnboardingLoaded(data.copyWith(profilePhotos: _compactPhotos(photos))));
+      OnboardingLoaded(data.copyWith(profilePhotos: _compactPhotos(photos))),
+    );
   }
 
   Future<void> _onSaveUserData(
@@ -470,7 +506,7 @@ class OnboardingBloc extends Bloc<OnboardingEvent, OnboardingState> {
     final context = e.context as BuildContext?;
     final user = FirebaseAuth.instance.currentUser;
     if (user == null) {
-      emit(OnboardingSaveFailure('User not authenticated'));
+      emit(const OnboardingSaveFailure('User not authenticated'));
       return;
     }
 

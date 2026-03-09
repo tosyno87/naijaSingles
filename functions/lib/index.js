@@ -39,36 +39,69 @@ var __importStar = (this && this.__importStar) || (function () {
     };
 })();
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.healthCheck = exports.createTestUsers = exports.onLikeCreated = exports.onSuperLikeCreated = exports.onMessageSent = exports.onMatchCreated = void 0;
+exports.seedMatchTuningConfig = exports.healthCheck = exports.aggregateMetrics = exports.validateIngestion = exports.createTestUsers = exports.onUserWritten = exports.onLikeCreated = exports.onSuperLikeCreated = exports.onMessageSent = exports.onMatchCreated = void 0;
 const admin = __importStar(require("firebase-admin"));
+const https_1 = require("firebase-functions/v2/https");
 const matchHandlers_1 = require("./handlers/matchHandlers");
 const messageHandlers_1 = require("./handlers/messageHandlers");
 const likeHandlers_1 = require("./handlers/likeHandlers");
 const testUserHandlers_1 = require("./handlers/testUserHandlers");
-// Initialize Firebase Admin SDK
+const discoverabilityHandlers_1 = require("./handlers/discoverabilityHandlers");
+const matchQualityHandlers_1 = require("./handlers/matchQualityHandlers");
+Object.defineProperty(exports, "validateIngestion", { enumerable: true, get: function () { return matchQualityHandlers_1.validateIngestion; } });
+Object.defineProperty(exports, "aggregateMetrics", { enumerable: true, get: function () { return matchQualityHandlers_1.aggregateMetrics; } });
 admin.initializeApp();
-// Initialize handlers
 const matchHandlers = new matchHandlers_1.MatchHandlers();
 const messageHandlers = new messageHandlers_1.MessageHandlers();
 const likeHandlers = new likeHandlers_1.LikeHandlers();
 const testUserHandlers = new testUserHandlers_1.TestUserHandlers();
-// Export all Cloud Functions
-// Match-related functions
+const discoverabilityHandlers = new discoverabilityHandlers_1.DiscoverabilityHandlers();
 exports.onMatchCreated = matchHandlers.onMatchCreated;
-// Message-related functions
 exports.onMessageSent = messageHandlers.onMessageSent;
-// Like-related functions
 exports.onSuperLikeCreated = likeHandlers.onSuperLikeCreated;
 exports.onLikeCreated = likeHandlers.onLikeCreated;
-// Test user creation function (development/testing)
-exports.createTestUsers = testUserHandlers.createTestUsers;
-// Health check function
-const healthCheck = async (req, res) => {
+exports.onUserWritten = discoverabilityHandlers.onUserWritten;
+const isTestEnvEnabled = process.env.ENABLE_TEST_ENDPOINTS === 'true';
+exports.createTestUsers = isTestEnvEnabled
+    ? testUserHandlers.createTestUsers
+    : (0, https_1.onRequest)((req, res) => {
+        res.status(404).json({ error: 'Not available in production' });
+    });
+exports.healthCheck = (0, https_1.onRequest)((req, res) => {
     res.status(200).json({
         status: 'healthy',
         timestamp: new Date().toISOString(),
         version: '1.0.0',
     });
-};
-exports.healthCheck = healthCheck;
+});
+exports.seedMatchTuningConfig = (0, https_1.onRequest)(async (req, res) => {
+    var _a;
+    if (req.method !== 'POST') {
+        res.status(405).json({ error: 'Method not allowed' });
+        return;
+    }
+    const force = ((_a = req.body) === null || _a === void 0 ? void 0 : _a.force) === true;
+    const db = admin.firestore();
+    const docRef = db.collection('runtimeConfig').doc('matchTuning');
+    if (!force) {
+        const existing = await docRef.get();
+        if (existing.exists) {
+            res.status(200).json({ status: 'skipped', reason: 'document already exists' });
+            return;
+        }
+    }
+    const payload = {
+        version: '1.0.0',
+        rollbackKey: 'v0_defaults',
+        datingWeights: { age: 0.30, location: 0.25, lifestyle: 0.20, interest: 0.15, completeness: 0.10 },
+        friendshipWeights: { social: 0.35, interest: 0.25, location: 0.20, age: 0.10, completeness: 0.10 },
+        networkingWeights: { professional: 0.40, industry: 0.25, location: 0.20, completeness: 0.15 },
+        locationPerfectMiles: 5.0,
+        locationDecayMiles: 50.0,
+        locationFloorScore: 0.2,
+        experiment: { active: false },
+    };
+    await docRef.set({ payload, updatedAt: admin.firestore.FieldValue.serverTimestamp() });
+    res.status(200).json({ status: 'seeded', version: payload.version });
+});
 //# sourceMappingURL=index.js.map

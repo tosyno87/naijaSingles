@@ -1,8 +1,11 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:google_fonts/google_fonts.dart';
 
 import '../../../../../common/constants/app_colors.dart';
+import '../../../../../common/utils/auth_router.dart';
 import '../../../../../common/widgets/afropeep_app_bar.dart';
 import '../../../../../common/widgets/afropeep_primary_button.dart';
 import '../../../../../common/widgets/afropeep_text_field.dart';
@@ -46,8 +49,7 @@ class _EmailSignupScreenState extends State<EmailSignupScreen> {
           child: BlocConsumer<EmailAuthBloc, EmailAuthState>(
             listener: (context, state) {
               if (state is EmailAuthSuccess) {
-                // Navigate to onboarding or home based on user status
-                Navigator.pushReplacementNamed(context, '/onboarding');
+                unawaited(AuthRouter.navigateAfterAuth(context));
               } else if (state is EmailAuthError) {
                 CustomSnackbar.showSnackBarSimple(
                   state.error,
@@ -216,9 +218,11 @@ class _EmailSignupScreenState extends State<EmailSignupScreen> {
                               ),
                               GestureDetector(
                                 onTap: () {
-                                  Navigator.pushReplacementNamed(
-                                    context,
-                                    '/email_login',
+                                  unawaited(
+                                    Navigator.pushReplacementNamed(
+                                      context,
+                                      '/email_login',
+                                    ),
                                   );
                                 },
                                 child: Text(

@@ -1,11 +1,13 @@
+import 'dart:async';
+
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 
 import '../../../common/constants/app_colors.dart';
-import '../data/services/unified_group_service.dart';
-import '../../../services/user_service.dart';
 import '../../../common/utils/app_logger.dart';
+import '../../../services/user_service.dart';
+import '../data/services/unified_group_service.dart';
 
 /// Modal for inviting members to a group
 class InviteMembersModal extends StatefulWidget {
@@ -26,7 +28,7 @@ class _InviteMembersModalState extends State<InviteMembersModal> {
   final TextEditingController _searchController = TextEditingController();
 
   List<UserProfile> _searchResults = [];
-  Set<String> _selectedUserIds = {};
+  final Set<String> _selectedUserIds = {};
   bool _isSearching = false;
   bool _isAddingMembers = false;
 
@@ -56,15 +58,17 @@ class _InviteMembersModalState extends State<InviteMembersModal> {
       final currentUserId = FirebaseAuth.instance.currentUser?.uid;
       final memberIds = widget.group.memberIds;
 
-      final filteredResults = results.where((user) {
-        return user.id != currentUserId && !memberIds.contains(user.id);
-      }).toList();
+      final filteredResults = results
+          .where(
+            (user) => user.id != currentUserId && !memberIds.contains(user.id),
+          )
+          .toList();
 
       setState(() {
         _searchResults = filteredResults;
         _isSearching = false;
       });
-    } catch (e) {
+    } on Object catch (e) {
       AppLogger.error('Error searching users', error: e);
       setState(() {
         _isSearching = false;
@@ -108,7 +112,7 @@ class _InviteMembersModalState extends State<InviteMembersModal> {
             userId: userId,
           );
           successCount++;
-        } catch (e) {
+        } on Object catch (e) {
           AppLogger.error('Error adding member $userId', error: e);
           failCount++;
         }
@@ -128,7 +132,7 @@ class _InviteMembersModalState extends State<InviteMembersModal> {
           ),
         );
       }
-    } catch (e) {
+    } on Object catch (e) {
       AppLogger.error('Error adding members', error: e);
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
@@ -152,7 +156,7 @@ class _InviteMembersModalState extends State<InviteMembersModal> {
         initialChildSize: 0.9,
         minChildSize: 0.5,
         maxChildSize: 0.95,
-        builder: (context, scrollController) => Container(
+        builder: (context, scrollController) => DecoratedBox(
           decoration: const BoxDecoration(
             color: Colors.white,
             borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
@@ -212,7 +216,7 @@ class _InviteMembersModalState extends State<InviteMembersModal> {
                         ? IconButton(
                             onPressed: () {
                               _searchController.clear();
-                              _searchUsers('');
+                              unawaited(_searchUsers(''));
                             },
                             icon: const Icon(Icons.clear),
                           )
@@ -255,9 +259,7 @@ class _InviteMembersModalState extends State<InviteMembersModal> {
                       const Spacer(),
                       TextButton(
                         onPressed: () {
-                          setState(() {
-                            _selectedUserIds.clear();
-                          });
+                          setState(_selectedUserIds.clear);
                         },
                         child: Text(
                           'Clear',

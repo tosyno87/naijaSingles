@@ -1,13 +1,17 @@
+import 'dart:async';
+
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
+import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:google_fonts/google_fonts.dart';
 
 import '../../../common/constants/app_colors.dart';
 import '../../../common/data/repo/user_search_repo.dart';
-import '../../../common/widgets/custom_3d_icons.dart';
+import '../../../common/widgets/state_views/state_views.dart';
 import '../../../models/user_model.dart';
-import '../widgets/match_confirmation_modal.dart';
+import '../../../services/super_like_service.dart';
 import '../widgets/hinge_profile_card.dart';
+import '../widgets/match_confirmation_modal.dart';
 
 class TribeConnectScreen extends StatefulWidget {
   const TribeConnectScreen({
@@ -18,34 +22,28 @@ class TribeConnectScreen extends StatefulWidget {
   });
   final UserModel currentUser;
   final List<UserModel> users;
-  final VoidCallback? onFiltersApplied;
+  final Future<void> Function()? onFiltersApplied;
 
   @override
   State<TribeConnectScreen> createState() => _TribeConnectScreenState();
 }
 
 class _TribeConnectScreenState extends State<TribeConnectScreen> {
-  // Track which users have been passed/connected to avoid showing them again
   final Set<String> _processedUserIds = <String>{};
-  int _currentProfileIndex = 0;
+  final SuperLikeService _superLikeService = SuperLikeService();
+  bool _isRefreshing = false;
 
-  // Get current profile being shown
-  UserModel? get _currentProfile {
-    final availableUsers = widget.users
-        .where((user) => !_processedUserIds.contains(user.id))
-        .toList();
-    if (_currentProfileIndex < availableUsers.length) {
-      return availableUsers[_currentProfileIndex];
-    }
-    return null;
-  }
+  List<UserModel> get _availableUsers => widget.users
+      .where(
+        (user) =>
+            user.id != null &&
+            user.id!.isNotEmpty &&
+            !_processedUserIds.contains(user.id),
+      )
+      .toList();
 
-  // Get all available (not yet processed) users
-  List<UserModel> get _availableUsers {
-    return widget.users
-        .where((user) => !_processedUserIds.contains(user.id))
-        .toList();
-  }
+  UserModel? get _currentProfile =>
+      _availableUsers.isNotEmpty ? _availableUsers.first : null;
 
   @override
   Widget build(BuildContext context) => Scaffold(
@@ -69,7 +67,7 @@ class _TribeConnectScreenState extends State<TribeConnectScreen> {
         actions: [
           IconButton(
             onPressed: _showFilters,
-            icon: Custom3DIcons.filter(),
+            icon: _buildToolbarIcon(FontAwesomeIcons.sliders),
           ),
           const SizedBox(width: 8),
         ],
@@ -93,90 +91,82 @@ class _TribeConnectScreenState extends State<TribeConnectScreen> {
         user: currentProfile,
         onConnect: () => _handleConnect(currentProfile),
         onPass: () => _handlePass(currentProfile),
+        onSuperLike: () => _handleSuperLike(currentProfile),
       ),
     );
   }
 
-  Widget _buildEmptyState() => Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Custom3DIcons.communities(size: 80, color: AppColors.primaryGreen),
-            const SizedBox(height: 24),
-            Text(
-              'No More Profiles',
-              style: GoogleFonts.montserrat(
-                fontSize: 24,
-                fontWeight: FontWeight.w600,
-                color: AppColors.textPrimary,
-              ),
-            ),
-            const SizedBox(height: 12),
-            Text(
-              'You\'ve seen all available profiles in your area.\nCheck back later for new connections!',
-              style: GoogleFonts.montserrat(
-                fontSize: 16,
-                fontWeight: FontWeight.w400,
-                color: AppColors.textSecondary,
-              ),
-              textAlign: TextAlign.center,
-            ),
-            const SizedBox(height: 32),
-            ElevatedButton(
-              onPressed: _refreshUsers,
-              style: ElevatedButton.styleFrom(
-                backgroundColor: AppColors.primaryGreen,
-                foregroundColor: Colors.white,
-                padding:
-                    const EdgeInsets.symmetric(horizontal: 32, vertical: 16),
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(24),
-                ),
-              ),
-              child: Text(
-                'Refresh',
-                style: GoogleFonts.montserrat(
-                  fontSize: 16,
-                  fontWeight: FontWeight.w600,
-                ),
-              ),
+  Widget _buildEmptyState() => AppEmptyView(
+        title: 'No More Profiles',
+        subtitle: 'You\'ve seen all available profiles. Check back later!',
+        icon: Icons.explore_off,
+        actionLabel: 'Refresh',
+        onAction: _isRefreshing ? null : _refreshUsers,
+      );
+
+  Widget _buildToolbarIcon(IconData icon) => Container(
+        width: 38,
+        height: 38,
+        decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.circular(12),
+          border: Border.all(
+            color: const Color(0xFFE8E8EC),
+          ),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black.withValues(alpha: 0.06),
+              blurRadius: 12,
+              offset: const Offset(0, 4),
             ),
           ],
+        ),
+        child: Center(
+          child: FaIcon(
+            icon,
+            size: 16,
+            color: AppColors.textPrimary,
+          ),
         ),
       );
 
   Future<void> _refreshUsers() async {
-    // TODO: Implement refresh logic
-    // Simulate loading
-    await Future.delayed(const Duration(seconds: 1));
+    setState(() {
+      _isRefreshing = true;
+      _processedUserIds.clear();
+    });
+    try {
+      await widget.onFiltersApplied?.call();
+    } finally {
+      if (mounted) setState(() => _isRefreshing = false);
+    }
   }
 
   void _showFilters() {
-    showModalBottomSheet(
-      context: context,
-      backgroundColor: AppColors.backgroundColor,
-      shape: const RoundedRectangleBorder(
-        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
-      ),
-      builder: (context) => _ConnectFilterSheet(
-        currentUser: widget.currentUser,
-        onApply: () {
-          setState(() {
-            _processedUserIds.clear();
-            _currentProfileIndex = 0;
-          });
-          widget.onFiltersApplied?.call();
-        },
+    unawaited(
+      showModalBottomSheet(
+        context: context,
+        backgroundColor: AppColors.backgroundColor,
+        shape: const RoundedRectangleBorder(
+          borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+        ),
+        builder: (context) => _ConnectFilterSheet(
+          currentUser: widget.currentUser,
+          onApply: () async {
+            setState(_processedUserIds.clear);
+            await widget.onFiltersApplied?.call();
+          },
+        ),
       ),
     );
   }
 
   Future<void> _handleConnect(UserModel user) async {
+    final uid = user.id;
+    if (uid == null || uid.isEmpty) return;
+
     try {
-      // Mark user as processed
-      setState(() {
-        _processedUserIds.add(user.id ?? '');
-      });
+      setState(() => _processedUserIds.add(uid));
 
       final matchId = await UserSearchRepo.rightSwipe(widget.currentUser, user);
 
@@ -186,68 +176,98 @@ class _TribeConnectScreenState extends State<TribeConnectScreen> {
         _showConnectConfirmation(user);
       }
 
-      // Move to next profile after a brief delay
-      _moveToNextProfile();
-    } catch (e) {
-      // Revert on error
-      setState(() {
-        _processedUserIds.remove(user.id ?? '');
-      });
+      _advanceProfile();
+    } on Object {
+      setState(() => _processedUserIds.remove(uid));
       _showError('Failed to connect. Please try again.');
     }
   }
 
   Future<void> _handlePass(UserModel user) async {
+    final uid = user.id;
+    if (uid == null || uid.isEmpty) return;
+
     try {
-      // Mark user as processed
-      setState(() {
-        _processedUserIds.add(user.id ?? '');
-      });
+      setState(() => _processedUserIds.add(uid));
 
       await UserSearchRepo.leftSwipe(widget.currentUser, user);
       _showPassConfirmation(user);
 
-      // Move to next profile after a brief delay
-      _moveToNextProfile();
-    } catch (e) {
-      // Revert on error
-      setState(() {
-        _processedUserIds.remove(user.id ?? '');
-      });
+      _advanceProfile();
+    } on Object {
+      setState(() => _processedUserIds.remove(uid));
       _showError('Failed to pass. Please try again.');
     }
   }
 
-  void _moveToNextProfile() {
-    // Small delay to show confirmation, then move to next
-    Future.delayed(const Duration(milliseconds: 800), () {
-      if (mounted) {
-        setState(() {
-          // Move to next available profile
-          // The available users list is recalculated each time, so we just increment index
-          final availableCount = _availableUsers.length;
-          if (availableCount > 0 && _currentProfileIndex < availableCount - 1) {
-            _currentProfileIndex++;
-          } else {
-            // All profiles processed, reset or show empty state
-            _currentProfileIndex = 0;
-          }
-        });
+  Future<void> _handleSuperLike(UserModel user) async {
+    final uid = user.id;
+    final currentUid = widget.currentUser.id;
+    if (uid == null ||
+        uid.isEmpty ||
+        currentUid == null ||
+        currentUid.isEmpty) {
+      return;
+    }
+
+    try {
+      setState(() => _processedUserIds.add(uid));
+
+      final fromUser = widget.currentUser;
+      final firstPhoto = (fromUser.imageUrl?.isNotEmpty ?? false)
+          ? fromUser.imageUrl![0]
+          : null;
+
+      final result = await _superLikeService.sendSuperLike(
+        fromUserId: currentUid,
+        toUserId: uid,
+        fromUserName: fromUser.name,
+        fromUserImageUrl: firstPhoto,
+        toUserName: user.name,
+      );
+
+      if (!mounted) {
+        return;
       }
+
+      if (result.isSuccess) {
+        if (result.isInstantMatch) {
+          _showMatchConfirmation(user);
+        } else {
+          _showSuperLikeConfirmation(user);
+        }
+      } else {
+        setState(() => _processedUserIds.remove(uid));
+        _showError(result.error ?? 'Could not send Super Like.');
+        return;
+      }
+
+      _advanceProfile();
+    } on Object {
+      setState(() => _processedUserIds.remove(uid));
+      _showError('Failed to send Super Like. Please try again.');
+    }
+  }
+
+  void _advanceProfile() {
+    Future.delayed(const Duration(milliseconds: 200), () {
+      if (mounted) setState(() {});
     });
   }
 
   void _showMatchConfirmation(UserModel user) {
-    showDialog(
-      context: context,
-      builder: (context) => MatchConfirmationModal(
-        currentUserImageUrl: widget.currentUser.imageUrl?.isNotEmpty ?? false
-            ? widget.currentUser.imageUrl![0]
-            : 'https://images.pexels.com/photos/220453/pexels-photo-220453.jpeg',
-        matchedUserImageUrl:
-            user.imageUrl?.isNotEmpty ?? false ? user.imageUrl![0] : '',
-        matchedUserName: user.name ?? 'Unknown',
-        matchedUserId: user.id ?? '',
+    unawaited(
+      showDialog(
+        context: context,
+        builder: (context) => MatchConfirmationModal(
+          currentUserImageUrl: widget.currentUser.imageUrl?.isNotEmpty ?? false
+              ? widget.currentUser.imageUrl![0]
+              : 'https://images.pexels.com/photos/220453/pexels-photo-220453.jpeg',
+          matchedUserImageUrl:
+              user.imageUrl?.isNotEmpty ?? false ? user.imageUrl![0] : '',
+          matchedUserName: user.name ?? 'Unknown',
+          matchedUserId: user.id!,
+        ),
       ),
     );
   }
@@ -272,6 +292,20 @@ class _TribeConnectScreenState extends State<TribeConnectScreen> {
         content: Text('Passed on ${user.name}'),
         backgroundColor: Colors.grey[600],
         duration: const Duration(seconds: 2),
+        behavior: SnackBarBehavior.floating,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(12),
+        ),
+      ),
+    );
+  }
+
+  void _showSuperLikeConfirmation(UserModel user) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text('Super Liked ${user.name}! ⭐'),
+        backgroundColor: const Color(0xFF2196F3),
+        duration: const Duration(seconds: 3),
         behavior: SnackBarBehavior.floating,
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(12),
@@ -305,7 +339,7 @@ class _ConnectFilterSheet extends StatefulWidget {
   });
 
   final UserModel currentUser;
-  final VoidCallback onApply;
+  final Future<void> Function() onApply;
 
   @override
   State<_ConnectFilterSheet> createState() => _ConnectFilterSheetState();
@@ -347,7 +381,7 @@ class _ConnectFilterSheetState extends State<_ConnectFilterSheet> {
 
     if (!mounted) return;
     Navigator.pop(context);
-    widget.onApply();
+    await widget.onApply();
   }
 
   @override
@@ -385,7 +419,8 @@ class _ConnectFilterSheetState extends State<_ConnectFilterSheet> {
                 style: ElevatedButton.styleFrom(
                   backgroundColor: AppColors.primaryGreen,
                   foregroundColor: Colors.white,
-                  disabledBackgroundColor: AppColors.primaryGreen.withAlpha(120),
+                  disabledBackgroundColor:
+                      AppColors.primaryGreen.withAlpha(120),
                   padding: const EdgeInsets.symmetric(vertical: 16),
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(12),
@@ -434,7 +469,8 @@ class _ConnectFilterSheetState extends State<_ConnectFilterSheet> {
           children: [
             Icon(
               option.icon,
-              color: isSelected ? AppColors.primaryGreen : AppColors.textSecondary,
+              color:
+                  isSelected ? AppColors.primaryGreen : AppColors.textSecondary,
               size: 22,
             ),
             const SizedBox(width: 12),

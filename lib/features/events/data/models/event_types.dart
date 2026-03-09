@@ -1,4 +1,3 @@
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:equatable/equatable.dart';
 
 import '../../../../common/utils/app_logger.dart';
@@ -73,52 +72,8 @@ EventType parseEventType(Object? typeValue) {
   return EventType.userGenerated;
 }
 
-/// Safely parses various date representations from Firestore.
-DateTime parseDateTime(Object? dateValue) {
-  if (dateValue == null) {
-    return DateTime.now();
-  }
-
-  if (dateValue is Timestamp) {
-    try {
-      return dateValue.toDate();
-    } on Exception {
-      return DateTime.now();
-    }
-  }
-
-  if (dateValue is DateTime) {
-    return dateValue;
-  }
-
-  if (dateValue is int) {
-    try {
-      return DateTime.fromMillisecondsSinceEpoch(dateValue);
-    } on Exception {
-      return DateTime.now();
-    }
-  }
-
-  if (dateValue is String) {
-    try {
-      return DateTime.parse(dateValue);
-    } on FormatException {
-      return DateTime.now();
-    }
-  }
-
-  if (dateValue is Map && dateValue.containsKey('millisecondsSinceEpoch')) {
-    try {
-      return DateTime.fromMillisecondsSinceEpoch(
-        dateValue['millisecondsSinceEpoch'] as int,
-      );
-    } on Exception {
-      return DateTime.now();
-    }
-  }
-
-  return DateTime.now();
-}
+// parseDateTime has been consolidated into
+// lib/common/utils/firestore_helpers.dart to avoid duplicates.
 
 class EventLocation extends Equatable {
   const EventLocation({
@@ -139,10 +94,15 @@ class EventLocation extends Equatable {
         name: json['name'] as String?,
         address: json['address'] is String
             ? json['address'] as String
-            : (json['address'] as Map<String, dynamic>?)?['localized_address_display'] as String?,
-        city: (json['city'] ?? (json['address'] as Map<String, dynamic>?)?['city']) as String?,
-        state: (json['state'] ?? (json['address'] as Map<String, dynamic>?)?['region']) as String?,
-        country: (json['country'] ?? (json['address'] as Map<String, dynamic>?)?['country']) as String?,
+            : (json['address']
+                    as Map<String, dynamic>?)?['localized_address_display']
+                as String?,
+        city: (json['city'] ??
+            (json['address'] as Map<String, dynamic>?)?['city']) as String?,
+        state: (json['state'] ??
+            (json['address'] as Map<String, dynamic>?)?['region']) as String?,
+        country: (json['country'] ??
+            (json['address'] as Map<String, dynamic>?)?['country']) as String?,
         latitude: (json['latitude'] as num?)?.toDouble(),
         longitude: (json['longitude'] as num?)?.toDouble(),
         placeId: json['placeId'] as String?,
@@ -150,9 +110,12 @@ class EventLocation extends Equatable {
             ? Map<String, dynamic>.from(json['additionalInfo'] as Map)
             : null,
       );
-    } catch (e, stackTrace) {
-      AppLogger.error('❌ Error parsing EventLocation',
-          error: e, stackTrace: stackTrace);
+    } on Object catch (e, stackTrace) {
+      AppLogger.error(
+        '❌ Error parsing EventLocation',
+        error: e,
+        stackTrace: stackTrace,
+      );
       rethrow;
     }
   }

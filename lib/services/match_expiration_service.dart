@@ -1,20 +1,19 @@
 import 'dart:async';
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/foundation.dart';
+import '../common/utils/firestore_helpers.dart';
 import '../features/match/models/match_model.dart';
 import 'performance_monitor.dart';
 
 /// Match expiration service that manages match lifecycle and cleanup
 /// Implements Priority 3: User Experience Enhancements
 class MatchExpirationService {
-  static const Duration MATCH_EXPIRY_DURATION = Duration(days: 7);
-  static const Duration CLEANUP_INTERVAL = Duration(hours: 6);
-  static const Duration WARNING_THRESHOLD =
+  static const Duration matchExpiryDuration = Duration(days: 7);
+  static const Duration cleanupInterval = Duration(hours: 6);
+  static const Duration warningThreshold =
       Duration(days: 5); // Warn 2 days before expiry
 
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
-  final FirebaseAuth _auth = FirebaseAuth.instance;
 
   // Collection references
   CollectionReference get _matchesCollection =>
@@ -33,12 +32,12 @@ class MatchExpirationService {
     debugPrint('🕐 Initializing match expiration service');
 
     // Start periodic cleanup
-    _cleanupTimer = Timer.periodic(CLEANUP_INTERVAL, (timer) {
-      _performScheduledCleanup();
+    _cleanupTimer = Timer.periodic(cleanupInterval, (timer) {
+      unawaited(_performScheduledCleanup());
     });
 
     // Perform initial cleanup
-    _performScheduledCleanup();
+    unawaited(_performScheduledCleanup());
   }
 
   /// Dispose of the service and cleanup resources
@@ -51,19 +50,19 @@ class MatchExpirationService {
   /// Check if a match has expired
   bool isMatchExpired(MatchModel match) {
     final matchAge = DateTime.now().difference(match.matchedAt);
-    return matchAge > MATCH_EXPIRY_DURATION;
+    return matchAge > matchExpiryDuration;
   }
 
   /// Check if a match is approaching expiration
   bool isMatchNearExpiry(MatchModel match) {
     final matchAge = DateTime.now().difference(match.matchedAt);
-    return matchAge > WARNING_THRESHOLD && matchAge <= MATCH_EXPIRY_DURATION;
+    return matchAge > warningThreshold && matchAge <= matchExpiryDuration;
   }
 
   /// Get time remaining before match expires
   Duration? getTimeUntilExpiry(MatchModel match) {
     final matchAge = DateTime.now().difference(match.matchedAt);
-    final timeRemaining = MATCH_EXPIRY_DURATION - matchAge;
+    final timeRemaining = matchExpiryDuration - matchAge;
 
     return timeRemaining.isNegative ? Duration.zero : timeRemaining;
   }
@@ -77,7 +76,7 @@ class MatchExpirationService {
               .where(
                 'matchedAt',
                 isLessThan: Timestamp.fromDate(
-                  DateTime.now().subtract(MATCH_EXPIRY_DURATION),
+                  DateTime.now().subtract(matchExpiryDuration),
                 ),
               )
               .get();
@@ -91,7 +90,7 @@ class MatchExpirationService {
             '📋 Found ${expiredMatches.length} expired matches for user $userId',
           );
           return expiredMatches;
-        } catch (e) {
+        } on Object catch (e) {
           debugPrint('❌ Error getting expired matches: $e');
           return [];
         }
@@ -106,13 +105,13 @@ class MatchExpirationService {
               .where(
                 'matchedAt',
                 isLessThan: Timestamp.fromDate(
-                  DateTime.now().subtract(WARNING_THRESHOLD),
+                  DateTime.now().subtract(warningThreshold),
                 ),
               )
               .where(
                 'matchedAt',
                 isGreaterThan: Timestamp.fromDate(
-                  DateTime.now().subtract(MATCH_EXPIRY_DURATION),
+                  DateTime.now().subtract(matchExpiryDuration),
                 ),
               )
               .get();
@@ -126,7 +125,7 @@ class MatchExpirationService {
             '⚠️ Found ${nearExpiryMatches.length} matches near expiry for user $userId',
           );
           return nearExpiryMatches;
-        } catch (e) {
+        } on Object catch (e) {
           debugPrint('❌ Error getting matches near expiry: $e');
           return [];
         }
@@ -201,7 +200,7 @@ class MatchExpirationService {
 
           debugPrint('✅ Successfully archived expired match: $matchId');
           return true;
-        } catch (e) {
+        } on Object catch (e) {
           debugPrint('❌ Error archiving expired match $matchId: $e');
           return false;
         }
@@ -209,7 +208,9 @@ class MatchExpirationService {
 
   /// Extend match expiration (premium feature)
   Future<bool> extendMatchExpiration(
-          String matchId, Duration extension) async =>
+    String matchId,
+    Duration extension,
+  ) async =>
       PerformanceMonitor.measure('extend_match_expiration', () async {
         try {
           final matchDoc = await _matchesCollection.doc(matchId).get();
@@ -219,11 +220,11 @@ class MatchExpirationService {
           }
 
           final matchData = matchDoc.data() as Map<String, dynamic>;
-          final currentExpiry = matchData['expiresAt'] as Timestamp?;
-          final newExpiry = currentExpiry != null
-              ? Timestamp.fromDate(currentExpiry.toDate().add(extension))
+          final currentExpiryDt = parseDateTimeOrNull(matchData['expiresAt']);
+          final newExpiry = currentExpiryDt != null
+              ? Timestamp.fromDate(currentExpiryDt.add(extension))
               : Timestamp.fromDate(
-                  DateTime.now().add(MATCH_EXPIRY_DURATION).add(extension),
+                  DateTime.now().add(matchExpiryDuration).add(extension),
                 );
 
           await _matchesCollection.doc(matchId).update({
@@ -236,7 +237,7 @@ class MatchExpirationService {
             '✅ Extended match $matchId expiration by ${extension.inDays} days',
           );
           return true;
-        } catch (e) {
+        } on Object catch (e) {
           debugPrint('❌ Error extending match expiration: $e');
           return false;
         }
@@ -253,7 +254,7 @@ class MatchExpirationService {
             .where(
               'matchedAt',
               isLessThan: Timestamp.fromDate(
-                DateTime.now().subtract(MATCH_EXPIRY_DURATION),
+                DateTime.now().subtract(matchExpiryDuration),
               ),
             )
             .limit(100) // Process in batches
@@ -286,7 +287,7 @@ class MatchExpirationService {
           readCount: expiredQuery.docs.length,
           writeCount: archivedCount * 3,
         ); // Estimate writes per archive
-      } catch (e) {
+      } on Object catch (e) {
         debugPrint('❌ Error in scheduled cleanup: $e');
       }
     });
@@ -331,7 +332,7 @@ class MatchExpirationService {
             matchesWithMessages: matchesWithMessages,
             totalMatches: allMatches.docs.length,
           );
-        } catch (e) {
+        } on Object catch (e) {
           debugPrint('❌ Error getting expiration stats: $e');
           return MatchExpirationStats.empty();
         }
@@ -348,13 +349,13 @@ class MatchExpirationService {
             .where(
               'matchedAt',
               isLessThan: Timestamp.fromDate(
-                DateTime.now().subtract(WARNING_THRESHOLD),
+                DateTime.now().subtract(warningThreshold),
               ),
             )
             .where(
               'matchedAt',
               isGreaterThan: Timestamp.fromDate(
-                DateTime.now().subtract(MATCH_EXPIRY_DURATION),
+                DateTime.now().subtract(matchExpiryDuration),
               ),
             )
             .where('expirationWarningSent', isEqualTo: false)
@@ -374,8 +375,7 @@ class MatchExpirationService {
               'expirationWarningSentAt': FieldValue.serverTimestamp(),
             });
 
-            // TODO: Send push notification to users
-            // This would integrate with your notification service
+            // TODO(dev): Send push notification to users via notification service
 
             warningsSent++;
           }
@@ -385,7 +385,7 @@ class MatchExpirationService {
           await batch.commit();
           debugPrint('✅ Sent $warningsSent expiration warnings');
         }
-      } catch (e) {
+      } on Object catch (e) {
         debugPrint('❌ Error sending expiration warnings: $e');
       }
     });
@@ -443,7 +443,7 @@ class MatchExpirationService {
 
           debugPrint('✅ Successfully restored archived match: $matchId');
           return true;
-        } catch (e) {
+        } on Object catch (e) {
           debugPrint('❌ Error restoring archived match: $e');
           return false;
         }

@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:meta/meta.dart';
 import 'app_colors.dart';
 
 /// Centralized theme definitions using AppColors tokens.
@@ -106,7 +105,6 @@ class MyThemes {
         colorScheme: const ColorScheme.light(
           primary: AppColors.primaryGreen,
           secondary: AppColors.accentGreen,
-          surface: AppColors.surfaceColor,
           error: AppColors.error,
         ),
         textTheme: textTheme,
@@ -123,7 +121,7 @@ class MyThemes {
           ),
           enabledBorder: OutlineInputBorder(
             borderRadius: BorderRadius.circular(12),
-            borderSide: BorderSide(color: AppColors.border),
+            borderSide: const BorderSide(color: AppColors.border),
           ),
           focusedBorder: OutlineInputBorder(
             borderRadius: BorderRadius.circular(12),

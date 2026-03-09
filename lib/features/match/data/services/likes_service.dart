@@ -1,7 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:flutter/foundation.dart';
 
+import '../../../../common/utils/app_logger.dart';
 import '../../models/match_model.dart';
 
 /// Optimized likes service that handles like actions and match creation
@@ -36,11 +36,11 @@ class LikesService {
   Future<String?> handleLike(String fromUserId, String toUserId) async {
     try {
       if (fromUserId.isEmpty || toUserId.isEmpty) {
-        debugPrint('Invalid user IDs provided');
+        AppLogger.debug('Invalid user IDs provided');
         return null;
       }
 
-      debugPrint('💝 Processing like: $fromUserId → $toUserId');
+      AppLogger.debug('Processing like: $fromUserId → $toUserId');
 
       // Step 1: Check if match already exists or mutual like (optimized - 1-2 reads)
       final mutualLikeResult = await _checkMutualLikeOptimized(
@@ -49,7 +49,7 @@ class LikesService {
       );
 
       if (mutualLikeResult.isExistingMatch) {
-        debugPrint('✅ Match already exists: ${mutualLikeResult.matchId}');
+        AppLogger.debug('Match already exists: ${mutualLikeResult.matchId}');
         return mutualLikeResult.matchId;
       }
 
@@ -57,33 +57,33 @@ class LikesService {
       await _saveLike(fromUserId, toUserId);
 
       if (mutualLikeResult.isMutualLike) {
-        debugPrint('🎉 Mutual like detected! Creating match...');
+        AppLogger.debug('Mutual like detected! Creating match...');
 
         // Step 3: Create match with batch operation (1 write batch)
         final matchId = await _createMatchOptimized(fromUserId, toUserId);
 
         if (matchId != null) {
-          debugPrint('✅ Match created successfully: $matchId');
+          AppLogger.debug('Match created successfully: $matchId');
           await _triggerMatchNotification(fromUserId, toUserId);
           return matchId;
         } else {
-          debugPrint('❌ Failed to create match');
+          AppLogger.debug('Failed to create match');
           return null;
         }
       } else {
-        debugPrint('💌 Like saved, waiting for mutual like');
+        AppLogger.debug('Like saved, waiting for mutual like');
         return null;
       }
-    } catch (e) {
-      debugPrint('❌ Error handling like: $e');
+    } on Object catch (e) {
+      AppLogger.error('Error handling like', error: e);
 
       // Provide more specific error messages
       if (e.toString().contains('permission-denied')) {
-        debugPrint('🔒 Permission denied - check Firestore rules');
+        AppLogger.debug('Permission denied - check Firestore rules');
       } else if (e.toString().contains('not-found')) {
-        debugPrint('👤 User not found');
+        AppLogger.debug('User not found');
       } else if (e.toString().contains('network')) {
-        debugPrint('🌐 Network error - check connection');
+        AppLogger.debug('Network error - check connection');
       }
 
       return null;
@@ -101,7 +101,7 @@ class LikesService {
       // Use cached result if available and recent
       final cacheKey = '${fromUserId}_$toUserId';
       if (_isLikeCheckCached(cacheKey)) {
-        debugPrint('🗄️ Using cached like check result');
+        AppLogger.debug('Using cached like check result');
         return MutualLikeCheckResult(
           isMutualLike: _recentLikeChecks[cacheKey] ?? false,
           isExistingMatch: false,
@@ -142,8 +142,9 @@ class LikesService {
             .get();
       } on FirebaseException catch (e) {
         if (e.code == 'permission-denied') {
-          debugPrint(
-            '⚠️ Permission denied checking existing matches; continuing with like check only',
+          AppLogger.warning(
+            'Permission denied checking existing matches; continuing with like check only',
+            error: e,
           );
         } else {
           rethrow;
@@ -157,7 +158,7 @@ class LikesService {
           final users = List<String>.from(data['users'] ?? []);
 
           if (users.contains(fromUserId) && users.contains(toUserId)) {
-            debugPrint('🔍 Found existing match: ${doc.id}');
+            AppLogger.debug('Found existing match: ${doc.id}');
             return MutualLikeCheckResult(
               isMutualLike: false,
               isExistingMatch: true,
@@ -171,14 +172,14 @@ class LikesService {
       _recentLikeChecks[cacheKey] = isMutualLike;
       _likeCheckTimestamps[cacheKey] = DateTime.now();
 
-      debugPrint('🔍 Mutual like check: $isMutualLike');
+      AppLogger.debug('Mutual like check: $isMutualLike');
 
       return MutualLikeCheckResult(
         isMutualLike: isMutualLike,
         isExistingMatch: false,
       );
-    } catch (e) {
-      debugPrint('❌ Error checking mutual like: $e');
+    } on Object catch (e) {
+      AppLogger.error('Error checking mutual like', error: e);
       return const MutualLikeCheckResult(
         isMutualLike: false,
         isExistingMatch: false,
@@ -196,7 +197,7 @@ class LikesService {
       'timestamp': FieldValue.serverTimestamp(),
     });
 
-    debugPrint('💾 Like saved: $likeDocId');
+    AppLogger.debug('Like saved: $likeDocId');
   }
 
   /// Create match with optimized batch operation
@@ -217,18 +218,20 @@ class LikesService {
       final userBDoc = userDataResults[1];
 
       if (!userADoc.exists || !userBDoc.exists) {
-        debugPrint('❌ One or both users do not exist');
+        AppLogger.debug('One or both users do not exist');
         return null;
       }
 
       // Prevent match creation if either user is deactivated/incognito
-      final userAStatus =
-          (userADoc.data() as Map<String, dynamic>?)?['accountStatus'] as String? ?? 'active';
-      final userBStatus =
-          (userBDoc.data() as Map<String, dynamic>?)?['accountStatus'] as String? ?? 'active';
+      final userAStatus = (userADoc.data()
+              as Map<String, dynamic>?)?['accountStatus'] as String? ??
+          'active';
+      final userBStatus = (userBDoc.data()
+              as Map<String, dynamic>?)?['accountStatus'] as String? ??
+          'active';
       if (userAStatus != 'active' || userBStatus != 'active') {
-        debugPrint(
-          '⏸️ Skipping match creation — userA status: $userAStatus, userB status: $userBStatus',
+        AppLogger.debug(
+          'Skipping match creation — userA status: $userAStatus, userB status: $userBStatus',
         );
         return null;
       }
@@ -313,14 +316,14 @@ class LikesService {
       // Execute all operations in single batch (1 write batch)
       await batch.commit();
 
-      debugPrint('✅ Match created with batch operation: $matchId');
+      AppLogger.debug('Match created with batch operation: $matchId');
 
       // Clear relevant caches
       _clearRelevantCaches(userAId, userBId);
 
       return matchId;
-    } catch (e) {
-      debugPrint('❌ Error creating optimized match: $e');
+    } on Object catch (e) {
+      AppLogger.error('Error creating optimized match', error: e);
       return null;
     }
   }
@@ -349,7 +352,7 @@ class LikesService {
     }
 
     if (keysToRemove.isNotEmpty) {
-      debugPrint('🧹 Cleared ${keysToRemove.length} cache entries');
+      AppLogger.debug('Cleared ${keysToRemove.length} cache entries');
     }
   }
 
@@ -359,11 +362,11 @@ class LikesService {
     String userBId,
   ) async {
     try {
-      debugPrint(
-        '🎉 Match created! Cloud Function will handle notifications automatically',
+      AppLogger.debug(
+        'Match created! Cloud Function will handle notifications automatically',
       );
-      debugPrint('   User A: $userAId');
-      debugPrint('   User B: $userBId');
+      AppLogger.debug('User A: $userAId');
+      AppLogger.debug('User B: $userBId');
 
       // The Cloud Function (onMatchCreated) will automatically trigger
       // when the match document is created in _createMatchOptimized()
@@ -371,8 +374,8 @@ class LikesService {
 
       // Optional: Add immediate local feedback for the current user
       await _showLocalMatchFeedback(userAId, userBId);
-    } catch (e) {
-      debugPrint('❌ Error in match notification trigger: $e');
+    } on Object catch (e) {
+      AppLogger.error('Error in match notification trigger', error: e);
     }
   }
 
@@ -396,12 +399,12 @@ class LikesService {
       final otherUserData = otherUserDoc.data()!;
       final otherUserName = otherUserData['name'] ?? 'Someone';
 
-      debugPrint('✨ Showing immediate match feedback for $otherUserName');
+      AppLogger.debug('Showing immediate match feedback for $otherUserName');
 
       // You can add a local notification or UI feedback here
       // This provides instant gratification while the push notification is being sent
-    } catch (e) {
-      debugPrint('Error showing local match feedback: $e');
+    } on Object catch (e) {
+      AppLogger.error('Error showing local match feedback', error: e);
     }
   }
 
@@ -424,8 +427,8 @@ class LikesService {
       _likeCheckTimestamps[cacheKey] = DateTime.now();
 
       return hasLiked;
-    } catch (e) {
-      debugPrint('Error checking if user has liked: $e');
+    } on Object catch (e) {
+      AppLogger.error('Error checking if user has liked', error: e);
       return false;
     }
   }
@@ -440,8 +443,8 @@ class LikesService {
           .map((doc) => doc.data() as Map<String, dynamic>)
           .map((data) => data['from'] as String)
           .toList();
-    } catch (e) {
-      debugPrint('Error getting users who liked me: $e');
+    } on Object catch (e) {
+      AppLogger.error('Error getting users who liked me', error: e);
       return [];
     }
   }
@@ -456,8 +459,8 @@ class LikesService {
           .map((doc) => doc.data() as Map<String, dynamic>)
           .map((data) => data['to'] as String)
           .toList();
-    } catch (e) {
-      debugPrint('Error getting users I liked: $e');
+    } on Object catch (e) {
+      AppLogger.error('Error getting users I liked', error: e);
       return [];
     }
   }
@@ -472,8 +475,8 @@ class LikesService {
           .get();
 
       return querySnapshot.docs.map(MatchModel.fromDocument).toList();
-    } catch (e) {
-      debugPrint('Error getting user matches: $e');
+    } on Object catch (e) {
+      AppLogger.error('Error getting user matches', error: e);
       return [];
     }
   }
@@ -489,10 +492,10 @@ class LikesService {
       _recentLikeChecks.remove(cacheKey);
       _likeCheckTimestamps.remove(cacheKey);
 
-      debugPrint('Like removed: $fromUserId unliked $toUserId');
+      AppLogger.debug('Like removed: $fromUserId unliked $toUserId');
       return true;
-    } catch (e) {
-      debugPrint('Error removing like: $e');
+    } on Object catch (e) {
+      AppLogger.error('Error removing like', error: e);
       return false;
     }
   }
@@ -505,8 +508,8 @@ class LikesService {
         return MatchModel.fromDocument(doc);
       }
       return null;
-    } catch (e) {
-      debugPrint('Error getting match by ID: $e');
+    } on Object catch (e) {
+      AppLogger.error('Error getting match by ID', error: e);
       return null;
     }
   }
@@ -534,7 +537,7 @@ class LikesService {
   void clearCache() {
     _recentLikeChecks.clear();
     _likeCheckTimestamps.clear();
-    debugPrint('🗑️ Likes service cache cleared');
+    AppLogger.debug('Likes service cache cleared');
   }
 }
 

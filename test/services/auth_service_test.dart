@@ -28,10 +28,12 @@ void main() {
     test('returns UserCredential on success', () async {
       final mockCredential = MockUserCredential();
 
-      when(() => mockFirebaseAuth.signInWithEmailAndPassword(
-            email: any(named: 'email'),
-            password: any(named: 'password'),
-          ),).thenAnswer((_) async => mockCredential);
+      when(
+        () => mockFirebaseAuth.signInWithEmailAndPassword(
+          email: any(named: 'email'),
+          password: any(named: 'password'),
+        ),
+      ).thenAnswer((_) async => mockCredential);
 
       final result = await authService.signInWithEmail(
         email: 'test@example.com',
@@ -42,10 +44,12 @@ void main() {
     });
 
     test('throws FirebaseAuthException on invalid credentials', () async {
-      when(() => mockFirebaseAuth.signInWithEmailAndPassword(
-            email: any(named: 'email'),
-            password: any(named: 'password'),
-          ),).thenThrow(
+      when(
+        () => mockFirebaseAuth.signInWithEmailAndPassword(
+          email: any(named: 'email'),
+          password: any(named: 'password'),
+        ),
+      ).thenThrow(
         FirebaseAuthException(
           code: 'wrong-password',
           message: 'The password is invalid',
@@ -64,20 +68,24 @@ void main() {
     test('trims email input', () async {
       final mockCredential = MockUserCredential();
 
-      when(() => mockFirebaseAuth.signInWithEmailAndPassword(
-            email: 'test@example.com',
-            password: any(named: 'password'),
-          ),).thenAnswer((_) async => mockCredential);
+      when(
+        () => mockFirebaseAuth.signInWithEmailAndPassword(
+          email: 'test@example.com',
+          password: any(named: 'password'),
+        ),
+      ).thenAnswer((_) async => mockCredential);
 
       await authService.signInWithEmail(
         email: '  test@example.com  ',
         password: 'password123',
       );
 
-      verify(() => mockFirebaseAuth.signInWithEmailAndPassword(
-            email: 'test@example.com',
-            password: 'password123',
-          ),).called(1);
+      verify(
+        () => mockFirebaseAuth.signInWithEmailAndPassword(
+          email: 'test@example.com',
+          password: 'password123',
+        ),
+      ).called(1);
     });
   });
 
@@ -88,14 +96,16 @@ void main() {
       void codeSent(String verificationId, int? resendToken) {}
       void codeAutoRetrievalTimeout(String verificationId) {}
 
-      when(() => mockFirebaseAuth.verifyPhoneNumber(
-            phoneNumber: any(named: 'phoneNumber'),
-            verificationCompleted: any(named: 'verificationCompleted'),
-            verificationFailed: any(named: 'verificationFailed'),
-            codeSent: any(named: 'codeSent'),
-            codeAutoRetrievalTimeout: any(named: 'codeAutoRetrievalTimeout'),
-            timeout: any(named: 'timeout'),
-          ),).thenAnswer((_) async {});
+      when(
+        () => mockFirebaseAuth.verifyPhoneNumber(
+          phoneNumber: any(named: 'phoneNumber'),
+          verificationCompleted: any(named: 'verificationCompleted'),
+          verificationFailed: any(named: 'verificationFailed'),
+          codeSent: any(named: 'codeSent'),
+          codeAutoRetrievalTimeout: any(named: 'codeAutoRetrievalTimeout'),
+          timeout: any(named: 'timeout'),
+        ),
+      ).thenAnswer((_) async {});
 
       await authService.verifyPhoneNumber(
         phone: '+12179044453',
@@ -105,14 +115,16 @@ void main() {
         codeAutoRetrievalTimeout: codeAutoRetrievalTimeout,
       );
 
-      verify(() => mockFirebaseAuth.verifyPhoneNumber(
-            phoneNumber: '+12179044453',
-            verificationCompleted: verificationCompleted,
-            verificationFailed: verificationFailed,
-            codeSent: codeSent,
-            codeAutoRetrievalTimeout: codeAutoRetrievalTimeout,
-            timeout: any(named: 'timeout'),
-          ),).called(1);
+      verify(
+        () => mockFirebaseAuth.verifyPhoneNumber(
+          phoneNumber: '+12179044453',
+          verificationCompleted: verificationCompleted,
+          verificationFailed: verificationFailed,
+          codeSent: codeSent,
+          codeAutoRetrievalTimeout: codeAutoRetrievalTimeout,
+          timeout: any(named: 'timeout'),
+        ),
+      ).called(1);
     });
   });
 
@@ -135,11 +147,12 @@ void main() {
     });
 
     test('throws exception when credential is invalid', () async {
-      when(() => mockFirebaseAuth.signInWithCredential(any()))
-          .thenThrow(FirebaseAuthException(
-        code: 'invalid-verification-code',
-        message: 'The verification code is invalid',
-      ),);
+      when(() => mockFirebaseAuth.signInWithCredential(any())).thenThrow(
+        FirebaseAuthException(
+          code: 'invalid-verification-code',
+          message: 'The verification code is invalid',
+        ),
+      );
 
       expect(
         () => authService.signInWithCredential(

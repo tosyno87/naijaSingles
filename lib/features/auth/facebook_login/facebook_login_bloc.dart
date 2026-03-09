@@ -15,7 +15,7 @@ class FacebookLoginBloc extends Bloc<FacebookLoginEvents, FacebookLoginStates> {
         emit(FacebookLoginSuccess(user: result));
       } on SocketException {
         emit(const FacebookLoginFailed(message: 'No Internet Connection'));
-      } catch (e) {
+      } on Object catch (e) {
         emit(FacebookLoginFailed(message: e.toString()));
       }
     });

@@ -1,6 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 
 import '../../../common/constants/constants.dart';
+import '../../../common/utils/firestore_helpers.dart';
 
 class DiaryEntry {
   DiaryEntry({
@@ -16,7 +17,7 @@ class DiaryEntry {
         id: doc.id,
         userId: doc['userId'] as String,
         content: doc['content'] as String,
-        timestamp: doc['timestamp'] as Timestamp,
+        timestamp: Timestamp.fromDate(parseDateTime(doc['timestamp'])),
         userName: doc['userName'] as String? ?? '',
         userImage: doc['userImage'] as String?,
       );

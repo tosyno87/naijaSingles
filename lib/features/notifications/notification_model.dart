@@ -1,5 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
+import '../../common/utils/firestore_helpers.dart';
 
 /// Model class for app notifications
 class AppNotification {
@@ -23,7 +24,7 @@ class AppNotification {
       id: doc.id,
       title: data['title'] ?? '',
       message: data['message'] ?? '',
-      timestamp: (data['timestamp'] as Timestamp?)?.toDate() ?? DateTime.now(),
+      timestamp: parseDateTime(data['timestamp']),
       type: data['type'] ?? 'general',
       avatarUrl: data['avatarUrl'],
       isRead: data['isRead'] ?? false,
@@ -55,6 +56,9 @@ class AppNotification {
     switch (type) {
       case 'like':
         return Icons.favorite;
+      case 'superLike':
+      case 'super_like':
+        return Icons.star_rounded;
       case 'match':
         return Icons.favorite_border;
       case 'message':
@@ -73,10 +77,13 @@ class AppNotification {
     switch (type) {
       case 'like':
         return Colors.red;
+      case 'superLike':
+      case 'super_like':
+        return const Color(0xFF2196F3);
       case 'match':
         return Colors.pink;
       case 'message':
-        return const Color(0xFF008037); // deepGreen
+        return const Color(0xFF008037);
       case 'invite':
         return Colors.blue;
       case 'view':

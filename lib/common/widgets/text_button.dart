@@ -34,9 +34,7 @@ class TextButtonWidget extends StatelessWidget {
                   child: Text(
                     text.tr().toString(),
                     style: TextStyle(
-                      color: isDarkMode
-                          ? Colors.white
-                          : AppColors.primaryGreen,
+                      color: isDarkMode ? Colors.white : AppColors.primaryGreen,
                       fontSize: 18,
                       fontWeight: FontWeight.w500,
                     ),

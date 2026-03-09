@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:developer';
 
 import 'package:flutter/material.dart';
@@ -9,7 +10,7 @@ class ThemePreferences {
   Future<void> setTheme(ThemeMode value) async {
     final SharedPreferences sharedPreferences =
         await SharedPreferences.getInstance();
-    sharedPreferences.setString(themekey, value.name);
+    unawaited(sharedPreferences.setString(themekey, value.name));
   }
 
   Future<ThemeMode> getTheme() async {

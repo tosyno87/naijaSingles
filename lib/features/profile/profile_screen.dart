@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'dart:developer';
 
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
@@ -8,21 +9,26 @@ import 'package:google_fonts/google_fonts.dart';
 
 import '../../common/constants/app_colors.dart';
 import '../../common/routes/route_name.dart';
+import '../../common/widgets/state_views/state_views.dart';
 
 import 'edit_profile_screen.dart';
 import 'privacy_settings_screen.dart';
 import 'settings_screen.dart';
 
 class ProfileScreen extends StatefulWidget {
-  const ProfileScreen({super.key});
+  const ProfileScreen({super.key, this.auth, this.firestore});
+
+  final FirebaseAuth? auth;
+  final FirebaseFirestore? firestore;
 
   @override
   State<ProfileScreen> createState() => _ProfileScreenState();
 }
 
 class _ProfileScreenState extends State<ProfileScreen> {
-  final FirebaseAuth _auth = FirebaseAuth.instance;
-  final FirebaseFirestore _firestore = FirebaseFirestore.instance;
+  late final FirebaseAuth _auth = widget.auth ?? FirebaseAuth.instance;
+  late final FirebaseFirestore _firestore =
+      widget.firestore ?? FirebaseFirestore.instance;
 
   Map<String, dynamic>? _userData;
   bool _isLoading = true;
@@ -46,18 +52,22 @@ class _ProfileScreenState extends State<ProfileScreen> {
   @override
   void dispose() {
     _photoPageController.dispose();
-    _userDataSubscription?.cancel();
+    unawaited(_userDataSubscription?.cancel());
     super.dispose();
   }
 
   // Listen to Firestore changes for automatic updates (e.g., after photo upload)
   void _listenToUserData() {
     try {
+      unawaited(_userDataSubscription?.cancel());
       final user = _auth.currentUser;
       if (user != null) {
         _userDataSubscription =
             _firestore.collection('users').doc(user.uid).snapshots().listen(
           (docSnapshot) {
+            if (!mounted) {
+              return;
+            }
             if (docSnapshot.exists) {
               setState(() {
                 _userData = docSnapshot.data();
@@ -69,37 +79,17 @@ class _ProfileScreenState extends State<ProfileScreen> {
           },
           onError: (error) {
             log('❌ Error listening to user data: $error');
+            if (!mounted) {
+              return;
+            }
             setState(() => _isLoading = false);
           },
         );
       } else {
         setState(() => _isLoading = false);
       }
-    } catch (e) {
+    } on Object catch (e) {
       log('❌ Error setting up user data listener: $e');
-      setState(() => _isLoading = false);
-    }
-  }
-
-  // Legacy method kept for compatibility (not used if _listenToUserData is active)
-  Future<void> _loadUserData() async {
-    try {
-      final user = _auth.currentUser;
-      if (user != null) {
-        final doc = await _firestore.collection('users').doc(user.uid).get();
-        if (doc.exists) {
-          setState(() {
-            _userData = doc.data();
-            _isLoading = false;
-          });
-        } else {
-          setState(() => _isLoading = false);
-        }
-      } else {
-        setState(() => _isLoading = false);
-      }
-    } catch (e) {
-      log('❌ Error loading user data: $e');
       setState(() => _isLoading = false);
     }
   }
@@ -131,21 +121,30 @@ class _ProfileScreenState extends State<ProfileScreen> {
               onSelected: (value) {
                 switch (value) {
                   case 'events':
-                    Navigator.pushNamed(context, RouteName.eventsScreen);
+                    unawaited(
+                      Navigator.pushNamed(
+                        context,
+                        RouteName.eventsScreen,
+                      ),
+                    );
                     break;
                   case 'privacy':
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder: (_) => const PrivacySettingsScreen(),
+                    unawaited(
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (_) => const PrivacySettingsScreen(),
+                        ),
                       ),
                     );
                     break;
                   case 'settings':
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder: (_) => const SettingsScreen(),
+                    unawaited(
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (_) => const SettingsScreen(),
+                        ),
                       ),
                     );
                     break;
@@ -187,489 +186,48 @@ class _ProfileScreenState extends State<ProfileScreen> {
           ],
         ),
         body: _isLoading
-            ? const Center(
-                child: CircularProgressIndicator(color: primaryColor))
-            : SafeArea(
-                child: SingleChildScrollView(
-                  // Remove padding for seamless Hinge-style layout
-                  padding: EdgeInsets.zero,
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      // Hinge-style large photo section (full width, no padding)
-                      _buildHingePhotoSection(),
+            ? const AppLoadingView(message: 'Loading profile...')
+            : _userData == null
+                ? AppEmptyView(
+                    title: 'Profile unavailable',
+                    subtitle:
+                        'We could not load your profile details right now.',
+                    icon: Icons.person_off_outlined,
+                    actionLabel: 'Retry',
+                    onAction: _listenToUserData,
+                  )
+                : SafeArea(
+                    child: SingleChildScrollView(
+                      // Remove padding for seamless Hinge-style layout
+                      padding: EdgeInsets.zero,
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          // Hinge-style large photo section (full width, no padding)
+                          _buildHingePhotoSection(),
 
-                      // Profile header (name, age, location) - integrated with photos
-                      _buildHingeProfileHeader(),
+                          // Profile header (name, age, location) - integrated with photos
+                          _buildHingeProfileHeader(),
 
-                      // About section - seamless
-                      _buildHingeAboutSection(),
+                          // About section - seamless
+                          _buildHingeAboutSection(),
 
-                      // Details section - seamless
-                      _buildHingeDetailsSection(),
+                          // Details section - seamless
+                          _buildHingeDetailsSection(),
 
-                      // Interests section - seamless
-                      _buildHingeInterestsSection(),
+                          // Interests section - seamless
+                          _buildHingeInterestsSection(),
 
-                      // Edit button with padding
-                      Padding(
-                        padding: const EdgeInsets.all(20),
-                        child: _buildEditButton(),
-                      ),
-                      const SizedBox(height: 32),
-                    ],
-                  ),
-                ),
-              ),
-      );
-
-  Widget _buildSimplifiedPhotoSection() {
-    // Try multiple field names for compatibility
-    final photos = _userData?['photos'] as List<dynamic>? ??
-        _userData?['Pictures'] as List<dynamic>? ??
-        _userData?['imageUrl'] as List<dynamic>? ??
-        [];
-
-    if (photos.isEmpty) {
-      return Container(
-        height: 300,
-        decoration: BoxDecoration(
-          color: cardColor,
-          borderRadius: BorderRadius.circular(16),
-          border: Border.all(color: primaryColor.withValues(alpha: 0.2)),
-        ),
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Icon(
-              Icons.add_a_photo_outlined,
-              size: 48,
-              color: primaryColor.withValues(alpha: 0.6),
-            ),
-            const SizedBox(height: 8),
-            Text(
-              'Add Photos',
-              style: GoogleFonts.montserrat(
-                color: textSecondary,
-                fontSize: 16,
-              ),
-            ),
-          ],
-        ),
-      );
-    }
-
-    return SizedBox(
-      height: 300,
-      child: Stack(
-        children: [
-          // Main photo
-          PageView.builder(
-            controller: _photoPageController,
-            itemCount: photos.length,
-            onPageChanged: (index) {
-              setState(() {
-                _currentPhotoIndex = index;
-              });
-            },
-            itemBuilder: (context, index) => GestureDetector(
-              onTap: () => _showFullScreenPhoto(photos, index),
-              child: Container(
-                margin: const EdgeInsets.symmetric(horizontal: 4),
-                decoration: BoxDecoration(
-                  borderRadius: BorderRadius.circular(16),
-                  color: Colors.grey
-                      .shade100, // Background for images that don't fill container
-                  boxShadow: [
-                    BoxShadow(
-                      color: Colors.black.withValues(alpha: 0.1),
-                      blurRadius: 8,
-                      offset: const Offset(0, 4),
-                    ),
-                  ],
-                ),
-                child: ClipRRect(
-                  borderRadius: BorderRadius.circular(16),
-                  child: Image.network(
-                    photos[index],
-                    fit: BoxFit.contain, // Show full image without cropping
-                    errorBuilder: (context, error, stackTrace) => ColoredBox(
-                      color: Colors.grey.shade200,
-                      child: Icon(
-                        Icons.broken_image_outlined,
-                        size: 60,
-                        color: Colors.grey.shade400,
-                      ),
-                    ),
-                  ),
-                ),
-              ),
-            ),
-          ),
-
-          // Photo counter
-          if (photos.length > 1)
-            Positioned(
-              top: 16,
-              right: 16,
-              child: Container(
-                padding:
-                    const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-                decoration: BoxDecoration(
-                  color: Colors.black.withValues(alpha: 0.7),
-                  borderRadius: BorderRadius.circular(20),
-                ),
-                child: Text(
-                  '${_currentPhotoIndex + 1}/${photos.length}',
-                  style: GoogleFonts.montserrat(
-                    color: Colors.white,
-                    fontSize: 12,
-                    fontWeight: FontWeight.w600,
-                  ),
-                ),
-              ),
-            ),
-
-          // Navigation arrows
-          if (photos.length > 1) ...[
-            Positioned(
-              left: 12,
-              top: 0,
-              bottom: 0,
-              child: Center(
-                child: GestureDetector(
-                  onTap: () {
-                    if (_currentPhotoIndex > 0) {
-                      _photoPageController.previousPage(
-                        duration: const Duration(milliseconds: 300),
-                        curve: Curves.easeInOut,
-                      );
-                    }
-                  },
-                  child: Container(
-                    padding: const EdgeInsets.all(8),
-                    decoration: BoxDecoration(
-                      color: Colors.black.withValues(alpha: 0.5),
-                      shape: BoxShape.circle,
-                    ),
-                    child: const Icon(
-                      Icons.chevron_left,
-                      color: Colors.white,
-                      size: 20,
-                    ),
-                  ),
-                ),
-              ),
-            ),
-            Positioned(
-              right: 12,
-              top: 0,
-              bottom: 0,
-              child: Center(
-                child: GestureDetector(
-                  onTap: () {
-                    if (_currentPhotoIndex < photos.length - 1) {
-                      _photoPageController.nextPage(
-                        duration: const Duration(milliseconds: 300),
-                        curve: Curves.easeInOut,
-                      );
-                    }
-                  },
-                  child: Container(
-                    padding: const EdgeInsets.all(8),
-                    decoration: BoxDecoration(
-                      color: Colors.black.withValues(alpha: 0.5),
-                      shape: BoxShape.circle,
-                    ),
-                    child: const Icon(
-                      Icons.chevron_right,
-                      color: Colors.white,
-                      size: 20,
-                    ),
-                  ),
-                ),
-              ),
-            ),
-          ],
-        ],
-      ),
-    );
-  }
-
-  Widget _buildSimplifiedBasicInfo() {
-    final name = _userData?['name'] ?? 'Your Name';
-    final age = _userData?['age'] ?? _calculateAge(_userData?['dateOfBirth']);
-    final gender = _userData?['gender'] ?? 'Not specified';
-
-    return Card(
-      color: cardColor,
-      elevation: 2,
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-      child: Padding(
-        padding: const EdgeInsets.all(20),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(
-              name,
-              style: GoogleFonts.montserrat(
-                fontSize: 28,
-                fontWeight: FontWeight.bold,
-                color: textPrimary,
-              ),
-            ),
-            const SizedBox(height: 12),
-            Row(
-              children: [
-                _buildInfoChip(
-                  icon: Icons.cake_outlined,
-                  label: age != null ? '$age years old' : 'Age not set',
-                ),
-                const SizedBox(width: 12),
-                _buildInfoChip(
-                  icon: Icons.person_outline,
-                  label: gender,
-                ),
-              ],
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-
-  Widget _buildSimplifiedAbout() {
-    final bio = _userData?['bio'] ?? '';
-
-    return Card(
-      color: cardColor,
-      elevation: 2,
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-      child: Padding(
-        padding: const EdgeInsets.all(20),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(
-              'About Me',
-              style: GoogleFonts.montserrat(
-                fontSize: 18,
-                fontWeight: FontWeight.w600,
-                color: textPrimary,
-              ),
-            ),
-            const SizedBox(height: 12),
-            Text(
-              bio.isEmpty ? 'Tell others about yourself...' : bio,
-              style: GoogleFonts.montserrat(
-                fontSize: 16,
-                color: bio.isEmpty ? textSecondary : textPrimary,
-                height: 1.5,
-              ),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-
-  Widget _buildSimplifiedInterests() {
-    final interests = _userData?['interests'] as List<dynamic>? ?? [];
-
-    return Card(
-      color: cardColor,
-      elevation: 2,
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-      child: Padding(
-        padding: const EdgeInsets.all(20),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Row(
-              children: [
-                const Icon(
-                  Icons.favorite_outline,
-                  color: primaryColor,
-                  size: 24,
-                ),
-                const SizedBox(width: 12),
-                Text(
-                  'Interests',
-                  style: GoogleFonts.montserrat(
-                    fontSize: 18,
-                    fontWeight: FontWeight.w600,
-                    color: textPrimary,
-                  ),
-                ),
-              ],
-            ),
-            const SizedBox(height: 16),
-            if (interests.isEmpty)
-              Text(
-                'No interests added yet',
-                style: GoogleFonts.montserrat(
-                  fontSize: 14,
-                  color: textSecondary,
-                  fontStyle: FontStyle.italic,
-                ),
-              )
-            else
-              Wrap(
-                spacing: 8,
-                runSpacing: 8,
-                children: interests
-                    .take(6)
-                    .map(
-                      (interest) => Container(
-                        padding: const EdgeInsets.symmetric(
-                            horizontal: 12, vertical: 6),
-                        decoration: BoxDecoration(
-                          color: primaryColor.withValues(alpha: 0.1),
-                          borderRadius: BorderRadius.circular(20),
-                          border:
-                              Border.all(color: primaryColor.withValues(alpha: 0.3)),
-                        ),
-                        child: Text(
-                          interest.toString(),
-                          style: GoogleFonts.montserrat(
-                            fontSize: 12,
-                            fontWeight: FontWeight.w500,
-                            color: primaryColor,
+                          // Edit button with padding
+                          Padding(
+                            padding: const EdgeInsets.all(20),
+                            child: _buildEditButton(),
                           ),
-                        ),
+                          const SizedBox(height: 32),
+                        ],
                       ),
-                    )
-                    .toList(),
-              ),
-            if (interests.length > 6)
-              Padding(
-                padding: const EdgeInsets.only(top: 8),
-                child: Text(
-                  '+${interests.length - 6} more',
-                  style: GoogleFonts.montserrat(
-                    fontSize: 12,
-                    color: textSecondary,
-                    fontStyle: FontStyle.italic,
+                    ),
                   ),
-                ),
-              ),
-          ],
-        ),
-      ),
-    );
-  }
-
-  Widget _buildSimplifiedLocation() {
-    // Handle both String and Map types for location and nationality
-    String location = '';
-    String nationality = '';
-
-    if (_userData?['location'] != null) {
-      if (_userData!['location'] is String) {
-        location = _userData!['location'] as String;
-      } else if (_userData!['location'] is Map) {
-        location = _userData!['location']['name'] ??
-            _userData!['location']['city'] ??
-            '';
-      }
-    }
-
-    if (_userData?['nationality'] != null) {
-      if (_userData!['nationality'] is String) {
-        nationality = _userData!['nationality'] as String;
-      } else if (_userData!['nationality'] is Map) {
-        nationality = _userData!['nationality']['name'] ??
-            _userData!['nationality']['country'] ??
-            '';
-      }
-    }
-
-    return Card(
-      color: cardColor,
-      elevation: 2,
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-      child: Padding(
-        padding: const EdgeInsets.all(20),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Row(
-              children: [
-                const Icon(
-                  Icons.location_on_outlined,
-                  color: primaryColor,
-                  size: 24,
-                ),
-                const SizedBox(width: 12),
-                Text(
-                  'Location',
-                  style: GoogleFonts.montserrat(
-                    fontSize: 18,
-                    fontWeight: FontWeight.w600,
-                    color: textPrimary,
-                  ),
-                ),
-              ],
-            ),
-            const SizedBox(height: 16),
-            if (location.isNotEmpty)
-              _buildLocationRow(Icons.location_on, 'Location', location),
-            if (nationality.isNotEmpty) ...[
-              const SizedBox(height: 12),
-              _buildLocationRow(Icons.public, 'Nationality', nationality),
-            ],
-          ],
-        ),
-      ),
-    );
-  }
-
-  Widget _buildLocationRow(IconData icon, String label, String value) => Row(
-        children: [
-          Icon(
-            icon,
-            color: textSecondary,
-            size: 20,
-          ),
-          const SizedBox(width: 12),
-          Expanded(
-            child: Text(
-              '$label: $value',
-              style: GoogleFonts.montserrat(
-                fontSize: 14,
-                color: textPrimary,
-              ),
-            ),
-          ),
-        ],
-      );
-
-  Widget _buildInfoChip({required IconData icon, required String label}) =>
-      Container(
-        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-        decoration: BoxDecoration(
-          color: primaryColor.withValues(alpha: 0.1),
-          borderRadius: BorderRadius.circular(20),
-        ),
-        child: Row(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Icon(
-              icon,
-              size: 16,
-              color: primaryColor,
-            ),
-            const SizedBox(width: 6),
-            Text(
-              label,
-              style: GoogleFonts.montserrat(
-                fontSize: 12,
-                color: primaryColor,
-                fontWeight: FontWeight.w500,
-              ),
-            ),
-          ],
-        ),
       );
 
   Widget _buildEditButton() => SizedBox(
@@ -677,16 +235,12 @@ class _ProfileScreenState extends State<ProfileScreen> {
         height: 56,
         child: ElevatedButton(
           onPressed: () async {
-            final result = await Navigator.push(
+            await Navigator.push(
               context,
               MaterialPageRoute(
                 builder: (_) => const EditProfileScreen(),
               ),
             );
-
-            if (result == true) {
-              _loadUserData();
-            }
           },
           style: ElevatedButton.styleFrom(
             backgroundColor: primaryColor,
@@ -714,7 +268,9 @@ class _ProfileScreenState extends State<ProfileScreen> {
       );
 
   int? _calculateAge(String? dobString) {
-    if (dobString == null) return null;
+    if (dobString == null) {
+      return null;
+    }
 
     try {
       final dob = DateTime.parse(dobString);
@@ -725,7 +281,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
         age--;
       }
       return age;
-    } catch (e) {
+    } on Object {
       return null;
     }
   }
@@ -779,10 +335,13 @@ class _ProfileScreenState extends State<ProfileScreen> {
           child: Stack(
             fit: StackFit.expand,
             children: [
-              Image.network(
-                photos[index].toString(),
+              CachedNetworkImage(
+                imageUrl: photos[index].toString(),
                 fit: BoxFit.cover,
-                errorBuilder: (context, error, stackTrace) => ColoredBox(
+                placeholder: (context, url) => const Center(
+                  child: CircularProgressIndicator(strokeWidth: 2),
+                ),
+                errorWidget: (context, url, error) => ColoredBox(
                   color: Colors.grey.shade300,
                   child: const Icon(Icons.broken_image_outlined, size: 60),
                 ),
@@ -818,22 +377,39 @@ class _ProfileScreenState extends State<ProfileScreen> {
     );
   }
 
+  String _safeStringFromField(
+    Object? value, {
+    List<String> mapKeys = const ['name', 'country'],
+  }) {
+    if (value == null) {
+      return '';
+    }
+    if (value is String) {
+      return value;
+    }
+    if (value is Map) {
+      for (final key in mapKeys) {
+        final v = value[key];
+        if (v != null && v.toString().isNotEmpty) {
+          return v.toString();
+        }
+      }
+    }
+    return '';
+  }
+
   // Hinge-style profile header
   Widget _buildHingeProfileHeader() {
     final name = _userData?['name'] ?? 'Your Name';
     final age = _userData?['age'] ?? _calculateAge(_userData?['dateOfBirth']);
-    final nationality = _userData?['nationality']?.toString() ?? '';
+    final nationality = _safeStringFromField(_userData?['nationality']);
 
-    String location = '';
-    if (_userData?['location'] != null) {
-      if (_userData!['location'] is String) {
-        location = _userData!['location'] as String;
-      } else if (_userData!['location'] is Map) {
-        location = _userData!['location']?['name']?.toString() ?? '';
-      }
-    }
-    if (location.isEmpty && _userData?['living_in'] != null) {
-      location = _userData!['living_in'].toString();
+    String location = _safeStringFromField(
+      _userData?['location'],
+      mapKeys: ['name', 'city'],
+    );
+    if (location.isEmpty) {
+      location = _safeStringFromField(_userData?['living_in']);
     }
 
     return Padding(
@@ -896,8 +472,11 @@ class _ProfileScreenState extends State<ProfileScreen> {
                     child: Row(
                       mainAxisSize: MainAxisSize.min,
                       children: [
-                        const Icon(Icons.location_on,
-                            size: 16, color: primaryColor),
+                        const Icon(
+                          Icons.location_on,
+                          size: 16,
+                          color: primaryColor,
+                        ),
                         const SizedBox(width: 6),
                         Text(
                           location,
@@ -921,7 +500,9 @@ class _ProfileScreenState extends State<ProfileScreen> {
   // Hinge-style about section
   Widget _buildHingeAboutSection() {
     final bio = _userData?['bio']?.toString() ?? '';
-    if (bio.isEmpty) return const SizedBox.shrink();
+    if (bio.isEmpty) {
+      return const SizedBox.shrink();
+    }
 
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 20),
@@ -981,7 +562,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
         getValue('occupation');
     if (workTitle != null) {
       details.add(
-          {'icon': Icons.business_center, 'label': '', 'value': workTitle});
+        {'icon': Icons.business_center, 'label': '', 'value': workTitle},
+      );
     }
 
     // Religion - book icon (like Hinge)
@@ -995,7 +577,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
         _userData?['preferences']?['relationshipIntent']?.toString();
     if (relationshipIntent != null && relationshipIntent.isNotEmpty) {
       details.add(
-          {'icon': Icons.search, 'label': '', 'value': relationshipIntent});
+        {'icon': Icons.search, 'label': '', 'value': relationshipIntent},
+      );
     }
 
     // Tribe - group icon
@@ -1004,7 +587,9 @@ class _ProfileScreenState extends State<ProfileScreen> {
       details.add({'icon': Icons.group, 'label': '', 'value': tribe});
     }
 
-    if (details.isEmpty) return const SizedBox.shrink();
+    if (details.isEmpty) {
+      return const SizedBox.shrink();
+    }
 
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 20),
@@ -1021,29 +606,31 @@ class _ProfileScreenState extends State<ProfileScreen> {
           ),
           const SizedBox(height: 8),
           // Hinge-style details: just icon and value, no label
-          ...details.map((detail) => Padding(
-                padding: const EdgeInsets.only(bottom: 12),
-                child: Row(
-                  children: [
-                    Icon(
-                      detail['icon'] as IconData,
-                      size: 20,
-                      color: textSecondary,
-                    ),
-                    const SizedBox(width: 12),
-                    Expanded(
-                      child: Text(
-                        detail['value'] as String,
-                        style: GoogleFonts.montserrat(
-                          fontSize: 16,
-                          fontWeight: FontWeight.w400,
-                          color: textPrimary,
-                        ),
+          ...details.map(
+            (detail) => Padding(
+              padding: const EdgeInsets.only(bottom: 12),
+              child: Row(
+                children: [
+                  Icon(
+                    detail['icon'] as IconData,
+                    size: 20,
+                    color: textSecondary,
+                  ),
+                  const SizedBox(width: 12),
+                  Expanded(
+                    child: Text(
+                      detail['value'] as String,
+                      style: GoogleFonts.montserrat(
+                        fontSize: 16,
+                        fontWeight: FontWeight.w400,
+                        color: textPrimary,
                       ),
                     ),
-                  ],
-                ),
-              )),
+                  ),
+                ],
+              ),
+            ),
+          ),
           const SizedBox(height: 24),
         ],
       ),
@@ -1053,7 +640,9 @@ class _ProfileScreenState extends State<ProfileScreen> {
   // Hinge-style interests section
   Widget _buildHingeInterestsSection() {
     final interests = _userData?['interests'] as List<dynamic>? ?? [];
-    if (interests.isEmpty) return const SizedBox.shrink();
+    if (interests.isEmpty) {
+      return const SizedBox.shrink();
+    }
 
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 20),
@@ -1073,25 +662,29 @@ class _ProfileScreenState extends State<ProfileScreen> {
             spacing: 8,
             runSpacing: 8,
             children: interests
-                .map((interest) => Container(
-                      padding: const EdgeInsets.symmetric(
-                          horizontal: 16, vertical: 10),
-                      decoration: BoxDecoration(
-                        color: primaryColor.withValues(alpha: 0.1),
-                        borderRadius: BorderRadius.circular(20),
-                        border: Border.all(
-                          color: primaryColor.withValues(alpha: 0.3),
-                        ),
+                .map(
+                  (interest) => Container(
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 16,
+                      vertical: 10,
+                    ),
+                    decoration: BoxDecoration(
+                      color: primaryColor.withValues(alpha: 0.1),
+                      borderRadius: BorderRadius.circular(20),
+                      border: Border.all(
+                        color: primaryColor.withValues(alpha: 0.3),
                       ),
-                      child: Text(
-                        interest.toString(),
-                        style: GoogleFonts.montserrat(
-                          fontSize: 14,
-                          fontWeight: FontWeight.w500,
-                          color: primaryColor,
-                        ),
+                    ),
+                    child: Text(
+                      interest.toString(),
+                      style: GoogleFonts.montserrat(
+                        fontSize: 14,
+                        fontWeight: FontWeight.w500,
+                        color: primaryColor,
                       ),
-                    ))
+                    ),
+                  ),
+                )
                 .toList(),
           ),
           const SizedBox(height: 24),
@@ -1102,11 +695,13 @@ class _ProfileScreenState extends State<ProfileScreen> {
 
   // Full screen photo viewer
   void _showFullScreenPhoto(List<dynamic> photos, int initialIndex) {
-    Navigator.of(context).push(
-      MaterialPageRoute(
-        builder: (context) => _FullScreenPhotoViewer(
-          photos: photos,
-          initialIndex: initialIndex,
+    unawaited(
+      Navigator.of(context).push(
+        MaterialPageRoute(
+          builder: (context) => _FullScreenPhotoViewer(
+            photos: photos,
+            initialIndex: initialIndex,
+          ),
         ),
       ),
     );
@@ -1172,10 +767,13 @@ class _FullScreenPhotoViewerState extends State<_FullScreenPhotoViewer> {
             minScale: 0.5,
             maxScale: 3,
             child: Center(
-              child: Image.network(
-                widget.photos[index],
+              child: CachedNetworkImage(
+                imageUrl: widget.photos[index].toString(),
                 fit: BoxFit.contain,
-                errorBuilder: (context, error, stackTrace) => ColoredBox(
+                placeholder: (context, url) => const Center(
+                  child: CircularProgressIndicator(strokeWidth: 2),
+                ),
+                errorWidget: (context, url, error) => ColoredBox(
                   color: Colors.grey.shade800,
                   child: Column(
                     mainAxisAlignment: MainAxisAlignment.center,

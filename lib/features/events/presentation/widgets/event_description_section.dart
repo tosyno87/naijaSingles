@@ -73,9 +73,7 @@ class _EventDescriptionSectionState extends State<EventDescriptionSection> {
                   const SizedBox(height: 12),
                   Semantics(
                     button: true,
-                    label: _showFull
-                        ? 'Show Less'.tr()
-                        : 'Read More'.tr(),
+                    label: _showFull ? 'Show Less'.tr() : 'Read More'.tr(),
                     child: Material(
                       color: Colors.transparent,
                       child: InkWell(

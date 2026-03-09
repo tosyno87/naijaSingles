@@ -159,8 +159,8 @@ class _TicketingStepState extends State<TicketingStep> {
                 child: DropdownButton<String>(
                   value: widget.eventData.currency,
                   isExpanded: true,
-                  dropdownColor: AppColors
-                      .backgroundColor, // Afropeep cream background
+                  dropdownColor:
+                      AppColors.backgroundColor, // Afropeep cream background
                   icon: const Icon(
                     Icons.keyboard_arrow_down,
                     color: Color(0xFF666666),
@@ -199,22 +199,6 @@ class _TicketingStepState extends State<TicketingStep> {
                           ),
                           const SizedBox(width: 8),
                           const Text('Nigerian Naira (NGN)'),
-                        ],
-                      ),
-                    ),
-                    DropdownMenuItem(
-                      value: 'USD',
-                      child: Row(
-                        children: [
-                          Text(
-                            r'$',
-                            style: GoogleFonts.montserrat(
-                              fontSize: 18,
-                              fontWeight: FontWeight.bold,
-                            ),
-                          ),
-                          const SizedBox(width: 8),
-                          const Text('US Dollar (USD)'),
                         ],
                       ),
                     ),
@@ -345,9 +329,8 @@ class _TicketingStepState extends State<TicketingStep> {
                 : Colors.white,
             borderRadius: BorderRadius.circular(12),
             border: Border.all(
-              color: isSelected
-                  ? AppColors.primaryGreen
-                  : const Color(0xFFE0E0E0),
+              color:
+                  isSelected ? AppColors.primaryGreen : const Color(0xFFE0E0E0),
               width: isSelected ? 2 : 1,
             ),
           ),

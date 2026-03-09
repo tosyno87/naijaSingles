@@ -53,8 +53,7 @@ class CustomCNImage extends StatelessWidget {
                   'Unable to load'.tr().toString(),
                   style: TextStyle(
                     fontSize: 12,
-                    color:
-                        isDarkMode ? Colors.white : Colors.black,
+                    color: isDarkMode ? Colors.white : Colors.black,
                   ),
                 ),
               ],

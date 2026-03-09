@@ -35,7 +35,7 @@ class BulkPhotoPickerService {
           limitedImages.map((image) => File(image.path)).toList();
 
       return files;
-    } catch (e) {
+    } on Object catch (e) {
       debugPrint('Error picking multiple photos: $e');
       return [];
     }

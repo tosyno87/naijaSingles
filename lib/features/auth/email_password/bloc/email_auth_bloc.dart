@@ -122,7 +122,7 @@ class EmailAuthBloc extends Bloc<EmailAuthEvent, EmailAuthState> {
       }
 
       emit(EmailAuthError(error: errorMessage));
-    } catch (e) {
+    } on Object catch (e) {
       log('Error during sign up: $e');
       emit(
         EmailAuthError(
@@ -180,7 +180,7 @@ class EmailAuthBloc extends Bloc<EmailAuthEvent, EmailAuthState> {
       }
 
       emit(EmailAuthError(error: errorMessage));
-    } catch (e) {
+    } on Object catch (e) {
       log('Error during sign in: $e');
       emit(
         EmailAuthError(
@@ -219,7 +219,7 @@ class EmailAuthBloc extends Bloc<EmailAuthEvent, EmailAuthState> {
       }
 
       emit(EmailAuthError(error: errorMessage));
-    } catch (e) {
+    } on Object catch (e) {
       log('Error sending password reset: $e');
       emit(
         EmailAuthError(
@@ -245,7 +245,7 @@ class EmailAuthBloc extends Bloc<EmailAuthEvent, EmailAuthState> {
       });
 
       log('Created user document for: ${user.uid}');
-    } catch (e) {
+    } on Object catch (e) {
       log('Error creating user document: $e');
       // We don't want to fail the sign-up if this fails
       // Just log the error
@@ -262,7 +262,7 @@ class EmailAuthBloc extends Bloc<EmailAuthEvent, EmailAuthState> {
       });
 
       log('Updated last login for: ${user.uid}');
-    } catch (e) {
+    } on Object catch (e) {
       log('Error updating last login: $e');
       // We don't want to fail the sign-in if this fails
       // Just log the error

@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import '../../../models/user_model.dart';
@@ -32,7 +34,7 @@ class _ModernProfileCardState extends State<ModernProfileCard>
     _fadeAnimation = Tween<double>(begin: 0, end: 1).animate(
       CurvedAnimation(parent: _animationController, curve: Curves.easeInOut),
     );
-    _animationController.forward();
+    unawaited(_animationController.forward());
   }
 
   @override

@@ -10,6 +10,7 @@ import 'package:intl/intl.dart';
 import '../../../../common/constants/app_colors.dart';
 import '../../../../common/routes/route_name.dart';
 import '../../../../common/utils/app_logger.dart';
+import '../../../../common/widgets/state_views/state_views.dart';
 import '../../data/models/enhanced_event_model.dart';
 import '../../data/services/user_event_service.dart';
 import '../bloc/event_creation_bloc.dart';
@@ -68,11 +69,13 @@ class _MyEventsScreenState extends State<MyEventsScreen>
             BlocListener<EventCreationBloc, EventCreationState>(
               listener: (context, state) {
                 AppLogger.debug(
-                    '🔄 EventCreationBloc State: ${state.runtimeType}');
+                  '🔄 EventCreationBloc State: ${state.runtimeType}',
+                );
 
                 if (state is EventDeleted) {
                   AppLogger.info(
-                      '✅ Event deleted successfully: ${state.eventId}');
+                    '✅ Event deleted successfully: ${state.eventId}',
+                  );
                   // Only clear loading if this is the event we're deleting
                   if (_deletingEventId == state.eventId) {
                     setState(() {
@@ -93,13 +96,14 @@ class _MyEventsScreenState extends State<MyEventsScreen>
                       ),
                     );
                     // Add a small delay before refreshing to ensure delete is processed
-                    Future.delayed(const Duration(milliseconds: 300), () {
-                      if (mounted) {
+                    unawaited(
+                      Future.delayed(const Duration(milliseconds: 300), () {
+                        if (!context.mounted) return;
                         context.read<EventCreationBloc>().add(
                               LoadUserEventsEvent(_currentUserId!),
                             );
-                      }
-                    });
+                      }),
+                    );
                   }
                 } else if (state is EventPublished) {
                   ScaffoldMessenger.of(context).showSnackBar(
@@ -210,10 +214,12 @@ class _MyEventsScreenState extends State<MyEventsScreen>
               Navigator.of(context).pop();
             } else {
               // If we can't pop, navigate to main navigation
-              Navigator.pushNamedAndRemoveUntil(
-                context,
-                RouteName.mainNavigation,
-                (route) => false,
+              unawaited(
+                Navigator.pushNamedAndRemoveUntil(
+                  context,
+                  RouteName.mainNavigation,
+                  (route) => false,
+                ),
               );
             }
           },
@@ -334,7 +340,6 @@ class _MyEventsScreenState extends State<MyEventsScreen>
                 message:
                     'You haven\'t published any events yet.\nCreate your first event to get started!',
                 icon: Icons.event_busy,
-                showCreateButton: false,
               );
             }
 
@@ -346,7 +351,6 @@ class _MyEventsScreenState extends State<MyEventsScreen>
             message:
                 'You haven\'t published any events yet.\nCreate your first event to get started!',
             icon: Icons.event_busy,
-            showCreateButton: false,
           );
         },
       );
@@ -377,7 +381,6 @@ class _MyEventsScreenState extends State<MyEventsScreen>
                 message:
                     'You don\'t have any draft events.\nSave an event as draft while creating it.',
                 icon: Icons.drafts,
-                showCreateButton: false,
               );
             }
 
@@ -389,7 +392,6 @@ class _MyEventsScreenState extends State<MyEventsScreen>
             message:
                 'You don\'t have any draft events.\nSave an event as draft while creating it.',
             icon: Icons.drafts,
-            showCreateButton: false,
           );
         },
       );
@@ -457,93 +459,16 @@ class _MyEventsScreenState extends State<MyEventsScreen>
     );
   }
 
-  Widget _buildLoadingState() => Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Container(
-              width: 60,
-              height: 60,
-              decoration: BoxDecoration(
-                color: AppColors.primaryGreen.withValues(alpha: 0.1),
-                borderRadius: BorderRadius.circular(30),
-              ),
-              child: const Center(
-                child: CircularProgressIndicator(
-                  valueColor: AlwaysStoppedAnimation(AppColors.primaryGreen),
-                  strokeWidth: 3,
-                ),
-              ),
-            ),
-            const SizedBox(height: 24),
-            Text(
-              'Loading your events...',
-              style: GoogleFonts.montserrat(
-                fontSize: 16,
-                fontWeight: FontWeight.w500,
-                color: const Color(0xFF666666),
-              ),
-            ),
-          ],
-        ),
-      );
+  Widget _buildLoadingState() =>
+      const AppLoadingView(message: 'Loading your events...');
 
-  Widget _buildErrorState(String message) => Center(
-        child: Padding(
-          padding: const EdgeInsets.all(32),
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              const Icon(
-                Icons.error_outline,
-                size: 80,
-                color: Color(0xFF999999),
-              ),
-              const SizedBox(height: 24),
-              Text(
-                'Something went wrong',
-                style: GoogleFonts.montserrat(
-                  fontSize: 24,
-                  fontWeight: FontWeight.bold,
-                  color: const Color(0xFF333333),
-                ),
-              ),
-              const SizedBox(height: 12),
-              Text(
-                message,
-                style: GoogleFonts.montserrat(
-                  fontSize: 16,
-                  color: const Color(0xFF666666),
-                ),
-                textAlign: TextAlign.center,
-              ),
-              const SizedBox(height: 32),
-              ElevatedButton(
-                onPressed: () {
-                  context.read<EventCreationBloc>().add(
-                        LoadUserEventsEvent(_currentUserId!),
-                      );
-                },
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: AppColors.primaryGreen,
-                  foregroundColor: Colors.white,
-                  padding:
-                      const EdgeInsets.symmetric(horizontal: 32, vertical: 16),
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(12),
-                  ),
-                ),
-                child: Text(
-                  'Try Again',
-                  style: GoogleFonts.montserrat(
-                    fontSize: 16,
-                    fontWeight: FontWeight.w600,
-                  ),
-                ),
-              ),
-            ],
-          ),
-        ),
+  Widget _buildErrorState(String message) => AppErrorView(
+        message: message,
+        onRetry: () {
+          context.read<EventCreationBloc>().add(
+                LoadUserEventsEvent(_currentUserId!),
+              );
+        },
       );
 
   Widget _buildEmptyState({
@@ -552,140 +477,12 @@ class _MyEventsScreenState extends State<MyEventsScreen>
     required IconData icon,
     bool showCreateButton = false,
   }) =>
-      Center(
-        child: SingleChildScrollView(
-          padding: const EdgeInsets.all(32),
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              // Animated icon container
-              Container(
-                width: 120,
-                height: 120,
-                decoration: BoxDecoration(
-                  gradient: LinearGradient(
-                    begin: Alignment.topLeft,
-                    end: Alignment.bottomRight,
-                    colors: [
-                      AppColors.primaryGreen.withValues(alpha: 0.1),
-                      AppColors.primaryGreen.withValues(alpha: 0.05),
-                    ],
-                  ),
-                  borderRadius: BorderRadius.circular(60),
-                ),
-                child: Icon(
-                  icon,
-                  size: 60,
-                  color: AppColors.primaryGreen,
-                ),
-              ),
-              const SizedBox(height: 32),
-
-              Text(
-                title,
-                style: GoogleFonts.montserrat(
-                  fontSize: 24,
-                  fontWeight: FontWeight.bold,
-                  color: const Color(0xFF333333),
-                ),
-                textAlign: TextAlign.center,
-              ),
-              const SizedBox(height: 16),
-
-              Text(
-                message,
-                style: GoogleFonts.montserrat(
-                  fontSize: 16,
-                  color: const Color(0xFF666666),
-                  height: 1.5,
-                ),
-                textAlign: TextAlign.center,
-              ),
-
-              if (showCreateButton) ...[
-                const SizedBox(height: 40),
-
-                // Feature highlights
-                Container(
-                  padding: const EdgeInsets.all(20),
-                  decoration: BoxDecoration(
-                    color: const Color(0xFFF8F9FA),
-                    borderRadius: BorderRadius.circular(12),
-                    border: Border.all(
-                      color: AppColors.primaryGreen.withValues(alpha: 0.1),
-                    ),
-                  ),
-                  child: Column(
-                    children: [
-                      _buildFeatureHighlight(
-                        icon: Icons.people,
-                        text: 'Connect with your community',
-                      ),
-                      const SizedBox(height: 12),
-                      _buildFeatureHighlight(
-                        icon: Icons.location_on,
-                        text: 'Host events in your area',
-                      ),
-                      const SizedBox(height: 12),
-                      _buildFeatureHighlight(
-                        icon: Icons.favorite,
-                        text: 'Meet like-minded people',
-                      ),
-                    ],
-                  ),
-                ),
-
-                const SizedBox(height: 32),
-
-                ElevatedButton.icon(
-                  onPressed: _createNewEvent,
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: AppColors.primaryGreen,
-                    foregroundColor: Colors.white,
-                    padding: const EdgeInsets.symmetric(
-                        horizontal: 32, vertical: 16),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(12),
-                    ),
-                    elevation: 2,
-                  ),
-                  icon: const Icon(Icons.add, size: 20),
-                  label: Text(
-                    'Create Your First Event',
-                    style: GoogleFonts.montserrat(
-                      fontSize: 16,
-                      fontWeight: FontWeight.w600,
-                    ),
-                  ),
-                ),
-              ],
-            ],
-          ),
-        ),
-      );
-
-  Widget _buildFeatureHighlight({
-    required IconData icon,
-    required String text,
-  }) =>
-      Row(
-        children: [
-          Icon(
-            icon,
-            size: 16,
-            color: AppColors.primaryGreen,
-          ),
-          const SizedBox(width: 12),
-          Expanded(
-            child: Text(
-              text,
-              style: GoogleFonts.montserrat(
-                fontSize: 14,
-                color: const Color(0xFF666666),
-              ),
-            ),
-          ),
-        ],
+      AppEmptyView(
+        title: title,
+        subtitle: message,
+        icon: icon,
+        actionLabel: showCreateButton ? 'Create Your First Event' : null,
+        onAction: showCreateButton ? _createNewEvent : null,
       );
 
   Widget _buildAuthRequiredScreen() => Scaffold(
@@ -740,247 +537,260 @@ class _MyEventsScreenState extends State<MyEventsScreen>
         ),
       );
 
-  void _createNewEvent() {
-    Navigator.pushNamed(context, RouteName.createEvent).then((_) {
-      // Refresh events list when returning from create screen
-      if (_currentUserId != null) {
-        context.read<EventCreationBloc>().add(
-              LoadUserEventsEvent(_currentUserId!),
-            );
-      }
-    });
+  Future<void> _createNewEvent() async {
+    await Navigator.pushNamed(context, RouteName.createEvent);
+    if (!mounted) return;
+    if (_currentUserId != null) {
+      context.read<EventCreationBloc>().add(
+            LoadUserEventsEvent(_currentUserId!),
+          );
+    }
   }
 
-  void _editEvent(EnhancedEventModel event) {
-    Navigator.pushNamed(
+  Future<void> _editEvent(EnhancedEventModel event) async {
+    await Navigator.pushNamed(
       context,
       RouteName.createEvent,
       arguments: {'existingEvent': event},
-    ).then((_) {
-      // Refresh events list when returning from edit screen
-      if (_currentUserId != null) {
-        context.read<EventCreationBloc>().add(
-              LoadUserEventsEvent(_currentUserId!),
-            );
-      }
-    });
+    );
+    if (!mounted) return;
+    if (_currentUserId != null) {
+      context.read<EventCreationBloc>().add(
+            LoadUserEventsEvent(_currentUserId!),
+          );
+    }
   }
 
   void _deleteEvent(BuildContext screenContext, EnhancedEventModel event) {
-    showDialog(
-      context: screenContext,
-      builder: (dialogContext) => AlertDialog(
-        backgroundColor: Colors.white,
-        surfaceTintColor: Colors.transparent,
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-        title: Row(
-          children: [
-            Container(
-              padding: const EdgeInsets.all(8),
-              decoration: BoxDecoration(
-                color: Colors.red.withValues(alpha: 0.1),
-                borderRadius: BorderRadius.circular(8),
+    unawaited(
+      showDialog(
+        context: screenContext,
+        builder: (dialogContext) => AlertDialog(
+          backgroundColor: Colors.white,
+          surfaceTintColor: Colors.transparent,
+          shape:
+              RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+          title: Row(
+            children: [
+              Container(
+                padding: const EdgeInsets.all(8),
+                decoration: BoxDecoration(
+                  color: Colors.red.withValues(alpha: 0.1),
+                  borderRadius: BorderRadius.circular(8),
+                ),
+                child: const Icon(
+                  Icons.delete_outline,
+                  color: Colors.red,
+                  size: 24,
+                ),
               ),
-              child: const Icon(
-                Icons.delete_outline,
-                color: Colors.red,
-                size: 24,
+              const SizedBox(width: 12),
+              Expanded(
+                child: Text(
+                  'Delete Event',
+                  style: GoogleFonts.montserrat(
+                    fontSize: 18,
+                    fontWeight: FontWeight.w600,
+                    color: const Color(0xFF333333),
+                  ),
+                ),
+              ),
+            ],
+          ),
+          content: Text(
+            'Are you sure you want to delete "${event.name}"? This action cannot be undone.',
+            style: GoogleFonts.montserrat(
+              fontSize: 14,
+              color: const Color(0xFF666666),
+              height: 1.4,
+            ),
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.of(dialogContext).pop(),
+              style: TextButton.styleFrom(
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(8),
+                ),
+              ),
+              child: Text(
+                'Cancel',
+                style: GoogleFonts.montserrat(
+                  fontWeight: FontWeight.w600,
+                  color: const Color(0xFF666666),
+                ),
               ),
             ),
-            const SizedBox(width: 12),
-            Expanded(
+            ElevatedButton(
+              onPressed: () {
+                AppLogger.debug(
+                  '🗑️ Delete button pressed for event: ${event.id}',
+                );
+                Navigator.of(dialogContext).pop();
+
+                // Track which event is being deleted
+                setState(() {
+                  _isDeleting = true;
+                  _deletingEventId = event.id;
+                });
+
+                // Add timeout mechanism
+                Timer(const Duration(seconds: 10), () {
+                  if (!mounted) return;
+                  if (_isDeleting && _deletingEventId == event.id) {
+                    setState(() {
+                      _isDeleting = false;
+                      _deletingEventId = null;
+                    });
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      SnackBar(
+                        content: Text(
+                          'Delete operation timed out. Please try again.',
+                          style: GoogleFonts.montserrat(color: Colors.white),
+                        ),
+                        backgroundColor: Colors.orange,
+                        behavior: SnackBarBehavior.floating,
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(10),
+                        ),
+                      ),
+                    );
+                  }
+                });
+
+                // Use the passed screen context that has access to EventCreationBloc
+                AppLogger.debug(
+                  '📤 Dispatching DeleteEventEvent for: ${event.id}',
+                );
+                screenContext
+                    .read<EventCreationBloc>()
+                    .add(DeleteEventEvent(event.id));
+              },
+              style: ElevatedButton.styleFrom(
+                backgroundColor: Colors.red,
+                foregroundColor: Colors.white,
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(8),
+                ),
+                elevation: 0,
+              ),
               child: Text(
-                'Delete Event',
+                'Delete',
                 style: GoogleFonts.montserrat(
-                  fontSize: 18,
                   fontWeight: FontWeight.w600,
-                  color: const Color(0xFF333333),
                 ),
               ),
             ),
           ],
         ),
-        content: Text(
-          'Are you sure you want to delete "${event.name}"? This action cannot be undone.',
-          style: GoogleFonts.montserrat(
-            fontSize: 14,
-            color: const Color(0xFF666666),
-            height: 1.4,
-          ),
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.of(dialogContext).pop(),
-            style: TextButton.styleFrom(
-              padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(8),
-              ),
-            ),
-            child: Text(
-              'Cancel',
-              style: GoogleFonts.montserrat(
-                fontWeight: FontWeight.w600,
-                color: const Color(0xFF666666),
-              ),
-            ),
-          ),
-          ElevatedButton(
-            onPressed: () {
-              AppLogger.debug(
-                  '🗑️ Delete button pressed for event: ${event.id}');
-              Navigator.of(dialogContext).pop();
-
-              // Track which event is being deleted
-              setState(() {
-                _isDeleting = true;
-                _deletingEventId = event.id;
-              });
-
-              // Add timeout mechanism
-              Timer(const Duration(seconds: 10), () {
-                if (_isDeleting && _deletingEventId == event.id) {
-                  setState(() {
-                    _isDeleting = false;
-                    _deletingEventId = null;
-                  });
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    SnackBar(
-                      content: Text(
-                        'Delete operation timed out. Please try again.',
-                        style: GoogleFonts.montserrat(color: Colors.white),
-                      ),
-                      backgroundColor: Colors.orange,
-                      behavior: SnackBarBehavior.floating,
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(10),
-                      ),
-                    ),
-                  );
-                }
-              });
-
-              // Use the passed screen context that has access to EventCreationBloc
-              AppLogger.debug(
-                  '📤 Dispatching DeleteEventEvent for: ${event.id}');
-              screenContext
-                  .read<EventCreationBloc>()
-                  .add(DeleteEventEvent(event.id));
-            },
-            style: ElevatedButton.styleFrom(
-              backgroundColor: Colors.red,
-              foregroundColor: Colors.white,
-              padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(8),
-              ),
-              elevation: 0,
-            ),
-            child: Text(
-              'Delete',
-              style: GoogleFonts.montserrat(
-                fontWeight: FontWeight.w600,
-              ),
-            ),
-          ),
-        ],
       ),
     );
   }
 
   void _publishDraft(BuildContext screenContext, EnhancedEventModel event) {
-    showDialog(
-      context: screenContext,
-      builder: (dialogContext) => AlertDialog(
-        backgroundColor: Colors.white,
-        surfaceTintColor: Colors.transparent,
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-        title: Row(
-          children: [
-            Container(
-              padding: const EdgeInsets.all(8),
-              decoration: BoxDecoration(
-                color: AppColors.primaryGreen.withValues(alpha: 0.1),
-                borderRadius: BorderRadius.circular(8),
+    unawaited(
+      showDialog(
+        context: screenContext,
+        builder: (dialogContext) => AlertDialog(
+          backgroundColor: Colors.white,
+          surfaceTintColor: Colors.transparent,
+          shape:
+              RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+          title: Row(
+            children: [
+              Container(
+                padding: const EdgeInsets.all(8),
+                decoration: BoxDecoration(
+                  color: AppColors.primaryGreen.withValues(alpha: 0.1),
+                  borderRadius: BorderRadius.circular(8),
+                ),
+                child: const Icon(
+                  Icons.publish,
+                  color: AppColors.primaryGreen,
+                  size: 24,
+                ),
               ),
-              child: const Icon(
-                Icons.publish,
-                color: AppColors.primaryGreen,
-                size: 24,
+              const SizedBox(width: 12),
+              Expanded(
+                child: Text(
+                  'Publish Draft',
+                  style: GoogleFonts.montserrat(
+                    fontSize: 18,
+                    fontWeight: FontWeight.w600,
+                    color: const Color(0xFF333333),
+                  ),
+                ),
+              ),
+            ],
+          ),
+          content: Text(
+            'Are you sure you want to publish "${event.name}"? It will be submitted for review and become visible to other users once approved.',
+            style: GoogleFonts.montserrat(
+              fontSize: 14,
+              color: const Color(0xFF666666),
+              height: 1.4,
+            ),
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.of(dialogContext).pop(),
+              style: TextButton.styleFrom(
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(8),
+                ),
+              ),
+              child: Text(
+                'Cancel',
+                style: GoogleFonts.montserrat(
+                  fontWeight: FontWeight.w600,
+                  color: const Color(0xFF666666),
+                ),
               ),
             ),
-            const SizedBox(width: 12),
-            Expanded(
+            ElevatedButton(
+              onPressed: () {
+                Navigator.of(dialogContext).pop();
+                // Use the passed screen context that has access to EventCreationBloc
+                screenContext
+                    .read<EventCreationBloc>()
+                    .add(PublishDraftEventEvent(event.id));
+              },
+              style: ElevatedButton.styleFrom(
+                backgroundColor: AppColors.primaryGreen,
+                foregroundColor: Colors.white,
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(8),
+                ),
+                elevation: 0,
+              ),
               child: Text(
-                'Publish Draft',
+                'Publish',
                 style: GoogleFonts.montserrat(
-                  fontSize: 18,
                   fontWeight: FontWeight.w600,
-                  color: const Color(0xFF333333),
                 ),
               ),
             ),
           ],
         ),
-        content: Text(
-          'Are you sure you want to publish "${event.name}"? It will be submitted for review and become visible to other users once approved.',
-          style: GoogleFonts.montserrat(
-            fontSize: 14,
-            color: const Color(0xFF666666),
-            height: 1.4,
-          ),
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.of(dialogContext).pop(),
-            style: TextButton.styleFrom(
-              padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(8),
-              ),
-            ),
-            child: Text(
-              'Cancel',
-              style: GoogleFonts.montserrat(
-                fontWeight: FontWeight.w600,
-                color: const Color(0xFF666666),
-              ),
-            ),
-          ),
-          ElevatedButton(
-            onPressed: () {
-              Navigator.of(dialogContext).pop();
-              // Use the passed screen context that has access to EventCreationBloc
-              screenContext
-                  .read<EventCreationBloc>()
-                  .add(PublishDraftEventEvent(event.id));
-            },
-            style: ElevatedButton.styleFrom(
-              backgroundColor: AppColors.primaryGreen,
-              foregroundColor: Colors.white,
-              padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(8),
-              ),
-              elevation: 0,
-            ),
-            child: Text(
-              'Publish',
-              style: GoogleFonts.montserrat(
-                fontWeight: FontWeight.w600,
-              ),
-            ),
-          ),
-        ],
       ),
     );
   }
 
   void _navigateToEventDetails(EnhancedEventModel event) {
-    Navigator.pushNamed(
-      context,
-      RouteName.eventDetails,
-      arguments: event,
+    unawaited(
+      Navigator.pushNamed(
+        context,
+        RouteName.eventDetails,
+        arguments: event,
+      ),
     );
   }
 
@@ -1004,7 +814,7 @@ Join me at this amazing event! 🚀
         .trim();
 
     // For MVP, we'll use the clipboard and show a snackbar
-    Clipboard.setData(ClipboardData(text: shareText));
+    unawaited(Clipboard.setData(ClipboardData(text: shareText)));
 
     // Show confirmation
     ScaffoldMessenger.of(context).showSnackBar(
@@ -1035,181 +845,183 @@ Join me at this amazing event! 🚀
   }
 
   void _showAnalytics(EnhancedEventModel event) {
-    showModalBottomSheet(
-      context: context,
-      backgroundColor: Colors.transparent,
-      isScrollControlled: true,
-      builder: (context) => Container(
-        height: MediaQuery.of(context).size.height * 0.6,
-        decoration: const BoxDecoration(
-          color: Colors.white,
-          borderRadius: BorderRadius.only(
-            topLeft: Radius.circular(20),
-            topRight: Radius.circular(20),
+    unawaited(
+      showModalBottomSheet(
+        context: context,
+        backgroundColor: Colors.transparent,
+        isScrollControlled: true,
+        builder: (context) => Container(
+          height: MediaQuery.of(context).size.height * 0.6,
+          decoration: const BoxDecoration(
+            color: Colors.white,
+            borderRadius: BorderRadius.only(
+              topLeft: Radius.circular(20),
+              topRight: Radius.circular(20),
+            ),
           ),
-        ),
-        child: Column(
-          children: [
-            // Handle bar
-            Container(
-              width: 40,
-              height: 4,
-              margin: const EdgeInsets.only(top: 12),
-              decoration: BoxDecoration(
-                color: Colors.grey[300],
-                borderRadius: BorderRadius.circular(2),
+          child: Column(
+            children: [
+              // Handle bar
+              Container(
+                width: 40,
+                height: 4,
+                margin: const EdgeInsets.only(top: 12),
+                decoration: BoxDecoration(
+                  color: Colors.grey[300],
+                  borderRadius: BorderRadius.circular(2),
+                ),
               ),
-            ),
 
-            // Header
-            Padding(
-              padding: const EdgeInsets.all(20),
-              child: Row(
-                children: [
-                  Container(
-                    padding: const EdgeInsets.all(8),
-                    decoration: BoxDecoration(
-                      color: AppColors.primaryGreen.withValues(alpha: 0.1),
-                      borderRadius: BorderRadius.circular(8),
-                    ),
-                    child: const Icon(
-                      Icons.analytics,
-                      color: AppColors.primaryGreen,
-                      size: 24,
-                    ),
-                  ),
-                  const SizedBox(width: 12),
-                  Expanded(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          'Event Analytics',
-                          style: GoogleFonts.montserrat(
-                            fontSize: 18,
-                            fontWeight: FontWeight.bold,
-                            color: const Color(0xFF333333),
-                          ),
-                        ),
-                        Text(
-                          event.name,
-                          style: GoogleFonts.montserrat(
-                            fontSize: 14,
-                            color: const Color(0xFF666666),
-                          ),
-                          maxLines: 1,
-                          overflow: TextOverflow.ellipsis,
-                        ),
-                      ],
-                    ),
-                  ),
-                ],
-              ),
-            ),
-
-            // Analytics content
-            Expanded(
-              child: SingleChildScrollView(
-                padding: const EdgeInsets.symmetric(horizontal: 20),
-                child: Column(
+              // Header
+              Padding(
+                padding: const EdgeInsets.all(20),
+                child: Row(
                   children: [
-                    // Stats grid
-                    Row(
-                      children: [
-                        Expanded(
-                          child: _buildAnalyticsCard(
-                            icon: Icons.visibility,
-                            title: 'Views',
-                            value: '${event.metadata['views'] ?? 0}',
-                            color: Colors.blue,
-                          ),
-                        ),
-                        const SizedBox(width: 12),
-                        Expanded(
-                          child: _buildAnalyticsCard(
-                            icon: Icons.people,
-                            title: 'Attendees',
-                            value: '${event.attendeeCount}',
-                            color: AppColors.primaryGreen,
-                          ),
-                        ),
-                      ],
-                    ),
-
-                    const SizedBox(height: 12),
-
-                    Row(
-                      children: [
-                        Expanded(
-                          child: _buildAnalyticsCard(
-                            icon: Icons.favorite,
-                            title: 'Interested',
-                            value: '${event.rsvpCount}',
-                            color: Colors.red,
-                          ),
-                        ),
-                        const SizedBox(width: 12),
-                        Expanded(
-                          child: _buildAnalyticsCard(
-                            icon: Icons.share,
-                            title: 'Shares',
-                            value: '${event.metadata['shares'] ?? 0}',
-                            color: Colors.purple,
-                          ),
-                        ),
-                      ],
-                    ),
-
-                    const SizedBox(height: 20),
-
-                    // Performance insights
                     Container(
-                      width: double.infinity,
-                      padding: const EdgeInsets.all(16),
+                      padding: const EdgeInsets.all(8),
                       decoration: BoxDecoration(
-                        color: const Color(0xFFF8F9FA),
-                        borderRadius: BorderRadius.circular(12),
-                        border: Border.all(color: const Color(0xFFE0E0E0)),
+                        color: AppColors.primaryGreen.withValues(alpha: 0.1),
+                        borderRadius: BorderRadius.circular(8),
                       ),
+                      child: const Icon(
+                        Icons.analytics,
+                        color: AppColors.primaryGreen,
+                        size: 24,
+                      ),
+                    ),
+                    const SizedBox(width: 12),
+                    Expanded(
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           Text(
-                            'Performance Insights',
+                            'Event Analytics',
                             style: GoogleFonts.montserrat(
-                              fontSize: 16,
-                              fontWeight: FontWeight.w600,
+                              fontSize: 18,
+                              fontWeight: FontWeight.bold,
                               color: const Color(0xFF333333),
                             ),
                           ),
-                          const SizedBox(height: 12),
-                          _buildInsightRow(
-                            icon: Icons.trending_up,
-                            text: 'Event is performing well in your category',
-                            color: Colors.green,
-                          ),
-                          const SizedBox(height: 8),
-                          _buildInsightRow(
-                            icon: Icons.location_on,
-                            text: 'Popular in ${event.location.city}',
-                            color: Colors.blue,
-                          ),
-                          const SizedBox(height: 8),
-                          _buildInsightRow(
-                            icon: Icons.schedule,
-                            text: 'Peak viewing time: 6-8 PM',
-                            color: Colors.orange,
+                          Text(
+                            event.name,
+                            style: GoogleFonts.montserrat(
+                              fontSize: 14,
+                              color: const Color(0xFF666666),
+                            ),
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
                           ),
                         ],
                       ),
                     ),
-
-                    const SizedBox(height: 20),
                   ],
                 ),
               ),
-            ),
-          ],
+
+              // Analytics content
+              Expanded(
+                child: SingleChildScrollView(
+                  padding: const EdgeInsets.symmetric(horizontal: 20),
+                  child: Column(
+                    children: [
+                      // Stats grid
+                      Row(
+                        children: [
+                          Expanded(
+                            child: _buildAnalyticsCard(
+                              icon: Icons.visibility,
+                              title: 'Views',
+                              value: '${event.metadata['views'] ?? 0}',
+                              color: Colors.blue,
+                            ),
+                          ),
+                          const SizedBox(width: 12),
+                          Expanded(
+                            child: _buildAnalyticsCard(
+                              icon: Icons.people,
+                              title: 'Attendees',
+                              value: '${event.attendeeCount}',
+                              color: AppColors.primaryGreen,
+                            ),
+                          ),
+                        ],
+                      ),
+
+                      const SizedBox(height: 12),
+
+                      Row(
+                        children: [
+                          Expanded(
+                            child: _buildAnalyticsCard(
+                              icon: Icons.favorite,
+                              title: 'Interested',
+                              value: '${event.rsvpCount}',
+                              color: Colors.red,
+                            ),
+                          ),
+                          const SizedBox(width: 12),
+                          Expanded(
+                            child: _buildAnalyticsCard(
+                              icon: Icons.share,
+                              title: 'Shares',
+                              value: '${event.metadata['shares'] ?? 0}',
+                              color: Colors.purple,
+                            ),
+                          ),
+                        ],
+                      ),
+
+                      const SizedBox(height: 20),
+
+                      // Performance insights
+                      Container(
+                        width: double.infinity,
+                        padding: const EdgeInsets.all(16),
+                        decoration: BoxDecoration(
+                          color: const Color(0xFFF8F9FA),
+                          borderRadius: BorderRadius.circular(12),
+                          border: Border.all(color: const Color(0xFFE0E0E0)),
+                        ),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              'Performance Insights',
+                              style: GoogleFonts.montserrat(
+                                fontSize: 16,
+                                fontWeight: FontWeight.w600,
+                                color: const Color(0xFF333333),
+                              ),
+                            ),
+                            const SizedBox(height: 12),
+                            _buildInsightRow(
+                              icon: Icons.trending_up,
+                              text: 'Event is performing well in your category',
+                              color: Colors.green,
+                            ),
+                            const SizedBox(height: 8),
+                            _buildInsightRow(
+                              icon: Icons.location_on,
+                              text: 'Popular in ${event.location.city}',
+                              color: Colors.blue,
+                            ),
+                            const SizedBox(height: 8),
+                            _buildInsightRow(
+                              icon: Icons.schedule,
+                              text: 'Peak viewing time: 6-8 PM',
+                              color: Colors.orange,
+                            ),
+                          ],
+                        ),
+                      ),
+
+                      const SizedBox(height: 20),
+                    ],
+                  ),
+                ),
+              ),
+            ],
+          ),
         ),
       ),
     );

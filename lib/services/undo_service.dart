@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/foundation.dart';
+import '../common/utils/firestore_helpers.dart';
 import 'performance_monitor.dart';
 
 /// Undo service that allows users to reverse their last PASS action only
@@ -23,11 +24,11 @@ import 'performance_monitor.dart';
 ///
 /// Implements Priority 3: User Experience Enhancements
 class UndoService {
-  static const Duration UNDO_WINDOW = Duration(seconds: 10);
-  static const int MAX_UNDO_HISTORY = 3; // Keep last 3 swipes for undo
-  static const int DAILY_UNDO_LIMIT =
+  static const Duration undoWindow = Duration(seconds: 10);
+  static const int maxUndoHistory = 3; // Keep last 3 swipes for undo
+  static const int dailyUndoLimit =
       1; // Free users get 1 undo per day (like Tinder)
-  static const int PREMIUM_UNDO_LIMIT = 5; // Premium users get 5 undos per day
+  static const int premiumUndoLimit = 5; // Premium users get 5 undos per day
 
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
 
@@ -62,7 +63,7 @@ class UndoService {
       _recentSwipes[userId]!.insert(0, swipeAction); // Add to front
 
       // Keep only recent swipes
-      if (_recentSwipes[userId]!.length > MAX_UNDO_HISTORY) {
+      if (_recentSwipes[userId]!.length > maxUndoHistory) {
         _recentSwipes[userId]!.removeLast();
       }
 
@@ -83,7 +84,7 @@ class UndoService {
       debugPrint(
         '📝 Recorded swipe: $userId → $targetUserId (${direction.name})',
       );
-    } catch (e) {
+    } on Object catch (e) {
       debugPrint('❌ Error recording swipe action: $e');
     }
   }
@@ -109,9 +110,9 @@ class UndoService {
 
       // Check if within undo window
       final timeSinceSwipe = DateTime.now().difference(lastSwipe.timestamp);
-      if (timeSinceSwipe > UNDO_WINDOW) {
+      if (timeSinceSwipe > undoWindow) {
         debugPrint(
-          '⚠️ Undo window expired for user $userId (${timeSinceSwipe.inSeconds}s > ${UNDO_WINDOW.inSeconds}s)',
+          '⚠️ Undo window expired for user $userId (${timeSinceSwipe.inSeconds}s > ${undoWindow.inSeconds}s)',
         );
         return false;
       }
@@ -125,7 +126,7 @@ class UndoService {
       // Check daily undo limit
       final undoCount = await getDailyUndoCount(userId);
       final isPremiun = await _isPremiuUser(userId);
-      final limit = isPremiun ? PREMIUM_UNDO_LIMIT : DAILY_UNDO_LIMIT;
+      final limit = isPremiun ? premiumUndoLimit : dailyUndoLimit;
 
       if (undoCount >= limit) {
         final limitText = isPremiun ? 'premium limit' : 'daily limit';
@@ -139,7 +140,7 @@ class UndoService {
         '✅ User $userId can undo last pass (${timeSinceSwipe.inSeconds}s ago)',
       );
       return true;
-    } catch (e) {
+    } on Object catch (e) {
       debugPrint('❌ Error checking undo availability: $e');
       return false;
     }
@@ -167,7 +168,7 @@ class UndoService {
 
       final doc = querySnapshot.docs.first;
       return SwipeAction.fromDocument(doc);
-    } catch (e) {
+    } on Object catch (e) {
       debugPrint('❌ Error getting last swipe action: $e');
       return null;
     }
@@ -183,7 +184,7 @@ class UndoService {
           if (!await canUndoLastSwipe(userId)) {
             final undoCount = await getDailyUndoCount(userId);
             final isPremiun = await _isPremiuUser(userId);
-            final limit = isPremiun ? PREMIUM_UNDO_LIMIT : DAILY_UNDO_LIMIT;
+            final limit = isPremiun ? premiumUndoLimit : dailyUndoLimit;
 
             if (undoCount >= limit) {
               final limitText =
@@ -194,7 +195,7 @@ class UndoService {
             }
 
             return UndoResult.failed(
-              'Cannot undo: only passes can be undone within ${UNDO_WINDOW.inSeconds} seconds',
+              'Cannot undo: only passes can be undone within ${undoWindow.inSeconds} seconds',
             );
           }
 
@@ -231,7 +232,7 @@ class UndoService {
           } else {
             return UndoResult.failed('Failed to reverse pass action');
           }
-        } catch (e) {
+        } on Object catch (e) {
           debugPrint('❌ Error undoing last swipe: $e');
           return UndoResult.failed('Error: ${e.toString()}');
         }
@@ -274,7 +275,7 @@ class UndoService {
 
       await batch.commit();
       return true;
-    } catch (e) {
+    } on Object catch (e) {
       debugPrint('❌ Error performing undo: $e');
       return false;
     }
@@ -300,7 +301,7 @@ class UndoService {
     _undoTimers[userId]?.cancel();
 
     // Set new timer
-    _undoTimers[userId] = Timer(UNDO_WINDOW, () {
+    _undoTimers[userId] = Timer(undoWindow, () {
       _markSwipeAsUndone(userId, swipeAction);
       _undoTimers.remove(userId);
     });
@@ -338,7 +339,7 @@ class UndoService {
           .get();
 
       return querySnapshot.docs.length;
-    } catch (e) {
+    } on Object catch (e) {
       debugPrint('❌ Error getting daily undo count: $e');
       return 0;
     }
@@ -352,7 +353,7 @@ class UndoService {
         'timestamp': FieldValue.serverTimestamp(),
         'dailyCount': await getDailyUndoCount(userId) + 1,
       });
-    } catch (e) {
+    } on Object catch (e) {
       debugPrint('❌ Error recording undo usage: $e');
     }
   }
@@ -366,7 +367,7 @@ class UndoService {
         return userData['isPremium'] == true;
       }
       return false;
-    } catch (e) {
+    } on Object catch (e) {
       debugPrint('❌ Error checking premium status: $e');
       return false;
     }
@@ -375,9 +376,6 @@ class UndoService {
   /// Get undo statistics for a user
   Future<UndoStats> getUndoStats(String userId) async {
     try {
-      final today = DateTime.now();
-      final startOfDay = DateTime(today.year, today.month, today.day);
-
       // Get daily undo count
       final dailyUndos = await getDailyUndoCount(userId);
 
@@ -398,7 +396,7 @@ class UndoService {
           recentSwipesQuery.docs.map(SwipeAction.fromDocument).toList();
 
       final isPremiun = await _isPremiuUser(userId);
-      final dailyLimit = isPremiun ? PREMIUM_UNDO_LIMIT : DAILY_UNDO_LIMIT;
+      final dailyLimit = isPremiun ? premiumUndoLimit : dailyUndoLimit;
 
       return UndoStats(
         dailyUndoCount: dailyUndos,
@@ -408,7 +406,7 @@ class UndoService {
         canUndoMore: dailyUndos < dailyLimit,
         isPremium: isPremiun,
       );
-    } catch (e) {
+    } on Object catch (e) {
       debugPrint('❌ Error getting undo stats: $e');
       return UndoStats.empty();
     }
@@ -435,7 +433,7 @@ class UndoService {
           '🗑️ Cleared ${expiredQuery.docs.length} expired swipe history entries',
         );
       }
-    } catch (e) {
+    } on Object catch (e) {
       debugPrint('❌ Error clearing expired history: $e');
     }
   }
@@ -471,7 +469,7 @@ class SwipeAction {
         (d) => d.toString() == data['direction'],
         orElse: () => SwipeDirection.left,
       ),
-      timestamp: (data['timestamp'] as Timestamp?)?.toDate() ?? DateTime.now(),
+      timestamp: parseDateTime(data['timestamp']),
       matchId: data['matchId'],
       canUndo: data['canUndo'] ?? false,
     );

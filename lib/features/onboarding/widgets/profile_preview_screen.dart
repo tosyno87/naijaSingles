@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:io';
 
 import 'package:flutter/material.dart';
@@ -54,8 +55,11 @@ class _ProfilePreviewScreenState extends State<ProfilePreviewScreen> {
           actions: [
             TextButton.icon(
               onPressed: _showImprovementSuggestions,
-              icon: const Icon(Icons.tips_and_updates,
-                  color: afropeepGreen, size: 18),
+              icon: const Icon(
+                Icons.tips_and_updates,
+                color: afropeepGreen,
+                size: 18,
+              ),
               label: Text(
                 'Tips',
                 style: GoogleFonts.montserrat(
@@ -333,7 +337,9 @@ class _ProfilePreviewScreenState extends State<ProfilePreviewScreen> {
                     .map(
                       (interest) => Container(
                         padding: const EdgeInsets.symmetric(
-                            horizontal: 12, vertical: 6),
+                          horizontal: 12,
+                          vertical: 6,
+                        ),
                         decoration: BoxDecoration(
                           color: cardBackground,
                           borderRadius: BorderRadius.circular(20),
@@ -679,52 +685,54 @@ class _ProfilePreviewScreenState extends State<ProfilePreviewScreen> {
       );
 
   void _showImprovementSuggestions() {
-    showModalBottomSheet(
-      context: context,
-      backgroundColor: Colors.white,
-      shape: const RoundedRectangleBorder(
-        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
-      ),
-      builder: (context) => Container(
-        padding: const EdgeInsets.all(24),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(
-              'Profile Improvement Tips',
-              style: GoogleFonts.montserrat(
-                fontSize: 20,
-                fontWeight: FontWeight.w600,
-                color: textDarkBrown,
+    unawaited(
+      showModalBottomSheet(
+        context: context,
+        backgroundColor: Colors.white,
+        shape: const RoundedRectangleBorder(
+          borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+        ),
+        builder: (context) => Container(
+          padding: const EdgeInsets.all(24),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                'Profile Improvement Tips',
+                style: GoogleFonts.montserrat(
+                  fontSize: 20,
+                  fontWeight: FontWeight.w600,
+                  color: textDarkBrown,
+                ),
               ),
-            ),
-            const SizedBox(height: 16),
-            _buildTipItem(
-              Icons.photo_camera,
-              'Photo Variety',
-              'Include different types of photos: close-up, full-body, activity, and social photos.',
-              Colors.blue,
-            ),
-            _buildTipItem(
-              Icons.edit,
-              'Compelling Bio',
-              'Write 50-200 characters that show your personality and give conversation starters.',
-              Colors.green,
-            ),
-            _buildTipItem(
-              Icons.favorite,
-              'Diverse Interests',
-              'Select 5-10 interests that represent different aspects of your personality.',
-              Colors.purple,
-            ),
-            _buildTipItem(
-              Icons.star,
-              'Main Photo',
-              'Your first photo should be a clear, smiling face shot with good lighting.',
-              goldAccent,
-            ),
-          ],
+              const SizedBox(height: 16),
+              _buildTipItem(
+                Icons.photo_camera,
+                'Photo Variety',
+                'Include different types of photos: close-up, full-body, activity, and social photos.',
+                Colors.blue,
+              ),
+              _buildTipItem(
+                Icons.edit,
+                'Compelling Bio',
+                'Write 50-200 characters that show your personality and give conversation starters.',
+                Colors.green,
+              ),
+              _buildTipItem(
+                Icons.favorite,
+                'Diverse Interests',
+                'Select 5-10 interests that represent different aspects of your personality.',
+                Colors.purple,
+              ),
+              _buildTipItem(
+                Icons.star,
+                'Main Photo',
+                'Your first photo should be a clear, smiling face shot with good lighting.',
+                goldAccent,
+              ),
+            ],
+          ),
         ),
       ),
     );

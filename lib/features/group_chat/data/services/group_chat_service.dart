@@ -1,6 +1,8 @@
 import 'dart:developer';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import '../../../../common/utils/firestore_helpers.dart';
+import '../../../groups/data/services/unified_group_service.dart' as unified;
 
 /// Industry-standard group chat service
 /// Features:
@@ -93,7 +95,7 @@ class GroupChatService {
 
       log('✅ Group chat created successfully: $groupId');
       return group;
-    } catch (e) {
+    } on Object catch (e) {
       log('❌ Error creating group chat: $e');
       rethrow;
     }
@@ -126,45 +128,19 @@ class GroupChatService {
       await _notifyGroupMembers(groupId, 'A new member joined the group');
 
       log('✅ Successfully joined group: $groupId');
-    } catch (e) {
+    } on Object catch (e) {
       log('❌ Error joining group: $e');
       rethrow;
     }
   }
 
-  /// Leave a group chat
-  Future<void> leaveGroup(String groupId) async {
-    try {
-      log('👥 Leaving group: $groupId');
-
-      final currentUserId = _auth.currentUser?.uid;
-      if (currentUserId == null) {
-        throw Exception('User not authenticated');
-      }
-
-      // Remove user from group members
-      log('🔍 Attempting to leave group: $groupId');
-      log('🔍 Current user: $currentUserId');
-
-      await _firestore.collection('unifiedGroups').doc(groupId).update({
-        'memberIds': FieldValue.arrayRemove([currentUserId]),
-        'adminIds': FieldValue.arrayRemove([currentUserId]),
-        'memberCount': FieldValue.increment(-1),
-      });
-
-      // Send leave message
-      await _sendGroupMessage(
-        groupId: groupId,
-        text: 'left the group',
-        messageType: MessageType.system,
-      );
-
-      log('✅ Successfully left group: $groupId');
-    } catch (e) {
-      log('❌ Error leaving group: $e');
-      rethrow;
-    }
-  }
+  /// Leave a group chat.
+  ///
+  /// Delegates to [unified.UnifiedGroupService] which owns the canonical
+  /// leave-group transaction (member removal, admin succession, system
+  /// message, and timestamp bookkeeping).
+  Future<void> leaveGroup(String groupId) =>
+      unified.UnifiedGroupService().leaveGroup(groupId);
 
   /// Invite users to group
   Future<void> inviteUsersToGroup(String groupId, List<String> userIds) async {
@@ -210,7 +186,7 @@ class GroupChatService {
       await _notifyGroupMembers(groupId, 'You were invited to join a group');
 
       log('✅ Successfully invited users to group: $groupId');
-    } catch (e) {
+    } on Object catch (e) {
       log('❌ Error inviting users to group: $e');
       rethrow;
     }
@@ -256,7 +232,7 @@ class GroupChatService {
       );
 
       log('✅ Successfully removed user from group: $groupId');
-    } catch (e) {
+    } on Object catch (e) {
       log('❌ Error removing user from group: $e');
       rethrow;
     }
@@ -300,7 +276,7 @@ class GroupChatService {
       );
 
       log('✅ Successfully promoted user to admin: $groupId');
-    } catch (e) {
+    } on Object catch (e) {
       log('❌ Error promoting user to admin: $e');
       rethrow;
     }
@@ -387,27 +363,24 @@ class GroupChatService {
 
       log('✅ Group message sent successfully: ${docRef.id}');
       return message;
-    } catch (e) {
+    } on Object catch (e) {
       log('❌ Error sending group message: $e');
       rethrow;
     }
   }
 
   /// Get group messages
-  Stream<List<GroupMessage>> getGroupMessages(String groupId) {
-    // Use unifiedGroups collection since that's where our groups are stored
-    return _firestore
-        .collection('unifiedGroups')
-        .doc(groupId)
-        .collection('messages')
-        .orderBy('timestamp', descending: true)
-        .snapshots()
-        .map(
-          (snapshot) => snapshot.docs
-              .map((doc) => GroupMessage.fromMap(doc.id, doc.data()))
-              .toList(),
-        );
-  }
+  Stream<List<GroupMessage>> getGroupMessages(String groupId) => _firestore
+      .collection('unifiedGroups')
+      .doc(groupId)
+      .collection('messages')
+      .orderBy('timestamp', descending: true)
+      .snapshots()
+      .map(
+        (snapshot) => snapshot.docs
+            .map((doc) => GroupMessage.fromMap(doc.id, doc.data()))
+            .toList(),
+      );
 
   /// Get user's groups
   Stream<List<GroupChat>> getUserGroups() {
@@ -454,7 +427,7 @@ class GroupChatService {
         'updatedAt': data['updatedAt'],
         'lastActivityAt': data['lastActivityAt'],
       });
-    } catch (e) {
+    } on Object catch (e) {
       log('❌ Error getting group details: $e');
       return null;
     }
@@ -503,7 +476,7 @@ class GroupChatService {
       }
 
       log('✅ Group settings updated successfully: $groupId');
-    } catch (e) {
+    } on Object catch (e) {
       log('❌ Error updating group settings: $e');
       rethrow;
     }
@@ -541,7 +514,7 @@ class GroupChatService {
       });
 
       log('✅ Group deleted successfully: $groupId');
-    } catch (e) {
+    } on Object catch (e) {
       log('❌ Error deleting group: $e');
       rethrow;
     }
@@ -574,7 +547,7 @@ class GroupChatService {
           .doc(groupId)
           .collection('messages')
           .add(messageData);
-    } catch (e) {
+    } on Object catch (e) {
       log('❌ Error sending group message: $e');
     }
   }
@@ -608,7 +581,7 @@ class GroupChatService {
           });
         }
       }
-    } catch (e) {
+    } on Object catch (e) {
       log('❌ Error notifying group members: $e');
     }
   }
@@ -668,10 +641,8 @@ class GroupChat {
         memberIds: List<String>.from(data['memberIds'] ?? []),
         memberCount: data['memberCount'] ?? 0,
         isActive: data['isActive'] ?? true,
-        createdAt:
-            (data['createdAt'] as Timestamp?)?.toDate() ?? DateTime.now(),
-        lastMessageAt:
-            (data['lastMessageAt'] as Timestamp?)?.toDate() ?? DateTime.now(),
+        createdAt: parseDateTime(data['createdAt']),
+        lastMessageAt: parseDateTime(data['lastMessageAt']),
         lastMessageText: data['lastMessageText'] ?? '',
         lastMessageSenderId: data['lastMessageSenderId'] ?? '',
       );
@@ -733,8 +704,7 @@ class GroupMessage {
         mediaUrl: data['mediaUrl'],
         mediaType: data['mediaType'],
         replyToMessageId: data['replyToMessageId'],
-        timestamp:
-            (data['timestamp'] as Timestamp?)?.toDate() ?? DateTime.now(),
+        timestamp: parseDateTime(data['timestamp']),
         isRead: data['isRead'] ?? false,
         readBy: List<String>.from(data['readBy'] ?? []),
       );

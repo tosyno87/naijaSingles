@@ -1,12 +1,13 @@
+import 'dart:async';
 import 'dart:developer';
 import 'dart:io';
 
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_image_compress/flutter_image_compress.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:image_picker/image_picker.dart';
-import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:path_provider/path_provider.dart' as path_provider;
 
 import '../bloc/theme/theme_bloc.dart';
@@ -87,7 +88,7 @@ class _SelectMedia extends StatelessWidget {
           return file;
         }
       }
-    } catch (e) {
+    } on Object {
       log('file is in error ');
       // Navigator.pop(context);
     }
@@ -96,7 +97,9 @@ class _SelectMedia extends StatelessWidget {
   }
 
   Future<void> getContentFromSource(
-      BuildContext context, ImageSource source) async {
+    BuildContext context,
+    ImageSource source,
+  ) async {
     final result = await getContentHandler(source: source, context: context);
     if (!context.mounted) return;
     if (result != null) {
@@ -188,7 +191,9 @@ class _SelectMedia extends StatelessWidget {
               children: [
                 TextButton.icon(
                   onPressed: () {
-                    getContentFromSource(context, ImageSource.camera);
+                    unawaited(
+                      getContentFromSource(context, ImageSource.camera),
+                    );
                   },
                   icon: const Icon(
                     FontAwesomeIcons.cameraRetro,
@@ -199,9 +204,7 @@ class _SelectMedia extends StatelessWidget {
                     style: TextStyle(
                       fontSize: 16,
                       fontWeight: FontWeight.bold,
-                      color: isDarkMode
-                          ? Colors.white
-                          : Colors.black87,
+                      color: isDarkMode ? Colors.white : Colors.black87,
                     ),
                   ),
                 ),
@@ -217,9 +220,7 @@ class _SelectMedia extends StatelessWidget {
                     style: TextStyle(
                       fontSize: 16,
                       fontWeight: FontWeight.bold,
-                      color: isDarkMode
-                          ? Colors.white
-                          : Colors.black87,
+                      color: isDarkMode ? Colors.white : Colors.black87,
                     ),
                   ),
                 ),

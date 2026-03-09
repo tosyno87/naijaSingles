@@ -1,5 +1,7 @@
-import 'package:contacts_service/contacts_service.dart';
+import 'dart:async';
+
 import 'package:flutter/material.dart';
+import 'package:flutter_contacts/flutter_contacts.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:permission_handler/permission_handler.dart';
 
@@ -12,17 +14,18 @@ import '../../../services/contact_invitation_service.dart';
 /// - Email invitation option
 /// - Search functionality
 /// - Permission handling
-/// - Industry-standard UI
 class ContactPickerWidget extends StatefulWidget {
   const ContactPickerWidget({
     required this.groupName,
     required this.groupId,
     required this.onInvitationsSent,
+    this.deferSending = false,
     super.key,
   });
   final String groupName;
   final String groupId;
   final Function(List<Map<String, dynamic>>) onInvitationsSent;
+  final bool deferSending;
 
   @override
   State<ContactPickerWidget> createState() => _ContactPickerWidgetState();
@@ -44,7 +47,7 @@ class _ContactPickerWidgetState extends State<ContactPickerWidget> {
   @override
   void initState() {
     super.initState();
-    _loadContacts();
+    unawaited(_loadContacts());
     _messageController.text =
         'You are invited to join "${widget.groupName}" group!';
   }
@@ -88,7 +91,7 @@ class _ContactPickerWidgetState extends State<ContactPickerWidget> {
           _isLoading = false;
         });
       }
-    } catch (e) {
+    } on Object catch (e) {
       if (mounted) {
         setState(() {
           _isLoading = false;
@@ -109,8 +112,10 @@ class _ContactPickerWidgetState extends State<ContactPickerWidget> {
         _filteredContacts = _contacts;
       } else {
         _filteredContacts = _contacts.where((contact) {
-          final name = contact.displayName?.toLowerCase() ?? '';
-          final phone = contact.phones?.first.value?.toLowerCase() ?? '';
+          final name = contact.displayName.toLowerCase();
+          final phone = contact.phones.isNotEmpty
+              ? contact.phones.first.number.toLowerCase()
+              : '';
           return name.contains(query.toLowerCase()) ||
               phone.contains(query.toLowerCase());
         }).toList();
@@ -141,7 +146,6 @@ class _ContactPickerWidgetState extends State<ContactPickerWidget> {
 
     final invitations = <Map<String, dynamic>>[];
 
-    // Process selected contacts
     for (final contact in _selectedContacts) {
       final invitationData = _contactService.createInvitationData(
         contact: contact,
@@ -152,18 +156,7 @@ class _ContactPickerWidgetState extends State<ContactPickerWidget> {
       invitations.add(invitationData);
     }
 
-    // Process email invitation if enabled
     if (_showEmailOption && _emailController.text.isNotEmpty) {
-      if (!_contactService.isValidEmail(_emailController.text)) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text('Please enter a valid email address'),
-            backgroundColor: Colors.red,
-          ),
-        );
-        return;
-      }
-
       invitations.add({
         'contactName': _emailController.text.split('@')[0],
         'email': _emailController.text,
@@ -175,19 +168,20 @@ class _ContactPickerWidgetState extends State<ContactPickerWidget> {
       });
     }
 
-    // Send invitations
-    for (final invitation in invitations) {
-      if (invitation['invitationType'] == 'phone') {
-        await _contactService.sendSMSInvitation(
-          phoneNumber: invitation['phone']!,
-          message: invitation['message'],
-        );
-      } else {
-        await _contactService.sendEmailInvitation(
-          email: invitation['email']!,
-          subject: 'Invitation to join ${invitation['groupName']}',
-          message: invitation['message'],
-        );
+    if (!widget.deferSending) {
+      for (final invitation in invitations) {
+        if (invitation['invitationType'] == 'phone') {
+          await _contactService.sendSMSInvitation(
+            phoneNumber: invitation['phone']!,
+            message: invitation['message'],
+          );
+        } else {
+          await _contactService.sendEmailInvitation(
+            email: invitation['email']!,
+            subject: 'Invitation to join ${invitation['groupName']}',
+            message: invitation['message'],
+          );
+        }
       }
     }
 
@@ -195,12 +189,15 @@ class _ContactPickerWidgetState extends State<ContactPickerWidget> {
       widget.onInvitationsSent(invitations);
       Navigator.pop(context);
 
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text('${invitations.length} invitations sent successfully!'),
-          backgroundColor: AppColors.primaryGreen,
-        ),
-      );
+      if (!widget.deferSending) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content:
+                Text('${invitations.length} invitations sent successfully!'),
+            backgroundColor: AppColors.primaryGreen,
+          ),
+        );
+      }
     }
   }
 
@@ -331,7 +328,6 @@ class _ContactPickerWidgetState extends State<ContactPickerWidget> {
         ),
         body: Column(
           children: [
-            // Search bar
             Container(
               padding: const EdgeInsets.all(16),
               child: TextField(
@@ -353,8 +349,6 @@ class _ContactPickerWidgetState extends State<ContactPickerWidget> {
                 ),
               ),
             ),
-
-            // Email invitation option
             Container(
               padding: const EdgeInsets.symmetric(horizontal: 16),
               child: Row(
@@ -379,8 +373,6 @@ class _ContactPickerWidgetState extends State<ContactPickerWidget> {
                 ],
               ),
             ),
-
-            // Email input field
             if (_showEmailOption)
               Container(
                 padding: const EdgeInsets.symmetric(horizontal: 16),
@@ -404,8 +396,6 @@ class _ContactPickerWidgetState extends State<ContactPickerWidget> {
                   ),
                 ),
               ),
-
-            // Custom message field
             Container(
               padding: const EdgeInsets.all(16),
               child: TextField(
@@ -425,8 +415,6 @@ class _ContactPickerWidgetState extends State<ContactPickerWidget> {
                 ),
               ),
             ),
-
-            // Contacts list
             Expanded(
               child: _isLoading
                   ? const Center(child: CircularProgressIndicator())
@@ -435,54 +423,56 @@ class _ContactPickerWidgetState extends State<ContactPickerWidget> {
                       : _filteredContacts.isEmpty
                           ? _buildEmptyContactsState()
                           : ListView.builder(
-                          itemCount: _filteredContacts.length,
-                          itemBuilder: (context, index) {
-                            final contact = _filteredContacts[index];
-                            final isSelected =
-                                _selectedContacts.contains(contact);
-                            final phone =
-                                _contactService.getPrimaryPhone(contact);
+                              itemCount: _filteredContacts.length,
+                              itemBuilder: (context, index) {
+                                final contact = _filteredContacts[index];
+                                final isSelected =
+                                    _selectedContacts.contains(contact);
+                                final phone =
+                                    _contactService.getPrimaryPhone(contact);
 
-                            return ListTile(
-                              leading: CircleAvatar(
-                                backgroundColor: isSelected
-                                    ? AppColors.primaryGreen
-                                    : Colors.grey[300],
-                                child: Icon(
-                                  Icons.person,
-                                  color: isSelected
-                                      ? Colors.white
-                                      : Colors.grey[600],
-                                ),
-                              ),
-                              title: Text(
-                                contact.displayName ?? 'Unknown',
-                                style: GoogleFonts.montserrat(
-                                  fontWeight: FontWeight.w500,
-                                  color: AppColors.textPrimary,
-                                ),
-                              ),
-                              subtitle: phone != null
-                                  ? Text(
-                                      phone,
-                                      style: GoogleFonts.montserrat(
-                                        color: Colors.grey[600],
-                                      ),
-                                    )
-                                  : null,
-                              trailing: isSelected
-                                  ? const Icon(
-                                      Icons.check_circle,
-                                      color: AppColors.primaryGreen,
-                                    )
-                                  : const Icon(
-                                      Icons.radio_button_unchecked,
-                                      color: Colors.grey,
+                                return ListTile(
+                                  leading: CircleAvatar(
+                                    backgroundColor: isSelected
+                                        ? AppColors.primaryGreen
+                                        : Colors.grey[300],
+                                    child: Icon(
+                                      Icons.person,
+                                      color: isSelected
+                                          ? Colors.white
+                                          : Colors.grey[600],
                                     ),
-                              onTap: () => _toggleContactSelection(contact),
-                            );
-                          },
-                        ),
+                                  ),
+                                  title: Text(
+                                    contact.displayName.isNotEmpty
+                                        ? contact.displayName
+                                        : 'Unknown',
+                                    style: GoogleFonts.montserrat(
+                                      fontWeight: FontWeight.w500,
+                                      color: AppColors.textPrimary,
+                                    ),
+                                  ),
+                                  subtitle: phone != null
+                                      ? Text(
+                                          phone,
+                                          style: GoogleFonts.montserrat(
+                                            color: Colors.grey[600],
+                                          ),
+                                        )
+                                      : null,
+                                  trailing: isSelected
+                                      ? const Icon(
+                                          Icons.check_circle,
+                                          color: AppColors.primaryGreen,
+                                        )
+                                      : const Icon(
+                                          Icons.radio_button_unchecked,
+                                          color: Colors.grey,
+                                        ),
+                                  onTap: () => _toggleContactSelection(contact),
+                                );
+                              },
+                            ),
             ),
           ],
         ),

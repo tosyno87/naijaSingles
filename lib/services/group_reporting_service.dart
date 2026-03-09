@@ -65,7 +65,7 @@ class GroupReportingService {
       );
 
       log('✅ Group report submitted: $groupId');
-    } catch (e) {
+    } on Object catch (e) {
       log('❌ Error reporting group: $e');
       throw Exception('Failed to submit report');
     }
@@ -107,7 +107,7 @@ class GroupReportingService {
             },
           )
           .toList();
-    } catch (e) {
+    } on Object catch (e) {
       log('Error getting group reports: $e');
       return [];
     }
@@ -133,7 +133,7 @@ class GroupReportingService {
             },
           )
           .toList();
-    } catch (e) {
+    } on Object catch (e) {
       log('Error getting user reports: $e');
       return [];
     }
@@ -149,9 +149,8 @@ class GroupReportingService {
       final currentUserId = _auth.currentUser?.uid;
       if (currentUserId == null) throw Exception('User not authenticated');
 
-      // TODO: Add admin/moderator permission check
-      // For now, allowing any authenticated user to update status
-      // In production, this should check user roles
+      // TODO(dev): Add admin/moderator permission check. For now, allowing any
+      // authenticated user to update status. In production, check user roles.
 
       await _firestore.collection('group_reports').doc(reportId).update({
         'status': status,
@@ -162,7 +161,7 @@ class GroupReportingService {
       });
 
       log('✅ Report status updated: $reportId -> $status');
-    } catch (e) {
+    } on Object catch (e) {
       log('❌ Error updating report status: $e');
       throw Exception('Failed to update report status');
     }
@@ -183,7 +182,7 @@ class GroupReportingService {
         'timestamp': FieldValue.serverTimestamp(),
         'severity': 'medium',
       });
-    } catch (e) {
+    } on Object catch (e) {
       log('Error logging report event: $e');
     }
   }
@@ -202,7 +201,7 @@ class GroupReportingService {
           .get();
 
       return querySnapshot.docs.isNotEmpty;
-    } catch (e) {
+    } on Object catch (e) {
       log('Error checking if user reported group: $e');
       return false;
     }

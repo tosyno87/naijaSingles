@@ -270,7 +270,7 @@ class EventsBloc extends Bloc<EventsEvent, EventsState> {
           hasReachedMax: events.length < _eventsPerPage,
         ),
       );
-    } catch (e) {
+    } on Object catch (e) {
       log('Error loading events: $e', name: 'EventsBloc');
       emit(
         EventsError(
@@ -326,7 +326,7 @@ class EventsBloc extends Bloc<EventsEvent, EventsState> {
           ),
         );
       }
-    } catch (e) {
+    } on Object catch (e) {
       log('Error loading more events: $e', name: 'EventsBloc');
       emit(currentState.copyWith(isLoadingMore: false));
     }
@@ -367,7 +367,7 @@ class EventsBloc extends Bloc<EventsEvent, EventsState> {
           currentFilter: event.filter,
         ),
       );
-    } catch (e) {
+    } on Object catch (e) {
       log('Error filtering events: $e', name: 'EventsBloc');
       emit(EventsError(message: _getErrorMessage(e)));
     }
@@ -394,7 +394,7 @@ class EventsBloc extends Bloc<EventsEvent, EventsState> {
           searchQuery: event.query,
         ),
       );
-    } catch (e) {
+    } on Object catch (e) {
       log('Error searching events: $e', name: 'EventsBloc');
       emit(EventsError(message: _getErrorMessage(e)));
     }
@@ -427,7 +427,7 @@ class EventsBloc extends Bloc<EventsEvent, EventsState> {
         return false;
       }
 
-      if (filter.paidOnly ?? false && event.isFree) {
+      if ((filter.paidOnly ?? false) && event.isFree) {
         return false;
       }
 
@@ -563,7 +563,7 @@ class EventsBloc extends Bloc<EventsEvent, EventsState> {
     return events;
   }
 
-  String _getErrorMessage(error) {
+  String _getErrorMessage(Object error) {
     if (error.toString().contains('FirestoreException')) {
       return 'Failed to save events. Please try again.';
     } else {
@@ -571,7 +571,7 @@ class EventsBloc extends Bloc<EventsEvent, EventsState> {
     }
   }
 
-  bool _isNetworkError(error) =>
+  bool _isNetworkError(Object error) =>
       error.toString().contains('SocketException') ||
       error.toString().contains('TimeoutException');
 }

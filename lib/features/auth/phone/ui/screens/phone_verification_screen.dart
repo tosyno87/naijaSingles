@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:country_code_picker/country_code_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -50,7 +52,6 @@ class _PhoneVerificationScreenState extends State<PhoneVerificationScreen> {
     // Define colors
     const Color backgroundColor = Colors.white; // Clean white
     const Color primaryColor = Color(0xFF008037); // Deep Green
-    const Color accentColor = Color(0xFFE74C3C); // Coral Red
     const Color textColor = Color(0xFF333333);
 
     final screenSize = MediaQuery.of(context).size;
@@ -221,14 +222,16 @@ class _PhoneVerificationScreenState extends State<PhoneVerificationScreen> {
                           context,
                         );
                       } else if (state is PhoneAuthCodeSentSuccess) {
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                            builder: (context) => OtpVerificationScreen(
-                              phoneNumber: countryCode +
-                                  phoneNumberController.text.trim(),
-                              verificationId: state.verificationId,
-                              updatePhoneNumber: widget.updatePhoneNumber,
+                        unawaited(
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) => OtpVerificationScreen(
+                                phoneNumber: countryCode +
+                                    phoneNumberController.text.trim(),
+                                verificationId: state.verificationId,
+                                updatePhoneNumber: widget.updatePhoneNumber,
+                              ),
                             ),
                           ),
                         );

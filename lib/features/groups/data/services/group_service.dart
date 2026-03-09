@@ -52,7 +52,7 @@ class GroupService {
 
       debugPrint('✅ Group created successfully: ${docRef.id}');
       return docRef.id;
-    } catch (e) {
+    } on Object catch (e) {
       debugPrint('❌ Error creating group: $e');
       return null;
     }
@@ -84,7 +84,7 @@ class GroupService {
 
       debugPrint('✅ Retrieved ${groups.length} public groups');
       return groups;
-    } catch (e) {
+    } on Object catch (e) {
       debugPrint('❌ Error getting public groups: $e');
       return [];
     }
@@ -107,7 +107,7 @@ class GroupService {
 
       debugPrint('✅ Retrieved ${groups.length} user groups');
       return groups;
-    } catch (e) {
+    } on Object catch (e) {
       debugPrint('❌ Error getting user groups: $e');
       return [];
     }
@@ -130,7 +130,7 @@ class GroupService {
 
       debugPrint('✅ Retrieved ${groups.length} user created groups');
       return groups;
-    } catch (e) {
+    } on Object catch (e) {
       debugPrint('❌ Error getting user created groups: $e');
       return [];
     }
@@ -175,7 +175,7 @@ class GroupService {
 
       debugPrint('✅ User joined group: $groupId');
       return true;
-    } catch (e) {
+    } on Object catch (e) {
       debugPrint('❌ Error joining group: $e');
       return false;
     }
@@ -236,7 +236,7 @@ class GroupService {
 
       debugPrint('✅ User left group: $groupId');
       return true;
-    } catch (e) {
+    } on Object catch (e) {
       debugPrint('❌ Error leaving group: $e');
       return false;
     }
@@ -252,7 +252,7 @@ class GroupService {
       }
 
       return GroupModel.fromDocument(doc);
-    } catch (e) {
+    } on Object catch (e) {
       debugPrint('❌ Error getting group: $e');
       return null;
     }
@@ -284,7 +284,7 @@ class GroupService {
 
       debugPrint('✅ Group updated successfully: $groupId');
       return true;
-    } catch (e) {
+    } on Object catch (e) {
       debugPrint('❌ Error updating group: $e');
       return false;
     }
@@ -310,7 +310,7 @@ class GroupService {
 
       debugPrint('✅ Group deleted successfully: $groupId');
       return true;
-    } catch (e) {
+    } on Object catch (e) {
       debugPrint('❌ Error deleting group: $e');
       return false;
     }
@@ -345,7 +345,7 @@ class GroupService {
 
       debugPrint('✅ Found ${filteredGroups.length} groups matching "$query"');
       return filteredGroups;
-    } catch (e) {
+    } on Object catch (e) {
       debugPrint('❌ Error searching groups: $e');
       return [];
     }
@@ -380,7 +380,7 @@ class GroupService {
       }
 
       return members;
-    } catch (e) {
+    } on Object catch (e) {
       debugPrint('❌ Error getting group members: $e');
       return [];
     }
@@ -419,7 +419,7 @@ class GroupService {
 
       debugPrint('✅ Admin added to group: $groupId');
       return true;
-    } catch (e) {
+    } on Object catch (e) {
       debugPrint('❌ Error adding admin: $e');
       return false;
     }
@@ -458,7 +458,7 @@ class GroupService {
 
       debugPrint('✅ Admin removed from group: $groupId');
       return true;
-    } catch (e) {
+    } on Object catch (e) {
       debugPrint('❌ Error removing admin: $e');
       return false;
     }

@@ -22,30 +22,55 @@ service cloud.firestore {
              );
     }
 
+    // Canonical flag: onboardingCompleted.  Legacy synonyms
+    // (profileSetupComplete, isProfileComplete) are kept for backward
+    // compatibility with documents created before flag names were unified.
+    // All new writes must set onboardingCompleted; the OR ensures existing
+    // documents still trigger the identity lock.
+    function isLockedIdentityFieldUpdate() {
+      return (resource.data.onboardingCompleted == true ||
+              resource.data.profileSetupComplete == true ||
+              resource.data.isProfileComplete == true) &&
+             (
+               request.resource.data.name != resource.data.name ||
+               request.resource.data.dateOfBirth != resource.data.dateOfBirth
+             );
+    }
+
+    function isEventOwner(eventData) {
+      return request.auth != null &&
+             ((eventData.keys().hasAny(['createdByUserId']) &&
+               request.auth.uid == eventData.createdByUserId) ||
+              (eventData.keys().hasAny(['creatorId']) &&
+               request.auth.uid == eventData.creatorId));
+    }
+
     // Users collection - allow authenticated users to read others for matching
     match /users/{userId} {
-      // Owner can always read/write their own data.
-      allow read, write: if request.auth != null && request.auth.uid == userId;
+      // Owner can always read/create/delete their own data.
+      allow read, create, delete: if request.auth != null && request.auth.uid == userId;
 
       // Single-document reads by non-owners enforce privacy server-side.
       // Paused, incognito, deleted, and banned profiles are hidden.
       allow get: if canReadUserProfile(userId);
 
-      // Collection queries (discovery, search) are allowed for any
-      // authenticated user. Firestore cannot statically verify per-document
-      // privacy checks (accountStatus, isDeleted, etc.) against query
-      // constraints, so list operations would always fail with
-      // permission-denied if gated by canReadUserProfile.
-      // App-side filtering (_passesAdditionalFilters, isDiscoverable)
-      // handles privacy for discovery results.
-      allow list: if request.auth != null;
+      // Collection queries (discovery, search) gate on a stored boolean
+      // `isDiscoverable` that a Cloud Function trigger keeps in sync with
+      // accountStatus, isDeleted, and isProfilePrivate. This gives server-
+      // side enforcement without the per-document inequality checks that
+      // cause permission-denied on compound queries.
+      // Clients must include .where('isDiscoverable', isEqualTo: true).
+      allow list: if request.auth != null
+                      && resource.data.isDiscoverable == true;
       
       // Allow users to update their own profile with data validation
       allow update: if request.auth != null && 
                      request.auth.uid == userId &&
-                     // Prevent users from changing critical fields
+                     // Prevent users from changing critical / server-managed fields
                      !request.resource.data.diff(resource.data).affectedKeys()
-                       .hasAny(['createdAt', 'uid', 'email', 'signInMethod']);
+                       .hasAny(['createdAt', 'uid', 'email', 'signInMethod', 'isDiscoverable']) &&
+                     // Once onboarding is complete, lock identity fields.
+                     !isLockedIdentityFieldUpdate();
       
       // Public profile subcollection (visible to others based on privacy settings)
       match /public/{document=**} {
@@ -364,8 +389,14 @@ service cloud.firestore {
                    request.auth.uid == resource.data.userId;
     }
 
-    // Notification Settings collection
+    // Notification Settings collection (camelCase legacy)
     match /notificationSettings/{userId} {
+      allow read, write: if request.auth != null && 
+                          request.auth.uid == userId;
+    }
+
+    // Notification Settings collection (snake_case – used by current client)
+    match /notification_settings/{userId} {
       allow read, write: if request.auth != null && 
                           request.auth.uid == userId;
     }
@@ -399,13 +430,13 @@ service cloud.firestore {
       
       // Users can update their own events
       allow update: if request.auth != null && 
-                     request.auth.uid == resource.data.createdByUserId &&
+                     isEventOwner(resource.data) &&
                      // Prevent changing the creator
-                     !request.resource.data.diff(resource.data).affectedKeys().hasAny(['createdByUserId']);
+                     !request.resource.data.diff(resource.data).affectedKeys().hasAny(['createdByUserId', 'creatorId']);
       
       // Users can delete their own events
       allow delete: if request.auth != null && 
-                     request.auth.uid == resource.data.createdByUserId;
+                     isEventOwner(resource.data);
     }
 
     // Event RSVPs collection - for tracking event attendance
@@ -413,7 +444,7 @@ service cloud.firestore {
       // Users can read RSVPs for events they created
       allow read: if request.auth != null && 
                    exists(/databases/$(database)/documents/events/$(resource.data.eventId)) &&
-                   request.auth.uid == get(/databases/$(database)/documents/events/$(resource.data.eventId)).data.createdByUserId;
+                   isEventOwner(get(/databases/$(database)/documents/events/$(resource.data.eventId)).data);
       
       // Users can read their own RSVPs
       allow read: if request.auth != null && 
@@ -468,7 +499,7 @@ service cloud.firestore {
       // Event creators can read attendees of their events
       allow read: if request.auth != null && 
                    exists(/databases/$(database)/documents/events/$(eventId)) &&
-                   request.auth.uid == get(/databases/$(database)/documents/events/$(eventId)).data.createdByUserId;
+                   isEventOwner(get(/databases/$(database)/documents/events/$(eventId)).data);
       
       // Attendees subcollection
       match /attendees/{userId} {
@@ -479,7 +510,7 @@ service cloud.firestore {
         // Event creators can read attendees
         allow read: if request.auth != null && 
                      exists(/databases/$(database)/documents/events/$(eventId)) &&
-                     request.auth.uid == get(/databases/$(database)/documents/events/$(eventId)).data.createdByUserId;
+                     isEventOwner(get(/databases/$(database)/documents/events/$(eventId)).data);
       }
     }
 
@@ -488,7 +519,7 @@ service cloud.firestore {
       // Users can read moderation status of their own events
       allow read: if request.auth != null && 
                    exists(/databases/$(database)/documents/events/$(eventId)) &&
-                   request.auth.uid == get(/databases/$(database)/documents/events/$(eventId)).data.createdByUserId;
+                   isEventOwner(get(/databases/$(database)/documents/events/$(eventId)).data);
       
       // Client-side writes blocked. Use Admin SDK (Cloud Functions) for moderation.
       allow create, update: if false;
@@ -496,8 +527,10 @@ service cloud.firestore {
 
     // Unified Groups collection - for the new unified group system
     match /unifiedGroups/{groupId} {
-      // Users can read groups
-      allow read: if request.auth != null;
+      // Users can read public groups or groups they belong to
+      allow read: if request.auth != null
+                      && (resource.data.get('isPublic', true) == true
+                          || request.auth.uid in resource.data.memberIds);
       
       // Users can create groups
       allow create: if request.auth != null && 
@@ -546,16 +579,10 @@ service cloud.firestore {
 
     // Legacy Groups collection - for backward compatibility
     match /groups/{groupId} {
-      // Users can read public groups
-      allow read: if request.auth != null && 
-                   resource.data.isPublic == true;
-      
-      // Users can read groups they're members of
-      allow read: if request.auth != null && 
-                   request.auth.uid in resource.data.memberIds;
-      
-      // Users can read group details for any group (needed for join validation)
-      allow read: if request.auth != null;
+      // Users can read public groups or groups they belong to
+      allow read: if request.auth != null
+                      && (resource.data.get('isPublic', true) == true
+                          || request.auth.uid in resource.data.memberIds);
       
       // Users can create groups
       allow create: if request.auth != null && 
@@ -580,12 +607,12 @@ service cloud.firestore {
 
     // Group Chats collection - for the original group chat system
     match /groupChats/{groupId} {
-      // Users can read groups they're members of
+      // Members can list and read group data
       allow read: if request.auth != null && 
                    request.auth.uid in resource.data.memberIds;
       
-      // Users can read group details for any group (needed for join validation)
-      allow read: if request.auth != null;
+      // Single-document lookup for join validation (does not allow list queries)
+      allow get: if request.auth != null;
       
       // Users can create groups
       allow create: if request.auth != null && 
@@ -678,18 +705,29 @@ service cloud.firestore {
     }
 
     // Group Unread Counts collection - for tracking unread messages per group
+    // Doc IDs follow the pattern {groupId}_{userId}.
     match /group_unread_counts/{countId} {
-      // Users can read and write their own unread counts
-      allow read, write: if request.auth != null && 
-                          request.auth.uid == resource.data.userId;
-      
+      // Single-doc reads must work even when the document doesn't exist yet
+      // (resource is null), so we scope by doc-ID suffix instead of
+      // resource.data which would fail on a missing document.
+      allow get: if request.auth != null &&
+                    (
+                      (resource != null && resource.data.userId == request.auth.uid) ||
+                      countId.matches('.*_' + request.auth.uid)
+                    );
+
+      // List queries filter by userId field on existing documents.
+      allow list: if request.auth != null &&
+                     resource.data.userId == request.auth.uid;
+
       // Users can create their own unread count records
       allow create: if request.auth != null && 
                      request.auth.uid == request.resource.data.userId &&
                      request.resource.data.keys().hasAll(['userId', 'groupId', 'count', 'updatedAt']);
       
-      // System can update unread counts (for message sending)
-      allow update: if request.auth != null;
+      // Only the document owner can update/delete their own unread counts
+      allow update, delete: if request.auth != null &&
+                               request.auth.uid == resource.data.userId;
     }
 
     // Group Reports collection - for group abuse reports
@@ -730,6 +768,20 @@ service cloud.firestore {
       // Users can read their own deletion records
       allow read: if request.auth != null && 
                    request.auth.uid == resource.data.userId;
+    }
+
+    // Match Quality Analytics — append-only from authenticated clients.
+    // Reads happen server-side via Admin SDK (Cloud Functions / aggregation).
+    match /matchQualityEvents/{eventId} {
+      allow create: if request.auth != null;
+      allow read, update, delete: if false;
+    }
+
+    // Runtime configuration — read-only for authenticated clients.
+    // Writes happen via Admin SDK (seed script / deploy tooling).
+    match /runtimeConfig/{docId} {
+      allow read: if request.auth != null;
+      allow write: if false;
     }
 
     // Block any other access not explicitly allowed above

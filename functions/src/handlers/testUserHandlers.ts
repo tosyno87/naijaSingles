@@ -3,7 +3,8 @@
  * Used for development and testing purposes
  */
 
-import * as functions from 'firebase-functions';
+import {onRequest} from 'firebase-functions/v2/https';
+import * as logger from 'firebase-functions/logger';
 import * as admin from 'firebase-admin';
 import * as crypto from 'crypto';
 
@@ -71,18 +72,14 @@ export class TestUserHandlers {
    * Create test users for development/testing
    * Requires admin secret token in Authorization header for security
    */
-  createTestUsers = functions.runWith({
-    timeoutSeconds: 540, // Max timeout (9 minutes) for large batches
-  }).https.onRequest(async (req: functions.https.Request, res: functions.Response): Promise<void> => {
+  createTestUsers = onRequest({timeoutSeconds: 540}, async (req, res): Promise<void> => {
       try {
-        // 1. Authentication check — fail closed if no secret is configured.
         const authHeader = req.headers.authorization;
-        const adminSecret = functions.config().admin?.secret || 
-                           process.env.ADMIN_SECRET;
+        const adminSecret = process.env.ADMIN_SECRET;
         
         if (!adminSecret) {
-          functions.logger.error(
-            'ADMIN_SECRET is not configured. Set it via: firebase functions:config:set admin.secret="YOUR_SECRET"',
+          logger.error(
+            'ADMIN_SECRET is not configured. Set it via: firebase functions:secrets:set ADMIN_SECRET',
           );
           res.status(503).json({
             success: false,

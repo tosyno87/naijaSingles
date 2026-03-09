@@ -4,9 +4,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:google_fonts/google_fonts.dart';
 
+import '../../../../common/constants/app_colors.dart';
 import '../../data/models/rsvp_model.dart';
 import '../bloc/rsvp_bloc.dart';
-import '../../../../common/constants/app_colors.dart';
 
 class EventAttendeesList extends StatefulWidget {
   const EventAttendeesList({

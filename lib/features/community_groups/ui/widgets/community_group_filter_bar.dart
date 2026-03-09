@@ -82,7 +82,10 @@ class CommunityGroupFilterBar extends StatelessWidget {
                   _buildFilterChip('All', selectedCountry, onCountryChanged),
                   const SizedBox(width: 8),
                   _buildFilterChip(
-                      'Nigeria', selectedCountry, onCountryChanged),
+                    'Nigeria',
+                    selectedCountry,
+                    onCountryChanged,
+                  ),
                   const SizedBox(width: 8),
                   _buildFilterChip('Ghana', selectedCountry, onCountryChanged),
                   const SizedBox(width: 8),
@@ -95,7 +98,10 @@ class CommunityGroupFilterBar extends StatelessWidget {
                   ),
                   const SizedBox(width: 8),
                   _buildFilterChip(
-                      'Ethiopia', selectedCountry, onCountryChanged),
+                    'Ethiopia',
+                    selectedCountry,
+                    onCountryChanged,
+                  ),
                 ],
               ),
             ),

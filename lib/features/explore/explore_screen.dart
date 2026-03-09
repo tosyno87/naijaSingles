@@ -1,12 +1,13 @@
+import 'dart:async';
 import 'dart:developer';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:google_fonts/google_fonts.dart';
 
 import '../../common/bloc/user/user_bloc.dart';
 import '../../common/constants/app_colors.dart';
 import '../../common/data/repo/user_search_repo.dart';
+import '../../common/widgets/state_views/state_views.dart';
 import '../../models/user_model.dart';
 import 'screens/tribe_connect_screen.dart';
 
@@ -31,7 +32,7 @@ class _ExploreScreenState extends State<ExploreScreen> {
   @override
   void initState() {
     super.initState();
-    _loadCurrentUser();
+    unawaited(_loadCurrentUser());
   }
 
   @override
@@ -59,7 +60,7 @@ class _ExploreScreenState extends State<ExploreScreen> {
           });
         }
       }
-    } catch (e) {
+    } on Object catch (e) {
       log('Error loading current user: $e');
       if (mounted && !_disposed) {
         setState(() {
@@ -92,7 +93,7 @@ class _ExploreScreenState extends State<ExploreScreen> {
           _isLoading = false;
         });
       }
-    } catch (e) {
+    } on Object catch (e) {
       log('Error loading users: $e');
       if (mounted && !_disposed) {
         setState(() {
@@ -106,90 +107,30 @@ class _ExploreScreenState extends State<ExploreScreen> {
   @override
   Widget build(BuildContext context) {
     if (_isLoading) {
-      return Scaffold(
+      return const Scaffold(
         backgroundColor: AppColors.backgroundColor,
-        body: Center(
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              const CircularProgressIndicator(
-                color: AppColors.primaryGreen,
-              ),
-              const SizedBox(height: 16),
-              Text(
-                'Loading your tribe...',
-                style: GoogleFonts.montserrat(
-                  fontSize: 16,
-                  fontWeight: FontWeight.w500,
-                  color: AppColors.textSecondary,
-                ),
-              ),
-            ],
-          ),
-        ),
+        body: AppLoadingView(message: 'Loading your tribe...'),
       );
     }
 
     if (_error != null) {
       return Scaffold(
         backgroundColor: AppColors.backgroundColor,
-        body: Center(
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              Icon(
-                Icons.error_outline,
-                size: 60,
-                color: AppColors.error.withValues(alpha: 0.5),
-              ),
-              const SizedBox(height: 16),
-              Text(
-                _error!,
-                style: GoogleFonts.montserrat(
-                  fontSize: 18,
-                  fontWeight: FontWeight.w500,
-                  color: AppColors.textPrimary,
-                ),
-                textAlign: TextAlign.center,
-              ),
-              const SizedBox(height: 16),
-              ElevatedButton(
-                onPressed: _loadCurrentUser,
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: AppColors.primaryGreen,
-                  foregroundColor: Colors.white,
-                ),
-                child: const Text('Retry'),
-              ),
-            ],
-          ),
+        body: AppErrorView(
+          title: 'Unable to load connect feed',
+          message: _error!,
+          onRetry: _loadCurrentUser,
         ),
       );
     }
 
     if (_currentUser == null) {
-      return Scaffold(
+      return const Scaffold(
         backgroundColor: AppColors.backgroundColor,
-        body: Center(
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              Icon(
-                Icons.person_off,
-                size: 60,
-                color: AppColors.textSecondary.withValues(alpha: 0.5),
-              ),
-              const SizedBox(height: 16),
-              Text(
-                'Please log in to explore profiles',
-                style: GoogleFonts.montserrat(
-                  fontSize: 18,
-                  fontWeight: FontWeight.w500,
-                  color: AppColors.textPrimary,
-                ),
-              ),
-            ],
-          ),
+        body: AppEmptyView(
+          title: 'Please log in',
+          subtitle: 'Sign in to explore profiles in Connect.',
+          icon: Icons.person_off,
         ),
       );
     }

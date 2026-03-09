@@ -3,11 +3,11 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:intl/intl.dart';
 
+import '../../../../common/constants/app_colors.dart';
 import '../../data/models/event_model.dart';
 import '../../data/services/location_service.dart';
 import '../utils/location_formatter.dart';
 import 'rsvp_button.dart';
-import '../../../../common/constants/app_colors.dart';
 
 class EventCard extends StatelessWidget {
   const EventCard({
@@ -75,7 +75,8 @@ class EventCard extends StatelessWidget {
                     color: Color(0xFFF5F5F5),
                     child: Center(
                       child: CircularProgressIndicator(
-                        valueColor: AlwaysStoppedAnimation(AppColors.primaryGreen),
+                        valueColor:
+                            AlwaysStoppedAnimation(AppColors.primaryGreen),
                       ),
                     ),
                   ),
@@ -361,9 +362,8 @@ class EventCard extends StatelessWidget {
     return 'Starts at $startTime';
   }
 
-  String _getLocationDisplayText() {
-    return LocationFormatter.formatLocation(event.location.displayAddress);
-  }
+  String _getLocationDisplayText() =>
+      LocationFormatter.formatLocation(event.location.displayAddress);
 }
 
 // Compact version for lists
@@ -376,9 +376,8 @@ class CompactEventCard extends StatelessWidget {
   final EventModel event;
   final VoidCallback? onTap;
 
-  String _getLocationText() {
-    return LocationFormatter.formatLocation(event.location.displayAddress);
-  }
+  String _getLocationText() =>
+      LocationFormatter.formatLocation(event.location.displayAddress);
 
   @override
   Widget build(BuildContext context) => GestureDetector(

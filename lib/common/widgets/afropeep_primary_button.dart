@@ -19,6 +19,7 @@ class AfropeepPrimaryButton extends StatelessWidget {
     this.variant = AuthButtonVariant.primary,
     this.width,
     this.height,
+    this.disabledBackgroundColor,
   });
   final IconData? icon;
   final String text;
@@ -29,6 +30,7 @@ class AfropeepPrimaryButton extends StatelessWidget {
   final AuthButtonVariant variant;
   final double? width;
   final double? height;
+  final Color? disabledBackgroundColor;
 
   @override
   Widget build(BuildContext context) {
@@ -39,7 +41,8 @@ class AfropeepPrimaryButton extends StatelessWidget {
     final btnHeight = height ?? 56;
 
     final isEnabled = onPressed != null && !isLoading;
-    final effectiveBgColor = isEnabled ? bgColor : Colors.grey.shade400;
+    final effectiveBgColor =
+        isEnabled ? bgColor : (disabledBackgroundColor ?? Colors.grey.shade400);
 
     return SizedBox(
       width: width ?? double.infinity,
@@ -52,13 +55,15 @@ class AfropeepPrimaryButton extends StatelessWidget {
           padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(
-                isPrimary ? 16 : 28), // Pill shape for secondary
+              isPrimary ? 16 : 28,
+            ), // Pill shape for secondary
           ),
           elevation: isEnabled && isPrimary ? 3 : 1,
           shadowColor: isEnabled && isPrimary
               ? AppColors.primaryGreen.withValues(alpha: 0.3)
               : Colors.transparent,
-          disabledBackgroundColor: Colors.grey.shade400,
+          disabledBackgroundColor:
+              disabledBackgroundColor ?? Colors.grey.shade400,
         ),
         child: isLoading
             ? SizedBox(

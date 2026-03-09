@@ -1,15 +1,13 @@
 /**
  * Match-related Cloud Function handlers
  */
-import * as functions from 'firebase-functions/v1';
 export declare class MatchHandlers {
     private userService;
     private notificationService;
     constructor();
-    /**
-     * Handle match creation (Gen 1 - compatible with existing deployments)
-     */
-    onMatchCreated: functions.CloudFunction<functions.firestore.QueryDocumentSnapshot>;
+    onMatchCreated: import("firebase-functions/core").CloudFunction<import("firebase-functions/v2/firestore").FirestoreEvent<import("firebase-functions/v2/firestore").QueryDocumentSnapshot | undefined, {
+        matchId: string;
+    }>>;
     /**
      * Log errors to Firestore for monitoring
      */

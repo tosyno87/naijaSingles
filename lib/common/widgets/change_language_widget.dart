@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
@@ -102,9 +104,8 @@ class _LanguageWidgetState extends State<LanguageWidget> {
                       'Change Language'.tr().toString(),
                       style: TextStyle(
                         fontSize: 18,
-                        color: isDarkMode
-                            ? Colors.white
-                            : AppColors.primaryGreen,
+                        color:
+                            isDarkMode ? Colors.white : AppColors.primaryGreen,
                         fontWeight: FontWeight.w500,
                       ),
                     ),
@@ -137,10 +138,13 @@ class _LanguageWidgetState extends State<LanguageWidget> {
                                             ),
                                           );
 
-                                      Navigator.pushReplacement(
-                                        context,
-                                        MaterialPageRoute(
-                                          builder: (context) => const Tabbar(),
+                                      unawaited(
+                                        Navigator.pushReplacement(
+                                          context,
+                                          MaterialPageRoute(
+                                            builder: (context) =>
+                                                const Tabbar(),
+                                          ),
                                         ),
                                       );
                                     },
@@ -158,10 +162,13 @@ class _LanguageWidgetState extends State<LanguageWidget> {
                                             ),
                                           );
 
-                                      Navigator.pushReplacement(
-                                        context,
-                                        MaterialPageRoute(
-                                          builder: (context) => const Tabbar(),
+                                      unawaited(
+                                        Navigator.pushReplacement(
+                                          context,
+                                          MaterialPageRoute(
+                                            builder: (context) =>
+                                                const Tabbar(),
+                                          ),
                                         ),
                                       );
                                     },
@@ -178,10 +185,13 @@ class _LanguageWidgetState extends State<LanguageWidget> {
                                               context,
                                             ),
                                           );
-                                      Navigator.pushReplacement(
-                                        context,
-                                        MaterialPageRoute(
-                                          builder: (context) => const Tabbar(),
+                                      unawaited(
+                                        Navigator.pushReplacement(
+                                          context,
+                                          MaterialPageRoute(
+                                            builder: (context) =>
+                                                const Tabbar(),
+                                          ),
                                         ),
                                       );
                                     },
@@ -199,11 +209,13 @@ class _LanguageWidgetState extends State<LanguageWidget> {
                                             ),
                                           );
 
-                                      Navigator.pushReplacement(
-                                        context,
-                                        MaterialPageRoute(
-                                          builder: (context) => const Tabbar(
-                                            isPaymentSuccess: false,
+                                      unawaited(
+                                        Navigator.pushReplacement(
+                                          context,
+                                          MaterialPageRoute(
+                                            builder: (context) => const Tabbar(
+                                              isPaymentSuccess: false,
+                                            ),
                                           ),
                                         ),
                                       );
@@ -222,10 +234,13 @@ class _LanguageWidgetState extends State<LanguageWidget> {
                                             ),
                                           );
 
-                                      Navigator.pushReplacement(
-                                        context,
-                                        MaterialPageRoute(
-                                          builder: (context) => const Tabbar(),
+                                      unawaited(
+                                        Navigator.pushReplacement(
+                                          context,
+                                          MaterialPageRoute(
+                                            builder: (context) =>
+                                                const Tabbar(),
+                                          ),
                                         ),
                                       );
                                     },
@@ -243,10 +258,13 @@ class _LanguageWidgetState extends State<LanguageWidget> {
                                             ),
                                           );
 
-                                      Navigator.pushReplacement(
-                                        context,
-                                        MaterialPageRoute(
-                                          builder: (context) => const Tabbar(),
+                                      unawaited(
+                                        Navigator.pushReplacement(
+                                          context,
+                                          MaterialPageRoute(
+                                            builder: (context) =>
+                                                const Tabbar(),
+                                          ),
                                         ),
                                       );
                                     },
@@ -278,7 +296,7 @@ class _LanguageWidgetState extends State<LanguageWidget> {
                   ),
                 ],
               );
-            } catch (e) {
+            } on Object {
               return Center(
                 child: Text(
                   'Unable to load'.tr().toString(),
@@ -298,29 +316,31 @@ void showChangeDialog(
   String language,
   VoidCallback onTap,
 ) {
-  showDialog(
-    context: context,
-    builder: (BuildContext context) => AlertDialog(
-      title: Text('Change Language'.tr().toString()),
-      content: Text(
-        'Do you want to change the language to $language?'.tr().toString(),
+  unawaited(
+    showDialog(
+      context: context,
+      builder: (BuildContext context) => AlertDialog(
+        title: Text('Change Language'.tr().toString()),
+        content: Text(
+          'Do you want to change the language to $language?'.tr().toString(),
+        ),
+        actions: <Widget>[
+          TextButton(
+            onPressed: () => Navigator.of(context).pop(false),
+            child: Text(
+              'No'.tr().toString(),
+              style: const TextStyle(color: AppColors.primaryGreen),
+            ),
+          ),
+          TextButton(
+            onPressed: onTap,
+            child: Text(
+              'Yes'.tr().toString(),
+              style: const TextStyle(color: AppColors.primaryGreen),
+            ),
+          ),
+        ],
       ),
-      actions: <Widget>[
-        TextButton(
-          onPressed: () => Navigator.of(context).pop(false),
-          child: Text(
-            'No'.tr().toString(),
-            style: const TextStyle(color: AppColors.primaryGreen),
-          ),
-        ),
-        TextButton(
-          onPressed: onTap,
-          child: Text(
-            'Yes'.tr().toString(),
-            style: const TextStyle(color: AppColors.primaryGreen),
-          ),
-        ),
-      ],
     ),
   );
 }

@@ -1,5 +1,7 @@
+import 'dart:async';
 import 'dart:io';
 
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:image_cropper/image_cropper.dart';
@@ -379,11 +381,13 @@ class _MediaStepState extends State<MediaStep> {
                 height: double.infinity,
                 color: AppColors.backgroundColor,
                 child: widget.eventData.imageUrls[index].startsWith('http')
-                    ? Image.network(
-                        widget.eventData.imageUrls[index],
+                    ? CachedNetworkImage(
+                        imageUrl: widget.eventData.imageUrls[index],
                         fit: BoxFit.contain,
-                        errorBuilder: (context, error, stackTrace) =>
-                            const Center(
+                        placeholder: (context, url) => const Center(
+                          child: CircularProgressIndicator(strokeWidth: 2),
+                        ),
+                        errorWidget: (context, url, error) => const Center(
                           child: Icon(
                             Icons.broken_image,
                             color: Color(0xFF999999),
@@ -515,6 +519,7 @@ class _MediaStepState extends State<MediaStep> {
       );
 
       // Hide loading indicator
+      if (!mounted) return;
       ScaffoldMessenger.of(context).hideCurrentSnackBar();
 
       if (croppedFile != null) {
@@ -528,8 +533,9 @@ class _MediaStepState extends State<MediaStep> {
       } else {
         _showErrorSnackBar('Image cropping was cancelled.');
       }
-    } catch (e) {
+    } on Object catch (e) {
       // Hide loading indicator
+      if (!mounted) return;
       ScaffoldMessenger.of(context).hideCurrentSnackBar();
       _showErrorSnackBar('Failed to crop image: ${e.toString()}');
     }
@@ -542,44 +548,46 @@ class _MediaStepState extends State<MediaStep> {
     }
 
     // Show confirmation dialog
-    showDialog(
-      context: context,
-      builder: (context) => AlertDialog(
-        title: Text(
-          'Remove Photo',
-          style: GoogleFonts.montserrat(fontWeight: FontWeight.w600),
-        ),
-        content: Text(
-          'Are you sure you want to remove this photo?',
-          style: GoogleFonts.montserrat(),
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(context),
-            child: Text(
-              'Cancel',
-              style: GoogleFonts.montserrat(color: Colors.grey),
-            ),
+    unawaited(
+      showDialog(
+        context: context,
+        builder: (context) => AlertDialog(
+          title: Text(
+            'Remove Photo',
+            style: GoogleFonts.montserrat(fontWeight: FontWeight.w600),
           ),
-          TextButton(
-            onPressed: () {
-              Navigator.pop(context);
-              setState(() {
-                if (index < _selectedImages.length) {
-                  _selectedImages.removeAt(index);
-                }
-                if (index < widget.eventData.imageUrls.length) {
-                  widget.eventData.imageUrls.removeAt(index);
-                }
-              });
-              _showSuccessSnackBar('Photo removed successfully!');
-            },
-            child: Text(
-              'Remove',
-              style: GoogleFonts.montserrat(color: Colors.red),
-            ),
+          content: Text(
+            'Are you sure you want to remove this photo?',
+            style: GoogleFonts.montserrat(),
           ),
-        ],
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.pop(context),
+              child: Text(
+                'Cancel',
+                style: GoogleFonts.montserrat(color: Colors.grey),
+              ),
+            ),
+            TextButton(
+              onPressed: () {
+                Navigator.pop(context);
+                setState(() {
+                  if (index < _selectedImages.length) {
+                    _selectedImages.removeAt(index);
+                  }
+                  if (index < widget.eventData.imageUrls.length) {
+                    widget.eventData.imageUrls.removeAt(index);
+                  }
+                });
+                _showSuccessSnackBar('Photo removed successfully!');
+              },
+              child: Text(
+                'Remove',
+                style: GoogleFonts.montserrat(color: Colors.red),
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }
@@ -615,6 +623,7 @@ class _MediaStepState extends State<MediaStep> {
       );
 
       // Hide loading indicator
+      if (!mounted) return;
       ScaffoldMessenger.of(context).hideCurrentSnackBar();
 
       if (image != null) {
@@ -627,8 +636,9 @@ class _MediaStepState extends State<MediaStep> {
         // Show cropping dialog for new images
         await _showCropDialogForNewImage(image.path);
       }
-    } catch (e) {
+    } on Object catch (e) {
       // Hide loading indicator
+      if (!mounted) return;
       ScaffoldMessenger.of(context).hideCurrentSnackBar();
       _showErrorSnackBar('Failed to select images: ${e.toString()}');
     } finally {
@@ -652,13 +662,16 @@ class _MediaStepState extends State<MediaStep> {
             mainAxisSize: MainAxisSize.min,
             children: [
               ListTile(
-                leading:
-                    const Icon(Icons.photo_library, color: AppColors.primaryGreen),
+                leading: const Icon(
+                  Icons.photo_library,
+                  color: AppColors.primaryGreen,
+                ),
                 title: Text('Gallery', style: GoogleFonts.montserrat()),
                 onTap: () => Navigator.pop(context, ImageSource.gallery),
               ),
               ListTile(
-                leading: const Icon(Icons.camera_alt, color: AppColors.primaryGreen),
+                leading:
+                    const Icon(Icons.camera_alt, color: AppColors.primaryGreen),
                 title: Text('Camera', style: GoogleFonts.montserrat()),
                 onTap: () => Navigator.pop(context, ImageSource.camera),
               ),
@@ -696,6 +709,7 @@ class _MediaStepState extends State<MediaStep> {
       );
 
       // Hide loading indicator
+      if (!mounted) return;
       ScaffoldMessenger.of(context).hideCurrentSnackBar();
 
       if (croppedFile != null) {
@@ -710,8 +724,9 @@ class _MediaStepState extends State<MediaStep> {
       } else {
         _showErrorSnackBar('Image cropping was cancelled.');
       }
-    } catch (e) {
+    } on Object catch (e) {
       // Hide loading indicator
+      if (!mounted) return;
       ScaffoldMessenger.of(context).hideCurrentSnackBar();
       _showErrorSnackBar('Failed to crop image: ${e.toString()}');
     }

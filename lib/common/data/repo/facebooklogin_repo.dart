@@ -1,3 +1,5 @@
+// ignore_for_file: one_member_abstracts
+
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter_facebook_auth/flutter_facebook_auth.dart';
 
@@ -21,9 +23,9 @@ class FaceBookLoginRepositoryImpl implements FaceBookLoginRepository {
       return user;
     } else if (status == LoginStatus.cancelled ||
         status == LoginStatus.failed) {
-      throw result.message.toString();
+      throw Exception(result.message.toString());
     } else {
-      throw 'Network Error';
+      throw Exception('Network Error');
     }
   }
 

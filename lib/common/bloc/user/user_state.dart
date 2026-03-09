@@ -20,9 +20,8 @@ class UserLoading extends UserState {
 
 /// User data loaded successfully
 class UserLoaded extends UserState {
-  final UserModel? user;
-
   const UserLoaded(this.user);
+  final UserModel? user;
 
   @override
   List<Object?> get props => [user];
@@ -30,9 +29,8 @@ class UserLoaded extends UserState {
 
 /// Error loading user data
 class UserError extends UserState {
-  final String message;
-
   const UserError(this.message);
+  final String message;
 
   @override
   List<Object?> get props => [message];

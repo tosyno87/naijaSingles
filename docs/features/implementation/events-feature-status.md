@@ -12,7 +12,7 @@ The Events feature was experiencing permission denied errors when trying to read
 ## 🔍 Current API Status
 
 ### Eventbrite API Limitations
-The current Eventbrite API token (`EVBCOWHIGTAKNCEGK7BQ`) has limited permissions:
+The current Eventbrite API token (stored in environment secrets) has limited permissions:
 - ✅ **User Info**: Can access user profile data
 - ✅ **Categories**: Can fetch event categories  
 - ❌ **Events Search**: Cannot access public events search endpoint (returns 404)

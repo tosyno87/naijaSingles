@@ -1,8 +1,8 @@
+import 'dart:async';
 import 'dart:developer' as dev;
 
-import 'package:contacts_service/contacts_service.dart';
-import 'package:email_validator/email_validator.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_contacts/flutter_contacts.dart';
 import 'package:permission_handler/permission_handler.dart';
 
 /// Industry-standard contact invitation service
@@ -20,29 +20,29 @@ class ContactInvitationService {
   /// Check and request contact permission
   Future<bool> requestContactPermission() async {
     try {
-      dev.log('📱 Requesting contact permission');
+      dev.log('Requesting contact permission');
 
       final status = await Permission.contacts.status;
 
       if (status.isGranted) {
-        dev.log('✅ Contact permission already granted');
+        dev.log('Contact permission already granted');
         return true;
       }
 
       if (status.isDenied) {
-        dev.log('🔒 Contact permission denied, requesting...');
+        dev.log('Contact permission denied, requesting...');
         final result = await Permission.contacts.request();
         return result.isGranted;
       }
 
       if (status.isPermanentlyDenied) {
-        dev.log('❌ Contact permission permanently denied');
+        dev.log('Contact permission permanently denied');
         return false;
       }
 
       return false;
-    } catch (e) {
-      dev.log('❌ Error requesting contact permission: $e');
+    } on Object catch (e) {
+      dev.log('Error requesting contact permission: $e');
       return false;
     }
   }
@@ -50,23 +50,22 @@ class ContactInvitationService {
   /// Get phone contacts with proper error handling.
   Future<List<Contact>> getPhoneContacts() async {
     try {
-      dev.log('📞 Getting phone contacts');
+      dev.log('Getting phone contacts');
 
       final hasPermission = await requestContactPermission();
       if (!hasPermission) {
-        dev.log('❌ No contact permission');
+        dev.log('No contact permission');
         return [];
       }
 
-      final contacts = await ContactsService.getContacts(
-        withThumbnails: false,
-        photoHighResolution: false,
+      final contacts = await FlutterContacts.getContacts(
+        withProperties: true,
       );
 
-      dev.log('📱 Retrieved ${contacts.length} contacts');
+      dev.log('Retrieved ${contacts.length} contacts');
       return contacts;
-    } catch (e) {
-      dev.log('❌ Error getting contacts: $e');
+    } on Object catch (e) {
+      dev.log('Error getting contacts: $e');
       return [];
     }
   }
@@ -86,35 +85,30 @@ class ContactInvitationService {
   /// Search contacts by name or phone
   Future<List<Contact>> searchContacts(String query) async {
     try {
-      if (query.isEmpty) return await getPhoneContacts();
+      if (query.isEmpty) return getPhoneContacts();
 
       final contacts = await getPhoneContacts();
       final lowercaseQuery = query.toLowerCase();
 
       return contacts.where((contact) {
-        final name = contact.displayName?.toLowerCase() ?? '';
-        final phones = contact.phones
-                ?.map((p) => p.value?.toLowerCase() ?? '')
-                .join(' ') ??
-            '';
+        final name = contact.displayName.toLowerCase();
+        final phones =
+            contact.phones.map((p) => p.number.toLowerCase()).join(' ');
 
         return name.contains(lowercaseQuery) || phones.contains(lowercaseQuery);
       }).toList();
-    } catch (e) {
-      dev.log('❌ Error searching contacts: $e');
+    } on Object catch (e) {
+      dev.log('Error searching contacts: $e');
       return [];
     }
   }
 
-  /// Validate email address
-  bool isValidEmail(String email) => EmailValidator.validate(email);
-
   /// Format contact for display
   String formatContactDisplay(Contact contact) {
-    final name = contact.displayName ?? 'Unknown';
-    final phone = contact.phones?.isNotEmpty ?? false
-        ? contact.phones!.first.value
-        : null;
+    final name =
+        contact.displayName.isNotEmpty ? contact.displayName : 'Unknown';
+    final phone =
+        contact.phones.isNotEmpty ? contact.phones.first.number : null;
 
     if (phone != null) {
       return '$name ($phone)';
@@ -124,18 +118,14 @@ class ContactInvitationService {
 
   /// Get primary phone number from contact
   String? getPrimaryPhone(Contact contact) {
-    if (contact.phones?.isEmpty ?? false) return null;
-
-    // Return the first phone number
-    return contact.phones!.first.value;
+    if (contact.phones.isEmpty) return null;
+    return contact.phones.first.number;
   }
 
   /// Get primary email from contact
   String? getPrimaryEmail(Contact contact) {
-    if (contact.emails?.isEmpty ?? false) return null;
-
-    // Return the first email
-    return contact.emails!.first.value;
+    if (contact.emails.isEmpty) return null;
+    return contact.emails.first.address;
   }
 
   /// Create invitation data for a contact
@@ -149,7 +139,8 @@ class ContactInvitationService {
     final email = getPrimaryEmail(contact);
 
     return {
-      'contactName': contact.displayName ?? 'Unknown',
+      'contactName':
+          contact.displayName.isNotEmpty ? contact.displayName : 'Unknown',
       'phone': phone,
       'email': email,
       'groupName': groupName,
@@ -166,13 +157,11 @@ class ContactInvitationService {
     required String message,
   }) async {
     try {
-      dev.log('📱 Sending SMS invitation to $phoneNumber');
-      // In a real app, you'd integrate with an SMS service
-      // For now, we'll just log the action
+      dev.log('Sending SMS invitation to $phoneNumber');
       dev.log('SMS Message: $message');
       return true;
-    } catch (e) {
-      dev.log('❌ Error sending SMS: $e');
+    } on Object catch (e) {
+      dev.log('Error sending SMS: $e');
       return false;
     }
   }
@@ -184,40 +173,40 @@ class ContactInvitationService {
     required String message,
   }) async {
     try {
-      dev.log('📧 Sending email invitation to $email');
-      // In a real app, you'd integrate with an email service
-      // For now, we'll just log the action
+      dev.log('Sending email invitation to $email');
       dev.log('Email Subject: $subject');
       dev.log('Email Message: $message');
       return true;
-    } catch (e) {
-      dev.log('❌ Error sending email: $e');
+    } on Object catch (e) {
+      dev.log('Error sending email: $e');
       return false;
     }
   }
 
   /// Show permission denied dialog
   void showPermissionDeniedDialog(BuildContext context) {
-    showDialog(
-      context: context,
-      builder: (context) => AlertDialog(
-        title: const Text('Permission Required'),
-        content: const Text(
-          'To add members from your contacts, please grant contact permission in your device settings.',
+    unawaited(
+      showDialog(
+        context: context,
+        builder: (context) => AlertDialog(
+          title: const Text('Permission Required'),
+          content: const Text(
+            'To add members from your contacts, please grant contact permission in your device settings.',
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.pop(context),
+              child: const Text('Cancel'),
+            ),
+            TextButton(
+              onPressed: () {
+                Navigator.pop(context);
+                unawaited(openAppSettings());
+              },
+              child: const Text('Open Settings'),
+            ),
+          ],
         ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(context),
-            child: const Text('Cancel'),
-          ),
-          TextButton(
-            onPressed: () {
-              Navigator.pop(context);
-              openAppSettings();
-            },
-            child: const Text('Open Settings'),
-          ),
-        ],
       ),
     );
   }

@@ -123,8 +123,7 @@ void main() {
                     ),
                     Chip(
                       label: const Text('Error'),
-                      backgroundColor:
-                          AppColors.error.withValues(alpha: 0.15),
+                      backgroundColor: AppColors.error.withValues(alpha: 0.15),
                     ),
                   ],
                 ),
@@ -159,21 +158,27 @@ void main() {
           ),
         );
 
-    testWidgets('Light theme swatch', (tester) async {
-      await tester.pumpWidget(themed(testLight, buildSwatch()));
-      await expectLater(
-        find.byType(MaterialApp),
-        matchesGoldenFile('goldens/light_theme_swatch.png'),
-      );
-    });
+    testWidgets(
+      'Light theme swatch',
+      (tester) async {
+        await tester.pumpWidget(themed(testLight, buildSwatch()));
+        await expectLater(
+          find.byType(MaterialApp),
+          matchesGoldenFile('goldens/light_theme_swatch.png'),
+        );
+      },
+    );
 
-    testWidgets('Dark theme swatch', (tester) async {
-      await tester.pumpWidget(themed(testDark, buildSwatch()));
-      await expectLater(
-        find.byType(MaterialApp),
-        matchesGoldenFile('goldens/dark_theme_swatch.png'),
-      );
-    });
+    testWidgets(
+      'Dark theme swatch',
+      (tester) async {
+        await tester.pumpWidget(themed(testDark, buildSwatch()));
+        await expectLater(
+          find.byType(MaterialApp),
+          matchesGoldenFile('goldens/dark_theme_swatch.png'),
+        );
+      },
+    );
   });
 
   // ─── Unit assertions on production theme factories ────────────────

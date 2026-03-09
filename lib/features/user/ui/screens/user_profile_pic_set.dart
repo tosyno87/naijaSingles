@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:developer';
 import 'dart:io';
 import 'dart:math' as math;
@@ -48,7 +49,7 @@ class _UserProfilePicState extends State<UserProfilePic>
     // Start animation after frame is built
     WidgetsBinding.instance.addPostFrameCallback((_) {
       if (mounted && _animationController != null) {
-        _animationController!.forward();
+        unawaited(_animationController!.forward());
       }
     });
   }
@@ -167,13 +168,15 @@ class _UserProfilePicState extends State<UserProfilePic>
                   onPressed: canContinue
                       ? () {
                           log('userdata is ${userData.toString()}');
-                          Navigator.pushNamed(
-                            context,
-                            RouteName.allowLocationScreen,
-                            arguments: {
-                              'userData': userData,
-                              'profilePic': photos[selectedPhotoIndex],
-                            },
+                          unawaited(
+                            Navigator.pushNamed(
+                              context,
+                              RouteName.allowLocationScreen,
+                              arguments: {
+                                'userData': userData,
+                                'profilePic': photos[selectedPhotoIndex],
+                              },
+                            ),
                           );
                         }
                       : null,
@@ -371,8 +374,7 @@ class _UserProfilePicState extends State<UserProfilePic>
                         selectedPhotoIndex = index;
                       });
                     } else {
-                      // Add new photo
-                      _pickImage(index);
+                      unawaited(_pickImage(index));
                     }
                   },
                   child: Container(
@@ -520,7 +522,7 @@ class DashedBorderPainter extends CustomPainter {
       ..style = PaintingStyle.stroke;
 
     // Draw top line
-    _drawDashedLine(canvas, paint, const Offset(0, 0), Offset(size.width, 0));
+    _drawDashedLine(canvas, paint, Offset.zero, Offset(size.width, 0));
 
     // Draw right line
     _drawDashedLine(
@@ -539,7 +541,7 @@ class DashedBorderPainter extends CustomPainter {
     );
 
     // Draw left line
-    _drawDashedLine(canvas, paint, Offset(0, size.height), const Offset(0, 0));
+    _drawDashedLine(canvas, paint, Offset(0, size.height), Offset.zero);
   }
 
   void _drawDashedLine(Canvas canvas, Paint paint, Offset start, Offset end) {

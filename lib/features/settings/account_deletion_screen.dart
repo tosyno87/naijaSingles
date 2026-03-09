@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:developer';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
@@ -7,6 +8,7 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:pin_code_fields/pin_code_fields.dart';
 
 import '../../common/constants/app_colors.dart';
+import '../../common/constants/app_spacing.dart';
 import '../../common/data/repo/googlelogin_repo.dart';
 import '../../common/data/repo/phone_auth_repo.dart';
 import '../../common/routes/route_name.dart';
@@ -22,17 +24,18 @@ class AccountDeletionScreen extends StatefulWidget {
 class _AccountDeletionScreenState extends State<AccountDeletionScreen> {
   final FirebaseAuth _auth = FirebaseAuth.instance;
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
-  final GoogleLoginRepository _googleLoginRepository = GoogleLoginRepositoryImpl();
+  final GoogleLoginRepository _googleLoginRepository =
+      GoogleLoginRepositoryImpl();
   final _passwordController = TextEditingController();
   final _reasonController = TextEditingController();
 
   // Afropeep MVP Color Scheme
-  static const Color primaryColor = Color(0xFF008037); // Deep green
-  static const Color cardColor = Color(0xFFFFFFFF); // White for cards
-  static const Color errorColor = Color(0xFFFF5A5F); // Red for errors/danger
-  static const Color warningColor = Color(0xFFFF9500); // Orange for warnings
-  static final Color textPrimary = Colors.brown.shade800;
-  static final Color textSecondary = Colors.brown.shade600;
+  static const Color primaryColor = AppColors.primaryGreen;
+  static const Color cardColor = AppColors.cardColor;
+  static const Color errorColor = Color(0xFFFF5A5F);
+  static const Color warningColor = Color(0xFFFF9500);
+  static const Color textPrimary = AppColors.textPrimary;
+  static const Color textSecondary = AppColors.textSecondary;
   static final Color textLight = Colors.grey.shade600;
 
   bool _isDeleting = false;
@@ -81,12 +84,12 @@ class _AccountDeletionScreenState extends State<AccountDeletionScreen> {
     if (user != null) {
       final providerData = user.providerData;
       final isPhone = providerData.any((info) => info.providerId == 'phone');
-      final isEmail =
-          providerData.any((info) => info.providerId == 'password');
+      final isEmail = providerData.any((info) => info.providerId == 'password');
       final isGoogle =
           providerData.any((info) => info.providerId == 'google.com');
       log(
-          '📱 User auth provider check: providerData=${providerData.map((p) => p.providerId).toList()}, isPhone=$isPhone, isEmail=$isEmail, isGoogle=$isGoogle');
+        '📱 User auth provider check: providerData=${providerData.map((p) => p.providerId).toList()}, isPhone=$isPhone, isEmail=$isEmail, isGoogle=$isGoogle',
+      );
 
       if (_isPhoneUser != isPhone ||
           _isEmailUser != isEmail ||
@@ -97,7 +100,8 @@ class _AccountDeletionScreenState extends State<AccountDeletionScreen> {
           _isGoogleUser = isGoogle;
         });
         log(
-            '📱 Updated _isPhoneUser: $_isPhoneUser, _isEmailUser: $_isEmailUser, _isGoogleUser: $_isGoogleUser');
+          '📱 Updated _isPhoneUser: $_isPhoneUser, _isEmailUser: $_isEmailUser, _isGoogleUser: $_isGoogleUser',
+        );
       } else {
         _isPhoneUser = isPhone;
         _isEmailUser = isEmail;
@@ -115,7 +119,7 @@ class _AccountDeletionScreenState extends State<AccountDeletionScreen> {
           backgroundColor: AppColors.backgroundColor,
           elevation: 0,
           leading: IconButton(
-            icon: Icon(Icons.arrow_back_ios, color: textPrimary),
+            icon: const Icon(Icons.arrow_back_ios, color: textPrimary),
             onPressed: () => Navigator.pop(context),
           ),
           title: Text(
@@ -129,21 +133,21 @@ class _AccountDeletionScreenState extends State<AccountDeletionScreen> {
           centerTitle: true,
         ),
         body: SingleChildScrollView(
-          padding: const EdgeInsets.all(16),
+          padding: AppSpacing.pagePadding,
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               // Warning Header
               _buildWarningHeader(),
-              const SizedBox(height: 24),
+              const SizedBox(height: AppSpacing.lg),
 
               // What Gets Deleted
               _buildWhatGetsDeletedSection(),
-              const SizedBox(height: 24),
+              const SizedBox(height: AppSpacing.lg),
 
               // Deletion Reason
               _buildDeletionReasonSection(),
-              const SizedBox(height: 24),
+              const SizedBox(height: AppSpacing.lg),
 
               // Password/Phone/Other Confirmation (based on auth provider)
               if (_isPhoneUser)
@@ -152,15 +156,15 @@ class _AccountDeletionScreenState extends State<AccountDeletionScreen> {
                 _buildPasswordConfirmationSection()
               else
                 _buildOtherProviderSection(),
-              const SizedBox(height: 24),
+              const SizedBox(height: AppSpacing.lg),
 
               // Confirmation Checkboxes
               _buildConfirmationSection(),
-              const SizedBox(height: 24),
+              const SizedBox(height: AppSpacing.lg),
 
               // Delete Button
               _buildDeleteButton(),
-              const SizedBox(height: 16),
+              const SizedBox(height: AppSpacing.md),
 
               // Alternative Options
               _buildAlternativeOptionsSection(),
@@ -173,7 +177,7 @@ class _AccountDeletionScreenState extends State<AccountDeletionScreen> {
         padding: const EdgeInsets.all(20),
         decoration: BoxDecoration(
           color: errorColor.withValues(alpha: 0.05),
-          borderRadius: BorderRadius.circular(16),
+          borderRadius: BorderRadius.circular(AppSpacing.cardRadius),
           border: Border.all(color: errorColor.withValues(alpha: 0.3)),
         ),
         child: Column(
@@ -191,7 +195,7 @@ class _AccountDeletionScreenState extends State<AccountDeletionScreen> {
                 color: errorColor,
               ),
             ),
-            const SizedBox(height: 16),
+            const SizedBox(height: AppSpacing.md),
             Text(
               'Delete Your Account?',
               style: GoogleFonts.montserrat(
@@ -201,7 +205,7 @@ class _AccountDeletionScreenState extends State<AccountDeletionScreen> {
               ),
               textAlign: TextAlign.center,
             ),
-            const SizedBox(height: 8),
+            const SizedBox(height: AppSpacing.sm),
             Text(
               'This action cannot be undone. Once you delete your account, all your data will be permanently removed from our servers.',
               style: GoogleFonts.montserrat(
@@ -219,7 +223,7 @@ class _AccountDeletionScreenState extends State<AccountDeletionScreen> {
         padding: const EdgeInsets.all(20),
         decoration: BoxDecoration(
           color: cardColor,
-          borderRadius: BorderRadius.circular(16),
+          borderRadius: BorderRadius.circular(AppSpacing.cardRadius),
           boxShadow: [
             BoxShadow(
               color: Colors.black.withValues(alpha: 0.06),
@@ -234,7 +238,7 @@ class _AccountDeletionScreenState extends State<AccountDeletionScreen> {
             Row(
               children: [
                 const Icon(Icons.delete_forever, color: errorColor, size: 24),
-                const SizedBox(width: 12),
+                const SizedBox(width: AppSpacing.buttonRadius),
                 Text(
                   'What Gets Deleted',
                   style: GoogleFonts.montserrat(
@@ -245,24 +249,24 @@ class _AccountDeletionScreenState extends State<AccountDeletionScreen> {
                 ),
               ],
             ),
-            const SizedBox(height: 16),
+            const SizedBox(height: AppSpacing.md),
             _buildDeletionItem('👤 Your profile and photos'),
             _buildDeletionItem('💬 All your messages and conversations'),
             _buildDeletionItem('❤️ Your matches and likes'),
             _buildDeletionItem('📍 Location and preference data'),
             _buildDeletionItem('📊 Activity history and analytics'),
             _buildDeletionItem('💳 Subscription and payment history'),
-            const SizedBox(height: 16),
+            const SizedBox(height: AppSpacing.md),
             Container(
-              padding: const EdgeInsets.all(12),
+              padding: const EdgeInsets.all(AppSpacing.buttonRadius),
               decoration: BoxDecoration(
                 color: warningColor.withValues(alpha: 0.1),
-                borderRadius: BorderRadius.circular(8),
+                borderRadius: BorderRadius.circular(AppSpacing.sm),
               ),
               child: Row(
                 children: [
                   const Icon(Icons.info, color: warningColor, size: 20),
-                  const SizedBox(width: 8),
+                  const SizedBox(width: AppSpacing.sm),
                   Expanded(
                     child: Text(
                       'This process may take up to 30 days to complete as we ensure all data is properly removed from our systems.',
@@ -281,11 +285,11 @@ class _AccountDeletionScreenState extends State<AccountDeletionScreen> {
       );
 
   Widget _buildDeletionItem(String text) => Padding(
-        padding: const EdgeInsets.only(bottom: 8),
+        padding: const EdgeInsets.only(bottom: AppSpacing.sm),
         child: Row(
           children: [
             const Icon(Icons.check_circle, color: errorColor, size: 16),
-            const SizedBox(width: 8),
+            const SizedBox(width: AppSpacing.sm),
             Expanded(
               child: Text(
                 text,
@@ -303,7 +307,7 @@ class _AccountDeletionScreenState extends State<AccountDeletionScreen> {
         padding: const EdgeInsets.all(20),
         decoration: BoxDecoration(
           color: cardColor,
-          borderRadius: BorderRadius.circular(16),
+          borderRadius: BorderRadius.circular(AppSpacing.cardRadius),
           boxShadow: [
             BoxShadow(
               color: Colors.black.withValues(alpha: 0.06),
@@ -323,7 +327,7 @@ class _AccountDeletionScreenState extends State<AccountDeletionScreen> {
                 color: textPrimary,
               ),
             ),
-            const SizedBox(height: 8),
+            const SizedBox(height: AppSpacing.sm),
             Text(
               'Help us improve by telling us why you\'re deleting your account (optional)',
               style: GoogleFonts.montserrat(
@@ -331,10 +335,10 @@ class _AccountDeletionScreenState extends State<AccountDeletionScreen> {
                 color: textSecondary,
               ),
             ),
-            const SizedBox(height: 16),
+            const SizedBox(height: AppSpacing.md),
             ..._deletionReasons.map(_buildReasonTile),
             if (_selectedReason == 'Other') ...[
-              const SizedBox(height: 16),
+              const SizedBox(height: AppSpacing.md),
               TextFormField(
                 controller: _reasonController,
                 maxLines: 3,
@@ -342,14 +346,16 @@ class _AccountDeletionScreenState extends State<AccountDeletionScreen> {
                   hintText: 'Please tell us more...',
                   hintStyle: GoogleFonts.montserrat(color: textLight),
                   border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(12),
+                    borderRadius:
+                        BorderRadius.circular(AppSpacing.buttonRadius),
                     borderSide: BorderSide(color: Colors.grey.shade300),
                   ),
                   focusedBorder: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(12),
+                    borderRadius:
+                        BorderRadius.circular(AppSpacing.buttonRadius),
                     borderSide: const BorderSide(color: primaryColor, width: 2),
                   ),
-                  contentPadding: const EdgeInsets.all(16),
+                  contentPadding: const EdgeInsets.all(AppSpacing.md),
                 ),
                 style: GoogleFonts.montserrat(fontSize: 16, color: textPrimary),
               ),
@@ -364,12 +370,13 @@ class _AccountDeletionScreenState extends State<AccountDeletionScreen> {
     return GestureDetector(
       onTap: () => setState(() => _selectedReason = reason),
       child: Container(
-        margin: const EdgeInsets.only(bottom: 8),
-        padding: const EdgeInsets.all(12),
+        margin: const EdgeInsets.only(bottom: AppSpacing.sm),
+        padding: const EdgeInsets.all(AppSpacing.buttonRadius),
         decoration: BoxDecoration(
-          color:
-              isSelected ? primaryColor.withValues(alpha: 0.1) : Colors.transparent,
-          borderRadius: BorderRadius.circular(8),
+          color: isSelected
+              ? primaryColor.withValues(alpha: 0.1)
+              : Colors.transparent,
+          borderRadius: BorderRadius.circular(AppSpacing.sm),
           border: Border.all(
             color: isSelected ? primaryColor : Colors.grey.shade300,
             width: isSelected ? 2 : 1,
@@ -392,7 +399,7 @@ class _AccountDeletionScreenState extends State<AccountDeletionScreen> {
                   ? const Icon(Icons.check, color: Colors.white, size: 12)
                   : null,
             ),
-            const SizedBox(width: 12),
+            const SizedBox(width: AppSpacing.buttonRadius),
             Expanded(
               child: Text(
                 reason,
@@ -413,7 +420,7 @@ class _AccountDeletionScreenState extends State<AccountDeletionScreen> {
         padding: const EdgeInsets.all(20),
         decoration: BoxDecoration(
           color: cardColor,
-          borderRadius: BorderRadius.circular(16),
+          borderRadius: BorderRadius.circular(AppSpacing.cardRadius),
           boxShadow: [
             BoxShadow(
               color: Colors.black.withValues(alpha: 0.06),
@@ -433,7 +440,7 @@ class _AccountDeletionScreenState extends State<AccountDeletionScreen> {
                 color: textPrimary,
               ),
             ),
-            const SizedBox(height: 8),
+            const SizedBox(height: AppSpacing.sm),
             Text(
               'Enter your password to confirm account deletion',
               style: GoogleFonts.montserrat(
@@ -441,7 +448,7 @@ class _AccountDeletionScreenState extends State<AccountDeletionScreen> {
                 color: textSecondary,
               ),
             ),
-            const SizedBox(height: 16),
+            const SizedBox(height: AppSpacing.md),
             TextFormField(
               controller: _passwordController,
               obscureText: !_passwordVisible,
@@ -449,15 +456,17 @@ class _AccountDeletionScreenState extends State<AccountDeletionScreen> {
                 hintText: 'Enter your password',
                 hintStyle: GoogleFonts.montserrat(color: textLight),
                 border: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(12),
+                  borderRadius: BorderRadius.circular(AppSpacing.buttonRadius),
                   borderSide: BorderSide(color: Colors.grey.shade300),
                 ),
                 focusedBorder: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(12),
+                  borderRadius: BorderRadius.circular(AppSpacing.buttonRadius),
                   borderSide: const BorderSide(color: primaryColor, width: 2),
                 ),
-                contentPadding:
-                    const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                contentPadding: const EdgeInsets.symmetric(
+                  horizontal: AppSpacing.md,
+                  vertical: AppSpacing.buttonRadius,
+                ),
                 prefixIcon: const Icon(Icons.lock, color: primaryColor),
                 suffixIcon: IconButton(
                   icon: Icon(
@@ -478,7 +487,7 @@ class _AccountDeletionScreenState extends State<AccountDeletionScreen> {
         padding: const EdgeInsets.all(20),
         decoration: BoxDecoration(
           color: cardColor,
-          borderRadius: BorderRadius.circular(16),
+          borderRadius: BorderRadius.circular(AppSpacing.cardRadius),
           boxShadow: [
             BoxShadow(
               color: Colors.black.withValues(alpha: 0.06),
@@ -493,8 +502,8 @@ class _AccountDeletionScreenState extends State<AccountDeletionScreen> {
             Row(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Icon(Icons.login, color: primaryColor, size: 22),
-                const SizedBox(width: 8),
+                const Icon(Icons.login, color: primaryColor, size: 22),
+                const SizedBox(width: AppSpacing.sm),
                 Expanded(
                   child: Text(
                     'Signed in with Google or another provider',
@@ -507,7 +516,7 @@ class _AccountDeletionScreenState extends State<AccountDeletionScreen> {
                 ),
               ],
             ),
-            const SizedBox(height: 12),
+            const SizedBox(height: AppSpacing.buttonRadius),
             Text(
               _isGoogleUser
                   ? 'If you signed in a while ago, we may ask you to confirm with Google before deleting.'
@@ -518,14 +527,14 @@ class _AccountDeletionScreenState extends State<AccountDeletionScreen> {
                 height: 1.4,
               ),
             ),
-            const SizedBox(height: 16),
+            const SizedBox(height: AppSpacing.md),
             SizedBox(
               width: double.infinity,
               child: OutlinedButton.icon(
                 onPressed: () async {
                   await _auth.signOut();
                   if (mounted) {
-                    Navigator.of(context).pushNamedAndRemoveUntil(
+                    await Navigator.of(context).pushNamedAndRemoveUntil(
                       RouteName.welcomeScreen,
                       (route) => false,
                     );
@@ -543,10 +552,13 @@ class _AccountDeletionScreenState extends State<AccountDeletionScreen> {
                 ),
                 style: OutlinedButton.styleFrom(
                   foregroundColor: primaryColor,
-                  side: BorderSide(color: primaryColor),
-                  padding: const EdgeInsets.symmetric(vertical: 12),
+                  side: const BorderSide(color: primaryColor),
+                  padding: const EdgeInsets.symmetric(
+                    vertical: AppSpacing.buttonRadius,
+                  ),
                   shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(12),
+                    borderRadius:
+                        BorderRadius.circular(AppSpacing.buttonRadius),
                   ),
                 ),
               ),
@@ -559,7 +571,7 @@ class _AccountDeletionScreenState extends State<AccountDeletionScreen> {
         padding: const EdgeInsets.all(20),
         decoration: BoxDecoration(
           color: cardColor,
-          borderRadius: BorderRadius.circular(16),
+          borderRadius: BorderRadius.circular(AppSpacing.cardRadius),
           boxShadow: [
             BoxShadow(
               color: Colors.black.withValues(alpha: 0.06),
@@ -579,7 +591,7 @@ class _AccountDeletionScreenState extends State<AccountDeletionScreen> {
                 color: textPrimary,
               ),
             ),
-            const SizedBox(height: 16),
+            const SizedBox(height: AppSpacing.md),
             _buildCheckboxTile(
               value: _understandConsequences,
               onChanged: (value) =>
@@ -587,7 +599,7 @@ class _AccountDeletionScreenState extends State<AccountDeletionScreen> {
               title: 'I understand that this action cannot be undone',
               subtitle: 'All my data will be permanently deleted',
             ),
-            const SizedBox(height: 12),
+            const SizedBox(height: AppSpacing.buttonRadius),
             _buildCheckboxTile(
               value: _confirmDeletion,
               onChanged: (value) =>
@@ -626,7 +638,7 @@ class _AccountDeletionScreenState extends State<AccountDeletionScreen> {
                     color: textPrimary,
                   ),
                 ),
-                const SizedBox(height: 4),
+                const SizedBox(height: AppSpacing.xs),
                 Text(
                   subtitle,
                   style: GoogleFonts.montserrat(
@@ -643,9 +655,8 @@ class _AccountDeletionScreenState extends State<AccountDeletionScreen> {
   Widget _buildDeleteButton() {
     // Phone and "other" (e.g. Google) users don't need password; email users do
     final isOtherProvider = !_isPhoneUser && !_isEmailUser;
-    final passwordValid = _isPhoneUser ||
-        isOtherProvider ||
-        _passwordController.text.isNotEmpty;
+    final passwordValid =
+        _isPhoneUser || isOtherProvider || _passwordController.text.isNotEmpty;
 
     final canDelete =
         passwordValid && _understandConsequences && _confirmDeletion;
@@ -669,9 +680,9 @@ class _AccountDeletionScreenState extends State<AccountDeletionScreen> {
           foregroundColor: Colors.white,
           disabledBackgroundColor: Colors.grey.shade400,
           disabledForegroundColor: Colors.white,
-          padding: const EdgeInsets.symmetric(vertical: 16),
+          padding: const EdgeInsets.symmetric(vertical: AppSpacing.md),
           shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(12),
+            borderRadius: BorderRadius.circular(AppSpacing.buttonRadius),
           ),
           elevation: canDelete && !_isDeleting ? 2 : 0,
         ),
@@ -687,7 +698,7 @@ class _AccountDeletionScreenState extends State<AccountDeletionScreen> {
                       strokeWidth: 2,
                     ),
                   ),
-                  const SizedBox(width: 12),
+                  const SizedBox(width: AppSpacing.buttonRadius),
                   Text(
                     'Deleting Account...',
                     style: GoogleFonts.montserrat(
@@ -709,10 +720,10 @@ class _AccountDeletionScreenState extends State<AccountDeletionScreen> {
   }
 
   Widget _buildAlternativeOptionsSection() => Container(
-        padding: const EdgeInsets.all(16),
+        padding: AppSpacing.cardPadding,
         decoration: BoxDecoration(
           color: primaryColor.withValues(alpha: 0.05),
-          borderRadius: BorderRadius.circular(12),
+          borderRadius: BorderRadius.circular(AppSpacing.buttonRadius),
           border: Border.all(color: primaryColor.withValues(alpha: 0.2)),
         ),
         child: Column(
@@ -721,7 +732,7 @@ class _AccountDeletionScreenState extends State<AccountDeletionScreen> {
             Row(
               children: [
                 const Icon(Icons.lightbulb, color: primaryColor, size: 20),
-                const SizedBox(width: 8),
+                const SizedBox(width: AppSpacing.sm),
                 Text(
                   'Consider These Alternatives',
                   style: GoogleFonts.montserrat(
@@ -732,7 +743,7 @@ class _AccountDeletionScreenState extends State<AccountDeletionScreen> {
                 ),
               ],
             ),
-            const SizedBox(height: 12),
+            const SizedBox(height: AppSpacing.buttonRadius),
             _buildAlternativeItem(
               '📴 Temporarily deactivate your account instead',
             ),
@@ -744,7 +755,7 @@ class _AccountDeletionScreenState extends State<AccountDeletionScreen> {
       );
 
   Widget _buildAlternativeItem(String text) => Padding(
-        padding: const EdgeInsets.only(bottom: 4),
+        padding: const EdgeInsets.only(bottom: AppSpacing.xs),
         child: Text(
           text,
           style: GoogleFonts.montserrat(
@@ -776,7 +787,8 @@ class _AccountDeletionScreenState extends State<AccountDeletionScreen> {
           providerData.any((info) => info.providerId == 'google.com');
 
       log(
-          '📱 Delete account: isPhoneUser=$isPhoneUser, isEmailUser=$isEmailUser, isGoogleUser=$isGoogleUser');
+        '📱 Delete account: isPhoneUser=$isPhoneUser, isEmailUser=$isEmailUser, isGoogleUser=$isGoogleUser',
+      );
 
       // Re-authenticate based on auth provider. Order is critical: cleanup Firestore/Storage
       // while user is still authenticated, then delete Auth user, then sign out and show success.
@@ -790,7 +802,7 @@ class _AccountDeletionScreenState extends State<AccountDeletionScreen> {
           await _auth.signOut();
           if (mounted) _showDeletionSuccessDialog();
           return;
-        } catch (e) {
+        } on Object catch (e) {
           if (e is FirebaseAuthException && e.code == 'requires-recent-login') {
             log('⚠️ Requires recent login - showing phone re-auth');
             AccountDeletionScope.inProgress = false;
@@ -816,7 +828,7 @@ class _AccountDeletionScreenState extends State<AccountDeletionScreen> {
           await _auth.signOut();
           if (mounted) _showDeletionSuccessDialog();
           return;
-        } catch (_) {
+        } on Object catch (_) {
           AccountDeletionScope.inProgress = false;
           rethrow;
         }
@@ -830,7 +842,7 @@ class _AccountDeletionScreenState extends State<AccountDeletionScreen> {
           await _auth.signOut();
           if (mounted) _showDeletionSuccessDialog();
           return;
-        } catch (e) {
+        } on Object catch (e) {
           if (e is FirebaseAuthException && e.code == 'requires-recent-login') {
             if (isGoogleUser) {
               await _handleGoogleReauthAndRetryDelete(user);
@@ -843,7 +855,7 @@ class _AccountDeletionScreenState extends State<AccountDeletionScreen> {
               _showSnackBar(
                 'For security, please sign out and sign back in, then return to Delete Account to try again.',
               );
-              showDialog(
+              await showDialog(
                 context: context,
                 builder: (ctx) => AlertDialog(
                   title: const Text('Re-authentication required'),
@@ -860,7 +872,7 @@ class _AccountDeletionScreenState extends State<AccountDeletionScreen> {
                         Navigator.pop(ctx);
                         await _auth.signOut();
                         if (mounted) {
-                          Navigator.of(context).pushNamedAndRemoveUntil(
+                          await Navigator.of(context).pushNamedAndRemoveUntil(
                             RouteName.welcomeScreen,
                             (route) => false,
                           );
@@ -878,7 +890,7 @@ class _AccountDeletionScreenState extends State<AccountDeletionScreen> {
           rethrow;
         }
       }
-    } catch (e) {
+    } on Object catch (e) {
       AccountDeletionScope.inProgress = false;
       log('❌ Error deleting account: $e');
       log('❌ Error type: ${e.runtimeType}');
@@ -913,7 +925,7 @@ class _AccountDeletionScreenState extends State<AccountDeletionScreen> {
             backgroundColor: errorColor,
             behavior: SnackBarBehavior.floating,
             shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(8),
+              borderRadius: BorderRadius.circular(AppSpacing.sm),
             ),
             duration: const Duration(seconds: 5),
           ),
@@ -925,45 +937,58 @@ class _AccountDeletionScreenState extends State<AccountDeletionScreen> {
   /// Shows dialog to re-authenticate phone user (send OTP then verify).
   void _showPhoneReauthDialog(User user) {
     final phone = user.phoneNumber ?? '';
-    showDialog(
-      context: context,
-      barrierDismissible: false,
-      builder: (ctx) => AlertDialog(
-        backgroundColor: cardColor,
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-        title: Text(
-          'Re-authentication required',
-          style: GoogleFonts.montserrat(
-            fontWeight: FontWeight.w600,
-            color: textPrimary,
+    unawaited(
+      showDialog(
+        context: context,
+        barrierDismissible: false,
+        builder: (ctx) => AlertDialog(
+          backgroundColor: cardColor,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(AppSpacing.cardRadius),
           ),
+          title: Text(
+            'Re-authentication required',
+            style: GoogleFonts.montserrat(
+              fontWeight: FontWeight.w600,
+              color: textPrimary,
+            ),
+          ),
+          content: Text(
+            'For security, we need to verify your phone number before deleting your account. We\'ll send a code to $phone.',
+            style: GoogleFonts.montserrat(color: textSecondary, fontSize: 14),
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.pop(ctx),
+              child: Text(
+                'Cancel',
+                style: GoogleFonts.montserrat(color: textSecondary),
+              ),
+            ),
+            ElevatedButton(
+              onPressed: _isSendingReauthCode
+                  ? null
+                  : () async {
+                      Navigator.pop(ctx);
+                      await _sendReauthCode(user);
+                    },
+              style: ElevatedButton.styleFrom(backgroundColor: primaryColor),
+              child: _isSendingReauthCode
+                  ? const SizedBox(
+                      width: 20,
+                      height: 20,
+                      child: CircularProgressIndicator(
+                        strokeWidth: 2,
+                        color: Colors.white,
+                      ),
+                    )
+                  : Text(
+                      'Send code',
+                      style: GoogleFonts.montserrat(color: Colors.white),
+                    ),
+            ),
+          ],
         ),
-        content: Text(
-          'For security, we need to verify your phone number before deleting your account. We\'ll send a code to $phone.',
-          style: GoogleFonts.montserrat(color: textSecondary, fontSize: 14),
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(ctx),
-            child: Text('Cancel', style: GoogleFonts.montserrat(color: textSecondary)),
-          ),
-          ElevatedButton(
-            onPressed: _isSendingReauthCode
-                ? null
-                : () async {
-                    Navigator.pop(ctx);
-                    await _sendReauthCode(user);
-                  },
-            style: ElevatedButton.styleFrom(backgroundColor: primaryColor),
-            child: _isSendingReauthCode
-                ? const SizedBox(
-                    width: 20,
-                    height: 20,
-                    child: CircularProgressIndicator(strokeWidth: 2, color: Colors.white),
-                  )
-                : Text('Send code', style: GoogleFonts.montserrat(color: Colors.white)),
-          ),
-        ],
       ),
     );
   }
@@ -971,7 +996,11 @@ class _AccountDeletionScreenState extends State<AccountDeletionScreen> {
   Future<void> _sendReauthCode(User user) async {
     final phone = user.phoneNumber?.trim();
     if (phone == null || phone.isEmpty) {
-      if (mounted) _showSnackBar('Phone number not found. Please sign out and sign back in.');
+      if (mounted) {
+        _showSnackBar(
+          'Phone number not found. Please sign out and sign back in.',
+        );
+      }
       return;
     }
     setState(() => _isSendingReauthCode = true);
@@ -984,9 +1013,11 @@ class _AccountDeletionScreenState extends State<AccountDeletionScreen> {
           try {
             await user.reauthenticateWithCredential(credential);
             await _performDeletionAfterReauth(user);
-          } catch (e) {
+          } on Object catch (e) {
             log('❌ Re-auth verificationCompleted error: $e');
-            if (mounted) _showSnackBar('Verification failed. Please try again.');
+            if (mounted) {
+              _showSnackBar('Verification failed. Please try again.');
+            }
           }
         },
         codeSent: (String verificationId, int? resendToken) {
@@ -1006,7 +1037,7 @@ class _AccountDeletionScreenState extends State<AccountDeletionScreen> {
         },
         codeAutoRetrievalTimeout: (String verificationId) {},
       );
-    } catch (e) {
+    } on Object catch (e) {
       log('❌ Send reauth code error: $e');
       if (mounted) {
         setState(() => _isSendingReauthCode = false);
@@ -1017,74 +1048,90 @@ class _AccountDeletionScreenState extends State<AccountDeletionScreen> {
 
   void _showReauthOtpDialog(User user) {
     _reauthOtpController.clear();
-    showDialog(
-      context: context,
-      barrierDismissible: false,
-      builder: (ctx) => AlertDialog(
-        backgroundColor: cardColor,
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-        title: Text(
-          'Enter verification code',
-          style: GoogleFonts.montserrat(fontWeight: FontWeight.w600, color: textPrimary),
-        ),
-        content: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Text(
-              'Enter the 6-digit code sent to ${user.phoneNumber}',
-              style: GoogleFonts.montserrat(color: textSecondary, fontSize: 14),
+    unawaited(
+      showDialog(
+        context: context,
+        barrierDismissible: false,
+        builder: (ctx) => AlertDialog(
+          backgroundColor: cardColor,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(AppSpacing.cardRadius),
+          ),
+          title: Text(
+            'Enter verification code',
+            style: GoogleFonts.montserrat(
+              fontWeight: FontWeight.w600,
+              color: textPrimary,
             ),
-            const SizedBox(height: 16),
-            PinCodeTextField(
-              appContext: context,
-              length: 6,
-              controller: _reauthOtpController,
-              keyboardType: TextInputType.number,
-              pinTheme: PinTheme(
-                shape: PinCodeFieldShape.box,
-                borderRadius: BorderRadius.circular(8),
-                fieldHeight: 48,
-                fieldWidth: 36,
-                activeColor: primaryColor,
-                inactiveColor: textLight,
-                selectedColor: primaryColor,
+          ),
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Text(
+                'Enter the 6-digit code sent to ${user.phoneNumber}',
+                style:
+                    GoogleFonts.montserrat(color: textSecondary, fontSize: 14),
               ),
-              onChanged: (_) {},
+              const SizedBox(height: AppSpacing.md),
+              PinCodeTextField(
+                appContext: context,
+                length: 6,
+                controller: _reauthOtpController,
+                keyboardType: TextInputType.number,
+                pinTheme: PinTheme(
+                  shape: PinCodeFieldShape.box,
+                  borderRadius: BorderRadius.circular(AppSpacing.sm),
+                  fieldHeight: 48,
+                  fieldWidth: 36,
+                  activeColor: primaryColor,
+                  inactiveColor: textLight,
+                  selectedColor: primaryColor,
+                ),
+                onChanged: (_) {},
+              ),
+            ],
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.pop(ctx),
+              child: Text(
+                'Cancel',
+                style: GoogleFonts.montserrat(color: textSecondary),
+              ),
+            ),
+            ElevatedButton(
+              onPressed: () async {
+                final code = _reauthOtpController.text.trim();
+                final vid = _verificationIdForReauth;
+                if (code.length != 6 || vid == null) {
+                  if (mounted) _showSnackBar('Please enter the 6-digit code.');
+                  return;
+                }
+                Navigator.pop(ctx);
+                setState(() => _isDeleting = true);
+                try {
+                  final credential = PhoneAuthProvider.credential(
+                    verificationId: vid,
+                    smsCode: code,
+                  );
+                  await user.reauthenticateWithCredential(credential);
+                  await _performDeletionAfterReauth(user);
+                } on Object catch (e) {
+                  log('❌ Re-auth OTP error: $e');
+                  setState(() => _isDeleting = false);
+                  if (mounted) {
+                    _showSnackBar('Invalid or expired code. Please try again.');
+                  }
+                }
+              },
+              style: ElevatedButton.styleFrom(backgroundColor: primaryColor),
+              child: Text(
+                'Verify and delete',
+                style: GoogleFonts.montserrat(color: Colors.white),
+              ),
             ),
           ],
         ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(ctx),
-            child: Text('Cancel', style: GoogleFonts.montserrat(color: textSecondary)),
-          ),
-          ElevatedButton(
-            onPressed: () async {
-              final code = _reauthOtpController.text.trim();
-              final vid = _verificationIdForReauth;
-              if (code.length != 6 || vid == null) {
-                if (mounted) _showSnackBar('Please enter the 6-digit code.');
-                return;
-              }
-              Navigator.pop(ctx);
-              setState(() => _isDeleting = true);
-              try {
-                final credential = PhoneAuthProvider.credential(
-                  verificationId: vid,
-                  smsCode: code,
-                );
-                await user.reauthenticateWithCredential(credential);
-                await _performDeletionAfterReauth(user);
-              } catch (e) {
-                log('❌ Re-auth OTP error: $e');
-                setState(() => _isDeleting = false);
-                if (mounted) _showSnackBar('Invalid or expired code. Please try again.');
-              }
-            },
-            style: ElevatedButton.styleFrom(backgroundColor: primaryColor),
-            child: Text('Verify and delete', style: GoogleFonts.montserrat(color: Colors.white)),
-          ),
-        ],
       ),
     );
   }
@@ -1103,11 +1150,13 @@ class _AccountDeletionScreenState extends State<AccountDeletionScreen> {
       await user.delete();
       await _auth.signOut();
       if (mounted) _showDeletionSuccessDialog();
-    } catch (e) {
+    } on Object catch (e) {
       log('❌ Error in _performDeletionAfterReauth: $e');
       AccountDeletionScope.inProgress = false;
       setState(() => _isDeleting = false);
-      if (mounted) _showSnackBar('Failed to complete deletion. Please try again.');
+      if (mounted) {
+        _showSnackBar('Failed to complete deletion. Please try again.');
+      }
     }
   }
 
@@ -1117,7 +1166,8 @@ class _AccountDeletionScreenState extends State<AccountDeletionScreen> {
         _showSnackBar('Re-verifying your account with Google...');
       }
 
-      final credential = await _googleLoginRepository.getGoogleReauthCredential();
+      final credential =
+          await _googleLoginRepository.getGoogleReauthCredential();
       if (credential == null) {
         AccountDeletionScope.inProgress = false;
         if (mounted) {
@@ -1129,7 +1179,7 @@ class _AccountDeletionScreenState extends State<AccountDeletionScreen> {
 
       await user.reauthenticateWithCredential(credential);
       await _performDeletionAfterReauth(user, authProvider: 'google');
-    } catch (e) {
+    } on Object catch (e) {
       AccountDeletionScope.inProgress = false;
       if (mounted) {
         setState(() => _isDeleting = false);
@@ -1142,129 +1192,161 @@ class _AccountDeletionScreenState extends State<AccountDeletionScreen> {
   void _showSnackBar(String message) {
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
-        content: Text(message, style: GoogleFonts.montserrat(color: Colors.white)),
+        content:
+            Text(message, style: GoogleFonts.montserrat(color: Colors.white)),
         backgroundColor: errorColor,
         behavior: SnackBarBehavior.floating,
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
-        duration: const Duration(seconds: 4),
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(AppSpacing.sm),
+        ),
       ),
     );
   }
 
   void _logDeletionAndSignOut(User user, {String? authProvider}) {
     try {
-      _firestore.collection('accountDeletions').add({
-        'userId': user.uid,
-        'email': user.email,
-        'phoneNumber': user.phoneNumber,
-        'authProvider': authProvider ?? 'unknown',
-        'reason': _selectedReason,
-        'customReason': _selectedReason == 'Other' ? _reasonController.text : null,
-        'requestedAt': FieldValue.serverTimestamp(),
-        'status': 'completed',
-        'deletedAt': FieldValue.serverTimestamp(),
-      });
-    } catch (e) {
+      unawaited(
+        _firestore.collection('accountDeletions').add({
+          'userId': user.uid,
+          'email': user.email,
+          'phoneNumber': user.phoneNumber,
+          'authProvider': authProvider ?? 'unknown',
+          'reason': _selectedReason,
+          'customReason':
+              _selectedReason == 'Other' ? _reasonController.text : null,
+          'requestedAt': FieldValue.serverTimestamp(),
+          'status': 'completed',
+          'deletedAt': FieldValue.serverTimestamp(),
+        }),
+      );
+    } on Object catch (e) {
       log('⚠️ Could not log deletion request: $e');
     }
   }
 
   void _showDeletionSuccessDialog() {
-    showDialog(
-      context: context,
-      barrierDismissible: false,
-      builder: (context) => AlertDialog(
-        backgroundColor: cardColor,
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
-        elevation: 8,
-        contentPadding: const EdgeInsets.all(24),
-        title: Column(
-          children: [
-            Container(
-              width: 80,
-              height: 80,
-              decoration: BoxDecoration(
-                color: errorColor.withValues(alpha: 0.1),
-                shape: BoxShape.circle,
+    unawaited(
+      showDialog(
+        context: context,
+        barrierDismissible: false,
+        builder: (context) => AlertDialog(
+          backgroundColor: cardColor,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(AppSpacing.chipRadius),
+          ),
+          elevation: 8,
+          contentPadding: const EdgeInsets.all(AppSpacing.lg),
+          title: Column(
+            children: [
+              Container(
+                width: 80,
+                height: 80,
+                decoration: BoxDecoration(
+                  color: errorColor.withValues(alpha: 0.1),
+                  shape: BoxShape.circle,
+                ),
+                child: const Icon(
+                  Icons.delete_forever,
+                  color: errorColor,
+                  size: 40,
+                ),
               ),
-              child: const Icon(Icons.delete_forever, color: errorColor, size: 40),
-            ),
-            const SizedBox(height: 16),
-            Text(
-              'Account Deleted',
-              style: GoogleFonts.montserrat(
-                fontWeight: FontWeight.bold,
-                fontSize: 20,
-                color: textPrimary,
+              const SizedBox(height: AppSpacing.md),
+              Text(
+                'Account Deleted',
+                style: GoogleFonts.montserrat(
+                  fontWeight: FontWeight.bold,
+                  fontSize: 20,
+                  color: textPrimary,
+                ),
               ),
-            ),
-          ],
-        ),
-        content: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Text(
-              'Your account has been permanently deleted. All your data, matches, messages, and photos have been removed from our servers.',
-              style: GoogleFonts.montserrat(
-                color: textSecondary,
-                fontSize: 16,
-                height: 1.5,
+            ],
+          ),
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Text(
+                'Your account has been permanently deleted. All your data, matches, messages, and photos have been removed from our servers.',
+                style: GoogleFonts.montserrat(
+                  color: textSecondary,
+                  fontSize: 16,
+                  height: 1.5,
+                ),
+                textAlign: TextAlign.center,
               ),
-              textAlign: TextAlign.center,
-            ),
-            const SizedBox(height: 16),
-            Container(
-              padding: const EdgeInsets.all(12),
-              decoration: BoxDecoration(
-                color: errorColor.withValues(alpha: 0.05),
-                borderRadius: BorderRadius.circular(12),
-                border: Border.all(color: errorColor.withValues(alpha: 0.2)),
-              ),
-              child: Row(
-                children: [
-                  const Icon(Icons.warning_amber_rounded, color: errorColor, size: 20),
-                  const SizedBox(width: 8),
-                  Expanded(
-                    child: Text(
-                      'This action cannot be undone. You will need to create a new account to use the app again.',
-                      style: GoogleFonts.montserrat(
-                        color: textSecondary,
-                        fontSize: 13,
-                        fontWeight: FontWeight.w500,
+              const SizedBox(height: AppSpacing.md),
+              Container(
+                padding: const EdgeInsets.all(AppSpacing.buttonRadius),
+                decoration: BoxDecoration(
+                  color: errorColor.withValues(alpha: 0.05),
+                  borderRadius: BorderRadius.circular(AppSpacing.buttonRadius),
+                  border: Border.all(color: errorColor.withValues(alpha: 0.2)),
+                ),
+                child: Row(
+                  children: [
+                    const Icon(
+                      Icons.warning_amber_rounded,
+                      color: errorColor,
+                      size: 20,
+                    ),
+                    const SizedBox(width: AppSpacing.sm),
+                    Expanded(
+                      child: Text(
+                        'This action cannot be undone. You will need to create a new account to use the app again.',
+                        style: GoogleFonts.montserrat(
+                          color: textSecondary,
+                          fontSize: 13,
+                          fontWeight: FontWeight.w500,
+                        ),
                       ),
                     ),
+                  ],
+                ),
+              ),
+            ],
+          ),
+          actions: [
+            SizedBox(
+              width: double.infinity,
+              child: ElevatedButton(
+                onPressed: () {
+                  AccountDeletionScope.inProgress = false;
+                  unawaited(
+                    Navigator.of(context).pushNamedAndRemoveUntil(
+                      RouteName.welcomeScreen,
+                      (route) => false,
+                    ),
+                  );
+                },
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: primaryColor,
+                  foregroundColor: Colors.white,
+                  padding: const EdgeInsets.symmetric(
+                    vertical: AppSpacing.buttonRadius,
                   ),
-                ],
+                  shape: RoundedRectangleBorder(
+                    borderRadius:
+                        BorderRadius.circular(AppSpacing.buttonRadius),
+                  ),
+                  elevation: 0,
+                ),
+                child: Text(
+                  'Got it',
+                  style: GoogleFonts.montserrat(
+                    fontWeight: FontWeight.w600,
+                    fontSize: 16,
+                  ),
+                ),
               ),
             ),
           ],
-        ),
-        actions: [
-          SizedBox(
-            width: double.infinity,
-            child: ElevatedButton(
-              onPressed: () {
-                AccountDeletionScope.inProgress = false;
-                Navigator.of(context).pushNamedAndRemoveUntil(
-                  RouteName.welcomeScreen,
-                  (route) => false,
-                );
-              },
-              style: ElevatedButton.styleFrom(
-                backgroundColor: primaryColor,
-                foregroundColor: Colors.white,
-                padding: const EdgeInsets.symmetric(vertical: 12),
-                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-                elevation: 0,
-              ),
-              child: Text(
-                'Got it',
-                style: GoogleFonts.montserrat(fontWeight: FontWeight.w600, fontSize: 16),
-              ),
-            ),
+          actionsPadding: const EdgeInsets.fromLTRB(
+            AppSpacing.lg,
+            0,
+            AppSpacing.lg,
+            AppSpacing.lg,
           ),
-        ],
-        actionsPadding: const EdgeInsets.fromLTRB(24, 0, 24, 24),
+        ),
       ),
     );
   }
@@ -1278,7 +1360,7 @@ class _AccountDeletionScreenState extends State<AccountDeletionScreen> {
       await repo.deleteUser(user);
 
       log('✅ User data cleanup completed');
-    } catch (e) {
+    } on Object catch (e) {
       log('⚠️ Error during user data cleanup: $e');
       log('⚠️ Cleanup error type: ${e.runtimeType}');
       // Re-throw so we can handle it properly in the calling method
@@ -1290,7 +1372,7 @@ class _AccountDeletionScreenState extends State<AccountDeletionScreen> {
         padding: const EdgeInsets.all(20),
         decoration: BoxDecoration(
           color: cardColor,
-          borderRadius: BorderRadius.circular(16),
+          borderRadius: BorderRadius.circular(AppSpacing.cardRadius),
           boxShadow: [
             BoxShadow(
               color: Colors.black.withValues(alpha: 0.06),
@@ -1310,7 +1392,7 @@ class _AccountDeletionScreenState extends State<AccountDeletionScreen> {
                 color: textPrimary,
               ),
             ),
-            const SizedBox(height: 8),
+            const SizedBox(height: AppSpacing.sm),
             Text(
               'Since you signed up with phone, your account will be deleted immediately after confirmation.',
               style: GoogleFonts.montserrat(
@@ -1318,18 +1400,18 @@ class _AccountDeletionScreenState extends State<AccountDeletionScreen> {
                 color: textSecondary,
               ),
             ),
-            const SizedBox(height: 16),
+            const SizedBox(height: AppSpacing.md),
             Container(
-              padding: const EdgeInsets.all(12),
+              padding: const EdgeInsets.all(AppSpacing.buttonRadius),
               decoration: BoxDecoration(
                 color: warningColor.withValues(alpha: 0.1),
-                borderRadius: BorderRadius.circular(8),
+                borderRadius: BorderRadius.circular(AppSpacing.sm),
                 border: Border.all(color: warningColor.withValues(alpha: 0.3)),
               ),
               child: Row(
                 children: [
                   const Icon(Icons.info_outline, color: warningColor, size: 20),
-                  const SizedBox(width: 8),
+                  const SizedBox(width: AppSpacing.sm),
                   Expanded(
                     child: Text(
                       'If you signed in a while ago, we\'ll send a verification code to your phone before deleting.',

@@ -5,7 +5,6 @@ import 'dart:io';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_storage/firebase_storage.dart';
-import 'package:flutter/material.dart';
 
 import '../../../../common/utils/app_logger.dart';
 import '../../bloc/onboarding_data.dart';
@@ -26,9 +25,6 @@ class OnboardingRepository {
         .set(essentialData, SetOptions(merge: true));
 
     await FirebaseFirestore.instance.collection('users').doc(userId).update({
-      'onboardingCompleted': true,
-      'profileSetupComplete': true,
-      'isProfileComplete': true,
       'updatedAt': FieldValue.serverTimestamp(),
     });
 
@@ -88,32 +84,28 @@ class OnboardingRepository {
 
         final snapshot = await uploadTask.timeout(
           const Duration(minutes: 2),
-          onTimeout: () =>
-              throw TimeoutException('Photo upload timed out'),
+          onTimeout: () => throw TimeoutException('Photo upload timed out'),
         );
 
         final url = await snapshot.ref.getDownloadURL();
         photoUrls.add(url);
-      } catch (e) {
+      } on Object catch (e) {
         log('❌ Error uploading photo $i: $e');
       }
     }
 
     if (photoUrls.isNotEmpty) {
-      await FirebaseFirestore.instance
-          .collection('users')
-          .doc(userId)
-          .set(
-            {
-              'profilePicture': photoUrls[0],
-              'photos': photoUrls,
-              'Pictures': photoUrls,
-              'imageUrl': photoUrls,
-              'profilePhotoCount': photoUrls.length,
-              'lastPhotoUpdate': FieldValue.serverTimestamp(),
-            },
-            SetOptions(merge: true),
-          );
+      await FirebaseFirestore.instance.collection('users').doc(userId).set(
+        {
+          'profilePicture': photoUrls[0],
+          'photos': photoUrls,
+          'Pictures': photoUrls,
+          'imageUrl': photoUrls,
+          'profilePhotoCount': photoUrls.length,
+          'lastPhotoUpdate': FieldValue.serverTimestamp(),
+        },
+        SetOptions(merge: true),
+      );
     }
   }
 
@@ -131,6 +123,7 @@ class OnboardingRepository {
       'dateOfBirth': d.dateOfBirth?.toIso8601String(),
       'age': d.age,
       'gender': d.gender,
+      'race': d.race,
       'tribe': d.tribe,
       'bio': d.bio,
       'interests': d.interests,
@@ -156,12 +149,16 @@ class OnboardingRepository {
       'drinkingPreference': d.drinkingPreference,
       'smokingPreference': d.smokingPreference,
       'lastActive': DateTime.now().toIso8601String(),
-      'isProfileComplete': true,
       'isBlocked': false,
       'isPremium': false,
       'createdAt': DateTime.now().toIso8601String(),
       'updatedAt': DateTime.now().toIso8601String(),
-      'editInfo': {'userGender': d.gender, 'userName': d.fullName},
+      'editInfo': {
+        'userGender': d.gender,
+        'userName': d.fullName,
+        'race': d.race,
+        'tribe': d.tribe,
+      },
       'preferences': {
         'interestedIn': d.interestedIn,
         'ageRange': d.ageRange,
@@ -170,9 +167,15 @@ class OnboardingRepository {
         'maximumDistance': d.maxDistance,
       },
       'showGender': d.interestedIn,
-      'ageRange': {'min': d.ageRange[0].toString(), 'max': d.ageRange[1].toString()},
+      'ageRange': {
+        'min': d.ageRange[0].toString(),
+        'max': d.ageRange[1].toString(),
+      },
       'userGender': d.gender,
-      'age_range': {'min': d.ageRange[0].toString(), 'max': d.ageRange[1].toString()},
+      'age_range': {
+        'min': d.ageRange[0].toString(),
+        'max': d.ageRange[1].toString(),
+      },
       'maximum_distance': d.maxDistance,
       'maxDistance': d.maxDistance,
       'location': {
@@ -184,8 +187,12 @@ class OnboardingRepository {
       'locationName': d.locationName,
       'latitude': d.latitude ?? 6.5244,
       'longitude': d.longitude ?? 3.3792,
+      // Canonical flag + legacy synonyms. All three must be set so the
+      // Firestore security rule isLockedIdentityFieldUpdate() activates
+      // regardless of which flag name a query or rule references.
       'onboardingCompleted': true,
       'profileSetupComplete': true,
+      'isProfileComplete': true,
     };
   }
 }

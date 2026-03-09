@@ -1,5 +1,7 @@
+import 'dart:async';
 import 'dart:ui';
 
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 
@@ -53,7 +55,7 @@ class _MatchConfirmationModalState extends State<MatchConfirmationModal>
       ),
     );
 
-    _animationController.forward();
+    unawaited(_animationController.forward());
   }
 
   @override
@@ -84,14 +86,16 @@ class _MatchConfirmationModalState extends State<MatchConfirmationModal>
         Navigator.pop(context);
 
         // Navigate to chat thread
-        Navigator.push(
-          context,
-          MaterialPageRoute(
-            builder: (_) => ChatThreadScreen(
-              threadId: threadId,
-              userName: widget.matchedUserName,
-              avatarUrl: widget.matchedUserImageUrl,
-              otherUserId: widget.matchedUserId,
+        unawaited(
+          Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (_) => ChatThreadScreen(
+                threadId: threadId,
+                userName: widget.matchedUserName,
+                avatarUrl: widget.matchedUserImageUrl,
+                otherUserId: widget.matchedUserId,
+              ),
             ),
           ),
         );
@@ -108,7 +112,7 @@ class _MatchConfirmationModalState extends State<MatchConfirmationModal>
           _isProcessing = false;
         });
       }
-    } catch (e) {
+    } on Object catch (e) {
       debugPrint('Error in _handleSendMessage: $e');
       // Show error
       if (!mounted) return;
@@ -266,10 +270,13 @@ class _MatchConfirmationModalState extends State<MatchConfirmationModal>
         ),
         child: ClipRRect(
           borderRadius: BorderRadius.circular(50),
-          child: Image.network(
-            imageUrl,
+          child: CachedNetworkImage(
+            imageUrl: imageUrl,
             fit: BoxFit.cover,
-            errorBuilder: (context, error, stackTrace) => Container(
+            placeholder: (context, url) => const Center(
+              child: CircularProgressIndicator(strokeWidth: 2),
+            ),
+            errorWidget: (context, url, error) => Container(
               color: Colors.grey[300],
               child: const Icon(
                 Icons.person,

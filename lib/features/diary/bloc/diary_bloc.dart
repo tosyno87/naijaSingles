@@ -36,14 +36,14 @@ class DiaryBloc extends Bloc<DiaryEvent, DiaryState> {
         userName: event.userName,
         userImage: event.userImage,
       );
-    } catch (e) {
+    } on Object catch (e) {
       emit(DiaryError(e.toString()));
     }
   }
 
   @override
-  Future<void> close() {
-    _subscription?.cancel();
+  Future<void> close() async {
+    await _subscription?.cancel();
     return super.close();
   }
 

@@ -5,12 +5,14 @@ import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
-import '../../../common/constants/app_colors.dart';
-import '../../../common/constants/constants.dart';
 import '../../../common/bloc/theme/theme_bloc.dart';
+import '../../../common/constants/app_colors.dart';
+import '../../../common/constants/app_spacing.dart';
+import '../../../common/constants/constants.dart';
 import '../../../common/utils/custom_toast.dart';
 import '../../../common/widgets/hookup_circularbar.dart';
 import '../../../common/widgets/image_widget.dart';
+import '../../../common/widgets/state_views/state_views.dart';
 import '../../../models/block_user_model.dart';
 import '../../../models/user_model.dart';
 import '../bloc/bloc_user_list_bloc.dart';
@@ -62,24 +64,11 @@ class _BlockedUserState extends State<BlockedUser> {
     return BlocBuilder<BlocUserListBloc, BlocUserListState>(
       builder: (context, state) {
         if (state is BlockUserLoadingState) {
-          return const Center(
-            child: CircularProgressIndicator(
-              valueColor: AlwaysStoppedAnimation(AppColors.primaryGreen),
-            ),
-          );
+          return const AppLoadingView();
         }
         if (state is BlockUserFailedState) {
-          return Center(
-            child: Text(
-              'Error to load data.'.tr().toString(),
-              textAlign: TextAlign.center,
-              style: TextStyle(
-                color: isDarkMode ? Colors.white : Colors.black54,
-                fontStyle: FontStyle.normal,
-                letterSpacing: 1,
-                fontSize: 18,
-              ),
-            ),
+          return AppErrorView(
+            message: 'Error to load data.'.tr().toString(),
           );
         }
         if (state is BlockUserLoadedState) {
@@ -126,10 +115,10 @@ class _BlockedUserState extends State<BlockedUser> {
                               : AppColors.secondaryColor
                                   .withValues(alpha: (.2 * 255).toDouble()),
                           borderRadius: const BorderRadius.only(
-                            topRight: Radius.circular(20),
-                            topLeft: Radius.circular(20),
-                            bottomLeft: Radius.circular(20),
-                            bottomRight: Radius.circular(20),
+                            topRight: Radius.circular(AppSpacing.chipRadius),
+                            topLeft: Radius.circular(AppSpacing.chipRadius),
+                            bottomLeft: Radius.circular(AppSpacing.chipRadius),
+                            bottomRight: Radius.circular(AppSpacing.chipRadius),
                           ),
                         ),
                         child: ListTile(
@@ -155,9 +144,8 @@ class _BlockedUserState extends State<BlockedUser> {
                           subtitle: Text(
                             'You blocked this user'.tr().toString(),
                             style: TextStyle(
-                              color: isDarkMode
-                                  ? Colors.white
-                                  : Colors.blueGrey,
+                              color:
+                                  isDarkMode ? Colors.white : Colors.blueGrey,
                               fontSize: 15,
                               fontWeight: FontWeight.w500,
                             ),
@@ -177,7 +165,7 @@ class _BlockedUserState extends State<BlockedUser> {
                             ],
                           ),
                           onTap: () async {
-                            showDialog(
+                            await showDialog(
                               context: context,
                               builder: (BuildContext ctx) => ClipRRect(
                                 borderRadius: BorderRadius.circular(10),
@@ -194,7 +182,8 @@ class _BlockedUserState extends State<BlockedUser> {
                                       child: Text(
                                         'No'.tr().toString(),
                                         style: const TextStyle(
-                                            color: AppColors.primaryGreen),
+                                          color: AppColors.primaryGreen,
+                                        ),
                                       ),
                                     ),
                                     TextButton(
@@ -206,7 +195,7 @@ class _BlockedUserState extends State<BlockedUser> {
                                               ),
                                             );
                                         Navigator.pop(ctx);
-                                        db
+                                        await db
                                             .collection('chats')
                                             .doc(blockUser.chatID)
                                             .collection('messages')
@@ -237,7 +226,8 @@ class _BlockedUserState extends State<BlockedUser> {
                                       child: Text(
                                         'Yes'.tr().toString(),
                                         style: const TextStyle(
-                                            color: AppColors.primaryGreen),
+                                          color: AppColors.primaryGreen,
+                                        ),
                                       ),
                                     ),
                                   ],
@@ -249,27 +239,16 @@ class _BlockedUserState extends State<BlockedUser> {
                       );
                     },
                   )
-                : Center(
-                    child: Text(
-                      'No Block user found'.tr().toString(),
-                      style: const TextStyle(
-                        color: AppColors.secondaryColor,
-                        fontSize: 16,
-                      ),
-                    ),
+                : AppEmptyView(
+                    title: 'No Block user found'.tr().toString(),
+                    icon: Icons.block,
                   ),
           );
         }
 
-        return Padding(
-          padding: const EdgeInsets.all(0),
-          child: Center(
-            child: Text(
-              'No Block user found'.tr().toString(),
-              style: const TextStyle(
-                  color: AppColors.secondaryColor, fontSize: 16),
-            ),
-          ),
+        return AppEmptyView(
+          title: 'No Block user found'.tr().toString(),
+          icon: Icons.block,
         );
       },
     );

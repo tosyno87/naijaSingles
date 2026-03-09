@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -26,55 +28,57 @@ class _PhotoUploadScreenState extends State<PhotoUploadScreen> {
 
   Future<void> _pickImage(ImageSource source, int index) async {
     context.read<OnboardingBloc>().add(
-      OnboardingProfilePhotoPicked(source, index, context),
-    );
+          OnboardingProfilePhotoPicked(source, index, context),
+        );
     if (mounted) {
       setState(() {});
     }
   }
 
   void _showImageSourceDialog(int index) {
-    showModalBottomSheet(
-      context: context,
-      backgroundColor: Colors.white,
-      shape: const RoundedRectangleBorder(
-        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
-      ),
-      builder: (context) => Padding(
-        padding: const EdgeInsets.all(24),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(
-              'Select Photo',
-              style: GoogleFonts.montserrat(
-                fontSize: 20,
-                fontWeight: FontWeight.w600,
-                color: textDarkBrown,
+    unawaited(
+      showModalBottomSheet(
+        context: context,
+        backgroundColor: Colors.white,
+        shape: const RoundedRectangleBorder(
+          borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+        ),
+        builder: (context) => Padding(
+          padding: const EdgeInsets.all(24),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                'Select Photo',
+                style: GoogleFonts.montserrat(
+                  fontSize: 20,
+                  fontWeight: FontWeight.w600,
+                  color: textDarkBrown,
+                ),
               ),
-            ),
-            const SizedBox(height: 16),
-            _buildImageSourceOption(
-              icon: Icons.camera_alt,
-              title: 'Take a Photo',
-              subtitle: 'Use your camera to take a new photo',
-              onTap: () {
-                Navigator.pop(context);
-                _pickImage(ImageSource.camera, index);
-              },
-            ),
-            const Divider(height: 24),
-            _buildImageSourceOption(
-              icon: Icons.photo_library,
-              title: 'Choose from Gallery',
-              subtitle: 'Select a photo from your device',
-              onTap: () {
-                Navigator.pop(context);
-                _pickImage(ImageSource.gallery, index);
-              },
-            ),
-          ],
+              const SizedBox(height: 16),
+              _buildImageSourceOption(
+                icon: Icons.camera_alt,
+                title: 'Take a Photo',
+                subtitle: 'Use your camera to take a new photo',
+                onTap: () {
+                  Navigator.pop(context);
+                  unawaited(_pickImage(ImageSource.camera, index));
+                },
+              ),
+              const Divider(height: 24),
+              _buildImageSourceOption(
+                icon: Icons.photo_library,
+                title: 'Choose from Gallery',
+                subtitle: 'Select a photo from your device',
+                onTap: () {
+                  Navigator.pop(context);
+                  unawaited(_pickImage(ImageSource.gallery, index));
+                },
+              ),
+            ],
+          ),
         ),
       ),
     );
@@ -199,8 +203,8 @@ class _PhotoUploadScreenState extends State<PhotoUploadScreen> {
               child: GestureDetector(
                 onTap: () {
                   context.read<OnboardingBloc>().add(
-                    OnboardingProfilePhotoRemoved(index),
-                  );
+                        OnboardingProfilePhotoRemoved(index),
+                      );
                   setState(() {});
                 },
                 child: Container(
@@ -223,134 +227,134 @@ class _PhotoUploadScreenState extends State<PhotoUploadScreen> {
   }
 
   @override
-  Widget build(BuildContext context) {
-    return BlocBuilder<OnboardingBloc, OnboardingState>(
-      builder: (context, state) {
-        final data = state.data;
-        final int uploadedCount =
-            (data?.profilePhotos.where((photo) => photo != null).length ?? 0);
-        final bool hasMinimumPhotos = uploadedCount >= 3;
+  Widget build(BuildContext context) =>
+      BlocBuilder<OnboardingBloc, OnboardingState>(
+        builder: (context, state) {
+          final data = state.data;
+          final int uploadedCount =
+              data?.profilePhotos.where((photo) => photo != null).length ?? 0;
+          final bool hasMinimumPhotos = uploadedCount >= 3;
 
-        return SingleChildScrollView(
-      padding: const EdgeInsets.all(24),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text(
-            'Add Your Profile Photos',
-            style: GoogleFonts.montserrat(
-              fontSize: 18,
-              fontWeight: FontWeight.w600,
-              color: textDarkBrown,
-            ),
-          ),
-
-          const SizedBox(height: 8),
-
-          Text(
-            'Upload at least 3 photos to complete your profile',
-            style: GoogleFonts.montserrat(
-              fontSize: 14,
-              color: textLightBrown,
-            ),
-          ),
-
-          const SizedBox(height: 8),
-
-          // Photo count indicator
-          Container(
-            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-            decoration: BoxDecoration(
-              color: hasMinimumPhotos
-                  ? afropeepGreen.withValues(alpha: 0.1)
-                  : Colors.red.withValues(alpha: 0.1),
-              borderRadius: BorderRadius.circular(16),
-            ),
-            child: Text(
-              '$uploadedCount/5 photos uploaded (minimum 3)',
-              style: GoogleFonts.montserrat(
-                fontSize: 12,
-                fontWeight: FontWeight.w500,
-                color: hasMinimumPhotos ? afropeepGreen : Colors.red,
-              ),
-            ),
-          ),
-
-          const SizedBox(height: 24),
-
-          // Photo grid - first row (required photos)
-          Row(
-            children: [
-              Expanded(child: _buildPhotoItem(0)),
-              const SizedBox(width: 12),
-              Expanded(child: _buildPhotoItem(1)),
-            ],
-          ),
-
-          const SizedBox(height: 12),
-
-          // Photo grid - second row (1 required, 2 optional)
-          Row(
-            children: [
-              Expanded(child: _buildPhotoItem(2)),
-              const SizedBox(width: 12),
-              Expanded(child: _buildPhotoItem(3)),
-            ],
-          ),
-
-          const SizedBox(height: 12),
-
-          // Photo grid - third row (optional)
-          _buildPhotoItem(4),
-
-          const SizedBox(height: 32),
-
-          // Photo tips
-          Container(
-            padding: const EdgeInsets.all(16),
-            decoration: BoxDecoration(
-              color: Colors.blue.shade50,
-              borderRadius: BorderRadius.circular(16),
-              border: Border.all(
-                color: Colors.blue.shade200,
-              ),
-            ),
+          return SingleChildScrollView(
+            padding: const EdgeInsets.all(24),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  'Tips for great profile photos:',
+                  'Add Your Profile Photos',
                   style: GoogleFonts.montserrat(
-                    fontSize: 16,
+                    fontSize: 18,
                     fontWeight: FontWeight.w600,
-                    color: Colors.blue.shade800,
+                    color: textDarkBrown,
                   ),
                 ),
+
                 const SizedBox(height: 8),
-                _buildTipItem(
-                  'Use clear, well-lit photos that show your face',
+
+                Text(
+                  'Upload at least 3 photos to complete your profile',
+                  style: GoogleFonts.montserrat(
+                    fontSize: 14,
+                    color: textLightBrown,
+                  ),
                 ),
-                _buildTipItem(
-                  'Include at least one full-body photo',
+
+                const SizedBox(height: 8),
+
+                // Photo count indicator
+                Container(
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                  decoration: BoxDecoration(
+                    color: hasMinimumPhotos
+                        ? afropeepGreen.withValues(alpha: 0.1)
+                        : Colors.red.withValues(alpha: 0.1),
+                    borderRadius: BorderRadius.circular(16),
+                  ),
+                  child: Text(
+                    '$uploadedCount/5 photos uploaded (minimum 3)',
+                    style: GoogleFonts.montserrat(
+                      fontSize: 12,
+                      fontWeight: FontWeight.w500,
+                      color: hasMinimumPhotos ? afropeepGreen : Colors.red,
+                    ),
+                  ),
                 ),
-                _buildTipItem(
-                  'Show your interests and personality',
+
+                const SizedBox(height: 24),
+
+                // Photo grid - first row (required photos)
+                Row(
+                  children: [
+                    Expanded(child: _buildPhotoItem(0)),
+                    const SizedBox(width: 12),
+                    Expanded(child: _buildPhotoItem(1)),
+                  ],
                 ),
-                _buildTipItem(
-                  'Avoid heavily filtered or edited photos',
+
+                const SizedBox(height: 12),
+
+                // Photo grid - second row (1 required, 2 optional)
+                Row(
+                  children: [
+                    Expanded(child: _buildPhotoItem(2)),
+                    const SizedBox(width: 12),
+                    Expanded(child: _buildPhotoItem(3)),
+                  ],
                 ),
-                _buildTipItem(
-                  'Smile! Profiles with smiling photos get more matches',
+
+                const SizedBox(height: 12),
+
+                // Photo grid - third row (optional)
+                _buildPhotoItem(4),
+
+                const SizedBox(height: 32),
+
+                // Photo tips
+                Container(
+                  padding: const EdgeInsets.all(16),
+                  decoration: BoxDecoration(
+                    color: Colors.blue.shade50,
+                    borderRadius: BorderRadius.circular(16),
+                    border: Border.all(
+                      color: Colors.blue.shade200,
+                    ),
+                  ),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        'Tips for great profile photos:',
+                        style: GoogleFonts.montserrat(
+                          fontSize: 16,
+                          fontWeight: FontWeight.w600,
+                          color: Colors.blue.shade800,
+                        ),
+                      ),
+                      const SizedBox(height: 8),
+                      _buildTipItem(
+                        'Use clear, well-lit photos that show your face',
+                      ),
+                      _buildTipItem(
+                        'Include at least one full-body photo',
+                      ),
+                      _buildTipItem(
+                        'Show your interests and personality',
+                      ),
+                      _buildTipItem(
+                        'Avoid heavily filtered or edited photos',
+                      ),
+                      _buildTipItem(
+                        'Smile! Profiles with smiling photos get more matches',
+                      ),
+                    ],
+                  ),
                 ),
               ],
             ),
-          ),
-        ],
-      ),
-    );
-      },
-    );
-  }
+          );
+        },
+      );
 
   Widget _buildTipItem(String text) => Padding(
         padding: const EdgeInsets.only(bottom: 8),

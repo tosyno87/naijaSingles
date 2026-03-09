@@ -2,7 +2,6 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 
-import '../../../features/match/data/services/likes_service.dart';
 import '../../../models/user_model.dart';
 import '../../../services/location_privacy_service.dart';
 import '../../../services/user_privacy_service.dart';
@@ -15,7 +14,6 @@ class PrivacyAwareUserSearchRepo {
   static CollectionReference get docRef => db.collection('users');
 
   static FirebaseAuth firebaseAuth = firebaseAuthInstance;
-  static final LikesService _likesService = LikesService();
   static final UserPrivacyService _privacyService = UserPrivacyService();
 
   static Map items = {};
@@ -29,11 +27,10 @@ class PrivacyAwareUserSearchRepo {
   static Map disLikedMap = {};
 
   static Future<void> getAccessItems() async {
-    db.collection('Item_access').snapshots().listen((doc) {
-      if (doc.docs.isNotEmpty) {
-        items = doc.docs[0].data();
-      }
-    });
+    final doc = await db.collection('Item_access').get();
+    if (doc.docs.isNotEmpty) {
+      items = doc.docs[0].data();
+    }
   }
 
   static Future<int> getSwipedCount(UserModel currentUser) async {
@@ -113,7 +110,7 @@ class PrivacyAwareUserSearchRepo {
 
       debugPrint('✅ Final privacy-aware user list size: ${userList.length}');
       return userList;
-    } catch (e) {
+    } on Object catch (e) {
       debugPrint('❌ Error in privacy-aware getUserList: $e');
       rethrow;
     }
@@ -142,16 +139,20 @@ class PrivacyAwareUserSearchRepo {
             continue;
           }
 
-          // Get privacy-filtered user data
-          final filteredUserData =
-              await _privacyService.getFilteredUserData(userId);
-          if (filteredUserData == null) {
-            continue; // Skip if no data available
+          // Use document data already returned by the list query.
+          // Re-fetching via getFilteredUserData would hit the stricter
+          // per-document `get` rule and fail with permission-denied.
+          final rawData = doc.data() as Map<String, dynamic>?;
+          if (rawData == null || rawData.isEmpty) {
+            continue;
           }
 
-          // Create UserModel from filtered data
+          // Apply default privacy masks (e.g. hide sexualOrientation)
+          // while preserving operational fields like lat/lng and photos.
+          final filteredData = _privacyService.filterForDiscovery(rawData);
+
           final UserModel user =
-              await _createUserModelFromFilteredData(filteredUserData, userId);
+              await _createUserModelFromFilteredData(filteredData, userId);
 
           // Calculate distance if location is available
           if (user.latitude != null &&
@@ -182,7 +183,7 @@ class PrivacyAwareUserSearchRepo {
 
           debugPrint('✅ Adding privacy-aware user: ${user.name}');
           userList.add(user);
-        } catch (e) {
+        } on Object catch (e) {
           debugPrint(
             '⚠️ Error processing privacy-aware document ${doc.id}: $e',
           );
@@ -191,7 +192,7 @@ class PrivacyAwareUserSearchRepo {
       }
 
       return userList;
-    } catch (e) {
+    } on Object catch (e) {
       debugPrint('❌ Error in _getPrivacyAwareUsers: $e');
       return [];
     }
@@ -232,14 +233,14 @@ class PrivacyAwareUserSearchRepo {
             debugPrint('📋 Adding fallback user: ${temp.name}');
             userList.add(temp);
           }
-        } catch (e) {
+        } on Object catch (e) {
           debugPrint('⚠️ Error processing fallback document ${doc.id}: $e');
           continue;
         }
       }
 
       return userList;
-    } catch (e) {
+    } on Object catch (e) {
       debugPrint('❌ Error in _getFallbackUsers: $e');
       return [];
     }
@@ -247,23 +248,14 @@ class PrivacyAwareUserSearchRepo {
 
   /// Build privacy-aware query
   static Query _buildPrivacyAwareQuery(UserModel currentUser) {
-    Query query = docRef.where('id', isNotEqualTo: currentUser.id);
+    final Query query = docRef.where('isDiscoverable', isEqualTo: true);
 
-    // Add basic filters that don't depend on privacy settings
-    if (currentUser.userGender != null) {
-      query = query.where('userGender', isNotEqualTo: currentUser.userGender);
-    }
-
-    return query.limit(50); // Limit for performance
+    return query.limit(50);
   }
 
   /// Build traditional query (fallback)
   static Query _buildTraditionalQuery(UserModel currentUser) {
-    Query query = docRef.where('id', isNotEqualTo: currentUser.id);
-
-    if (currentUser.userGender != null) {
-      query = query.where('userGender', isNotEqualTo: currentUser.userGender);
-    }
+    Query query = docRef.where('isDiscoverable', isEqualTo: true);
 
     if (currentUser.ageRange != null) {
       query = query
@@ -322,21 +314,26 @@ class PrivacyAwareUserSearchRepo {
       showMyAge: data['showMyAge'] ?? true,
       latitude: latitude,
       longitude: longitude,
-      imageUrl: data['photos'] is List
-          ? List<String>.from((data['photos'] as List)
-              .map((e) => e?.toString() ?? '')
-              .where((url) => url.toString().isNotEmpty))
-          : data['Pictures'] is List
-              ? List<String>.from((data['Pictures'] as List)
-                  .map((e) => e?.toString() ?? '')
-                  .where((url) => url.toString().isNotEmpty))
-              : [],
+      imageUrl: _extractPhotos(data),
       isBlocked: data['isBlocked'] ?? false,
       lookingFor: data['lookingFor']?.toString() ?? 'Dating',
       bio: data['bio']?.toString(),
       accountStatus: data['accountStatus']?.toString(),
       sexualOrientation: data['sexualOrientation'],
     );
+  }
+
+  /// Resolve photo URLs from the multiple field names used across the schema.
+  static List<String> _extractPhotos(Map<String, dynamic> data) {
+    for (final key in ['photos', 'Pictures', 'imageUrl']) {
+      final value = data[key];
+      if (value is List && value.isNotEmpty) {
+        return List<String>.from(
+          value.map((e) => e?.toString() ?? '').where((url) => url.isNotEmpty),
+        );
+      }
+    }
+    return [];
   }
 
   /// Get location-based users using GeoHash (privacy-aware)
@@ -371,42 +368,45 @@ class PrivacyAwareUserSearchRepo {
         try {
           final query = docRef
               .where('geoHash', isEqualTo: geoHash)
-              .where('id', isNotEqualTo: currentUser.id)
+              .where('isDiscoverable', isEqualTo: true)
               .limit(20);
 
           final snapshot = await query.get();
 
           for (var doc in snapshot.docs) {
             try {
-              final filteredData =
-                  await _privacyService.getFilteredUserData(doc.id);
-              if (filteredData != null) {
-                final user = await _createUserModelFromFilteredData(
-                  filteredData,
-                  doc.id,
+              if (doc.id == currentUser.id) {
+                continue;
+              }
+              final rawData = doc.data() as Map<String, dynamic>?;
+              if (rawData == null || rawData.isEmpty) {
+                continue;
+              }
+              final filteredData = _privacyService.filterForDiscovery(rawData);
+              final user = await _createUserModelFromFilteredData(
+                filteredData,
+                doc.id,
+              );
+
+              if (user.latitude != null && user.longitude != null) {
+                final actualDistance = distance.calculateDistance(
+                  currentUser.latitude!,
+                  currentUser.longitude!,
+                  user.latitude!,
+                  user.longitude!,
                 );
 
-                // Calculate actual distance
-                if (user.latitude != null && user.longitude != null) {
-                  final actualDistance = distance.calculateDistance(
-                    currentUser.latitude!,
-                    currentUser.longitude!,
-                    user.latitude!,
-                    user.longitude!,
-                  );
-
-                  if (actualDistance <= radiusMiles) {
-                    user.distanceBW = actualDistance.round();
-                    nearbyUsers.add(user);
-                  }
+                if (actualDistance <= radiusMiles) {
+                  user.distanceBW = actualDistance.round();
+                  nearbyUsers.add(user);
                 }
               }
-            } catch (e) {
+            } on Object catch (e) {
               debugPrint('⚠️ Error processing nearby user ${doc.id}: $e');
               continue;
             }
           }
-        } catch (e) {
+        } on Object catch (e) {
           debugPrint('⚠️ Error querying GeoHash $geoHash: $e');
           continue;
         }
@@ -414,7 +414,7 @@ class PrivacyAwareUserSearchRepo {
 
       debugPrint('🗺️ Found ${nearbyUsers.length} nearby users');
       return nearbyUsers;
-    } catch (e) {
+    } on Object catch (e) {
       debugPrint('❌ Error in getUsersNearby: $e');
       return [];
     }
@@ -446,7 +446,7 @@ class PrivacyAwareUserSearchRepo {
               await _createUserModelFromFilteredData(filteredData, doc.id);
           matchesList.add(user);
         }
-      } catch (e) {
+      } on Object catch (e) {
         debugPrint('⚠️ Error loading match ${doc.id}: $e');
         continue;
       }

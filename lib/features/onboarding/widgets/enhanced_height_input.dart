@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'ios_height_picker.dart';
@@ -25,7 +27,6 @@ class EnhancedHeightInput extends StatefulWidget {
 class _EnhancedHeightInputState extends State<EnhancedHeightInput> {
   late double _height;
   late String _heightUnit;
-  final bool _showPicker = false;
 
   @override
   void initState() {
@@ -49,88 +50,90 @@ class _EnhancedHeightInputState extends State<EnhancedHeightInput> {
     final screenWidth = MediaQuery.of(context).size.width;
     final isTablet = screenWidth > 600;
 
-    showModalBottomSheet(
-      context: context,
-      isScrollControlled: true,
-      backgroundColor: Colors.transparent,
-      builder: (context) => Container(
-        height: MediaQuery.of(context).size.height * 0.6,
-        decoration: const BoxDecoration(
-          color: Color(0xFFFDF1E7),
-          borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
-        ),
-        child: Column(
-          children: [
-            // Handle bar
-            Container(
-              width: 40,
-              height: 4,
-              margin: const EdgeInsets.only(top: 12),
-              decoration: BoxDecoration(
-                color: Colors.grey.shade400,
-                borderRadius: BorderRadius.circular(2),
-              ),
-            ),
-
-            // Header
-            Padding(
-              padding: EdgeInsets.all(isTablet ? 24 : 20),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  TextButton(
-                    onPressed: () => Navigator.pop(context),
-                    child: Text(
-                      'Cancel',
-                      style: GoogleFonts.montserrat(
-                        fontSize: isTablet ? 16 : 14,
-                        color: Colors.grey.shade600,
-                      ),
-                    ),
-                  ),
-                  Text(
-                    'Select Height',
-                    style: GoogleFonts.montserrat(
-                      fontSize: isTablet ? 20 : 18,
-                      fontWeight: FontWeight.w600,
-                      color: Colors.black87,
-                    ),
-                  ),
-                  TextButton(
-                    onPressed: () {
-                      Navigator.pop(context);
-                      widget.onChanged(_height, _heightUnit);
-                    },
-                    child: Text(
-                      'Done',
-                      style: GoogleFonts.montserrat(
-                        fontSize: isTablet ? 16 : 14,
-                        fontWeight: FontWeight.w600,
-                        color: const Color(0xFF008037),
-                      ),
-                    ),
-                  ),
-                ],
-              ),
-            ),
-
-            // iOS Height Picker
-            Expanded(
-              child: Padding(
-                padding: EdgeInsets.symmetric(horizontal: isTablet ? 24 : 20),
-                child: IOSHeightPicker(
-                  initialHeight: _height,
-                  initialUnit: _heightUnit,
-                  onChanged: (height, unit) {
-                    setState(() {
-                      _height = height;
-                      _heightUnit = unit;
-                    });
-                  },
+    unawaited(
+      showModalBottomSheet(
+        context: context,
+        isScrollControlled: true,
+        backgroundColor: Colors.transparent,
+        builder: (context) => Container(
+          height: MediaQuery.of(context).size.height * 0.6,
+          decoration: const BoxDecoration(
+            color: Color(0xFFFDF1E7),
+            borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
+          ),
+          child: Column(
+            children: [
+              // Handle bar
+              Container(
+                width: 40,
+                height: 4,
+                margin: const EdgeInsets.only(top: 12),
+                decoration: BoxDecoration(
+                  color: Colors.grey.shade400,
+                  borderRadius: BorderRadius.circular(2),
                 ),
               ),
-            ),
-          ],
+
+              // Header
+              Padding(
+                padding: EdgeInsets.all(isTablet ? 24 : 20),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    TextButton(
+                      onPressed: () => Navigator.pop(context),
+                      child: Text(
+                        'Cancel',
+                        style: GoogleFonts.montserrat(
+                          fontSize: isTablet ? 16 : 14,
+                          color: Colors.grey.shade600,
+                        ),
+                      ),
+                    ),
+                    Text(
+                      'Select Height',
+                      style: GoogleFonts.montserrat(
+                        fontSize: isTablet ? 20 : 18,
+                        fontWeight: FontWeight.w600,
+                        color: Colors.black87,
+                      ),
+                    ),
+                    TextButton(
+                      onPressed: () {
+                        Navigator.pop(context);
+                        widget.onChanged(_height, _heightUnit);
+                      },
+                      child: Text(
+                        'Done',
+                        style: GoogleFonts.montserrat(
+                          fontSize: isTablet ? 16 : 14,
+                          fontWeight: FontWeight.w600,
+                          color: const Color(0xFF008037),
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+
+              // iOS Height Picker
+              Expanded(
+                child: Padding(
+                  padding: EdgeInsets.symmetric(horizontal: isTablet ? 24 : 20),
+                  child: IOSHeightPicker(
+                    initialHeight: _height,
+                    initialUnit: _heightUnit,
+                    onChanged: (height, unit) {
+                      setState(() {
+                        _height = height;
+                        _heightUnit = unit;
+                      });
+                    },
+                  ),
+                ),
+              ),
+            ],
+          ),
         ),
       ),
     );
@@ -138,9 +141,6 @@ class _EnhancedHeightInputState extends State<EnhancedHeightInput> {
 
   @override
   Widget build(BuildContext context) {
-    final screenWidth = MediaQuery.of(context).size.width;
-    final isTablet = screenWidth > 600;
-
     if (widget.useIOSPicker) {
       return _buildPickerButton();
     } else {

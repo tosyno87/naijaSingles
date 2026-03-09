@@ -14,6 +14,9 @@ gem "xcode-install" # For Xcode version management
 # Security: Pin activesupport to patched version to fix CVE-2023-38037 and CVE-2023-28120
 gem "activesupport", ">= 6.1.7.5"
 
+# Security: Pin faraday to fix SSRF via protocol-relative URL host override (Dependabot #9)
+gem "faraday", ">= 1.10.5", "< 2.0"
+
 # Development gems
 group :development do
   gem "rubocop" # Ruby code style checker

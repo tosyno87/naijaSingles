@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:developer';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
@@ -5,11 +6,11 @@ import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
+import '../../../../common/bloc/theme/theme_bloc.dart';
 import '../../../../common/constants/app_colors.dart';
 import '../../../../common/constants/constants.dart';
 import '../../../../common/data/repo/pagination_repo.dart';
 import '../../../../common/data/repo/user_messaging_repo.dart';
-import '../../../../common/bloc/theme/theme_bloc.dart';
 import '../../../../common/widgets/hookup_circularbar.dart';
 import '../../../../config/app_config.dart';
 import '../../../../models/chat_model.dart';
@@ -34,6 +35,7 @@ class RecentChats extends StatefulWidget {
 class _RecentChatsState extends State<RecentChats> {
   final db = firebaseFireStoreInstance;
   String sortBy = 'time';
+  StreamSubscription<QuerySnapshot>? _chatSubscription;
   bool _isLoadingMore = false;
   bool _hasMoreMessages = true;
   int perPage = perPageData;
@@ -53,13 +55,14 @@ class _RecentChatsState extends State<RecentChats> {
         !widget.scrollController.position.outOfRange) {
       if (_hasMoreMessages && !_isLoadingMore) {
         log('load more called');
-        _loadMoreChats();
+        unawaited(_loadMoreChats());
       }
     }
   }
 
   void _loadInitialChats() {
-    UserMessagingRepo.query(widget.currentUser, perPage).listen((snapshot) {
+    _chatSubscription =
+        UserMessagingRepo.query(widget.currentUser, perPage).listen((snapshot) {
       if (mounted) {
         setState(() {
           chats = snapshot.docs;
@@ -88,6 +91,12 @@ class _RecentChatsState extends State<RecentChats> {
       lastVisibleDocument =
           snapshot.docs.isNotEmpty ? snapshot.docs.last : null;
     });
+  }
+
+  @override
+  void dispose() {
+    unawaited(_chatSubscription?.cancel());
+    super.dispose();
   }
 
   @override
@@ -138,7 +147,7 @@ class _RecentChatsState extends State<RecentChats> {
                 : ListView.builder(
                     shrinkWrap: true,
                     controller: widget.scrollController,
-                    padding: const EdgeInsets.all(0),
+                    padding: EdgeInsets.zero,
                     itemCount: chats.length + 1,
                     itemBuilder: (context, index) {
                       if (index == chats.length) {
@@ -196,7 +205,8 @@ class _RecentChatsState extends State<RecentChats> {
                       } else {
                         final data = chats[index].data();
                         log(' lastmessage data is ${data.toString()}');
-                        final ChatModel chat = ChatModel?.from(data);
+                        final ChatModel chat =
+                            ChatModel.from(data as Map<String, dynamic>);
 
                         return FutureBuilder(
                           future: UserMessagingRepo.getChatUserDetails(
@@ -215,7 +225,7 @@ class _RecentChatsState extends State<RecentChats> {
                                 tempUser: snapshot2.data!,
                                 chat: chat,
                                 chatId:
-                                    chatId(widget.currentUser, snapshot2.data),
+                                    chatId(widget.currentUser, snapshot2.data!),
                                 currentUser: widget.currentUser,
                               );
                             }
@@ -240,12 +250,14 @@ class _RecentChatsState extends State<RecentChats> {
         }
 
         return Padding(
-          padding: const EdgeInsets.all(0),
+          padding: EdgeInsets.zero,
           child: Center(
             child: Text(
               'No recent chat found'.tr().toString(),
               style: const TextStyle(
-                  color: AppColors.secondaryColor, fontSize: 16),
+                color: AppColors.secondaryColor,
+                fontSize: 16,
+              ),
             ),
           ),
         );

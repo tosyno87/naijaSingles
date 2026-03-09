@@ -1,16 +1,28 @@
+import 'dart:async';
+
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:flutter/foundation.dart';
 
+import '../../../common/utils/app_logger.dart';
+import '../../../common/utils/firestore_helpers.dart';
+import '../../../features/match/data/analytics/match_quality_reporter.dart';
+import '../../../services/performance_monitor.dart';
 import '../message_model.dart';
+import 'conversation_quality_metrics.dart';
 
 class ChatService {
-  final FirebaseFirestore _firestore = FirebaseFirestore.instance;
-  final FirebaseAuth _auth = FirebaseAuth.instance;
+  ChatService({
+    FirebaseFirestore? firestore,
+    FirebaseAuth? auth,
+  })  : _firestore = firestore ?? FirebaseFirestore.instance,
+        _auth = auth ?? FirebaseAuth.instance,
+        _chatThreadsCollection =
+            (firestore ?? FirebaseFirestore.instance).collection('chatThreads');
 
-  // Collection references
-  final CollectionReference _chatThreadsCollection =
-      FirebaseFirestore.instance.collection('chatThreads');
+  final FirebaseFirestore _firestore;
+  final FirebaseAuth _auth;
+
+  final CollectionReference _chatThreadsCollection;
 
   // Get current user ID
   String? get currentUserId => _auth.currentUser?.uid;
@@ -35,8 +47,14 @@ class ChatService {
 
       // No thread found
       return null;
-    } catch (e) {
-      debugPrint('Error checking for chat thread: $e');
+    } on FirebaseException catch (e) {
+      AppLogger.error(
+        'Firebase error checking for chat thread: ${e.code} - ${e.message}',
+        error: e,
+      );
+      return null;
+    } on Object catch (e) {
+      AppLogger.error('Unexpected error checking for chat thread', error: e);
       return null;
     }
   }
@@ -73,23 +91,50 @@ class ChatService {
       final threadRef = _chatThreadsCollection.doc();
       final threadId = threadRef.id;
 
-      // Get current user's name - handle case where document doesn't exist
+      // Fetch both users' profiles in parallel for names and avatars
       String currentUserName = 'User';
+      String? currentUserAvatar;
+      String? otherUserAvatar;
       try {
-        final currentUserDoc =
-            await _firestore.collection('users').doc(currentUserId).get();
+        final results = await Future.wait([
+          _firestore.collection('users').doc(currentUserId).get(),
+          _firestore.collection('users').doc(otherUserId).get(),
+        ]);
+
+        final currentUserDoc = results[0];
         if (currentUserDoc.exists) {
           final data = currentUserDoc.data();
-          if (data != null && data.containsKey('name')) {
-            currentUserName = data['name'] as String? ?? 'User';
+          currentUserName = data?['name'] as String? ?? 'User';
+          final photos = data?['photos'] as List<dynamic>?;
+          if (photos != null && photos.isNotEmpty) {
+            currentUserAvatar = photos.first as String?;
           }
         }
-      } catch (e) {
-        debugPrint('Error getting current user name: $e');
-        // Continue with default name
+
+        final otherUserDoc = results[1];
+        if (otherUserDoc.exists) {
+          final data = otherUserDoc.data();
+          final photos = data?['photos'] as List<dynamic>?;
+          if (photos != null && photos.isNotEmpty) {
+            otherUserAvatar = photos.first as String?;
+          }
+        }
+      } on FirebaseException catch (e) {
+        AppLogger.error(
+          'Firebase error getting user profiles: ${e.code} - ${e.message}',
+          error: e,
+        );
+      } on Object catch (e) {
+        AppLogger.error('Unexpected error getting user profiles', error: e);
       }
 
-      // Create thread data
+      // Build avatar map (only include non-null entries)
+      final Map<String, String> userAvatars = {
+        if (currentUserAvatar != null) currentUserId!: currentUserAvatar,
+        if (otherUserAvatar != null) otherUserId: otherUserAvatar,
+      };
+
+      // Create thread data with denormalized avatars
       await threadRef.set({
         'threadId': threadId,
         'userIds': [currentUserId, otherUserId],
@@ -97,6 +142,7 @@ class ChatService {
           currentUserId: currentUserName,
           otherUserId: otherUserName,
         },
+        if (userAvatars.isNotEmpty) 'userAvatars': userAvatars,
         'lastMessage': null,
         'lastMessageText': 'Say hi to $otherUserName!',
         'lastMessageSenderId': null,
@@ -107,8 +153,9 @@ class ChatService {
 
       return threadId;
     } on FirebaseException catch (e) {
-      debugPrint(
+      AppLogger.error(
         'Firebase error creating chat thread: ${e.code} - ${e.message}',
+        error: e,
       );
 
       // Handle specific security rule violations
@@ -119,8 +166,8 @@ class ChatService {
       }
 
       throw Exception('Failed to create chat: ${e.message}');
-    } catch (e) {
-      debugPrint('Error creating chat thread: $e');
+    } on Object catch (e) {
+      AppLogger.error('Error creating chat thread', error: e);
       // Re-throw our custom exceptions
       if (e.toString().contains('You can only chat with users') ||
           e.toString().contains('This conversation is not available')) {
@@ -130,95 +177,127 @@ class ChatService {
     }
   }
 
-  // Send a message in a thread
-  Future<bool> sendMessage(String threadId, String text) async {
-    try {
-      if (currentUserId == null) return false;
+  Future<bool> sendMessage(String threadId, String text) =>
+      PerformanceMonitor.measure('send_message', () async {
+        try {
+          if (currentUserId == null) return false;
 
-      // Validate message content locally first
-      if (text.trim().isEmpty) {
-        throw Exception('Message cannot be empty.');
-      }
+          // Validate message content locally first
+          if (text.trim().isEmpty) {
+            throw Exception('Message cannot be empty.');
+          }
 
-      if (text.length > 1000) {
-        throw Exception(
-          'Message is too long. Please keep messages under 1000 characters.',
-        );
-      }
-
-      // Reference to the messages subcollection
-      final messagesRef =
-          _chatThreadsCollection.doc(threadId).collection('messages');
-
-      // Get the thread document to find the other user's ID
-      String otherUserId = '';
-      try {
-        final threadDoc = await _chatThreadsCollection.doc(threadId).get();
-        if (threadDoc.exists) {
-          final data = threadDoc.data() as Map<String, dynamic>?;
-          if (data != null && data.containsKey('userIds')) {
-            final userIds = List<String>.from(data['userIds']);
-            otherUserId = userIds.firstWhere(
-              (id) => id != currentUserId,
-              orElse: () => '',
+          if (text.length > 1000) {
+            throw Exception(
+              'Message is too long. Please keep messages under 1000 characters.',
             );
           }
-        }
-      } catch (e) {
-        debugPrint('Error getting thread document: $e');
-        // Continue with empty otherUserId
-      }
 
-      // Create message data
-      final messageData = {
-        'senderId': currentUserId,
-        'text': text.trim(),
-        'timestamp': FieldValue.serverTimestamp(),
-        'read': false,
-      };
+          // Reference to the messages subcollection
+          final messagesRef =
+              _chatThreadsCollection.doc(threadId).collection('messages');
 
-      // Add the message
-      await messagesRef.add(messageData);
+          // Get the thread document to find the other user's ID
+          String otherUserId = '';
+          DateTime? threadCreatedAt;
+          bool isConversationStart = false;
+          try {
+            final threadDoc = await _chatThreadsCollection.doc(threadId).get();
+            if (threadDoc.exists) {
+              final data = threadDoc.data() as Map<String, dynamic>?;
+              if (data != null && data.containsKey('userIds')) {
+                final userIds = List<String>.from(data['userIds']);
+                otherUserId = userIds.firstWhere(
+                  (id) => id != currentUserId,
+                  orElse: () => '',
+                );
+              }
+              threadCreatedAt = parseDateTime(data?['createdAt']);
+              isConversationStart = data?['lastMessageSenderId'] == null;
+            }
+          } on FirebaseException catch (e) {
+            AppLogger.error(
+              'Firebase error getting thread document: ${e.code} - ${e.message}',
+              error: e,
+            );
+            // Continue with empty otherUserId
+          } on Object catch (e) {
+            AppLogger.error(
+              'Unexpected error getting thread document',
+              error: e,
+            );
+            // Continue with empty otherUserId
+          }
 
-      // Update the thread with last message info
-      final updateData = {
-        'lastMessage': messageData,
-        'lastMessageText': text.trim(),
-        'lastMessageSenderId': currentUserId,
-        'lastUpdated': FieldValue.serverTimestamp(),
-        'unreadCount.$currentUserId': 0,
-      };
+          // Create message data
+          final messageData = {
+            'senderId': currentUserId,
+            'text': text.trim(),
+            'timestamp': FieldValue.serverTimestamp(),
+            'read': false,
+          };
 
-      // Only update the other user's unread count if we found their ID
-      if (otherUserId.isNotEmpty) {
-        updateData['unreadCount.$otherUserId'] = FieldValue.increment(1);
-      }
+          // Add the message
+          await messagesRef.add(messageData);
 
-      await _chatThreadsCollection.doc(threadId).update(updateData);
+          // Update the thread with last message info
+          final updateData = {
+            'lastMessage': messageData,
+            'lastMessageText': text.trim(),
+            'lastMessageSenderId': currentUserId,
+            'lastUpdated': FieldValue.serverTimestamp(),
+            'unreadCount.$currentUserId': 0,
+          };
 
-      return true;
-    } on FirebaseException catch (e) {
-      debugPrint('Firebase error sending message: ${e.code} - ${e.message}');
+          // Only update the other user's unread count if we found their ID
+          if (otherUserId.isNotEmpty) {
+            updateData['unreadCount.$otherUserId'] = FieldValue.increment(1);
+          }
 
-      // Handle specific security rule violations
-      if (e.code == 'permission-denied') {
-        if (e.message?.contains('text.size()') ?? false) {
-          throw Exception(
-            'Message is too long. Please keep messages under 1000 characters.',
+          await _chatThreadsCollection.doc(threadId).update(updateData);
+
+          if (isConversationStart && otherUserId.isNotEmpty) {
+            final createdAt = threadCreatedAt ?? DateTime.now();
+            final within24Hours =
+                DateTime.now().difference(createdAt).inHours <= 24;
+            // TODO(product-excellence): store conversation mode on chatThreads
+            // so conversation analytics are not hardcoded to 'Dating'.
+            unawaited(
+              MatchQualityReporter.instance.recordConversationStart(
+                userId: currentUserId!,
+                candidateId: otherUserId,
+                mode: 'Dating',
+                within24Hours: within24Hours,
+              ),
+            );
+          }
+
+          return true;
+        } on FirebaseException catch (e) {
+          AppLogger.error(
+            'Firebase error sending message: ${e.code} - ${e.message}',
+            error: e,
           );
-        } else if (e.message?.contains('isUserBlocked') ?? false) {
-          throw Exception('This conversation is no longer available.');
-        } else {
-          throw Exception('Unable to send message. Please try again.');
-        }
-      }
 
-      throw Exception('Failed to send message: ${e.message}');
-    } catch (e) {
-      debugPrint('Error sending message: $e');
-      return false;
-    }
-  }
+          // Handle specific security rule violations
+          if (e.code == 'permission-denied') {
+            if (e.message?.contains('text.size()') ?? false) {
+              throw Exception(
+                'Message is too long. Please keep messages under 1000 characters.',
+              );
+            } else if (e.message?.contains('isUserBlocked') ?? false) {
+              throw Exception('This conversation is no longer available.');
+            } else {
+              throw Exception('Unable to send message. Please try again.');
+            }
+          }
+
+          throw Exception('Failed to send message: ${e.message}');
+        } on Object catch (e) {
+          AppLogger.error('Error sending message', error: e);
+          return false;
+        }
+      });
 
   // Mark messages as read
   Future<void> markThreadAsRead(String threadId) async {
@@ -230,8 +309,14 @@ class ChatService {
         await _chatThreadsCollection
             .doc(threadId)
             .update({'unreadCount.$currentUserId': 0});
-      } catch (e) {
-        debugPrint('Error updating unread count: $e');
+      } on FirebaseException catch (e) {
+        AppLogger.error(
+          'Firebase error updating unread count: ${e.code} - ${e.message}',
+          error: e,
+        );
+        // Continue to try marking messages as read
+      } on Object catch (e) {
+        AppLogger.error('Unexpected error updating unread count', error: e);
         // Continue to try marking messages as read
       }
 
@@ -254,36 +339,232 @@ class ChatService {
 
           await batch.commit();
         }
-      } catch (e) {
-        debugPrint('Error marking messages as read: $e');
+      } on FirebaseException catch (e) {
+        AppLogger.error(
+          'Firebase error marking messages as read: ${e.code} - ${e.message}',
+          error: e,
+        );
+      } on Object catch (e) {
+        AppLogger.error('Unexpected error marking messages as read', error: e);
       }
-    } catch (e) {
-      debugPrint('Error in markThreadAsRead: $e');
+    } on FirebaseException catch (e) {
+      AppLogger.error(
+        'Firebase error in markThreadAsRead: ${e.code} - ${e.message}',
+        error: e,
+      );
+    } on Object catch (e) {
+      AppLogger.error('Unexpected error in markThreadAsRead', error: e);
     }
   }
 
-  // Stream of messages for a specific thread
-  Stream<List<Message>> getMessagesStream(String threadId) =>
-      _chatThreadsCollection
-          .doc(threadId)
-          .collection('messages')
-          .orderBy('timestamp', descending: false)
-          .snapshots()
-          .map(
+  /// Stream of messages for a specific thread.
+  ///
+  /// When a user has cleared the chat, only messages sent *after* the
+  /// `clearedAt.<uid>` timestamp on the thread document are returned.
+  ///
+  /// The thread document (which holds `clearedAt`) is observed via its own
+  /// snapshot listener rather than fetched on every message emission. Because
+  /// `clearedAt` changes extremely rarely, the `.distinct()` filter ensures
+  /// re-filtering only happens when the value actually changes.
+  Stream<List<Message>> getMessagesStream(String threadId) {
+    final uid = currentUserId;
+    final threadOpenTimer = Stopwatch()..start();
+    var openLatencyTracked = false;
+    var qualityTracked = false;
+
+    final messagesQuery = _chatThreadsCollection
+        .doc(threadId)
+        .collection('messages')
+        .orderBy('timestamp', descending: false);
+
+    if (uid == null) {
+      return messagesQuery.snapshots().map(
             (snapshot) => snapshot.docs.map((doc) {
               final data = doc.data();
               return Message(
                 id: doc.id,
                 senderId: data['senderId'] ?? '',
                 text: data['text'] ?? '',
-                timestamp: (data['timestamp'] as Timestamp?)?.toDate() ??
-                    DateTime.now(),
+                timestamp: parseDateTime(data['timestamp']),
                 isRead: data['read'] ?? false,
               );
             }).toList(),
           );
+    }
 
-  // Stream of all chat threads for current user with enhanced error handling
+    final clearedAtStream =
+        _chatThreadsCollection.doc(threadId).snapshots().map((snap) {
+      final data = snap.data() as Map<String, dynamic>?;
+      final clearedAtMap = data?['clearedAt'] as Map<String, dynamic>?;
+      final raw = clearedAtMap?[uid];
+      if (raw is Timestamp) {
+        return raw.toDate();
+      }
+      if (raw is String) {
+        return DateTime.tryParse(raw);
+      }
+      return null;
+    }).distinct();
+
+    final controller = StreamController<List<Message>>();
+    DateTime? clearedAt;
+    String? otherUserId;
+    List<Message>? latestMessages;
+    bool clearedAtReady = false;
+
+    unawaited(
+      _chatThreadsCollection.doc(threadId).get().then<void>(
+        (doc) {
+          final data = doc.data() as Map<String, dynamic>?;
+          final userIds = (data?['userIds'] as List<dynamic>?)
+              ?.map((id) => id.toString())
+              .toList(growable: false);
+          if (userIds != null) {
+            otherUserId = userIds.firstWhere(
+              (id) => id != uid,
+              orElse: () => '',
+            );
+          }
+        },
+        onError: (Object e) {
+          AppLogger.warning(
+            'Unable to resolve thread participants for quality event',
+            error: e,
+          );
+        },
+      ),
+    );
+
+    void emitFiltered() {
+      if (latestMessages == null || !clearedAtReady || controller.isClosed) {
+        return;
+      }
+      final filtered = clearedAt == null
+          ? latestMessages!
+          : latestMessages!
+              .where((m) => m.timestamp.isAfter(clearedAt!))
+              .toList();
+      controller.add(filtered);
+    }
+
+    // One-shot fallback: if the real-time listener fails before delivering
+    // a first value, attempt a single get() so the privacy invariant is
+    // preserved. Only degrades to unfiltered when Firestore is truly
+    // unreachable.
+    void fetchClearedAtFallback() {
+      if (clearedAtReady || controller.isClosed) {
+        return;
+      }
+      unawaited(
+        _chatThreadsCollection.doc(threadId).get().then<void>(
+          (doc) {
+            if (clearedAtReady || controller.isClosed) {
+              return;
+            }
+            final data = doc.data() as Map<String, dynamic>?;
+            final clearedAtMap = data?['clearedAt'] as Map<String, dynamic>?;
+            final raw = clearedAtMap?[uid];
+            if (raw is Timestamp) {
+              clearedAt = raw.toDate();
+            } else if (raw is String) {
+              clearedAt = DateTime.tryParse(raw);
+            }
+            clearedAtReady = true;
+            emitFiltered();
+          },
+          onError: (Object fallbackError) {
+            AppLogger.error(
+              'Fallback clearedAt fetch failed for thread $threadId',
+              error: fallbackError,
+            );
+            if (!clearedAtReady && !controller.isClosed) {
+              clearedAtReady = true;
+              emitFiltered();
+            }
+          },
+        ),
+      );
+    }
+
+    final threadSub = clearedAtStream.listen(
+      (value) {
+        clearedAt = value;
+        clearedAtReady = true;
+        emitFiltered();
+      },
+      onError: (Object e) {
+        AppLogger.error(
+          'Error listening to clearedAt for thread $threadId',
+          error: e,
+        );
+        fetchClearedAtFallback();
+      },
+      onDone: fetchClearedAtFallback,
+    );
+
+    final msgSub = messagesQuery.snapshots().listen(
+      (snapshot) {
+        if (!openLatencyTracked) {
+          openLatencyTracked = true;
+          threadOpenTimer.stop();
+          unawaited(
+            MatchQualityReporter.instance.recordLatency(
+              operation: 'thread_open',
+              latencyMs: threadOpenTimer.elapsedMilliseconds,
+              // TODO(product-excellence): source mode from thread metadata.
+              mode: 'Dating',
+              userId: uid,
+            ),
+          );
+        }
+        latestMessages = snapshot.docs.map((doc) {
+          final data = doc.data();
+          return Message(
+            id: doc.id,
+            senderId: data['senderId'] ?? '',
+            text: data['text'] ?? '',
+            timestamp: parseDateTime(data['timestamp']),
+            isRead: data['read'] ?? false,
+          );
+        }).toList();
+        if (!qualityTracked && latestMessages!.length >= 2) {
+          qualityTracked = true;
+          final quality = calculateConversationQualityMetrics(
+            latestMessages!,
+            currentUserId: uid,
+          );
+          unawaited(
+            MatchQualityReporter.instance.recordConversationQuality(
+              userId: uid,
+              // TODO(product-excellence): source mode from thread metadata.
+              mode: 'Dating',
+              conversationDepth: quality.conversationDepth,
+              responseRate: quality.responseRate,
+              medianReplyDelayMs: quality.medianReplyDelayMs,
+              candidateId: otherUserId,
+            ),
+          );
+        }
+        emitFiltered();
+      },
+      onError: (Object e) {
+        if (!controller.isClosed) {
+          controller.addError(e);
+        }
+      },
+    );
+
+    controller.onCancel = () async {
+      await Future.wait([threadSub.cancel(), msgSub.cancel()]);
+      await controller.close();
+    };
+
+    return controller.stream;
+  }
+
+  // Stream of all chat threads for current user with enhanced error handling.
+  // Threads involving blocked users are filtered out as defense in depth
+  // (the block flow also deletes the thread document).
   Stream<List<MessageThreadInfo>> getChatThreadsStream() {
     if (currentUserId == null) {
       return Stream.value([]);
@@ -294,28 +575,37 @@ class ChatService {
         .orderBy('lastUpdated', descending: true)
         .snapshots()
         .handleError((error) {
-      debugPrint('Error in getChatThreadsStream: $error');
-      // Return empty list on error to prevent UI crashes
+      AppLogger.error('Error in getChatThreadsStream', error: error);
       return [];
-    }).map((snapshot) {
+    }).asyncMap((snapshot) async {
       try {
+        // Fetch blocked user IDs so we can hide their threads even if the
+        // thread document was not yet deleted (race condition / legacy data).
+        final blockedSnapshot = await _firestore
+            .collection('users')
+            .doc(currentUserId)
+            .collection('blockedlist')
+            .get();
+        final blockedIds = blockedSnapshot.docs.map((doc) => doc.id).toSet();
+
         return snapshot.docs
             .map((doc) {
               try {
                 final data = doc.data() as Map<String, dynamic>;
 
-                // Find the other user's ID
                 final userIds = List<String>.from(data['userIds'] ?? []);
                 final otherUserId = userIds.firstWhere(
                   (id) => id != currentUserId,
                   orElse: () => '',
                 );
 
-                // Get user names
                 final userNames = data['userNames'] as Map<String, dynamic>?;
                 final otherUserName = userNames?[otherUserId] ?? 'User';
 
-                // Get unread count for current user
+                final userAvatars =
+                    data['userAvatars'] as Map<String, dynamic>?;
+                final avatarUrl = userAvatars?[otherUserId] as String?;
+
                 final unreadCount =
                     data['unreadCount'] as Map<String, dynamic>?;
                 final unread = (unreadCount?[currentUserId] ?? 0) > 0;
@@ -326,13 +616,28 @@ class ChatService {
                   otherUserName: otherUserName,
                   lastMessage: data['lastMessageText'] ?? 'Say hello!',
                   lastMessageSenderId: data['lastMessageSenderId'],
-                  timestamp: (data['lastUpdated'] as Timestamp?)?.toDate() ??
-                      DateTime.now(),
+                  timestamp: parseDateTime(data['lastUpdated']),
                   unread: unread,
+                  avatarUrl: avatarUrl,
                 );
-              } catch (e) {
-                debugPrint('Error processing individual thread: $e');
-                // Return a placeholder thread to avoid breaking the entire list
+              } on FirebaseException catch (e) {
+                AppLogger.error(
+                  'Firebase error processing individual thread: ${e.code} - ${e.message}',
+                  error: e,
+                );
+                return MessageThreadInfo(
+                  threadId: doc.id,
+                  otherUserId: '',
+                  otherUserName: 'Unknown User',
+                  lastMessage: 'Error loading message',
+                  timestamp: DateTime.now(),
+                  unread: false,
+                );
+              } on Object catch (e) {
+                AppLogger.error(
+                  'Unexpected error processing individual thread',
+                  error: e,
+                );
                 return MessageThreadInfo(
                   threadId: doc.id,
                   otherUserId: '',
@@ -343,10 +648,20 @@ class ChatService {
                 );
               }
             })
-            .where((thread) => thread.otherUserId.isNotEmpty)
+            .where(
+              (thread) =>
+                  thread.otherUserId.isNotEmpty &&
+                  !blockedIds.contains(thread.otherUserId),
+            )
             .toList();
-      } catch (e) {
-        debugPrint('Error mapping chat threads: $e');
+      } on FirebaseException catch (e) {
+        AppLogger.error(
+          'Firebase error mapping chat threads: ${e.code} - ${e.message}',
+          error: e,
+        );
+        return <MessageThreadInfo>[];
+      } on Object catch (e) {
+        AppLogger.error('Unexpected error mapping chat threads', error: e);
         return <MessageThreadInfo>[];
       }
     });
@@ -389,8 +704,17 @@ class ChatService {
       }
 
       return false;
-    } catch (e) {
-      debugPrint('Error checking if users are matched: $e');
+    } on FirebaseException catch (e) {
+      AppLogger.error(
+        'Firebase error checking if users are matched: ${e.code} - ${e.message}',
+        error: e,
+      );
+      return false;
+    } on Object catch (e) {
+      AppLogger.error(
+        'Unexpected error checking if users are matched',
+        error: e,
+      );
       return false;
     }
   }
@@ -419,8 +743,14 @@ class ChatService {
           .get();
 
       return blockedUserBlockDoc.exists;
-    } catch (e) {
-      debugPrint('Error checking if user is blocked: $e');
+    } on FirebaseException catch (e) {
+      AppLogger.error(
+        'Firebase error checking if user is blocked: ${e.code} - ${e.message}',
+        error: e,
+      );
+      return false;
+    } on Object catch (e) {
+      AppLogger.error('Unexpected error checking if user is blocked', error: e);
       return false;
     }
   }
@@ -429,14 +759,14 @@ class ChatService {
   Future<bool> deleteChatThread(String threadId) async {
     try {
       if (currentUserId == null) {
-        debugPrint('❌ Cannot delete chat: No current user');
+        AppLogger.debug('Cannot delete chat: No current user');
         return false;
       }
 
       // Get thread info to find the other user
       final threadDoc = await _chatThreadsCollection.doc(threadId).get();
       if (!threadDoc.exists) {
-        debugPrint('❌ Chat thread not found: $threadId');
+        AppLogger.debug('Chat thread not found: $threadId');
         return false;
       }
 
@@ -444,39 +774,45 @@ class ChatService {
       final userIds = List<String>.from(threadData['userIds'] ?? []);
 
       if (userIds.length != 2) {
-        debugPrint(
-          '❌ Invalid chat thread: Expected 2 users, got ${userIds.length}',
+        AppLogger.debug(
+          'Invalid chat thread: Expected 2 users, got ${userIds.length}',
         );
         return false;
       }
 
       // Verify current user is part of this chat
       if (!userIds.contains(currentUserId)) {
-        debugPrint(
-          '❌ Permission denied: User $currentUserId not part of chat $threadId',
+        AppLogger.debug(
+          'Permission denied: User $currentUserId not part of chat $threadId',
         );
         return false;
       }
 
       final otherUserId = userIds.firstWhere((id) => id != currentUserId);
-      debugPrint('🗑️ Deleting chat between $currentUserId and $otherUserId');
+      AppLogger.debug('Deleting chat between $currentUserId and $otherUserId');
 
       // Delete all messages in the thread first
       await _deleteAllMessagesInThread(threadId);
 
       // Delete the thread document
       await _chatThreadsCollection.doc(threadId).delete();
-      debugPrint('✅ Chat thread deleted: $threadId');
+      AppLogger.debug('Chat thread deleted: $threadId');
 
       // Unmatch users - remove from both users' matches collections
       await _unmatchUsers(currentUserId!, otherUserId);
 
-      debugPrint(
-        '✅ Chat deleted and users unmatched: $currentUserId <-> $otherUserId',
+      AppLogger.debug(
+        'Chat deleted and users unmatched: $currentUserId <-> $otherUserId',
       );
       return true;
-    } catch (e) {
-      debugPrint('❌ Error deleting chat thread: $e');
+    } on FirebaseException catch (e) {
+      AppLogger.error(
+        'Firebase error deleting chat thread: ${e.code} - ${e.message}',
+        error: e,
+      );
+      return false;
+    } on Object catch (e) {
+      AppLogger.error('Unexpected error deleting chat thread', error: e);
       return false;
     }
   }
@@ -489,7 +825,7 @@ class ChatService {
       final messagesSnapshot = await messagesRef.get();
 
       if (messagesSnapshot.docs.isEmpty) {
-        debugPrint('📭 No messages to delete in thread $threadId');
+        AppLogger.debug('No messages to delete in thread $threadId');
         return;
       }
 
@@ -507,14 +843,20 @@ class ChatService {
         }
 
         await batch.commit();
-        debugPrint(
-          '🗑️ Deleted ${endIndex - i} messages from thread $threadId',
+        AppLogger.debug(
+          'Deleted ${endIndex - i} messages from thread $threadId',
         );
       }
 
-      debugPrint('✅ All messages deleted from thread $threadId');
-    } catch (e) {
-      debugPrint('❌ Error deleting messages: $e');
+      AppLogger.debug('All messages deleted from thread $threadId');
+    } on FirebaseException catch (e) {
+      AppLogger.error(
+        'Firebase error deleting messages: ${e.code} - ${e.message}',
+        error: e,
+      );
+      // Don't throw - continue with thread deletion even if message deletion fails
+    } on Object catch (e) {
+      AppLogger.error('Unexpected error deleting messages', error: e);
       // Don't throw - continue with thread deletion even if message deletion fails
     }
   }
@@ -522,7 +864,7 @@ class ChatService {
   // Unmatch two users by removing their match records
   Future<void> _unmatchUsers(String userId1, String userId2) async {
     try {
-      debugPrint('🔄 Unmatching users: $userId1 <-> $userId2');
+      AppLogger.debug('Unmatching users: $userId1 <-> $userId2');
 
       // Use separate operations instead of batch to handle permission issues better
       await _removeFromMatchesCollection(userId1, userId2);
@@ -530,9 +872,15 @@ class ChatService {
       await _removeFromUserSubcollections(userId1, userId2);
       await _removeLikesForUnmatch(userId1, userId2);
 
-      debugPrint('✅ Users successfully unmatched');
-    } catch (e) {
-      debugPrint('❌ Error unmatching users: $e');
+      AppLogger.debug('Users successfully unmatched');
+    } on FirebaseException catch (e) {
+      AppLogger.error(
+        'Firebase error unmatching users: ${e.code} - ${e.message}',
+        error: e,
+      );
+      // Don't throw - unmatching is secondary to chat deletion
+    } on Object catch (e) {
+      AppLogger.error('Unexpected error unmatching users', error: e);
       // Don't throw - unmatching is secondary to chat deletion
     }
   }
@@ -552,11 +900,19 @@ class ChatService {
         final users = List<String>.from(doc.data()['users'] ?? []);
         if (users.contains(userId2)) {
           await doc.reference.delete();
-          debugPrint('🗑️ Deleted match: ${doc.id}');
+          AppLogger.debug('Deleted match: ${doc.id}');
         }
       }
-    } catch (e) {
-      debugPrint('❌ Error removing from matches collection: $e');
+    } on FirebaseException catch (e) {
+      AppLogger.error(
+        'Firebase error removing from matches collection: ${e.code} - ${e.message}',
+        error: e,
+      );
+    } on Object catch (e) {
+      AppLogger.error(
+        'Unexpected error removing from matches collection',
+        error: e,
+      );
     }
   }
 
@@ -575,11 +931,19 @@ class ChatService {
         final users = List<String>.from(doc.data()['users'] ?? []);
         if (users.contains(userId2)) {
           await doc.reference.delete();
-          debugPrint('🗑️ Deleted legacy match: ${doc.id}');
+          AppLogger.debug('Deleted legacy match: ${doc.id}');
         }
       }
-    } catch (e) {
-      debugPrint('❌ Error removing from legacy matches collection: $e');
+    } on FirebaseException catch (e) {
+      AppLogger.error(
+        'Firebase error removing from legacy matches collection: ${e.code} - ${e.message}',
+        error: e,
+      );
+    } on Object catch (e) {
+      AppLogger.error(
+        'Unexpected error removing from legacy matches collection',
+        error: e,
+      );
     }
   }
 
@@ -597,10 +961,16 @@ class ChatService {
             .collection('Matches')
             .doc(userId2)
             .delete();
-        debugPrint('🗑️ Removed $userId2 from $userId1 matches subcollection');
-      } catch (e) {
-        debugPrint(
-          '⚠️ Could not remove from $userId1 matches subcollection: $e',
+        AppLogger.debug('Removed $userId2 from $userId1 matches subcollection');
+      } on FirebaseException catch (e) {
+        AppLogger.warning(
+          'Firebase error removing from $userId1 matches subcollection: ${e.code} - ${e.message}',
+          error: e,
+        );
+      } on Object catch (e) {
+        AppLogger.warning(
+          'Could not remove from $userId1 matches subcollection',
+          error: e,
         );
       }
 
@@ -612,14 +982,28 @@ class ChatService {
             .collection('Matches')
             .doc(userId1)
             .delete();
-        debugPrint('🗑️ Removed $userId1 from $userId2 matches subcollection');
-      } catch (e) {
-        debugPrint(
-          '⚠️ Could not remove from $userId2 matches subcollection: $e',
+        AppLogger.debug('Removed $userId1 from $userId2 matches subcollection');
+      } on FirebaseException catch (e) {
+        AppLogger.warning(
+          'Firebase error removing from $userId2 matches subcollection: ${e.code} - ${e.message}',
+          error: e,
+        );
+      } on Object catch (e) {
+        AppLogger.warning(
+          'Could not remove from $userId2 matches subcollection',
+          error: e,
         );
       }
-    } catch (e) {
-      debugPrint('❌ Error removing from user subcollections: $e');
+    } on FirebaseException catch (e) {
+      AppLogger.error(
+        'Firebase error removing from user subcollections: ${e.code} - ${e.message}',
+        error: e,
+      );
+    } on Object catch (e) {
+      AppLogger.error(
+        'Unexpected error removing from user subcollections',
+        error: e,
+      );
     }
   }
 
@@ -634,9 +1018,17 @@ class ChatService {
             .collection('LikedBy')
             .doc(userId2)
             .delete();
-        debugPrint('🗑️ Removed like: $userId2 -> $userId1');
-      } catch (e) {
-        debugPrint('⚠️ Could not remove like $userId2 -> $userId1: $e');
+        AppLogger.debug('Removed like: $userId2 -> $userId1');
+      } on FirebaseException catch (e) {
+        AppLogger.warning(
+          'Firebase error removing like $userId2 -> $userId1: ${e.code} - ${e.message}',
+          error: e,
+        );
+      } on Object catch (e) {
+        AppLogger.warning(
+          'Could not remove like $userId2 -> $userId1',
+          error: e,
+        );
       }
 
       // Remove user1 from user2's LikedBy collection
@@ -647,12 +1039,25 @@ class ChatService {
             .collection('LikedBy')
             .doc(userId1)
             .delete();
-        debugPrint('🗑️ Removed like: $userId1 -> $userId2');
-      } catch (e) {
-        debugPrint('⚠️ Could not remove like $userId1 -> $userId2: $e');
+        AppLogger.debug('Removed like: $userId1 -> $userId2');
+      } on FirebaseException catch (e) {
+        AppLogger.warning(
+          'Firebase error removing like $userId1 -> $userId2: ${e.code} - ${e.message}',
+          error: e,
+        );
+      } on Object catch (e) {
+        AppLogger.warning(
+          'Could not remove like $userId1 -> $userId2',
+          error: e,
+        );
       }
-    } catch (e) {
-      debugPrint('❌ Error removing likes: $e');
+    } on FirebaseException catch (e) {
+      AppLogger.error(
+        'Firebase error removing likes: ${e.code} - ${e.message}',
+        error: e,
+      );
+    } on Object catch (e) {
+      AppLogger.error('Unexpected error removing likes', error: e);
     }
   }
 }

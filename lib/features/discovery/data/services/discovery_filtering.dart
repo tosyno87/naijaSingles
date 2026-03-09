@@ -36,7 +36,7 @@ class DiscoveryFiltering {
     }
 
     final candidateGender = normalizeGender(
-      user.userGender?.toString().isNotEmpty == true
+      user.userGender?.toString().isNotEmpty ?? false
           ? user.userGender
           : user.editInfo?['userGender']?.toString(),
     );

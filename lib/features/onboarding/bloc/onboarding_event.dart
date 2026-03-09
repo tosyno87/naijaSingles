@@ -44,6 +44,15 @@ final class OnboardingTribeUpdated extends OnboardingEvent {
   List<Object?> get props => [tribe];
 }
 
+final class OnboardingRaceUpdated extends OnboardingEvent {
+  const OnboardingRaceUpdated(this.race);
+
+  final String race;
+
+  @override
+  List<Object?> get props => [race];
+}
+
 final class OnboardingBioUpdated extends OnboardingEvent {
   const OnboardingBioUpdated(this.bio);
 

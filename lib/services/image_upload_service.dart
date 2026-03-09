@@ -1,10 +1,10 @@
+import 'dart:developer' as dev;
 import 'dart:io';
 import 'dart:typed_data';
 
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
-import 'package:path/path.dart' as path;
 
 /// Service for handling image uploads to Firebase Storage
 class ImageUploadService {
@@ -34,7 +34,7 @@ class ImageUploadService {
         return File(image.path);
       }
       return null;
-    } catch (e) {
+    } on Object catch (e) {
       throw Exception('Failed to pick image: $e');
     }
   }
@@ -46,29 +46,60 @@ class ImageUploadService {
     String? fileName,
   }) async {
     try {
+      if (!imageFile.existsSync()) {
+        throw Exception('Selected image file does not exist.');
+      }
+
+      final extension = _extensionFromPath(imageFile.path);
+      final contentType = _contentTypeForExtension(extension);
+
       // Generate unique filename if not provided
-      final String finalFileName =
-          fileName ?? '${DateTime.now().millisecondsSinceEpoch}.jpg';
+      final String finalFileName = fileName ??
+          '${DateTime.now().millisecondsSinceEpoch}'
+              '${extension.isNotEmpty ? extension : '.jpg'}';
 
-      // Create reference to Firebase Storage
-      final Reference ref = _storage.ref().child('$path/$finalFileName');
+      final storagePath = '$path/$finalFileName';
+      final bucket = _storage.app.options.storageBucket ?? 'NO_BUCKET';
+      final fileSize = imageFile.lengthSync();
 
-      // Upload file
-      final UploadTask uploadTask = ref.putFile(imageFile);
+      dev.log(
+        '📤 Upload: $storagePath | bucket=$bucket | '
+        'size=${fileSize}B | type=$contentType',
+      );
 
-      // Wait for upload to complete
+      final Reference ref = _storage.ref().child(storagePath);
+
+      final bytes = await imageFile.readAsBytes();
+      final UploadTask uploadTask = ref.putData(
+        bytes,
+        SettableMetadata(contentType: contentType),
+      );
+
       final TaskSnapshot snapshot = await uploadTask;
-
-      // Get download URL
       final String downloadUrl = await snapshot.ref.getDownloadURL();
 
+      dev.log('✅ Upload succeeded: $storagePath');
       return downloadUrl;
-    } catch (e) {
+    } on FirebaseException catch (e) {
+      final bucket = _storage.app.options.storageBucket ?? 'NO_BUCKET';
+      dev.log(
+        '❌ Upload FirebaseException: code=${e.code}, '
+        'message=${e.message}, plugin=${e.plugin}, bucket=$bucket',
+      );
+      throw Exception(
+        'Storage error [${e.code}]: ${e.message ?? 'no details'} '
+        '(plugin: ${e.plugin}, bucket: $bucket)',
+      );
+    } on Object catch (e) {
+      dev.log('❌ Upload error: $e');
       throw Exception('Failed to upload image: $e');
     }
   }
 
-  /// Upload image with compression
+  /// Upload image with compression.
+  ///
+  /// Currently delegates directly to [uploadImage]. When a compression
+  /// package (e.g. flutter_image_compress) is added, compress here first.
   Future<String> uploadCompressedImage({
     required File imageFile,
     required String path,
@@ -76,26 +107,19 @@ class ImageUploadService {
     int quality = 85,
     int maxWidth = 800,
     int maxHeight = 800,
-  }) async {
-    try {
-      // For now, upload as-is. In production, you'd compress the image
-      // using packages like flutter_image_compress
-      return await uploadImage(
+  }) =>
+      uploadImage(
         imageFile: imageFile,
         path: path,
         fileName: fileName,
       );
-    } catch (e) {
-      throw Exception('Failed to upload compressed image: $e');
-    }
-  }
 
   /// Delete image from Firebase Storage
   Future<void> deleteImage(String imageUrl) async {
     try {
       final Reference ref = _storage.refFromURL(imageUrl);
       await ref.delete();
-    } catch (e) {
+    } on Object catch (e) {
       throw Exception('Failed to delete image: $e');
     }
   }
@@ -105,7 +129,7 @@ class ImageUploadService {
     try {
       final Uint8List bytes = await imageFile.readAsBytes();
       return bytes.length;
-    } catch (e) {
+    } on Object catch (e) {
       throw Exception('Failed to get image size: $e');
     }
   }
@@ -113,13 +137,15 @@ class ImageUploadService {
   /// Validate image file
   bool validateImage(File imageFile) {
     try {
-      final String extension = path.extension(imageFile.path).toLowerCase();
+      final String extension = _extensionFromPath(imageFile.path);
       const List<String> allowedExtensions = [
         '.jpg',
         '.jpeg',
         '.png',
         '.gif',
         '.webp',
+        '.heic',
+        '.heif',
       ];
 
       if (!allowedExtensions.contains(extension)) {
@@ -135,64 +161,95 @@ class ImageUploadService {
       }
 
       return true;
-    } catch (e) {
+    } on Object {
       return false;
     }
   }
 
+  String _contentTypeForExtension(String extension) {
+    switch (extension) {
+      case '.jpg':
+      case '.jpeg':
+        return 'image/jpeg';
+      case '.png':
+        return 'image/png';
+      case '.gif':
+        return 'image/gif';
+      case '.webp':
+        return 'image/webp';
+      case '.heic':
+        return 'image/heic';
+      case '.heif':
+        return 'image/heif';
+      default:
+        return 'image/jpeg';
+    }
+  }
+
+  String _extensionFromPath(String filePath) {
+    final index = filePath.lastIndexOf('.');
+    if (index < 0 || index == filePath.length - 1) {
+      return '';
+    }
+    return filePath.substring(index).toLowerCase();
+  }
+
   /// Show image picker dialog
-  Future<File?> showImagePickerDialog() async => showDialog<File>(
-        context: navigatorKey.currentContext!,
-        builder: (BuildContext context) => AlertDialog(
-          title: const Text('Select Image'),
-          content: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              ListTile(
-                leading: const Icon(Icons.photo_library),
-                title: const Text('Gallery'),
-                onTap: () async {
-                  Navigator.pop(context);
-                  final File? image = await pickImage();
-                  if (image != null && validateImage(image)) {
-                    Navigator.pop(context, image);
-                  } else if (image != null) {
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      const SnackBar(
-                        content: Text(
-                          'Invalid image. Please select a valid image file.',
-                        ),
-                        backgroundColor: Colors.red,
+  Future<File?> showImagePickerDialog() async {
+    final ctx = navigatorKey.currentContext;
+    if (ctx == null) return null;
+    return showDialog<File>(
+      context: ctx,
+      builder: (BuildContext context) => AlertDialog(
+        title: const Text('Select Image'),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            ListTile(
+              leading: const Icon(Icons.photo_library),
+              title: const Text('Gallery'),
+              onTap: () async {
+                final File? image = await pickImage();
+                if (!context.mounted) return;
+                if (image != null && validateImage(image)) {
+                  Navigator.pop(context, image);
+                } else if (image != null) {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    const SnackBar(
+                      content: Text(
+                        'Invalid image. Please select a valid image file.',
                       ),
-                    );
-                  }
-                },
-              ),
-              ListTile(
-                leading: const Icon(Icons.camera_alt),
-                title: const Text('Camera'),
-                onTap: () async {
-                  Navigator.pop(context);
-                  final File? image =
-                      await pickImage(source: ImageSource.camera);
-                  if (image != null && validateImage(image)) {
-                    Navigator.pop(context, image);
-                  } else if (image != null) {
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      const SnackBar(
-                        content: Text(
-                          'Invalid image. Please select a valid image file.',
-                        ),
-                        backgroundColor: Colors.red,
+                      backgroundColor: Colors.red,
+                    ),
+                  );
+                }
+              },
+            ),
+            ListTile(
+              leading: const Icon(Icons.camera_alt),
+              title: const Text('Camera'),
+              onTap: () async {
+                final File? image = await pickImage(source: ImageSource.camera);
+                if (!context.mounted) return;
+                if (image != null && validateImage(image)) {
+                  Navigator.pop(context, image);
+                } else if (image != null) {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    const SnackBar(
+                      content: Text(
+                        'Invalid image. Please select a valid image file.',
                       ),
-                    );
-                  }
-                },
-              ),
-            ],
-          ),
+                      backgroundColor: Colors.red,
+                    ),
+                  );
+                }
+              },
+            ),
+          ],
         ),
-      );
+      ),
+    );
+  }
 }
 
 // Global navigator key for accessing context

@@ -1,8 +1,12 @@
+import 'dart:async';
+
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 
 import '../../../common/constants/app_colors.dart';
+import '../../../common/constants/app_spacing.dart';
+import '../../../common/widgets/state_views/state_views.dart';
 import '../data/services/unified_group_service.dart';
 
 /// Comprehensive Member Management Screen
@@ -29,7 +33,6 @@ class _MemberManagementScreenState extends State<MemberManagementScreen>
   List<Map<String, dynamic>> _searchResults = [];
   bool _isSearching = false;
   bool _isLoading = false;
-  String? _error;
 
   @override
   void initState() {
@@ -82,12 +85,21 @@ class _MemberManagementScreenState extends State<MemberManagementScreen>
             ],
           ),
         ),
-        body: TabBarView(
-          controller: _tabController,
+        body: Stack(
           children: [
-            _buildMembersTab(),
-            _buildAdminsTab(),
-            _buildInviteTab(),
+            TabBarView(
+              controller: _tabController,
+              children: [
+                _buildMembersTab(),
+                _buildAdminsTab(),
+                _buildInviteTab(),
+              ],
+            ),
+            if (_isLoading)
+              ColoredBox(
+                color: Colors.black.withValues(alpha: 0.2),
+                child: const Center(child: AppLoadingView()),
+              ),
           ],
         ),
       );
@@ -106,10 +118,10 @@ class _MemberManagementScreenState extends State<MemberManagementScreen>
   Widget _buildInviteTab() => _buildInviteSection();
 
   Widget _buildSearchBar() => Container(
-        margin: const EdgeInsets.all(16),
+        margin: const EdgeInsets.all(AppSpacing.md),
         decoration: BoxDecoration(
           color: Colors.grey[100],
-          borderRadius: BorderRadius.circular(12),
+          borderRadius: BorderRadius.circular(AppSpacing.buttonRadius),
         ),
         child: TextField(
           controller: _searchController,
@@ -118,8 +130,10 @@ class _MemberManagementScreenState extends State<MemberManagementScreen>
             hintStyle: GoogleFonts.montserrat(color: Colors.grey[600]),
             prefixIcon: const Icon(Icons.search, color: AppColors.primaryGreen),
             border: InputBorder.none,
-            contentPadding:
-                const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+            contentPadding: const EdgeInsets.symmetric(
+              horizontal: AppSpacing.md,
+              vertical: 12,
+            ),
           ),
           onChanged: _onSearchChanged,
         ),
@@ -132,14 +146,15 @@ class _MemberManagementScreenState extends State<MemberManagementScreen>
     final creatorId = widget.group.creatorId;
 
     if (members.isEmpty) {
-      return _buildEmptyState(
-        'No members yet',
-        'Invite people to join your group',
+      return const AppEmptyView(
+        title: 'No members yet',
+        subtitle: 'Invite people to join your group',
+        icon: Icons.people_outline,
       );
     }
 
     return ListView.builder(
-      padding: const EdgeInsets.symmetric(horizontal: 16),
+      padding: const EdgeInsets.symmetric(horizontal: AppSpacing.md),
       itemCount: members.length,
       itemBuilder: (context, index) {
         final memberId = members[index];
@@ -164,11 +179,15 @@ class _MemberManagementScreenState extends State<MemberManagementScreen>
     final creatorId = widget.group.creatorId;
 
     if (admins.isEmpty) {
-      return _buildEmptyState('No admins', 'Promote members to admin status');
+      return const AppEmptyView(
+        title: 'No admins',
+        subtitle: 'Promote members to admin status',
+        icon: Icons.people_outline,
+      );
     }
 
     return ListView.builder(
-      padding: const EdgeInsets.symmetric(horizontal: 16),
+      padding: const EdgeInsets.symmetric(horizontal: AppSpacing.md),
       itemCount: admins.length,
       itemBuilder: (context, index) {
         final adminId = admins[index];
@@ -189,11 +208,11 @@ class _MemberManagementScreenState extends State<MemberManagementScreen>
   Widget _buildInviteSection() => Column(
         children: [
           Container(
-            margin: const EdgeInsets.all(16),
-            padding: const EdgeInsets.all(16),
+            margin: const EdgeInsets.all(AppSpacing.md),
+            padding: AppSpacing.cardPadding,
             decoration: BoxDecoration(
               color: AppColors.primaryGreen.withValues(alpha: 0.1),
-              borderRadius: BorderRadius.circular(12),
+              borderRadius: BorderRadius.circular(AppSpacing.buttonRadius),
             ),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -206,7 +225,7 @@ class _MemberManagementScreenState extends State<MemberManagementScreen>
                     color: AppColors.primaryGreen,
                   ),
                 ),
-                const SizedBox(height: 8),
+                const SizedBox(height: AppSpacing.sm),
                 Text(
                   'Search for users by name, email, or username to invite them to your group.',
                   style: GoogleFonts.montserrat(
@@ -220,11 +239,12 @@ class _MemberManagementScreenState extends State<MemberManagementScreen>
           _buildSearchBar(),
           Expanded(
             child: _isSearching
-                ? const Center(child: CircularProgressIndicator())
+                ? const AppLoadingView()
                 : _searchResults.isEmpty
-                    ? _buildEmptyState(
-                        'No search results',
-                        'Try searching for users to invite',
+                    ? const AppEmptyView(
+                        title: 'No search results',
+                        subtitle: 'Try searching for users to invite',
+                        icon: Icons.people_outline,
                       )
                     : _buildSearchResults(),
           ),
@@ -239,11 +259,11 @@ class _MemberManagementScreenState extends State<MemberManagementScreen>
     required bool canManage,
   }) =>
       Container(
-        margin: const EdgeInsets.only(bottom: 8),
-        padding: const EdgeInsets.all(16),
+        margin: const EdgeInsets.only(bottom: AppSpacing.sm),
+        padding: AppSpacing.cardPadding,
         decoration: BoxDecoration(
           color: Colors.white,
-          borderRadius: BorderRadius.circular(12),
+          borderRadius: BorderRadius.circular(AppSpacing.buttonRadius),
           border: Border.all(color: Colors.grey[200]!),
           boxShadow: [
             BoxShadow(
@@ -285,16 +305,17 @@ class _MemberManagementScreenState extends State<MemberManagementScreen>
                           color: Colors.black,
                         ),
                       ),
-                      const SizedBox(width: 8),
+                      const SizedBox(width: AppSpacing.sm),
                       if (isCreator)
                         Container(
                           padding: const EdgeInsets.symmetric(
-                            horizontal: 8,
+                            horizontal: AppSpacing.sm,
                             vertical: 2,
                           ),
                           decoration: BoxDecoration(
                             color: Colors.amber,
-                            borderRadius: BorderRadius.circular(12),
+                            borderRadius:
+                                BorderRadius.circular(AppSpacing.buttonRadius),
                           ),
                           child: Text(
                             'CREATOR',
@@ -308,12 +329,13 @@ class _MemberManagementScreenState extends State<MemberManagementScreen>
                       else if (isAdmin)
                         Container(
                           padding: const EdgeInsets.symmetric(
-                            horizontal: 8,
+                            horizontal: AppSpacing.sm,
                             vertical: 2,
                           ),
                           decoration: BoxDecoration(
                             color: AppColors.primaryGreen,
-                            borderRadius: BorderRadius.circular(12),
+                            borderRadius:
+                                BorderRadius.circular(AppSpacing.buttonRadius),
                           ),
                           child: Text(
                             'ADMIN',
@@ -326,7 +348,7 @@ class _MemberManagementScreenState extends State<MemberManagementScreen>
                         ),
                     ],
                   ),
-                  const SizedBox(height: 4),
+                  const SizedBox(height: AppSpacing.xs),
                   Text(
                     isCurrentUser ? 'You' : 'Member',
                     style: GoogleFonts.montserrat(
@@ -352,7 +374,7 @@ class _MemberManagementScreenState extends State<MemberManagementScreen>
                             Icons.admin_panel_settings,
                             color: AppColors.primaryGreen,
                           ),
-                          SizedBox(width: 8),
+                          SizedBox(width: AppSpacing.sm),
                           Text('Promote to Admin'),
                         ],
                       ),
@@ -363,7 +385,7 @@ class _MemberManagementScreenState extends State<MemberManagementScreen>
                       child: Row(
                         children: [
                           Icon(Icons.person, color: Colors.orange),
-                          SizedBox(width: 8),
+                          SizedBox(width: AppSpacing.sm),
                           Text('Demote to Member'),
                         ],
                       ),
@@ -373,7 +395,7 @@ class _MemberManagementScreenState extends State<MemberManagementScreen>
                     child: Row(
                       children: [
                         Icon(Icons.person_remove, color: Colors.red),
-                        SizedBox(width: 8),
+                        SizedBox(width: AppSpacing.sm),
                         Text('Remove from Group'),
                       ],
                     ),
@@ -385,16 +407,16 @@ class _MemberManagementScreenState extends State<MemberManagementScreen>
       );
 
   Widget _buildSearchResults() => ListView.builder(
-        padding: const EdgeInsets.symmetric(horizontal: 16),
+        padding: const EdgeInsets.symmetric(horizontal: AppSpacing.md),
         itemCount: _searchResults.length,
         itemBuilder: (context, index) {
           final user = _searchResults[index];
           return Container(
-            margin: const EdgeInsets.only(bottom: 8),
-            padding: const EdgeInsets.all(16),
+            margin: const EdgeInsets.only(bottom: AppSpacing.sm),
+            padding: AppSpacing.cardPadding,
             decoration: BoxDecoration(
               color: Colors.white,
-              borderRadius: BorderRadius.circular(12),
+              borderRadius: BorderRadius.circular(AppSpacing.buttonRadius),
               border: Border.all(color: Colors.grey[200]!),
             ),
             child: Row(
@@ -446,7 +468,8 @@ class _MemberManagementScreenState extends State<MemberManagementScreen>
                     backgroundColor: AppColors.primaryGreen,
                     foregroundColor: Colors.white,
                     shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(20),
+                      borderRadius:
+                          BorderRadius.circular(AppSpacing.chipRadius),
                     ),
                   ),
                   child: Text(
@@ -458,37 +481,6 @@ class _MemberManagementScreenState extends State<MemberManagementScreen>
             ),
           );
         },
-      );
-
-  Widget _buildEmptyState(String title, String subtitle) => Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Icon(
-              Icons.people_outline,
-              size: 64,
-              color: Colors.grey[400],
-            ),
-            const SizedBox(height: 16),
-            Text(
-              title,
-              style: GoogleFonts.montserrat(
-                fontSize: 18,
-                fontWeight: FontWeight.w600,
-                color: Colors.grey[600],
-              ),
-            ),
-            const SizedBox(height: 8),
-            Text(
-              subtitle,
-              style: GoogleFonts.montserrat(
-                fontSize: 14,
-                color: Colors.grey[500],
-              ),
-              textAlign: TextAlign.center,
-            ),
-          ],
-        ),
       );
 
   void _onSearchChanged(String query) {
@@ -504,38 +496,39 @@ class _MemberManagementScreenState extends State<MemberManagementScreen>
       _isSearching = true;
     });
 
-    _groupService
-        .searchUsersForInvitation(
-      query: query,
-      groupId: widget.group.id,
-    )
-        .then((results) {
-      if (mounted) {
-        setState(() {
-          _searchResults = results;
-          _isSearching = false;
-        });
-      }
-    }).catchError((error) {
-      if (mounted) {
-        setState(() {
-          _error = error.toString();
-          _isSearching = false;
-        });
-      }
-    });
+    unawaited(
+      _groupService
+          .searchUsersForInvitation(
+        query: query,
+        groupId: widget.group.id,
+      )
+          .then((results) {
+        if (mounted) {
+          setState(() {
+            _searchResults = results;
+            _isSearching = false;
+          });
+        }
+      }).catchError((error) {
+        if (mounted) {
+          setState(() {
+            _isSearching = false;
+          });
+        }
+      }),
+    );
   }
 
   void _handleMemberAction(String action, String memberId) {
     switch (action) {
       case 'promote':
-        _promoteMember(memberId);
+        unawaited(_promoteMember(memberId));
         break;
       case 'demote':
-        _demoteMember(memberId);
+        unawaited(_demoteMember(memberId));
         break;
       case 'remove':
-        _removeMember(memberId);
+        unawaited(_removeMember(memberId));
         break;
     }
   }
@@ -555,11 +548,11 @@ class _MemberManagementScreenState extends State<MemberManagementScreen>
           ),
         );
       }
-    } catch (e) {
+    } on Object catch (_) {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text('Error: $e'),
+          const SnackBar(
+            content: Text('Failed to promote member. Please try again.'),
             backgroundColor: Colors.red,
           ),
         );
@@ -586,11 +579,11 @@ class _MemberManagementScreenState extends State<MemberManagementScreen>
           ),
         );
       }
-    } catch (e) {
+    } on Object catch (_) {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text('Error: $e'),
+          const SnackBar(
+            content: Text('Failed to demote member. Please try again.'),
             backgroundColor: Colors.red,
           ),
         );
@@ -608,7 +601,8 @@ class _MemberManagementScreenState extends State<MemberManagementScreen>
       builder: (context) => AlertDialog(
         title: const Text('Remove Member'),
         content: const Text(
-            'Are you sure you want to remove this member from the group?'),
+          'Are you sure you want to remove this member from the group?',
+        ),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context, false),
@@ -638,11 +632,11 @@ class _MemberManagementScreenState extends State<MemberManagementScreen>
             ),
           );
         }
-      } catch (e) {
+      } on Object catch (_) {
         if (mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(
-              content: Text('Error: $e'),
+            const SnackBar(
+              content: Text('Failed to remove member. Please try again.'),
               backgroundColor: Colors.red,
             ),
           );
@@ -677,11 +671,11 @@ class _MemberManagementScreenState extends State<MemberManagementScreen>
           _searchResults.removeWhere((user) => user['id'] == userId);
         });
       }
-    } catch (e) {
+    } on Object catch (_) {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text('Error: $e'),
+          const SnackBar(
+            content: Text('Failed to send invitation. Please try again.'),
             backgroundColor: Colors.red,
           ),
         );
@@ -694,37 +688,39 @@ class _MemberManagementScreenState extends State<MemberManagementScreen>
   }
 
   void _showInviteDialog() {
-    showDialog(
-      context: context,
-      builder: (context) => AlertDialog(
-        title: const Text('Invite Members'),
-        content: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            TextField(
-              controller: _inviteMessageController,
-              decoration: const InputDecoration(
-                labelText: 'Custom message (optional)',
-                hintText: 'Add a personal message to your invitation',
-                border: OutlineInputBorder(),
+    unawaited(
+      showDialog(
+        context: context,
+        builder: (context) => AlertDialog(
+          title: const Text('Invite Members'),
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              TextField(
+                controller: _inviteMessageController,
+                decoration: const InputDecoration(
+                  labelText: 'Custom message (optional)',
+                  hintText: 'Add a personal message to your invitation',
+                  border: OutlineInputBorder(),
+                ),
+                maxLines: 3,
               ),
-              maxLines: 3,
+            ],
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.pop(context),
+              child: const Text('Cancel'),
+            ),
+            TextButton(
+              onPressed: () {
+                Navigator.pop(context);
+                _tabController.animateTo(2);
+              },
+              child: const Text('Continue'),
             ),
           ],
         ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(context),
-            child: const Text('Cancel'),
-          ),
-          TextButton(
-            onPressed: () {
-              Navigator.pop(context);
-              _tabController.animateTo(2); // Switch to invite tab
-            },
-            child: const Text('Continue'),
-          ),
-        ],
       ),
     );
   }
@@ -737,8 +733,5 @@ class _MemberManagementScreenState extends State<MemberManagementScreen>
     return widget.group.creatorId == currentUserId;
   }
 
-  String _getUserDisplayName(String userId) {
-    // In a real app, you'd fetch this from user data
-    return 'User ${userId.substring(0, 8)}';
-  }
+  String _getUserDisplayName(String userId) => 'User ${userId.substring(0, 8)}';
 }

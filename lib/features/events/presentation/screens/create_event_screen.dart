@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:google_fonts/google_fonts.dart';
 
+import '../../../../common/constants/app_colors.dart';
 import '../../../../common/routes/route_name.dart';
 import '../../../../common/utils/app_logger.dart';
 import '../../data/models/enhanced_event_model.dart';
@@ -15,7 +16,6 @@ import '../widgets/create_event_steps/cultural_heritage_step.dart';
 import '../widgets/create_event_steps/datetime_step.dart';
 import '../widgets/create_event_steps/location_step.dart';
 import '../widgets/create_event_steps/preview_step.dart';
-import '../../../../common/constants/app_colors.dart';
 
 class CreateEventScreen extends StatefulWidget {
   // For template-based creation
@@ -318,7 +318,7 @@ class _CreateEventScreenState extends State<CreateEventScreen> {
     if (!_isCurrentStepValid()) {
       AppLogger.debug('⚠️ _handleNextStep: Current step is not valid');
       // Show error message (validation already handles this)
-      _validateCurrentStep(showErrors: true);
+      _validateCurrentStep();
       return;
     }
 
@@ -331,7 +331,7 @@ class _CreateEventScreenState extends State<CreateEventScreen> {
 
   void _nextStep() {
     // Double-check validation before advancing
-    if (!_validateCurrentStep(showErrors: true)) {
+    if (!_validateCurrentStep()) {
       AppLogger.debug('⚠️ _nextStep: Validation failed, not advancing');
       return;
     }
@@ -340,17 +340,21 @@ class _CreateEventScreenState extends State<CreateEventScreen> {
       _currentStep++;
     });
 
-    _pageController.nextPage(
-      duration: const Duration(milliseconds: 300),
-      curve: Curves.easeInOut,
+    unawaited(
+      _pageController.nextPage(
+        duration: const Duration(milliseconds: 300),
+        curve: Curves.easeInOut,
+      ),
     );
   }
 
   void _previousStep() {
     setState(() => _currentStep--);
-    _pageController.previousPage(
-      duration: const Duration(milliseconds: 300),
-      curve: Curves.easeInOut,
+    unawaited(
+      _pageController.previousPage(
+        duration: const Duration(milliseconds: 300),
+        curve: Curves.easeInOut,
+      ),
     );
   }
 
@@ -374,9 +378,7 @@ class _CreateEventScreenState extends State<CreateEventScreen> {
   }
 
   /// Check if current step is valid without showing errors (for button state)
-  bool _isCurrentStepValid() {
-    return _validateCurrentStep(showErrors: false);
-  }
+  bool _isCurrentStepValid() => _validateCurrentStep(showErrors: false);
 
   bool _validateBasicInfo({bool showErrors = true}) {
     if (_eventData.name.trim().isEmpty) {
@@ -394,11 +396,7 @@ class _CreateEventScreenState extends State<CreateEventScreen> {
     return true;
   }
 
-  bool _validateCulturalHeritage({bool showErrors = true}) {
-    // Age group is now optional (like Facebook Events)
-    // No longer requiring cultural heritage or language requirements
-    return true;
-  }
+  bool _validateCulturalHeritage({bool showErrors = true}) => true;
 
   bool _validateDateTime({bool showErrors = true}) {
     if (_eventData.startDate == null) {
@@ -462,13 +460,15 @@ class _CreateEventScreenState extends State<CreateEventScreen> {
     // Advanced settings are optional, but validate if user has made changes
     if (!_eventData.isFree &&
         (_eventData.ticketPrice == null || _eventData.ticketPrice! <= 0)) {
-      if (showErrors)
+      if (showErrors) {
         _showError('Please enter a valid ticket price for paid events');
+      }
       return false;
     }
     if (_eventData.maxAttendees <= 0) {
-      if (showErrors)
+      if (showErrors) {
         _showError('Please enter a valid maximum number of attendees');
+      }
       return false;
     }
     return true;
@@ -539,117 +539,127 @@ class _CreateEventScreenState extends State<CreateEventScreen> {
   }
 
   void _showSuccessDialog(String message, [String? eventId]) {
-    showDialog(
-      context: context,
-      barrierDismissible: false,
-      barrierColor: Colors.black54, // Fix dark screen issue
-      builder: (context) => AlertDialog(
-        backgroundColor: Colors.white, // Ensure white background
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-        contentPadding: const EdgeInsets.all(20),
-        title: Row(
-          children: [
-            const Icon(Icons.check_circle, color: AppColors.primaryGreen, size: 28),
-            const SizedBox(width: 12),
-            Expanded(
-              // Prevent text overflow
-              child: Text(
-                'Success!',
-                style: GoogleFonts.montserrat(
-                  fontSize: 20,
-                  fontWeight: FontWeight.w600,
-                  color: const Color(0xFF333333),
+    unawaited(
+      showDialog(
+        context: context,
+        barrierDismissible: false,
+        barrierColor: Colors.black54,
+        builder: (context) => AlertDialog(
+          backgroundColor: Colors.white, // Ensure white background
+          shape:
+              RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+          contentPadding: const EdgeInsets.all(20),
+          title: Row(
+            children: [
+              const Icon(
+                Icons.check_circle,
+                color: AppColors.primaryGreen,
+                size: 28,
+              ),
+              const SizedBox(width: 12),
+              Expanded(
+                // Prevent text overflow
+                child: Text(
+                  'Success!',
+                  style: GoogleFonts.montserrat(
+                    fontSize: 20,
+                    fontWeight: FontWeight.w600,
+                    color: const Color(0xFF333333),
+                  ),
                 ),
               ),
+            ],
+          ),
+          content: Text(
+            message,
+            style: GoogleFonts.montserrat(
+              fontSize: 16,
+              color: const Color(0xFF666666),
             ),
+          ),
+          actions: [
+            if (eventId != null) ...[
+              // Button row with proper spacing
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                children: [
+                  // Close button
+                  Expanded(
+                    child: TextButton(
+                      onPressed: () {
+                        Navigator.of(context).pop(); // Close dialog
+                        Navigator.of(context)
+                            .pop(); // Close create event screen
+                      },
+                      style: TextButton.styleFrom(
+                        padding: const EdgeInsets.symmetric(vertical: 12),
+                      ),
+                      child: Text(
+                        'Close',
+                        style: GoogleFonts.montserrat(
+                          fontWeight: FontWeight.w600,
+                          color: const Color(0xFF666666),
+                        ),
+                      ),
+                    ),
+                  ),
+                  const SizedBox(width: 12),
+                  // View My Events button
+                  Expanded(
+                    flex: 2,
+                    child: ElevatedButton(
+                      onPressed: () {
+                        AppLogger.debug(
+                          '[DEBUG] View My Events button pressed',
+                        );
+                        // Close the dialog first
+                        Navigator.of(context).pop();
+                        AppLogger.debug(
+                          '[DEBUG] Dialog closed, navigating to My Events',
+                        );
+
+                        unawaited(_navigateToMyEvents());
+                      },
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: AppColors.primaryGreen,
+                        foregroundColor: Colors.white,
+                        padding: const EdgeInsets.symmetric(vertical: 12),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(8),
+                        ),
+                      ),
+                      child: Text(
+                        'View My Events',
+                        style: GoogleFonts.montserrat(
+                          fontWeight: FontWeight.w600,
+                          fontSize: 14,
+                        ),
+                        textAlign: TextAlign.center,
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ] else
+              ElevatedButton(
+                onPressed: () {
+                  Navigator.of(context).pop(); // Close dialog
+                  Navigator.of(context).pop(); // Close create event screen
+                },
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: AppColors.primaryGreen,
+                  foregroundColor: Colors.white,
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(8),
+                  ),
+                ),
+                child: Text(
+                  'OK',
+                  style: GoogleFonts.montserrat(fontWeight: FontWeight.w600),
+                ),
+              ),
           ],
         ),
-        content: Text(
-          message,
-          style: GoogleFonts.montserrat(
-            fontSize: 16,
-            color: const Color(0xFF666666),
-          ),
-        ),
-        actions: [
-          if (eventId != null) ...[
-            // Button row with proper spacing
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-              children: [
-                // Close button
-                Expanded(
-                  child: TextButton(
-                    onPressed: () {
-                      Navigator.of(context).pop(); // Close dialog
-                      Navigator.of(context).pop(); // Close create event screen
-                    },
-                    style: TextButton.styleFrom(
-                      padding: const EdgeInsets.symmetric(vertical: 12),
-                    ),
-                    child: Text(
-                      'Close',
-                      style: GoogleFonts.montserrat(
-                        fontWeight: FontWeight.w600,
-                        color: const Color(0xFF666666),
-                      ),
-                    ),
-                  ),
-                ),
-                const SizedBox(width: 12),
-                // View My Events button
-                Expanded(
-                  flex: 2,
-                  child: ElevatedButton(
-                    onPressed: () {
-                      AppLogger.debug('[DEBUG] View My Events button pressed');
-                      // Close the dialog first
-                      Navigator.of(context).pop();
-                      AppLogger.debug(
-                          '[DEBUG] Dialog closed, navigating to My Events');
-
-                      // Navigate to My Events page
-                      _navigateToMyEvents();
-                    },
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: AppColors.primaryGreen,
-                      foregroundColor: Colors.white,
-                      padding: const EdgeInsets.symmetric(vertical: 12),
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(8),
-                      ),
-                    ),
-                    child: Text(
-                      'View My Events',
-                      style: GoogleFonts.montserrat(
-                        fontWeight: FontWeight.w600,
-                        fontSize: 14,
-                      ),
-                      textAlign: TextAlign.center,
-                    ),
-                  ),
-                ),
-              ],
-            ),
-          ] else
-            ElevatedButton(
-              onPressed: () {
-                Navigator.of(context).pop(); // Close dialog
-                Navigator.of(context).pop(); // Close create event screen
-              },
-              style: ElevatedButton.styleFrom(
-                backgroundColor: AppColors.primaryGreen,
-                foregroundColor: Colors.white,
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(8),
-                ),
-              ),
-              child: Text(
-                'OK',
-                style: GoogleFonts.montserrat(fontWeight: FontWeight.w600),
-              ),
-            ),
-        ],
       ),
     );
   }
@@ -667,10 +677,10 @@ class _CreateEventScreenState extends State<CreateEventScreen> {
       // This ensures back button goes to the screen before create event
       await navigator.pushReplacementNamed(RouteName.myEvents);
       AppLogger.debug('[DEBUG] Navigation to My Events successful');
-    } catch (e) {
+    } on Object catch (e) {
       AppLogger.error('[DEBUG] Navigation failed', error: e);
       // Fallback navigation - go back to main navigation
-      navigator.pushNamedAndRemoveUntil(
+      await navigator.pushNamedAndRemoveUntil(
         RouteName.mainNavigation,
         (route) => false,
       );
@@ -715,92 +725,94 @@ class _CreateEventScreenState extends State<CreateEventScreen> {
 
   void _handleBackPress() {
     if (_hasUnsavedChanges) {
-      showDialog(
-        context: context,
-        builder: (context) => AlertDialog(
-          backgroundColor: Colors.white,
-          surfaceTintColor: Colors.transparent,
-          shape:
-              RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-          title: Row(
-            children: [
-              Container(
-                padding: const EdgeInsets.all(8),
-                decoration: BoxDecoration(
-                  color: Colors.orange.withValues(alpha: 0.1),
-                  borderRadius: BorderRadius.circular(8),
+      unawaited(
+        showDialog(
+          context: context,
+          builder: (context) => AlertDialog(
+            backgroundColor: Colors.white,
+            surfaceTintColor: Colors.transparent,
+            shape:
+                RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+            title: Row(
+              children: [
+                Container(
+                  padding: const EdgeInsets.all(8),
+                  decoration: BoxDecoration(
+                    color: Colors.orange.withValues(alpha: 0.1),
+                    borderRadius: BorderRadius.circular(8),
+                  ),
+                  child: const Icon(
+                    Icons.warning_outlined,
+                    color: Colors.orange,
+                    size: 24,
+                  ),
                 ),
-                child: const Icon(
-                  Icons.warning_outlined,
-                  color: Colors.orange,
-                  size: 24,
+                const SizedBox(width: 12),
+                Expanded(
+                  child: Text(
+                    'Discard Changes?',
+                    style: GoogleFonts.montserrat(
+                      fontSize: 18,
+                      fontWeight: FontWeight.w600,
+                      color: const Color(0xFF333333),
+                    ),
+                  ),
+                ),
+              ],
+            ),
+            content: Text(
+              'You have unsaved changes. Do you want to save as draft or discard them?',
+              style: GoogleFonts.montserrat(
+                fontSize: 14,
+                color: const Color(0xFF666666),
+                height: 1.4,
+              ),
+            ),
+            actions: [
+              TextButton(
+                onPressed: () {
+                  Navigator.of(context).pop(); // Close dialog
+                  Navigator.of(context).pop(); // Close screen
+                },
+                style: TextButton.styleFrom(
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(8),
+                  ),
+                ),
+                child: Text(
+                  'Discard',
+                  style: GoogleFonts.montserrat(
+                    fontWeight: FontWeight.w600,
+                    color: Colors.red,
+                  ),
                 ),
               ),
-              const SizedBox(width: 12),
-              Expanded(
+              ElevatedButton(
+                onPressed: () {
+                  Navigator.of(context).pop(); // Close dialog
+                  _saveAsDraft();
+                },
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: AppColors.primaryGreen,
+                  foregroundColor: Colors.white,
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(8),
+                  ),
+                  elevation: 0,
+                ),
                 child: Text(
-                  'Discard Changes?',
+                  'Save Draft',
                   style: GoogleFonts.montserrat(
-                    fontSize: 18,
                     fontWeight: FontWeight.w600,
-                    color: const Color(0xFF333333),
                   ),
                 ),
               ),
             ],
           ),
-          content: Text(
-            'You have unsaved changes. Do you want to save as draft or discard them?',
-            style: GoogleFonts.montserrat(
-              fontSize: 14,
-              color: const Color(0xFF666666),
-              height: 1.4,
-            ),
-          ),
-          actions: [
-            TextButton(
-              onPressed: () {
-                Navigator.of(context).pop(); // Close dialog
-                Navigator.of(context).pop(); // Close screen
-              },
-              style: TextButton.styleFrom(
-                padding:
-                    const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(8),
-                ),
-              ),
-              child: Text(
-                'Discard',
-                style: GoogleFonts.montserrat(
-                  fontWeight: FontWeight.w600,
-                  color: Colors.red,
-                ),
-              ),
-            ),
-            ElevatedButton(
-              onPressed: () {
-                Navigator.of(context).pop(); // Close dialog
-                _saveAsDraft();
-              },
-              style: ElevatedButton.styleFrom(
-                backgroundColor: AppColors.primaryGreen,
-                foregroundColor: Colors.white,
-                padding:
-                    const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(8),
-                ),
-                elevation: 0,
-              ),
-              child: Text(
-                'Save Draft',
-                style: GoogleFonts.montserrat(
-                  fontWeight: FontWeight.w600,
-                ),
-              ),
-            ),
-          ],
         ),
       );
     } else {

@@ -1,5 +1,6 @@
-// ignore_for_file: public_member_api_docs, sort_constructors_first, unnecessary_string_interpolations
+// ignore_for_file: public_member_api_docs, sort_constructors_first
 
+import 'dart:async';
 import 'dart:developer';
 import 'dart:io';
 
@@ -11,8 +12,8 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:otp_autofill/otp_autofill.dart';
 import 'package:pin_code_fields/pin_code_fields.dart';
 
-import '../../../../../common/data/repo/phone_auth_repo.dart';
 import '../../../../../common/bloc/user/user_bloc.dart';
+import '../../../../../common/data/repo/phone_auth_repo.dart';
 import '../../../../../common/routes/route_name.dart';
 import '../../../../../common/utils/profile_completion_guard.dart';
 import '../../../../../common/widgets/custom_snackbar.dart';
@@ -58,7 +59,7 @@ class _OtpPageState extends State<OtpPage> {
 
   @override
   void dispose() {
-    controller?.stopListen();
+    unawaited(controller?.stopListen());
     super.dispose();
   }
 
@@ -66,28 +67,34 @@ class _OtpPageState extends State<OtpPage> {
   void initState() {
     // OTP autofill is Android-only. On iOS, use built-in TextField autofill
     if (Platform.isAndroid) {
-      _initializeOtpInteractor();
+      unawaited(_initializeOtpInteractor());
     } else {
       log('📱 iOS detected - using built-in OTP autofill (no package needed)');
     }
     super.initState();
   }
 
-  void _initializeOtpInteractor() {
+  Future<void> _initializeOtpInteractor() async {
     try {
       _otpInteractor = OTPInteractor();
-      _otpInteractor!
-          .getAppSignature()
-          .then((value) => log('signature - $value'))
-          .catchError((error) {
+      try {
+        final signature = await _otpInteractor!.getAppSignature();
+        log('signature - $signature');
+      } on Object catch (error) {
         log('⚠️ Error getting app signature: $error');
-      });
+      }
 
       controller = OTPTextEditController(
         codeLength: 6,
         onCodeReceive: (code) => log('Your Application receive code - $code'),
         otpInteractor: _otpInteractor,
-      )..startListenUserConsent(
+      );
+      final otpController = controller;
+      if (otpController == null) {
+        return;
+      }
+      unawaited(
+        otpController.startListenUserConsent(
           (code) {
             log('code is $code');
             final exp = RegExp(r'(\d{6})');
@@ -97,8 +104,9 @@ class _OtpPageState extends State<OtpPage> {
           strategies: [
             // SampleStrategy(),
           ],
-        );
-    } catch (e) {
+        ),
+      );
+    } on Object catch (e) {
       log('⚠️ Error initializing OTP interactor: $e');
       // On error, controller will be null and app will use regular TextField
     }
@@ -283,7 +291,7 @@ class _OtpPageState extends State<OtpPage> {
                                 ),
                               );
                           if (Platform.isAndroid) {
-                            _initializeOtpInteractor();
+                            unawaited(_initializeOtpInteractor());
                           }
                         },
                       ),
@@ -299,7 +307,7 @@ class _OtpPageState extends State<OtpPage> {
                       },
                       listener: (context, state) {
                         // Prevent multiple navigation attempts
-                        if (_hasNavigated || !mounted) {
+                        if (_hasNavigated || !context.mounted) {
                           log('⚠️ Navigation already happened or widget unmounted, ignoring state: ${state.runtimeType}');
                           return;
                         }
@@ -319,37 +327,43 @@ class _OtpPageState extends State<OtpPage> {
                           // Sign-up flow with a number already registered = prevent duplicate account
                           if (!widget.isLogin) {
                             log('❌ Sign-up with already-registered number - block duplicate account');
-                            if (!_hasNavigated && mounted) {
+                            if (!_hasNavigated && context.mounted) {
                               _hasNavigated = true;
                               CustomSnackbar.showSnackBarSimple(
                                 'This phone number is already registered. Please sign in instead.',
                                 context,
                               );
                               context.read<AuthstatusBloc>().add(LogoutEvent());
-                              Future.microtask(() {
-                                if (mounted) {
-                                  Navigator.pop(context);
-                                }
-                              });
+                              unawaited(
+                                Future.microtask(() {
+                                  if (context.mounted) {
+                                    Navigator.pop(context);
+                                  }
+                                }),
+                              );
                             }
                             return;
                           }
 
                           // Double-check that user actually has a complete profile
                           if (!ProfileCompletionGuard.isUserComplete(
-                              state.user)) {
+                            state.user,
+                          )) {
                             log('⚠️ User marked as registered but profile is incomplete - treating as new registration');
-                            if (!_hasNavigated && mounted) {
+                            if (!_hasNavigated && context.mounted) {
                               _hasNavigated = true;
                               log('✅ Redirecting to onboarding for incomplete profile');
-                              Future.microtask(() {
-                                if (mounted) {
-                                  Navigator.of(context).pushNamedAndRemoveUntil(
-                                    RouteName.onboarding,
-                                    (route) => false,
-                                  );
-                                }
-                              });
+                              unawaited(
+                                Future.microtask(() async {
+                                  if (context.mounted) {
+                                    await Navigator.of(context)
+                                        .pushNamedAndRemoveUntil(
+                                      RouteName.onboarding,
+                                      (route) => false,
+                                    );
+                                  }
+                                }),
+                              );
                             }
                             return;
                           }
@@ -360,17 +374,18 @@ class _OtpPageState extends State<OtpPage> {
                               .read<UserBloc>()
                               .add(UserDataUpdated(state.user));
 
-                          // Small delay to ensure all state is properly set
-                          Future.microtask(() {
-                            if (!mounted) return;
+                          unawaited(
+                            Future.microtask(() async {
+                              if (!context.mounted) return;
 
-                            // This should only be reached for LOGIN flows with complete profiles
-                            log('✅ Navigating to main navigation for existing user login');
-                            Navigator.of(context).pushNamedAndRemoveUntil(
-                              RouteName.mainNavigation,
-                              (route) => false,
-                            );
-                          });
+                              log('✅ Navigating to main navigation for existing user login');
+                              await Navigator.of(context)
+                                  .pushNamedAndRemoveUntil(
+                                RouteName.mainNavigation,
+                                (route) => false,
+                              );
+                            }),
+                          );
                         } else if (state is NewRegistration) {
                           log('');
                           log('═══════════════════════════════════════════════════════');
@@ -382,34 +397,40 @@ class _OtpPageState extends State<OtpPage> {
 
                           if (widget.isLogin) {
                             // If trying to login with a number that doesn't have an account
-                            if (!_hasNavigated && mounted) {
+                            if (!_hasNavigated && context.mounted) {
                               _hasNavigated = true;
                               CustomSnackbar.showSnackBarSimple(
                                 'No account found with this phone number. Please sign up first.',
                                 context,
                               );
-                              Future.microtask(() {
-                                if (mounted) {
-                                  Navigator.pop(context);
-                                }
-                              });
+                              unawaited(
+                                Future.microtask(() {
+                                  if (context.mounted) {
+                                    Navigator.pop(context);
+                                  }
+                                }),
+                              );
                             }
                           } else {
                             // New user sign-up - navigate to onboarding to create profile
-                            if (!_hasNavigated && mounted) {
+                            if (!_hasNavigated && context.mounted) {
                               _hasNavigated = true;
                               log('✅ Navigating to onboarding for new user');
-                              Future.microtask(() {
-                                if (mounted) {
-                                  Navigator.of(context).pushNamedAndRemoveUntil(
-                                    RouteName.onboarding,
-                                    (route) => false,
-                                  );
-                                }
-                              });
+                              unawaited(
+                                Future.microtask(() async {
+                                  if (context.mounted) {
+                                    await Navigator.of(context)
+                                        .pushNamedAndRemoveUntil(
+                                      RouteName.onboarding,
+                                      (route) => false,
+                                    );
+                                  }
+                                }),
+                              );
                             }
                           }
                         } else if (state is RegistrationFailed) {
+                          if (!context.mounted) return;
                           ScaffoldMessenger.of(context).showSnackBar(
                             SnackBar(content: Text(state.message)),
                           );
@@ -476,51 +497,51 @@ class _OtpPageState extends State<OtpPage> {
                           ),
                         );
                       },
-                      listener: (context, state) {
+                      listener: (context, state) async {
                         // Prevent navigation if already navigated
-                        if (_hasNavigated || !mounted) return;
+                        if (_hasNavigated || !context.mounted) return;
 
                         if (state is PhoneAuthVerified) {
                           try {
                             if (state.user != null) {
                               log('✅ Phone verified, checking registration status...');
-                              state.user!.getIdToken().then((value) async {
-                                if (value != null &&
-                                    mounted &&
-                                    !_hasNavigated) {
+                              try {
+                                final value = await state.user!.getIdToken();
+                                if (!context.mounted) return;
+                                if (value != null && !_hasNavigated) {
                                   log('Got token after phone verification, dispatching CheckRegistration');
                                   BlocProvider.of<RegistrationBloc>(context)
                                       .add(CheckRegistration(token: value));
                                 } else if (value == null) {
                                   log('Error: Token is null after phone verification');
-                                  if (mounted) {
-                                    CustomSnackbar.showSnackBarSimple(
-                                      'Authentication error: Token is null',
-                                      context,
-                                    );
-                                  }
+                                  CustomSnackbar.showSnackBarSimple(
+                                    'Authentication error: Token is null',
+                                    context,
+                                  );
                                 }
-                              }).catchError((error) {
+                              } on Object catch (error) {
                                 log('Error getting token after phone verification: $error');
-                                if (mounted && !_hasNavigated) {
+                                if (!context.mounted) return;
+                                if (!_hasNavigated) {
                                   CustomSnackbar.showSnackBarSimple(
                                     'Authentication error: $error',
                                     context,
                                   );
                                 }
-                              });
+                              }
                             } else {
                               log('Error: User is null after phone verification');
-                              if (mounted && !_hasNavigated) {
+                              if (context.mounted && !_hasNavigated) {
                                 CustomSnackbar.showSnackBarSimple(
                                   'Authentication error: User is null',
                                   context,
                                 );
                               }
                             }
-                          } catch (e) {
+                          } on Object catch (e) {
                             log('Exception during token retrieval after phone verification: $e');
-                            if (mounted && !_hasNavigated) {
+                            if (!context.mounted) return;
+                            if (!_hasNavigated) {
                               CustomSnackbar.showSnackBarSimple(
                                 'Authentication error: $e',
                                 context,
@@ -528,11 +549,13 @@ class _OtpPageState extends State<OtpPage> {
                             }
                           }
                         } else if (state is PhoneupdateSuccess) {
-                          if (!_hasNavigated && mounted) {
+                          if (!_hasNavigated && context.mounted) {
                             _hasNavigated = true;
-                            Navigator.pushReplacementNamed(
-                              context,
-                              RouteName.mainNavigation,
+                            unawaited(
+                              Navigator.pushReplacementNamed(
+                                context,
+                                RouteName.mainNavigation,
+                              ),
                             );
                           }
                         } else if (state is PhoneAuthError) {

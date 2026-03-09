@@ -27,8 +27,15 @@ const PROJECT_ID = "naijasingles-74a75";
 
 // Firebase CLI OAuth client ID (public, used by all Firebase CLI installations)
 const FIREBASE_CLIENT_ID =
+  process.env.FIREBASE_CLIENT_ID ||
   "563584335869-fgrhgmd47bqnekij5i8b5pr03ho849e6.apps.googleusercontent.com";
-const FIREBASE_CLIENT_SECRET = "j9iVZfS8kkCEFUPaAeJV0sAi";
+const FIREBASE_CLIENT_SECRET = process.env.FIREBASE_CLIENT_SECRET;
+if (!FIREBASE_CLIENT_SECRET) {
+  throw new Error(
+    "FIREBASE_CLIENT_SECRET env var is required. " +
+    "Set it before running this script."
+  );
+}
 
 function createFirestore() {
   // If GOOGLE_APPLICATION_CREDENTIALS is set, Firestore uses it automatically

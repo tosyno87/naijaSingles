@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:developer';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
@@ -6,14 +7,16 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
 import '../../common/bloc/theme/theme_bloc.dart';
+import '../../common/bloc/user/user_bloc.dart';
 import '../../common/constants/app_colors.dart';
+import '../../common/constants/app_spacing.dart';
 import '../../common/constants/constants.dart';
 import '../../common/data/repo/pagination_repo.dart';
 import '../../common/data/repo/user_search_repo.dart';
-import '../../common/bloc/user/user_bloc.dart';
 import '../../common/widgets/custom_snackbar.dart';
 import '../../common/widgets/hookup_circularbar.dart';
 import '../../common/widgets/image_widget.dart';
+import '../../common/widgets/state_views/state_views.dart';
 import '../../config/app_config.dart';
 import '../../models/user_model.dart';
 import '../user/ui/widgets/user_info.dart';
@@ -52,7 +55,7 @@ class NotificationsState extends State<Notifications> {
         !_scrollController.position.outOfRange) {
       if (_hasMoreMessages && !_isLoadingMore) {
         log('load more called');
-        _loadMoreNotifications();
+        unawaited(_loadMoreNotifications());
       }
     }
   }
@@ -131,14 +134,9 @@ class NotificationsState extends State<Notifications> {
             topRight: Radius.circular(50),
           ),
           child: notifications.isEmpty
-              ? Center(
-                  child: Text(
-                    'No match found'.tr().toString(),
-                    style: const TextStyle(
-                      color: AppColors.secondaryColor,
-                      fontSize: 16,
-                    ),
-                  ),
+              ? AppEmptyView(
+                  title: 'No match found'.tr().toString(),
+                  icon: Icons.notifications_off_outlined,
                 )
               : ListView.builder(
                   controller: _scrollController,
@@ -165,7 +163,8 @@ class NotificationsState extends State<Notifications> {
                         padding: const EdgeInsets.all(5),
                         child: DecoratedBox(
                           decoration: BoxDecoration(
-                            borderRadius: BorderRadius.circular(20),
+                            borderRadius:
+                                BorderRadius.circular(AppSpacing.chipRadius),
                             color: !doc.get('isRead')
                                 ? isDarkMode
                                     ? Theme.of(context).scaffoldBackgroundColor
@@ -230,7 +229,7 @@ class NotificationsState extends State<Notifications> {
                             ),
                             onTap: () async {
                               log(doc.get('Matches'));
-                              showDialog(
+                              await showDialog(
                                 context: context,
                                 builder: (context) => const Center(
                                   child: CircularProgressIndicator(
@@ -264,9 +263,11 @@ class NotificationsState extends State<Notifications> {
                                   context: context,
                                   builder: (context) {
                                     if (!doc.get('isRead')) {
-                                      PaginationRepo.updateNotification(
-                                        currentUser!,
-                                        doc,
+                                      unawaited(
+                                        PaginationRepo.updateNotification(
+                                          currentUser!,
+                                          doc,
+                                        ),
                                       );
                                     }
                                     return Info(

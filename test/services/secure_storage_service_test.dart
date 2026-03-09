@@ -1,40 +1,18 @@
+import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:naijasingles/services/secure_storage_service.dart';
-
-/// NOTE: These tests verify the SecureStorageService API and structure.
-/// 
-/// IMPORTANT: flutter_secure_storage requires platform channels which are
-/// not available in unit tests. These tests will fail for write/read operations
-/// because the underlying platform storage isn't available.
-/// 
-/// For full functionality testing:
-/// 1. Run integration tests on a device/emulator
-/// 2. Perform manual testing (see docs/testing/SECURE_STORAGE_TESTING_GUIDE.md)
-/// 3. Test in a real app environment
-/// 
-/// These unit tests are useful for:
-/// - Verifying API structure
-/// - Checking error handling
-/// - Ensuring methods exist and are callable
 
 void main() {
   group('SecureStorageService', () {
     late SecureStorageService secureStorage;
 
     setUp(() async {
+      FlutterSecureStorage.setMockInitialValues({});
       secureStorage = SecureStorageService();
       await secureStorage.initialize();
-      // Clear all data before each test
-      // Note: This may fail in unit tests due to platform channel requirements
-      try {
-        await secureStorage.deleteAll();
-      } catch (e) {
-        // Expected in unit test environment
-      }
     });
 
     tearDown(() async {
-      // Clean up after each test
       await secureStorage.deleteAll();
     });
 
@@ -50,7 +28,6 @@ void main() {
       test('should be idempotent (safe to call multiple times)', () async {
         final service = SecureStorageService();
         await service.initialize();
-        // Should not throw when called again
         await expectLater(
           service.initialize(),
           completes,
@@ -64,17 +41,11 @@ void main() {
         const value = 'test_value';
 
         final writeResult = await secureStorage.write(key, value);
-        // Note: In unit tests, this may return false due to platform channel requirements
-        // In real app environment, this should return true
-        expect(writeResult, anyOf(isTrue, isFalse));
+        expect(writeResult, isTrue);
 
         final readValue = await secureStorage.read(key);
-        // Note: In unit tests, this may return null due to platform channel requirements
-        // In real app environment, this should return the stored value
-        if (writeResult) {
-          expect(readValue, equals(value));
-        }
-      }, skip: 'Requires platform channels - test manually or in integration tests');
+        expect(readValue, equals(value));
+      });
 
       test('should return null when reading non-existent key', () async {
         const key = 'non_existent_key';
@@ -279,17 +250,14 @@ void main() {
 
     group('Clear Auth Data Operations', () {
       test('should clear all authentication data', () async {
-        // Store various auth data
         await secureStorage.storeAuthToken('token123');
         await secureStorage.storeRefreshToken('refresh123');
         await secureStorage.storeUserId('user123');
         await secureStorage.storeBiometricCredentials('creds123');
 
-        // Clear all auth data
         final clearResult = await secureStorage.clearAuthData();
         expect(clearResult, isTrue);
 
-        // Verify all auth data is cleared
         expect(await secureStorage.getAuthToken(), isNull);
         expect(await secureStorage.getRefreshToken(), isNull);
         expect(await secureStorage.getUserId(), isNull);
@@ -322,7 +290,7 @@ void main() {
 
       test('should handle long string values', () async {
         const key = 'long_key';
-        final value = 'a' * 1000; // 1000 character string
+        final value = 'a' * 1000;
 
         final writeResult = await secureStorage.write(key, value);
         expect(writeResult, isTrue);
@@ -334,4 +302,3 @@ void main() {
     });
   });
 }
-

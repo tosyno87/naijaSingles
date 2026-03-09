@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'repo/user_repo.dart';
 
 class StretViewPreferences {
@@ -7,7 +9,7 @@ class StretViewPreferences {
   final String userId;
 
   Future<void> setView(String value, final List<String> userIds) async {
-    UserRepo.streetviewfilter(value, userIds);
+    unawaited(UserRepo.streetviewfilter(value, userIds));
   }
 
   Future<String> getView() async {

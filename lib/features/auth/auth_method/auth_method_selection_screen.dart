@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:io';
 
 import 'package:flutter/material.dart';
@@ -5,6 +6,7 @@ import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:google_fonts/google_fonts.dart';
 
+import '../../../common/utils/auth_router.dart';
 import '../../../common/widgets/custom_snackbar.dart';
 import '../google_sign_in/google_sign_in_bloc.dart';
 import '../phone/ui/screens/phone_number.dart';
@@ -94,11 +96,13 @@ class AuthMethodSelectionScreen extends StatelessWidget {
                     text: 'Continue with Phone',
                     color: primaryColor,
                     onTap: () {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (context) => PhoneNumber(
-                            updatePhoneNumber: false,
+                      unawaited(
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => PhoneNumber(
+                              updatePhoneNumber: false,
+                            ),
                           ),
                         ),
                       );
@@ -114,7 +118,7 @@ class AuthMethodSelectionScreen extends StatelessWidget {
                     text: 'Continue with Email',
                     color: accentColor,
                     onTap: () {
-                      Navigator.pushNamed(context, '/email_signup');
+                      unawaited(Navigator.pushNamed(context, '/email_signup'));
                     },
                   ),
 
@@ -126,11 +130,7 @@ class AuthMethodSelectionScreen extends StatelessWidget {
                     child: BlocConsumer<GoogleSignInBloc, GoogleSignInState>(
                       listener: (context, state) {
                         if (state is GoogleSignInSuccess) {
-                          // Navigate to onboarding or home based on user status
-                          Navigator.pushReplacementNamed(
-                            context,
-                            '/onboarding',
-                          );
+                          unawaited(AuthRouter.navigateAfterAuth(context));
                         } else if (state is GoogleSignInFailure) {
                           CustomSnackbar.showSnackBarSimple(
                             state.error,
@@ -186,11 +186,13 @@ class AuthMethodSelectionScreen extends StatelessWidget {
                       ),
                       GestureDetector(
                         onTap: () {
-                          Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                              builder: (context) =>
-                                  const SignInMethodSelectionScreen(),
+                          unawaited(
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (context) =>
+                                    const SignInMethodSelectionScreen(),
+                              ),
                             ),
                           );
                         },

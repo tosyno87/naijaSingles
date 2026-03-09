@@ -6,6 +6,8 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:image_picker/image_picker.dart';
 
+import '../common/utils/firestore_helpers.dart';
+
 /// Industry-standard media sharing service for chat
 /// Features:
 /// - Image sharing with compression
@@ -74,7 +76,7 @@ class MediaSharingService {
 
       log('✅ Image shared successfully: $imageUrl');
       return mediaMessage;
-    } catch (e) {
+    } on Object catch (e) {
       log('❌ Error sharing image: $e');
       rethrow;
     }
@@ -134,7 +136,7 @@ class MediaSharingService {
 
       log('✅ Video shared successfully: $videoUrl');
       return mediaMessage;
-    } catch (e) {
+    } on Object catch (e) {
       log('❌ Error sharing video: $e');
       rethrow;
     }
@@ -186,7 +188,7 @@ class MediaSharingService {
 
       log('✅ Audio message shared successfully: $audioUrl');
       return mediaMessage;
-    } catch (e) {
+    } on Object catch (e) {
       log('❌ Error sharing audio message: $e');
       rethrow;
     }
@@ -255,7 +257,7 @@ class MediaSharingService {
 
       log('✅ File shared successfully: $fileUrl');
       return mediaMessage;
-    } catch (e) {
+    } on Object catch (e) {
       log('❌ Error sharing file: $e');
       rethrow;
     }
@@ -272,7 +274,7 @@ class MediaSharingService {
       );
 
       return image?.path;
-    } catch (e) {
+    } on Object catch (e) {
       log('❌ Error picking image from gallery: $e');
       return null;
     }
@@ -289,7 +291,7 @@ class MediaSharingService {
       );
 
       return image?.path;
-    } catch (e) {
+    } on Object catch (e) {
       log('❌ Error picking image from camera: $e');
       return null;
     }
@@ -304,7 +306,7 @@ class MediaSharingService {
       );
 
       return video?.path;
-    } catch (e) {
+    } on Object catch (e) {
       log('❌ Error picking video from gallery: $e');
       return null;
     }
@@ -319,7 +321,7 @@ class MediaSharingService {
       );
 
       return video?.path;
-    } catch (e) {
+    } on Object catch (e) {
       log('❌ Error picking video from camera: $e');
       return null;
     }
@@ -334,7 +336,7 @@ class MediaSharingService {
 
       final uploadTask = await ref.putFile(file);
       return await uploadTask.ref.getDownloadURL();
-    } catch (e) {
+    } on Object catch (e) {
       log('❌ Error uploading image: $e');
       rethrow;
     }
@@ -349,7 +351,7 @@ class MediaSharingService {
 
       final uploadTask = await ref.putFile(file);
       return await uploadTask.ref.getDownloadURL();
-    } catch (e) {
+    } on Object catch (e) {
       log('❌ Error uploading video: $e');
       rethrow;
     }
@@ -364,7 +366,7 @@ class MediaSharingService {
 
       final uploadTask = await ref.putFile(file);
       return await uploadTask.ref.getDownloadURL();
-    } catch (e) {
+    } on Object catch (e) {
       log('❌ Error uploading audio: $e');
       rethrow;
     }
@@ -380,7 +382,7 @@ class MediaSharingService {
 
       final uploadTask = await ref.putFile(file);
       return await uploadTask.ref.getDownloadURL();
-    } catch (e) {
+    } on Object catch (e) {
       log('❌ Error uploading file: $e');
       rethrow;
     }
@@ -392,7 +394,7 @@ class MediaSharingService {
       // For now, return the same image URL
       // In production, you'd create an actual thumbnail
       return await _uploadImage(imagePath);
-    } catch (e) {
+    } on Object catch (e) {
       log('❌ Error creating image thumbnail: $e');
       rethrow;
     }
@@ -404,7 +406,7 @@ class MediaSharingService {
       // For now, return a placeholder
       // In production, you'd extract a frame from the video
       return 'https://via.placeholder.com/300x200?text=Video+Thumbnail';
-    } catch (e) {
+    } on Object catch (e) {
       log('❌ Error creating video thumbnail: $e');
       rethrow;
     }
@@ -415,7 +417,7 @@ class MediaSharingService {
     try {
       final file = File(filePath);
       return await file.length();
-    } catch (e) {
+    } on Object catch (e) {
       log('❌ Error getting file size: $e');
       return 0;
     }
@@ -427,7 +429,7 @@ class MediaSharingService {
       // For now, return a placeholder duration
       // In production, you'd use a video processing library
       return 30.0;
-    } catch (e) {
+    } on Object catch (e) {
       log('❌ Error getting video duration: $e');
       return 0.0;
     }
@@ -445,7 +447,7 @@ class MediaSharingService {
         'lastMessageSenderId': senderId,
         'lastUpdated': FieldValue.serverTimestamp(),
       });
-    } catch (e) {
+    } on Object catch (e) {
       log('❌ Error updating thread metadata: $e');
     }
   }
@@ -475,7 +477,7 @@ class MediaSharingService {
           .delete();
 
       log('✅ Media message deleted successfully');
-    } catch (e) {
+    } on Object catch (e) {
       log('❌ Error deleting media message: $e');
       rethrow;
     }
@@ -521,7 +523,7 @@ class MediaMessage {
         caption: map['caption'],
         fileSize: map['fileSize'] ?? 0,
         duration: map['duration']?.toDouble(),
-        timestamp: (map['timestamp'] as Timestamp?)?.toDate() ?? DateTime.now(),
+        timestamp: parseDateTime(map['timestamp']),
         isRead: map['isRead'] ?? false,
         readBy: List<String>.from(map['readBy'] ?? []),
       );

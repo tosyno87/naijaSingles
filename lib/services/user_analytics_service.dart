@@ -118,7 +118,7 @@ class UserAnalyticsService {
       );
 
       return analytics;
-    } catch (e) {
+    } on Object catch (e) {
       debugPrint('❌ Error analyzing users: $e');
       return UserAnalytics.empty();
     }
@@ -207,7 +207,7 @@ class UserAnalyticsService {
           await _firestore.collection('users').doc(userId).delete();
           deletedCount++;
           debugPrint('✅ Deleted user: $userId');
-        } catch (e) {
+        } on Object catch (e) {
           debugPrint('❌ Failed to delete user $userId: $e');
         }
       }
@@ -223,7 +223,7 @@ class UserAnalyticsService {
         remainingUsers: remainingUsers,
         success: true,
       );
-    } catch (e) {
+    } on Object catch (e) {
       debugPrint('❌ Error during cleanup: $e');
       return CleanupResult(
         deletedCount: 0,
@@ -291,7 +291,7 @@ class UserAnalyticsService {
         genderBalance: genderBalance,
         recommendations: recommendations,
       );
-    } catch (e) {
+    } on Object catch (e) {
       debugPrint('❌ Error analyzing algorithm status: $e');
       return AlgorithmStatus.error(e.toString());
     }

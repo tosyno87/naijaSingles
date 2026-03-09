@@ -1,7 +1,9 @@
 import 'package:flutter/foundation.dart';
 
+import '../common/utils/distance.dart' as geo;
 import '../features/match/data/services/compatibility_engine.dart';
 import '../models/user_model.dart';
+import 'match_config.dart';
 
 /// Mode-specific compatibility engine that calculates different scores based on relationship intent
 /// Implements Priority 2: Enhanced Matching Algorithm with mode differentiation
@@ -11,22 +13,23 @@ class ModeSpecificCompatibilityEngine {
   static double calculateModeCompatibility(
     UserModel user1,
     UserModel user2,
-    String mode,
-  ) {
+    String mode, {
+    MatchConfig config = MatchConfig.defaults,
+  }) {
     try {
       switch (mode) {
         case 'Dating':
-          return _calculateDatingCompatibility(user1, user2);
+          return _calculateDatingCompatibility(user1, user2, config);
         case 'Friendship':
-          return _calculateFriendshipCompatibility(user1, user2);
+          return _calculateFriendshipCompatibility(user1, user2, config);
         case 'Networking':
-          return _calculateNetworkingCompatibility(user1, user2);
+          return _calculateNetworkingCompatibility(user1, user2, config);
         default:
           return CompatibilityEngine.calculateCompatibility(user1, user2);
       }
-    } catch (e) {
+    } on Object catch (e) {
       debugPrint('❌ Error calculating mode compatibility: $e');
-      return 0.5; // Return neutral score on error
+      return 0.5;
     }
   }
 
@@ -35,29 +38,20 @@ class ModeSpecificCompatibilityEngine {
   static double _calculateDatingCompatibility(
     UserModel user1,
     UserModel user2,
+    MatchConfig config,
   ) {
-    double totalScore = 0;
-
-    // Age compatibility (30% - more important for dating)
-    final ageScore = CompatibilityEngine.calculateCompatibility(user1, user2);
-    totalScore += ageScore * 0.30;
-
-    // Location proximity (25% - important for dating)
-    final locationScore = _calculateLocationScore(user1, user2);
-    totalScore += locationScore * 0.25;
-
-    // Lifestyle compatibility (20% - new for dating)
+    final w = config.datingWeights;
+    final ageScore = _calculateAgeCompatibility(user1, user2);
+    final locationScore = _calculateLocationScore(user1, user2, config);
     final lifestyleScore = _calculateLifestyleCompatibility(user1, user2);
-    totalScore += lifestyleScore * 0.20;
-
-    // Interest alignment (15% - shared activities)
     final interestScore = _calculateInterestScore(user1, user2);
-    totalScore += interestScore * 0.15;
-
-    // Profile completeness (10% - effort in profile)
     final completenessScore = _calculateCompletenessScore(user1, user2);
-    totalScore += completenessScore * 0.10;
 
+    double totalScore = ageScore * w.age +
+        locationScore * w.location +
+        lifestyleScore * w.lifestyle +
+        interestScore * w.interest +
+        completenessScore * w.completeness;
     totalScore = totalScore.clamp(0.0, 1.0);
 
     debugPrint(
@@ -75,29 +69,20 @@ class ModeSpecificCompatibilityEngine {
   static double _calculateFriendshipCompatibility(
     UserModel user1,
     UserModel user2,
+    MatchConfig config,
   ) {
-    double totalScore = 0;
-
-    // Social activity alignment (35% - most important for friendship)
+    final w = config.friendshipWeights;
     final socialScore = _calculateSocialCompatibility(user1, user2);
-    totalScore += socialScore * 0.35;
-
-    // Interest overlap (25% - shared hobbies)
     final interestScore = _calculateInterestScore(user1, user2);
-    totalScore += interestScore * 0.25;
-
-    // Location proximity (20% - easier to meet up)
-    final locationScore = _calculateLocationScore(user1, user2);
-    totalScore += locationScore * 0.20;
-
-    // Age compatibility (10% - less strict for friendship)
+    final locationScore = _calculateLocationScore(user1, user2, config);
     final ageScore = _calculateAgeCompatibility(user1, user2);
-    totalScore += ageScore * 0.10;
-
-    // Profile completeness (10% - effort in profile)
     final completenessScore = _calculateCompletenessScore(user1, user2);
-    totalScore += completenessScore * 0.10;
 
+    double totalScore = socialScore * w.social +
+        interestScore * w.interest +
+        locationScore * w.location +
+        ageScore * w.age +
+        completenessScore * w.completeness;
     totalScore = totalScore.clamp(0.0, 1.0);
 
     debugPrint(
@@ -115,25 +100,18 @@ class ModeSpecificCompatibilityEngine {
   static double _calculateNetworkingCompatibility(
     UserModel user1,
     UserModel user2,
+    MatchConfig config,
   ) {
-    double totalScore = 0;
-
-    // Professional alignment (40% - most important for networking)
+    final w = config.networkingWeights;
     final professionalScore = _calculateProfessionalCompatibility(user1, user2);
-    totalScore += professionalScore * 0.40;
-
-    // Industry compatibility (25% - same or complementary industries)
     final industryScore = _calculateIndustryCompatibility(user1, user2);
-    totalScore += industryScore * 0.25;
-
-    // Location proximity (20% - business meetings)
-    final locationScore = _calculateLocationScore(user1, user2);
-    totalScore += locationScore * 0.20;
-
-    // Profile completeness (15% - professional profile quality)
+    final locationScore = _calculateLocationScore(user1, user2, config);
     final completenessScore = _calculateCompletenessScore(user1, user2);
-    totalScore += completenessScore * 0.15;
 
+    double totalScore = professionalScore * w.professional +
+        industryScore * w.industry +
+        locationScore * w.location +
+        completenessScore * w.completeness;
     totalScore = totalScore.clamp(0.0, 1.0);
 
     debugPrint(
@@ -148,13 +126,17 @@ class ModeSpecificCompatibilityEngine {
 
   // Helper methods for specific compatibility calculations
 
-  static double _calculateLocationScore(UserModel user1, UserModel user2) {
+  static double _calculateLocationScore(
+    UserModel user1,
+    UserModel user2, [
+    MatchConfig config = MatchConfig.defaults,
+  ]) {
     try {
       if (user1.coordinates == null ||
           user2.coordinates == null ||
           user1.coordinates!.isEmpty ||
           user2.coordinates!.isEmpty) {
-        return 0.5; // Neutral score if location data is missing
+        return 0.5;
       }
 
       final lat1 = user1.coordinates!['latitude'] as double?;
@@ -166,18 +148,20 @@ class ModeSpecificCompatibilityEngine {
         return 0.5;
       }
 
-      // Calculate distance (simplified - you might want to use a proper distance calculation)
-      final distance = ((lat1 - lat2).abs() + (lng1 - lng2).abs()) *
-          111; // Rough km conversion
+      final distanceMiles = geo.calculateDistance(lat1, lng1, lat2, lng2);
+      final perfect = config.locationPerfectMiles;
+      final decay = config.locationDecayMiles;
+      final floor = config.locationFloorScore;
 
-      if (distance <= 5.0) {
-        return 1; // Perfect score for very close users
-      } else if (distance <= 50.0) {
-        return 1.0 - ((distance - 5.0) / 45.0) * 0.8; // Linear decrease
+      if (distanceMiles <= perfect) {
+        return 1;
+      } else if (distanceMiles <= decay) {
+        return 1.0 -
+            ((distanceMiles - perfect) / (decay - perfect)) * (1.0 - floor);
       } else {
-        return 0.2; // Low score for distant users
+        return floor;
       }
-    } catch (e) {
+    } on Object catch (e) {
       debugPrint('❌ Error calculating location score: $e');
       return 0.5;
     }
@@ -188,17 +172,50 @@ class ModeSpecificCompatibilityEngine {
     UserModel user2,
   ) {
     try {
-      // This would compare lifestyle factors like:
-      // - Drinking habits
-      // - Smoking habits
-      // - Fitness level
-      // - Sleep schedule
-      // - Social preferences
+      double totalScore = 0;
+      int dimensions = 0;
 
-      // For now, return a neutral score
-      // In a real implementation, you'd compare these fields from user profiles
-      return 0.7; // Default good compatibility
-    } catch (e) {
+      // Drinking habits
+      if (user1.drinkingStatus != null &&
+          user1.drinkingStatus!.isNotEmpty &&
+          user2.drinkingStatus != null &&
+          user2.drinkingStatus!.isNotEmpty) {
+        totalScore += user1.drinkingStatus!.toLowerCase() ==
+                user2.drinkingStatus!.toLowerCase()
+            ? 1.0
+            : 0.3;
+        dimensions++;
+      }
+
+      // Smoking habits
+      if (user1.smokingStatus != null &&
+          user1.smokingStatus!.isNotEmpty &&
+          user2.smokingStatus != null &&
+          user2.smokingStatus!.isNotEmpty) {
+        totalScore += user1.smokingStatus!.toLowerCase() ==
+                user2.smokingStatus!.toLowerCase()
+            ? 1.0
+            : 0.3;
+        dimensions++;
+      }
+
+      // Religion
+      if (user1.religion != null &&
+          user1.religion!.isNotEmpty &&
+          user2.religion != null &&
+          user2.religion!.isNotEmpty) {
+        totalScore +=
+            user1.religion!.toLowerCase() == user2.religion!.toLowerCase()
+                ? 1.0
+                : 0.4;
+        dimensions++;
+      }
+
+      if (dimensions == 0) {
+        return 0.5;
+      }
+      return (totalScore / dimensions).clamp(0.0, 1.0);
+    } on Object catch (e) {
       debugPrint('❌ Error calculating lifestyle compatibility: $e');
       return 0.5;
     }
@@ -209,15 +226,55 @@ class ModeSpecificCompatibilityEngine {
     UserModel user2,
   ) {
     try {
-      // This would compare social factors like:
-      // - Group activity preferences
-      // - Social energy level
-      // - Meeting style preferences
-      // - Friend group size preferences
+      double totalScore = 0;
+      int dimensions = 0;
 
-      // For now, return a neutral score
-      return 0.7; // Default good compatibility
-    } catch (e) {
+      // Language overlap (Jaccard similarity)
+      final langs1 = user1.languages
+              ?.where((l) => l.isNotEmpty)
+              .map((l) => l.toLowerCase())
+              .toSet() ??
+          <String>{};
+      final langs2 = user2.languages
+              ?.where((l) => l.isNotEmpty)
+              .map((l) => l.toLowerCase())
+              .toSet() ??
+          <String>{};
+      if (langs1.isNotEmpty && langs2.isNotEmpty) {
+        final intersection = langs1.intersection(langs2);
+        final union = langs1.union(langs2);
+        totalScore += union.isNotEmpty ? intersection.length / union.length : 0;
+        dimensions++;
+      }
+
+      // Tribe / cultural affinity
+      if (user1.tribe != null &&
+          user1.tribe!.isNotEmpty &&
+          user2.tribe != null &&
+          user2.tribe!.isNotEmpty) {
+        totalScore += user1.tribe!.toLowerCase() == user2.tribe!.toLowerCase()
+            ? 1.0
+            : 0.4;
+        dimensions++;
+      }
+
+      // Nationality
+      if (user1.nationality != null &&
+          user1.nationality!.isNotEmpty &&
+          user2.nationality != null &&
+          user2.nationality!.isNotEmpty) {
+        totalScore +=
+            user1.nationality!.toLowerCase() == user2.nationality!.toLowerCase()
+                ? 1.0
+                : 0.5;
+        dimensions++;
+      }
+
+      if (dimensions == 0) {
+        return 0.5;
+      }
+      return (totalScore / dimensions).clamp(0.0, 1.0);
+    } on Object catch (e) {
       debugPrint('❌ Error calculating social compatibility: $e');
       return 0.5;
     }
@@ -228,15 +285,56 @@ class ModeSpecificCompatibilityEngine {
     UserModel user2,
   ) {
     try {
-      // This would compare professional factors like:
-      // - Career level compatibility
-      // - Professional goals alignment
-      // - Collaboration style
-      // - Networking preferences
+      double totalScore = 0;
+      int dimensions = 0;
 
-      // For now, return a neutral score
-      return 0.7; // Default good compatibility
-    } catch (e) {
+      // Occupation / profession similarity
+      final occ1 = (user1.occupation ?? user1.profession ?? '').toLowerCase();
+      final occ2 = (user2.occupation ?? user2.profession ?? '').toLowerCase();
+      if (occ1.isNotEmpty && occ2.isNotEmpty) {
+        if (occ1 == occ2) {
+          totalScore += 1.0;
+        } else {
+          final words1 = occ1.split(RegExp(r'\s+')).toSet();
+          final words2 = occ2.split(RegExp(r'\s+')).toSet();
+          final overlap = words1.intersection(words2).length;
+          totalScore += overlap > 0 ? 0.7 : 0.3;
+        }
+        dimensions++;
+      }
+
+      // Education level
+      if (user1.education != null &&
+          user1.education!.isNotEmpty &&
+          user2.education != null &&
+          user2.education!.isNotEmpty) {
+        totalScore +=
+            user1.education!.toLowerCase() == user2.education!.toLowerCase()
+                ? 1.0
+                : 0.5;
+        dimensions++;
+      }
+
+      // Company / industry overlap via job_title
+      final job1 = user1.job_title?.toLowerCase() ?? '';
+      final job2 = user2.job_title?.toLowerCase() ?? '';
+      if (job1.isNotEmpty && job2.isNotEmpty) {
+        if (job1 == job2) {
+          totalScore += 1.0;
+        } else {
+          final words1 = job1.split(RegExp(r'\s+')).toSet();
+          final words2 = job2.split(RegExp(r'\s+')).toSet();
+          final overlap = words1.intersection(words2).length;
+          totalScore += overlap > 0 ? 0.7 : 0.4;
+        }
+        dimensions++;
+      }
+
+      if (dimensions == 0) {
+        return 0.5;
+      }
+      return (totalScore / dimensions).clamp(0.0, 1.0);
+    } on Object catch (e) {
       debugPrint('❌ Error calculating professional compatibility: $e');
       return 0.5;
     }
@@ -296,7 +394,7 @@ class ModeSpecificCompatibilityEngine {
       } else {
         return 0.6; // Different industries
       }
-    } catch (e) {
+    } on Object catch (e) {
       debugPrint('❌ Error calculating industry compatibility: $e');
       return 0.5;
     }
@@ -304,13 +402,61 @@ class ModeSpecificCompatibilityEngine {
 
   static double _calculateInterestScore(UserModel user1, UserModel user2) {
     try {
-      // This would compare user interests
-      // For now, return a neutral score
-      return 0.7; // Default good compatibility
-    } catch (e) {
+      final interests1 = _extractInterests(user1);
+      final interests2 = _extractInterests(user2);
+
+      if (interests1.isEmpty || interests2.isEmpty) {
+        return 0.3;
+      }
+
+      final intersection = interests1.intersection(interests2);
+      final union = interests1.union(interests2);
+      if (union.isEmpty) {
+        return 0.3;
+      }
+
+      final jaccard = intersection.length / union.length;
+      final sharedBoost = intersection.length >= 3
+          ? 0.2
+          : (intersection.length >= 2 ? 0.1 : 0.0);
+
+      return (jaccard + sharedBoost).clamp(0.0, 1.0);
+    } on Object catch (e) {
       debugPrint('❌ Error calculating interest score: $e');
       return 0.5;
     }
+  }
+
+  static Set<String> _extractInterests(UserModel user) {
+    final interests = <String>{};
+
+    if (user.bio != null && user.bio!.isNotEmpty) {
+      interests.addAll(
+        user.bio!
+            .toLowerCase()
+            .replaceAll(RegExp(r'[^\w\s]'), ' ')
+            .split(' ')
+            .where((w) => w.length > 3),
+      );
+    }
+
+    if (user.profession != null && user.profession!.isNotEmpty) {
+      interests.add(user.profession!.toLowerCase());
+    }
+
+    if (user.education != null && user.education!.isNotEmpty) {
+      interests.add(user.education!.toLowerCase());
+    }
+
+    if (user.drinkingStatus != null && user.drinkingStatus!.isNotEmpty) {
+      interests.add('drinking_${user.drinkingStatus!.toLowerCase()}');
+    }
+
+    if (user.smokingStatus != null && user.smokingStatus!.isNotEmpty) {
+      interests.add('smoking_${user.smokingStatus!.toLowerCase()}');
+    }
+
+    return interests;
   }
 
   static double _calculateAgeCompatibility(UserModel user1, UserModel user2) {
@@ -326,7 +472,7 @@ class ModeSpecificCompatibilityEngine {
       } else {
         return 0.3; // Low score for large age differences
       }
-    } catch (e) {
+    } on Object catch (e) {
       debugPrint('❌ Error calculating age compatibility: $e');
       return 0.5;
     }
@@ -339,21 +485,41 @@ class ModeSpecificCompatibilityEngine {
       int user2Score = 0;
 
       // Check various profile fields
-      if (user1.name?.isNotEmpty ?? false) user1Score++;
-      if (user1.bio?.isNotEmpty ?? false) user1Score++;
-      if (user1.job_title?.isNotEmpty ?? false) user1Score++;
-      if (user1.imageUrl?.isNotEmpty ?? false) user1Score++;
-      if (user1.coordinates != null) user1Score++;
+      if (user1.name?.isNotEmpty ?? false) {
+        user1Score++;
+      }
+      if (user1.bio?.isNotEmpty ?? false) {
+        user1Score++;
+      }
+      if (user1.job_title?.isNotEmpty ?? false) {
+        user1Score++;
+      }
+      if (user1.imageUrl?.isNotEmpty ?? false) {
+        user1Score++;
+      }
+      if (user1.coordinates != null) {
+        user1Score++;
+      }
 
-      if (user2.name?.isNotEmpty ?? false) user2Score++;
-      if (user2.bio?.isNotEmpty ?? false) user2Score++;
-      if (user2.job_title?.isNotEmpty ?? false) user2Score++;
-      if (user2.imageUrl?.isNotEmpty ?? false) user2Score++;
-      if (user2.coordinates != null) user2Score++;
+      if (user2.name?.isNotEmpty ?? false) {
+        user2Score++;
+      }
+      if (user2.bio?.isNotEmpty ?? false) {
+        user2Score++;
+      }
+      if (user2.job_title?.isNotEmpty ?? false) {
+        user2Score++;
+      }
+      if (user2.imageUrl?.isNotEmpty ?? false) {
+        user2Score++;
+      }
+      if (user2.coordinates != null) {
+        user2Score++;
+      }
 
       // Return average completeness
       return (user1Score + user2Score) / 10.0;
-    } catch (e) {
+    } on Object catch (e) {
       debugPrint('❌ Error calculating completeness score: $e');
       return 0.5;
     }
@@ -363,33 +529,44 @@ class ModeSpecificCompatibilityEngine {
   static Map<String, double> getCompatibilityBreakdown(
     UserModel user1,
     UserModel user2,
-    String mode,
-  ) {
+    String mode, {
+    MatchConfig config = MatchConfig.defaults,
+  }) {
     switch (mode) {
       case 'Dating':
+        final w = config.datingWeights;
         return {
-          'age':
-              CompatibilityEngine.calculateCompatibility(user1, user2) * 0.30,
-          'location': _calculateLocationScore(user1, user2) * 0.25,
-          'lifestyle': _calculateLifestyleCompatibility(user1, user2) * 0.20,
-          'interest': _calculateInterestScore(user1, user2) * 0.15,
-          'completeness': _calculateCompletenessScore(user1, user2) * 0.10,
+          'age': _calculateAgeCompatibility(user1, user2) * w.age,
+          'location':
+              _calculateLocationScore(user1, user2, config) * w.location,
+          'lifestyle':
+              _calculateLifestyleCompatibility(user1, user2) * w.lifestyle,
+          'interest': _calculateInterestScore(user1, user2) * w.interest,
+          'completeness':
+              _calculateCompletenessScore(user1, user2) * w.completeness,
         };
       case 'Friendship':
+        final w = config.friendshipWeights;
         return {
-          'social': _calculateSocialCompatibility(user1, user2) * 0.35,
-          'interest': _calculateInterestScore(user1, user2) * 0.25,
-          'location': _calculateLocationScore(user1, user2) * 0.20,
-          'age': _calculateAgeCompatibility(user1, user2) * 0.10,
-          'completeness': _calculateCompletenessScore(user1, user2) * 0.10,
+          'social': _calculateSocialCompatibility(user1, user2) * w.social,
+          'interest': _calculateInterestScore(user1, user2) * w.interest,
+          'location':
+              _calculateLocationScore(user1, user2, config) * w.location,
+          'age': _calculateAgeCompatibility(user1, user2) * w.age,
+          'completeness':
+              _calculateCompletenessScore(user1, user2) * w.completeness,
         };
       case 'Networking':
+        final w = config.networkingWeights;
         return {
-          'professional':
-              _calculateProfessionalCompatibility(user1, user2) * 0.40,
-          'industry': _calculateIndustryCompatibility(user1, user2) * 0.25,
-          'location': _calculateLocationScore(user1, user2) * 0.20,
-          'completeness': _calculateCompletenessScore(user1, user2) * 0.15,
+          'professional': _calculateProfessionalCompatibility(user1, user2) *
+              w.professional,
+          'industry':
+              _calculateIndustryCompatibility(user1, user2) * w.industry,
+          'location':
+              _calculateLocationScore(user1, user2, config) * w.location,
+          'completeness':
+              _calculateCompletenessScore(user1, user2) * w.completeness,
         };
       default:
         return {

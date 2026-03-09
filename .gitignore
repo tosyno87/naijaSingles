@@ -12,6 +12,12 @@
 .swiftpm/
 migrate_working_dir/
 
+# SonarQube
+.scannerwork/
+
+# Temporary / generated previews
+tmp/
+
 # Environment variables and secrets
 .env
 .env.local
@@ -79,4 +85,11 @@ my_key.pub
 ios/build/
 ios/build/*.ipa
 ios/Runner.xcarchive/
+# macOS Finder duplicate files
+*\ [0-9]*
+*\ [0-9]*.*
+
+# Provisioning profiles (should not be in source control)
+*.mobileprovision
+
 # Secrets configured Thu Oct  2 20:49:29 EDT 2025

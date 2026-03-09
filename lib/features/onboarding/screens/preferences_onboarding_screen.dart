@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:google_fonts/google_fonts.dart';
 
 import '../bloc/onboarding_bloc.dart';
+import '../onboarding_theme.dart';
 
 class PreferencesOnboardingScreen extends StatefulWidget {
   const PreferencesOnboardingScreen({super.key});
@@ -14,9 +14,9 @@ class PreferencesOnboardingScreen extends StatefulWidget {
 
 class _PreferencesOnboardingScreenState
     extends State<PreferencesOnboardingScreen> {
-  String _selectedInterestedIn = 'everyone';
+  String _selectedInterestedIn = '';
   RangeValues _ageRange = const RangeValues(18, 50);
-  double _maxDistance = 50.0; // Default 50 miles (industry standard)
+  double _maxDistance = 50;
 
   @override
   void initState() {
@@ -34,100 +34,54 @@ class _PreferencesOnboardingScreenState
   }
 
   @override
-  Widget build(BuildContext context) {
-    final screenWidth = MediaQuery.of(context).size.width;
-    final isTablet = screenWidth > 600;
+  Widget build(BuildContext context) => OnboardingTheme.constrainedContent(
+        child: SingleChildScrollView(
+          padding: OnboardingTheme.pagePadding,
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text('Dating Preferences', style: OnboardingTheme.titleStyle),
+              const SizedBox(height: OnboardingTheme.titleToSubtitle),
+              Text(
+                'Help us find your perfect match',
+                style: OnboardingTheme.subtitleStyle,
+              ),
+              const SizedBox(height: OnboardingTheme.subtitleToField),
+              Text(
+                "I'm interested in",
+                style: OnboardingTheme.sectionLabelStyle,
+              ),
+              const SizedBox(height: OnboardingTheme.labelToField),
+              _buildInterestedInOptions(),
+              const SizedBox(height: OnboardingTheme.fieldToSection),
+              Text(
+                'Maximum Distance',
+                style: OnboardingTheme.sectionLabelStyle,
+              ),
+              const SizedBox(height: OnboardingTheme.labelToField),
+              _buildDistanceSlider(),
+              const SizedBox(height: OnboardingTheme.fieldToSection),
+              Text('Age Range', style: OnboardingTheme.sectionLabelStyle),
+              const SizedBox(height: OnboardingTheme.labelToField),
+              _buildAgeRangeSlider(),
+              const SizedBox(height: OnboardingTheme.fieldToBottom),
+            ],
+          ),
+        ),
+      );
 
-    return SingleChildScrollView(
-      padding: EdgeInsets.all(isTablet ? 32 : 24),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
+  Widget _buildInterestedInOptions() => Column(
         children: [
-          // Header
-          Text(
-            'Dating Preferences',
-            style: GoogleFonts.montserrat(
-              fontSize: isTablet ? 32 : 28,
-              fontWeight: FontWeight.bold,
-              color: Colors.black87,
-            ),
-          ),
-          SizedBox(height: isTablet ? 12 : 8),
-          Text(
-            'Help us find your perfect match',
-            style: GoogleFonts.montserrat(
-              fontSize: isTablet ? 18 : 16,
-              color: Colors.black54,
-            ),
-          ),
-
-          SizedBox(height: isTablet ? 40 : 32),
-
-          // Interested In Section
-          Text(
-            'I\'m interested in',
-            style: GoogleFonts.montserrat(
-              fontSize: isTablet ? 22 : 18,
-              fontWeight: FontWeight.w600,
-              color: Colors.black87,
-            ),
-          ),
-          SizedBox(height: isTablet ? 16 : 12),
-          _buildInterestedInOptions(),
-
-          SizedBox(height: isTablet ? 40 : 32),
-
-          // Distance Section (Industry Standard - Tinder, Bumble, Hinge)
-          Text(
-            'Maximum Distance',
-            style: GoogleFonts.montserrat(
-              fontSize: isTablet ? 22 : 18,
-              fontWeight: FontWeight.w600,
-              color: Colors.black87,
-            ),
-          ),
-          SizedBox(height: isTablet ? 16 : 12),
-          _buildDistanceSlider(),
-
-          SizedBox(height: isTablet ? 40 : 32),
-
-          // Age Range Section
-          Text(
-            'Age Range',
-            style: GoogleFonts.montserrat(
-              fontSize: isTablet ? 22 : 18,
-              fontWeight: FontWeight.w600,
-              color: Colors.black87,
-            ),
-          ),
-          SizedBox(height: isTablet ? 16 : 12),
-          _buildAgeRangeSlider(),
-
-          SizedBox(height: isTablet ? 40 : 32),
+          _buildInterestedInOption('Men', 'men', Icons.male),
+          const SizedBox(height: 12),
+          _buildInterestedInOption('Women', 'women', Icons.female),
+          const SizedBox(height: 12),
+          _buildInterestedInOption('Everyone', 'everyone', Icons.people),
         ],
-      ),
-    );
-  }
-
-  Widget _buildInterestedInOptions() {
-    final screenWidth = MediaQuery.of(context).size.width;
-    final isTablet = screenWidth > 600;
-
-    return Column(
-      children: [
-        _buildInterestedInOption('Men', 'men', Icons.male),
-        SizedBox(height: isTablet ? 16 : 12),
-        _buildInterestedInOption('Women', 'women', Icons.female),
-        SizedBox(height: isTablet ? 16 : 12),
-        _buildInterestedInOption('Everyone', 'everyone', Icons.people),
-      ],
-    );
-  }
+      );
 
   Widget _buildInterestedInOption(String label, String value, IconData icon) {
     final isSelected = _selectedInterestedIn == value;
-    final screenWidth = MediaQuery.of(context).size.width;
-    final isTablet = screenWidth > 600;
 
     return GestureDetector(
       onTap: () {
@@ -138,51 +92,53 @@ class _PreferencesOnboardingScreenState
       },
       child: Container(
         width: double.infinity,
-        padding: EdgeInsets.symmetric(
-          horizontal: isTablet ? 24 : 16,
-          vertical: isTablet ? 20 : 16,
+        constraints: const BoxConstraints(
+          minHeight: OnboardingTheme.fieldHeight,
+        ),
+        padding: const EdgeInsets.symmetric(
+          horizontal: OnboardingTheme.fieldContentPadding,
+          vertical: OnboardingTheme.fieldContentPadding,
         ),
         decoration: BoxDecoration(
           color: isSelected
-              ? const Color(0xFF008037).withValues(alpha: 0.1)
-              : Colors.white,
+              ? OnboardingTheme.primaryGreen.withValues(alpha: 0.08)
+              : OnboardingTheme.fieldFill,
           border: Border.all(
-            color: isSelected ? const Color(0xFF008037) : Colors.grey.shade300,
-            width: 2,
+            color: isSelected
+                ? OnboardingTheme.primaryGreen
+                : OnboardingTheme.fieldBorder,
+            width: isSelected
+                ? OnboardingTheme.fieldFocusBorderWidth
+                : OnboardingTheme.fieldBorderWidth,
           ),
-          borderRadius: BorderRadius.circular(12),
-          boxShadow: [
-            BoxShadow(
-              color: Colors.black.withValues(alpha: 0.05),
-              blurRadius: 4,
-              offset: const Offset(0, 2),
-            ),
-          ],
+          borderRadius: BorderRadius.circular(OnboardingTheme.fieldRadius),
         ),
         child: Row(
           children: [
             Icon(
               icon,
-              color:
-                  isSelected ? const Color(0xFF008037) : Colors.grey.shade600,
-              size: isTablet ? 24 : 20,
+              color: isSelected
+                  ? OnboardingTheme.primaryGreen
+                  : OnboardingTheme.subtitleColor,
+              size: OnboardingTheme.fieldIconSize,
             ),
-            SizedBox(width: isTablet ? 16 : 12),
+            const SizedBox(width: 12),
             Expanded(
               child: Text(
                 label,
-                style: GoogleFonts.montserrat(
-                  fontSize: isTablet ? 18 : 16,
-                  fontWeight: isSelected ? FontWeight.w600 : FontWeight.normal,
-                  color: isSelected ? const Color(0xFF008037) : Colors.black87,
+                style: OnboardingTheme.fieldTextStyle.copyWith(
+                  fontWeight: isSelected ? FontWeight.w600 : FontWeight.w500,
+                  color: isSelected
+                      ? OnboardingTheme.primaryGreen
+                      : OnboardingTheme.fieldTextColor,
                 ),
               ),
             ),
             if (isSelected)
-              Icon(
+              const Icon(
                 Icons.check_circle,
-                color: const Color(0xFF008037),
-                size: isTablet ? 24 : 20,
+                color: OnboardingTheme.primaryGreen,
+                size: OnboardingTheme.fieldIconSize,
               ),
           ],
         ),
@@ -190,99 +146,77 @@ class _PreferencesOnboardingScreenState
     );
   }
 
-  Widget _buildAgeRangeSlider() {
-    final screenWidth = MediaQuery.of(context).size.width;
-    final isTablet = screenWidth > 600;
-
-    return Column(
-      children: [
-        Text(
-          '${_ageRange.start.round()} - ${_ageRange.end.round()} years',
-          style: GoogleFonts.montserrat(
-            fontSize: isTablet ? 18 : 16,
-            fontWeight: FontWeight.w600,
-            color: const Color(0xFF008037),
+  Widget _buildAgeRangeSlider() => Column(
+        children: [
+          Text(
+            '${_ageRange.start.round()} - ${_ageRange.end.round()} years',
+            style: OnboardingTheme.fieldTextStyle.copyWith(
+              color: OnboardingTheme.primaryGreen,
+              fontWeight: FontWeight.w600,
+            ),
           ),
-        ),
-        SizedBox(height: isTablet ? 16 : 12),
-        RangeSlider(
-          values: _ageRange,
-          min: 18,
-          max: 80,
-          divisions: 62,
-          activeColor: const Color(0xFF008037),
-          inactiveColor: Colors.grey.shade300,
-          onChanged: (RangeValues values) {
-            setState(() => _ageRange = values);
-            context.read<OnboardingBloc>().add(
-                  OnboardingAgeRangeUpdated([
-                    values.start.round(),
-                    values.end.round(),
-                  ]),
-                );
-          },
-        ),
-      ],
-    );
-  }
-
-  Widget _buildDistanceSlider() {
-    final screenWidth = MediaQuery.of(context).size.width;
-    final isTablet = screenWidth > 600;
-
-    return Column(
-      children: [
-        Text(
-          _maxDistance.round() == 100
-              ? '${_maxDistance.round()} miles (Anywhere)'
-              : 'Within ${_maxDistance.round()} miles',
-          style: GoogleFonts.montserrat(
-            fontSize: isTablet ? 18 : 16,
-            fontWeight: FontWeight.w600,
-            color: const Color(0xFF008037),
+          const SizedBox(height: 12),
+          RangeSlider(
+            values: _ageRange,
+            min: 18,
+            max: 80,
+            divisions: 62,
+            activeColor: OnboardingTheme.primaryGreen,
+            inactiveColor: OnboardingTheme.progressTrack,
+            onChanged: (RangeValues values) {
+              setState(() => _ageRange = values);
+              context.read<OnboardingBloc>().add(
+                    OnboardingAgeRangeUpdated([
+                      values.start.round(),
+                      values.end.round(),
+                    ]),
+                  );
+            },
           ),
-        ),
-        SizedBox(height: isTablet ? 16 : 12),
-        Slider(
-          value: _maxDistance,
-          min: 1,
-          max: 100,
-          divisions: 99,
-          activeColor: const Color(0xFF008037),
-          inactiveColor: Colors.grey.shade300,
-          label: _maxDistance.round() == 100
-              ? 'Anywhere'
-              : '${_maxDistance.round()} miles',
-          onChanged: (double value) {
-            setState(() => _maxDistance = value);
-            context.read<OnboardingBloc>().add(
-                  OnboardingMaxDistanceUpdated(value.round()),
-                );
-          },
-        ),
-        Padding(
-          padding: EdgeInsets.symmetric(horizontal: isTablet ? 24 : 16),
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Text(
-                '1 mile',
-                style: GoogleFonts.montserrat(
-                  fontSize: 12,
-                  color: Colors.grey.shade600,
-                ),
-              ),
-              Text(
-                '100 miles',
-                style: GoogleFonts.montserrat(
-                  fontSize: 12,
-                  color: Colors.grey.shade600,
-                ),
-              ),
-            ],
+        ],
+      );
+
+  Widget _buildDistanceSlider() => Column(
+        children: [
+          Text(
+            _maxDistance.round() == 100
+                ? '${_maxDistance.round()} miles (Anywhere)'
+                : 'Within ${_maxDistance.round()} miles',
+            style: OnboardingTheme.fieldTextStyle.copyWith(
+              color: OnboardingTheme.primaryGreen,
+              fontWeight: FontWeight.w600,
+            ),
           ),
-        ),
-      ],
-    );
-  }
+          const SizedBox(height: 12),
+          Slider(
+            value: _maxDistance,
+            min: 1,
+            max: 100,
+            divisions: 99,
+            activeColor: OnboardingTheme.primaryGreen,
+            inactiveColor: OnboardingTheme.progressTrack,
+            label: _maxDistance.round() == 100
+                ? 'Anywhere'
+                : '${_maxDistance.round()} miles',
+            onChanged: (double value) {
+              setState(() => _maxDistance = value);
+              context.read<OnboardingBloc>().add(
+                    OnboardingMaxDistanceUpdated(value.round()),
+                  );
+            },
+          ),
+          Padding(
+            padding: const EdgeInsets.symmetric(
+              horizontal: OnboardingTheme.fieldContentPadding,
+            ),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Text('1 mile', style: OnboardingTheme.helperStyle),
+                Text('100 miles', style: OnboardingTheme.helperStyle),
+              ],
+            ),
+          ),
+        ],
+      );
 }

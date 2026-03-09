@@ -1,18 +1,19 @@
-// ignore_for_file: deprecated_member_use, depend_on_referenced_packages
+// ignore_for_file: depend_on_referenced_packages
 
 import 'dart:async';
 import 'dart:developer';
 import 'dart:io';
 
 import 'package:easy_localization/easy_localization.dart';
+import 'package:firebase_app_check/firebase_app_check.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+
 import 'common/bloc/language/language_bloc.dart';
-import 'common/bloc/streetview/streetview_bloc.dart';
 import 'common/bloc/theme/theme_bloc.dart';
 import 'common/bloc/user/user_bloc.dart';
 import 'common/constants/theme.dart';
@@ -23,13 +24,13 @@ import 'common/utils/observer.dart';
 import 'config/secure_config.dart';
 import 'features/auth/auth_status/bloc/authstatus_bloc.dart';
 import 'features/events/data/services/seed_events_service.dart';
+import 'features/notifications/data/services/notification_service.dart';
 import 'features/onboarding/bloc/onboarding_bloc.dart';
 import 'features/onboarding/data/repositories/onboarding_repository.dart';
 // import 'debug/auto_login_service.dart'; // Uncomment if needed for testing
 import 'firebase_options.dart';
-import 'features/notifications/data/services/notification_service.dart';
-import 'services/secure_storage_service.dart';
 import 'services/crashlytics_service.dart';
+import 'services/secure_storage_service.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -41,7 +42,7 @@ Future<void> main() async {
     await SecureConfig.initialize();
     SecureConfig.validate();
     log('🔒 Secure configuration loaded successfully');
-  } catch (e) {
+  } on Object catch (e) {
     log('❌ Secure configuration error: $e');
     if (kDebugMode) {
       log('💡 Make sure you have created a .env file with your Firebase configuration');
@@ -55,62 +56,70 @@ Future<void> main() async {
   try {
     await SecureStorageService().initialize();
     log('🔐 Secure storage service initialized successfully');
-  } catch (e) {
+  } on Object catch (e) {
     log('❌ Secure storage initialization error: $e');
     // Continue anyway - secure storage will use defaults
   }
 
-  // Initialize Firebase with error handling
+  // Initialize Firebase — handle native SDK already having the default app
   try {
     await Firebase.initializeApp(
       options: DefaultFirebaseOptions.currentPlatform,
     );
     log('🔥 Firebase initialized successfully');
-
-    // Configure Firebase Auth for iOS Simulator testing
-    if (Platform.isIOS && kDebugMode) {
-      // Disable app verification for testing on iOS Simulator
-      // This allows phone auth to work without real SMS
-      // IMPORTANT: Only use test phone numbers from Firebase Console
-      // Go to: Firebase Console > Authentication > Sign-in method > Phone > Phone numbers for testing
-      try {
-        // Note: Flutter doesn't have direct access to Auth.auth().settings
-        // Instead, we'll handle this in the phone auth repository
-        log('📱 iOS Simulator detected - Test phone numbers should be configured in Firebase Console');
-        log('💡 Configure test numbers at: Firebase Console > Auth > Sign-in method > Phone > Test phone numbers');
-      } catch (e) {
-        log('⚠️ Could not configure simulator settings: $e');
-      }
+  } on Object catch (e) {
+    if (e.toString().contains('duplicate-app')) {
+      log('ℹ️ Firebase already initialized by native SDK — using existing app');
+    } else {
+      log('❌ Firebase initialization error: $e');
     }
+  }
 
-    // Initialize Crashlytics for crash reporting
-    try {
-      await CrashlyticsService().initialize();
-      log('📊 Crashlytics initialized successfully');
-    } catch (e) {
-      log('❌ Crashlytics initialization error: $e');
-      // Continue anyway - app should work without Crashlytics
-    }
+  // App Check (non-blocking — failures must not poison Storage)
+  try {
+    await FirebaseAppCheck.instance.activate(
+      // ignore: deprecated_member_use
+      appleProvider:
+          kDebugMode ? AppleProvider.debug : AppleProvider.deviceCheck,
+    );
+    log('🛡️ Firebase App Check activated');
+  } on Object catch (e) {
+    log('⚠️ App Check activation failed (continuing without it): $e');
+  }
 
-    // Initialize Notification Service
+  // Configure Firebase Auth for iOS Simulator testing
+  if (Platform.isIOS && kDebugMode) {
+    log('📱 iOS Simulator detected — configure test numbers in Firebase Console');
+  }
+
+  // Initialize Crashlytics for crash reporting
+  try {
+    await CrashlyticsService().initialize();
+    log('📊 Crashlytics initialized successfully');
+  } on Object catch (e) {
+    log('❌ Crashlytics initialization error: $e');
+  }
+
+  // Initialize Notification Service
+  try {
     await NotificationService.initialize();
     log('🔔 Notification Service initialized');
+  } on Object catch (e) {
+    log('❌ Notification Service initialization error: $e');
+  }
 
-    // Seed events only in debug mode to prevent fake data in production
-    if (kDebugMode) {
-      try {
-        final currentUser = FirebaseAuth.instance.currentUser;
-        if (currentUser != null) {
-          final seedService = SeedEventsService();
-          await seedService.seedEventsIfEmpty();
-          log('🎉 Events seeding completed (debug only)');
-        }
-      } catch (e) {
-        log('⚠️ Events seeding error (debug only): $e');
+  // Seed events only in debug mode to prevent fake data in production
+  if (kDebugMode) {
+    try {
+      final currentUser = FirebaseAuth.instance.currentUser;
+      if (currentUser != null) {
+        final seedService = SeedEventsService();
+        await seedService.seedEventsIfEmpty();
+        log('🎉 Events seeding completed (debug only)');
       }
+    } on Object catch (e) {
+      log('⚠️ Events seeding error (debug only): $e');
     }
-  } catch (e) {
-    log('❌ Firebase initialization error: $e');
   }
 
   // Authentication state will be managed by the app flow
@@ -119,12 +128,12 @@ Future<void> main() async {
   FirebaseAuth.instance.authStateChanges().listen(
     (User? user) {
       log("👤 Auth state changed: ${user?.uid ?? 'No user'}");
-      
+
       // Update Crashlytics user identifier
       if (user != null) {
-        CrashlyticsService().setUserId(user.uid);
+        unawaited(CrashlyticsService().setUserId(user.uid));
       } else {
-        CrashlyticsService().clearUserId();
+        unawaited(CrashlyticsService().clearUserId());
       }
 
       if (kDebugMode && user != null) {
@@ -148,7 +157,7 @@ Future<void> main() async {
   /*
   try {
     await AutoLoginService.autoLoginForTesting();
-  } catch (e) {
+  } on Object catch (e) {
     log('⚠️ Auto-login error: $e');
   }
   */
@@ -162,85 +171,84 @@ Future<void> main() async {
       await FirebaseAuth.instance.signOut();
       log('✅ Signed out - app will start with no authenticated user');
     }
-  } catch (e) {
+  } on Object catch (e) {
     log('⚠️ Error signing out existing user: $e');
   }
 
   Bloc.observer = SimpleBlocObserver();
-  SystemChrome.setPreferredOrientations([
+  await SystemChrome.setPreferredOrientations([
     DeviceOrientation.portraitDown,
     DeviceOrientation.portraitUp,
-  ]).then((_) {
-    runApp(
-      EasyLocalization(
-        supportedLocales: const [
-          Locale('en', 'US'),
-          Locale('es', 'ES'),
-          Locale('fr', 'FR'),
-          Locale('pt', 'PT'),
-          Locale('ar', 'SA'),
-          Locale('hi', 'IN'),
-          Locale('zh', 'CN'),
-          Locale('ja', 'JP'),
-          Locale('ko', 'KR'),
-          Locale('de', 'DE'),
-          Locale('it', 'IT'),
-          Locale('ru', 'RU'),
-          Locale('tr', 'TR'),
-          Locale('nl', 'NL'),
-          Locale('sv', 'SE'),
-          Locale('da', 'DK'),
-          Locale('no', 'NO'),
-          Locale('fi', 'FI'),
-          Locale('pl', 'PL'),
-          Locale('cs', 'CZ'),
-          Locale('hu', 'HU'),
-          Locale('ro', 'RO'),
-          Locale('bg', 'BG'),
-          Locale('hr', 'HR'),
-          Locale('sk', 'SK'),
-          Locale('sl', 'SI'),
-          Locale('et', 'EE'),
-          Locale('lv', 'LV'),
-          Locale('lt', 'LT'),
-          Locale('uk', 'UA'),
-          Locale('he', 'IL'),
-          Locale('th', 'TH'),
-          Locale('vi', 'VN'),
-          Locale('id', 'ID'),
-          Locale('ms', 'MY'),
-          Locale('tl', 'PH'),
-        ],
-        path: 'asset/translation',
-        fallbackLocale: const Locale('en', 'US'),
-        child: MultiBlocProvider(
-          providers: [
-            BlocProvider<AuthstatusBloc>(
-              create: (context) => AuthstatusBloc(
-                phoneAuthRepository: PhoneAuthRepository(),
-              ),
+  ]);
+  runApp(
+    EasyLocalization(
+      supportedLocales: const [
+        Locale('en', 'US'),
+        Locale('es', 'ES'),
+        Locale('fr', 'FR'),
+        Locale('pt', 'PT'),
+        Locale('ar', 'SA'),
+        Locale('hi', 'IN'),
+        Locale('zh', 'CN'),
+        Locale('ja', 'JP'),
+        Locale('ko', 'KR'),
+        Locale('de', 'DE'),
+        Locale('it', 'IT'),
+        Locale('ru', 'RU'),
+        Locale('tr', 'TR'),
+        Locale('nl', 'NL'),
+        Locale('sv', 'SE'),
+        Locale('da', 'DK'),
+        Locale('no', 'NO'),
+        Locale('fi', 'FI'),
+        Locale('pl', 'PL'),
+        Locale('cs', 'CZ'),
+        Locale('hu', 'HU'),
+        Locale('ro', 'RO'),
+        Locale('bg', 'BG'),
+        Locale('hr', 'HR'),
+        Locale('sk', 'SK'),
+        Locale('sl', 'SI'),
+        Locale('et', 'EE'),
+        Locale('lv', 'LV'),
+        Locale('lt', 'LT'),
+        Locale('uk', 'UA'),
+        Locale('he', 'IL'),
+        Locale('th', 'TH'),
+        Locale('vi', 'VN'),
+        Locale('id', 'ID'),
+        Locale('ms', 'MY'),
+        Locale('tl', 'PH'),
+      ],
+      path: 'asset/translation',
+      fallbackLocale: const Locale('en', 'US'),
+      child: MultiBlocProvider(
+        providers: [
+          BlocProvider<AuthstatusBloc>(
+            create: (context) => AuthstatusBloc(
+              phoneAuthRepository: PhoneAuthRepository(),
             ),
-            BlocProvider<UserBloc>(
-              create: (context) => UserBloc(),
-            ),
-            BlocProvider<ThemeBloc>(
-              create: (context) => ThemeBloc(),
-            ),
-            BlocProvider<LanguageBloc>(
-              create: (context) => LanguageBloc(),
-            ),
-          ],
-          child: BlocProvider<OnboardingBloc>(
-            create: (context) => OnboardingBloc(
-              repository: OnboardingRepository(),
-              userBloc: context.read<UserBloc>(),
-            ),
-            child: const MyApp(),
           ),
+          BlocProvider<UserBloc>(
+            create: (context) => UserBloc(),
+          ),
+          BlocProvider<ThemeBloc>(
+            create: (context) => ThemeBloc(),
+          ),
+          BlocProvider<LanguageBloc>(
+            create: (context) => LanguageBloc(),
+          ),
+        ],
+        child: BlocProvider<OnboardingBloc>(
+          create: (context) => OnboardingBloc(
+            repository: OnboardingRepository(),
+            userBloc: context.read<UserBloc>(),
+          ),
+          child: const MyApp(),
         ),
       ),
-    );
-  });
+    ),
+  );
 }
 
 class MyApp extends StatelessWidget {
@@ -253,14 +261,13 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     // Set navigator key for notification service
-    NotificationService.setNavigatorKey(navigatorKey);
+    NotificationService.navigatorKey = navigatorKey;
 
     return BlocBuilder<ThemeBloc, ThemeState>(
       builder: (context, themeState) {
         // Get theme mode from BLoC state
-        final isDarkMode = themeState is ThemeLoaded
-            ? themeState.isDarkMode
-            : false; // Default to light mode if not loaded
+        final isDarkMode = themeState is ThemeLoaded &&
+            themeState.isDarkMode; // Default to light mode if not loaded
 
         return MaterialApp(
           navigatorKey: navigatorKey, // Add navigator key

@@ -1,5 +1,6 @@
 import 'dart:io';
 
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -7,8 +8,8 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:image_cropper/image_cropper.dart';
 import 'package:image_picker/image_picker.dart';
 
-import '../../../data/models/enhanced_event_model.dart';
 import '../../../../../common/constants/app_colors.dart';
+import '../../../data/models/enhanced_event_model.dart';
 
 class AdvancedSettingsStep extends StatefulWidget {
   const AdvancedSettingsStep({
@@ -209,7 +210,18 @@ class _AdvancedSettingsStepState extends State<AdvancedSettingsStep> {
               // Image
               Positioned.fill(
                 child: imagePath.startsWith('http')
-                    ? Image.network(imagePath, fit: BoxFit.cover)
+                    ? CachedNetworkImage(
+                        imageUrl: imagePath,
+                        fit: BoxFit.cover,
+                        placeholder: (context, url) => const Center(
+                          child: CircularProgressIndicator(strokeWidth: 2),
+                        ),
+                        errorWidget: (context, url, error) => const Icon(
+                          Icons.event,
+                          size: 40,
+                          color: Colors.grey,
+                        ),
+                      )
                     : Image.file(File(imagePath), fit: BoxFit.cover),
               ),
               // Remove button
@@ -437,7 +449,8 @@ class _AdvancedSettingsStepState extends State<AdvancedSettingsStep> {
           });
         }
       }
-    } catch (e) {
+    } on Object catch (e) {
+      if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Text('Error picking image: $e'),

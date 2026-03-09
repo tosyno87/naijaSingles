@@ -148,7 +148,7 @@ class UserPrivacyService {
         await updatePrivacySettings(defaultSettings);
         return defaultSettings;
       }
-    } catch (e) {
+    } on Object catch (e) {
       debugPrint('Error getting privacy settings: $e');
       return const UserPrivacySettings();
     }
@@ -157,20 +157,28 @@ class UserPrivacyService {
   /// Update user's privacy settings
   Future<bool> updatePrivacySettings(UserPrivacySettings settings) async {
     try {
-      if (currentUserId == null) return false;
+      if (currentUserId == null) {
+        return false;
+      }
 
-      await _firestore
-          .collection('users')
-          .doc(currentUserId)
+      final userRef = _firestore.collection('users').doc(currentUserId);
+
+      await userRef
           .collection('private')
           .doc('privacy')
           .set(settings.toMap(), SetOptions(merge: true));
 
-      // Update public profile based on privacy settings
+      // Keep the root-level discovery flag in sync so that the Firestore
+      // query `where('isDiscoverable', isEqualTo: true)` in
+      // DiscoveryService honours the privacy toggle.
+      await userRef.update({
+        'isDiscoverable': !settings.hideFromDiscovery,
+      });
+
       await _updatePublicProfile(settings);
 
       return true;
-    } catch (e) {
+    } on Object catch (e) {
       debugPrint('Error updating privacy settings: $e');
       return false;
     }
@@ -179,13 +187,17 @@ class UserPrivacyService {
   /// Update public profile based on privacy settings
   Future<void> _updatePublicProfile(UserPrivacySettings settings) async {
     try {
-      if (currentUserId == null) return;
+      if (currentUserId == null) {
+        return;
+      }
 
       // Get current user data
       final userDoc =
           await _firestore.collection('users').doc(currentUserId).get();
 
-      if (!userDoc.exists) return;
+      if (!userDoc.exists) {
+        return;
+      }
 
       final userData = userDoc.data()!;
       final Map<String, dynamic> publicData = {};
@@ -235,30 +247,38 @@ class UserPrivacyService {
           .collection('public')
           .doc('profile')
           .set(publicData, SetOptions(merge: true));
-    } catch (e) {
+    } on Object catch (e) {
       debugPrint('Error updating public profile: $e');
     }
   }
 
-  /// Get filtered user data based on privacy settings
+  /// Get filtered user data based on privacy settings.
+  ///
+  /// For the current user we read `/users/{uid}/private/privacy` to apply
+  /// their own privacy prefs. For **other** users the private subcollection
+  /// is owner-only, so we fall back to default privacy settings (all fields
+  /// visible) and read only the public profile or main document.
   Future<Map<String, dynamic>?> getFilteredUserData(String userId) async {
     try {
-      // Get user's privacy settings
-      final privacyDoc = await _firestore
-          .collection('users')
-          .doc(userId)
-          .collection('private')
-          .doc('privacy')
-          .get();
+      final currentUid = FirebaseAuth.instance.currentUser?.uid;
+      final isOwner = currentUid != null && currentUid == userId;
 
       UserPrivacySettings privacy;
-      if (privacyDoc.exists) {
-        privacy = UserPrivacySettings.fromMap(privacyDoc.data()!);
+      if (isOwner) {
+        final privacyDoc = await _firestore
+            .collection('users')
+            .doc(userId)
+            .collection('private')
+            .doc('privacy')
+            .get();
+        privacy = privacyDoc.exists
+            ? UserPrivacySettings.fromMap(privacyDoc.data()!)
+            : const UserPrivacySettings();
       } else {
         privacy = const UserPrivacySettings();
       }
 
-      // Get public profile data
+      // Try public profile subcollection first
       final publicDoc = await _firestore
           .collection('users')
           .doc(userId)
@@ -267,7 +287,6 @@ class UserPrivacyService {
           .get();
 
       if (!publicDoc.exists) {
-        // Fallback to main user document
         final userDoc = await _firestore.collection('users').doc(userId).get();
 
         if (userDoc.exists) {
@@ -277,10 +296,44 @@ class UserPrivacyService {
       }
 
       return publicDoc.data();
-    } catch (e) {
+    } on Object catch (e) {
       debugPrint('Error getting filtered user data: $e');
       return null;
     }
+  }
+
+  /// Apply default privacy filtering to already-fetched user data.
+  ///
+  /// Unlike [_filterUserData] (which builds a whitelist of display fields),
+  /// this preserves all operational fields (lat/lng, geoHash, photos, etc.)
+  /// needed for discovery while masking display-sensitive fields according
+  /// to default privacy settings. We cannot read another user's private
+  /// privacy document from the client, so defaults are applied.
+  Map<String, dynamic> filterForDiscovery(Map<String, dynamic> rawData) {
+    final data = Map<String, dynamic>.from(rawData);
+    const privacy = UserPrivacySettings();
+
+    if (!privacy.showAge) {
+      data.remove('age');
+      data.remove('dateOfBirth');
+    }
+    if (!privacy.showTribe) {
+      data.remove('tribe');
+    }
+    if (!privacy.showOrientation) {
+      data.remove('sexualOrientation');
+    }
+    if (!privacy.showLocation) {
+      data.remove('living_in');
+      data.remove('city');
+      data.remove('state');
+      data.remove('locationName');
+    }
+    if (!privacy.showLastActive) {
+      data.remove('lastActive');
+    }
+
+    return data;
   }
 
   /// Filter user data based on privacy settings
@@ -325,7 +378,9 @@ class UserPrivacyService {
   /// Check if user allows messages from current user
   Future<bool> canSendMessage(String targetUserId) async {
     try {
-      if (currentUserId == null) return false;
+      if (currentUserId == null) {
+        return false;
+      }
 
       // Get target user's privacy settings
       final privacyDoc = await _firestore
@@ -354,33 +409,28 @@ class UserPrivacyService {
       // For now, only allow messages from matches
       // This simplifies the messaging system
       return false;
-    } catch (e) {
+    } on Object catch (e) {
       debugPrint('Error checking message permission: $e');
       return false;
     }
   }
 
-  /// Check if users are matched (placeholder - integrate with your match service)
+  /// Check whether two users have a mutual match in the `matches` collection.
   Future<bool> _checkIfMatched(String userId1, String userId2) async {
-    // This should integrate with your existing match checking logic
-    // For now, return false as placeholder
-    return false;
-  }
+    final snapshot = await _firestore
+        .collection('matches')
+        .where('users', arrayContains: userId1)
+        .get();
 
-  /// Check if user has liked another user (placeholder)
-  Future<bool> _checkIfLiked(String fromUserId, String toUserId) async {
-    try {
-      final likeDoc = await _firestore
-          .collection('likes')
-          .where('from', isEqualTo: fromUserId)
-          .where('to', isEqualTo: toUserId)
-          .get();
-
-      return likeDoc.docs.isNotEmpty;
-    } catch (e) {
-      debugPrint('Error checking like status: $e');
-      return false;
+    for (final doc in snapshot.docs) {
+      final users = List<String>.from(
+        (doc.data()['users'] as List<dynamic>?) ?? <String>[],
+      );
+      if (users.contains(userId2)) {
+        return true;
+      }
     }
+    return false;
   }
 
   /// Get privacy summary for display
@@ -391,10 +441,18 @@ class UserPrivacyService {
       return 'Profile hidden from discovery';
     }
 
-    if (!settings.showAge) activeSettings.add('Age hidden');
-    if (!settings.showTribe) activeSettings.add('Tribe hidden');
-    if (!settings.showOrientation) activeSettings.add('Orientation private');
-    if (!settings.showLocation) activeSettings.add('Location private');
+    if (!settings.showAge) {
+      activeSettings.add('Age hidden');
+    }
+    if (!settings.showTribe) {
+      activeSettings.add('Tribe hidden');
+    }
+    if (!settings.showOrientation) {
+      activeSettings.add('Orientation private');
+    }
+    if (!settings.showLocation) {
+      activeSettings.add('Location private');
+    }
     if (!settings.allowMessagesFromMatches) {
       activeSettings.add('Messages restricted');
     }

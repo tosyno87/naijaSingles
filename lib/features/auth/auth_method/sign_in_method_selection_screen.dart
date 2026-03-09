@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:io';
 
 import 'package:flutter/material.dart';
@@ -6,7 +7,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:google_fonts/google_fonts.dart';
 
 import '../../../common/constants/app_colors.dart';
-import '../../../common/widgets/afropeep_logo.dart';
+import '../../../common/utils/auth_router.dart';
 import '../../../common/widgets/afropeep_primary_button.dart';
 import '../../../common/widgets/custom_snackbar.dart';
 import '../google_login/google_login_bloc.dart';
@@ -19,159 +20,190 @@ class SignInMethodSelectionScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    // Set system UI overlay style for status bar
     SystemChrome.setSystemUIOverlayStyle(
-      SystemUiOverlayStyle.dark.copyWith(
+      SystemUiOverlayStyle.light.copyWith(
         statusBarColor: Colors.transparent,
       ),
     );
 
-    // Define colors for Afropeep brand style
-    const Color primaryColor = AppColors.primaryGreen; // #008037
-    const Color googleBlue = Color(0xFF4285F4); // Google blue
-    const Color appleBlack = Color(0xFF000000); // Apple black
-    const Color textColor = AppColors.textPrimary;
-    const Color textSecondary = AppColors.textSecondary;
+    const Color googleBlue = Color(0xFF4285F4);
+    const Color appleBlack = Color(0xFF000000);
+
+    final screenWidth = MediaQuery.of(context).size.width;
+    final buttonWidth = screenWidth * 0.80;
+    final bottomPadding = MediaQuery.of(context).padding.bottom;
 
     return Scaffold(
-      backgroundColor: AppColors.backgroundColor,
+      extendBodyBehindAppBar: true,
+      backgroundColor: Colors.black,
       appBar: AppBar(
         backgroundColor: Colors.transparent,
         elevation: 0,
         leading: IconButton(
-          icon: const Icon(Icons.arrow_back_ios, color: primaryColor),
+          icon: const Icon(Icons.arrow_back_ios, color: Colors.white),
           onPressed: () => Navigator.pop(context),
         ),
       ),
       body: Stack(
+        fit: StackFit.expand,
         children: [
-          // Background texture watermark
-          Positioned.fill(
-            child: Opacity(
-              opacity: 0.05,
-              child: Container(
-                color: Colors.transparent,
+          Image.asset(
+            'assets/images/backgrounds/welcome_couple.png',
+            fit: BoxFit.cover,
+            errorBuilder: (context, error, stackTrace) => Container(
+              decoration: const BoxDecoration(
+                gradient: LinearGradient(
+                  begin: Alignment.topCenter,
+                  end: Alignment.bottomCenter,
+                  colors: [Color(0xFF1A3D2B), Color(0xFF006B2E)],
+                ),
               ),
             ),
           ),
 
-          // Main content
+          // Stronger gradient — readable across the full content zone
+          const DecoratedBox(
+            decoration: BoxDecoration(
+              gradient: LinearGradient(
+                begin: Alignment.topCenter,
+                end: Alignment.bottomCenter,
+                colors: [
+                  Color(0x40000000), // 25%
+                  Color(0x33000000), // 20% — no clear gap
+                  Color(0xCC000000), // 80%
+                ],
+                stops: [0.0, 0.35, 1.0],
+              ),
+            ),
+          ),
+
+          // Content pushed to bottom half
           SafeArea(
-            child: LayoutBuilder(
-              builder: (context, constraints) => SingleChildScrollView(
-                child: ConstrainedBox(
-                  constraints: BoxConstraints(
-                    minHeight: constraints.maxHeight,
-                  ),
-                  child: Padding(
-                    padding: EdgeInsets.only(
-                      left: 24,
-                      right: 24,
-                      bottom: MediaQuery.of(context).padding.bottom > 0
-                          ? MediaQuery.of(context).padding.bottom + 16
-                          : 24,
-                      top: 16,
+            child: Padding(
+              padding: EdgeInsets.fromLTRB(
+                24,
+                0,
+                24,
+                bottomPadding > 0 ? bottomPadding : 24,
+              ),
+              child: Column(
+                children: [
+                  const Spacer(),
+
+                  // Wordmark (matches welcome screen)
+                  Text(
+                    'Afropeep',
+                    style: GoogleFonts.plusJakartaSans(
+                      fontSize: 34,
+                      fontWeight: FontWeight.w700,
+                      color: Colors.white,
+                      letterSpacing: 0.6,
+                      shadows: [
+                        Shadow(
+                          color: Colors.black.withValues(alpha: 0.5),
+                          blurRadius: 12,
+                        ),
+                      ],
                     ),
-                    child: Column(
-                      children: [
-                        const SizedBox(height: 16),
+                  ),
 
-                        // Afropeep Logo - larger size for better visibility
-                        const AfropeepLogo(size: 100),
+                  const SizedBox(height: 24),
 
-                        const SizedBox(height: 32),
+                  Text(
+                    'Sign in',
+                    textAlign: TextAlign.center,
+                    style: GoogleFonts.montserrat(
+                      fontSize: 28,
+                      fontWeight: FontWeight.bold,
+                      color: Colors.white,
+                      letterSpacing: -0.5,
+                    ),
+                  ),
 
-                        // Header text - "Sign in"
-                        Text(
-                          'Sign in',
-                          textAlign: TextAlign.center,
-                          style: GoogleFonts.montserrat(
-                            fontSize: 28,
-                            fontWeight: FontWeight.bold,
-                            color: textColor,
-                            letterSpacing: -0.5,
-                          ),
+                  const SizedBox(height: 8),
+
+                  Text(
+                    "Choose how you'd like to sign in",
+                    textAlign: TextAlign.center,
+                    style: GoogleFonts.montserrat(
+                      fontSize: 15,
+                      fontWeight: FontWeight.w500,
+                      color: const Color(0xB3FFFFFF),
+                    ),
+                  ),
+
+                  const SizedBox(height: 32),
+
+                  if (Platform.isIOS) ...[
+                    Center(
+                      child: SizedBox(
+                        width: buttonWidth,
+                        child: AfropeepPrimaryButton(
+                          icon: Icons.apple,
+                          text: 'Continue with Apple',
+                          backgroundColor: appleBlack,
+                          textColor: Colors.white,
+                          variant: AuthButtonVariant.secondary,
+                          onPressed: () {
+                            CustomSnackbar.showSnackBarSimple(
+                              'Apple Sign In will be implemented soon',
+                              context,
+                            );
+                          },
                         ),
+                      ),
+                    ),
+                    const SizedBox(height: 12),
+                  ],
 
-                        const SizedBox(height: 8),
-
-                        // Subtitle
-                        Text(
-                          "Choose how you'd like to sign in",
-                          textAlign: TextAlign.center,
-                          style: GoogleFonts.montserrat(
-                            fontSize: 15,
-                            fontWeight: FontWeight.w500,
-                            color: textSecondary,
-                          ),
-                        ),
-
-                        const SizedBox(height: 40),
-
-                        // Button order: Apple (iOS only) → Google → Phone (primary)
-                        // Apple Sign In Button (iOS only) - Secondary (first on iOS)
-                        if (Platform.isIOS) ...[
-                          AfropeepPrimaryButton(
-                            icon: Icons.apple,
-                            text: 'Continue with Apple',
-                            backgroundColor: appleBlack,
+                  Center(
+                    child: SizedBox(
+                      width: buttonWidth,
+                      child: BlocProvider(
+                        create: (context) => GoogleLoginBloc(),
+                        child: BlocConsumer<GoogleLoginBloc, GoogleLoginStates>(
+                          listener: (context, state) {
+                            if (state is GoogleLoginSuccess) {
+                              unawaited(
+                                AuthRouter.navigateAfterAuth(context),
+                              );
+                            } else if (state is GoogleLoginFailed) {
+                              CustomSnackbar.showSnackBarSimple(
+                                state.message,
+                                context,
+                              );
+                            }
+                          },
+                          builder: (context, state) => AfropeepPrimaryButton(
+                            icon: Icons.g_mobiledata_rounded,
+                            text: 'Continue with Google',
+                            backgroundColor: googleBlue,
                             textColor: Colors.white,
                             variant: AuthButtonVariant.secondary,
+                            isLoading: state is GoogleLoginLoading,
                             onPressed: () {
-                              CustomSnackbar.showSnackBarSimple(
-                                'Apple Sign In will be implemented soon',
-                                context,
+                              BlocProvider.of<GoogleLoginBloc>(context).add(
+                                const GoogleLoginRequested(),
                               );
                             },
                           ),
-                          const SizedBox(height: 12),
-                        ],
-
-                        // Google Sign In Button - Secondary (first on Android, second on iOS)
-                        BlocProvider(
-                          create: (context) => GoogleLoginBloc(),
-                          child:
-                              BlocConsumer<GoogleLoginBloc, GoogleLoginStates>(
-                            listener: (context, state) {
-                              if (state is GoogleLoginSuccess) {
-                                Navigator.pushReplacementNamed(
-                                  context,
-                                  '/main_navigation',
-                                );
-                              } else if (state is GoogleLoginFailed) {
-                                CustomSnackbar.showSnackBarSimple(
-                                  state.message,
-                                  context,
-                                );
-                              }
-                            },
-                            builder: (context, state) => AfropeepPrimaryButton(
-                              icon: Icons.g_mobiledata_rounded,
-                              text: 'Continue with Google',
-                              backgroundColor: googleBlue,
-                              textColor: Colors.white,
-                              variant: AuthButtonVariant.secondary,
-                              isLoading: state is GoogleLoginLoading,
-                              onPressed: () {
-                                BlocProvider.of<GoogleLoginBloc>(context).add(
-                                  const GoogleLoginRequested(),
-                                );
-                              },
-                            ),
-                          ),
                         ),
+                      ),
+                    ),
+                  ),
 
-                        const SizedBox(height: 12),
+                  const SizedBox(height: 12),
 
-                        // Phone Number Button - Primary (last, most prominent)
-                        AfropeepPrimaryButton(
-                          icon: Icons.phone_outlined,
-                          text: 'Continue with Phone',
-                          backgroundColor: primaryColor,
-                          textColor: Colors.white,
-                          onPressed: () {
-                            // Use pushReplacement to remove this screen from stack
-                            // This prevents both screens from being visible during transition
+                  Center(
+                    child: SizedBox(
+                      width: buttonWidth,
+                      child: AfropeepPrimaryButton(
+                        icon: Icons.phone_outlined,
+                        text: 'Continue with Phone',
+                        backgroundColor: AppColors.primaryGreen,
+                        textColor: Colors.white,
+                        onPressed: () {
+                          unawaited(
                             Navigator.pushReplacement(
                               context,
                               MaterialPageRoute(
@@ -180,52 +212,50 @@ class SignInMethodSelectionScreen extends StatelessWidget {
                                   isSignIn: true,
                                 ),
                               ),
-                            );
-                          },
-                        ),
-
-                        const SizedBox(height: 32),
-
-                        // Don't have an account? Create one
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            Text(
-                              "Don't have an account? ",
-                              style: GoogleFonts.montserrat(
-                                fontSize: 14,
-                                color: textSecondary,
-                              ),
                             ),
-                            GestureDetector(
-                              onTap: () {
-                                // Use pushReplacement to remove this screen from stack
-                                Navigator.pushReplacement(
-                                  context,
-                                  MaterialPageRoute(
-                                    builder: (context) => PhoneNumber(
-                                      updatePhoneNumber: false,
-                                    ),
-                                  ),
-                                );
-                              },
-                              child: Text(
-                                'Create one',
-                                style: GoogleFonts.montserrat(
-                                  fontSize: 14,
-                                  fontWeight: FontWeight.w600,
-                                  color: primaryColor,
+                          );
+                        },
+                      ),
+                    ),
+                  ),
+
+                  const SizedBox(height: 24),
+
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Text(
+                        "Don't have an account? ",
+                        style: GoogleFonts.montserrat(
+                          fontSize: 14,
+                          color: const Color(0xB3FFFFFF),
+                        ),
+                      ),
+                      GestureDetector(
+                        onTap: () {
+                          unawaited(
+                            Navigator.pushReplacement(
+                              context,
+                              MaterialPageRoute(
+                                builder: (context) => PhoneNumber(
+                                  updatePhoneNumber: false,
                                 ),
                               ),
                             ),
-                          ],
+                          );
+                        },
+                        child: Text(
+                          'Create one',
+                          style: GoogleFonts.montserrat(
+                            fontSize: 14,
+                            fontWeight: FontWeight.w600,
+                            color: Colors.white,
+                          ),
                         ),
-
-                        const SizedBox(height: 16),
-                      ],
-                    ),
+                      ),
+                    ],
                   ),
-                ),
+                ],
               ),
             ),
           ),

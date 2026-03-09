@@ -3,8 +3,11 @@
 // This file uses the legacy GroupModel/GroupService. The canonical version
 // uses UnifiedGroup/UnifiedGroupService with richer features (notifications,
 // reporting, member invites, etc.).
-// TODO: Migrate callers (groups_screen.dart) to the canonical version,
+// TODO(dev): Migrate callers (groups_screen.dart) to the canonical version,
 // then delete this file.
+import 'dart:async';
+
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import '../../../../common/constants/app_colors.dart';
@@ -12,7 +15,6 @@ import '../../../../common/widgets/custom_3d_icons.dart';
 import '../../../../models/group_model.dart';
 import '../../data/services/group_service.dart';
 
-@Deprecated('Use GroupDetailsScreen from groups/screens/ instead')
 class GroupDetailsScreen extends StatefulWidget {
   const GroupDetailsScreen({
     required this.group,
@@ -40,7 +42,7 @@ class _GroupDetailsScreenState extends State<GroupDetailsScreen>
     super.initState();
     _tabController = TabController(length: 3, vsync: this);
     _checkUserStatus();
-    _loadMembers();
+    unawaited(_loadMembers());
   }
 
   @override
@@ -61,15 +63,17 @@ class _GroupDetailsScreenState extends State<GroupDetailsScreen>
   }
 
   Future<void> _loadMembers() async {
+    final groupId = widget.group.id;
+    if (groupId == null) return;
     setState(() => _isLoading = true);
 
     try {
-      final members = await _groupService.getGroupMembers(widget.group.id!);
+      final members = await _groupService.getGroupMembers(groupId);
       setState(() {
         _members = members;
         _isLoading = false;
       });
-    } catch (e) {
+    } on Object catch (e) {
       setState(() => _isLoading = false);
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
@@ -83,7 +87,9 @@ class _GroupDetailsScreenState extends State<GroupDetailsScreen>
   }
 
   Future<void> _joinGroup() async {
-    final success = await _groupService.joinGroup(widget.group.id!);
+    final groupId = widget.group.id;
+    if (groupId == null) return;
+    final success = await _groupService.joinGroup(groupId);
 
     if (success && mounted) {
       ScaffoldMessenger.of(context).showSnackBar(
@@ -93,7 +99,7 @@ class _GroupDetailsScreenState extends State<GroupDetailsScreen>
         ),
       );
       _checkUserStatus();
-      _loadMembers();
+      await _loadMembers();
     } else if (mounted) {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
@@ -105,7 +111,9 @@ class _GroupDetailsScreenState extends State<GroupDetailsScreen>
   }
 
   Future<void> _leaveGroup() async {
-    final success = await _groupService.leaveGroup(widget.group.id!);
+    final groupId = widget.group.id;
+    if (groupId == null) return;
+    final success = await _groupService.leaveGroup(groupId);
 
     if (success && mounted) {
       ScaffoldMessenger.of(context).showSnackBar(
@@ -159,10 +167,13 @@ class _GroupDetailsScreenState extends State<GroupDetailsScreen>
                 // Group Image
                 if (widget.group.imageUrl != null)
                   Positioned.fill(
-                    child: Image.network(
-                      widget.group.imageUrl!,
+                    child: CachedNetworkImage(
+                      imageUrl: widget.group.imageUrl ?? '',
                       fit: BoxFit.cover,
-                      errorBuilder: (context, error, stackTrace) =>
+                      placeholder: (context, url) => const Center(
+                        child: CircularProgressIndicator(strokeWidth: 2),
+                      ),
+                      errorWidget: (context, url, error) =>
                           _buildDefaultBackground(),
                     ),
                   )
@@ -210,10 +221,10 @@ class _GroupDetailsScreenState extends State<GroupDetailsScreen>
               onSelected: (value) {
                 switch (value) {
                   case 'edit':
-                    // TODO: Navigate to edit group screen
+                    // TODO(dev): Navigate to edit group screen
                     break;
                   case 'settings':
-                    // TODO: Navigate to group settings
+                    // TODO(dev): Navigate to group settings
                     break;
                   case 'delete':
                     _showDeleteDialog();
@@ -248,8 +259,10 @@ class _GroupDetailsScreenState extends State<GroupDetailsScreen>
                       children: [
                         Icon(Icons.delete, color: Colors.red),
                         SizedBox(width: 8),
-                        Text('Delete Group',
-                            style: TextStyle(color: Colors.red)),
+                        Text(
+                          'Delete Group',
+                          style: TextStyle(color: Colors.red),
+                        ),
                       ],
                     ),
                   ),
@@ -327,7 +340,7 @@ class _GroupDetailsScreenState extends State<GroupDetailsScreen>
                     _buildStatItem(
                       icon: Icons.location_on,
                       label: 'Location',
-                      value: widget.group.location!,
+                      value: widget.group.location ?? '',
                     ),
                   const SizedBox(width: 24),
                   _buildStatItem(
@@ -445,7 +458,7 @@ class _GroupDetailsScreenState extends State<GroupDetailsScreen>
             Expanded(
               child: ElevatedButton.icon(
                 onPressed: () {
-                  // TODO: Navigate to group chat
+                  // TODO(dev): Navigate to group chat
                   ScaffoldMessenger.of(context).showSnackBar(
                     const SnackBar(
                       content: Text('Group chat coming soon!'),
@@ -595,10 +608,10 @@ class _GroupDetailsScreenState extends State<GroupDetailsScreen>
                 onSelected: (value) {
                   switch (value) {
                     case 'make_admin':
-                      _makeAdmin(member['id']);
+                      unawaited(_makeAdmin(member['id']));
                       break;
                     case 'remove_admin':
-                      _removeAdmin(member['id']);
+                      unawaited(_removeAdmin(member['id']));
                       break;
                     case 'remove_member':
                       _removeMember(member['id']);
@@ -719,7 +732,9 @@ class _GroupDetailsScreenState extends State<GroupDetailsScreen>
       );
 
   Future<void> _makeAdmin(String userId) async {
-    final success = await _groupService.addAdmin(widget.group.id!, userId);
+    final groupId = widget.group.id;
+    if (groupId == null) return;
+    final success = await _groupService.addAdmin(groupId, userId);
     if (success && mounted) {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
@@ -727,12 +742,14 @@ class _GroupDetailsScreenState extends State<GroupDetailsScreen>
           backgroundColor: AppColors.success,
         ),
       );
-      _loadMembers();
+      await _loadMembers();
     }
   }
 
   Future<void> _removeAdmin(String userId) async {
-    final success = await _groupService.removeAdmin(widget.group.id!, userId);
+    final groupId = widget.group.id;
+    if (groupId == null) return;
+    final success = await _groupService.removeAdmin(groupId, userId);
     if (success && mounted) {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
@@ -740,12 +757,12 @@ class _GroupDetailsScreenState extends State<GroupDetailsScreen>
           backgroundColor: AppColors.info,
         ),
       );
-      _loadMembers();
+      await _loadMembers();
     }
   }
 
   void _removeMember(String userId) {
-    // TODO: Implement remove member functionality
+    // TODO(dev): Implement remove member functionality
     ScaffoldMessenger.of(context).showSnackBar(
       const SnackBar(
         content: Text('Remove member functionality coming soon!'),
@@ -755,35 +772,41 @@ class _GroupDetailsScreenState extends State<GroupDetailsScreen>
   }
 
   void _showDeleteDialog() {
-    showDialog(
-      context: context,
-      builder: (context) => AlertDialog(
-        title: const Text('Delete Group'),
-        content: Text(
-          'Are you sure you want to delete "${widget.group.name}"? This action cannot be undone.',
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(context),
-            child: const Text('Cancel'),
+    final groupId = widget.group.id;
+    if (groupId == null) return;
+    unawaited(
+      showDialog(
+        context: context,
+        builder: (context) => AlertDialog(
+          title: const Text('Delete Group'),
+          content: Text(
+            'Are you sure you want to delete "${widget.group.name}"? This action cannot be undone.',
           ),
-          TextButton(
-            onPressed: () async {
-              Navigator.pop(context);
-              final success = await _groupService.deleteGroup(widget.group.id!);
-              if (success && mounted) {
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.pop(context),
+              child: const Text('Cancel'),
+            ),
+            TextButton(
+              onPressed: () async {
+                final navigator = Navigator.of(context);
+                final scaffoldMessenger = ScaffoldMessenger.of(context);
                 Navigator.pop(context);
-                ScaffoldMessenger.of(context).showSnackBar(
-                  const SnackBar(
-                    content: Text('Group deleted successfully'),
-                    backgroundColor: AppColors.success,
-                  ),
-                );
-              }
-            },
-            child: const Text('Delete', style: TextStyle(color: Colors.red)),
-          ),
-        ],
+                final success = await _groupService.deleteGroup(groupId);
+                if (success) {
+                  navigator.pop();
+                  scaffoldMessenger.showSnackBar(
+                    const SnackBar(
+                      content: Text('Group deleted successfully'),
+                      backgroundColor: AppColors.success,
+                    ),
+                  );
+                }
+              },
+              child: const Text('Delete', style: TextStyle(color: Colors.red)),
+            ),
+          ],
+        ),
       ),
     );
   }

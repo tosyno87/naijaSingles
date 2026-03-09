@@ -2,6 +2,8 @@ import 'dart:developer';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 
+import '../common/utils/firestore_helpers.dart';
+
 /// Industry-standard content moderation service
 /// Features:
 /// - Text content filtering
@@ -126,7 +128,7 @@ class ContentModerationService {
 
       log('✅ Text moderation completed: ${result.action}');
       return result;
-    } catch (e) {
+    } on Object catch (e) {
       log('❌ Error moderating text: $e');
       return ModerationResult(
         action: ModerationAction.approve,
@@ -177,7 +179,7 @@ class ContentModerationService {
 
       log('✅ Image moderation completed: ${result.action}');
       return result;
-    } catch (e) {
+    } on Object catch (e) {
       log('❌ Error moderating image: $e');
       return ModerationResult(
         action: ModerationAction.approve,
@@ -247,7 +249,7 @@ class ContentModerationService {
 
       log('✅ Profile moderation completed: ${result.action}');
       return result;
-    } catch (e) {
+    } on Object catch (e) {
       log('❌ Error moderating profile: $e');
       return ModerationResult(
         action: ModerationAction.approve,
@@ -286,7 +288,7 @@ class ContentModerationService {
       });
 
       log('✅ Content reported successfully');
-    } catch (e) {
+    } on Object catch (e) {
       log('❌ Error reporting content: $e');
       rethrow;
     }
@@ -317,11 +319,10 @@ class ContentModerationService {
                   ?.map((issue) => ModerationIssue.fromMap(issue))
                   .toList() ??
               [],
-          moderatedAt:
-              (data['moderatedAt'] as Timestamp?)?.toDate() ?? DateTime.now(),
+          moderatedAt: parseDateTime(data['moderatedAt']),
         );
       }).toList();
-    } catch (e) {
+    } on Object catch (e) {
       log('❌ Error getting moderation history: $e');
       return [];
     }
@@ -349,7 +350,7 @@ class ContentModerationService {
     }
 
     // Check if any word appears more than 3 times
-    return wordCounts.values.any((count) => count > 3);
+    return wordCounts.values.any((n) => n > 3);
   }
 
   /// Check for all caps
@@ -458,28 +459,6 @@ class ContentModerationService {
       confidence: 0.6,
       moderatedAt: DateTime.now(),
     );
-  }
-
-  /// Save moderation result
-  Future<void> _saveModerationResult(
-    String userId,
-    String contentType,
-    String contentId,
-    ModerationResult result,
-  ) async {
-    try {
-      await _firestore.collection('moderation_history').add({
-        'userId': userId,
-        'contentType': contentType,
-        'contentId': contentId,
-        'action': result.action.name,
-        'issues': result.issues.map((issue) => issue.toMap()).toList(),
-        'confidence': result.confidence,
-        'moderatedAt': result.moderatedAt,
-      });
-    } catch (e) {
-      log('❌ Error saving moderation result: $e');
-    }
   }
 }
 

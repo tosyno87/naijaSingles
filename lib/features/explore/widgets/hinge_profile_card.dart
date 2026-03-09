@@ -1,8 +1,10 @@
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
-import '../../../models/user_model.dart';
+
 import '../../../common/constants/app_colors.dart';
+import '../../../models/user_model.dart';
 
 /// Hinge-style profile card that displays all information in a vertical scrollable format
 /// Users can scroll down to see photos, bio, prompts, and details without tapping
@@ -11,12 +13,14 @@ class HingeProfileCard extends StatefulWidget {
     required this.user,
     this.onConnect,
     this.onPass,
+    this.onSuperLike,
     super.key,
   });
 
   final UserModel user;
   final VoidCallback? onConnect;
   final VoidCallback? onPass;
+  final VoidCallback? onSuperLike;
 
   @override
   State<HingeProfileCard> createState() => _HingeProfileCardState();
@@ -85,7 +89,7 @@ class _HingeProfileCardState extends State<HingeProfileCard> {
     );
   }
 
-  List<String> _extractPhotos(dynamic imageUrl) {
+  List<String> _extractPhotos(Object? imageUrl) {
     if (imageUrl == null) return [];
     if (imageUrl is! List) return [];
     if (imageUrl.isEmpty) return [];
@@ -99,42 +103,40 @@ class _HingeProfileCardState extends State<HingeProfileCard> {
     return photos;
   }
 
-  Widget _buildSinglePhotoPlaceholder(double height) {
-    return SizedBox(
-      height: height,
-      width: double.infinity,
-      child: Container(
-        decoration: BoxDecoration(
-          color: Colors.grey[200],
-          borderRadius: const BorderRadius.vertical(
-            top: Radius.circular(20),
+  Widget _buildSinglePhotoPlaceholder(double height) => SizedBox(
+        height: height,
+        width: double.infinity,
+        child: DecoratedBox(
+          decoration: BoxDecoration(
+            color: Colors.grey[200],
+            borderRadius: const BorderRadius.vertical(
+              top: Radius.circular(20),
+            ),
           ),
-        ),
-        child: Center(
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              Icon(Icons.person, size: 64, color: Colors.grey[400]),
-              const SizedBox(height: 8),
-              Text(
-                'Photo unavailable',
-                style: GoogleFonts.montserrat(
-                  fontSize: 14,
-                  color: Colors.grey[600],
+          child: Center(
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Icon(Icons.person, size: 64, color: Colors.grey[400]),
+                const SizedBox(height: 8),
+                Text(
+                  'Photo unavailable',
+                  style: GoogleFonts.montserrat(
+                    fontSize: 14,
+                    color: Colors.grey[600],
+                  ),
                 ),
-              ),
-            ],
+              ],
+            ),
           ),
         ),
-      ),
-    );
-  }
+      );
 
   Widget _buildPhotoPlaceholder() {
     final screenHeight = MediaQuery.of(context).size.height;
     return SizedBox(
       height: screenHeight * 0.5,
-      child: Container(
+      child: DecoratedBox(
         decoration: BoxDecoration(
           color: Colors.grey[200],
           borderRadius: const BorderRadius.vertical(
@@ -199,32 +201,27 @@ class _HingeProfileCardState extends State<HingeProfileCard> {
                 if (usePlaceholder)
                   _buildSinglePhotoPlaceholder(screenHeight * 0.5)
                 else
-                  Image.network(
-                    photoUrl,
+                  CachedNetworkImage(
+                    imageUrl: photoUrl,
                     fit: BoxFit.cover,
                     width: double.infinity,
                     height: double.infinity,
-                    loadingBuilder: (context, child, loadingProgress) {
-                      if (loadingProgress == null) return child;
-                      return Container(
-                        color: Colors.grey[200],
-                        child: Center(
-                          child: CircularProgressIndicator(
-                            value: loadingProgress.expectedTotalBytes != null
-                                ? loadingProgress.cumulativeBytesLoaded /
-                                    loadingProgress.expectedTotalBytes!
-                                : null,
-                            valueColor: const AlwaysStoppedAnimation<Color>(
-                              Color(0xFF008037),
-                            ),
+                    placeholder: (context, url) => Container(
+                      color: Colors.grey[200],
+                      child: const Center(
+                        child: CircularProgressIndicator(
+                          valueColor: AlwaysStoppedAnimation<Color>(
+                            Color(0xFF008037),
                           ),
+                          strokeWidth: 2,
                         ),
-                      );
-                    },
-                    errorBuilder: (context, error, stackTrace) {
+                      ),
+                    ),
+                    errorWidget: (context, url, error) {
                       if (kDebugMode) {
                         debugPrint(
-                            '❌ Error loading photo $index ($photoUrl): $error');
+                          '❌ Error loading photo $index ($photoUrl): $error',
+                        );
                       }
                       return _buildSinglePhotoPlaceholder(screenHeight * 0.5);
                     },
@@ -317,59 +314,51 @@ class _HingeProfileCardState extends State<HingeProfileCard> {
     );
   }
 
-  Widget _buildBasicInfoItem(IconData icon, String text) {
-    return Row(
-      mainAxisSize: MainAxisSize.min,
-      children: [
-        Icon(icon, size: 18, color: AppColors.textSecondary),
-        const SizedBox(width: 4),
-        Text(
-          text,
-          style: GoogleFonts.montserrat(
-            fontSize: 14,
-            fontWeight: FontWeight.w500,
-            color: AppColors.textPrimary,
-          ),
-        ),
-      ],
-    );
-  }
-
-  Widget _buildBioSection(String bio) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 20),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
+  Widget _buildBasicInfoItem(IconData icon, String text) => Row(
+        mainAxisSize: MainAxisSize.min,
         children: [
+          Icon(icon, size: 18, color: AppColors.textSecondary),
+          const SizedBox(width: 4),
           Text(
-            'About',
+            text,
             style: GoogleFonts.montserrat(
-              fontSize: 18,
-              fontWeight: FontWeight.w600,
+              fontSize: 14,
+              fontWeight: FontWeight.w500,
               color: AppColors.textPrimary,
             ),
           ),
-          const SizedBox(height: 12),
-          Text(
-            bio,
-            style: GoogleFonts.montserrat(
-              fontSize: 16,
-              fontWeight: FontWeight.w400,
-              color: AppColors.textSecondary,
-              height: 1.5,
-            ),
-          ),
-          const SizedBox(height: 24),
         ],
-      ),
-    );
-  }
+      );
 
-  Widget _buildPromptsSection() {
-    // Placeholder for prompts - can be expanded later
-    // Hinge uses 3 prompts, we can add this feature later
-    return const SizedBox.shrink();
-  }
+  Widget _buildBioSection(String bio) => Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 20),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              'About',
+              style: GoogleFonts.montserrat(
+                fontSize: 18,
+                fontWeight: FontWeight.w600,
+                color: AppColors.textPrimary,
+              ),
+            ),
+            const SizedBox(height: 12),
+            Text(
+              bio,
+              style: GoogleFonts.montserrat(
+                fontSize: 16,
+                fontWeight: FontWeight.w400,
+                color: AppColors.textSecondary,
+                height: 1.5,
+              ),
+            ),
+            const SizedBox(height: 24),
+          ],
+        ),
+      );
+
+  Widget _buildPromptsSection() => const SizedBox.shrink();
 
   Widget _buildDetailsSection() {
     final details = <Map<String, dynamic>>[];
@@ -382,14 +371,15 @@ class _HingeProfileCardState extends State<HingeProfileCard> {
       details.add({
         'icon': Icons.business_center,
         'label': '',
-        'value': workTitle.toString()
+        'value': workTitle.toString(),
       });
     }
 
     // Education - graduation cap icon (like Hinge)
     if (widget.user.education != null && widget.user.education!.isNotEmpty) {
       details.add(
-          {'icon': Icons.school, 'label': '', 'value': widget.user.education!});
+        {'icon': Icons.school, 'label': '', 'value': widget.user.education},
+      );
     }
 
     // Religion - book icon (like Hinge)
@@ -397,7 +387,7 @@ class _HingeProfileCardState extends State<HingeProfileCard> {
       details.add({
         'icon': Icons.menu_book,
         'label': '',
-        'value': widget.user.religion!
+        'value': widget.user.religion,
       });
     }
 
@@ -409,14 +399,14 @@ class _HingeProfileCardState extends State<HingeProfileCard> {
       details.add({
         'icon': Icons.search,
         'label': '',
-        'value': relationshipIntent.toString()
+        'value': relationshipIntent.toString(),
       });
     }
 
     // Tribe - group icon
     if (widget.user.tribe != null && widget.user.tribe!.isNotEmpty) {
       details
-          .add({'icon': Icons.group, 'label': '', 'value': widget.user.tribe!});
+          .add({'icon': Icons.group, 'label': '', 'value': widget.user.tribe});
     }
 
     if (details.isEmpty) return const SizedBox.shrink();
@@ -428,57 +418,61 @@ class _HingeProfileCardState extends State<HingeProfileCard> {
         children: [
           const SizedBox(height: 8),
           // Hinge-style details: just icon and value, no label
-          ...details.map((detail) => Padding(
-                padding: const EdgeInsets.only(bottom: 12),
-                child: Row(
-                  children: [
-                    Icon(
-                      detail['icon'] as IconData,
-                      size: 20,
-                      color: AppColors.textSecondary,
-                    ),
-                    const SizedBox(width: 12),
-                    Expanded(
-                      child: Text(
-                        detail['value'] as String,
-                        style: GoogleFonts.montserrat(
-                          fontSize: 16,
-                          fontWeight: FontWeight.w400,
-                          color: AppColors.textPrimary,
-                        ),
+          ...details.map(
+            (detail) => Padding(
+              padding: const EdgeInsets.only(bottom: 12),
+              child: Row(
+                children: [
+                  Icon(
+                    detail['icon'] as IconData,
+                    size: 20,
+                    color: AppColors.textSecondary,
+                  ),
+                  const SizedBox(width: 12),
+                  Expanded(
+                    child: Text(
+                      detail['value'] as String,
+                      style: GoogleFonts.montserrat(
+                        fontSize: 16,
+                        fontWeight: FontWeight.w400,
+                        color: AppColors.textPrimary,
                       ),
                     ),
-                  ],
-                ),
-              )),
+                  ),
+                ],
+              ),
+            ),
+          ),
           const SizedBox(height: 24),
         ],
       ),
     );
   }
 
-  Widget _buildInterestsSection(List<String> interests) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 20),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text(
-            'Interests',
-            style: GoogleFonts.montserrat(
-              fontSize: 18,
-              fontWeight: FontWeight.w600,
-              color: AppColors.textPrimary,
+  Widget _buildInterestsSection(List<String> interests) => Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 20),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              'Interests',
+              style: GoogleFonts.montserrat(
+                fontSize: 18,
+                fontWeight: FontWeight.w600,
+                color: AppColors.textPrimary,
+              ),
             ),
-          ),
-          const SizedBox(height: 12),
-          Wrap(
-            spacing: 8,
-            runSpacing: 8,
-            children: interests
-                .map((interest) => Container(
+            const SizedBox(height: 12),
+            Wrap(
+              spacing: 8,
+              runSpacing: 8,
+              children: interests
+                  .map(
+                    (interest) => Container(
                       padding: const EdgeInsets.symmetric(
-                          horizontal: 16, vertical: 10),
+                        horizontal: 16,
+                        vertical: 10,
+                      ),
                       decoration: BoxDecoration(
                         color: AppColors.primaryGreen.withValues(alpha: 0.1),
                         borderRadius: BorderRadius.circular(20),
@@ -494,70 +488,75 @@ class _HingeProfileCardState extends State<HingeProfileCard> {
                           color: AppColors.primaryGreen,
                         ),
                       ),
-                    ))
-                .toList(),
-          ),
-          const SizedBox(height: 24),
-        ],
-      ),
-    );
-  }
+                    ),
+                  )
+                  .toList(),
+            ),
+            const SizedBox(height: 24),
+          ],
+        ),
+      );
 
-  Widget _buildActionButtons() {
-    return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          // Pass button - circular, minimalistic
-          Material(
-            color: Colors.white,
-            shape: const CircleBorder(
-              side: BorderSide(color: AppColors.textSecondary, width: 1.5),
-            ),
-            child: InkWell(
+  Widget _buildActionButtons() => Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            // Pass button
+            _buildCircleAction(
               onTap: widget.onPass,
-              customBorder: const CircleBorder(),
-              child: Container(
-                width: 56,
-                height: 56,
-                decoration: const BoxDecoration(
-                  shape: BoxShape.circle,
-                ),
-                child: const Icon(
-                  Icons.close,
-                  color: AppColors.textSecondary,
-                  size: 24,
-                ),
+              fillColor: Colors.white,
+              border: const BorderSide(
+                color: AppColors.textSecondary,
+                width: 1.5,
               ),
+              icon: Icons.close,
+              iconColor: AppColors.textSecondary,
+              size: 56,
             ),
-          ),
-          const SizedBox(width: 24),
-          // Connect button - circular, minimalistic
-          Material(
-            color: AppColors.primaryGreen,
-            shape: const CircleBorder(),
-            child: InkWell(
+            const SizedBox(width: 20),
+            // Super Like button
+            _buildCircleAction(
+              onTap: widget.onSuperLike,
+              fillColor: const Color(0xFF2196F3),
+              icon: Icons.star_rounded,
+              iconColor: Colors.white,
+              size: 48,
+            ),
+            const SizedBox(width: 20),
+            // Connect / Like button
+            _buildCircleAction(
               onTap: widget.onConnect,
-              customBorder: const CircleBorder(),
-              child: Container(
-                width: 56,
-                height: 56,
-                decoration: const BoxDecoration(
-                  shape: BoxShape.circle,
-                ),
-                child: const Icon(
-                  Icons.favorite,
-                  color: Colors.white,
-                  size: 24,
-                ),
-              ),
+              fillColor: AppColors.primaryGreen,
+              icon: Icons.favorite,
+              iconColor: Colors.white,
+              size: 56,
             ),
+          ],
+        ),
+      );
+
+  Widget _buildCircleAction({
+    required VoidCallback? onTap,
+    required Color fillColor,
+    required IconData icon,
+    required Color iconColor,
+    required double size,
+    BorderSide border = BorderSide.none,
+  }) =>
+      Material(
+        color: fillColor,
+        shape: CircleBorder(side: border),
+        child: InkWell(
+          onTap: onTap,
+          customBorder: const CircleBorder(),
+          child: SizedBox(
+            width: size,
+            height: size,
+            child: Icon(icon, color: iconColor, size: size * 0.43),
           ),
-        ],
-      ),
-    );
-  }
+        ),
+      );
 
   List<String> _extractInterests() {
     final interests = <String>[];

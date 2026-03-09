@@ -1,6 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import '../common/utils/app_logger.dart';
+import '../common/utils/firestore_helpers.dart';
 
 /// Service for managing user data and profiles
 class UserService {
@@ -11,7 +12,9 @@ class UserService {
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
   final FirebaseAuth _auth = FirebaseAuth.instance;
 
-  /// Get user profile data by ID
+  /// Get user profile data by ID.
+  /// Returns null when the profile is private/paused/banned (permission-denied
+  /// from Firestore rules is expected for those cases).
   Future<UserProfile?> getUserProfile(String userId) async {
     try {
       final doc = await _firestore.collection('users').doc(userId).get();
@@ -20,7 +23,16 @@ class UserService {
         return UserProfile.fromMap(doc.data()!, doc.id);
       }
       return null;
-    } catch (e) {
+    } on FirebaseException catch (e) {
+      if (e.code == 'permission-denied') {
+        AppLogger.debug(
+          'Profile read denied for $userId (private/paused/banned)',
+        );
+      } else {
+        AppLogger.error('Error getting user profile', error: e);
+      }
+      return null;
+    } on Object catch (e) {
       AppLogger.error('Error getting user profile', error: e);
       return null;
     }
@@ -38,7 +50,7 @@ class UserService {
           .where((profile) => profile != null)
           .cast<UserProfile>()
           .toList();
-    } catch (e) {
+    } on Object catch (e) {
       AppLogger.error('Error getting user profiles', error: e);
       return [];
     }
@@ -65,7 +77,7 @@ class UserService {
       return snapshot.docs
           .map((doc) => UserProfile.fromMap(doc.data(), doc.id))
           .toList();
-    } catch (e) {
+    } on Object catch (e) {
       AppLogger.error('Error searching users', error: e);
       return [];
     }
@@ -79,7 +91,7 @@ class UserService {
           .doc(profile.id)
           .update(profile.toMap());
       return true;
-    } catch (e) {
+    } on Object catch (e) {
       AppLogger.error('Error updating user profile', error: e);
       return false;
     }
@@ -90,7 +102,7 @@ class UserService {
     try {
       final profile = await getUserProfile(userId);
       return profile?.displayName ?? 'Unknown User';
-    } catch (e) {
+    } on Object catch (e) {
       AppLogger.error('Error getting user display name', error: e);
       return 'Unknown User';
     }
@@ -101,7 +113,7 @@ class UserService {
     try {
       final profile = await getUserProfile(userId);
       return profile?.avatarUrl;
-    } catch (e) {
+    } on Object catch (e) {
       AppLogger.error('Error getting user avatar URL', error: e);
       return null;
     }
@@ -112,7 +124,7 @@ class UserService {
     try {
       final doc = await _firestore.collection('users').doc(userId).get();
       return doc.exists;
-    } catch (e) {
+    } on Object catch (e) {
       AppLogger.error('Error checking if user exists', error: e);
       return false;
     }
@@ -137,8 +149,8 @@ class UserProfile {
         displayName: map['displayName'] ?? 'Unknown User',
         email: map['email'],
         avatarUrl: map['avatarUrl'],
-        createdAt: (map['createdAt'] as Timestamp?)?.toDate() ?? DateTime.now(),
-        updatedAt: (map['updatedAt'] as Timestamp?)?.toDate() ?? DateTime.now(),
+        createdAt: parseDateTime(map['createdAt']),
+        updatedAt: parseDateTime(map['updatedAt']),
         preferences: map['preferences'] as Map<String, dynamic>?,
       );
   final String id;

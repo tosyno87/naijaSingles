@@ -281,7 +281,8 @@ class ModeSpecificProfileSections extends StatelessWidget {
         decoration: BoxDecoration(
           color: const Color(0xFF008037).withValues(alpha: 0.1),
           borderRadius: BorderRadius.circular(16),
-          border: Border.all(color: const Color(0xFF008037).withValues(alpha: 0.3)),
+          border:
+              Border.all(color: const Color(0xFF008037).withValues(alpha: 0.3)),
         ),
         child: Text(
           tag,
@@ -358,20 +359,11 @@ class ModeSpecificProfileSections extends StatelessWidget {
   String _getNetworkingAvailability() =>
       'Business hours'; // This would come from user data
 
-  List<String> _getDealbreakersList() {
-    // This would return actual dealbreakers from user data
-    return [];
-  }
+  List<String> _getDealbreakersList() => [];
 
-  List<String> _getHobbiesList() {
-    // This would return actual hobbies from user data
-    return [];
-  }
+  List<String> _getHobbiesList() => [];
 
-  List<String> _getSkillsList() {
-    // This would return actual skills from user data
-    return [];
-  }
+  List<String> _getSkillsList() => [];
 }
 
 class _ModeConfig {

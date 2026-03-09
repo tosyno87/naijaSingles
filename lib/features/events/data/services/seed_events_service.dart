@@ -21,7 +21,7 @@ class SeedEventsService {
       AppLogger.info('No events found, seeding with sample events...');
       await _seedSampleEvents();
       AppLogger.info('Sample events seeded successfully');
-    } catch (e) {
+    } on Object catch (e) {
       AppLogger.error('Error seeding events', error: e);
     }
   }

@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:developer';
 
 import 'package:flutter/material.dart';
@@ -10,7 +11,7 @@ class UserNationality extends StatefulWidget {
   final Map<String, dynamic> userData;
 
   @override
-  _UserNationalityState createState() => _UserNationalityState();
+  State<UserNationality> createState() => _UserNationalityState();
 }
 
 class _UserNationalityState extends State<UserNationality> {
@@ -491,10 +492,12 @@ class _UserNationalityState extends State<UserNationality> {
                           'isDiaspora': isDiaspora,
                         });
                         log(widget.userData.toString());
-                        Navigator.pushNamed(
-                          context,
-                          RouteName.sexualorientationScreen,
-                          arguments: widget.userData,
+                        unawaited(
+                          Navigator.pushNamed(
+                            context,
+                            RouteName.sexualorientationScreen,
+                            arguments: widget.userData,
+                          ),
                         );
                       } else {
                         CustomSnackbar.showSnackBarSimple(

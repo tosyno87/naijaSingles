@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
@@ -36,7 +38,8 @@ class SingleChatTile extends StatelessWidget {
         color: chat.senderId != currentUser.id && !chat.isRead
             ? isDarkMode
                 ? Theme.of(context).scaffoldBackgroundColor
-                : AppColors.primaryGreen.withValues(alpha: (.1 * 255).toDouble())
+                : AppColors.primaryGreen
+                    .withValues(alpha: (.1 * 255).toDouble())
             : isDarkMode
                 ? Theme.of(context)
                     .scaffoldBackgroundColor
@@ -77,9 +80,7 @@ class SingleChatTile extends StatelessWidget {
                           ? 'Photo'
                           : chat.text!.replaceAll('\n', ' '),
                       style: TextStyle(
-                        color: isDarkMode
-                            ? Colors.white
-                            : Colors.blueGrey,
+                        color: isDarkMode ? Colors.white : Colors.blueGrey,
                         fontSize: 15,
                         fontWeight: FontWeight.w600,
                       ),
@@ -90,9 +91,7 @@ class SingleChatTile extends StatelessWidget {
                       ? Text(
                           'You blocked this contact'.tr().toString(),
                           style: TextStyle(
-                            color: isDarkMode
-                                ? Colors.white
-                                : Colors.blueGrey,
+                            color: isDarkMode ? Colors.white : Colors.blueGrey,
                             fontSize: 15,
                             fontWeight: FontWeight.w600,
                           ),
@@ -101,9 +100,7 @@ class SingleChatTile extends StatelessWidget {
                       : Text(
                           'This contact has blocked you'.tr().toString(),
                           style: TextStyle(
-                            color: isDarkMode
-                                ? Colors.white
-                                : Colors.blueGrey,
+                            color: isDarkMode ? Colors.white : Colors.blueGrey,
                             fontSize: 15,
                             fontWeight: FontWeight.w600,
                           ),
@@ -180,13 +177,15 @@ class SingleChatTile extends StatelessWidget {
           },
         ),
         onTap: () async {
-          Navigator.push(
-            context,
-            MaterialPageRoute(
-              builder: (context) => ChatPage(
-                sender: currentUser,
-                second: tempUser,
-                chatId: chatId,
+          unawaited(
+            Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (context) => ChatPage(
+                  sender: currentUser,
+                  second: tempUser,
+                  chatId: chatId,
+                ),
               ),
             ),
           );

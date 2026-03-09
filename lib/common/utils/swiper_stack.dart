@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:math';
 
 import 'package:flutter/widgets.dart';
@@ -27,12 +28,15 @@ class SwipeStack extends StatefulWidget {
     this.onSwipe,
     this.onRewind,
     this.padding = const EdgeInsets.symmetric(vertical: 20, horizontal: 25),
-  })  : assert(maxAngle >= 0 && maxAngle <= 360),
-        assert(threshold >= 1 && threshold <= 100),
-        assert(visibleCount >= 2),
-        assert(translationInterval >= 0),
-        assert(scaleInterval >= 0),
-        assert(historyCount >= 0),
+  })  : assert(maxAngle >= 0 && maxAngle <= 360, 'maxAngle must be 0..360'),
+        assert(threshold >= 1 && threshold <= 100, 'threshold must be 1..100'),
+        assert(visibleCount >= 2, 'visibleCount must be at least 2'),
+        assert(
+          translationInterval >= 0,
+          'translationInterval cannot be negative',
+        ),
+        assert(scaleInterval >= 0, 'scaleInterval cannot be negative'),
+        assert(historyCount >= 0, 'historyCount cannot be negative'),
         super(key: key);
   final List<SwiperItem> children;
   final int maxAngle;
@@ -178,8 +182,10 @@ class SwipeStackState extends State<SwipeStack>
                 fit: StackFit.expand,
                 children: widget.children
                     .asMap()
-                    .map((int index, _) =>
-                        MapEntry(index, _item(constraints, index)))
+                    .map(
+                      (int index, _) =>
+                          MapEntry(index, _item(constraints, index)),
+                    )
                     .values
                     .toList(),
               ),
@@ -270,7 +276,7 @@ class SwipeStackState extends State<SwipeStack>
     );
   }
 
-  void _onPandEnd(_) {
+  void _onPandEnd(DragEndDetails _) {
     setState(() {});
     if (_progress < widget.threshold) {
       _goFirstPosition();
@@ -282,7 +288,7 @@ class SwipeStackState extends State<SwipeStack>
       ).animate(_animationController);
       _animationY = Tween<double>(begin: _top, end: _top + _top)
           .animate(_animationController);
-      _animationController.forward();
+      unawaited(_animationController.forward());
     }
   }
 
@@ -295,7 +301,7 @@ class SwipeStackState extends State<SwipeStack>
       _animationAngle =
           Tween<double>(begin: _angle, end: 0).animate(_animationController);
     }
-    _animationController.forward();
+    unawaited(_animationController.forward());
   }
 
   void swipeLeft() {
@@ -313,7 +319,7 @@ class SwipeStackState extends State<SwipeStack>
         _animationAngle = Tween<double>(begin: 0, end: _maxAngle * 0.7)
             .animate(_animationController);
       }
-      _animationController.forward();
+      unawaited(_animationController.forward());
     }
   }
 
@@ -332,7 +338,7 @@ class SwipeStackState extends State<SwipeStack>
         _animationAngle = Tween<double>(begin: 0, end: (_maxAngle * 0.7) * -1)
             .animate(_animationController);
       }
-      _animationController.forward();
+      unawaited(_animationController.forward());
     }
   }
 
@@ -353,7 +359,7 @@ class SwipeStackState extends State<SwipeStack>
             .animate(_animationController);
       }
 
-      _animationController.forward();
+      unawaited(_animationController.forward());
     }
   }
 

@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:developer';
 
 import 'package:easy_localization/easy_localization.dart';
@@ -13,8 +14,7 @@ class ChangeThemeButtonWidget extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final themeBloc = context.watch<ThemeBloc>();
-    ThemeMode currentThemeMode =
-        themeBloc.currentThemeMode ?? ThemeMode.system;
+    ThemeMode currentThemeMode = themeBloc.currentThemeMode ?? ThemeMode.system;
     return Padding(
       padding: const EdgeInsets.all(8),
       child: Card(
@@ -27,8 +27,9 @@ class ChangeThemeButtonWidget extends StatelessWidget {
                 child: Text(
                   'Change Theme'.tr().toString(),
                   style: TextStyle(
-                    color:
-                        themeBloc.isDarkMode ? Colors.white : AppColors.primaryGreen,
+                    color: themeBloc.isDarkMode
+                        ? Colors.white
+                        : AppColors.primaryGreen,
                     fontSize: 18,
                     fontWeight: FontWeight.w500,
                   ),
@@ -45,79 +46,91 @@ class ChangeThemeButtonWidget extends StatelessWidget {
                         color: AppColors.primaryGreen,
                       ),
                 onTap: () {
-                  showDialog(
-                    context: context,
-                    builder: (BuildContext dialogContext) => AlertDialog(
-                      title: Text('Select Theme Mode'.tr().toString()),
-                      content: StatefulBuilder(
-                        builder: (BuildContext context, StateSetter setState) =>
-                            Column(
-                          mainAxisSize: MainAxisSize.min,
-                          children: <Widget>[
-                            RadioListTile<ThemeMode>(
-                              title: Text('System Default'.tr().toString()),
-                              value: ThemeMode.system,
-                              activeColor: AppColors.primaryGreen,
-                              groupValue: currentThemeMode,
-                              onChanged: (ThemeMode? value) {
-                                setState(() {
-                                  currentThemeMode = value!;
-                                });
+                  unawaited(
+                    showDialog(
+                      context: context,
+                      builder: (BuildContext dialogContext) => AlertDialog(
+                        title: Text('Select Theme Mode'.tr().toString()),
+                        content: StatefulBuilder(
+                          builder:
+                              (BuildContext context, StateSetter setState) =>
+                                  Column(
+                            mainAxisSize: MainAxisSize.min,
+                            children: <Widget>[
+                              RadioListTile<ThemeMode>(
+                                title: Text('System Default'.tr().toString()),
+                                value: ThemeMode.system,
+                                activeColor: AppColors.primaryGreen,
+                                // ignore: deprecated_member_use
+                                groupValue: currentThemeMode,
+                                // ignore: deprecated_member_use
+                                onChanged: (ThemeMode? value) {
+                                  setState(() {
+                                    currentThemeMode = value!;
+                                  });
 
-                                log('theme $value');
-                              },
-                            ),
-                            RadioListTile<ThemeMode>(
-                              title: Text('Light'.tr().toString()),
-                              activeColor: AppColors.primaryGreen,
-                              value: ThemeMode.light,
-                              groupValue: currentThemeMode,
-                              onChanged: (ThemeMode? value) {
-                                setState(() {
-                                  currentThemeMode = value!;
-                                });
-                                log('theme $value');
-                              },
-                            ),
-                            RadioListTile<ThemeMode>(
-                              title: Text('Dark'.tr().toString()),
-                              activeColor: AppColors.primaryGreen,
-                              value: ThemeMode.dark,
-                              groupValue: currentThemeMode,
-                              onChanged: (ThemeMode? value) {
-                                setState(() {
-                                  currentThemeMode = value!;
-                                });
-                                log('theme $value');
-                              },
-                            ),
-                          ],
+                                  log('theme $value');
+                                },
+                              ),
+                              RadioListTile<ThemeMode>(
+                                title: Text('Light'.tr().toString()),
+                                activeColor: AppColors.primaryGreen,
+                                value: ThemeMode.light,
+                                // ignore: deprecated_member_use
+                                groupValue: currentThemeMode,
+                                // ignore: deprecated_member_use
+                                onChanged: (ThemeMode? value) {
+                                  setState(() {
+                                    currentThemeMode = value!;
+                                  });
+                                  log('theme $value');
+                                },
+                              ),
+                              RadioListTile<ThemeMode>(
+                                title: Text('Dark'.tr().toString()),
+                                activeColor: AppColors.primaryGreen,
+                                value: ThemeMode.dark,
+                                // ignore: deprecated_member_use
+                                groupValue: currentThemeMode,
+                                // ignore: deprecated_member_use
+                                onChanged: (ThemeMode? value) {
+                                  setState(() {
+                                    currentThemeMode = value!;
+                                  });
+                                  log('theme $value');
+                                },
+                              ),
+                            ],
+                          ),
                         ),
+                        actions: <Widget>[
+                          TextButton(
+                            child: Text(
+                              'Cancel'.tr().toString(),
+                              style: const TextStyle(
+                                color: AppColors.secondaryColor,
+                              ),
+                            ),
+                            onPressed: () {
+                              Navigator.of(dialogContext).pop();
+                            },
+                          ),
+                          TextButton(
+                            child: Text(
+                              'Apply'.tr().toString(),
+                              style: const TextStyle(
+                                color: AppColors.primaryGreen,
+                              ),
+                            ),
+                            onPressed: () {
+                              context
+                                  .read<ThemeBloc>()
+                                  .add(ThemeModeChanged(currentThemeMode));
+                              Navigator.of(dialogContext).pop();
+                            },
+                          ),
+                        ],
                       ),
-                      actions: <Widget>[
-                        TextButton(
-                          child: Text(
-                            'Cancel'.tr().toString(),
-                            style: const TextStyle(
-                                color: AppColors.secondaryColor),
-                          ),
-                          onPressed: () {
-                            Navigator.of(dialogContext).pop();
-                          },
-                        ),
-                        TextButton(
-                          child: Text(
-                            'Apply'.tr().toString(),
-                            style: const TextStyle(color: AppColors.primaryGreen),
-                          ),
-                          onPressed: () {
-                            context
-                                .read<ThemeBloc>()
-                                .add(ThemeModeChanged(currentThemeMode));
-                            Navigator.of(dialogContext).pop();
-                          },
-                        ),
-                      ],
                     ),
                   );
                 },

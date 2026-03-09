@@ -27,7 +27,8 @@ class PrivacyMigrationPrompt extends StatelessWidget {
             end: Alignment.bottomRight,
           ),
           borderRadius: BorderRadius.circular(16),
-          border: Border.all(color: AppColors.primaryGreen.withValues(alpha: 0.3)),
+          border:
+              Border.all(color: AppColors.primaryGreen.withValues(alpha: 0.3)),
           boxShadow: [
             BoxShadow(
               color: Colors.black.withValues(alpha: 0.1),
@@ -124,17 +125,17 @@ class PrivacyMigrationPrompt extends StatelessWidget {
                 Expanded(
                   flex: 2,
                   child: ElevatedButton(
-                    onPressed: () {
-                      Navigator.push(
+                    onPressed: () async {
+                      await Navigator.push(
                         context,
                         MaterialPageRoute(
                           builder: (_) => const PrivacyMigrationScreen(),
                         ),
-                      ).then((_) {
-                        if (onMigrate != null) {
-                          onMigrate!();
-                        }
-                      });
+                      );
+                      if (!context.mounted) return;
+                      if (onMigrate != null) {
+                        onMigrate!();
+                      }
                     },
                     style: ElevatedButton.styleFrom(
                       backgroundColor: AppColors.primaryGreen,
@@ -197,7 +198,9 @@ class CompactPrivacyMigrationPrompt extends StatelessWidget {
           decoration: BoxDecoration(
             color: AppColors.primaryGreen.withValues(alpha: 0.1),
             borderRadius: BorderRadius.circular(12),
-            border: Border.all(color: AppColors.primaryGreen.withValues(alpha: 0.3)),
+            border: Border.all(
+              color: AppColors.primaryGreen.withValues(alpha: 0.3),
+            ),
           ),
           child: Row(
             children: [

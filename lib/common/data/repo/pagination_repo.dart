@@ -6,11 +6,11 @@ import '../../constants/constants.dart';
 class PaginationRepo {
   static final db = firebaseFireStoreInstance;
 
-  static void updateNotification(
+  static Future<void> updateNotification(
     UserModel currentUser,
     QueryDocumentSnapshot<Object?> doc,
-  ) {
-    db
+  ) async {
+    await db
         .collection('users/${currentUser.id}/Matches')
         .doc('${doc.get("Matches")}')
         .update({'isRead': true});

@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import '../../../models/user_model.dart';
 import 'modern_profile_card.dart';
@@ -42,10 +44,12 @@ class _HorizontalProfileViewerState extends State<HorizontalProfileViewer> {
     if (oldWidget.users != widget.users) {
       _remainingUsers = List.from(widget.users);
       _currentIndex = 0;
-      _pageController.animateToPage(
-        0,
-        duration: const Duration(milliseconds: 300),
-        curve: Curves.easeInOut,
+      unawaited(
+        _pageController.animateToPage(
+          0,
+          duration: const Duration(milliseconds: 300),
+          curve: Curves.easeInOut,
+        ),
       );
     }
   }
@@ -75,10 +79,12 @@ class _HorizontalProfileViewerState extends State<HorizontalProfileViewer> {
     } else {
       // Navigate to the next profile
       if (_currentIndex < _remainingUsers.length) {
-        _pageController.animateToPage(
-          _currentIndex,
-          duration: const Duration(milliseconds: 300),
-          curve: Curves.easeInOut,
+        unawaited(
+          _pageController.animateToPage(
+            _currentIndex,
+            duration: const Duration(milliseconds: 300),
+            curve: Curves.easeInOut,
+          ),
         );
       }
     }

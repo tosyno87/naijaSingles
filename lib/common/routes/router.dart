@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
@@ -23,7 +25,7 @@ import '../../features/events/presentation/screens/events_screen.dart';
 import '../../features/events/presentation/screens/my_events_screen.dart';
 import '../../features/explore/explore_screen.dart';
 import '../../features/group_chat/screens/group_list_screen.dart';
-import '../../features/groups/ui/screens/groups_screen.dart';
+import '../../features/groups/screens/unified_groups_screen.dart';
 import '../../features/home/main_navigation_screen.dart';
 import '../../features/home/ui/screens/splash.dart';
 import '../../features/home/ui/screens/user_filter/settings.dart';
@@ -81,11 +83,7 @@ class _FirebaseCallbackHandlerState extends State<_FirebaseCallbackHandler> {
   }
 
   @override
-  Widget build(BuildContext context) {
-    // Return completely transparent/empty widget
-    // This ensures no visual flash occurs
-    return const SizedBox.shrink();
-  }
+  Widget build(BuildContext context) => const SizedBox.shrink();
 }
 
 abstract class AppRouter {
@@ -100,7 +98,7 @@ abstract class AppRouter {
         const widget = WelcomeScreen();
         debugPrint('✅ WelcomeScreen widget created successfully');
         return widget;
-      } catch (e, stackTrace) {
+      } on Object catch (e, stackTrace) {
         debugPrint('❌ Error creating WelcomeScreen: $e');
         debugPrint('Stack trace: $stackTrace');
         rethrow;
@@ -118,13 +116,17 @@ abstract class AppRouter {
     RouteName.emailSignup: (context) => const EmailSignupScreen(),
     RouteName.emailLogin: (context) => const EmailLoginScreen(),
     RouteName.emailPasswordReset: (context) => const EmailPasswordResetScreen(),
-    RouteName.profileScreen: (context) => ProfilePage(
-          isPuchased:
-              (ModalRoute.of(context)!.settings.arguments as Map)['isPuchased'],
-          items: (ModalRoute.of(context)!.settings.arguments as Map)['items'],
-          purchases:
-              (ModalRoute.of(context)!.settings.arguments as Map)['purchases'],
-        ),
+    RouteName.profileScreen: (context) {
+      final args = ModalRoute.of(context)?.settings.arguments;
+      if (args == null || args is! Map) {
+        return const Scaffold(body: Center(child: Text('Invalid route')));
+      }
+      return ProfilePage(
+        isPurchased: args['isPurchased'] ?? false,
+        items: args['items'] ?? {},
+        purchases: args['purchases'] ?? [],
+      );
+    },
     RouteName.phoneNumberScreen: (context) {
       // Get isSignIn from route arguments, default to false (sign-up)
       final args = ModalRoute.of(context)?.settings.arguments as Map?;
@@ -135,32 +137,53 @@ abstract class AppRouter {
       );
     },
     RouteName.searchLocationpage: (context) => const SearchLocation(),
-    RouteName.updateLocationScreen: (context) => UpdateLocation(
-          selectedLocation: ModalRoute.of(context)!.settings.arguments
-              as Map<dynamic, dynamic>,
-        ),
-    RouteName.chatPageScreen: (context) => ChatPage(
-          sender: (ModalRoute.of(context)!.settings.arguments as Map)['sender'],
-          chatId: (ModalRoute.of(context)!.settings.arguments as Map)['chatID']
-              .toString(),
-          second: (ModalRoute.of(context)!.settings.arguments as Map)['second'],
-        ),
+    RouteName.updateLocationScreen: (context) {
+      final args = ModalRoute.of(context)?.settings.arguments;
+      if (args == null || args is! Map<dynamic, dynamic>) {
+        return const Scaffold(body: Center(child: Text('Invalid route')));
+      }
+      return UpdateLocation(selectedLocation: args);
+    },
+    RouteName.chatPageScreen: (context) {
+      final args = ModalRoute.of(context)?.settings.arguments;
+      if (args == null || args is! Map) {
+        return const Scaffold(body: Center(child: Text('Invalid route')));
+      }
+      return ChatPage(
+        sender: args['sender'],
+        chatId: args['chatID'].toString(),
+        second: args['second'],
+      );
+    },
     RouteName.editProfileScreen: (context) => const EditProfileScreen(),
-    RouteName.largeImageScreen: (context) => LargeImage(
-          largeImage: ModalRoute.of(context)!.settings.arguments as String,
-        ),
+    RouteName.largeImageScreen: (context) {
+      final args = ModalRoute.of(context)?.settings.arguments;
+      if (args == null || args is! String) {
+        return const Scaffold(body: Center(child: Text('Invalid route')));
+      }
+      return LargeImage(largeImage: args);
+    },
     RouteName.onboarding: (context) => const OnboardingMain(),
     RouteName.mainNavigation: (context) => const MainNavigationScreen(),
-    RouteName.updatePhoneScreen: (context) =>
-        UpdateNumber(ModalRoute.of(context)!.settings.arguments as UserModel),
+    RouteName.updatePhoneScreen: (context) {
+      final args = ModalRoute.of(context)?.settings.arguments;
+      if (args == null || args is! UserModel) {
+        return const Scaffold(body: Center(child: Text('Invalid route')));
+      }
+      return UpdateNumber(args);
+    },
     RouteName.genderScreen: (context) => const Gender(),
-    RouteName.settingPage: (context) => SettingPage(
-          currentUser: (ModalRoute.of(context)!.settings.arguments
-              as Map)['currentUser'] as UserModel,
-          isPurchased: (ModalRoute.of(context)!.settings.arguments
-              as Map)['isPurchased'],
-          items: (ModalRoute.of(context)!.settings.arguments as Map)['items'],
-        ),
+    RouteName.settingPage: (context) {
+      final args = ModalRoute.of(context)?.settings.arguments;
+      if (args == null || args is! Map) {
+        return const Scaffold(body: Center(child: Text('Invalid route')));
+      }
+      return SettingPage(
+        currentUser: args['currentUser'] as UserModel,
+        isPurchased: args['isPurchased'] ?? false,
+        items: args['items'] ?? {},
+      );
+    },
     RouteName.showGenderScreen: (context) => const ShowGender(),
     RouteName.matchPage: (context) => const MatchScreen(),
     RouteName.sexualorientationScreen: (context) => const SexualOrientation(),
@@ -254,19 +277,27 @@ abstract class AppRouter {
         isLogin: argsMap['isLogin'] ?? false,
       );
     },
-    RouteName.userDobScreen: (context) => UserDOB(
-          ModalRoute.of(context)!.settings.arguments as Map<String, dynamic>,
-        ),
+    RouteName.userDobScreen: (context) {
+      final args = ModalRoute.of(context)?.settings.arguments;
+      if (args == null || args is! Map<String, dynamic>) {
+        return const Scaffold(body: Center(child: Text('Invalid route')));
+      }
+      return UserDOB(args);
+    },
     RouteName.userNameScreen: (context) => const UserName(),
-    RouteName.nationalityScreen: (context) => UserNationality(
-          ModalRoute.of(context)!.settings.arguments as Map<String, dynamic>,
-        ),
+    RouteName.nationalityScreen: (context) {
+      final args = ModalRoute.of(context)?.settings.arguments;
+      if (args == null || args is! Map<String, dynamic>) {
+        return const Scaffold(body: Center(child: Text('Invalid route')));
+      }
+      return UserNationality(args);
+    },
     // Keep legacy route alias for backward compatibility, but route all users
     // through the same canonical onboarding experience.
     RouteName.onboardingFlow: (context) => const OnboardingMain(),
     RouteName.exploreScreen: (context) =>
         const ExploreScreen(), // No back button by default
-    RouteName.groupsScreen: (context) => const GroupsScreen(),
+    RouteName.groupsScreen: (context) => const UnifiedGroupsScreen(),
     RouteName.groupChatsScreen: (context) => const GroupListScreen(),
 
     // Settings screens
@@ -300,7 +331,10 @@ abstract class AppRouter {
     },
     RouteName.myEvents: (context) => const MyEventsScreen(),
     RouteName.eventDetails: (context) {
-      final arguments = ModalRoute.of(context)!.settings.arguments;
+      final arguments = ModalRoute.of(context)?.settings.arguments;
+      if (arguments == null) {
+        return const Scaffold(body: Center(child: Text('Invalid route')));
+      }
 
       // Handle both EventModel and EnhancedEventModel
       if (arguments is EnhancedEventModel) {
@@ -341,7 +375,10 @@ abstract class AppRouter {
 
     // User detail route
     RouteName.userDetailScreen: (context) {
-      final arguments = ModalRoute.of(context)!.settings.arguments;
+      final arguments = ModalRoute.of(context)?.settings.arguments;
+      if (arguments == null) {
+        return const Scaffold(body: Center(child: Text('Invalid route')));
+      }
       if (arguments is UserModel) {
         return UserDetailScreen(user: arguments);
       } else if (arguments is Map && arguments['user'] is UserModel) {
@@ -369,13 +406,15 @@ abstract class AppRouter {
     // The route name includes the full path with query parameters
     if (routeName.startsWith('/link')) {
       debugPrint(
-          '✅ Router: Handling Firebase auth callback deep link: $routeName');
+        '✅ Router: Handling Firebase auth callback deep link: $routeName',
+      );
 
       // Simplified check: if route starts with /link and contains deep_link_id, treat as Firebase callback
       // This prevents "Page Not Found" errors - Firebase will handle the callback automatically
       if (routeName.contains('deep_link_id')) {
         debugPrint(
-            '✅ Router: Firebase auth callback detected, processing silently');
+          '✅ Router: Firebase auth callback detected, processing silently',
+        );
 
         // Return a completely transparent route that immediately pops
         // This prevents any visible flash while Firebase processes the callback
@@ -385,10 +424,8 @@ abstract class AppRouter {
           transitionDuration: Duration.zero,
           reverseTransitionDuration: Duration.zero,
           opaque: false, // Make route transparent
-          pageBuilder: (context, animation, secondaryAnimation) {
-            // Return an empty transparent widget that immediately pops
-            return const _FirebaseCallbackHandler();
-          },
+          pageBuilder: (context, animation, secondaryAnimation) =>
+              const _FirebaseCallbackHandler(),
         );
       }
     }
@@ -403,11 +440,13 @@ abstract class AppRouter {
             debugPrint('🏗️ Router: Building widget for route "$routeName"');
             final widget = builder(context);
             debugPrint(
-                '✅ Router: Widget built successfully for route "$routeName"');
+              '✅ Router: Widget built successfully for route "$routeName"',
+            );
             return widget;
-          } catch (e, stackTrace) {
+          } on Object catch (e, stackTrace) {
             debugPrint(
-                '❌ Router: Error building widget for route "$routeName": $e');
+              '❌ Router: Error building widget for route "$routeName": $e',
+            );
             debugPrint('Stack trace: $stackTrace');
             // Return error widget instead of crashing
             return Scaffold(
@@ -485,11 +524,12 @@ abstract class AppRouter {
                 const SizedBox(height: 32),
                 ElevatedButton.icon(
                   onPressed: () {
-                    // Clear navigation stack and go to welcome
-                    Navigator.pushNamedAndRemoveUntil(
-                      context,
-                      RouteName.welcomeScreen,
-                      (route) => false,
+                    unawaited(
+                      Navigator.pushNamedAndRemoveUntil(
+                        context,
+                        RouteName.welcomeScreen,
+                        (route) => false,
+                      ),
                     );
                   },
                   icon: const Icon(Icons.home),
@@ -506,11 +546,12 @@ abstract class AppRouter {
                 const SizedBox(height: 16),
                 TextButton(
                   onPressed: () {
-                    // Clear navigation stack and go to main app
-                    Navigator.pushNamedAndRemoveUntil(
-                      context,
-                      RouteName.mainNavigation,
-                      (route) => false,
+                    unawaited(
+                      Navigator.pushNamedAndRemoveUntil(
+                        context,
+                        RouteName.mainNavigation,
+                        (route) => false,
+                      ),
                     );
                   },
                   child: const Text('Go to Main App'),

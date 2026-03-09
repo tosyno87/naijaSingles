@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 
@@ -64,7 +66,9 @@ class _CommunitiesHubScreenState extends State<CommunitiesHubScreen> {
                   Custom3DIcons.events(),
                   const Color(0xFF008037), // Green accent
                   () {
-                    Navigator.pushNamed(context, RouteName.eventsScreen);
+                    unawaited(
+                      Navigator.pushNamed(context, RouteName.eventsScreen),
+                    );
                   },
                 ),
               ),
@@ -76,10 +80,12 @@ class _CommunitiesHubScreenState extends State<CommunitiesHubScreen> {
                   Custom3DIcons.groups(),
                   const Color(0xFF008037), // Green accent
                   () {
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder: (context) => const UnifiedGroupsScreen(),
+                    unawaited(
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => const UnifiedGroupsScreen(),
+                        ),
                       ),
                     );
                   },

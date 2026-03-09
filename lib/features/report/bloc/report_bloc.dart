@@ -18,7 +18,7 @@ class ReportBloc extends Bloc<ReportEvents, ReportStates> {
           reportedBy: event.reportedBy,
         );
         emit(const ReportUserSuccess(message: 'User Reported'));
-      } catch (e) {
+      } on Object catch (e) {
         emit(ReportUserFailed(message: e.toString()));
         log('Error reporting user: $e');
       }

@@ -1,3 +1,4 @@
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import '../common/constants/app_colors.dart';
@@ -106,10 +107,13 @@ class GroupInfoModal extends StatelessWidget {
             child: group.imageUrl != null
                 ? ClipRRect(
                     borderRadius: BorderRadius.circular(14),
-                    child: Image.network(
-                      group.imageUrl!,
+                    child: CachedNetworkImage(
+                      imageUrl: group.imageUrl!,
                       fit: BoxFit.cover,
-                      errorBuilder: (context, error, stackTrace) =>
+                      placeholder: (context, url) => const Center(
+                        child: CircularProgressIndicator(strokeWidth: 2),
+                      ),
+                      errorWidget: (context, url, error) =>
                           _buildDefaultAvatar(),
                     ),
                   )
@@ -340,7 +344,7 @@ class GroupInfoModal extends StatelessWidget {
           _buildSettingRow(
             icon: Icons.person_add,
             label: 'Member Approval',
-            value: 'Not required', // TODO: Add to model
+            value: 'Not required', // TODO(dev): Add to model
             valueColor: Colors.green,
           ),
         ],
@@ -407,7 +411,7 @@ class GroupInfoModal extends StatelessWidget {
                 child: _buildStatCard(
                   icon: Icons.chat_bubble,
                   label: 'Messages',
-                  value: '0', // TODO: Add message count
+                  value: '0', // TODO(dev): Add message count
                   color: Colors.blue,
                 ),
               ),

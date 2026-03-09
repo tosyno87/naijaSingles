@@ -37,20 +37,18 @@ var __importStar = (this && this.__importStar) || (function () {
 })();
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.LikeHandlers = void 0;
-const functions = __importStar(require("firebase-functions/v1"));
+const firestore_1 = require("firebase-functions/v2/firestore");
 const admin = __importStar(require("firebase-admin"));
 const userService_1 = require("../services/userService");
 const notificationService_1 = require("../services/notificationService");
 class LikeHandlers {
     constructor() {
-        /**
-         * Handle super like creation (Gen 1 - compatible with existing deployments)
-         */
-        this.onSuperLikeCreated = functions.firestore
-            .document('superLikes/{superLikeId}')
-            .onCreate(async (snap, context) => {
+        this.onSuperLikeCreated = (0, firestore_1.onDocumentCreated)('superLikes/{superLikeId}', async (event) => {
+            const snap = event.data;
+            if (!snap)
+                return;
             const superLikeData = snap.data();
-            const superLikeId = context.params.superLikeId;
+            const superLikeId = event.params.superLikeId;
             console.log(`⭐ New super like created: ${superLikeId}`, superLikeData);
             try {
                 const fromUserId = superLikeData.fromUserId;
@@ -82,15 +80,13 @@ class LikeHandlers {
                 await this.logError('super_like_created', error, { superLikeId, superLikeData });
             }
         });
-        /**
-         * Handle like creation (Gen 1 - compatible with existing deployments)
-         */
-        this.onLikeCreated = functions.firestore
-            .document('users/{userId}/LikedBy/{likeId}')
-            .onCreate(async (snap, context) => {
+        this.onLikeCreated = (0, firestore_1.onDocumentCreated)('users/{userId}/LikedBy/{likeId}', async (event) => {
+            const snap = event.data;
+            if (!snap)
+                return;
             const likeData = snap.data();
-            const likedUserId = context.params.userId;
-            const likeId = context.params.likeId;
+            const likedUserId = event.params.userId;
+            const likeId = event.params.likeId;
             const likerId = likeData.LikedBy;
             console.log(`💖 New like: ${likerId} liked ${likedUserId}`);
             try {

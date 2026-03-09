@@ -58,7 +58,7 @@ class SimpleGoogleSignIn {
         log('Failed to sign in with Google - user is null');
         return null;
       }
-    } catch (e) {
+    } on Object catch (e) {
       log('Error in simple Google Sign-In: $e');
       return null;
     }

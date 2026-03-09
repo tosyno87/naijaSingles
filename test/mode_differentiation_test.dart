@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:naijasingles/models/user_model.dart';
 import 'package:naijasingles/services/mode_specific_compatibility_engine.dart';
@@ -81,11 +82,13 @@ void main() {
         expect(friendshipScore, inInclusiveRange(0.0, 1.0));
         expect(networkingScore, inInclusiveRange(0.0, 1.0));
 
-        print('Dating Score: ${(datingScore * 100).toStringAsFixed(1)}%');
-        print(
-            'Friendship Score: ${(friendshipScore * 100).toStringAsFixed(1)}%',);
-        print(
-            'Networking Score: ${(networkingScore * 100).toStringAsFixed(1)}%',);
+        debugPrint('Dating Score: ${(datingScore * 100).toStringAsFixed(1)}%');
+        debugPrint(
+          'Friendship Score: ${(friendshipScore * 100).toStringAsFixed(1)}%',
+        );
+        debugPrint(
+          'Networking Score: ${(networkingScore * 100).toStringAsFixed(1)}%',
+        );
       });
 
       test('should return compatibility breakdown', () {
@@ -157,13 +160,17 @@ void main() {
         expect(datingPrefs['ageRange']['max'], equals(28)); // 30 - 2
 
         // Friendship should have expanded age range
-        expect(friendshipPrefs['ageRange']['min'],
-            equals(18),); // 20 - 5, clamped to 18
+        expect(
+          friendshipPrefs['ageRange']['min'],
+          equals(18),
+        ); // 20 - 5, clamped to 18
         expect(friendshipPrefs['ageRange']['max'], equals(35)); // 30 + 5
 
         // Networking should have most expanded age range
-        expect(networkingPrefs['ageRange']['min'],
-            equals(18),); // 20 - 10, clamped to 18
+        expect(
+          networkingPrefs['ageRange']['min'],
+          equals(18),
+        ); // 20 - 10, clamped to 18
         expect(networkingPrefs['ageRange']['max'], equals(40)); // 30 + 10
 
         // Distance preferences should be different
@@ -182,14 +189,18 @@ void main() {
         // Test friendship validation (should fail because user is looking for dating)
         expect(
           ModeSpecificFilteringService.validateModeMatch(
-              targetUser, 'Friendship',),
+            targetUser,
+            'Friendship',
+          ),
           isFalse,
         );
 
         // Test networking validation (should fail because user is looking for dating)
         expect(
           ModeSpecificFilteringService.validateModeMatch(
-              targetUser, 'Networking',),
+            targetUser,
+            'Networking',
+          ),
           isFalse,
         );
       });
@@ -199,10 +210,12 @@ void main() {
             ModeSpecificFilteringService.getModeSpecificSuggestions('Dating');
         final friendshipSuggestions =
             ModeSpecificFilteringService.getModeSpecificSuggestions(
-                'Friendship',);
+          'Friendship',
+        );
         final networkingSuggestions =
             ModeSpecificFilteringService.getModeSpecificSuggestions(
-                'Networking',);
+          'Networking',
+        );
 
         expect(datingSuggestions, isNotEmpty);
         expect(friendshipSuggestions, isNotEmpty);
@@ -211,6 +224,207 @@ void main() {
         expect(datingSuggestions, contains('Looking for someone special'));
         expect(friendshipSuggestions, contains('Make new friends'));
         expect(networkingSuggestions, contains('Professional connections'));
+      });
+    });
+
+    group('Ranking correctness', () {
+      test('dating weights age more heavily than friendship does', () {
+        final baseUser = UserModel(
+          id: 'base',
+          name: 'Base',
+          age: 25,
+          coordinates: {'latitude': 40.7128, 'longitude': -74.0060},
+        );
+        final sameAge = UserModel(
+          id: 'same',
+          name: 'Same Age',
+          age: 25,
+          coordinates: {'latitude': 40.7128, 'longitude': -74.0060},
+        );
+        final farAge = UserModel(
+          id: 'far',
+          name: 'Far Age',
+          age: 45,
+          coordinates: {'latitude': 40.7128, 'longitude': -74.0060},
+        );
+
+        final datingSame =
+            ModeSpecificCompatibilityEngine.calculateModeCompatibility(
+          baseUser,
+          sameAge,
+          'Dating',
+        );
+        final datingFar =
+            ModeSpecificCompatibilityEngine.calculateModeCompatibility(
+          baseUser,
+          farAge,
+          'Dating',
+        );
+        final friendSame =
+            ModeSpecificCompatibilityEngine.calculateModeCompatibility(
+          baseUser,
+          sameAge,
+          'Friendship',
+        );
+        final friendFar =
+            ModeSpecificCompatibilityEngine.calculateModeCompatibility(
+          baseUser,
+          farAge,
+          'Friendship',
+        );
+
+        final datingDelta = datingSame - datingFar;
+        final friendDelta = friendSame - friendFar;
+
+        // Dating should penalize age mismatch more than friendship
+        expect(
+          datingDelta,
+          greaterThan(friendDelta),
+          reason: 'Dating (30% age weight) should show larger score delta than '
+              'Friendship (10% age weight) for the same age difference',
+        );
+      });
+
+      test(
+          'matching lifestyles score higher than mismatching lifestyles in dating',
+          () {
+        final user = UserModel(
+          id: 'u1',
+          name: 'User',
+          age: 25,
+          drinkingStatus: 'Never',
+          smokingStatus: 'Never',
+          religion: 'Christian',
+        );
+        final matchingLifestyle = UserModel(
+          id: 'u2',
+          name: 'Match',
+          age: 25,
+          drinkingStatus: 'Never',
+          smokingStatus: 'Never',
+          religion: 'Christian',
+        );
+        final mismatchLifestyle = UserModel(
+          id: 'u3',
+          name: 'Mismatch',
+          age: 25,
+          drinkingStatus: 'Regularly',
+          smokingStatus: 'Regularly',
+          religion: 'None',
+        );
+
+        final matchScore =
+            ModeSpecificCompatibilityEngine.calculateModeCompatibility(
+          user,
+          matchingLifestyle,
+          'Dating',
+        );
+        final mismatchScore =
+            ModeSpecificCompatibilityEngine.calculateModeCompatibility(
+          user,
+          mismatchLifestyle,
+          'Dating',
+        );
+
+        expect(
+          matchScore,
+          greaterThan(mismatchScore),
+          reason: 'Matching lifestyles must produce a higher dating score',
+        );
+      });
+
+      test('matching profession scores higher in networking than mismatching',
+          () {
+        final user = UserModel(
+          id: 'u1',
+          name: 'User',
+          age: 30,
+          job_title: 'Software Engineer',
+          occupation: 'Software Engineering',
+          education: 'Computer Science',
+        );
+        final sameProfession = UserModel(
+          id: 'u2',
+          name: 'Same',
+          age: 30,
+          job_title: 'Software Engineer',
+          occupation: 'Software Engineering',
+          education: 'Computer Science',
+        );
+        final differentProfession = UserModel(
+          id: 'u3',
+          name: 'Different',
+          age: 30,
+          job_title: 'Pastry Chef',
+          occupation: 'Culinary Arts',
+          education: 'Le Cordon Bleu',
+        );
+
+        final sameScore =
+            ModeSpecificCompatibilityEngine.calculateModeCompatibility(
+          user,
+          sameProfession,
+          'Networking',
+        );
+        final diffScore =
+            ModeSpecificCompatibilityEngine.calculateModeCompatibility(
+          user,
+          differentProfession,
+          'Networking',
+        );
+
+        expect(
+          sameScore,
+          greaterThan(diffScore),
+          reason: 'Same profession must score higher in networking mode',
+        );
+      });
+
+      test('shared languages boost friendship score', () {
+        final user = UserModel(
+          id: 'u1',
+          name: 'User',
+          age: 25,
+          languages: ['English', 'Yoruba', 'French'],
+          tribe: 'Yoruba',
+          nationality: 'Nigerian',
+        );
+        final sharedLangs = UserModel(
+          id: 'u2',
+          name: 'Shared',
+          age: 25,
+          languages: ['English', 'Yoruba'],
+          tribe: 'Yoruba',
+          nationality: 'Nigerian',
+        );
+        final noSharedLangs = UserModel(
+          id: 'u3',
+          name: 'None',
+          age: 25,
+          languages: ['Mandarin', 'Japanese'],
+          tribe: 'Other',
+          nationality: 'Chinese',
+        );
+
+        final sharedScore =
+            ModeSpecificCompatibilityEngine.calculateModeCompatibility(
+          user,
+          sharedLangs,
+          'Friendship',
+        );
+        final noSharedScore =
+            ModeSpecificCompatibilityEngine.calculateModeCompatibility(
+          user,
+          noSharedLangs,
+          'Friendship',
+        );
+
+        expect(
+          sharedScore,
+          greaterThan(noSharedScore),
+          reason:
+              'Shared languages/tribe/nationality must boost friendship score',
+        );
       });
     });
 
@@ -244,8 +458,9 @@ void main() {
         );
 
         expect(networkingScore, inInclusiveRange(0.0, 1.0));
-        print(
-            'Networking User Score: ${(networkingScore * 100).toStringAsFixed(1)}%',);
+        debugPrint(
+          'Networking User Score: ${(networkingScore * 100).toStringAsFixed(1)}%',
+        );
       });
 
       test('should handle edge cases gracefully', () {
@@ -266,7 +481,7 @@ void main() {
         );
 
         expect(score, inInclusiveRange(0.0, 1.0));
-        print('Minimal User Score: ${(score * 100).toStringAsFixed(1)}%');
+        debugPrint('Minimal User Score: ${(score * 100).toStringAsFixed(1)}%');
       });
     });
   });

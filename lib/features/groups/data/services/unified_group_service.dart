@@ -1,6 +1,8 @@
+import 'dart:async';
 import 'dart:developer';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import '../../../../common/utils/firestore_helpers.dart';
 import '../../../../models/group_join_exception.dart';
 import '../../../../services/content_moderation_service.dart';
 
@@ -133,7 +135,7 @@ class UnifiedGroupService {
       log('✅ Unified group created successfully: $groupId');
       log('📊 Group data: memberIds=${groupData['memberIds']}, isActive=${groupData['isActive']}');
       return group;
-    } catch (e) {
+    } on Object catch (e) {
       log('❌ Error creating unified group: $e');
       rethrow;
     }
@@ -208,7 +210,7 @@ class UnifiedGroupService {
 
       log('✅ Successfully joined group: $groupId');
       return GroupJoinResult.success(groupData['name'] ?? 'Unknown Group');
-    } catch (e) {
+    } on Object catch (e) {
       log('❌ Error joining group: $e');
       if (e is GroupJoinException) rethrow;
 
@@ -242,32 +244,91 @@ class UnifiedGroupService {
         throw Exception('User not authenticated');
       }
 
-      // Remove user from group members
-      await _firestore.collection('unifiedGroups').doc(groupId).update({
-        'memberIds': FieldValue.arrayRemove([currentUserId]),
-        'adminIds': FieldValue.arrayRemove([currentUserId]),
-        'memberCount': FieldValue.increment(-1),
-        'lastActivityAt': FieldValue.serverTimestamp(),
+      final groupRef = _firestore.collection('unifiedGroups').doc(groupId);
+      var enableChat = false;
+      await _firestore.runTransaction((transaction) async {
+        final groupDoc = await transaction.get(groupRef);
+        if (!groupDoc.exists) {
+          throw Exception('Group not found');
+        }
+
+        final groupData = groupDoc.data() as Map<String, dynamic>;
+        enableChat = groupData['enableChat'] == true;
+
+        final existingMembers = List<String>.from(groupData['memberIds'] ?? []);
+        if (!existingMembers.contains(currentUserId)) {
+          throw Exception('User is not a member of this group');
+        }
+
+        final updatedMembers = existingMembers.toSet()..remove(currentUserId);
+        final updatedAdmins = List<String>.from(groupData['adminIds'] ?? [])
+            .toSet()
+          ..remove(currentUserId);
+        final creatorId = groupData['creatorId'] as String?;
+
+        if (updatedMembers.isEmpty) {
+          transaction.update(groupRef, {
+            'memberIds': <String>[],
+            'adminIds': <String>[],
+            'memberCount': 0,
+            'isActive': false,
+            'updatedAt': FieldValue.serverTimestamp(),
+            'lastActivityAt': FieldValue.serverTimestamp(),
+          });
+          return;
+        }
+
+        final nextMembers = updatedMembers.toList();
+        final nextAdmins = updatedAdmins.toList();
+        final updateData = <String, dynamic>{
+          'memberIds': nextMembers,
+          'memberCount': nextMembers.length,
+          'adminIds': nextAdmins,
+          'updatedAt': FieldValue.serverTimestamp(),
+          'lastActivityAt': FieldValue.serverTimestamp(),
+        };
+
+        if (creatorId == currentUserId) {
+          final newCreatorId =
+              nextAdmins.isNotEmpty ? nextAdmins.first : nextMembers.first;
+          if (!nextAdmins.contains(newCreatorId)) {
+            nextAdmins.add(newCreatorId);
+            updateData['adminIds'] = nextAdmins;
+          }
+          updateData['creatorId'] = newCreatorId;
+        }
+
+        transaction.update(groupRef, updateData);
       });
 
-      // Send leave message if chat is enabled
-      final groupDoc =
-          await _firestore.collection('unifiedGroups').doc(groupId).get();
-      if (groupDoc.exists) {
-        final groupData = groupDoc.data()!;
-        final enableChat = groupData['enableChat'] ?? false;
-
-        if (enableChat) {
-          await _sendGroupMessage(
-            groupId: groupId,
-            text: 'left the group',
-            messageType: MessageType.system,
-          );
+      if (enableChat) {
+        try {
+          await _firestore
+              .collection('unifiedGroups')
+              .doc(groupId)
+              .collection('messages')
+              .add({
+            'groupId': groupId,
+            'senderId': currentUserId,
+            'text': 'left the group',
+            'messageType': MessageType.system.name,
+            'timestamp': FieldValue.serverTimestamp(),
+            'isRead': false,
+            'readBy': [currentUserId],
+          });
+          await _firestore.collection('unifiedGroups').doc(groupId).update({
+            'lastMessageAt': FieldValue.serverTimestamp(),
+            'lastMessageText': 'left the group',
+            'lastMessageSenderId': currentUserId,
+            'lastActivityAt': FieldValue.serverTimestamp(),
+          });
+        } on Object catch (messageError) {
+          log('⚠️ Leave message skipped for group $groupId: $messageError');
         }
       }
 
       log('✅ Successfully left group: $groupId');
-    } catch (e) {
+    } on Object catch (e) {
       log('❌ Error leaving group: $e');
       rethrow;
     }
@@ -357,7 +418,7 @@ class UnifiedGroupService {
 
       log('✅ Group message sent successfully: ${docRef.id}');
       return message;
-    } catch (e) {
+    } on Object catch (e) {
       log('❌ Error sending group message: $e');
       rethrow;
     }
@@ -408,8 +469,7 @@ class UnifiedGroupService {
 
         if (uniqueMembers.length != memberIds.length) {
           log('🧹 Found duplicates in group ${doc.id}, cleaning up...');
-          // Clean up duplicates asynchronously
-          cleanupDuplicateMembers(doc.id);
+          unawaited(cleanupDuplicateMembers(doc.id));
         }
 
         log('📋 getUserGroups: Group ${doc.id} - isActive: ${data['isActive']}, memberIds: $uniqueMembers');
@@ -447,8 +507,12 @@ class UnifiedGroupService {
     return query.snapshots().map((snapshot) {
       // Filter and sort in memory to avoid complex index requirements
       final groups = snapshot.docs
-          .map((doc) =>
-              UnifiedGroup.fromMap(doc.id, doc.data() as Map<String, dynamic>))
+          .map(
+            (doc) => UnifiedGroup.fromMap(
+              doc.id,
+              doc.data() as Map<String, dynamic>,
+            ),
+          )
           .toList();
 
       // Filter active groups and sort by last activity
@@ -489,7 +553,7 @@ class UnifiedGroupService {
       }).toList();
 
       return results;
-    } catch (e) {
+    } on Object catch (e) {
       log('❌ Error searching groups: $e');
       return [];
     }
@@ -503,7 +567,7 @@ class UnifiedGroupService {
       if (!doc.exists) return null;
 
       return UnifiedGroup.fromMap(doc.id, doc.data()!);
-    } catch (e) {
+    } on Object catch (e) {
       log('❌ Error getting group details: $e');
       return null;
     }
@@ -540,7 +604,7 @@ class UnifiedGroupService {
 
         log('✅ Cleaned up duplicate members: ${uniqueMembers.length} unique members');
       }
-    } catch (e) {
+    } on Object catch (e) {
       log('❌ Error cleaning up duplicate members: $e');
     }
   }
@@ -624,7 +688,7 @@ class UnifiedGroupService {
           .update(updateData);
 
       log('✅ Group settings updated successfully: $groupId');
-    } catch (e) {
+    } on Object catch (e) {
       log('❌ Error updating group settings: $e');
       rethrow;
     }
@@ -662,7 +726,7 @@ class UnifiedGroupService {
       });
 
       log('✅ Group deleted successfully: $groupId');
-    } catch (e) {
+    } on Object catch (e) {
       log('❌ Error deleting group: $e');
       rethrow;
     }
@@ -709,7 +773,7 @@ class UnifiedGroupService {
           .add(messageData);
 
       log('✅ Group message sent successfully: $groupId');
-    } catch (e) {
+    } on Object catch (e) {
       log('❌ Error sending group message: $e');
       rethrow;
     }
@@ -744,7 +808,7 @@ class UnifiedGroupService {
           });
         }
       }
-    } catch (e) {
+    } on Object catch (e) {
       log('❌ Error notifying group members: $e');
     }
   }
@@ -817,7 +881,7 @@ class UnifiedGroupService {
 
       log('✅ Successfully added member to group: $groupId');
       return true;
-    } catch (e) {
+    } on Object catch (e) {
       log('❌ Error adding member to group: $e');
       rethrow;
     }
@@ -889,7 +953,7 @@ class UnifiedGroupService {
 
       log('✅ Successfully removed member from group: $groupId');
       return true;
-    } catch (e) {
+    } on Object catch (e) {
       log('❌ Error removing member from group: $e');
       rethrow;
     }
@@ -960,7 +1024,7 @@ class UnifiedGroupService {
 
       log('✅ Successfully promoted member to admin: $groupId');
       return true;
-    } catch (e) {
+    } on Object catch (e) {
       log('❌ Error promoting member to admin: $e');
       rethrow;
     }
@@ -1030,7 +1094,7 @@ class UnifiedGroupService {
 
       log('✅ Successfully demoted admin to member: $groupId');
       return true;
-    } catch (e) {
+    } on Object catch (e) {
       log('❌ Error demoting admin to member: $e');
       rethrow;
     }
@@ -1084,7 +1148,7 @@ class UnifiedGroupService {
 
       log('✅ Found ${users.length} users for invitation');
       return users;
-    } catch (e) {
+    } on Object catch (e) {
       log('❌ Error searching users for invitation: $e');
       rethrow;
     }
@@ -1153,7 +1217,7 @@ class UnifiedGroupService {
 
       log('✅ Successfully sent group invitation');
       return true;
-    } catch (e) {
+    } on Object catch (e) {
       log('❌ Error sending group invitation: $e');
       rethrow;
     }
@@ -1194,8 +1258,8 @@ class UnifiedGroupService {
       }
 
       // Check if invitation has expired
-      final expiresAt = invitationData['expiresAt'] as Timestamp?;
-      if (expiresAt != null && expiresAt.toDate().isBefore(DateTime.now())) {
+      final expiresAt = parseDateTimeOrNull(invitationData['expiresAt']);
+      if (expiresAt != null && expiresAt.isBefore(DateTime.now())) {
         throw Exception('This invitation has expired');
       }
 
@@ -1217,7 +1281,7 @@ class UnifiedGroupService {
 
       log('✅ Successfully accepted group invitation');
       return true;
-    } catch (e) {
+    } on Object catch (e) {
       log('❌ Error accepting group invitation: $e');
       rethrow;
     }
@@ -1264,7 +1328,7 @@ class UnifiedGroupService {
 
       log('✅ Successfully declined group invitation');
       return true;
-    } catch (e) {
+    } on Object catch (e) {
       log('❌ Error declining group invitation: $e');
       rethrow;
     }
@@ -1384,13 +1448,10 @@ class UnifiedGroup {
         isPublic: data['isPublic'] ?? true,
         enableChat: data['enableChat'] ?? true,
         isActive: data['isActive'] ?? true,
-        createdAt:
-            (data['createdAt'] as Timestamp?)?.toDate() ?? DateTime.now(),
-        updatedAt:
-            (data['updatedAt'] as Timestamp?)?.toDate() ?? DateTime.now(),
-        lastActivityAt:
-            (data['lastActivityAt'] as Timestamp?)?.toDate() ?? DateTime.now(),
-        lastMessageAt: (data['lastMessageAt'] as Timestamp?)?.toDate(),
+        createdAt: parseDateTime(data['createdAt']),
+        updatedAt: parseDateTime(data['updatedAt']),
+        lastActivityAt: parseDateTime(data['lastActivityAt']),
+        lastMessageAt: parseDateTimeOrNull(data['lastMessageAt']),
         lastMessageText: data['lastMessageText'],
         lastMessageSenderId: data['lastMessageSenderId'],
       );
@@ -1516,8 +1577,7 @@ class GroupMessage {
         mediaUrl: data['mediaUrl'],
         mediaType: data['mediaType'],
         replyToMessageId: data['replyToMessageId'],
-        timestamp:
-            (data['timestamp'] as Timestamp?)?.toDate() ?? DateTime.now(),
+        timestamp: parseDateTime(data['timestamp']),
         isRead: data['isRead'] ?? false,
         readBy: List<String>.from(data['readBy'] ?? []),
       );

@@ -1,6 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:equatable/equatable.dart';
 
+import '../../../../common/utils/firestore_helpers.dart';
 import 'event_types.dart';
 
 export 'event_types.dart';
@@ -26,6 +27,7 @@ class EnhancedEventModel extends Equatable {
     this.rsvpCount = 0,
     this.maxAttendees = 100,
     this.createdByUserId,
+    this.creatorId,
     this.isUserGenerated = false,
     this.eventType = EventType.userGenerated,
     this.status = EventStatus.published,
@@ -102,6 +104,7 @@ class EnhancedEventModel extends Equatable {
         createdAt: parseDateTime(json['createdAt']),
         updatedAt: parseDateTime(json['updatedAt']),
         createdByUserId: json['createdByUserId'],
+        creatorId: json['creatorId'],
         isUserGenerated: json['isUserGenerated'] ?? false,
         eventType: parseEventType(json['eventType']),
         status: parseEventStatus(json['status']),
@@ -131,6 +134,7 @@ class EnhancedEventModel extends Equatable {
   final DateTime createdAt;
   final DateTime updatedAt;
   final String? createdByUserId;
+  final String? creatorId;
   final bool isUserGenerated;
   final EventType eventType;
   final EventStatus status;
@@ -139,6 +143,16 @@ class EnhancedEventModel extends Equatable {
   final Map<String, dynamic> metadata;
 
   bool get isPublished => status == EventStatus.published;
+  String? get ownerUserId => createdByUserId ?? creatorId;
+
+  /// Mirrors Firestore `isEventOwner` OR-logic: the user is considered the
+  /// owner when *either* stored creator field matches, not just the first
+  /// non-null one. This prevents client/server ownership divergence when a
+  /// document contains both fields with different values.
+  bool isOwnedBy(String userId) =>
+      (createdByUserId != null && createdByUserId == userId) ||
+      (creatorId != null && creatorId == userId);
+
   bool get isVisible => isPublished && endDate.isAfter(DateTime.now());
   bool get isActive => isVisible;
   bool get isDraft => status == EventStatus.draft;
@@ -221,6 +235,7 @@ class EnhancedEventModel extends Equatable {
         'createdAt': Timestamp.fromDate(createdAt),
         'updatedAt': Timestamp.fromDate(updatedAt),
         'createdByUserId': createdByUserId,
+        if (creatorId != null) 'creatorId': creatorId,
         'isUserGenerated': isUserGenerated,
         'eventType': eventType.toString().split('.').last,
         'status': status.toString().split('.').last,
@@ -251,6 +266,7 @@ class EnhancedEventModel extends Equatable {
     DateTime? createdAt,
     DateTime? updatedAt,
     String? createdByUserId,
+    String? creatorId,
     bool? isUserGenerated,
     EventType? eventType,
     EventStatus? status,
@@ -278,6 +294,7 @@ class EnhancedEventModel extends Equatable {
         createdAt: createdAt ?? this.createdAt,
         updatedAt: updatedAt ?? this.updatedAt,
         createdByUserId: createdByUserId ?? this.createdByUserId,
+        creatorId: creatorId ?? this.creatorId,
         isUserGenerated: isUserGenerated ?? this.isUserGenerated,
         eventType: eventType ?? this.eventType,
         status: status ?? this.status,
@@ -288,11 +305,32 @@ class EnhancedEventModel extends Equatable {
 
   @override
   List<Object?> get props => [
-        id, externalId, name, description, startDate, endDate,
-        imageUrls, location, ticketUrl, isFree, ticketPrice,
-        category, tags, attendeeCount, rsvpCount, maxAttendees,
-        createdAt, updatedAt, createdByUserId, isUserGenerated,
-        eventType, status, isPromoted, promotionExpiry, metadata,
+        id,
+        externalId,
+        name,
+        description,
+        startDate,
+        endDate,
+        imageUrls,
+        location,
+        ticketUrl,
+        isFree,
+        ticketPrice,
+        category,
+        tags,
+        attendeeCount,
+        rsvpCount,
+        maxAttendees,
+        createdAt,
+        updatedAt,
+        createdByUserId,
+        creatorId,
+        isUserGenerated,
+        eventType,
+        status,
+        isPromoted,
+        promotionExpiry,
+        metadata,
       ];
 }
 

@@ -139,8 +139,7 @@ class _LocationStepState extends State<LocationStep> {
                     .withValues(alpha: 0.7), // Afropeep green hint
               ),
               filled: true,
-              fillColor:
-                  AppColors.backgroundColor, // Afropeep cream background
+              fillColor: AppColors.backgroundColor, // Afropeep cream background
               border: OutlineInputBorder(
                 borderRadius: BorderRadius.circular(12),
                 borderSide: BorderSide(
@@ -198,8 +197,7 @@ class _LocationStepState extends State<LocationStep> {
                     .withValues(alpha: 0.7), // Afropeep green hint
               ),
               filled: true,
-              fillColor:
-                  AppColors.backgroundColor, // Afropeep cream background
+              fillColor: AppColors.backgroundColor, // Afropeep cream background
               border: OutlineInputBorder(
                 borderRadius: BorderRadius.circular(12),
                 borderSide: BorderSide(
@@ -257,8 +255,7 @@ class _LocationStepState extends State<LocationStep> {
                     .withValues(alpha: 0.7), // Afropeep green hint
               ),
               filled: true,
-              fillColor:
-                  AppColors.backgroundColor, // Afropeep cream background
+              fillColor: AppColors.backgroundColor, // Afropeep cream background
               border: OutlineInputBorder(
                 borderRadius: BorderRadius.circular(12),
                 borderSide: BorderSide(
@@ -316,8 +313,7 @@ class _LocationStepState extends State<LocationStep> {
                     .withValues(alpha: 0.7), // Afropeep green hint
               ),
               filled: true,
-              fillColor:
-                  AppColors.backgroundColor, // Afropeep cream background
+              fillColor: AppColors.backgroundColor, // Afropeep cream background
               border: OutlineInputBorder(
                 borderRadius: BorderRadius.circular(12),
                 borderSide: BorderSide(
@@ -369,8 +365,7 @@ class _LocationStepState extends State<LocationStep> {
                     .withValues(alpha: 0.7), // Afropeep green hint
               ),
               filled: true,
-              fillColor:
-                  AppColors.backgroundColor, // Afropeep cream background
+              fillColor: AppColors.backgroundColor, // Afropeep cream background
               border: OutlineInputBorder(
                 borderRadius: BorderRadius.circular(12),
                 borderSide: BorderSide(

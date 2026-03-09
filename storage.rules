@@ -51,6 +51,24 @@ service firebase.storage {
       allow read: if isSignedIn();
     }
 
+    // Group avatars (owner-scoped path): group_avatars/{ownerId}/{...}
+    match /group_avatars/{ownerId}/{allPaths=**} {
+      // Only the owner can upload/update/delete under their group avatar path.
+      allow write: if isSignedIn() &&
+                   request.auth.uid == ownerId &&
+                   isImageUpload() &&
+                   isReasonableImageSize();
+
+      // Any authenticated user can read group avatars.
+      allow read: if isSignedIn();
+    }
+
+    // Legacy group avatar paths (without owner prefix) remain read-only.
+    match /group_avatars/{allPaths=**} {
+      allow read: if isSignedIn();
+      allow write: if false;
+    }
+
     // Legacy event image paths (without owner prefix) remain read-only.
     match /event_images/{allPaths=**} {
       allow read: if isSignedIn();

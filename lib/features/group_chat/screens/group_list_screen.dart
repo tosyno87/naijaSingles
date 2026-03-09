@@ -1,7 +1,10 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 
 import '../../../common/constants/app_colors.dart';
+import '../../../common/widgets/state_views/state_views.dart';
 import '../data/services/group_chat_service.dart';
 import 'create_group_screen.dart';
 import 'group_chat_screen.dart';
@@ -41,38 +44,14 @@ class _GroupListScreenState extends State<GroupListScreen> {
           stream: _groupChatService.getUserGroups(),
           builder: (context, snapshot) {
             if (snapshot.connectionState == ConnectionState.waiting) {
-              return const Center(child: CircularProgressIndicator());
+              return const AppLoadingView(message: 'Loading groups...');
             }
 
             if (snapshot.hasError) {
-              return Center(
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Icon(
-                      Icons.error_outline,
-                      size: 64,
-                      color: Colors.red[300],
-                    ),
-                    const SizedBox(height: 16),
-                    Text(
-                      'Error loading groups',
-                      style: GoogleFonts.montserrat(
-                        fontSize: 18,
-                        color: Colors.red[600],
-                      ),
-                    ),
-                    const SizedBox(height: 8),
-                    Text(
-                      '${snapshot.error}',
-                      style: GoogleFonts.montserrat(
-                        fontSize: 14,
-                        color: Colors.grey[600],
-                      ),
-                      textAlign: TextAlign.center,
-                    ),
-                  ],
-                ),
+              return AppErrorView(
+                title: 'Error loading groups',
+                message: '${snapshot.error}',
+                onRetry: () => setState(() {}),
               );
             }
 
@@ -93,55 +72,13 @@ class _GroupListScreenState extends State<GroupListScreen> {
         ),
       );
 
-  Widget _buildEmptyState() => Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Icon(
-              Icons.group_outlined,
-              size: 80,
-              color: Colors.grey[400],
-            ),
-            const SizedBox(height: 24),
-            Text(
-              'No Group Chats Yet',
-              style: GoogleFonts.montserrat(
-                fontSize: 24,
-                fontWeight: FontWeight.w600,
-                color: Colors.grey[600],
-              ),
-            ),
-            const SizedBox(height: 12),
-            Text(
-              'Create a group or join one to start chatting with multiple people!',
-              style: GoogleFonts.montserrat(
-                fontSize: 16,
-                color: Colors.grey[500],
-              ),
-              textAlign: TextAlign.center,
-            ),
-            const SizedBox(height: 32),
-            ElevatedButton.icon(
-              onPressed: _navigateToCreateGroup,
-              icon: const Icon(Icons.add),
-              label: Text(
-                'Create Group',
-                style: GoogleFonts.montserrat(
-                  fontWeight: FontWeight.w600,
-                ),
-              ),
-              style: ElevatedButton.styleFrom(
-                backgroundColor: AppColors.primaryGreen,
-                foregroundColor: Colors.white,
-                padding:
-                    const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(12),
-                ),
-              ),
-            ),
-          ],
-        ),
+  Widget _buildEmptyState() => AppEmptyView(
+        title: 'No Group Chats Yet',
+        subtitle:
+            'Create a group or join one to start chatting with multiple people!',
+        icon: Icons.group_outlined,
+        actionLabel: 'Create Group',
+        onAction: _navigateToCreateGroup,
       );
 
   Widget _buildGroupTile(GroupChat group) => Container(
@@ -285,19 +222,23 @@ class _GroupListScreenState extends State<GroupListScreen> {
   }
 
   void _navigateToGroupChat(GroupChat group) {
-    Navigator.push(
-      context,
-      MaterialPageRoute(
-        builder: (context) => GroupChatScreen(groupId: group.id),
+    unawaited(
+      Navigator.push(
+        context,
+        MaterialPageRoute(
+          builder: (context) => GroupChatScreen(groupId: group.id),
+        ),
       ),
     );
   }
 
   void _navigateToCreateGroup() {
-    Navigator.push(
-      context,
-      MaterialPageRoute(
-        builder: (context) => const CreateGroupScreen(),
+    unawaited(
+      Navigator.push(
+        context,
+        MaterialPageRoute(
+          builder: (context) => const CreateGroupScreen(),
+        ),
       ),
     );
   }

@@ -1,3 +1,5 @@
+// ignore_for_file: one_member_abstracts
+
 import 'package:cloud_firestore/cloud_firestore.dart';
 
 import '../../constants/constants.dart';

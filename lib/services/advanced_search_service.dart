@@ -1,6 +1,7 @@
 import 'dart:developer';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import '../common/utils/firestore_helpers.dart';
 import '../models/user_model.dart';
 
 /// Industry-standard advanced search service
@@ -66,7 +67,7 @@ class AdvancedSearchService {
 
       log('🔍 Found ${filteredUsers.length} users matching criteria');
       return filteredUsers;
-    } catch (e) {
+    } on Object catch (e) {
       log('❌ Error in advanced search: $e');
       return [];
     }
@@ -74,62 +75,85 @@ class AdvancedSearchService {
 
   /// Apply basic filters to query
   Query _applyFilters(Query query, SearchCriteria criteria) {
+    Query filteredQuery = query;
     // Age range filter
     if (criteria.ageRange != null) {
-      query =
-          query.where('age', isGreaterThanOrEqualTo: criteria.ageRange!.min);
-      query = query.where('age', isLessThanOrEqualTo: criteria.ageRange!.max);
+      filteredQuery = filteredQuery.where(
+        'age',
+        isGreaterThanOrEqualTo: criteria.ageRange!.min,
+      );
+      filteredQuery = filteredQuery.where(
+        'age',
+        isLessThanOrEqualTo: criteria.ageRange!.max,
+      );
     }
 
     // Gender filter
     if (criteria.gender != null && criteria.gender!.isNotEmpty) {
-      query = query.where('gender', isEqualTo: criteria.gender);
+      filteredQuery = filteredQuery.where('gender', isEqualTo: criteria.gender);
     }
 
     // Interested in filter
     if (criteria.interestedIn != null && criteria.interestedIn!.isNotEmpty) {
-      query = query.where('interestedIn', isEqualTo: criteria.interestedIn);
+      filteredQuery = filteredQuery.where(
+        'interestedIn',
+        isEqualTo: criteria.interestedIn,
+      );
     }
 
     // Tribe filter
     if (criteria.tribe != null && criteria.tribe!.isNotEmpty) {
-      query = query.where('tribe', isEqualTo: criteria.tribe);
+      filteredQuery = filteredQuery.where('tribe', isEqualTo: criteria.tribe);
     }
 
     // Nationality filter
     if (criteria.nationality != null && criteria.nationality!.isNotEmpty) {
-      query = query.where('nationality', isEqualTo: criteria.nationality);
+      filteredQuery = filteredQuery.where(
+        'nationality',
+        isEqualTo: criteria.nationality,
+      );
     }
 
     // Religion filter
     if (criteria.religion != null && criteria.religion!.isNotEmpty) {
-      query = query.where('religion', isEqualTo: criteria.religion);
+      filteredQuery = filteredQuery.where(
+        'religion',
+        isEqualTo: criteria.religion,
+      );
     }
 
     // Education filter
     if (criteria.education != null && criteria.education!.isNotEmpty) {
-      query = query.where('education', isEqualTo: criteria.education);
+      filteredQuery = filteredQuery.where(
+        'education',
+        isEqualTo: criteria.education,
+      );
     }
 
     // Occupation filter
     if (criteria.occupation != null && criteria.occupation!.isNotEmpty) {
-      query = query.where('occupation', isEqualTo: criteria.occupation);
+      filteredQuery = filteredQuery.where(
+        'occupation',
+        isEqualTo: criteria.occupation,
+      );
     }
 
     // Height range filter
     if (criteria.heightRange != null) {
-      query = query.where(
+      filteredQuery = filteredQuery.where(
         'height',
         isGreaterThanOrEqualTo: criteria.heightRange!.min,
       );
-      query =
-          query.where('height', isLessThanOrEqualTo: criteria.heightRange!.max);
+      filteredQuery = filteredQuery.where(
+        'height',
+        isLessThanOrEqualTo: criteria.heightRange!.max,
+      );
     }
 
     // Relationship intent filter
     if (criteria.relationshipIntent != null &&
         criteria.relationshipIntent!.isNotEmpty) {
-      query = query.where(
+      filteredQuery = filteredQuery.where(
         'relationshipIntent',
         isEqualTo: criteria.relationshipIntent,
       );
@@ -137,58 +161,69 @@ class AdvancedSearchService {
 
     // Looking for filter
     if (criteria.lookingFor != null && criteria.lookingFor!.isNotEmpty) {
-      query = query.where('lookingFor', isEqualTo: criteria.lookingFor);
+      filteredQuery = filteredQuery.where(
+        'lookingFor',
+        isEqualTo: criteria.lookingFor,
+      );
     }
 
     // Exclude current user
     final currentUserId = _auth.currentUser?.uid;
     if (currentUserId != null) {
-      query = query.where(FieldPath.documentId, isNotEqualTo: currentUserId);
+      filteredQuery = filteredQuery.where(
+        FieldPath.documentId,
+        isNotEqualTo: currentUserId,
+      );
     }
 
     // Exclude blocked users
-    query = query.where('isBlocked', isEqualTo: false);
+    filteredQuery = filteredQuery.where('isBlocked', isEqualTo: false);
 
     // Only show users with complete profiles
-    query = query.where('isProfileComplete', isEqualTo: true);
+    filteredQuery = filteredQuery.where('isProfileComplete', isEqualTo: true);
 
-    return query;
+    return filteredQuery;
   }
 
   /// Apply location-based filtering
   Query _applyLocationFilter(Query query, LocationCriteria location) {
+    Query filteredQuery = query;
     // This is a simplified version. In production, you'd use GeoFirestore
     // or implement proper geospatial queries
 
     if (location.city != null && location.city!.isNotEmpty) {
-      query = query.where('locationName', isEqualTo: location.city);
+      filteredQuery = filteredQuery.where(
+        'locationName',
+        isEqualTo: location.city,
+      );
     }
 
-    return query;
+    return filteredQuery;
   }
 
   /// Apply sorting to query
   Query _applySorting(Query query, SearchCriteria criteria) {
+    Query sortedQuery = query;
     switch (criteria.sortBy) {
       case SearchSortBy.newest:
-        query = query.orderBy('createdAt', descending: true);
+        sortedQuery = sortedQuery.orderBy('createdAt', descending: true);
         break;
       case SearchSortBy.oldest:
-        query = query.orderBy('createdAt', descending: false);
+        sortedQuery = sortedQuery.orderBy('createdAt', descending: false);
         break;
       case SearchSortBy.lastActive:
-        query = query.orderBy('lastActive', descending: true);
+        sortedQuery = sortedQuery.orderBy('lastActive', descending: true);
         break;
       case SearchSortBy.distance:
         // Distance sorting would require geospatial queries
-        query = query.orderBy('lastActive', descending: true);
+        sortedQuery = sortedQuery.orderBy('lastActive', descending: true);
         break;
       case SearchSortBy.age:
-        query = query.orderBy('age', descending: false);
+        sortedQuery = sortedQuery.orderBy('age', descending: false);
         break;
     }
 
-    return query;
+    return sortedQuery;
   }
 
   /// Apply additional filters that can't be done in Firestore
@@ -265,7 +300,7 @@ class AdvancedSearchService {
 
       // Remove duplicates and return
       return suggestions.toSet().take(10).toList();
-    } catch (e) {
+    } on Object catch (e) {
       log('❌ Error getting search suggestions: $e');
       return [];
     }
@@ -288,7 +323,7 @@ class AdvancedSearchService {
       });
 
       log('🔍 Search saved: $name');
-    } catch (e) {
+    } on Object catch (e) {
       log('❌ Error saving search: $e');
     }
   }
@@ -312,11 +347,10 @@ class AdvancedSearchService {
           id: doc.id,
           name: data['name'] ?? '',
           criteria: SearchCriteria.fromMap(data['criteria'] ?? {}),
-          createdAt:
-              (data['createdAt'] as Timestamp?)?.toDate() ?? DateTime.now(),
+          createdAt: parseDateTime(data['createdAt']),
         );
       }).toList();
-    } catch (e) {
+    } on Object catch (e) {
       log('❌ Error getting saved searches: $e');
       return [];
     }
@@ -336,7 +370,7 @@ class AdvancedSearchService {
           .delete();
 
       log('🔍 Search deleted: $searchId');
-    } catch (e) {
+    } on Object catch (e) {
       log('❌ Error deleting search: $e');
     }
   }
@@ -361,11 +395,10 @@ class AdvancedSearchService {
           id: doc.id,
           query: data['query'] ?? '',
           resultCount: data['resultCount'] ?? 0,
-          searchedAt:
-              (data['searchedAt'] as Timestamp?)?.toDate() ?? DateTime.now(),
+          searchedAt: parseDateTime(data['searchedAt']),
         );
       }).toList();
-    } catch (e) {
+    } on Object catch (e) {
       log('❌ Error getting search history: $e');
       return [];
     }
@@ -386,7 +419,7 @@ class AdvancedSearchService {
         'resultCount': resultCount,
         'searchedAt': FieldValue.serverTimestamp(),
       });
-    } catch (e) {
+    } on Object catch (e) {
       log('❌ Error recording search: $e');
     }
   }
@@ -410,7 +443,7 @@ class AdvancedSearchService {
 
       await batch.commit();
       log('🔍 Search history cleared');
-    } catch (e) {
+    } on Object catch (e) {
       log('❌ Error clearing search history: $e');
     }
   }

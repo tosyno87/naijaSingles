@@ -79,7 +79,9 @@ class CulturalStoryCard extends StatelessWidget {
                   if (isVerified)
                     Container(
                       padding: const EdgeInsets.symmetric(
-                          horizontal: 8, vertical: 4),
+                        horizontal: 8,
+                        vertical: 4,
+                      ),
                       decoration: BoxDecoration(
                         color: Colors.white.withValues(alpha: 0.8),
                         borderRadius: BorderRadius.circular(12),
@@ -188,7 +190,8 @@ class CulturalStoryCard extends StatelessWidget {
                             vertical: 6,
                           ),
                           decoration: BoxDecoration(
-                            color: const Color(0xFF008037).withValues(alpha: 0.1),
+                            color:
+                                const Color(0xFF008037).withValues(alpha: 0.1),
                             borderRadius: BorderRadius.circular(16),
                           ),
                           child: Row(

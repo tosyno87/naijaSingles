@@ -1,4 +1,5 @@
 import 'dart:developer';
+
 import 'package:cloud_firestore/cloud_firestore.dart';
 
 /// Industry-standard profile analytics service
@@ -34,8 +35,10 @@ class ProfileAnalyticsService {
       await _updateProfileViewCount(profileId);
 
       log('✅ Profile view tracked successfully');
-    } catch (e) {
-      log('❌ Error tracking profile view: $e');
+    } on FirebaseException catch (e) {
+      log('❌ Firebase error tracking profile view: ${e.code} - ${e.message}');
+    } on Object catch (e) {
+      log('❌ Unexpected error tracking profile view: $e');
     }
   }
 
@@ -56,8 +59,10 @@ class ProfileAnalyticsService {
       await _updateProfileLikeCount(profileId);
 
       log('✅ Profile like tracked successfully');
-    } catch (e) {
-      log('❌ Error tracking profile like: $e');
+    } on FirebaseException catch (e) {
+      log('❌ Firebase error tracking profile like: ${e.code} - ${e.message}');
+    } on Object catch (e) {
+      log('❌ Unexpected error tracking profile like: $e');
     }
   }
 
@@ -75,8 +80,10 @@ class ProfileAnalyticsService {
       });
 
       log('✅ Profile pass tracked successfully');
-    } catch (e) {
-      log('❌ Error tracking profile pass: $e');
+    } on FirebaseException catch (e) {
+      log('❌ Firebase error tracking profile pass: ${e.code} - ${e.message}');
+    } on Object catch (e) {
+      log('❌ Unexpected error tracking profile pass: $e');
     }
   }
 
@@ -94,8 +101,10 @@ class ProfileAnalyticsService {
       });
 
       log('✅ Match tracked successfully');
-    } catch (e) {
-      log('❌ Error tracking match: $e');
+    } on FirebaseException catch (e) {
+      log('❌ Firebase error tracking match: ${e.code} - ${e.message}');
+    } on Object catch (e) {
+      log('❌ Unexpected error tracking match: $e');
     }
   }
 
@@ -118,8 +127,12 @@ class ProfileAnalyticsService {
       });
 
       log('✅ Message sent tracked successfully');
-    } catch (e) {
-      log('❌ Error tracking message sent: $e');
+    } on FirebaseException catch (e) {
+      log(
+        '❌ Firebase error tracking message sent: ${e.code} - ${e.message}',
+      );
+    } on Object catch (e) {
+      log('❌ Unexpected error tracking message sent: $e');
     }
   }
 
@@ -137,8 +150,10 @@ class ProfileAnalyticsService {
       });
 
       log('✅ Profile edit tracked successfully');
-    } catch (e) {
-      log('❌ Error tracking profile edit: $e');
+    } on FirebaseException catch (e) {
+      log('❌ Firebase error tracking profile edit: ${e.code} - ${e.message}');
+    } on Object catch (e) {
+      log('❌ Unexpected error tracking profile edit: $e');
     }
   }
 
@@ -216,8 +231,24 @@ class ProfileAnalyticsService {
 
       log('✅ Profile analytics retrieved successfully');
       return analytics;
-    } catch (e) {
-      log('❌ Error getting profile analytics: $e');
+    } on FirebaseException catch (e) {
+      log(
+        '❌ Firebase error getting profile analytics: ${e.code} - ${e.message}',
+      );
+      return ProfileAnalytics(
+        userId: userId,
+        totalViews: 0,
+        totalLikes: 0,
+        totalPasses: 0,
+        totalMatches: 0,
+        likeRate: 0,
+        matchRate: 0,
+        dailyAnalytics: [],
+        demographicAnalytics: DemographicAnalytics.empty(),
+        lastUpdated: DateTime.now(),
+      );
+    } on Object catch (e) {
+      log('❌ Unexpected error getting profile analytics: $e');
       return ProfileAnalytics(
         userId: userId,
         totalViews: 0,
@@ -278,8 +309,13 @@ class ProfileAnalyticsService {
       }
 
       return last30Days;
-    } catch (e) {
-      log('❌ Error getting daily analytics: $e');
+    } on FirebaseException catch (e) {
+      log(
+        '❌ Firebase error getting daily analytics: ${e.code} - ${e.message}',
+      );
+      return [];
+    } on Object catch (e) {
+      log('❌ Unexpected error getting daily analytics: $e');
       return [];
     }
   }
@@ -333,8 +369,13 @@ class ProfileAnalyticsService {
         genderGroups: genderGroups,
         locationGroups: locationGroups,
       );
-    } catch (e) {
-      log('❌ Error getting demographic analytics: $e');
+    } on FirebaseException catch (e) {
+      log(
+        '❌ Firebase error getting demographic analytics: ${e.code} - ${e.message}',
+      );
+      return DemographicAnalytics.empty();
+    } on Object catch (e) {
+      log('❌ Unexpected error getting demographic analytics: $e');
       return DemographicAnalytics.empty();
     }
   }
@@ -355,8 +396,12 @@ class ProfileAnalyticsService {
         'viewCount': FieldValue.increment(1),
         'lastViewedAt': FieldValue.serverTimestamp(),
       });
-    } catch (e) {
-      log('❌ Error updating profile view count: $e');
+    } on FirebaseException catch (e) {
+      log(
+        '❌ Firebase error updating profile view count: ${e.code} - ${e.message}',
+      );
+    } on Object catch (e) {
+      log('❌ Unexpected error updating profile view count: $e');
     }
   }
 
@@ -367,8 +412,12 @@ class ProfileAnalyticsService {
         'likeCount': FieldValue.increment(1),
         'lastLikedAt': FieldValue.serverTimestamp(),
       });
-    } catch (e) {
-      log('❌ Error updating profile like count: $e');
+    } on FirebaseException catch (e) {
+      log(
+        '❌ Firebase error updating profile like count: ${e.code} - ${e.message}',
+      );
+    } on Object catch (e) {
+      log('❌ Unexpected error updating profile like count: $e');
     }
   }
 
@@ -416,8 +465,19 @@ class ProfileAnalyticsService {
         dailyActiveUsers: activeUsers,
         lastUpdated: DateTime.now(),
       );
-    } catch (e) {
-      log('❌ Error getting app analytics: $e');
+    } on FirebaseException catch (e) {
+      log(
+        '❌ Firebase error getting app analytics: ${e.code} - ${e.message}',
+      );
+      return AppAnalytics(
+        totalUsers: 0,
+        totalMatches: 0,
+        totalMessages: 0,
+        dailyActiveUsers: 0,
+        lastUpdated: DateTime.now(),
+      );
+    } on Object catch (e) {
+      log('❌ Unexpected error getting app analytics: $e');
       return AppAnalytics(
         totalUsers: 0,
         totalMatches: 0,
@@ -451,8 +511,13 @@ class ProfileAnalyticsService {
       score += 0.2 * analytics.likeRate / 100;
 
       return score.clamp(0.0, 1.0);
-    } catch (e) {
-      log('❌ Error calculating engagement score: $e');
+    } on FirebaseException catch (e) {
+      log(
+        '❌ Firebase error calculating engagement score: ${e.code} - ${e.message}',
+      );
+      return 0.0;
+    } on Object catch (e) {
+      log('❌ Unexpected error calculating engagement score: $e');
       return 0.0;
     }
   }
@@ -496,8 +561,13 @@ class ProfileAnalyticsService {
       }
 
       return completedFields / totalFields;
-    } catch (e) {
-      log('❌ Error calculating profile completeness: $e');
+    } on FirebaseException catch (e) {
+      log(
+        '❌ Firebase error calculating profile completeness: ${e.code} - ${e.message}',
+      );
+      return 0.0;
+    } on Object catch (e) {
+      log('❌ Unexpected error calculating profile completeness: $e');
       return 0.0;
     }
   }
@@ -518,8 +588,13 @@ class ProfileAnalyticsService {
 
       // Normalize activity score (0-1)
       return (activityCount / 20).clamp(0.0, 1.0); // 20 activities = 1.0 score
-    } catch (e) {
-      log('❌ Error calculating activity level: $e');
+    } on FirebaseException catch (e) {
+      log(
+        '❌ Firebase error calculating activity level: ${e.code} - ${e.message}',
+      );
+      return 0.0;
+    } on Object catch (e) {
+      log('❌ Unexpected error calculating activity level: $e');
       return 0.0;
     }
   }

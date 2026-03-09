@@ -287,15 +287,19 @@ void main() {
       // Test tag filtering logic (this would be in the BLoC)
       final eventTags =
           eventWithMatchingTags.tags.map((tag) => tag.toLowerCase()).toList();
-      final hasMatchingTag = tagFilter.tags!.any((filterTag) => eventTags
-          .any((eventTag) => eventTag.contains(filterTag.toLowerCase())),);
+      final hasMatchingTag = tagFilter.tags!.any(
+        (filterTag) => eventTags
+            .any((eventTag) => eventTag.contains(filterTag.toLowerCase())),
+      );
       expect(hasMatchingTag, isTrue);
 
       final eventTags2 = eventWithoutMatchingTags.tags
           .map((tag) => tag.toLowerCase())
           .toList();
-      final hasMatchingTag2 = tagFilter.tags!.any((filterTag) => eventTags2
-          .any((eventTag) => eventTag.contains(filterTag.toLowerCase())),);
+      final hasMatchingTag2 = tagFilter.tags!.any(
+        (filterTag) => eventTags2
+            .any((eventTag) => eventTag.contains(filterTag.toLowerCase())),
+      );
       expect(hasMatchingTag2, isFalse);
     });
   });

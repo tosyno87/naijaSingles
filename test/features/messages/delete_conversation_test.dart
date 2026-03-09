@@ -1,90 +1,111 @@
+import 'package:fake_cloud_firestore/fake_cloud_firestore.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 void main() {
+  late FakeFirebaseFirestore fakeFirestore;
+
+  setUp(() {
+    fakeFirestore = FakeFirebaseFirestore();
+  });
+
   group('Delete Conversation Tests', () {
-    test('should remove match records from all collections', () {
-      // Test that conversation deletion removes all related data
-      final conversationData = {
-        'messages': ['message1', 'message2', 'message3'],
-        'participants': ['user1', 'user2'],
-        'match_record': 'match123',
-        'created_at': DateTime.now().toIso8601String(),
-      };
+    test('deleting a thread document removes it from Firestore', () async {
+      final threadRef = fakeFirestore.collection('chatThreads').doc('thread1');
 
-      // Verify conversation data exists
-      expect(conversationData['messages'], isNotEmpty);
-      expect(conversationData['participants'], isNotEmpty);
-      expect(conversationData['match_record'], isNotEmpty);
+      await threadRef.set({
+        'userIds': ['user1', 'user2'],
+        'lastMessage': 'Hello',
+        'lastTimestamp': DateTime.now().toIso8601String(),
+      });
 
-      // Simulate deletion process
-      final deletedData = {
-        'messages': <String>[],
-        'participants': <String>[],
-        'match_record': null,
-        'deleted_at': DateTime.now().toIso8601String(),
-      };
+      var doc = await threadRef.get();
+      expect(doc.exists, isTrue);
 
-      // Verify deletion
-      expect(deletedData['messages'], isEmpty);
-      expect(deletedData['participants'], isEmpty);
-      expect(deletedData['match_record'], isNull);
-      expect(deletedData['deleted_at'], isNotEmpty);
+      await threadRef.delete();
+
+      doc = await threadRef.get();
+      expect(doc.exists, isFalse);
     });
 
-    test('should handle conversation deletion gracefully', () {
-      // Test error handling for conversation deletion
-      final testCases = [
-        {'conversation_id': 'conv1', 'should_succeed': true},
-        {'conversation_id': 'conv2', 'should_succeed': true},
-        {'conversation_id': null, 'should_succeed': false},
-        {'conversation_id': '', 'should_succeed': false},
-      ];
+    test('deleting a thread does not affect other threads', () async {
+      final threads = fakeFirestore.collection('chatThreads');
 
-      for (final testCase in testCases) {
-        final conversationId = testCase['conversation_id'] as String?;
-        final shouldSucceed = testCase['should_succeed'] as bool;
+      await threads.doc('thread1').set({
+        'userIds': ['user1', 'user2'],
+        'lastMessage': 'Hey',
+      });
+      await threads.doc('thread2').set({
+        'userIds': ['user1', 'user3'],
+        'lastMessage': 'Hi there',
+      });
 
-        if (conversationId != null && conversationId.isNotEmpty) {
-          expect(shouldSucceed, isTrue);
-          expect(conversationId, isNotEmpty);
-        } else {
-          expect(shouldSucceed, isFalse);
-        }
-      }
+      await threads.doc('thread1').delete();
+
+      final remaining = await threads.get();
+      expect(remaining.docs.length, equals(1));
+      expect(remaining.docs.first.id, equals('thread2'));
     });
 
-    test('should notify participants of conversation deletion', () {
-      // Test that participants are notified when conversation is deleted
-      final participants = ['user1', 'user2'];
-      final notificationData = {
-        'type': 'conversation_deleted',
-        'participants': participants,
-        'timestamp': DateTime.now().toIso8601String(),
-      };
+    test('batch delete removes thread and associated match record', () async {
+      await fakeFirestore.collection('chatThreads').doc('thread1').set({
+        'userIds': ['user1', 'user2'],
+        'lastMessage': 'Hello',
+      });
+      await fakeFirestore.collection('matches').doc('match1').set({
+        'users': ['user1', 'user2'],
+        'matchedAt': DateTime.now().toIso8601String(),
+      });
 
-      expect(notificationData['type'], equals('conversation_deleted'));
-      expect(notificationData['participants'], equals(participants));
-      expect(notificationData['timestamp'], isNotEmpty);
+      final batch = fakeFirestore.batch();
+      batch.delete(fakeFirestore.collection('chatThreads').doc('thread1'));
+      batch.delete(fakeFirestore.collection('matches').doc('match1'));
+      await batch.commit();
+
+      final threadDoc =
+          await fakeFirestore.collection('chatThreads').doc('thread1').get();
+      final matchDoc =
+          await fakeFirestore.collection('matches').doc('match1').get();
+
+      expect(threadDoc.exists, isFalse);
+      expect(matchDoc.exists, isFalse);
     });
 
-    test('should clean up related media files', () {
-      // Test that media files are cleaned up when conversation is deleted
-      final mediaFiles = [
-        'image1.jpg',
-        'image2.png',
-        'video1.mp4',
-        'audio1.m4a',
-      ];
+    test('soft-clearing a chat with clearedAt does not remove the document',
+        () async {
+      final threadRef = fakeFirestore.collection('chatThreads').doc('thread1');
 
-      final cleanupResult = {
-        'files_deleted': mediaFiles.length,
-        'files_failed': 0,
-        'total_size_freed': '15.2 MB',
-      };
+      await threadRef.set({
+        'userIds': ['user1', 'user2'],
+        'lastMessage': 'Hey',
+      });
 
-      expect(cleanupResult['files_deleted'], equals(mediaFiles.length));
-      expect(cleanupResult['files_failed'], equals(0));
-      expect(cleanupResult['total_size_freed'], isNotEmpty);
+      await threadRef.update({
+        'clearedAt.user1': DateTime.now().toIso8601String(),
+      });
+
+      final doc = await threadRef.get();
+      expect(doc.exists, isTrue);
+      final data = doc.data()!;
+      expect(data['clearedAt'], isA<Map>());
+      expect((data['clearedAt'] as Map)['user1'], isNotNull);
+    });
+
+    test('clearing chat only affects the clearing user', () async {
+      final threadRef = fakeFirestore.collection('chatThreads').doc('thread1');
+
+      await threadRef.set({
+        'userIds': ['user1', 'user2'],
+        'lastMessage': 'Hey',
+      });
+
+      await threadRef.update({
+        'clearedAt.user1': DateTime.now().toIso8601String(),
+      });
+
+      final doc = await threadRef.get();
+      final clearedAt = doc.data()!['clearedAt'] as Map;
+      expect(clearedAt.containsKey('user1'), isTrue);
+      expect(clearedAt.containsKey('user2'), isFalse);
     });
   });
 }

@@ -1,9 +1,12 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:google_fonts/google_fonts.dart';
 
 import '../../../../../common/constants/app_colors.dart';
+import '../../../../../common/utils/auth_router.dart';
 import '../../../../../common/widgets/afropeep_app_bar.dart';
 import '../../../../../common/widgets/afropeep_primary_button.dart';
 import '../../../../../common/widgets/afropeep_text_field.dart';
@@ -54,8 +57,7 @@ class _EmailLoginScreenState extends State<EmailLoginScreen> {
         child: BlocConsumer<EmailAuthBloc, EmailAuthState>(
           listener: (context, state) {
             if (state is EmailAuthSuccess) {
-              // Navigate to home screen
-              Navigator.pushReplacementNamed(context, '/main_navigation');
+              unawaited(AuthRouter.navigateAfterAuth(context));
             } else if (state is EmailAuthError) {
               CustomSnackbar.showSnackBarSimple(
                 state.error,
@@ -159,11 +161,13 @@ class _EmailLoginScreenState extends State<EmailLoginScreen> {
                           alignment: Alignment.centerRight,
                           child: TextButton(
                             onPressed: () {
-                              Navigator.push(
-                                context,
-                                MaterialPageRoute(
-                                  builder: (context) =>
-                                      const EmailPasswordResetScreen(),
+                              unawaited(
+                                Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                    builder: (context) =>
+                                        const EmailPasswordResetScreen(),
+                                  ),
                                 ),
                               );
                             },
@@ -216,11 +220,13 @@ class _EmailLoginScreenState extends State<EmailLoginScreen> {
                             ),
                             GestureDetector(
                               onTap: () {
-                                Navigator.push(
-                                  context,
-                                  MaterialPageRoute(
-                                    builder: (context) =>
-                                        const AuthMethodSelectionScreen(),
+                                unawaited(
+                                  Navigator.push(
+                                    context,
+                                    MaterialPageRoute(
+                                      builder: (context) =>
+                                          const AuthMethodSelectionScreen(),
+                                    ),
                                   ),
                                 );
                               },

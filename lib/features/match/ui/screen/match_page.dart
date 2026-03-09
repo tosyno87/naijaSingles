@@ -21,7 +21,7 @@ class MatchScreenState extends State<MatchScreen> {
   final ScrollController _scrollController = ScrollController();
   @override
   void initState() {
-    currentUser = context.read<UserBloc>().currentUser!;
+    currentUser = context.read<UserBloc>().currentUser;
     super.initState();
   }
 

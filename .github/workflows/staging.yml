@@ -80,7 +80,6 @@ jobs:
             --no-pub \
             --dart-define=FIREBASE_PROJECT_ID=${{ env.FIREBASE_PROJECT_ID || 'naijasingles-dev' }} \
             --dart-define=FLAVOR=staging \
-            --web-renderer html \
             --base-href "/"
 
       - name: Authenticate to Google Cloud

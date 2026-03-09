@@ -1,0 +1,26 @@
+{
+  "experimentId": "baseline",
+  "baselineVariantId": "control",
+  "variantId": "control",
+  "baseline": {
+    "connectToMatchRate": 0.0,
+    "matchToFirstMessageRate": 0.0,
+    "conversationRetention7dRate": 0.0,
+    "responseRate": 0.0,
+    "medianReplyDelayMs": 0,
+    "conversationDepth": 0.0,
+    "sampleSize": 0
+  },
+  "variant": {
+    "connectToMatchRate": 0.0,
+    "matchToFirstMessageRate": 0.0,
+    "conversationRetention7dRate": 0.0,
+    "responseRate": 0.0,
+    "medianReplyDelayMs": 0,
+    "conversationDepth": 0.0,
+    "sampleSize": 0
+  },
+  "guardrails": {
+    "minSampleSize": 200
+  }
+}

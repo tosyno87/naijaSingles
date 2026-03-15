@@ -48,31 +48,24 @@ class DiscoveryService {
       final userId = currentUser.id;
       if (userId == null) return [];
 
-      AppLogger.debug('Starting user discovery for: ${currentUser.name}');
-      AppLogger.debug('Current user ID: $userId');
-      AppLogger.debug('Intent filter: $intentFilter');
-
       final isMigrated = await _migrationService.isUserMigrated(userId);
-      AppLogger.debug('User migration status: $isMigrated');
 
       if (isMigrated) {
-        AppLogger.debug('Using privacy-aware discovery');
         final users = await PrivacyAwareUserSearchRepo.getUserList(
           currentUser,
           intentFilter: intentFilter,
         );
-        AppLogger.debug(
-          'Privacy-aware discovery returned: ${users.length} users',
-        );
+        AppLogger.debug('Discovery returned ${users.length} users');
         return users;
       } else {
-        AppLogger.debug('Using unified discovery (user not migrated)');
         // Use unified discovery service for non-migrated users
-        return await _getUsersForDiscoveryUnified(
+        final users = await _getUsersForDiscoveryUnified(
           currentUser,
           intentFilter: intentFilter,
           forceRefresh: forceRefresh,
         );
+        AppLogger.debug('Discovery (unified) returned ${users.length} users');
+        return users;
       }
     } on FirebaseException catch (e) {
       AppLogger.error(

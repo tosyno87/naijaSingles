@@ -1,3 +1,4 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 
@@ -6,6 +7,7 @@ import '../../utils/app_logger.dart';
 
 abstract class GoogleLoginRepository {
   Future<User?> signInWithGoogle();
+  Future<void> ensureUserDocument(User user);
   Future<AuthCredential?> getGoogleReauthCredential();
 }
 
@@ -24,9 +26,9 @@ class GoogleLoginRepositoryImpl implements GoogleLoginRepository {
       // Begin interactive sign-in process
       final GoogleSignInAccount? googleUser = await _googleSignIn.signIn();
 
-      // If user cancels the sign-in flow, return null
+      // If user cancels the sign-in flow, return null (no throw)
       if (googleUser == null) {
-        throw Exception('Google sign in was canceled by user');
+        return null;
       }
 
       // Obtain auth details from the request
@@ -61,6 +63,32 @@ class GoogleLoginRepositoryImpl implements GoogleLoginRepository {
       }
       // Rethrow the error for the BLoC to handle
       rethrow;
+    }
+  }
+
+  @override
+  Future<void> ensureUserDocument(User user) async {
+    final userRef =
+        firebaseFireStoreInstance.collection('users').doc(user.uid);
+    final doc = await userRef.get();
+    if (doc.exists && doc.data() != null && doc.data()!.isNotEmpty) {
+      await userRef.update({
+        'lastActive': FieldValue.serverTimestamp(),
+        'lastSignIn': FieldValue.serverTimestamp(),
+        'email': user.email,
+        'name': user.displayName ?? '',
+        'photoUrl': user.photoURL ?? '',
+      });
+    } else {
+      await userRef.set({
+        'email': user.email,
+        'name': user.displayName,
+        'photoUrl': user.photoURL,
+        'createdAt': FieldValue.serverTimestamp(),
+        'lastActive': FieldValue.serverTimestamp(),
+        'signInMethod': 'google',
+        'onboardingCompleted': false,
+      });
     }
   }
 

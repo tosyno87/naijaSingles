@@ -672,145 +672,95 @@ class _SettingsScreenState extends State<SettingsScreen> {
 
   void _showDeleteConfirmation() {
     Navigator.pop(context);
-    final controller = TextEditingController();
 
     unawaited(
       showDialog(
         context: context,
-        builder: (dialogContext) => StatefulBuilder(
-          builder: (dialogContext, setDialogState) {
-            final confirmed = controller.text == 'DELETE';
-            return AlertDialog(
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(AppSpacing.cardRadius),
-              ),
-              title: Text(
-                'Final Confirmation',
-                style: GoogleFonts.montserrat(
-                  fontSize: 20,
-                  fontWeight: FontWeight.bold,
-                  color: Colors.red.shade700,
-                ),
-              ),
-              content: Column(
-                mainAxisSize: MainAxisSize.min,
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    'Type "DELETE" to confirm account deletion:',
-                    style: GoogleFonts.montserrat(
-                      fontSize: 16,
-                      color: textSecondary,
-                    ),
+        builder: (dialogContext) => AlertDialog(
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(AppSpacing.cardRadius),
+          ),
+          title: Text(
+            'Final Confirmation',
+            style: GoogleFonts.montserrat(
+              fontSize: 20,
+              fontWeight: FontWeight.bold,
+              color: Colors.red.shade700,
+            ),
+          ),
+          content: Text(
+            'Are you sure? This cannot be undone. All your data will be permanently deleted.',
+            style: GoogleFonts.montserrat(
+              fontSize: 16,
+              color: textSecondary,
+            ),
+          ),
+          actions: [
+            Padding(
+              padding: const EdgeInsets.only(right: AppSpacing.sm),
+              child: TextButton(
+                onPressed: () => Navigator.pop(dialogContext),
+                style: TextButton.styleFrom(
+                  foregroundColor: textSecondary,
+                  shape: RoundedRectangleBorder(
+                    borderRadius:
+                        BorderRadius.circular(AppSpacing.buttonRadius),
                   ),
-                  const SizedBox(height: AppSpacing.buttonRadius),
-                  TextField(
-                    controller: controller,
-                    autofocus: true,
-                    onChanged: (_) => setDialogState(() {}),
-                    style: GoogleFonts.montserrat(
-                      fontSize: 16,
-                      color: textPrimary,
-                    ),
-                    decoration: InputDecoration(
-                      hintText: 'DELETE',
-                      hintStyle: GoogleFonts.montserrat(
-                        fontSize: 16,
-                        color: textSecondary.withValues(alpha: 0.4),
-                      ),
-                      border: OutlineInputBorder(
-                        borderRadius:
-                            BorderRadius.circular(AppSpacing.buttonRadius),
-                        borderSide: BorderSide(color: Colors.red.shade200),
-                      ),
-                      focusedBorder: OutlineInputBorder(
-                        borderRadius:
-                            BorderRadius.circular(AppSpacing.buttonRadius),
-                        borderSide: BorderSide(
-                          color: Colors.red.shade400,
-                          width: 2,
-                        ),
-                      ),
-                      contentPadding: const EdgeInsets.symmetric(
-                        horizontal: AppSpacing.md,
-                        vertical: AppSpacing.buttonRadius,
-                      ),
-                    ),
-                  ),
-                ],
-              ),
-              actions: [
-                Padding(
-                  padding: const EdgeInsets.only(right: AppSpacing.sm),
-                  child: TextButton(
-                    onPressed: () => Navigator.pop(dialogContext),
-                    style: TextButton.styleFrom(
-                      foregroundColor: textSecondary,
-                      shape: RoundedRectangleBorder(
-                        borderRadius:
-                            BorderRadius.circular(AppSpacing.buttonRadius),
-                      ),
-                      padding: const EdgeInsets.symmetric(
-                        horizontal: AppSpacing.md,
-                        vertical: AppSpacing.buttonRadius,
-                      ),
-                    ),
-                    child: Text(
-                      'Cancel',
-                      style: GoogleFonts.montserrat(
-                        fontSize: 14,
-                        fontWeight: FontWeight.w600,
-                        color: textSecondary,
-                      ),
-                    ),
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: AppSpacing.md,
+                    vertical: AppSpacing.buttonRadius,
                   ),
                 ),
-                Padding(
-                  padding: const EdgeInsets.only(left: AppSpacing.sm),
-                  child: ElevatedButton(
-                    onPressed: confirmed
-                        ? () {
-                            Navigator.pop(dialogContext);
-                            unawaited(
-                              Navigator.push(
-                                context,
-                                MaterialPageRoute(
-                                  builder: (_) => const AccountDeletionScreen(),
-                                ),
-                              ),
-                            );
-                          }
-                        : null,
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: Colors.red.shade600,
-                      foregroundColor: Colors.white,
-                      disabledBackgroundColor: Colors.red.shade200,
-                      disabledForegroundColor: Colors.white70,
-                      shape: RoundedRectangleBorder(
-                        borderRadius:
-                            BorderRadius.circular(AppSpacing.buttonRadius),
-                      ),
-                      elevation: confirmed ? 2 : 0,
-                      padding: const EdgeInsets.symmetric(
-                        horizontal: 16,
-                        vertical: 12,
-                      ),
-                      minimumSize: const Size(120, 44),
-                    ),
-                    child: Text(
-                      'Confirm Delete',
-                      style: GoogleFonts.montserrat(
-                        fontSize: 13,
-                        fontWeight: FontWeight.w600,
-                        color: Colors.white,
-                      ),
-                      textAlign: TextAlign.center,
-                    ),
+                child: Text(
+                  'Cancel',
+                  style: GoogleFonts.montserrat(
+                    fontSize: 14,
+                    fontWeight: FontWeight.w600,
+                    color: textSecondary,
                   ),
                 ),
-              ],
-            );
-          },
+              ),
+            ),
+            Padding(
+              padding: const EdgeInsets.only(left: AppSpacing.sm),
+              child: ElevatedButton(
+                onPressed: () {
+                  Navigator.pop(dialogContext);
+                  unawaited(
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (_) => const AccountDeletionScreen(),
+                      ),
+                    ),
+                  );
+                },
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: Colors.red.shade600,
+                  foregroundColor: Colors.white,
+                  shape: RoundedRectangleBorder(
+                    borderRadius:
+                        BorderRadius.circular(AppSpacing.buttonRadius),
+                  ),
+                  elevation: 2,
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 16,
+                    vertical: 12,
+                  ),
+                  minimumSize: const Size(120, 44),
+                ),
+                child: Text(
+                  'Delete my account',
+                  style: GoogleFonts.montserrat(
+                    fontSize: 13,
+                    fontWeight: FontWeight.w600,
+                    color: Colors.white,
+                  ),
+                  textAlign: TextAlign.center,
+                ),
+              ),
+            ),
+          ],
         ),
       ),
     );

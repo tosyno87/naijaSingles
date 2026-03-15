@@ -62,6 +62,8 @@ void main() {
         when(() => repo.getCurrentUser()).thenAnswer((_) async => firebaseUser);
         when(() => firebaseUser.displayName).thenReturn('name');
         when(() => repo.userDetails(any())).thenAnswer((_) async => false);
+        when(() => repo.ensureMinimalUserDocument(firebaseUser))
+            .thenAnswer((_) async {});
         return bloc;
       },
       act: (bloc) => bloc.add(const CheckRegistration(token: 't')),

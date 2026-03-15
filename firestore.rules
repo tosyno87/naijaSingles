@@ -760,13 +760,19 @@ service cloud.firestore {
     }
 
     // Account Deletions collection - for audit logging
+    // Create: client may write pending/aborted with full audit fields once. Update: client may only set status to 'aborted' (no other field changes). completed/deletedAt are server-only.
     match /accountDeletions/{deletionId} {
-      // Users can create their own deletion records
-      allow create: if request.auth != null && 
-                     request.auth.uid == request.resource.data.userId;
-      
-      // Users can read their own deletion records
-      allow read: if request.auth != null && 
+      allow create: if request.auth != null &&
+                      request.auth.uid == deletionId &&
+                      request.resource.data.userId == request.auth.uid &&
+                      request.resource.data.status in ['pending', 'aborted'] &&
+                      !request.resource.data.keys().hasAny(['deletedAt']);
+      allow update: if request.auth != null &&
+                      request.auth.uid == deletionId &&
+                      request.resource.data.diff(resource.data).affectedKeys().hasOnly(['status']) &&
+                      request.resource.data.status == 'aborted' &&
+                      !request.resource.data.keys().hasAny(['deletedAt']);
+      allow read: if request.auth != null &&
                    request.auth.uid == resource.data.userId;
     }
 

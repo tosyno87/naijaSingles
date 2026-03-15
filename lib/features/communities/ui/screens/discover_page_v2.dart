@@ -2,7 +2,6 @@ import 'dart:async';
 import 'dart:developer';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -315,31 +314,6 @@ class _DiscoverPageV2State extends State<DiscoverPageV2> {
   }
 
   // ---------------------------------------------------------------------------
-  // Filter sheet
-  // ---------------------------------------------------------------------------
-
-  void _showFilterSheet() {
-    final user = _currentUser;
-    if (user == null) return;
-
-    unawaited(
-      showModalBottomSheet<void>(
-        context: context,
-        shape: const RoundedRectangleBorder(
-          borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
-        ),
-        builder: (_) => _DiscoverFilterSheet(
-          currentUser: user,
-          onApply: (selectedFilter) async {
-            _currentUser?.lookingFor = selectedFilter;
-            await _loadAll();
-          },
-        ),
-      ),
-    );
-  }
-
-  // ---------------------------------------------------------------------------
   // Build
   // ---------------------------------------------------------------------------
 
@@ -393,38 +367,14 @@ class _DiscoverPageV2State extends State<DiscoverPageV2> {
 
   Widget _buildSubtitleRow() => Padding(
         padding: const EdgeInsets.symmetric(horizontal: AppSpacing.lg),
-        child: Row(
-          children: [
-            Expanded(
-              child: Text(
-                _subtitleText,
-                style: GoogleFonts.montserrat(
-                  fontSize: 16,
-                  fontWeight: FontWeight.w400,
-                  color: AppColors.textSecondary,
-                  height: 1.4,
-                ),
-              ),
-            ),
-            const SizedBox(width: AppSpacing.sm + 4),
-            Material(
-              color: AppColors.primaryGreen.withValues(alpha: 0.08),
-              borderRadius: BorderRadius.circular(AppSpacing.buttonRadius),
-              child: InkWell(
-                onTap: _showFilterSheet,
-                borderRadius: BorderRadius.circular(AppSpacing.buttonRadius),
-                child: const SizedBox(
-                  width: 44,
-                  height: 44,
-                  child: Icon(
-                    Icons.tune_rounded,
-                    size: 20,
-                    color: AppColors.primaryGreen,
-                  ),
-                ),
-              ),
-            ),
-          ],
+        child: Text(
+          _subtitleText,
+          style: GoogleFonts.montserrat(
+            fontSize: 16,
+            fontWeight: FontWeight.w400,
+            color: AppColors.textSecondary,
+            height: 1.4,
+          ),
         ),
       );
 
@@ -985,207 +935,6 @@ class _DiscoverPageV2State extends State<DiscoverPageV2> {
             title: message,
             actionLabel: actionLabel,
             onAction: onAction,
-          ),
-        ),
-      );
-}
-
-// -----------------------------------------------------------------------------
-// Discover filter bottom sheet
-// -----------------------------------------------------------------------------
-
-class _DiscoverFilterSheet extends StatefulWidget {
-  const _DiscoverFilterSheet({
-    required this.currentUser,
-    required this.onApply,
-  });
-
-  final UserModel currentUser;
-  final Future<void> Function(String selectedFilter) onApply;
-
-  @override
-  State<_DiscoverFilterSheet> createState() => _DiscoverFilterSheetState();
-}
-
-class _DiscoverFilterSheetState extends State<_DiscoverFilterSheet> {
-  static const _modes = <String, (String, IconData)>{
-    'Dating': ('Dating & Romance', Icons.favorite_outline),
-    'Friendship': ('Friendship & Social', Icons.people_outline),
-    'Networking': ('Professional Networking', Icons.work_outline),
-    'Mixed': ('All of the Above', Icons.explore_outlined),
-  };
-
-  late String _selected;
-  bool _saving = false;
-
-  @override
-  void initState() {
-    super.initState();
-    _selected = widget.currentUser.lookingFor ?? 'Dating';
-    if (!_modes.containsKey(_selected)) {
-      _selected = 'Dating';
-    }
-  }
-
-  Future<void> _applyFilters() async {
-    final changed = _selected != (widget.currentUser.lookingFor ?? 'Dating');
-    if (!changed) {
-      Navigator.pop(context);
-      return;
-    }
-
-    setState(() => _saving = true);
-
-    try {
-      final uid = FirebaseAuth.instance.currentUser?.uid;
-      if (uid != null) {
-        await FirebaseFirestore.instance
-            .collection('users')
-            .doc(uid)
-            .update({'lookingFor': _selected});
-      }
-      if (!mounted) return;
-      Navigator.pop(context);
-      await widget.onApply(_selected);
-    } on Object catch (e) {
-      log('Error saving filter: $e');
-      if (!mounted) return;
-      setState(() => _saving = false);
-    }
-  }
-
-  @override
-  Widget build(BuildContext context) => SafeArea(
-        child: Padding(
-          padding: const EdgeInsets.fromLTRB(24, 20, 24, 16),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Center(
-                child: Container(
-                  width: 40,
-                  height: 4,
-                  decoration: BoxDecoration(
-                    color: Colors.grey.shade300,
-                    borderRadius: BorderRadius.circular(2),
-                  ),
-                ),
-              ),
-              const SizedBox(height: 16),
-              Text(
-                'What are you looking for?',
-                style: GoogleFonts.montserrat(
-                  fontSize: 20,
-                  fontWeight: FontWeight.w700,
-                  color: AppColors.textPrimary,
-                ),
-              ),
-              const SizedBox(height: 4),
-              Text(
-                'This helps us show you the right people',
-                style: GoogleFonts.montserrat(
-                  fontSize: 14,
-                  color: AppColors.textSecondary,
-                ),
-              ),
-              const SizedBox(height: 20),
-              ..._modes.entries.map((e) {
-                final isSelected = e.key == _selected;
-                return Padding(
-                  padding: const EdgeInsets.only(bottom: 10),
-                  child: Material(
-                    color: isSelected
-                        ? AppColors.primaryGreen.withValues(alpha: 0.08)
-                        : Colors.transparent,
-                    borderRadius: BorderRadius.circular(14),
-                    child: InkWell(
-                      onTap: () => setState(() => _selected = e.key),
-                      borderRadius: BorderRadius.circular(14),
-                      child: Container(
-                        padding: const EdgeInsets.symmetric(
-                          horizontal: 16,
-                          vertical: 14,
-                        ),
-                        decoration: BoxDecoration(
-                          borderRadius: BorderRadius.circular(14),
-                          border: Border.all(
-                            color: isSelected
-                                ? AppColors.primaryGreen
-                                : Colors.grey.shade200,
-                            width: isSelected ? 2 : 1,
-                          ),
-                        ),
-                        child: Row(
-                          children: [
-                            Icon(
-                              e.value.$2,
-                              size: 22,
-                              color: isSelected
-                                  ? AppColors.primaryGreen
-                                  : AppColors.textSecondary,
-                            ),
-                            const SizedBox(width: 12),
-                            Expanded(
-                              child: Text(
-                                e.value.$1,
-                                style: GoogleFonts.montserrat(
-                                  fontSize: 15,
-                                  fontWeight: isSelected
-                                      ? FontWeight.w600
-                                      : FontWeight.w500,
-                                  color: isSelected
-                                      ? AppColors.primaryGreen
-                                      : AppColors.textPrimary,
-                                ),
-                              ),
-                            ),
-                            if (isSelected)
-                              const Icon(
-                                Icons.check_circle,
-                                size: 22,
-                                color: AppColors.primaryGreen,
-                              ),
-                          ],
-                        ),
-                      ),
-                    ),
-                  ),
-                );
-              }),
-              const SizedBox(height: 12),
-              SizedBox(
-                width: double.infinity,
-                height: 52,
-                child: ElevatedButton(
-                  onPressed: _saving ? null : _applyFilters,
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: AppColors.primaryGreen,
-                    foregroundColor: Colors.white,
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(26),
-                    ),
-                    elevation: 0,
-                  ),
-                  child: _saving
-                      ? const SizedBox(
-                          width: 22,
-                          height: 22,
-                          child: CircularProgressIndicator(
-                            strokeWidth: 2.5,
-                            color: Colors.white,
-                          ),
-                        )
-                      : Text(
-                          'Apply',
-                          style: GoogleFonts.montserrat(
-                            fontSize: 16,
-                            fontWeight: FontWeight.w600,
-                          ),
-                        ),
-                ),
-              ),
-            ],
           ),
         ),
       );

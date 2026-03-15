@@ -13,7 +13,6 @@ import '../../common/constants/app_colors.dart';
 import '../../common/constants/constants.dart';
 import '../../common/routes/route_name.dart';
 import '../../common/utils/account_deletion_scope.dart';
-import '../../common/utils/app_logger.dart';
 import '../../common/utils/profile_completion_guard.dart';
 import '../../debug/quick_analysis.dart';
 import '../../models/user_model.dart';
@@ -447,10 +446,6 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
         currentIndex: _validSelectedIndex,
         onTap: (index) {
           _switchToTab(index);
-          AppLogger.debug(
-            '🔄 Tab tapped: index=$index, _selectedIndex=$_selectedIndex, _validSelectedIndex=$_validSelectedIndex',
-          );
-          AppLogger.debug('📱 Pages length: ${_pages.length}');
         },
         backgroundColor: Colors.white,
         selectedItemColor: AppColors.primaryGreen,

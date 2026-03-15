@@ -39,7 +39,7 @@ var __importStar = (this && this.__importStar) || (function () {
     };
 })();
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.seedMatchTuningConfig = exports.healthCheck = exports.aggregateMetrics = exports.validateIngestion = exports.createTestUsers = exports.onUserWritten = exports.onLikeCreated = exports.onSuperLikeCreated = exports.onMessageSent = exports.onMatchCreated = void 0;
+exports.seedMatchTuningConfig = exports.healthCheck = exports.onAuthUserDeleted = exports.aggregateMetrics = exports.validateIngestion = exports.createTestUsers = exports.onUserWritten = exports.onLikeCreated = exports.onSuperLikeCreated = exports.onMessageSent = exports.onMatchCreated = void 0;
 const admin = __importStar(require("firebase-admin"));
 const https_1 = require("firebase-functions/v2/https");
 const matchHandlers_1 = require("./handlers/matchHandlers");
@@ -50,6 +50,8 @@ const discoverabilityHandlers_1 = require("./handlers/discoverabilityHandlers");
 const matchQualityHandlers_1 = require("./handlers/matchQualityHandlers");
 Object.defineProperty(exports, "validateIngestion", { enumerable: true, get: function () { return matchQualityHandlers_1.validateIngestion; } });
 Object.defineProperty(exports, "aggregateMetrics", { enumerable: true, get: function () { return matchQualityHandlers_1.aggregateMetrics; } });
+const authCleanupHandlers_1 = require("./handlers/authCleanupHandlers");
+Object.defineProperty(exports, "onAuthUserDeleted", { enumerable: true, get: function () { return authCleanupHandlers_1.onAuthUserDeleted; } });
 admin.initializeApp();
 const matchHandlers = new matchHandlers_1.MatchHandlers();
 const messageHandlers = new messageHandlers_1.MessageHandlers();

@@ -1,6 +1,7 @@
 import 'dart:developer';
 import 'dart:io';
 
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
 import '../../../common/data/repo/googlelogin_repo.dart';
@@ -27,17 +28,34 @@ class GoogleLoginBloc extends Bloc<GoogleLoginEvents, GoogleLoginStates> {
     try {
       log('Attempting to sign in with Google...');
       final user = await _repository.signInWithGoogle();
-      log('Google sign-in successful: ${user?.displayName}');
+      if (user == null) {
+        log('Google sign-in canceled by user');
+        emit(GoogleLoginInitial());
+        return;
+      }
+      log('Google sign-in successful: ${user.displayName}');
+      await _repository.ensureUserDocument(user);
       emit(GoogleLoginSuccess(user: user));
     } on SocketException {
       log('Google sign-in failed: No Internet Connection');
       emit(const GoogleLoginFailed(message: 'No Internet Connection'));
+    } on FirebaseAuthException catch (e) {
+      log('Google sign-in failed: ${e.code} ${e.message}');
+      final message = e.code == 'account-exists-with-different-credential'
+          ? 'An account already exists with the same email but different sign-in method.'
+          : (e.message ?? 'Sign in failed. Please try again.');
+      emit(GoogleLoginFailed(message: message));
     } on Object catch (e) {
-      log('Google sign-in failed: ${e.toString()}');
-      final errorMessage = e.toString().contains('Exception:')
-          ? e.toString().split('Exception:').last.trim()
-          : e.toString();
-      emit(GoogleLoginFailed(message: errorMessage));
+      final msg = e.toString();
+      if (msg.contains('canceled by user') || msg.contains('was canceled')) {
+        log('Google sign-in canceled by user');
+        emit(GoogleLoginInitial());
+        return;
+      }
+      log('Google sign-in failed: $msg');
+      // User-friendly message for credential/reconciliation/network errors
+      emit(const GoogleLoginFailed(
+          message: 'Could not complete sign in. Please try again.'));
     }
   }
 

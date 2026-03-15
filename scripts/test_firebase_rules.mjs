@@ -1332,22 +1332,70 @@ async function run() {
     pass('userSettings: non-owner cannot write settings');
 
     // ── accountDeletions collection ─────────────────────────────────────────
+    // Create: doc id must equal auth.uid, userId must match, status in ['pending','aborted'], no deletedAt.
+    // Update: only status -> 'aborted' allowed (affectedKeys hasOnly ['status']); completed/deletedAt server-only.
+
+    await assertSucceeds(
+      setDoc(doc(userADb, 'accountDeletions/userA'), {
+        userId: 'userA',
+        reason: 'Testing',
+        status: 'pending',
+      }),
+    );
+    pass('accountDeletions: user can create own record with status pending');
 
     await assertSucceeds(
       setDoc(doc(userADb, 'accountDeletions/del_new'), {
         userId: 'userA',
         reason: 'Testing',
+        status: 'aborted',
       }),
     );
-    pass('accountDeletions: user can create own deletion record');
+    pass('accountDeletions: user can create own record with status aborted');
 
     await assertFails(
       setDoc(doc(userADb, 'accountDeletions/del_spoof'), {
         userId: 'userB',
         reason: 'Spoofed',
+        status: 'pending',
       }),
     );
-    pass('accountDeletions: cannot create deletion with spoofed userId');
+    pass('accountDeletions: cannot create with spoofed userId');
+
+    await assertFails(
+      setDoc(doc(userADb, 'accountDeletions/del_completed'), {
+        userId: 'userA',
+        status: 'completed',
+      }),
+    );
+    pass('accountDeletions: cannot create with status completed (server-only)');
+
+    await assertFails(
+      setDoc(doc(userADb, 'accountDeletions/del_with_ts'), {
+        userId: 'userA',
+        status: 'pending',
+        deletedAt: new Date(),
+      }),
+    );
+    pass('accountDeletions: cannot create with deletedAt (server-only)');
+
+    await assertSucceeds(
+      updateDoc(doc(userADb, 'accountDeletions/del_a'), { status: 'aborted' }),
+    );
+    pass('accountDeletions: user can update own record to status aborted only');
+
+    await assertFails(
+      updateDoc(doc(userADb, 'accountDeletions/del_a'), {
+        status: 'aborted',
+        reason: 'Changed',
+      }),
+    );
+    pass('accountDeletions: cannot update any field other than status to aborted');
+
+    await assertFails(
+      updateDoc(doc(userADb, 'accountDeletions/del_a'), { status: 'completed' }),
+    );
+    pass('accountDeletions: cannot update to status completed (server-only)');
 
     await assertSucceeds(getDoc(doc(userADb, 'accountDeletions/del_a')));
     pass('accountDeletions: user can read own deletion record');

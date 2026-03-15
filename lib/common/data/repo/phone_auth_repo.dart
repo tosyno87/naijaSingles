@@ -227,6 +227,21 @@ class PhoneAuthRepository {
     }
   }
 
+  /// Creates a minimal users/{uid} document for new phone users so AuthRouter can route.
+  /// Call before navigating after NewRegistration. Throws on failure.
+  Future<void> ensureMinimalUserDocument(User user) async {
+    final rawPhone = user.phoneNumber ?? '';
+    final phoneDigits = _normalizePhoneToDigits(rawPhone);
+    await firebaseFireStoreInstance.collection('users').doc(user.uid).set({
+      'userId': user.uid,
+      'phoneNumber': phoneDigits.isNotEmpty ? phoneDigits : rawPhone,
+      'onboardingCompleted': false,
+      'createdAt': FieldValue.serverTimestamp(),
+      'lastActive': FieldValue.serverTimestamp(),
+      'signInMethod': 'phone',
+    }, SetOptions(merge: true));
+  }
+
   Future<bool> userDetails(String userId) async {
     try {
       // Try direct document access first (faster and more reliable)

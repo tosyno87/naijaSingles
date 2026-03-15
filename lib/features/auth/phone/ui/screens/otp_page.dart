@@ -15,7 +15,7 @@ import 'package:pin_code_fields/pin_code_fields.dart';
 import '../../../../../common/bloc/user/user_bloc.dart';
 import '../../../../../common/data/repo/phone_auth_repo.dart';
 import '../../../../../common/routes/route_name.dart';
-import '../../../../../common/utils/profile_completion_guard.dart';
+import '../../../../../common/utils/auth_router.dart';
 import '../../../../../common/widgets/custom_snackbar.dart';
 import '../../../../../common/widgets/hookup_circularbar.dart';
 import '../../../auth_status/bloc/authstatus_bloc.dart';
@@ -313,122 +313,47 @@ class _OtpPageState extends State<OtpPage> {
                         }
 
                         if (state is AlreadyRegistered) {
-                          log('');
-                          log('═══════════════════════════════════════════════════════');
                           log('✅ REGISTRATION CHECK: User Already Registered');
-                          log('═══════════════════════════════════════════════════════');
-                          log('User ID: ${state.user.id ?? "Unknown"}');
-                          log('Name: ${state.user.name ?? "No name"}');
-                          log('Is Login Flow: ${widget.isLogin}');
-                          log('Is Sign-In: ${widget.isLogin}');
-                          log('═══════════════════════════════════════════════════════');
-                          log('');
-
                           // Sign-up flow with a number already registered = prevent duplicate account
                           if (!widget.isLogin) {
                             log('❌ Sign-up with already-registered number - block duplicate account');
-                            if (!_hasNavigated && context.mounted) {
-                              _hasNavigated = true;
-                              CustomSnackbar.showSnackBarSimple(
-                                'This phone number is already registered. Please sign in instead.',
-                                context,
-                              );
-                              context.read<AuthstatusBloc>().add(LogoutEvent());
-                              unawaited(
-                                Future.microtask(() {
-                                  if (context.mounted) {
-                                    Navigator.pop(context);
-                                  }
-                                }),
-                              );
-                            }
+                            _hasNavigated = true;
+                            CustomSnackbar.showSnackBarSimple(
+                              'This phone number is already registered. Please sign in instead.',
+                              context,
+                            );
+                            context.read<AuthstatusBloc>().add(LogoutEvent());
+                            unawaited(
+                              Future.microtask(() {
+                                if (context.mounted) {
+                                  Navigator.pop(context);
+                                }
+                              }),
+                            );
                             return;
                           }
-
-                          // Double-check that user actually has a complete profile
-                          if (!ProfileCompletionGuard.isUserComplete(
-                            state.user,
-                          )) {
-                            log('⚠️ User marked as registered but profile is incomplete - treating as new registration');
-                            if (!_hasNavigated && context.mounted) {
-                              _hasNavigated = true;
-                              log('✅ Redirecting to onboarding for incomplete profile');
-                              unawaited(
-                                Future.microtask(() async {
-                                  if (context.mounted) {
-                                    await Navigator.of(context)
-                                        .pushNamedAndRemoveUntil(
-                                      RouteName.onboarding,
-                                      (route) => false,
-                                    );
-                                  }
-                                }),
-                              );
-                            }
-                            return;
-                          }
-
-                          // Only proceed to main navigation if this is a LOGIN flow AND user has complete profile
                           _hasNavigated = true;
-                          context
-                              .read<UserBloc>()
-                              .add(UserDataUpdated(state.user));
-
-                          unawaited(
-                            Future.microtask(() async {
-                              if (!context.mounted) return;
-
-                              log('✅ Navigating to main navigation for existing user login');
-                              await Navigator.of(context)
-                                  .pushNamedAndRemoveUntil(
-                                RouteName.mainNavigation,
-                                (route) => false,
-                              );
-                            }),
-                          );
+                          context.read<UserBloc>().add(UserDataUpdated(state.user));
+                          unawaited(AuthRouter.navigateAfterAuth(context));
                         } else if (state is NewRegistration) {
-                          log('');
-                          log('═══════════════════════════════════════════════════════');
                           log('📝 REGISTRATION CHECK: New User Registration');
-                          log('═══════════════════════════════════════════════════════');
-                          log('Is Login Flow: ${widget.isLogin}');
-                          log('═══════════════════════════════════════════════════════');
-                          log('');
-
                           if (widget.isLogin) {
-                            // If trying to login with a number that doesn't have an account
-                            if (!_hasNavigated && context.mounted) {
-                              _hasNavigated = true;
-                              CustomSnackbar.showSnackBarSimple(
-                                'No account found with this phone number. Please sign up first.',
-                                context,
-                              );
-                              unawaited(
-                                Future.microtask(() {
-                                  if (context.mounted) {
-                                    Navigator.pop(context);
-                                  }
-                                }),
-                              );
-                            }
-                          } else {
-                            // New user sign-up - navigate to onboarding to create profile
-                            if (!_hasNavigated && context.mounted) {
-                              _hasNavigated = true;
-                              log('✅ Navigating to onboarding for new user');
-                              unawaited(
-                                Future.microtask(() async {
-                                  if (context.mounted) {
-                                    await Navigator.of(context)
-                                        .pushNamedAndRemoveUntil(
-                                      RouteName.onboarding,
-                                      (route) => false,
-                                    );
-                                  }
-                                }),
-                              );
-                            }
+                            _hasNavigated = true;
+                            CustomSnackbar.showSnackBarSimple(
+                              'No account found with this phone number. Please sign up first.',
+                              context,
+                            );
+                            unawaited(
+                              Future.microtask(() {
+                                if (context.mounted) {
+                                  Navigator.pop(context);
+                                }
+                              }),
+                            );
+                            return;
                           }
+                          _hasNavigated = true;
+                          unawaited(AuthRouter.navigateAfterAuth(context));
                         } else if (state is RegistrationFailed) {
                           if (!context.mounted) return;
                           ScaffoldMessenger.of(context).showSnackBar(

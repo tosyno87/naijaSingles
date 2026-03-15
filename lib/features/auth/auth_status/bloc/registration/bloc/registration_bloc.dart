@@ -64,11 +64,16 @@ class RegistrationBloc extends Bloc<RegistrationEvents, RegistrationStates> {
                 log('✅ User already registered with complete profile: ${usr.name}');
                 emit(AlreadyRegistered(user: usr));
               } else {
-                // User document exists but profile is incomplete - treat as new registration
-                // This ensures users complete onboarding even if document exists
+                // User document exists but profile is incomplete - ensure minimal doc then treat as new registration
                 log('⚠️ User document exists but profile is incomplete - treating as new registration');
-                log('⚠️ Redirecting to onboarding to complete profile');
-                emit(NewRegistration(token: event.token, user: user));
+                try {
+                  await phoneAuthRepository.ensureMinimalUserDocument(user);
+                  emit(NewRegistration(token: event.token, user: user));
+                } on Object catch (e) {
+                  log('❌ Failed to ensure minimal user doc: $e');
+                  emit(const RegistrationFailed(
+                      message: 'Could not set up your account. Please try again.'));
+                }
               }
             } on Object catch (getUserError) {
               log('❌ Error getting user data: $getUserError');
@@ -78,7 +83,14 @@ class RegistrationBloc extends Bloc<RegistrationEvents, RegistrationStates> {
               // there might be a data inconsistency
               // In this case, treat as new registration to allow onboarding
               log('⚠️ User document exists but cannot retrieve data - treating as new registration');
-              emit(NewRegistration(token: event.token, user: user));
+              try {
+                await phoneAuthRepository.ensureMinimalUserDocument(user);
+                emit(NewRegistration(token: event.token, user: user));
+              } on Object catch (e) {
+                log('❌ Failed to ensure minimal user doc: $e');
+                emit(const RegistrationFailed(
+                    message: 'Could not set up your account. Please try again.'));
+              }
             }
           } else {
             log('📝 User not found in database - new registration');
@@ -134,7 +146,14 @@ class RegistrationBloc extends Bloc<RegistrationEvents, RegistrationStates> {
                   return;
                 }
               }
-              emit(NewRegistration(token: event.token, user: user));
+              try {
+                await phoneAuthRepository.ensureMinimalUserDocument(user);
+                emit(NewRegistration(token: event.token, user: user));
+              } on Object catch (e) {
+                log('❌ Failed to ensure minimal user doc: $e');
+                emit(const RegistrationFailed(
+                    message: 'Could not set up your account. Please try again.'));
+              }
             } else {
               emit(
                 const RegistrationFailed(

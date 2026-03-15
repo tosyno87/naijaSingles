@@ -1,5 +1,4 @@
 import 'dart:async';
-import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -27,7 +26,6 @@ class SignInMethodSelectionScreen extends StatelessWidget {
     );
 
     const Color googleBlue = Color(0xFF4285F4);
-    const Color appleBlack = Color(0xFF000000);
 
     final screenWidth = MediaQuery.of(context).size.width;
     final buttonWidth = screenWidth * 0.80;
@@ -133,28 +131,6 @@ class SignInMethodSelectionScreen extends StatelessWidget {
                   ),
 
                   const SizedBox(height: 32),
-
-                  if (Platform.isIOS) ...[
-                    Center(
-                      child: SizedBox(
-                        width: buttonWidth,
-                        child: AfropeepPrimaryButton(
-                          icon: Icons.apple,
-                          text: 'Continue with Apple',
-                          backgroundColor: appleBlack,
-                          textColor: Colors.white,
-                          variant: AuthButtonVariant.secondary,
-                          onPressed: () {
-                            CustomSnackbar.showSnackBarSimple(
-                              'Apple Sign In will be implemented soon',
-                              context,
-                            );
-                          },
-                        ),
-                      ),
-                    ),
-                    const SizedBox(height: 12),
-                  ],
 
                   Center(
                     child: SizedBox(

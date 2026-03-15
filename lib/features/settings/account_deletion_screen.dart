@@ -64,6 +64,7 @@ class _AccountDeletionScreenState extends State<AccountDeletionScreen> {
 
   @override
   void dispose() {
+    _passwordController.removeListener(_onPasswordChanged);
     _passwordController.dispose();
     _reasonController.dispose();
     _reauthOtpController.dispose();
@@ -73,10 +74,16 @@ class _AccountDeletionScreenState extends State<AccountDeletionScreen> {
   @override
   void initState() {
     super.initState();
+    // React to password input so delete button enables as user types (AFR-21)
+    _passwordController.addListener(_onPasswordChanged);
     // Check auth provider after the first frame to ensure state is ready
     WidgetsBinding.instance.addPostFrameCallback((_) {
       _checkAuthProvider();
     });
+  }
+
+  void _onPasswordChanged() {
+    if (mounted) setState(() {});
   }
 
   void _checkAuthProvider() {
@@ -790,14 +797,20 @@ class _AccountDeletionScreenState extends State<AccountDeletionScreen> {
         '📱 Delete account: isPhoneUser=$isPhoneUser, isEmailUser=$isEmailUser, isGoogleUser=$isGoogleUser',
       );
 
-      // Re-authenticate based on auth provider. Order is critical: cleanup Firestore/Storage
-      // while user is still authenticated, then delete Auth user, then sign out and show success.
+      // Write audit pending first (while still authenticated); then delete Auth; CF sets completed and cleans up.
       if (isPhoneUser) {
-        log('📱 Phone user - cleanup then delete');
+        log('📱 Phone user - audit pending, then delete');
         AccountDeletionScope.inProgress = true;
         try {
-          await _cleanupUserData(user);
-          _logDeletionAndSignOut(user, authProvider: 'phone');
+          final uid = user.uid;
+          final email = user.email;
+          final phoneNumber = user.phoneNumber;
+          await _writeAuditRecordPending(
+            userId: uid,
+            authProvider: 'phone',
+            email: email,
+            phoneNumber: phoneNumber,
+          );
           await user.delete();
           await _auth.signOut();
           if (mounted) _showDeletionSuccessDialog();
@@ -811,10 +824,11 @@ class _AccountDeletionScreenState extends State<AccountDeletionScreen> {
             return;
           }
           AccountDeletionScope.inProgress = false;
+          await _writeAuditRecordAborted(user.uid);
           rethrow;
         }
       } else if (isEmailUser && user.email != null) {
-        log('📧 Email user - reauth, cleanup, then delete');
+        log('📧 Email user - reauth, audit pending, then delete');
         AccountDeletionScope.inProgress = true;
         try {
           final credential = EmailAuthProvider.credential(
@@ -822,22 +836,37 @@ class _AccountDeletionScreenState extends State<AccountDeletionScreen> {
             password: _passwordController.text,
           );
           await user.reauthenticateWithCredential(credential);
-          await _cleanupUserData(user);
-          _logDeletionAndSignOut(user, authProvider: 'email');
+          final uid = user.uid;
+          final email = user.email;
+          final phoneNumber = user.phoneNumber;
+          await _writeAuditRecordPending(
+            userId: uid,
+            authProvider: 'email',
+            email: email,
+            phoneNumber: phoneNumber,
+          );
           await user.delete();
           await _auth.signOut();
           if (mounted) _showDeletionSuccessDialog();
           return;
         } on Object catch (_) {
           AccountDeletionScope.inProgress = false;
+          await _writeAuditRecordAborted(user.uid);
           rethrow;
         }
       } else {
-        log('🔐 Other auth provider - cleanup then delete');
+        log('🔐 Other auth provider - audit pending, then delete');
         AccountDeletionScope.inProgress = true;
         try {
-          await _cleanupUserData(user);
-          _logDeletionAndSignOut(user, authProvider: 'other');
+          final uid = user.uid;
+          final email = user.email;
+          final phoneNumber = user.phoneNumber;
+          await _writeAuditRecordPending(
+            userId: uid,
+            authProvider: 'other',
+            email: email,
+            phoneNumber: phoneNumber,
+          );
           await user.delete();
           await _auth.signOut();
           if (mounted) _showDeletionSuccessDialog();
@@ -851,6 +880,7 @@ class _AccountDeletionScreenState extends State<AccountDeletionScreen> {
 
             AccountDeletionScope.inProgress = false;
             setState(() => _isDeleting = false);
+            await _writeAuditRecordAborted(user.uid);
             if (mounted) {
               _showSnackBar(
                 'For security, please sign out and sign back in, then return to Delete Account to try again.',
@@ -887,11 +917,14 @@ class _AccountDeletionScreenState extends State<AccountDeletionScreen> {
             return;
           }
           AccountDeletionScope.inProgress = false;
+          await _writeAuditRecordAborted(user.uid);
           rethrow;
         }
       }
     } on Object catch (e) {
       AccountDeletionScope.inProgress = false;
+      final uid = _auth.currentUser?.uid;
+      if (uid != null) await _writeAuditRecordAborted(uid);
       log('❌ Error deleting account: $e');
       log('❌ Error type: ${e.runtimeType}');
       if (e is FirebaseAuthException) {
@@ -1136,16 +1169,22 @@ class _AccountDeletionScreenState extends State<AccountDeletionScreen> {
     );
   }
 
-  /// After re-auth: cleanup Firestore/Storage, log, delete Auth user, sign out, show success.
+  /// After re-auth: write audit pending, then delete Auth user, sign out. CF sets audit completed and cleans up.
   Future<void> _performDeletionAfterReauth(
     User user, {
     String authProvider = 'phone',
   }) async {
     AccountDeletionScope.inProgress = true;
     try {
-      log('🧹 Cleaning up user data after re-auth...');
-      await _cleanupUserData(user);
-      _logDeletionAndSignOut(user, authProvider: authProvider);
+      final uid = user.uid;
+      final email = user.email;
+      final phoneNumber = user.phoneNumber;
+      await _writeAuditRecordPending(
+        userId: uid,
+        authProvider: authProvider,
+        email: email,
+        phoneNumber: phoneNumber,
+      );
       log('🔥 Deleting Firebase Auth user...');
       await user.delete();
       await _auth.signOut();
@@ -1153,6 +1192,7 @@ class _AccountDeletionScreenState extends State<AccountDeletionScreen> {
     } on Object catch (e) {
       log('❌ Error in _performDeletionAfterReauth: $e');
       AccountDeletionScope.inProgress = false;
+      await _writeAuditRecordAborted(user.uid);
       setState(() => _isDeleting = false);
       if (mounted) {
         _showSnackBar('Failed to complete deletion. Please try again.');
@@ -1170,6 +1210,7 @@ class _AccountDeletionScreenState extends State<AccountDeletionScreen> {
           await _googleLoginRepository.getGoogleReauthCredential();
       if (credential == null) {
         AccountDeletionScope.inProgress = false;
+        await _writeAuditRecordAborted(user.uid);
         if (mounted) {
           setState(() => _isDeleting = false);
           _showSnackBar('Re-verification cancelled.');
@@ -1181,6 +1222,7 @@ class _AccountDeletionScreenState extends State<AccountDeletionScreen> {
       await _performDeletionAfterReauth(user, authProvider: 'google');
     } on Object catch (e) {
       AccountDeletionScope.inProgress = false;
+      await _writeAuditRecordAborted(user.uid);
       if (mounted) {
         setState(() => _isDeleting = false);
         _showSnackBar('Google re-verification failed. Please try again.');
@@ -1203,24 +1245,36 @@ class _AccountDeletionScreenState extends State<AccountDeletionScreen> {
     );
   }
 
-  void _logDeletionAndSignOut(User user, {String? authProvider}) {
+  /// Writes the account deletion audit record as pending (doc id = userId).
+  /// Call before [user.delete()] while still authenticated. Cloud Function sets status to completed after cleanup.
+  /// Propagates errors so we do not delete if the write fails.
+  Future<void> _writeAuditRecordPending({
+    required String userId,
+    required String authProvider,
+    String? email,
+    String? phoneNumber,
+  }) async {
+    await _firestore.collection('accountDeletions').doc(userId).set({
+      'userId': userId,
+      'email': email,
+      'phoneNumber': phoneNumber,
+      'authProvider': authProvider,
+      'reason': _selectedReason,
+      'customReason':
+          _selectedReason == 'Other' ? _reasonController.text : null,
+      'requestedAt': FieldValue.serverTimestamp(),
+      'status': 'pending',
+    }, SetOptions(merge: true));
+  }
+
+  /// Marks the audit record as aborted (e.g. deletion failed or user gave up). Best-effort; logs and swallows errors.
+  Future<void> _writeAuditRecordAborted(String userId) async {
     try {
-      unawaited(
-        _firestore.collection('accountDeletions').add({
-          'userId': user.uid,
-          'email': user.email,
-          'phoneNumber': user.phoneNumber,
-          'authProvider': authProvider ?? 'unknown',
-          'reason': _selectedReason,
-          'customReason':
-              _selectedReason == 'Other' ? _reasonController.text : null,
-          'requestedAt': FieldValue.serverTimestamp(),
-          'status': 'completed',
-          'deletedAt': FieldValue.serverTimestamp(),
-        }),
-      );
+      await _firestore.collection('accountDeletions').doc(userId).set({
+        'status': 'aborted',
+      }, SetOptions(merge: true));
     } on Object catch (e) {
-      log('⚠️ Could not log deletion request: $e');
+      log('⚠️ Could not write audit aborted: $e');
     }
   }
 
@@ -1349,23 +1403,6 @@ class _AccountDeletionScreenState extends State<AccountDeletionScreen> {
         ),
       ),
     );
-  }
-
-  Future<void> _cleanupUserData(User user) async {
-    try {
-      log('🧹 Starting user data cleanup for: ${user.uid}');
-
-      // Use PhoneAuthRepository's deleteUser method which handles cleanup
-      final repo = PhoneAuthRepository();
-      await repo.deleteUser(user);
-
-      log('✅ User data cleanup completed');
-    } on Object catch (e) {
-      log('⚠️ Error during user data cleanup: $e');
-      log('⚠️ Cleanup error type: ${e.runtimeType}');
-      // Re-throw so we can handle it properly in the calling method
-      rethrow;
-    }
   }
 
   Widget _buildPhoneConfirmationSection() => Container(

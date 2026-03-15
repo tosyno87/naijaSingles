@@ -26,13 +26,13 @@ class MatchService {
     try {
       if (currentUserId == null) {
         debugPrint('No current user logged in');
-        return null;
+        throw StateError('Not authenticated. Please sign in to like.');
       }
 
       return await _likesService.handleLike(currentUserId!, toUserId);
     } on Object catch (e) {
       debugPrint('Error in handleLike: $e');
-      return null;
+      rethrow;
     }
   }
 

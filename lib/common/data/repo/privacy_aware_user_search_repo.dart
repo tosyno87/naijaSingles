@@ -6,6 +6,7 @@ import '../../../models/user_model.dart';
 import '../../../services/location_privacy_service.dart';
 import '../../../services/user_privacy_service.dart';
 import '../../constants/constants.dart';
+import '../../utils/app_logger.dart';
 import '../../utils/distance.dart' as distance;
 
 /// Privacy-aware user search repository that respects user privacy settings
@@ -103,15 +104,12 @@ class PrivacyAwareUserSearchRepo {
                   u.lookingFor == 'Mixed',
             )
             .toList();
-        debugPrint(
-          '🎯 After intent filter ($effectiveIntent): ${userList.length} users',
-        );
       }
 
-      debugPrint('✅ Final privacy-aware user list size: ${userList.length}');
+      AppLogger.debug('Privacy-aware list size: ${userList.length}');
       return userList;
     } on Object catch (e) {
-      debugPrint('❌ Error in privacy-aware getUserList: $e');
+      AppLogger.error('Error in privacy-aware getUserList', error: e);
       rethrow;
     }
   }
@@ -126,9 +124,6 @@ class PrivacyAwareUserSearchRepo {
     try {
       // Get all users (we'll filter by privacy settings)
       final querySnapshot = await _buildPrivacyAwareQuery(currentUser).get();
-      debugPrint(
-        '🔍 Privacy query returned ${querySnapshot.docs.length} documents',
-      );
 
       for (var doc in querySnapshot.docs) {
         try {
@@ -181,7 +176,6 @@ class PrivacyAwareUserSearchRepo {
             continue;
           }
 
-          debugPrint('✅ Adding privacy-aware user: ${user.name}');
           userList.add(user);
         } on Object catch (e) {
           debugPrint(

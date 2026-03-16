@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import '../../../common/constants/app_colors.dart';
 import '../../../common/widgets/state_views/state_views.dart';
+import '../../../features/match/data/services/match_service.dart';
 import '../../../models/user_model.dart';
 import '../widgets/mode_specific_profile_sections.dart';
 
@@ -26,6 +27,8 @@ class UserDetailScreen extends StatefulWidget {
 class _UserDetailScreenState extends State<UserDetailScreen> {
   int _currentPhotoIndex = 0;
   final PageController _photoPageController = PageController();
+  bool _isLiking = false;
+  final MatchService _matchService = MatchService();
 
   // MVP theme colors
   static const Color afropeepGreen = Color(0xFF008037); // MVP green
@@ -92,75 +95,201 @@ class _UserDetailScreenState extends State<UserDetailScreen> {
         ),
         centerTitle: true,
       ),
-      body: CustomScrollView(
-        slivers: [
-          // Photo section
-          SliverToBoxAdapter(
-            child: SizedBox(
-              height: 500,
-              child: _buildPhotoSection(photos),
-            ),
-          ),
-
-          // Profile content
-          SliverToBoxAdapter(
-            child: DecoratedBox(
-              decoration: BoxDecoration(
-                color: AppColors.backgroundColor,
-                borderRadius: const BorderRadius.vertical(
-                  top: Radius.circular(24),
-                ),
-                boxShadow: [
-                  BoxShadow(
-                    color: Colors.black.withValues(alpha: 0.1),
-                    blurRadius: 10,
-                    offset: const Offset(0, -5),
+      body: Column(
+        children: [
+          Expanded(
+            child: CustomScrollView(
+              slivers: [
+                // Photo section
+                SliverToBoxAdapter(
+                  child: SizedBox(
+                    height: 500,
+                    child: _buildPhotoSection(photos),
                   ),
-                ],
-              ),
-              child: Padding(
-                padding: const EdgeInsets.all(24),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    // Basic info
-                    _buildBasicInfo(),
+                ),
 
-                    const SizedBox(height: 24),
-
-                    // Bio section
-                    if (_getBio().isNotEmpty) ...[
-                      _buildBioSection(),
-                      const SizedBox(height: 24),
-                    ],
-
-                    // Interests section
-                    if (_getInterests().isNotEmpty) ...[
-                      _buildInterestsSection(),
-                      const SizedBox(height: 24),
-                    ],
-
-                    // Mode-specific sections
-                    if (widget.selectedMode != null) ...[
-                      ModeSpecificProfileSections(
-                        user: widget.user,
-                        selectedMode: widget.selectedMode!,
+                // Profile content
+                SliverToBoxAdapter(
+                  child: DecoratedBox(
+                    decoration: BoxDecoration(
+                      color: AppColors.backgroundColor,
+                      borderRadius: const BorderRadius.vertical(
+                        top: Radius.circular(24),
                       ),
-                      const SizedBox(height: 24),
-                    ],
+                      boxShadow: [
+                        BoxShadow(
+                          color: Colors.black.withValues(alpha: 0.1),
+                          blurRadius: 10,
+                          offset: const Offset(0, -5),
+                        ),
+                      ],
+                    ),
+                    child: Padding(
+                      padding: const EdgeInsets.all(24),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          // Basic info
+                          _buildBasicInfo(),
 
-                    // Additional info
-                    _buildAdditionalInfo(),
+                          const SizedBox(height: 24),
 
-                    const SizedBox(
-                      height: 24,
-                    ), // Extra space at bottom for comfortable scrolling
-                  ],
+                          // Bio section
+                          if (_getBio().isNotEmpty) ...[
+                            _buildBioSection(),
+                            const SizedBox(height: 24),
+                          ],
+
+                          // Interests section
+                          if (_getInterests().isNotEmpty) ...[
+                            _buildInterestsSection(),
+                            const SizedBox(height: 24),
+                          ],
+
+                          // Mode-specific sections
+                          if (widget.selectedMode != null) ...[
+                            ModeSpecificProfileSections(
+                              user: widget.user,
+                              selectedMode: widget.selectedMode!,
+                            ),
+                            const SizedBox(height: 24),
+                          ],
+
+                          // Additional info
+                          _buildAdditionalInfo(),
+
+                          const SizedBox(
+                            height: 24,
+                          ), // Extra space at bottom for comfortable scrolling
+                        ],
+                      ),
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ),
+          _buildBottomActionBar(),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildBottomActionBar() {
+    final targetUserId = widget.user.id;
+    if (targetUserId == null || targetUserId.isEmpty) {
+      return const SizedBox.shrink();
+    }
+
+    return SafeArea(
+      top: false,
+      child: Container(
+        padding: const EdgeInsets.fromLTRB(24, 12, 24, 16),
+        decoration: BoxDecoration(
+          color: AppColors.backgroundColor,
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black.withValues(alpha: 0.06),
+              blurRadius: 8,
+              offset: const Offset(0, -2),
+            ),
+          ],
+        ),
+        child: Row(
+          children: [
+            Expanded(
+              child: ElevatedButton.icon(
+                onPressed: _isLiking
+                    ? null
+                    : () async {
+                        setState(() => _isLiking = true);
+                        try {
+                          final matchId =
+                              await _matchService.handleLike(targetUserId);
+                          if (!mounted) return;
+                          setState(() => _isLiking = false);
+                          if (matchId != null) {
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              SnackBar(
+                                content: Text(
+                                  "It's a match! You can message ${widget.user.name?.split(' ').first ?? 'them'} from your matches.",
+                                  style: GoogleFonts.montserrat(),
+                                ),
+                                backgroundColor: afropeepGreen,
+                              ),
+                            );
+                            Navigator.pop(context);
+                          } else {
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              SnackBar(
+                                content: Text(
+                                  'Like sent!',
+                                  style: GoogleFonts.montserrat(),
+                                ),
+                                backgroundColor: afropeepGreen,
+                              ),
+                            );
+                          }
+                        } on Object catch (_) {
+                          if (mounted) setState(() => _isLiking = false);
+                          if (!mounted) return;
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            SnackBar(
+                              content: Text(
+                                'Could not send like. Try again.',
+                                style: GoogleFonts.montserrat(),
+                              ),
+                              backgroundColor: Colors.red.shade400,
+                            ),
+                          );
+                        }
+                      },
+                icon: _isLiking
+                    ? const SizedBox(
+                        width: 18,
+                        height: 18,
+                        child: CircularProgressIndicator(strokeWidth: 2),
+                      )
+                    : const Icon(Icons.favorite, size: 22),
+                label: Text(
+                  _isLiking ? 'Sending...' : 'Like',
+                  style: GoogleFonts.montserrat(
+                    fontSize: 16,
+                    fontWeight: FontWeight.w600,
+                  ),
+                ),
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: afropeepGreen,
+                  foregroundColor: Colors.white,
+                  padding: const EdgeInsets.symmetric(vertical: 14),
+                  shape: const RoundedRectangleBorder(
+                    borderRadius: BorderRadius.all(Radius.circular(14)),
+                  ),
                 ),
               ),
             ),
-          ),
-        ],
+            const SizedBox(width: 12),
+            OutlinedButton(
+              onPressed: () => Navigator.pop(context),
+              style: OutlinedButton.styleFrom(
+                foregroundColor: afropeepGreen,
+                side: const BorderSide(color: afropeepGreen),
+                padding:
+                    const EdgeInsets.symmetric(vertical: 14, horizontal: 16),
+                shape: const RoundedRectangleBorder(
+                  borderRadius: BorderRadius.all(Radius.circular(14)),
+                ),
+              ),
+              child: Text(
+                'Back',
+                style: GoogleFonts.montserrat(
+                  fontSize: 16,
+                  fontWeight: FontWeight.w600,
+                ),
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }

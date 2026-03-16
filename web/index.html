@@ -2,62 +2,46 @@
     <base href="$FLUTTER_BASE_HREF">
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Afropeep - Connect Your African Soul</title>
-    <meta name="description" content="Afropeep is the premier dating and networking platform for Africans worldwide. Connect your tribe from anywhere - Dating, Friendship, and Business networking.">
-    <meta name="keywords" content="African dating, Nigerian singles, African networking, dating app, friendship app, business networking">
+    <title>Afropeep – Join the waitlist</title>
+    <meta name="description" content="Afropeep is coming soon. Dating, friendship, and community for the African diaspora. Join the waitlist for early access.">
+    <meta name="keywords" content="Afropeep, African dating, diaspora, waitlist, dating app, community">
     
     <!-- Open Graph Meta Tags -->
-    <meta property="og:title" content="Afropeep - Connect Your African Soul">
-    <meta property="og:description" content="The premier dating and networking platform for Africans worldwide. Connect your tribe from anywhere.">
-    <meta property="og:image" content="https://naijasingles-74a75.web.app/assets/afropeep-hero.jpg">
+    <meta property="og:title" content="Afropeep – Join the waitlist">
+    <meta property="og:description" content="App coming soon. Dating, friendship, and community for the African diaspora. Join the waitlist for early access.">
+    <meta property="og:image" content="https://naijasingles-74a75.web.app/hero-couple.jpg">
     <meta property="og:url" content="https://naijasingles-74a75.web.app">
     <meta property="og:type" content="website">
     
     <!-- Twitter Card Meta Tags -->
     <meta name="twitter:card" content="summary_large_image">
-    <meta name="twitter:title" content="Afropeep - Connect Your African Soul">
-    <meta name="twitter:description" content="The premier dating and networking platform for Africans worldwide.">
-    <meta name="twitter:image" content="https://naijasingles-74a75.web.app/assets/afropeep-hero.jpg">
+    <meta name="twitter:title" content="Afropeep – Join the waitlist">
+    <meta name="twitter:description" content="App coming soon. Join the waitlist for early access.">
+    <meta name="twitter:image" content="https://naijasingles-74a75.web.app/hero-couple.jpg">
     
     <!-- Favicon -->
     <link rel="icon" type="image/png" href="favicon.png">
     
-    <!-- Google Fonts -->
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&amp;family=Montserrat:wght@300;400;500;600;700;800;900&amp;family=Playfair+Display:wght@400;500;600;700&amp;display=swap" rel="stylesheet">
+    <!-- Google Fonts: Plus Jakarta Sans (brand), Montserrat (UI/body) - match app -->
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&amp;family=Montserrat:wght@400;500;600;700&amp;display=swap" rel="stylesheet">
     
     <!-- Font Awesome -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     
     <style>
         :root {
-            /* Afropeep Brand Colors from Cultural Guidelines */
-            --african-gold: #FFD700;
-            --african-green: #228B22;
-            --african-red: #DC143C;
-            --earth-brown: #8B4513;
-            --royal-purple: #663399;
-            --warm-orange: #FF8C00;
-            --deep-blue: #191970;
-            --cream-white: #FFF8DC;
-            
-            /* App Theme Colors */
+            /* App-aligned palette: green, white, dark neutral only */
             --primary-green: #008037;
-            --accent-coral: #E74C3C;
-            --background-cream: #FFF6E5;
-            
-            /* Light Theme Colors for Cream Background */
-            --dark-bg: #0F0F23;
-            --card-bg: #FFF6E5;
-            --text-primary: #333333;
+            --primary-green-dark: #006B2E;
+            --primary-green-light: #059669;
+            --background-cream: #FFFFFF;
+            --card-bg: #FFFFFF;
+            --text-primary: #2D2D2D;
             --text-secondary: #666666;
             --text-muted: #999999;
-            --border-color: rgba(0, 128, 55, 0.1);
-            
-            /* Afropeep Gradients */
-            --gradient-primary: linear-gradient(135deg, #008037 0%, #E74C3C 100%);
-            --gradient-african: linear-gradient(135deg, #228B22 0%, #FFD700 50%, #DC143C 100%);
-            --gradient-warm: linear-gradient(135deg, #FF8C00 0%, #FFD700 100%);
-            --gradient-dark: linear-gradient(135deg, #0F0F23 0%, #1A1A2E 100%);
+            --border-color: rgba(0, 128, 55, 0.12);
+            /* Single brand gradient - app primary button */
+            --gradient-primary: linear-gradient(180deg, #22D879 0%, #18B866 50%, #0E7C45 100%);
         }
         
         * {
@@ -67,7 +51,7 @@
         }
         
         body {
-            font-family: 'Inter', sans-serif;
+            font-family: 'Montserrat', sans-serif;
             line-height: 1.6;
             color: var(--text-primary);
             background: var(--background-cream);
@@ -76,7 +60,7 @@
         
         /* Header */
         .header {
-            background: #FFF6E5;
+            background: #FFFFFF;
             position: sticky;
             top: 0;
             z-index: 1000;
@@ -90,12 +74,12 @@
         .header::after {
             content: '';
             position: absolute;
-            bottom: -3px;
+            bottom: 0;
             left: 0;
             right: 0;
-            height: 3px;
-            background: linear-gradient(90deg, #008037 0%, rgba(0, 128, 55, 0.3) 50%, #008037 100%);
-            border-radius: 0 0 20px 20px;
+            height: 2px;
+            background: var(--primary-green);
+            opacity: 0.2;
         }
         
         .nav {
@@ -116,110 +100,13 @@
         }
         
         .logo img {
-            height: 72px;
+            height: 120px;
             width: auto;
             object-fit: contain;
             filter: none;
             image-rendering: -webkit-optimize-contrast;
             image-rendering: crisp-edges;
             transition: all 0.3s ease;
-        }
-        
-        .logo-text {
-            display: flex;
-            align-items: center;
-        }
-        
-        .logo-afro {
-            background: var(--gradient-african);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
-            font-weight: 700;
-        }
-        
-        .logo-peep {
-            background: var(--gradient-african);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
-            font-weight: 700;
-        }
-        
-        .afropeep-logo {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-        }
-        
-        .logo-icon {
-            position: relative;
-            width: 32px;
-            height: 32px;
-            background: var(--primary-green);
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            box-shadow: 0 2px 8px rgba(0, 128, 55, 0.3);
-        }
-        
-        .logo-footprint {
-            width: 18px;
-            height: 18px;
-            background: #000;
-            clip-path: polygon(
-                50% 0%, 60% 20%, 70% 30%, 75% 45%, 80% 60%, 75% 75%, 
-                70% 85%, 60% 90%, 50% 95%, 40% 90%, 30% 85%, 25% 75%, 
-                20% 60%, 25% 45%, 30% 30%, 40% 20%
-            );
-        }
-        
-        .logo-bubbles {
-            position: absolute;
-            top: -6px;
-            left: -8px;
-            display: flex;
-            flex-direction: column;
-            gap: 2px;
-        }
-        
-        .bubble {
-            background: #90EE90;
-            border-radius: 50%;
-            opacity: 0.9;
-        }
-        
-        .bubble-1 {
-            width: 6px;
-            height: 6px;
-        }
-        
-        .bubble-2 {
-            width: 4px;
-            height: 4px;
-        }
-        
-        .bubble-3 {
-            width: 3px;
-            height: 3px;
-        }
-        
-        .logo-text {
-            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
-            font-weight: 600;
-            font-size: 1.4rem;
-            letter-spacing: -0.02em;
-        }
-        
-        .logo-a, .logo-fr, .logo-o {
-            color: #9ACD32;
-            font-weight: 600;
-        }
-        
-        .logo-p, .logo-e, .logo-e2, .logo-p2 {
-            color: #FF6B35;
-            font-weight: 600;
         }
         
         .nav-links {
@@ -255,67 +142,92 @@
             width: 100%;
         }
         
-        /* Hero Section */
+        /* Hero Section - mirrors app auth screen: full-bleed image, overlay, centered wordmark + CTA */
         .hero {
             min-height: 100vh;
             display: flex;
             align-items: center;
+            justify-content: center;
             position: relative;
-            background: linear-gradient(135deg, #FFF6E5 0%, #FFF8F0 100%);
+            background: linear-gradient(135deg, #1A3D2B 0%, #006B2E 100%);
             overflow: hidden;
         }
         
-        .hero::before {
-            content: '';
+        .hero-bg {
+            position: absolute;
+            inset: 0;
+            background-image: url('hero-couple.jpg');
+            background-size: cover;
+            background-position: center;
+        }
+        
+        .hero-bg + .hero-overlay-top,
+        .hero-overlay-top {
             position: absolute;
             top: 0;
             left: 0;
             right: 0;
+            height: 28%;
+            background: linear-gradient(180deg, rgba(0,0,0,0.45) 0%, transparent 100%);
+            pointer-events: none;
+        }
+        
+        .hero-overlay-bottom {
+            position: absolute;
+            left: 0;
+            right: 0;
             bottom: 0;
-            background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 1000"><defs><radialGradient id="a" cx="50%" cy="50%"><stop offset="0%" stop-color="%23FF6B9D" stop-opacity="0.1"/><stop offset="100%" stop-color="%238B5CF6" stop-opacity="0.05"/></radialGradient></defs><rect width="100%" height="100%" fill="url(%23a)"/></svg>');
-            opacity: 0.3;
+            height: 55%;
+            background: linear-gradient(0deg, rgba(0,0,0,0.65) 0%, transparent 100%);
+            pointer-events: none;
         }
         
         .hero-content {
-            max-width: 1200px;
-            margin: 0 auto;
-            padding: 0 2rem;
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 4rem;
-            align-items: center;
             position: relative;
             z-index: 2;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            padding: 2rem 24px 2.5rem;
+            max-width: 400px;
         }
         
-        .hero-text {
-            max-width: 600px;
-        }
-        
-        .hero h1 {
-            font-family: 'Montserrat', sans-serif;
-            font-size: 4rem;
+        .hero-wordmark {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            font-size: 2.75rem;
             font-weight: 700;
-            margin-bottom: 1.5rem;
-            background: linear-gradient(135deg, #008037 0%, #8B4513 100%);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
+            color: #fff;
+            letter-spacing: -0.3px;
+            text-shadow: 0 1px 8px rgba(0,0,0,0.15);
+            margin-bottom: 0;
             line-height: 1.1;
         }
         
-        .hero .tagline {
-            font-size: 1.5rem;
-            color: var(--text-secondary);
-            margin-bottom: 2rem;
-            font-weight: 400;
+        .hero-spacer {
+            flex: 1;
+            min-height: 2rem;
         }
         
-        .hero .subtitle {
-            font-size: 1.1rem;
-            color: var(--text-muted);
-            margin-bottom: 3rem;
-            line-height: 1.7;
+        .hero-tagline {
+            font-family: 'Montserrat', sans-serif;
+            font-size: 1rem;
+            font-weight: 400;
+            color: rgba(255,255,255,0.85);
+            margin-bottom: 1.5rem;
+            line-height: 1.4;
+        }
+        
+        .hero-cta-wrap {
+            margin-bottom: 1rem;
+        }
+        
+        .hero-legal {
+            font-family: 'Montserrat', sans-serif;
+            font-size: 0.875rem;
+            color: rgba(255,255,255,0.7);
+            line-height: 1.4;
         }
         
         /* Download Buttons */
@@ -406,6 +318,29 @@
             font-weight: 600;
         }
         
+        .download-btn.waitlist-cta {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            min-width: 260px;
+            height: 56px;
+            padding: 0 24px;
+            border-radius: 28px;
+            background: var(--gradient-primary);
+            font-family: 'Montserrat', sans-serif;
+            font-size: 1.0625rem;
+            font-weight: 600;
+            color: #fff;
+            text-decoration: none;
+            box-shadow: 0 6px 20px rgba(24, 184, 102, 0.28);
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+        }
+        
+        .download-btn.waitlist-cta:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 8px 24px rgba(24, 184, 102, 0.35);
+        }
+        
         .btn-content {
             display: flex;
             align-items: center;
@@ -474,45 +409,6 @@
             font-weight: 700;
         }
         
-        /* Hero Images */
-        .hero-images {
-            position: relative;
-            height: 500px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
-        
-        .hero-image {
-            transition: all 0.3s ease;
-            overflow: hidden;
-            box-shadow: 0 10px 40px rgba(0, 128, 55, 0.15);
-            background: transparent;
-        }
-        
-        .hero-image:hover {
-            transform: scale(1.02);
-            box-shadow: 0 20px 60px rgba(0, 128, 55, 0.25);
-        }
-        
-        .hero-image.main {
-            width: 400px;
-            height: 500px;
-            margin: 0 20px;
-        }
-        
-        .hero-image.secondary {
-            width: 300px;
-            height: 400px;
-            margin: 0 20px;
-        }
-        
-        .hero-image.tertiary {
-            width: 250px;
-            height: 350px;
-            margin: 0 20px;
-        }
-        
         /* Features Section */
         .features {
             padding: 8rem 2rem;
@@ -526,22 +422,20 @@
         
         .section-title {
             text-align: center;
-            font-family: 'Playfair Display', serif;
-            font-size: 3rem;
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            font-size: 2rem;
             font-weight: 700;
-            margin-bottom: 1rem;
-            background: var(--gradient-african);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
+            margin-bottom: 0.5rem;
+            color: var(--text-primary);
         }
         
         .section-subtitle {
             text-align: center;
-            font-size: 1.2rem;
+            font-family: 'Montserrat', sans-serif;
+            font-size: 1rem;
             color: var(--text-secondary);
-            margin-bottom: 4rem;
-            max-width: 600px;
+            margin-bottom: 3rem;
+            max-width: 560px;
             margin-left: auto;
             margin-right: auto;
         }
@@ -569,23 +463,21 @@
             top: 0;
             left: 0;
             right: 0;
-            height: 4px;
-            background: var(--gradient-african);
+            height: 3px;
+            background: var(--primary-green);
+            border-radius: 24px 24px 0 0;
         }
         
         .feature-card:hover {
-            transform: translateY(-10px);
-            box-shadow: 0 30px 60px rgba(0,0,0,0.3);
-            border-color: var(--primary-pink);
+            transform: translateY(-4px);
+            box-shadow: 0 12px 32px rgba(0, 128, 55, 0.12);
+            border-color: rgba(0, 128, 55, 0.2);
         }
         
         .feature-icon {
-            font-size: 3rem;
-            margin-bottom: 1.5rem;
-            background: var(--gradient-african);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
+            font-size: 2.5rem;
+            margin-bottom: 1.25rem;
+            color: var(--primary-green);
         }
         
         .feature-card h3 {
@@ -641,22 +533,20 @@
             top: 0;
             left: 0;
             right: 0;
-            height: 4px;
-            background: var(--gradient-secondary);
+            height: 3px;
+            background: var(--primary-green);
+            border-radius: 24px 24px 0 0;
         }
         
         .mode-card:hover {
-            transform: translateY(-10px);
-            box-shadow: 0 30px 60px rgba(0,0,0,0.3);
+            transform: translateY(-4px);
+            box-shadow: 0 12px 32px rgba(0, 128, 55, 0.12);
         }
         
         .mode-icon {
-            font-size: 3rem;
-            margin-bottom: 1.5rem;
-            background: var(--gradient-secondary);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
+            font-size: 2.5rem;
+            margin-bottom: 1.25rem;
+            color: var(--primary-green);
         }
         
         .mode-card h3 {
@@ -671,40 +561,20 @@
             line-height: 1.7;
         }
         
+        .mode-card-image {
+            width: 100%;
+            margin-bottom: 1.5rem;
+        }
+        
+        .mode-card-image img {
+            width: 100%;
+            height: 200px;
+            object-fit: cover;
+            border-radius: 12px;
+        }
+        
 
         /* Stats Section */
-        .stats {
-            padding: 8rem 2rem;
-            background: var(--background-cream);
-        }
-        
-        .stats-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-            gap: 3rem;
-            text-align: center;
-        }
-        
-        .stat-item {
-            padding: 2rem;
-        }
-        
-        .stat-item h3 {
-            font-size: 4rem;
-            font-weight: 800;
-            margin-bottom: 0.5rem;
-            background: var(--gradient-primary);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
-        }
-        
-        .stat-item p {
-            font-size: 1.2rem;
-            color: var(--text-secondary);
-            font-weight: 500;
-        }
-        
         /* Footer */
         .footer {
             background: var(--background-cream);
@@ -715,6 +585,23 @@
         .footer-content {
             max-width: 1200px;
             margin: 0 auto;
+        }
+        
+        .footer-waitlist {
+            text-align: center;
+            margin-bottom: 2rem;
+            color: var(--text-secondary);
+            font-size: 1rem;
+        }
+        
+        .footer-waitlist a {
+            color: var(--primary-green);
+            font-weight: 600;
+            text-decoration: none;
+        }
+        
+        .footer-waitlist a:hover {
+            text-decoration: underline;
         }
         
         .footer-links {
@@ -779,17 +666,6 @@
                 overflow-x: hidden;
             }
             
-            /* Improve touch scrolling */
-            .hero-images {
-                -webkit-transform: translateZ(0);
-                transform: translateZ(0);
-            }
-            
-            /* Disable hover effects on mobile */
-            .hero-image:hover {
-                transform: none;
-            }
-            
             .feature-card:hover {
                 transform: none;
             }
@@ -798,37 +674,21 @@
                 transform: none;
             }
             .hero-content {
-                grid-template-columns: 1fr;
-                gap: 2rem;
-                text-align: center;
+                padding: 1.5rem 20px 2rem;
             }
             
-            .hero h1 {
-                font-size: 2.8rem;
+            .hero-wordmark {
+                font-size: 2.25rem;
             }
             
-            .hero .tagline {
-                font-size: 1.2rem;
+            .hero-tagline {
+                font-size: 0.9375rem;
             }
             
-            .download-buttons {
-                flex-direction: column;
-                align-items: center;
-                gap: 1rem;
-                max-width: 300px;
-                margin: 2rem auto;
-            }
-            
-            .download-btn {
-                min-width: 160px;
-                max-width: 180px;
-                padding: 12px 1.25rem;
-                min-height: 52px;
-            }
-            
-            .btn-icon svg {
-                max-height: 20px;
-                max-width: 20px;
+            .download-btn.waitlist-cta {
+                min-width: 240px;
+                height: 52px;
+                font-size: 1rem;
             }
             
             .nav {
@@ -850,7 +710,7 @@
             }
             
             .logo img {
-                height: 60px;
+                height: 80px;
                 width: auto;
             }
             
@@ -862,25 +722,8 @@
                 grid-template-columns: 1fr;
             }
             
-            .hero-images {
-                height: auto;
-                flex-direction: column;
-                gap: 20px;
-                padding: 20px 0;
-            }
-            
-            .hero-image.main {
-                width: 100%;
-                max-width: 300px;
-                height: 300px;
-                margin: 0 auto;
-            }
-            
-            .hero-image.secondary {
-                width: 100%;
-                max-width: 280px;
-                height: 280px;
-                margin: 0 auto;
+            .section-title {
+                font-size: 1.5rem;
             }
         }
         
@@ -998,71 +841,29 @@
     <header class="header">
         <nav class="nav">
         <div class="logo">
-            <img src="afropeep-logo.png" alt="Afropeep Logo" style="height: 100px; width: auto;">
+            <img src="afropeep-logo.png" alt="Afropeep Logo" style="height: 120px; width: auto;">
         </div>
             <ul class="nav-links">
                 <li><a href="#features">Features</a></li>
                 <li><a href="#modes">Modes</a></li>
-                <li><a href="#stats">Community</a></li>
                 <li><a href="#contact">Contact</a></li>
             </ul>
         </nav>
     </header>
 
-    <!-- Hero Section -->
+    <!-- Hero Section - app auth feel: full-bleed image, overlay, wordmark, one CTA -->
     <section class="hero">
+        <div class="hero-bg" role="img" aria-hidden="true"></div>
+        <div class="hero-overlay-top"></div>
+        <div class="hero-overlay-bottom"></div>
         <div class="hero-content">
-            <div class="hero-text fade-in-up">
-                <h1>Connect Your African Soul</h1>
-                <p class="tagline">Find Love, Build Friendships, Grow Your Network</p>
-                <p class="subtitle">Join thousands of Africans worldwide who are finding meaningful connections through Afropeep. Whether you're looking for romance, friendship, or business opportunities, your perfect match is waiting.</p>
-                
-                <div class="download-buttons">
-                    <a href="#" class="download-btn app-store">
-                        <div class="btn-content">
-                            <div class="btn-icon">
-                                <svg width="24" height="24" fill="currentColor" viewBox="0 0 24 24">
-                                    <path d="M18.71 19.5c-.83 1.24-1.71 2.45-3.05 2.47-1.34.03-1.77-.79-3.29-.79-1.53 0-2 .77-3.27.82-1.31.05-2.3-1.32-3.14-2.53C4.25 17 2.94 12.45 4.7 9.39c.87-1.52 2.43-2.48 4.12-2.51 1.28-.02 2.5.87 3.29.87.78 0 2.26-1.07 3.81-.91.65.03 2.47.26 3.64 1.98-.09.06-2.17 1.28-2.15 3.81.03 3.02 2.65 4.03 2.68 4.04-.03.07-.42 1.44-1.38 2.83M13 3.5c.73-.83 1.94-1.46 2.94-1.5.13 1.17-.34 2.35-1.04 3.19-.69.85-1.83 1.51-2.95 1.42-.15-1.15.41-2.35 1.05-3.11z"></path>
-                                </svg>
-                            </div>
-                            <div class="btn-text">
-                                <span class="btn-label">Download on the</span>
-                                <span class="btn-store">App Store</span>
-                            </div>
-                        </div>
-                    </a>
-                    <a href="#" class="download-btn google-play">
-                        <div class="btn-content">
-                            <div class="btn-icon">
-                                <svg width="24" height="24" fill="currentColor" viewBox="0 0 24 24">
-                                    <path d="M3.609 1.814L13.792 12L3.609 22.186a.996.996 0 0 1-.61-.92V2.734a1 1 0 0 1 .609-.92zm10.89 10.893l2.302 2.302-10.937 6.333 8.635-8.635zm3.199-3.198l2.807 1.626a1 1 0 0 1 0 1.73l-2.808 1.626L12.5 12l5.198-3.291zM5.864 2.658L16.802 8.99l-2.302 2.302-8.636-8.634z" fill="#EA4335"></path>
-                                    <path d="M16.802 8.99L5.864 2.658l8.636 8.634 2.302-2.302z" fill="#FBBC04"></path>
-                                    <path d="M12.5 12l5.198 3.291-2.808 1.626L12.5 12z" fill="#34A853"></path>
-                                    <path d="M12.5 12l-5.198-3.291L5.864 2.658l8.636 8.634L12.5 12z" fill="#4285F4"></path>
-                                </svg>
-                            </div>
-                            <div class="btn-text">
-                                <span class="btn-label">GET IT ON</span>
-                                <span class="btn-store">Google Play</span>
-                            </div>
-                        </div>
-                    </a>
-                </div>
-                
-                <p style="color: var(--text-muted); font-size: 0.9rem;">
-                    <i class="fas fa-rocket"></i> 
-                    Mobile app launching soon! Join our exclusive waitlist for early access.
-                </p>
+            <h1 class="hero-wordmark">Afropeep</h1>
+            <div class="hero-spacer"></div>
+            <p class="hero-tagline">App coming soon. Join the waitlist for early access.</p>
+            <div class="hero-cta-wrap">
+                <a href="#contact" class="download-btn waitlist-cta">Join waitlist</a>
             </div>
-            
-            <div class="hero-images">
-                <div class="hero-image main">
-                    <img src="hero-couple.jpg?v=2" alt="Happy Black couple laughing and connecting" style="width: 100%; height: 100%; object-fit: cover; border-radius: 16px;">
-                </div>
-                <div class="hero-image secondary">
-                    <img src="promo-image.jpg?v=3" alt="Beautiful Black woman smiling" style="width: 100%; height: 100%; object-fit: cover; border-radius: 16px;">
-                </div>
-            </div>
+            <p class="hero-legal">Dating, friendship, and community for the African diaspora.</p>
         </div>
     </section>
 
@@ -1085,29 +886,44 @@
                     </div>
                 </div>
                 <div class="feature-card scroll-reveal">
-                    <div class="feature-icon">
-                        <i class="fas fa-shield-alt"></i>
+                    <div class="feature-image">
+                        <img src="safe-secure.jpg" alt="Black woman using phone indoors, calm and confident" style="width: 100%; height: 200px; object-fit: cover; border-radius: 12px;">
                     </div>
-                    <h3>Safe &amp; Secure</h3>
-                    <p>Your privacy and safety are our top priorities. Advanced verification, photo verification, and 24/7 moderation keep our community secure and authentic.</p>
-                </div>
-                <div class="feature-card scroll-reveal">
-                    <div class="feature-icon">
-                        <i class="fas fa-globe-africa"></i>
+                    <div class="feature-content">
+                        <div class="feature-icon">
+                            <i class="fas fa-shield-alt"></i>
+                        </div>
+                        <h3>Safe &amp; Secure</h3>
+                        <p>Your privacy and safety are our top priorities. Advanced verification, photo verification, and 24/7 moderation keep our community secure and authentic.</p>
                     </div>
-                    <h3>Global Community</h3>
-                    <p>Connect with Africans worldwide - from Lagos to London, from Accra to Atlanta. Your tribe is everywhere, and we help you find them.</p>
-                </div>
-                <div class="feature-card scroll-reveal">
-                    <div class="feature-icon">
-                        <i class="fas fa-mobile-alt"></i>
-                    </div>
-                    <h3>Modern Experience</h3>
-                    <p>Designed for modern mobile users with intuitive swiping, instant messaging, video calls, and real-time notifications that keep you connected.</p>
                 </div>
                 <div class="feature-card scroll-reveal">
                     <div class="feature-image">
-                        <img src="events-social.jpg" alt="African cultural events celebration" style="width: 100%; height: 200px; object-fit: cover; border-radius: 12px;">
+                        <img src="global-community.jpg" alt="Diverse African diaspora friends in urban outdoor setting" style="width: 100%; height: 200px; object-fit: cover; border-radius: 12px;">
+                    </div>
+                    <div class="feature-content">
+                        <div class="feature-icon">
+                            <i class="fas fa-globe-africa"></i>
+                        </div>
+                        <h3>Global Community</h3>
+                        <p>Connect with Africans worldwide - from Lagos to London, from Accra to Atlanta. Your tribe is everywhere, and we help you find them.</p>
+                    </div>
+                </div>
+                <div class="feature-card scroll-reveal">
+                    <div class="feature-image">
+                        <img src="modern-experience.jpg" alt="Person holding phone in modern lifestyle setting" style="width: 100%; height: 200px; object-fit: cover; border-radius: 12px;">
+                    </div>
+                    <div class="feature-content">
+                        <div class="feature-icon">
+                            <i class="fas fa-mobile-alt"></i>
+                        </div>
+                        <h3>Modern Experience</h3>
+                        <p>Designed for modern mobile users with intuitive swiping, instant messaging, video calls, and real-time notifications that keep you connected.</p>
+                    </div>
+                </div>
+                <div class="feature-card scroll-reveal">
+                    <div class="feature-image">
+                        <img src="community-stats.png" alt="Community at an African cultural or social gathering" style="width: 100%; height: 200px; object-fit: cover; border-radius: 12px;">
                     </div>
                     <div class="feature-content">
                         <div class="feature-icon">
@@ -1118,11 +934,16 @@
                     </div>
                 </div>
                 <div class="feature-card scroll-reveal">
-                    <div class="feature-icon">
-                        <i class="fas fa-star"></i>
+                    <div class="feature-image">
+                        <img src="premium-features.jpg" alt="Elegant premium lifestyle portrait" style="width: 100%; height: 200px; object-fit: cover; border-radius: 12px;">
                     </div>
-                    <h3>Premium Features</h3>
-                    <p>Unlock advanced filters, see who liked you, get priority in search results, and access exclusive events with our premium membership.</p>
+                    <div class="feature-content">
+                        <div class="feature-icon">
+                            <i class="fas fa-star"></i>
+                        </div>
+                        <h3>Premium Features</h3>
+                        <p>Unlock advanced filters, see who liked you, get priority in search results, and access exclusive events with our premium membership.</p>
+                    </div>
                 </div>
             </div>
         </div>
@@ -1135,6 +956,9 @@
             <p class="section-subtitle scroll-reveal">Choose your journey, find your people</p>
             <div class="modes-grid">
                 <div class="mode-card scroll-reveal">
+                    <div class="mode-card-image">
+                        <img src="dating-mode.jpg" alt="Stylish couple on a date" style="width: 100%; height: 200px; object-fit: cover; border-radius: 12px;">
+                    </div>
                     <div class="mode-icon">
                         <i class="fas fa-heart"></i>
                     </div>
@@ -1142,6 +966,9 @@
                     <p>Find your perfect match with our advanced compatibility algorithm. Swipe through profiles, send likes, and start meaningful conversations that could lead to lasting love.</p>
                 </div>
                 <div class="mode-card scroll-reveal">
+                    <div class="mode-card-image">
+                        <img src="friendship.jpg" alt="Friends laughing or walking together" style="width: 100%; height: 200px; object-fit: cover; border-radius: 12px;">
+                    </div>
                     <div class="mode-icon">
                         <i class="fas fa-handshake"></i>
                     </div>
@@ -1149,6 +976,9 @@
                     <p>Build lasting friendships with like-minded Africans. Share interests, attend events together, and expand your social circle with people who get you.</p>
                 </div>
                 <div class="mode-card scroll-reveal">
+                    <div class="mode-card-image">
+                        <img src="hero-networking.jpg" alt="Two professionals in conversation" style="width: 100%; height: 200px; object-fit: cover; border-radius: 12px;">
+                    </div>
                     <div class="mode-icon">
                         <i class="fas fa-briefcase"></i>
                     </div>
@@ -1160,54 +990,22 @@
     </section>
 
 
-    <!-- Stats Section -->
-    <section class="stats" id="stats">
-        <div class="container">
-            <h2 class="section-title scroll-reveal">Join Our Growing Community</h2>
-            <div class="stats-grid">
-                <div class="stat-item scroll-reveal">
-                    <h3>25K+</h3>
-                    <p>Active Users</p>
-                </div>
-                <div class="stat-item scroll-reveal">
-                    <h3>50+</h3>
-                    <p>Countries</p>
-                </div>
-                <div class="stat-item scroll-reveal">
-                    <h3>5K+</h3>
-                    <p>Successful Matches</p>
-                </div>
-                <div class="stat-item scroll-reveal">
-                    <h3>200+</h3>
-                    <p>Events Hosted</p>
-                </div>
-            </div>
-        </div>
-    </section>
-
     <!-- Footer -->
     <footer class="footer" id="contact">
         <div class="footer-content">
+            <p class="footer-waitlist">
+                Want early access? Email us at <a href="mailto:support@naijasingles.com?subject=Waitlist">support@naijasingles.com</a>.
+            </p>
             <div class="footer-links">
-                <a href="#privacy">Privacy Policy</a>
-                <a href="#terms">Terms of Service</a>
-                <a href="#support">Support</a>
-                <a href="#about">About Us</a>
-                <a href="#careers">Careers</a>
-            </div>
-            
-            <div class="social-links">
-                <a href="#"><i class="fab fa-instagram"></i></a>
-                <a href="#"><i class="fab fa-twitter"></i></a>
-                <a href="#"><i class="fab fa-facebook"></i></a>
-                <a href="#"><i class="fab fa-linkedin"></i></a>
-                <a href="#"><i class="fab fa-tiktok"></i></a>
+                <a href="mailto:support@naijasingles.com?subject=Privacy%20Policy">Privacy Policy</a>
+                <a href="mailto:support@naijasingles.com?subject=Terms%20of%20Service">Terms of Service</a>
+                <a href="mailto:support@naijasingles.com">Support</a>
             </div>
             
             <div class="footer-bottom">
                 <p>© 2024 Afropeep. All rights reserved.</p>
                 <p style="margin-top: 1rem;">
-                    Made with <i class="fas fa-heart" style="color: #FF6B9D;"></i> for the African diaspora worldwide
+                    Made with <i class="fas fa-heart" style="color: var(--primary-green);"></i> for the African diaspora worldwide
                 </p>
             </div>
         </div>
@@ -1279,34 +1077,6 @@
             });
         });
 
-        // Add parallax effect to hero images - mobile optimized
-        let parallaxTicking = false;
-        function updateParallax() {
-            const scrolled = window.pageYOffset;
-            const heroImages = document.querySelectorAll('.hero-image');
-            
-            // Disable parallax on mobile for better performance
-            if (window.innerWidth <= 768) {
-                heroImages.forEach(img => {
-                    img.style.transform = 'none';
-                });
-                parallaxTicking = false;
-                return;
-            }
-            
-            heroImages.forEach((img, index) => {
-                const speed = 0.5 + (index * 0.1);
-                img.style.transform = `translateY(${scrolled * speed}px)`;
-            });
-            parallaxTicking = false;
-        }
-        
-        window.addEventListener('scroll', function() {
-            if (!parallaxTicking) {
-                requestAnimationFrame(updateParallax);
-                parallaxTicking = true;
-            }
-        });
     </script>
 
 </body></html>

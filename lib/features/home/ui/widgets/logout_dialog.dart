@@ -62,7 +62,7 @@ void showLogoutDialog(BuildContext context) {
               // Small delay to ensure subscriptions are fully canceled
               await Future.delayed(const Duration(milliseconds: 100));
               if (context.mounted) {
-                // Navigate to welcome screen to show all sign-in options (phone, Google, Apple)
+                // Navigate to welcome screen to show all sign-in options (phone, Google)
                 await Navigator.pushNamedAndRemoveUntil(
                   context,
                   RouteName.welcomeScreen,

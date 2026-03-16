@@ -21,7 +21,8 @@ class MatchService {
 
   /// Handle like action with mutual like detection
   /// This is the main method to call when a user likes another user
-  /// Returns match ID if mutual match is created, null otherwise
+  /// Returns match ID if mutual match is created, null otherwise.
+  /// Returns null when not authenticated (fail gracefully).
   Future<String?> handleLike(String toUserId) async {
     try {
       if (currentUserId == null) {
@@ -32,7 +33,7 @@ class MatchService {
       return await _likesService.handleLike(currentUserId!, toUserId);
     } on Object catch (e) {
       debugPrint('Error in handleLike: $e');
-      return null;
+      rethrow;
     }
   }
 

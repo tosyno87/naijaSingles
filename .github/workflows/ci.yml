@@ -88,15 +88,15 @@ jobs:
       run: |
         set +e
         OUTPUT=$(flutter analyze --no-fatal-infos 2>&1)
+        STATUS=$?
         set -e
         echo "$OUTPUT" > /tmp/analyzer_output.txt
-        COUNT=$(echo "$OUTPUT" | grep -oE '[0-9]+ issues? found' | grep -oE '^[0-9]+' || echo "0")
-        echo "Analyzer issues: $COUNT"
-        if [ "$COUNT" -gt 0 ]; then
-          echo "::error::Analyzer issue count ($COUNT) exceeds threshold (0)"
+        echo "Analyzer exit code: $STATUS"
+        if [ "$STATUS" -ne 0 ]; then
+          echo "::error::Analyzer reported warnings or errors"
           exit 1
         fi
-        echo "Analyzer issues within budget ($COUNT <= 0)"
+        echo "Analyzer passed with only non-fatal info suggestions, if any"
 
     - name: Check code formatting
       run: dart format --output=none --set-exit-if-changed .

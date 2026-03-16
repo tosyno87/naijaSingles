@@ -77,7 +77,7 @@ class LikesService {
     } on Object catch (e) {
       AppLogger.error('Error handling like', error: e);
 
-      // Provide more specific error messages
+      // Provide more specific error messages for logging
       if (e.toString().contains('permission-denied')) {
         AppLogger.debug('Permission denied - check Firestore rules');
       } else if (e.toString().contains('not-found')) {
@@ -86,7 +86,7 @@ class LikesService {
         AppLogger.debug('Network error - check connection');
       }
 
-      return null;
+      rethrow;
     }
   }
 

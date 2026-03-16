@@ -16,6 +16,7 @@ import {
   validateIngestion,
   aggregateMetrics,
 } from './handlers/matchQualityHandlers';
+import {onAuthUserDeleted} from './handlers/authCleanupHandlers';
 
 admin.initializeApp();
 
@@ -39,6 +40,7 @@ export const createTestUsers = isTestEnvEnabled
     });
 
 export {validateIngestion, aggregateMetrics};
+export {onAuthUserDeleted};
 
 export const healthCheck = onRequest((req, res) => {
   res.status(200).json({

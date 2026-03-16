@@ -1,5 +1,4 @@
 import 'dart:async';
-import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -8,7 +7,9 @@ import 'package:google_fonts/google_fonts.dart';
 
 import '../../../common/utils/auth_router.dart';
 import '../../../common/widgets/custom_snackbar.dart';
-import '../google_sign_in/google_sign_in_bloc.dart';
+import '../google_login/google_login_bloc.dart';
+import '../google_login/google_login_events.dart';
+import '../google_login/google_login_states.dart';
 import '../phone/ui/screens/phone_number.dart';
 import 'sign_in_method_selection_screen.dart';
 
@@ -27,9 +28,7 @@ class AuthMethodSelectionScreen extends StatelessWidget {
     // Define colors based on Afrocentric design guidelines
     const Color backgroundColor = Colors.white; // White background (MVP color)
     const Color primaryColor = Color(0xFF008037); // Green accent
-    const Color accentColor = Color(0xFF008037); // Use green for consistency
     const Color googleBlue = Color(0xFF3B82F6); // Google blue
-    const Color appleBlack = Color(0xFF000000); // Apple black
     const Color textColor = Color(0xFF2D2D2D); // Dark text
     const Color textLightBrown = Color(0xFF666666); // Light gray for subtitle
 
@@ -93,7 +92,7 @@ class AuthMethodSelectionScreen extends StatelessWidget {
                   _buildAuthMethodButton(
                     context: context,
                     icon: Icons.phone_android,
-                    text: 'Continue with Phone',
+                    text: 'Continue with phone',
                     color: primaryColor,
                     onTap: () {
                       unawaited(
@@ -111,29 +110,16 @@ class AuthMethodSelectionScreen extends StatelessWidget {
 
                   const SizedBox(height: 16),
 
-                  // Email Button
-                  _buildAuthMethodButton(
-                    context: context,
-                    icon: Icons.email_outlined,
-                    text: 'Continue with Email',
-                    color: accentColor,
-                    onTap: () {
-                      unawaited(Navigator.pushNamed(context, '/email_signup'));
-                    },
-                  ),
-
-                  const SizedBox(height: 16),
-
                   // Google Sign In Button
                   BlocProvider(
-                    create: (context) => GoogleSignInBloc(),
-                    child: BlocConsumer<GoogleSignInBloc, GoogleSignInState>(
+                    create: (context) => GoogleLoginBloc(),
+                    child: BlocConsumer<GoogleLoginBloc, GoogleLoginStates>(
                       listener: (context, state) {
-                        if (state is GoogleSignInSuccess) {
+                        if (state is GoogleLoginSuccess) {
                           unawaited(AuthRouter.navigateAfterAuth(context));
-                        } else if (state is GoogleSignInFailure) {
+                        } else if (state is GoogleLoginFailed) {
                           CustomSnackbar.showSnackBarSimple(
-                            state.error,
+                            state.message,
                             context,
                           );
                         }
@@ -143,33 +129,15 @@ class AuthMethodSelectionScreen extends StatelessWidget {
                         icon: Icons.g_mobiledata_rounded,
                         text: 'Continue with Google',
                         color: googleBlue,
-                        isLoading: state is GoogleSignInLoading,
+                        isLoading: state is GoogleLoginLoading,
                         onTap: () {
-                          BlocProvider.of<GoogleSignInBloc>(context).add(
-                            GoogleSignInRequested(),
+                          BlocProvider.of<GoogleLoginBloc>(context).add(
+                            const GoogleLoginRequested(),
                           );
                         },
                       ),
                     ),
                   ),
-
-                  // Apple Sign In Button (iOS only)
-                  if (Platform.isIOS) ...[
-                    const SizedBox(height: 16),
-                    _buildAuthMethodButton(
-                      context: context,
-                      icon: Icons.apple,
-                      text: 'Continue with Apple',
-                      color: appleBlack,
-                      onTap: () {
-                        // Implement Apple Sign In
-                        CustomSnackbar.showSnackBarSimple(
-                          'Apple Sign In will be implemented soon',
-                          context,
-                        );
-                      },
-                    ),
-                  ],
 
                   const Spacer(),
 

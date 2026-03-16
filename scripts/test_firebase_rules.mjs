@@ -1188,10 +1188,7 @@ async function run() {
         theme: 'dark',
       });
 
-      await setDoc(doc(db, 'accountDeletions/del_a'), {
-        userId: 'userA',
-        reason: 'Moving on',
-      });
+      // accountDeletions: not seeded; tests create accountDeletions/userA and update it
 
       await setDoc(doc(db, 'security_logs/slog_a'), {
         reporterId: 'userA',
@@ -1344,9 +1341,10 @@ async function run() {
     );
     pass('accountDeletions: user can create own record with status pending');
 
+    // Rule requires doc id == auth.uid; use userB so we test create (new doc) with status aborted
     await assertSucceeds(
-      setDoc(doc(userADb, 'accountDeletions/del_new'), {
-        userId: 'userA',
+      setDoc(doc(userBDb, 'accountDeletions/userB'), {
+        userId: 'userB',
         reason: 'Testing',
         status: 'aborted',
       }),
@@ -1380,12 +1378,12 @@ async function run() {
     pass('accountDeletions: cannot create with deletedAt (server-only)');
 
     await assertSucceeds(
-      updateDoc(doc(userADb, 'accountDeletions/del_a'), { status: 'aborted' }),
+      updateDoc(doc(userADb, 'accountDeletions/userA'), { status: 'aborted' }),
     );
     pass('accountDeletions: user can update own record to status aborted only');
 
     await assertFails(
-      updateDoc(doc(userADb, 'accountDeletions/del_a'), {
+      updateDoc(doc(userADb, 'accountDeletions/userA'), {
         status: 'aborted',
         reason: 'Changed',
       }),
@@ -1393,14 +1391,14 @@ async function run() {
     pass('accountDeletions: cannot update any field other than status to aborted');
 
     await assertFails(
-      updateDoc(doc(userADb, 'accountDeletions/del_a'), { status: 'completed' }),
+      updateDoc(doc(userADb, 'accountDeletions/userA'), { status: 'completed' }),
     );
     pass('accountDeletions: cannot update to status completed (server-only)');
 
-    await assertSucceeds(getDoc(doc(userADb, 'accountDeletions/del_a')));
+    await assertSucceeds(getDoc(doc(userADb, 'accountDeletions/userA')));
     pass('accountDeletions: user can read own deletion record');
 
-    await assertFails(getDoc(doc(userBDb, 'accountDeletions/del_a')));
+    await assertFails(getDoc(doc(userBDb, 'accountDeletions/userA')));
     pass('accountDeletions: other user cannot read deletion record');
 
     // ── security_logs collection ────────────────────────────────────────────

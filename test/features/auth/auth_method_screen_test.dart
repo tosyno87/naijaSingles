@@ -16,7 +16,7 @@ void main() {
       );
       await tester.pumpAndSettle();
 
-      expect(find.text('Continue with Phone'), findsOneWidget);
+      expect(find.text('Continue with phone'), findsOneWidget);
       expect(find.text('Continue with Google'), findsOneWidget);
 
       // No legacy options (only Google + Phone are supported)
@@ -33,7 +33,7 @@ void main() {
       );
       await tester.pumpAndSettle();
 
-      expect(find.text('Continue with Phone'), findsOneWidget);
+      expect(find.text('Continue with phone'), findsOneWidget);
       expect(find.text('Continue with Google'), findsOneWidget);
 
       // No legacy options (only Google + Phone are supported)

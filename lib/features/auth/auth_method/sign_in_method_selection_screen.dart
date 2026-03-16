@@ -1,13 +1,14 @@
 import 'dart:async';
 
+import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:google_fonts/google_fonts.dart';
 
-import '../../../common/constants/app_colors.dart';
 import '../../../common/utils/auth_router.dart';
-import '../../../common/widgets/afropeep_primary_button.dart';
+import '../../../common/utils/privacy_policy_screen.dart';
+import '../../../common/utils/terms_of_service_screen.dart';
 import '../../../common/widgets/custom_snackbar.dart';
 import '../google_login/google_login_bloc.dart';
 import '../google_login/google_login_events.dart';
@@ -27,9 +28,13 @@ class SignInMethodSelectionScreen extends StatelessWidget {
 
     const Color googleBlue = Color(0xFF4285F4);
 
-    final screenWidth = MediaQuery.of(context).size.width;
+    final size = MediaQuery.sizeOf(context);
+    final screenWidth = size.width;
+    final screenHeight = size.height;
     final buttonWidth = screenWidth * 0.80;
     final bottomPadding = MediaQuery.of(context).padding.bottom;
+    // Proportional top offset so "Afropeep" sits in upper third (Hinge-style)
+    final topBrandOffset = screenHeight * 0.12;
 
     return Scaffold(
       extendBodyBehindAppBar: true,
@@ -38,7 +43,11 @@ class SignInMethodSelectionScreen extends StatelessWidget {
         backgroundColor: Colors.transparent,
         elevation: 0,
         leading: IconButton(
-          icon: const Icon(Icons.arrow_back_ios, color: Colors.white),
+          icon: const Icon(
+            Icons.arrow_back_ios,
+            color: Colors.white,
+            size: 20,
+          ),
           onPressed: () => Navigator.pop(context),
         ),
       ),
@@ -59,23 +68,44 @@ class SignInMethodSelectionScreen extends StatelessWidget {
             ),
           ),
 
-          // Stronger gradient — readable across the full content zone
-          const DecoratedBox(
-            decoration: BoxDecoration(
-              gradient: LinearGradient(
-                begin: Alignment.topCenter,
-                end: Alignment.bottomCenter,
-                colors: [
-                  Color(0x40000000), // 25%
-                  Color(0x33000000), // 20% — no clear gap
-                  Color(0xCC000000), // 80%
-                ],
-                stops: [0.0, 0.35, 1.0],
+          // Match welcome screen: localized bands only (no full-screen darkening)
+          Positioned(
+            top: 0,
+            left: 0,
+            right: 0,
+            height: screenHeight * 0.28,
+            child: const DecoratedBox(
+              decoration: BoxDecoration(
+                gradient: LinearGradient(
+                  begin: Alignment.topCenter,
+                  end: Alignment.bottomCenter,
+                  colors: [
+                    Color(0x73000000), // 45% black
+                    Color(0x00000000),
+                  ],
+                ),
+              ),
+            ),
+          ),
+          Positioned(
+            left: 0,
+            right: 0,
+            bottom: 0,
+            height: screenHeight * 0.55,
+            child: const DecoratedBox(
+              decoration: BoxDecoration(
+                gradient: LinearGradient(
+                  begin: Alignment.topCenter,
+                  end: Alignment.bottomCenter,
+                  colors: [
+                    Color(0x00000000),
+                    Color(0xA6000000), // 65% black
+                  ],
+                ),
               ),
             ),
           ),
 
-          // Content pushed to bottom half
           SafeArea(
             child: Padding(
               padding: EdgeInsets.fromLTRB(
@@ -85,52 +115,184 @@ class SignInMethodSelectionScreen extends StatelessWidget {
                 bottomPadding > 0 ? bottomPadding : 24,
               ),
               child: Column(
+                crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: [
+                  SizedBox(height: topBrandOffset),
+
+                  // Wordmark — clean, premium: title case, thicker, larger
+                  Center(
+                    child: Text(
+                      'Afropeep',
+                      style: GoogleFonts.plusJakartaSans(
+                        fontSize: 42,
+                        fontWeight: FontWeight.w700,
+                        color: Colors.white,
+                        letterSpacing: -0.3,
+                        shadows: [
+                          Shadow(
+                            color: Colors.black.withValues(alpha: 0.15),
+                            blurRadius: 8,
+                            offset: const Offset(0, 1),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+
                   const Spacer(),
 
-                  // Wordmark (matches welcome screen)
-                  Text(
-                    'Afropeep',
-                    style: GoogleFonts.plusJakartaSans(
-                      fontSize: 34,
-                      fontWeight: FontWeight.w700,
-                      color: Colors.white,
-                      letterSpacing: 0.6,
-                      shadows: [
-                        Shadow(
-                          color: Colors.black.withValues(alpha: 0.5),
-                          blurRadius: 12,
+                  SizedBox(
+                    width: buttonWidth,
+                    child: Text.rich(
+                      TextSpan(
+                        style: GoogleFonts.montserrat(
+                          fontSize: 14,
+                          fontWeight: FontWeight.w400,
+                          height: 1.4,
+                          color: const Color(0xB3FFFFFF),
                         ),
-                      ],
+                        children: [
+                          const TextSpan(
+                            text: 'By continuing, you agree to our ',
+                          ),
+                          TextSpan(
+                            text: 'Terms',
+                            style: const TextStyle(
+                              fontWeight: FontWeight.w600,
+                              decoration: TextDecoration.underline,
+                              color: Color(0xB3FFFFFF),
+                            ),
+                            recognizer: TapGestureRecognizer()
+                              ..onTap = () {
+                                unawaited(
+                                  Navigator.push(
+                                    context,
+                                    MaterialPageRoute(
+                                      builder: (_) =>
+                                          const TermsOfServiceScreen(),
+                                    ),
+                                  ),
+                                );
+                              },
+                          ),
+                          const TextSpan(text: ' and '),
+                          TextSpan(
+                            text: 'Privacy Policy',
+                            style: const TextStyle(
+                              fontWeight: FontWeight.w600,
+                              decoration: TextDecoration.underline,
+                              color: Color(0xB3FFFFFF),
+                            ),
+                            recognizer: TapGestureRecognizer()
+                              ..onTap = () {
+                                unawaited(
+                                  Navigator.push(
+                                    context,
+                                    MaterialPageRoute(
+                                      builder: (_) =>
+                                          const PrivacyPolicyScreen(),
+                                    ),
+                                  ),
+                                );
+                              },
+                          ),
+                          const TextSpan(text: '.'),
+                        ],
+                      ),
+                      textAlign: TextAlign.center,
                     ),
                   ),
 
                   const SizedBox(height: 24),
 
-                  Text(
-                    'Sign in',
-                    textAlign: TextAlign.center,
-                    style: GoogleFonts.montserrat(
-                      fontSize: 28,
-                      fontWeight: FontWeight.bold,
-                      color: Colors.white,
-                      letterSpacing: -0.5,
+                  Center(
+                    child: SizedBox(
+                      width: buttonWidth,
+                      height: 56,
+                      child: Material(
+                        color: Colors.transparent,
+                        child: InkWell(
+                          onTap: () {
+                            unawaited(
+                              Navigator.pushReplacement(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (context) => PhoneNumber(
+                                    updatePhoneNumber: false,
+                                    isSignIn: true,
+                                  ),
+                                ),
+                              ),
+                            );
+                          },
+                          borderRadius: BorderRadius.circular(28),
+                          child: Stack(
+                            fit: StackFit.expand,
+                            children: [
+                              // 1. Multi-stop gradient (depth)
+                              Container(
+                                decoration: BoxDecoration(
+                                  borderRadius: BorderRadius.circular(28),
+                                  gradient: const LinearGradient(
+                                    begin: Alignment.topCenter,
+                                    end: Alignment.bottomCenter,
+                                    colors: [
+                                      Color(0xFF22D879), // top
+                                      Color(0xFF18B866), // middle
+                                      Color(0xFF0E7C45), // bottom
+                                    ],
+                                    stops: [0.0, 0.5, 1.0],
+                                  ),
+                                  boxShadow: [
+                                    BoxShadow(
+                                      color: const Color(0xFF18B866)
+                                          .withValues(alpha: 0.28),
+                                      blurRadius: 20,
+                                      offset: const Offset(0, 6),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                              // 2. Top highlight (top 35%, subtle shine)
+                              Container(
+                                decoration: BoxDecoration(
+                                  borderRadius: BorderRadius.circular(28),
+                                  gradient: LinearGradient(
+                                    begin: Alignment.topCenter,
+                                    end: const Alignment(0, -0.3), // ~35% down
+                                    colors: [
+                                      Colors.white.withValues(alpha: 0.12),
+                                      Colors.transparent,
+                                    ],
+                                  ),
+                                ),
+                              ),
+                              // 3. Content: text only (match welcome primary button)
+                              Center(
+                                child: Padding(
+                                  padding: const EdgeInsets.symmetric(
+                                    horizontal: 24,
+                                    vertical: 15,
+                                  ),
+                                  child: Text(
+                                    'Continue with phone',
+                                    style: GoogleFonts.montserrat(
+                                      fontSize: 17,
+                                      fontWeight: FontWeight.w600,
+                                      letterSpacing: 0.3,
+                                      color: Colors.white,
+                                    ),
+                                  ),
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ),
                     ),
                   ),
 
-                  const SizedBox(height: 8),
-
-                  Text(
-                    "Choose how you'd like to sign in",
-                    textAlign: TextAlign.center,
-                    style: GoogleFonts.montserrat(
-                      fontSize: 15,
-                      fontWeight: FontWeight.w500,
-                      color: const Color(0xB3FFFFFF),
-                    ),
-                  ),
-
-                  const SizedBox(height: 32),
+                  const SizedBox(height: 12),
 
                   Center(
                     child: SizedBox(
@@ -150,47 +312,55 @@ class SignInMethodSelectionScreen extends StatelessWidget {
                               );
                             }
                           },
-                          builder: (context, state) => AfropeepPrimaryButton(
-                            icon: Icons.g_mobiledata_rounded,
-                            text: 'Continue with Google',
-                            backgroundColor: googleBlue,
-                            textColor: Colors.white,
-                            variant: AuthButtonVariant.secondary,
-                            isLoading: state is GoogleLoginLoading,
-                            onPressed: () {
-                              BlocProvider.of<GoogleLoginBloc>(context).add(
-                                const GoogleLoginRequested(),
-                              );
-                            },
-                          ),
-                        ),
-                      ),
-                    ),
-                  ),
-
-                  const SizedBox(height: 12),
-
-                  Center(
-                    child: SizedBox(
-                      width: buttonWidth,
-                      child: AfropeepPrimaryButton(
-                        icon: Icons.phone_outlined,
-                        text: 'Continue with Phone',
-                        backgroundColor: AppColors.primaryGreen,
-                        textColor: Colors.white,
-                        onPressed: () {
-                          unawaited(
-                            Navigator.pushReplacement(
-                              context,
-                              MaterialPageRoute(
-                                builder: (context) => PhoneNumber(
-                                  updatePhoneNumber: false,
-                                  isSignIn: true,
-                                ),
+                          builder: (context, state) => TextButton.icon(
+                            onPressed: state is GoogleLoginLoading
+                                ? null
+                                : () {
+                                    BlocProvider.of<GoogleLoginBloc>(context)
+                                        .add(
+                                      const GoogleLoginRequested(),
+                                    );
+                                  },
+                            icon: state is GoogleLoginLoading
+                                ? const SizedBox(
+                                    width: 18,
+                                    height: 18,
+                                    child: CircularProgressIndicator(
+                                      strokeWidth: 2,
+                                      color: Colors.white,
+                                    ),
+                                  )
+                                : Icon(
+                                    Icons.g_mobiledata_rounded,
+                                    color: Colors.white.withValues(alpha: 0.9),
+                                    size: 28,
+                                  ),
+                            label: Text(
+                              'Continue with Google',
+                              style: GoogleFonts.montserrat(
+                                fontSize: 15,
+                                fontWeight: FontWeight.w500,
+                                letterSpacing: 0.3,
+                                color: Colors.white.withValues(alpha: 0.9),
                               ),
                             ),
-                          );
-                        },
+                            style: TextButton.styleFrom(
+                              foregroundColor:
+                                  Colors.white.withValues(alpha: 0.9),
+                              padding: const EdgeInsets.symmetric(
+                                vertical: 14,
+                                horizontal: 24,
+                              ),
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(999),
+                                side: BorderSide(
+                                  color: googleBlue.withValues(alpha: 0.45),
+                                ),
+                              ),
+                              backgroundColor: const Color(0x1AFFFFFF),
+                            ),
+                          ),
+                        ),
                       ),
                     ),
                   ),
@@ -204,6 +374,7 @@ class SignInMethodSelectionScreen extends StatelessWidget {
                         "Don't have an account? ",
                         style: GoogleFonts.montserrat(
                           fontSize: 14,
+                          fontWeight: FontWeight.w400,
                           color: const Color(0xB3FFFFFF),
                         ),
                       ),
@@ -223,8 +394,9 @@ class SignInMethodSelectionScreen extends StatelessWidget {
                         child: Text(
                           'Create one',
                           style: GoogleFonts.montserrat(
-                            fontSize: 14,
+                            fontSize: 15,
                             fontWeight: FontWeight.w600,
+                            letterSpacing: 0.3,
                             color: Colors.white,
                           ),
                         ),

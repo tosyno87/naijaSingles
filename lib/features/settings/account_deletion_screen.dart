@@ -3,8 +3,6 @@ import 'dart:async';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-
-import '../../common/utils/app_logger.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:pin_code_fields/pin_code_fields.dart';
 
@@ -14,6 +12,7 @@ import '../../common/data/repo/googlelogin_repo.dart';
 import '../../common/data/repo/phone_auth_repo.dart';
 import '../../common/routes/route_name.dart';
 import '../../common/utils/account_deletion_scope.dart';
+import '../../common/utils/app_logger.dart';
 
 class AccountDeletionScreen extends StatefulWidget {
   const AccountDeletionScreen({super.key});
@@ -1247,25 +1246,31 @@ class _AccountDeletionScreenState extends State<AccountDeletionScreen> {
     String? email,
     String? phoneNumber,
   }) async {
-    await _firestore.collection('accountDeletions').doc(userId).set({
-      'userId': userId,
-      'email': email,
-      'phoneNumber': phoneNumber,
-      'authProvider': authProvider,
-      'reason': _selectedReason,
-      'customReason':
-          _selectedReason == 'Other' ? _reasonController.text : null,
-      'requestedAt': FieldValue.serverTimestamp(),
-      'status': 'pending',
-    }, SetOptions(merge: true));
+    await _firestore.collection('accountDeletions').doc(userId).set(
+      {
+        'userId': userId,
+        'email': email,
+        'phoneNumber': phoneNumber,
+        'authProvider': authProvider,
+        'reason': _selectedReason,
+        'customReason':
+            _selectedReason == 'Other' ? _reasonController.text : null,
+        'requestedAt': FieldValue.serverTimestamp(),
+        'status': 'pending',
+      },
+      SetOptions(merge: true),
+    );
   }
 
   /// Marks the audit record as aborted (e.g. deletion failed or user gave up). Best-effort; logs and swallows errors.
   Future<void> _writeAuditRecordAborted(String userId) async {
     try {
-      await _firestore.collection('accountDeletions').doc(userId).set({
-        'status': 'aborted',
-      }, SetOptions(merge: true));
+      await _firestore.collection('accountDeletions').doc(userId).set(
+        {
+          'status': 'aborted',
+        },
+        SetOptions(merge: true),
+      );
     } on Object catch (e) {
       AppLogger.warning('Could not write audit aborted', error: e);
     }

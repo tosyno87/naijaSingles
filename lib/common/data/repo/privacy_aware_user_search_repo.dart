@@ -3,10 +3,10 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 
 import '../../../models/user_model.dart';
-import '../../utils/app_logger.dart';
 import '../../../services/location_privacy_service.dart';
 import '../../../services/user_privacy_service.dart';
 import '../../constants/constants.dart';
+import '../../utils/app_logger.dart';
 import '../../utils/distance.dart' as distance;
 
 /// Privacy-aware user search repository that respects user privacy settings

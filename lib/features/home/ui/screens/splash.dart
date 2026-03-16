@@ -207,14 +207,14 @@ class SplashState extends State<Splash> {
 
                   const SizedBox(height: 24),
 
-                  // App name - single wordmark in dark brown/charcoal
+                  // App name — clean wordmark (splash uses dark text on light bg)
                   Text(
                     'Afropeep',
-                    style: GoogleFonts.montserrat(
-                      fontSize: 32,
-                      fontWeight: FontWeight.w600,
-                      color: textColor, // Dark brown/charcoal, not pure black
-                      letterSpacing: 0.5,
+                    style: GoogleFonts.plusJakartaSans(
+                      fontSize: 38,
+                      fontWeight: FontWeight.w700,
+                      letterSpacing: -0.3,
+                      color: textColor,
                     ),
                   ),
                 ],

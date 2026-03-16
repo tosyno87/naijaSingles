@@ -85,65 +85,63 @@ class PrivacyPolicyPageState extends State<PrivacyPolicyPage> {
   }
 
   @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        backgroundColor: Colors.white,
-        foregroundColor: AppColors.textPrimary,
-        elevation: 0,
-        title: Text(
-          widget.tittle,
-          style: const TextStyle(color: AppColors.textPrimary),
+  Widget build(BuildContext context) => Scaffold(
+        appBar: AppBar(
+          backgroundColor: Colors.white,
+          foregroundColor: AppColors.textPrimary,
+          elevation: 0,
+          title: Text(
+            widget.tittle,
+            style: const TextStyle(color: AppColors.textPrimary),
+          ),
+          centerTitle: false,
         ),
-        centerTitle: false,
-      ),
-      backgroundColor: Colors.white,
-      body: Stack(
-        children: [
-          if (_loadError != null)
-            Center(
-              child: Padding(
-                padding: const EdgeInsets.all(24),
-                child: Column(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    Icon(
-                      Icons.error_outline,
-                      size: 48,
-                      color: AppColors.textSecondary,
-                    ),
-                    const SizedBox(height: 16),
-                    Text(
-                      _loadError!,
-                      textAlign: TextAlign.center,
-                      style: const TextStyle(
+        backgroundColor: Colors.white,
+        body: Stack(
+          children: [
+            if (_loadError != null)
+              Center(
+                child: Padding(
+                  padding: const EdgeInsets.all(24),
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      const Icon(
+                        Icons.error_outline,
+                        size: 48,
                         color: AppColors.textSecondary,
-                        fontSize: 16,
                       ),
-                    ),
-                    const SizedBox(height: 24),
-                    FilledButton.icon(
-                      onPressed: _retry,
-                      icon: const Icon(Icons.refresh),
-                      label: const Text('Retry'),
-                      style: FilledButton.styleFrom(
-                        backgroundColor: AppColors.primaryGreen,
-                        foregroundColor: Colors.white,
+                      const SizedBox(height: 16),
+                      Text(
+                        _loadError!,
+                        textAlign: TextAlign.center,
+                        style: const TextStyle(
+                          color: AppColors.textSecondary,
+                          fontSize: 16,
+                        ),
                       ),
-                    ),
-                  ],
+                      const SizedBox(height: 24),
+                      FilledButton.icon(
+                        onPressed: _retry,
+                        icon: const Icon(Icons.refresh),
+                        label: const Text('Retry'),
+                        style: FilledButton.styleFrom(
+                          backgroundColor: AppColors.primaryGreen,
+                          foregroundColor: Colors.white,
+                        ),
+                      ),
+                    ],
+                  ),
                 ),
+              )
+            else
+              WebViewWidget(controller: controller),
+            if (loadingPercentage < 100 && _loadError == null)
+              LinearProgressIndicator(
+                value: loadingPercentage / 100.0,
+                color: AppColors.primaryGreen,
               ),
-            )
-          else
-            WebViewWidget(controller: controller),
-          if (loadingPercentage < 100 && _loadError == null)
-            LinearProgressIndicator(
-              value: loadingPercentage / 100.0,
-              color: AppColors.primaryGreen,
-            ),
-        ],
-      ),
-    );
-  }
+          ],
+        ),
+      );
 }

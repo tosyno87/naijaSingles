@@ -444,9 +444,7 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
       // SINGLE bottom navigation bar for the entire app
       bottomNavigationBar: BottomNavigationBar(
         currentIndex: _validSelectedIndex,
-        onTap: (index) {
-          _switchToTab(index);
-        },
+        onTap: _switchToTab,
         backgroundColor: Colors.white,
         selectedItemColor: AppColors.primaryGreen,
         unselectedItemColor: const Color(0xFF8E8E93),

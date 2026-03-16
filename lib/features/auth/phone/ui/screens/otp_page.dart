@@ -333,7 +333,9 @@ class _OtpPageState extends State<OtpPage> {
                             return;
                           }
                           _hasNavigated = true;
-                          context.read<UserBloc>().add(UserDataUpdated(state.user));
+                          context
+                              .read<UserBloc>()
+                              .add(UserDataUpdated(state.user));
                           unawaited(AuthRouter.navigateAfterAuth(context));
                         } else if (state is NewRegistration) {
                           log('📝 REGISTRATION CHECK: New User Registration');

@@ -72,7 +72,8 @@ class RegistrationBloc extends Bloc<RegistrationEvents, RegistrationStates> {
                 } on Object catch (e) {
                   log('❌ Failed to ensure minimal user doc: $e');
                   emit(const RegistrationFailed(
-                      message: 'Could not set up your account. Please try again.'));
+                    message: 'Could not set up your account. Please try again.',
+                  ),);
                 }
               }
             } on Object catch (getUserError) {
@@ -89,7 +90,8 @@ class RegistrationBloc extends Bloc<RegistrationEvents, RegistrationStates> {
               } on Object catch (e) {
                 log('❌ Failed to ensure minimal user doc: $e');
                 emit(const RegistrationFailed(
-                    message: 'Could not set up your account. Please try again.'));
+                  message: 'Could not set up your account. Please try again.',
+                ),);
               }
             }
           } else {
@@ -152,7 +154,8 @@ class RegistrationBloc extends Bloc<RegistrationEvents, RegistrationStates> {
               } on Object catch (e) {
                 log('❌ Failed to ensure minimal user doc: $e');
                 emit(const RegistrationFailed(
-                    message: 'Could not set up your account. Please try again.'));
+                  message: 'Could not set up your account. Please try again.',
+                ),);
               }
             } else {
               emit(

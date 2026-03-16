@@ -177,7 +177,9 @@ class _UserDetailScreenState extends State<UserDetailScreen> {
 
   Widget _buildBottomActionBar() {
     final targetUserId = widget.user.id;
-    if (targetUserId == null || targetUserId.isEmpty) return const SizedBox.shrink();
+    if (targetUserId == null || targetUserId.isEmpty) {
+      return const SizedBox.shrink();
+    }
 
     return SafeArea(
       top: false,
@@ -202,7 +204,8 @@ class _UserDetailScreenState extends State<UserDetailScreen> {
                     : () async {
                         setState(() => _isLiking = true);
                         try {
-                          final matchId = await _matchService.handleLike(targetUserId);
+                          final matchId =
+                              await _matchService.handleLike(targetUserId);
                           if (!mounted) return;
                           setState(() => _isLiking = false);
                           if (matchId != null) {
@@ -271,7 +274,8 @@ class _UserDetailScreenState extends State<UserDetailScreen> {
               style: OutlinedButton.styleFrom(
                 foregroundColor: afropeepGreen,
                 side: const BorderSide(color: afropeepGreen),
-                padding: const EdgeInsets.symmetric(vertical: 14, horizontal: 16),
+                padding:
+                    const EdgeInsets.symmetric(vertical: 14, horizontal: 16),
                 shape: const RoundedRectangleBorder(
                   borderRadius: BorderRadius.all(Radius.circular(14)),
                 ),

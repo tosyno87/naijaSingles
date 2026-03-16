@@ -68,8 +68,7 @@ class GoogleLoginRepositoryImpl implements GoogleLoginRepository {
 
   @override
   Future<void> ensureUserDocument(User user) async {
-    final userRef =
-        firebaseFireStoreInstance.collection('users').doc(user.uid);
+    final userRef = firebaseFireStoreInstance.collection('users').doc(user.uid);
     final doc = await userRef.get();
     if (doc.exists && doc.data() != null && doc.data()!.isNotEmpty) {
       await userRef.update({

@@ -55,7 +55,8 @@ class GoogleLoginBloc extends Bloc<GoogleLoginEvents, GoogleLoginStates> {
       log('Google sign-in failed: $msg');
       // User-friendly message for credential/reconciliation/network errors
       emit(const GoogleLoginFailed(
-          message: 'Could not complete sign in. Please try again.'));
+        message: 'Could not complete sign in. Please try again.',
+      ),);
     }
   }
 

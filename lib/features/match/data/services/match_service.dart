@@ -21,12 +21,13 @@ class MatchService {
 
   /// Handle like action with mutual like detection
   /// This is the main method to call when a user likes another user
-  /// Returns match ID if mutual match is created, null otherwise
+  /// Returns match ID if mutual match is created, null otherwise.
+  /// Returns null when not authenticated (fail gracefully).
   Future<String?> handleLike(String toUserId) async {
     try {
       if (currentUserId == null) {
         debugPrint('No current user logged in');
-        throw StateError('Not authenticated. Please sign in to like.');
+        return null;
       }
 
       return await _likesService.handleLike(currentUserId!, toUserId);

@@ -232,14 +232,17 @@ class PhoneAuthRepository {
   Future<void> ensureMinimalUserDocument(User user) async {
     final rawPhone = user.phoneNumber ?? '';
     final phoneDigits = _normalizePhoneToDigits(rawPhone);
-    await firebaseFireStoreInstance.collection('users').doc(user.uid).set({
-      'userId': user.uid,
-      'phoneNumber': phoneDigits.isNotEmpty ? phoneDigits : rawPhone,
-      'onboardingCompleted': false,
-      'createdAt': FieldValue.serverTimestamp(),
-      'lastActive': FieldValue.serverTimestamp(),
-      'signInMethod': 'phone',
-    }, SetOptions(merge: true));
+    await firebaseFireStoreInstance.collection('users').doc(user.uid).set(
+      {
+        'userId': user.uid,
+        'phoneNumber': phoneDigits.isNotEmpty ? phoneDigits : rawPhone,
+        'onboardingCompleted': false,
+        'createdAt': FieldValue.serverTimestamp(),
+        'lastActive': FieldValue.serverTimestamp(),
+        'signInMethod': 'phone',
+      },
+      SetOptions(merge: true),
+    );
   }
 
   Future<bool> userDetails(String userId) async {

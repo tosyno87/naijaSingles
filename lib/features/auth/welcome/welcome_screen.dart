@@ -394,83 +394,81 @@ class _WelcomeScreenState extends State<WelcomeScreen>
   Widget _buildPrimaryButton({
     required String text,
     required VoidCallback onPressed,
-  }) {
-    return SizedBox(
-      height: 56,
-      width: double.infinity,
-      child: Material(
+  }) =>
+      SizedBox(
+        height: 56,
+        width: double.infinity,
+        child: Material(
         color: Colors.transparent,
-        child: InkWell(
-          onTap: () {
+          child: InkWell(
+            onTap: () {
             unawaited(HapticFeedback.lightImpact());
-            onPressed();
-          },
-          borderRadius: BorderRadius.circular(28),
-          child: Stack(
-            fit: StackFit.expand,
-            children: [
-              // 1. Multi-stop gradient (depth)
-              Container(
-                decoration: BoxDecoration(
-                  borderRadius: BorderRadius.circular(28),
-                  gradient: const LinearGradient(
-                    begin: Alignment.topCenter,
-                    end: Alignment.bottomCenter,
-                    colors: [
-                      Color(0xFF22D879), // top
-                      Color(0xFF18B866), // middle
-                      Color(0xFF0E7C45), // bottom
-                    ],
-                    stops: [0.0, 0.5, 1.0],
-                  ),
-                  boxShadow: [
-                    BoxShadow(
-                      color: const Color(0xFF18B866).withValues(alpha: 0.28),
-                      blurRadius: 20,
-                      spreadRadius: 0,
-                      offset: const Offset(0, 6),
+              onPressed();
+            },
+            borderRadius: BorderRadius.circular(28),
+            child: Stack(
+              fit: StackFit.expand,
+              children: [
+                // 1. Multi-stop gradient (depth)
+                Container(
+                  decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(28),
+                    gradient: const LinearGradient(
+                      begin: Alignment.topCenter,
+                      end: Alignment.bottomCenter,
+                      colors: [
+                        Color(0xFF22D879), // top
+                        Color(0xFF18B866), // middle
+                        Color(0xFF0E7C45), // bottom
+                      ],
+                      stops: [0.0, 0.5, 1.0],
                     ),
-                  ],
-                ),
-              ),
-              // 2. Top highlight (top 35%, subtle shine)
-              Container(
-                decoration: BoxDecoration(
-                  borderRadius: BorderRadius.circular(28),
-                  gradient: LinearGradient(
-                    begin: Alignment.topCenter,
-                    end: const Alignment(0, -0.3),
-                    colors: [
-                      Colors.white.withValues(alpha: 0.12),
-                      Colors.transparent,
+                    boxShadow: [
+                      BoxShadow(
+                        color: const Color(0xFF18B866).withValues(alpha: 0.28),
+                        blurRadius: 20,
+                        offset: const Offset(0, 6),
+                      ),
                     ],
                   ),
                 ),
-              ),
-              // 3. Content
-              Center(
-                child: Padding(
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: 24,
-                    vertical: 15,
-                  ),
-                  child: Text(
-                    text,
-                    style: GoogleFonts.montserrat(
-                      fontSize: 17,
-                      fontWeight: FontWeight.w600,
-                      letterSpacing: 0.3,
-                      color: Colors.white,
+                // 2. Top highlight (top 35%, subtle shine)
+                Container(
+                  decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(28),
+                    gradient: LinearGradient(
+                      begin: Alignment.topCenter,
+                      end: const Alignment(0, -0.3),
+                      colors: [
+                        Colors.white.withValues(alpha: 0.12),
+                        Colors.transparent,
+                      ],
                     ),
                   ),
                 ),
-              ),
-            ],
+                // 3. Content
+                Center(
+                  child: Padding(
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 24,
+                      vertical: 15,
+                    ),
+                    child: Text(
+                      text,
+                      style: GoogleFonts.montserrat(
+                        fontSize: 17,
+                        fontWeight: FontWeight.w600,
+                        letterSpacing: 0.3,
+                        color: Colors.white,
+                      ),
+                    ),
+                  ),
+                ),
+              ],
+            ),
           ),
         ),
-      ),
-    );
-  }
+      );
 
   Widget _buildSecondaryButton({
     required String text,

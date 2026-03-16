@@ -249,7 +249,6 @@ class SignInMethodSelectionScreen extends StatelessWidget {
                                       color: const Color(0xFF18B866)
                                           .withValues(alpha: 0.28),
                                       blurRadius: 20,
-                                      spreadRadius: 0,
                                       offset: const Offset(0, 6),
                                     ),
                                   ],

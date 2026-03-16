@@ -1246,25 +1246,31 @@ class _AccountDeletionScreenState extends State<AccountDeletionScreen> {
     String? email,
     String? phoneNumber,
   }) async {
-    await _firestore.collection('accountDeletions').doc(userId).set({
-      'userId': userId,
-      'email': email,
-      'phoneNumber': phoneNumber,
-      'authProvider': authProvider,
-      'reason': _selectedReason,
-      'customReason':
-          _selectedReason == 'Other' ? _reasonController.text : null,
-      'requestedAt': FieldValue.serverTimestamp(),
-      'status': 'pending',
-    }, SetOptions(merge: true),);
+    await _firestore.collection('accountDeletions').doc(userId).set(
+      {
+        'userId': userId,
+        'email': email,
+        'phoneNumber': phoneNumber,
+        'authProvider': authProvider,
+        'reason': _selectedReason,
+        'customReason':
+            _selectedReason == 'Other' ? _reasonController.text : null,
+        'requestedAt': FieldValue.serverTimestamp(),
+        'status': 'pending',
+      },
+      SetOptions(merge: true),
+    );
   }
 
   /// Marks the audit record as aborted (e.g. deletion failed or user gave up). Best-effort; logs and swallows errors.
   Future<void> _writeAuditRecordAborted(String userId) async {
     try {
-      await _firestore.collection('accountDeletions').doc(userId).set({
-        'status': 'aborted',
-      }, SetOptions(merge: true),);
+      await _firestore.collection('accountDeletions').doc(userId).set(
+        {
+          'status': 'aborted',
+        },
+        SetOptions(merge: true),
+      );
     } on Object catch (e) {
       AppLogger.warning('Could not write audit aborted', error: e);
     }

@@ -7,9 +7,9 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:google_fonts/google_fonts.dart';
 
 import '../../../common/utils/auth_router.dart';
-import '../../../common/utils/privacy_page.dart';
+import '../../../common/utils/privacy_policy_screen.dart';
+import '../../../common/utils/terms_of_service_screen.dart';
 import '../../../common/widgets/custom_snackbar.dart';
-import '../../../config/app_config.dart';
 import '../google_login/google_login_bloc.dart';
 import '../google_login/google_login_events.dart';
 import '../google_login/google_login_states.dart';
@@ -168,11 +168,8 @@ class SignInMethodSelectionScreen extends StatelessWidget {
                                   Navigator.push(
                                     context,
                                     MaterialPageRoute(
-                                      builder: (context) =>
-                                          const PrivacyPolicyPage(
-                                        url: termConditionUrl,
-                                        tittle: 'Terms of Service',
-                                      ),
+                                      builder: (_) =>
+                                          const TermsOfServiceScreen(),
                                     ),
                                   ),
                                 );
@@ -192,11 +189,8 @@ class SignInMethodSelectionScreen extends StatelessWidget {
                                   Navigator.push(
                                     context,
                                     MaterialPageRoute(
-                                      builder: (context) =>
-                                          const PrivacyPolicyPage(
-                                        url: privacyUrl,
-                                        tittle: 'Privacy Policy',
-                                      ),
+                                      builder: (_) =>
+                                          const PrivacyPolicyScreen(),
                                     ),
                                   ),
                                 );

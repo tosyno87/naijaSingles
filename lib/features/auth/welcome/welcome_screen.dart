@@ -251,24 +251,21 @@ class _WelcomeScreenState extends State<WelcomeScreen>
                 children: [
                   const SizedBox(height: 44),
 
-                  // Wordmark
+                  // Wordmark — clean, premium: title case, thicker, larger
                   FadeTransition(
                     opacity: _textFade,
                     child: Text(
                       'Afropeep',
                       style: GoogleFonts.plusJakartaSans(
-                        fontSize: 34,
+                        fontSize: 42,
                         fontWeight: FontWeight.w700,
                         color: Colors.white,
-                        letterSpacing: 0.6,
+                        letterSpacing: -0.3,
                         shadows: [
                           Shadow(
-                            color: Colors.black.withValues(alpha: 0.5),
-                            blurRadius: 12,
-                          ),
-                          Shadow(
-                            color: Colors.black.withValues(alpha: 0.25),
-                            blurRadius: 4,
+                            color: Colors.black.withValues(alpha: 0.15),
+                            blurRadius: 8,
+                            offset: const Offset(0, 1),
                           ),
                         ],
                       ),

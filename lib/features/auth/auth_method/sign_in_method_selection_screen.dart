@@ -68,32 +68,40 @@ class SignInMethodSelectionScreen extends StatelessWidget {
             ),
           ),
 
-          const DecoratedBox(
-            decoration: BoxDecoration(
-              gradient: LinearGradient(
-                begin: Alignment.topCenter,
-                end: Alignment.bottomCenter,
-                colors: [
-                  Color(0x40000000), // 25%
-                  Color(0x33000000), // 20%
-                  Color(0xCC000000), // 80%
-                ],
-                stops: [0.0, 0.35, 1.0],
+          // Match welcome screen: localized bands only (no full-screen darkening)
+          Positioned(
+            top: 0,
+            left: 0,
+            right: 0,
+            height: screenHeight * 0.28,
+            child: const DecoratedBox(
+              decoration: BoxDecoration(
+                gradient: LinearGradient(
+                  begin: Alignment.topCenter,
+                  end: Alignment.bottomCenter,
+                  colors: [
+                    Color(0x73000000), // 45% black
+                    Color(0x00000000),
+                  ],
+                ),
               ),
             ),
           ),
-
-          // Dark gradient behind buttons (40% black at bottom) for clearer text
-          const DecoratedBox(
-            decoration: BoxDecoration(
-              gradient: LinearGradient(
-                begin: Alignment.topCenter,
-                end: Alignment.bottomCenter,
-                colors: [
-                  Colors.transparent,
-                  Color(0x66000000), // 40% black at bottom
-                ],
-                stops: [0.0, 1.0],
+          Positioned(
+            left: 0,
+            right: 0,
+            bottom: 0,
+            height: screenHeight * 0.55,
+            child: const DecoratedBox(
+              decoration: BoxDecoration(
+                gradient: LinearGradient(
+                  begin: Alignment.topCenter,
+                  end: Alignment.bottomCenter,
+                  colors: [
+                    Color(0x00000000),
+                    Color(0xA6000000), // 65% black
+                  ],
+                ),
               ),
             ),
           ),
@@ -111,23 +119,20 @@ class SignInMethodSelectionScreen extends StatelessWidget {
                 children: [
                   SizedBox(height: topBrandOffset),
 
-                  // Wordmark — match welcome screen (plusJakartaSans, bold, white)
+                  // Wordmark — clean, premium: title case, thicker, larger
                   Center(
                     child: Text(
                       'Afropeep',
                       style: GoogleFonts.plusJakartaSans(
-                        fontSize: 34,
+                        fontSize: 42,
                         fontWeight: FontWeight.w700,
                         color: Colors.white,
-                        letterSpacing: 0.6,
+                        letterSpacing: -0.3,
                         shadows: [
                           Shadow(
-                            color: Colors.black.withValues(alpha: 0.5),
-                            blurRadius: 12,
-                          ),
-                          Shadow(
-                            color: Colors.black.withValues(alpha: 0.25),
-                            blurRadius: 4,
+                            color: Colors.black.withValues(alpha: 0.15),
+                            blurRadius: 8,
+                            offset: const Offset(0, 1),
                           ),
                         ],
                       ),

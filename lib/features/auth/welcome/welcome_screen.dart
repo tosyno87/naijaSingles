@@ -8,7 +8,6 @@ import 'package:flutter/services.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:vector_math/vector_math_64.dart' show Vector3;
 
-import '../../../common/constants/app_colors.dart';
 import '../../../common/routes/route_name.dart';
 import '../auth_method/sign_in_method_selection_screen.dart';
 import '../phone/ui/screens/phone_number.dart';
@@ -395,44 +394,83 @@ class _WelcomeScreenState extends State<WelcomeScreen>
   Widget _buildPrimaryButton({
     required String text,
     required VoidCallback onPressed,
-  }) =>
-      DecoratedBox(
-        decoration: BoxDecoration(
-          gradient: AppColors.primaryGradient,
-          borderRadius: BorderRadius.circular(28),
-          boxShadow: [
-            BoxShadow(
-              color: AppColors.primaryGreen.withValues(alpha: 0.3),
-              blurRadius: 16,
-              offset: const Offset(0, 6),
-            ),
-          ],
-        ),
-        child: ElevatedButton(
-          onPressed: () {
+  }) {
+    return SizedBox(
+      height: 56,
+      width: double.infinity,
+      child: Material(
+        color: Colors.transparent,
+        child: InkWell(
+          onTap: () {
             unawaited(HapticFeedback.lightImpact());
             onPressed();
           },
-          style: ElevatedButton.styleFrom(
-            backgroundColor: Colors.transparent,
-            foregroundColor: Colors.white,
-            shadowColor: Colors.transparent,
-            minimumSize: const Size(double.infinity, 54),
-            padding: const EdgeInsets.symmetric(vertical: 15, horizontal: 24),
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(28),
-            ),
-          ),
-          child: Text(
-            text,
-            style: GoogleFonts.montserrat(
-              fontSize: 17,
-              fontWeight: FontWeight.w600,
-              letterSpacing: 0.3,
-            ),
+          borderRadius: BorderRadius.circular(28),
+          child: Stack(
+            fit: StackFit.expand,
+            children: [
+              // 1. Multi-stop gradient (depth)
+              Container(
+                decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(28),
+                  gradient: const LinearGradient(
+                    begin: Alignment.topCenter,
+                    end: Alignment.bottomCenter,
+                    colors: [
+                      Color(0xFF22D879), // top
+                      Color(0xFF18B866), // middle
+                      Color(0xFF0E7C45), // bottom
+                    ],
+                    stops: [0.0, 0.5, 1.0],
+                  ),
+                  boxShadow: [
+                    BoxShadow(
+                      color: const Color(0xFF18B866).withValues(alpha: 0.28),
+                      blurRadius: 20,
+                      spreadRadius: 0,
+                      offset: const Offset(0, 6),
+                    ),
+                  ],
+                ),
+              ),
+              // 2. Top highlight (top 35%, subtle shine)
+              Container(
+                decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(28),
+                  gradient: LinearGradient(
+                    begin: Alignment.topCenter,
+                    end: const Alignment(0, -0.3),
+                    colors: [
+                      Colors.white.withValues(alpha: 0.12),
+                      Colors.transparent,
+                    ],
+                  ),
+                ),
+              ),
+              // 3. Content
+              Center(
+                child: Padding(
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 24,
+                    vertical: 15,
+                  ),
+                  child: Text(
+                    text,
+                    style: GoogleFonts.montserrat(
+                      fontSize: 17,
+                      fontWeight: FontWeight.w600,
+                      letterSpacing: 0.3,
+                      color: Colors.white,
+                    ),
+                  ),
+                ),
+              ),
+            ],
           ),
         ),
-      );
+      ),
+    );
+  }
 
   Widget _buildSecondaryButton({
     required String text,

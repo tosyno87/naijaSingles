@@ -92,7 +92,7 @@ class AuthMethodSelectionScreen extends StatelessWidget {
                   _buildAuthMethodButton(
                     context: context,
                     icon: Icons.phone_android,
-                    text: 'Continue with Phone',
+                    text: 'Continue with phone',
                     color: primaryColor,
                     onTap: () {
                       unawaited(

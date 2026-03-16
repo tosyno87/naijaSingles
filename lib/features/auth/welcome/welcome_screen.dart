@@ -399,10 +399,10 @@ class _WelcomeScreenState extends State<WelcomeScreen>
         height: 56,
         width: double.infinity,
         child: Material(
-        color: Colors.transparent,
+          color: Colors.transparent,
           child: InkWell(
             onTap: () {
-            unawaited(HapticFeedback.lightImpact());
+              unawaited(HapticFeedback.lightImpact());
               onPressed();
             },
             borderRadius: BorderRadius.circular(28),

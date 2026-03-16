@@ -346,7 +346,8 @@ class SignInMethodSelectionScreen extends StatelessWidget {
                               ),
                             ),
                             style: TextButton.styleFrom(
-                              foregroundColor: Colors.white.withValues(alpha: 0.9),
+                              foregroundColor:
+                                  Colors.white.withValues(alpha: 0.9),
                               padding: const EdgeInsets.symmetric(
                                 vertical: 14,
                                 horizontal: 24,

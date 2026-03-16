@@ -26,6 +26,7 @@ class AfropeepPrimaryButton extends StatelessWidget {
   final IconData? icon;
   final String text;
   final Color? backgroundColor;
+
   /// Optional gradient; when set, overrides [backgroundColor] for enabled state.
   final LinearGradient? gradient;
   final Color? textColor;
@@ -34,6 +35,7 @@ class AfropeepPrimaryButton extends StatelessWidget {
   final AuthButtonVariant variant;
   final double? width;
   final double? height;
+
   /// Custom border radius (e.g. 28 for pill). Default: 16 primary, 28 secondary.
   final double? borderRadius;
   final Color? disabledBackgroundColor;

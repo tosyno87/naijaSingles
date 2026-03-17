@@ -38,6 +38,7 @@ dependencies:
   
   cloud_functions: ^6.0.0        # Updated to latest
   country_code_picker: ^3.3.0    # Updated to latest
+  dlibphonenumber: ^1.1.56      # E.164 and country-aware phone validation
   crop_image: ^1.0.16            # Updated to latest
   cupertino_icons: ^1.0.8        # Updated to latest
   easy_localization: ^3.0.7+1    # Updated to latest

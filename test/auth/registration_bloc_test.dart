@@ -56,7 +56,7 @@ void main() {
     );
 
     blocTest<RegistrationBloc, RegistrationStates>(
-      'emits [Loading, NewRegistration] when no data found',
+      'emits [Loading, NewRegistration] when no data found (signup)',
       build: () {
         when(() => firebaseUser.uid).thenReturn('test-user-id');
         when(() => repo.getCurrentUser()).thenAnswer((_) async => firebaseUser);
@@ -66,11 +66,37 @@ void main() {
             .thenAnswer((_) async {});
         return bloc;
       },
-      act: (bloc) => bloc.add(const CheckRegistration(token: 't')),
+      act: (bloc) =>
+          bloc.add(const CheckRegistration(token: 't', isLogin: false)),
       expect: () => [
         RegistrationLoading(),
         NewRegistration(token: 't', user: firebaseUser),
       ],
+    );
+
+    blocTest<RegistrationBloc, RegistrationStates>(
+      'emits [Loading, NotRegistered] when isLogin and user not registered; does not call ensureMinimalUserDocument; calls signOut',
+      build: () {
+        when(() => firebaseUser.uid).thenReturn('test-user-id');
+        when(() => firebaseUser.displayName).thenReturn('name');
+        when(() => firebaseUser.phoneNumber).thenReturn('+2348012345678');
+        when(() => repo.getCurrentUser()).thenAnswer((_) async => firebaseUser);
+        when(() => repo.userDetails(any())).thenAnswer((_) async => false);
+        when(() => repo.findUserIdByPhoneNumber(any()))
+            .thenAnswer((_) async => null);
+        when(() => repo.signOut()).thenAnswer((_) async {});
+        return bloc;
+      },
+      act: (bloc) =>
+          bloc.add(const CheckRegistration(token: 't', isLogin: true)),
+      expect: () => [
+        RegistrationLoading(),
+        const NotRegistered(),
+      ],
+      verify: (_) {
+        verify(() => repo.signOut()).called(1);
+        verifyNever(() => repo.ensureMinimalUserDocument(firebaseUser));
+      },
     );
 
     blocTest<RegistrationBloc, RegistrationStates>(

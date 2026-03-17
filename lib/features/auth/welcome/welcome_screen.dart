@@ -8,9 +8,9 @@ import 'package:flutter/services.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:vector_math/vector_math_64.dart' show Vector3;
 
-import '../../../common/routes/route_name.dart';
+import '../../../common/utils/auth_router.dart';
+import '../auth_method/auth_method_selection_screen.dart';
 import '../auth_method/sign_in_method_selection_screen.dart';
-import '../phone/ui/screens/phone_number.dart';
 
 class WelcomeScreen extends StatefulWidget {
   const WelcomeScreen({super.key});
@@ -338,10 +338,7 @@ class _WelcomeScreenState extends State<WelcomeScreen>
           child: _buildPrimaryButton(
             text: 'Continue to App',
             onPressed: () => unawaited(
-              Navigator.pushReplacementNamed(
-                context,
-                RouteName.mainNavigation,
-              ),
+              AuthRouter.navigateAfterAuth(context),
             ),
           ),
         ),
@@ -360,7 +357,7 @@ class _WelcomeScreenState extends State<WelcomeScreen>
                 Navigator.push(
                   context,
                   MaterialPageRoute(
-                    builder: (context) => PhoneNumber(updatePhoneNumber: false),
+                    builder: (context) => const AuthMethodSelectionScreen(),
                   ),
                 ),
               ),

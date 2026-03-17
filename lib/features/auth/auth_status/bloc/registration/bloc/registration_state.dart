@@ -45,3 +45,10 @@ class NewRegistration extends RegistrationStates {
   @override
   List<Object> get props => [token, user];
 }
+
+/// Emitted when user attempted login but has no Firestore profile. Caller should sign out and pop.
+class NotRegistered extends RegistrationStates {
+  const NotRegistered();
+  @override
+  List<Object> get props => [];
+}

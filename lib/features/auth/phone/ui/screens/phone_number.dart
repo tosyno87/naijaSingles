@@ -4,6 +4,7 @@ import 'dart:developer';
 import 'dart:io';
 
 import 'package:country_code_picker/country_code_picker.dart';
+import 'package:dlibphonenumber/dlibphonenumber.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -40,6 +41,7 @@ class _PhoneNumberState extends State<PhoneNumber> {
   bool _isLoading = false;
 
   String countryCode = '+1';
+  String _regionCode = 'US';
   TextEditingController phoneNumberController = TextEditingController();
   final TextEditingController _codeController = TextEditingController();
 
@@ -57,36 +59,26 @@ class _PhoneNumberState extends State<PhoneNumber> {
     super.dispose();
   }
 
-  static const _minDigitsByPrefix = <String, int>{
-    '+1': 10, // US / CA
-    '+44': 10, // UK
-    '+233': 9, // Ghana
-    '+234': 10, // Nigeria
-    '+254': 9, // Kenya
-    '+27': 9, // South Africa
-    '+256': 9, // Uganda
-    '+255': 9, // Tanzania
-    '+237': 8, // Cameroon
-    '+225': 8, // Ivory Coast
-    '+221': 9, // Senegal
-    '+49': 10, // Germany
-    '+33': 9, // France
-    '+39': 10, // Italy
-  };
-
   void _validatePhoneNumber() {
+    if (!mounted) return;
+    final raw = phoneNumberController.text.trim();
+    final phoneDigits = raw.replaceAll(RegExp(r'[^\d]'), '');
+    if (phoneDigits.isEmpty) {
+      setState(() => isValidNumber = false);
+      return;
+    }
+    bool isValid = false;
+    try {
+      final phoneUtil = PhoneNumberUtil.instance;
+      final fullNumber = countryCode + phoneDigits;
+      final parsed = phoneUtil.parse(fullNumber, _regionCode);
+      isValid = phoneUtil.isValidNumber(parsed);
+    } on Object catch (e) {
+      log('📞 Phone validation failed: $e');
+    }
     if (mounted) {
-      final phoneDigits =
-          phoneNumberController.text.trim().replaceAll(RegExp(r'[^\d]'), '');
-
-      final minDigits = _minDigitsByPrefix[countryCode] ?? 7;
-      final isValid = phoneDigits.length >= minDigits;
-
-      setState(() {
-        isValidNumber = isValid;
-      });
-
-      log('📞 Phone validation: "${phoneNumberController.text.trim()}" -> $phoneDigits digits -> button enabled: $isValid (min: $minDigits for $countryCode)');
+      setState(() => isValidNumber = isValid);
+      log('📞 Phone validation: "$raw" ($countryCode) -> valid: $isValid');
     }
   }
 
@@ -322,7 +314,8 @@ class _PhoneNumberState extends State<PhoneNumber> {
                                       onChanged: (CountryCode code) {
                                         if (mounted) {
                                           setState(() {
-                                            countryCode = code.dialCode!;
+                                            countryCode = code.dialCode ?? '+1';
+                                            _regionCode = code.code ?? 'US';
                                             _validatePhoneNumber();
                                           });
                                         }

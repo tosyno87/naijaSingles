@@ -153,6 +153,12 @@ class RegistrationBloc extends Bloc<RegistrationEvents, RegistrationStates> {
                   return;
                 }
               }
+              if (event.isLogin) {
+                log('📝 Login with unregistered number — signing out and emitting NotRegistered');
+                await phoneAuthRepository.signOut();
+                emit(const NotRegistered());
+                return;
+              }
               try {
                 await phoneAuthRepository.ensureMinimalUserDocument(user);
                 emit(NewRegistration(token: event.token, user: user));

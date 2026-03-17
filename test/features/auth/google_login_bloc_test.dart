@@ -91,7 +91,7 @@ void main() {
     );
 
     blocTest<GoogleLoginBloc, GoogleLoginStates>(
-      'emits [GoogleLoginLoading, GoogleLoginFailed] when signIn throws FirebaseAuthException',
+      'emits [GoogleLoginLoading, GoogleLoginFailed] with recovery message when signIn throws account-exists-with-different-credential',
       build: () {
         when(() => mockRepo.signInWithGoogle()).thenThrow(
           FirebaseAuthException(
@@ -104,7 +104,10 @@ void main() {
       act: (bloc) => bloc.add(const GoogleLoginRequested()),
       expect: () => [
         GoogleLoginLoading(),
-        isA<GoogleLoginFailed>(),
+        const GoogleLoginFailed(
+          message:
+              'An account already exists with the same email but different sign-in method.',
+        ),
       ],
       verify: (_) {
         verify(() => mockRepo.signInWithGoogle()).called(1);

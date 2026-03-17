@@ -544,12 +544,7 @@ class OnboardingBloc extends Bloc<OnboardingEvent, OnboardingState> {
     } on Object catch (err) {
       log('Error saving user data: $err');
       emit(OnboardingSaveFailure(err.toString()));
-      if (context != null && context.mounted) {
-        await Navigator.of(context).pushNamedAndRemoveUntil(
-          '/main_navigation',
-          (route) => false,
-        );
-      }
+      // Do not navigate to main app on failure; user stays on onboarding to retry.
     }
   }
 }

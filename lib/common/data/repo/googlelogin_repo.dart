@@ -47,21 +47,11 @@ class GoogleLoginRepositoryImpl implements GoogleLoginRepository {
 
       // Return the user
       return userCredential.user;
+    } on FirebaseAuthException catch (e) {
+      AppLogger.error('Google Sign-In Error', error: e);
+      rethrow;
     } on Object catch (e) {
       AppLogger.error('Google Sign-In Error', error: e);
-      // Handle specific errors if needed
-      if (e is FirebaseAuthException) {
-        if (e.code == 'account-exists-with-different-credential') {
-          throw Exception(
-            'An account already exists with the same email address but different sign-in credentials.',
-          );
-        } else if (e.code == 'invalid-credential') {
-          throw Exception(
-            'Error occurred while accessing credentials. Try again.',
-          );
-        }
-      }
-      // Rethrow the error for the BLoC to handle
       rethrow;
     }
   }

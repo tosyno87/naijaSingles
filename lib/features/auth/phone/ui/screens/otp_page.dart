@@ -452,7 +452,9 @@ class _OtpPageState extends State<OtpPage> {
                                 if (value != null && !_hasNavigated) {
                                   log('Got token after phone verification, dispatching CheckRegistration');
                                   BlocProvider.of<RegistrationBloc>(context)
-                                      .add(CheckRegistration(token: value, isLogin: widget.isLogin));
+                                      .add(CheckRegistration(
+                                          token: value,
+                                          isLogin: widget.isLogin));
                                 } else if (value == null) {
                                   log('Error: Token is null after phone verification');
                                   CustomSnackbar.showSnackBarSimple(

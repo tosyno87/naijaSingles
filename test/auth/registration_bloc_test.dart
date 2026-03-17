@@ -66,7 +66,8 @@ void main() {
             .thenAnswer((_) async {});
         return bloc;
       },
-      act: (bloc) => bloc.add(const CheckRegistration(token: 't', isLogin: false)),
+      act: (bloc) =>
+          bloc.add(const CheckRegistration(token: 't', isLogin: false)),
       expect: () => [
         RegistrationLoading(),
         NewRegistration(token: 't', user: firebaseUser),
@@ -81,11 +82,13 @@ void main() {
         when(() => firebaseUser.phoneNumber).thenReturn('+2348012345678');
         when(() => repo.getCurrentUser()).thenAnswer((_) async => firebaseUser);
         when(() => repo.userDetails(any())).thenAnswer((_) async => false);
-        when(() => repo.findUserIdByPhoneNumber(any())).thenAnswer((_) async => null);
+        when(() => repo.findUserIdByPhoneNumber(any()))
+            .thenAnswer((_) async => null);
         when(() => repo.signOut()).thenAnswer((_) async {});
         return bloc;
       },
-      act: (bloc) => bloc.add(const CheckRegistration(token: 't', isLogin: true)),
+      act: (bloc) =>
+          bloc.add(const CheckRegistration(token: 't', isLogin: true)),
       expect: () => [
         RegistrationLoading(),
         const NotRegistered(),

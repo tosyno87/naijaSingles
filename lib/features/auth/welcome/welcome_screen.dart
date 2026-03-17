@@ -351,17 +351,17 @@ class _WelcomeScreenState extends State<WelcomeScreen>
         Center(
           child: SizedBox(
             width: buttonWidth,
-          child: _buildPrimaryButton(
-            text: 'Create Account',
-            onPressed: () => unawaited(
-              Navigator.push(
-                context,
-                MaterialPageRoute(
-                  builder: (context) => const AuthMethodSelectionScreen(),
+            child: _buildPrimaryButton(
+              text: 'Create Account',
+              onPressed: () => unawaited(
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => const AuthMethodSelectionScreen(),
+                  ),
                 ),
               ),
             ),
-          ),
           ),
         ),
         const SizedBox(height: 16),

@@ -17,6 +17,7 @@ class RegistrationRequest extends RegistrationEvents {
 class CheckRegistration extends RegistrationEvents {
   const CheckRegistration({required this.token, this.isLogin = false});
   final String token;
+
   /// True when user is attempting login (not signup). If not registered we sign out and emit NotRegistered.
   final bool isLogin;
 

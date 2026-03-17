@@ -105,7 +105,8 @@ void main() {
       expect: () => [
         GoogleLoginLoading(),
         const GoogleLoginFailed(
-          message: 'An account already exists with the same email but different sign-in method.',
+          message:
+              'An account already exists with the same email but different sign-in method.',
         ),
       ],
       verify: (_) {

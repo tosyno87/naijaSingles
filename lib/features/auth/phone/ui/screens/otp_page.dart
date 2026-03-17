@@ -30,6 +30,8 @@ class OtpPage extends StatefulWidget {
   final String phoneNumber;
   final String verificationId;
   final bool isLogin; // Added to distinguish between login and registration
+  final PhoneAuthBloc? phoneAuthBlocOverride;
+  final RegistrationBloc? registrationBlocOverride;
 
   OtpPage({
     required this.phoneNumber,
@@ -38,6 +40,8 @@ class OtpPage extends StatefulWidget {
     this.codeController = '',
     this.updatePhoneNumber = false,
     this.isLogin = false,
+    this.phoneAuthBlocOverride,
+    this.registrationBlocOverride,
   });
 
   @override
@@ -134,18 +138,28 @@ class _OtpPageState extends State<OtpPage> {
         create: (context) => PhoneAuthRepository(),
         child: MultiBlocProvider(
           providers: [
-            BlocProvider(
-              create: (context) => PhoneAuthBloc(
-                phoneAuthRepository:
-                    RepositoryProvider.of<PhoneAuthRepository>(context),
+            if (widget.phoneAuthBlocOverride != null)
+              BlocProvider<PhoneAuthBloc>.value(
+                value: widget.phoneAuthBlocOverride!,
+              )
+            else
+              BlocProvider(
+                create: (context) => PhoneAuthBloc(
+                  phoneAuthRepository:
+                      RepositoryProvider.of<PhoneAuthRepository>(context),
+                ),
               ),
-            ),
-            BlocProvider(
-              create: (context) => RegistrationBloc(
-                phoneAuthRepository:
-                    RepositoryProvider.of<PhoneAuthRepository>(context),
+            if (widget.registrationBlocOverride != null)
+              BlocProvider<RegistrationBloc>.value(
+                value: widget.registrationBlocOverride!,
+              )
+            else
+              BlocProvider(
+                create: (context) => RegistrationBloc(
+                  phoneAuthRepository:
+                      RepositoryProvider.of<PhoneAuthRepository>(context),
+                ),
               ),
-            ),
           ],
           child: Scaffold(
             backgroundColor: backgroundColor,
@@ -337,23 +351,23 @@ class _OtpPageState extends State<OtpPage> {
                               .read<UserBloc>()
                               .add(UserDataUpdated(state.user));
                           unawaited(AuthRouter.navigateAfterAuth(context));
+                        } else if (state is NotRegistered) {
+                          log('📝 REGISTRATION CHECK: Login with no profile — sign out and pop');
+                          _hasNavigated = true;
+                          CustomSnackbar.showSnackBarSimple(
+                            'No account found with this phone number. Please sign up first.',
+                            context,
+                          );
+                          context.read<AuthstatusBloc>().add(LogoutEvent());
+                          unawaited(
+                            Future.microtask(() {
+                              if (context.mounted) {
+                                Navigator.pop(context);
+                              }
+                            }),
+                          );
                         } else if (state is NewRegistration) {
                           log('📝 REGISTRATION CHECK: New User Registration');
-                          if (widget.isLogin) {
-                            _hasNavigated = true;
-                            CustomSnackbar.showSnackBarSimple(
-                              'No account found with this phone number. Please sign up first.',
-                              context,
-                            );
-                            unawaited(
-                              Future.microtask(() {
-                                if (context.mounted) {
-                                  Navigator.pop(context);
-                                }
-                              }),
-                            );
-                            return;
-                          }
                           _hasNavigated = true;
                           unawaited(AuthRouter.navigateAfterAuth(context));
                         } else if (state is RegistrationFailed) {
@@ -438,7 +452,7 @@ class _OtpPageState extends State<OtpPage> {
                                 if (value != null && !_hasNavigated) {
                                   log('Got token after phone verification, dispatching CheckRegistration');
                                   BlocProvider.of<RegistrationBloc>(context)
-                                      .add(CheckRegistration(token: value));
+                                      .add(CheckRegistration(token: value, isLogin: widget.isLogin));
                                 } else if (value == null) {
                                   log('Error: Token is null after phone verification');
                                   CustomSnackbar.showSnackBarSimple(

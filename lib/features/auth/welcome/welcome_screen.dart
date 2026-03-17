@@ -21,7 +21,6 @@ class WelcomeScreen extends StatefulWidget {
 
 class _WelcomeScreenState extends State<WelcomeScreen>
     with TickerProviderStateMixin {
-  bool _isAuthenticated = false;
   bool _isLoading = true;
 
   // Ken Burns — perpetual slow zoom + pan
@@ -107,18 +106,24 @@ class _WelcomeScreenState extends State<WelcomeScreen>
 
       final currentUser = FirebaseAuth.instance.currentUser;
 
+      if (currentUser != null) {
+        log('User has session — skipping Welcome, navigating via AuthRouter');
+        if (mounted) {
+          await AuthRouter.navigateAfterAuth(context);
+        }
+        return;
+      }
+
       if (mounted) {
         setState(() {
-          _isAuthenticated = currentUser != null;
           _isLoading = false;
         });
-        log("User authentication status: ${_isAuthenticated ? 'Authenticated' : 'Not authenticated'}");
+        log('User not authenticated — showing Welcome (Create Account / Log in)');
       }
     } on Object catch (e) {
       log('Error checking auth status: $e');
       if (mounted) {
         setState(() {
-          _isAuthenticated = false;
           _isLoading = false;
         });
       }
@@ -330,20 +335,6 @@ class _WelcomeScreenState extends State<WelcomeScreen>
 
   Widget _buildButtons(double screenWidth) {
     final buttonWidth = screenWidth * 0.80;
-
-    if (_isAuthenticated) {
-      return Center(
-        child: SizedBox(
-          width: buttonWidth,
-          child: _buildPrimaryButton(
-            text: 'Continue to App',
-            onPressed: () => unawaited(
-              AuthRouter.navigateAfterAuth(context),
-            ),
-          ),
-        ),
-      );
-    }
 
     return Column(
       mainAxisSize: MainAxisSize.min,

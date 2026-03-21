@@ -104,13 +104,13 @@ class _WelcomeScreenState extends State<WelcomeScreen>
       await Future.delayed(const Duration(milliseconds: 100));
       if (!mounted) return;
 
+      // Session-first launch behavior:
+      // - Returning signed-in users go straight to app home
+      // - Users without a session see auth entry options
       final currentUser = FirebaseAuth.instance.currentUser;
-
       if (currentUser != null) {
-        log('User has session — skipping Welcome, navigating via AuthRouter');
-        if (mounted) {
-          await AuthRouter.navigateAfterAuth(context);
-        }
+        log('User has active session — routing via AuthRouter');
+        await AuthRouter.navigateAfterAuth(context);
         return;
       }
 
@@ -118,7 +118,7 @@ class _WelcomeScreenState extends State<WelcomeScreen>
         setState(() {
           _isLoading = false;
         });
-        log('User not authenticated — showing Welcome (Create Account / Log in)');
+        log('No active session — showing Welcome (Create Account / Log in)');
       }
     } on Object catch (e) {
       log('Error checking auth status: $e');

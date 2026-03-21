@@ -47,17 +47,7 @@ class AuthRouter {
         'AuthRouter: invalid/stale auth session detected '
         '(anonymous or unsupported provider) — signing out to welcome',
       );
-      try {
-        await FirebaseAuth.instance.signOut();
-      } on Object catch (e) {
-        log('AuthRouter: signOut failed while clearing stale session: $e');
-      }
-      if (context.mounted) {
-        await Navigator.of(context).pushNamedAndRemoveUntil(
-          RouteName.welcomeScreen,
-          (route) => false,
-        );
-      }
+      await _signOutAndGoWelcome(context);
       return;
     }
 
@@ -68,9 +58,28 @@ class AuthRouter {
           .get()
           .timeout(const Duration(seconds: 5));
 
-      final isComplete = doc.exists &&
-          doc.data() != null &&
-          ProfileCompletionGuard.isDocumentComplete(doc.data()!);
+      final profileData = doc.data();
+      if (!doc.exists || profileData == null) {
+        log(
+          'AuthRouter: authenticated session has no user profile document '
+          '— signing out and returning to welcome',
+        );
+        if (!context.mounted) return;
+        await _signOutAndGoWelcome(context);
+        return;
+      }
+
+      final isComplete = ProfileCompletionGuard.isDocumentComplete(profileData);
+
+      if (!isComplete && _isBlankProfile(profileData)) {
+        log(
+          'AuthRouter: blank/incomplete profile detected '
+          '— signing out and returning to welcome',
+        );
+        if (!context.mounted) return;
+        await _signOutAndGoWelcome(context);
+        return;
+      }
 
       if (!context.mounted) return;
 
@@ -117,5 +126,42 @@ class AuthRouter {
     if (providerIds.isEmpty) return true;
 
     return !providerIds.any(_supportedProviderIds.contains);
+  }
+
+  static bool _isBlankProfile(Map<String, dynamic> data) {
+    bool isNonEmptyString(Object? value) =>
+        value is String && value.trim().isNotEmpty;
+    bool hasNonEmptyList(String key) =>
+        data[key] is List && (data[key] as List).isNotEmpty;
+
+    final hasName =
+        isNonEmptyString(data['name']) || isNonEmptyString(data['userName']);
+    final hasGender = isNonEmptyString(data['gender']) ||
+        isNonEmptyString(data['userGender']);
+    final hasBio = isNonEmptyString(data['bio']);
+    final hasPhoto = hasNonEmptyList('photos') ||
+        hasNonEmptyList('Pictures') ||
+        hasNonEmptyList('imageUrl') ||
+        isNonEmptyString(data['profilePicture']);
+    final hasLocation = isNonEmptyString(data['locationName']) ||
+        (data['location'] is Map &&
+            isNonEmptyString((data['location'] as Map)['address']));
+
+    return !(hasName || hasGender || hasPhoto || hasBio || hasLocation);
+  }
+
+  static Future<void> _signOutAndGoWelcome(BuildContext context) async {
+    try {
+      await FirebaseAuth.instance.signOut();
+    } on Object catch (e) {
+      log('AuthRouter: signOut failed while clearing session: $e');
+    }
+
+    if (context.mounted) {
+      await Navigator.of(context).pushNamedAndRemoveUntil(
+        RouteName.welcomeScreen,
+        (route) => false,
+      );
+    }
   }
 }

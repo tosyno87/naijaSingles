@@ -15,16 +15,21 @@ class OnboardingRepository {
     required OnboardingData data,
     required String userId,
   }) async {
+    final userRef = FirebaseFirestore.instance.collection('users').doc(userId);
     final essentialData = _buildEssentialData(data);
 
     AppLogger.info('🔍 Saving essential user data to Firestore...');
 
-    await FirebaseFirestore.instance
-        .collection('users')
-        .doc(userId)
-        .set(essentialData, SetOptions(merge: true));
+    // Firestore rules lock `createdAt` after initial creation.
+    // Keep it only on first write; never attempt to mutate it later.
+    final snapshot = await userRef.get();
+    if (snapshot.exists) {
+      essentialData.remove('createdAt');
+    }
 
-    await FirebaseFirestore.instance.collection('users').doc(userId).update({
+    await userRef.set(essentialData, SetOptions(merge: true));
+
+    await userRef.update({
       'updatedAt': FieldValue.serverTimestamp(),
     });
 

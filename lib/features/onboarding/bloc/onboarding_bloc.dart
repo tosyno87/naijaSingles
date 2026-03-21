@@ -544,6 +544,19 @@ class OnboardingBloc extends Bloc<OnboardingEvent, OnboardingState> {
     } on Object catch (err) {
       log('Error saving user data: $err');
       emit(OnboardingSaveFailure(err.toString()));
+      if (context != null && context.mounted) {
+        final navigator = Navigator.of(context, rootNavigator: true);
+        if (navigator.canPop()) {
+          navigator.pop();
+        }
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text(
+              'Could not complete profile setup. Please try again.',
+            ),
+          ),
+        );
+      }
       // Do not navigate to main app on failure; user stays on onboarding to retry.
     }
   }

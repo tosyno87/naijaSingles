@@ -22,6 +22,12 @@ class WelcomeScreen extends StatefulWidget {
 class _WelcomeScreenState extends State<WelcomeScreen>
     with TickerProviderStateMixin {
   bool _isLoading = true;
+  static const Set<String> _supportedProviderIds = <String>{
+    'phone',
+    'google.com',
+    'password',
+    'apple.com',
+  };
 
   // Ken Burns — perpetual slow zoom + pan
   late AnimationController _kenBurnsController;
@@ -109,9 +115,19 @@ class _WelcomeScreenState extends State<WelcomeScreen>
       // - Users without a session see auth entry options
       final currentUser = FirebaseAuth.instance.currentUser;
       if (currentUser != null) {
-        log('User has active session — routing via AuthRouter');
-        await AuthRouter.navigateAfterAuth(context);
-        return;
+        // Defensive cleanup for stale/invalid auth sessions that may persist
+        // across TestFlight updates. These users should see auth entry.
+        if (_shouldTreatAsSignedOut(currentUser)) {
+          log(
+            'Invalid/stale auth session detected '
+            '(anonymous or unsupported provider). Signing out.',
+          );
+          await FirebaseAuth.instance.signOut();
+        } else {
+          log('User has active session — routing via AuthRouter');
+          await AuthRouter.navigateAfterAuth(context);
+          return;
+        }
       }
 
       if (mounted) {
@@ -128,6 +144,18 @@ class _WelcomeScreenState extends State<WelcomeScreen>
         });
       }
     }
+  }
+
+  bool _shouldTreatAsSignedOut(User user) {
+    if (user.isAnonymous) return true;
+
+    final providerIds = user.providerData
+        .map((provider) => provider.providerId)
+        .where((id) => id.trim().isNotEmpty)
+        .toSet();
+    if (providerIds.isEmpty) return true;
+
+    return !providerIds.any(_supportedProviderIds.contains);
   }
 
   @override

@@ -16,6 +16,12 @@ class AuthRouter {
   AuthRouter._();
 
   static const Duration _newAccountWindow = Duration(minutes: 2);
+  static const Set<String> _supportedProviderIds = <String>{
+    'phone',
+    'google.com',
+    'password',
+    'apple.com',
+  };
 
   /// Reads the current user's Firestore document and navigates to
   /// [RouteName.onboarding] (incomplete profile) or
@@ -27,6 +33,25 @@ class AuthRouter {
     final user = FirebaseAuth.instance.currentUser;
     if (user == null) {
       log('AuthRouter: no authenticated user — returning to welcome');
+      if (context.mounted) {
+        await Navigator.of(context).pushNamedAndRemoveUntil(
+          RouteName.welcomeScreen,
+          (route) => false,
+        );
+      }
+      return;
+    }
+
+    if (_shouldTreatAsSignedOut(user)) {
+      log(
+        'AuthRouter: invalid/stale auth session detected '
+        '(anonymous or unsupported provider) — signing out to welcome',
+      );
+      try {
+        await FirebaseAuth.instance.signOut();
+      } on Object catch (e) {
+        log('AuthRouter: signOut failed while clearing stale session: $e');
+      }
       if (context.mounted) {
         await Navigator.of(context).pushNamedAndRemoveUntil(
           RouteName.welcomeScreen,
@@ -80,5 +105,17 @@ class AuthRouter {
         );
       }
     }
+  }
+
+  static bool _shouldTreatAsSignedOut(User user) {
+    if (user.isAnonymous) return true;
+
+    final providerIds = user.providerData
+        .map((provider) => provider.providerId)
+        .where((id) => id.trim().isNotEmpty)
+        .toSet();
+    if (providerIds.isEmpty) return true;
+
+    return !providerIds.any(_supportedProviderIds.contains);
   }
 }

@@ -270,6 +270,7 @@ jobs:
         env:
           SKIP_FLUTTER_CLEAN: "true"
         run: |
+          ./scripts/verify_release_firebase_config.sh
           flutter pub get
           flutter build ios --release --dart-define=ENV=production --no-codesign
           cd ios

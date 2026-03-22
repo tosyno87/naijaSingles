@@ -41,6 +41,14 @@ class PhoneAuthBloc extends Bloc<PhoneAuthEvent, PhoneAuthState> {
   }
   final PhoneAuthRepository phoneAuthRepository;
   final auth = firebaseAuthInstance;
+  static const bool _verboseAuthLogs = bool.fromEnvironment('VERBOSE_AUTH_LOGS');
+
+  void _authDebugLog(String message) {
+    if (_verboseAuthLogs) {
+      log(message);
+    }
+  }
+
   FutureOr<void> _updatenumber(
     OnPhoneNumberupdateEvent event,
     Emitter<PhoneAuthState> emit,
@@ -77,12 +85,6 @@ class PhoneAuthBloc extends Bloc<PhoneAuthEvent, PhoneAuthState> {
     SendOtpToPhoneEvent event,
     Emitter<PhoneAuthState> emit,
   ) async {
-    log('');
-    log('🎯🎯🎯 EVENT RECEIVED IN BLOC! 🎯🎯🎯');
-    log('Event: SendOtpToPhoneEvent');
-    log('Phone: ${event.phoneNumber}');
-    log('');
-
     emit(PhoneAuthLoading());
     try {
       // Normalize phone number: remove spaces, dashes, and parentheses
@@ -93,23 +95,7 @@ class PhoneAuthBloc extends Bloc<PhoneAuthEvent, PhoneAuthState> {
           .replaceAll('(', '')
           .replaceAll(')', '')
           .trim();
-
-      log('');
-      log('═══════════════════════════════════════════════════════');
-      log('🔥 FIREBASE PHONE AUTH CALLED');
-      log('═══════════════════════════════════════════════════════');
-      log('Phone Number Received: ${event.phoneNumber}');
-      log('Normalized Phone: $normalizedPhone');
-      log('');
-      log('✅ Make sure this EXACT number is in Firebase Console:');
-      log('   "$normalizedPhone"');
-      log('');
-      log('⚠️  Firebase Console may show formatted numbers like:');
-      log('   "+234 800 000 0000" or "+234-800-000-0000"');
-      log('   But internally it stores: "$normalizedPhone"');
-      log('   Your app MUST send: "$normalizedPhone"');
-      log('═══════════════════════════════════════════════════════');
-      log('');
+      _authDebugLog('PhoneAuth: send OTP requested');
 
       // For iOS, we need to handle the verification differently
       if (Platform.isIOS) {
@@ -117,11 +103,11 @@ class PhoneAuthBloc extends Bloc<PhoneAuthEvent, PhoneAuthState> {
         await phoneAuthRepository.verifyPhone(
           phoneNumber: normalizedPhone,
           verificationCompleted: (PhoneAuthCredential credential) async {
-            log('✅ Phone verification completed automatically');
+            _authDebugLog('PhoneAuth: verification completed automatically');
             add(OnPhoneAuthVerificationCompleteEvent(credential: credential));
           },
           codeSent: (String verificationId, int? resendToken) {
-            log('📨 Verification code sent. Verification ID: $verificationId');
+            _authDebugLog('PhoneAuth: code sent');
             add(
               OnPhoneOtpSent(
                 verificationId: verificationId,
@@ -132,16 +118,14 @@ class PhoneAuthBloc extends Bloc<PhoneAuthEvent, PhoneAuthState> {
           },
           verificationFailed: (FirebaseAuthException e) {
             log('❌ Phone verification failed: ${e.code} - ${e.message}');
-            log('💡 Error code: ${e.code}');
             if (e.code == 'invalid-phone-number') {
-              log('⚠️ INVALID PHONE NUMBER FORMAT');
-              log('   Expected format: +1234567890 (with + and country code, no spaces)');
-              log('   Your number: $normalizedPhone');
-              log('   Make sure it matches EXACTLY in Firebase Console test numbers');
+              _authDebugLog(
+                'PhoneAuth: invalid phone number format for request',
+              );
             } else if (e.code == 'missing-verification-code') {
-              log('⚠️ Missing verification code - test number might not be configured');
+              _authDebugLog('PhoneAuth: missing verification code');
             } else if (e.code == 'quota-exceeded') {
-              log('⚠️ Quota exceeded - too many requests');
+              _authDebugLog('PhoneAuth: quota exceeded');
             }
             add(
               OnPhoneAuthErrorEvent(
@@ -150,7 +134,7 @@ class PhoneAuthBloc extends Bloc<PhoneAuthEvent, PhoneAuthState> {
             );
           },
           codeAutoRetrievalTimeout: (String verificationId) {
-            log('⏱️ Code auto-retrieval timeout: $verificationId');
+            _authDebugLog('PhoneAuth: code auto-retrieval timeout');
           },
         );
       } else {
@@ -158,11 +142,11 @@ class PhoneAuthBloc extends Bloc<PhoneAuthEvent, PhoneAuthState> {
         await phoneAuthRepository.verifyPhone(
           phoneNumber: normalizedPhone,
           verificationCompleted: (PhoneAuthCredential credential) async {
-            log('✅ Phone verification completed automatically');
+            _authDebugLog('PhoneAuth: verification completed automatically');
             add(OnPhoneAuthVerificationCompleteEvent(credential: credential));
           },
           codeSent: (String verificationId, int? resendToken) {
-            log('📨 Verification code sent. Verification ID: $verificationId');
+            _authDebugLog('PhoneAuth: code sent');
             add(
               OnPhoneOtpSent(
                 verificationId: verificationId,
@@ -180,7 +164,7 @@ class PhoneAuthBloc extends Bloc<PhoneAuthEvent, PhoneAuthState> {
             );
           },
           codeAutoRetrievalTimeout: (String verificationId) {
-            log('⏱️ Code auto-retrieval timeout: $verificationId');
+            _authDebugLog('PhoneAuth: code auto-retrieval timeout');
           },
         );
       }

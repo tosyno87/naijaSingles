@@ -36,6 +36,7 @@ class PhoneNumber extends StatefulWidget {
 }
 
 class _PhoneNumberState extends State<PhoneNumber> {
+  static const bool _verboseAuthLogs = bool.fromEnvironment('VERBOSE_AUTH_LOGS');
   final _scaffoldKey = GlobalKey<ScaffoldState>();
   bool isValidNumber = false;
   bool _isLoading = false;
@@ -44,6 +45,12 @@ class _PhoneNumberState extends State<PhoneNumber> {
   String _regionCode = 'US';
   TextEditingController phoneNumberController = TextEditingController();
   final TextEditingController _codeController = TextEditingController();
+
+  void _authDebugLog(String message) {
+    if (_verboseAuthLogs) {
+      log(message);
+    }
+  }
 
   @override
   void initState() {
@@ -74,11 +81,11 @@ class _PhoneNumberState extends State<PhoneNumber> {
       final parsed = phoneUtil.parse(fullNumber, _regionCode);
       isValid = phoneUtil.isValidNumber(parsed);
     } on Object catch (e) {
-      log('📞 Phone validation failed: $e');
+      _authDebugLog('Phone validation parse failed: ${e.runtimeType}');
     }
     if (mounted) {
       setState(() => isValidNumber = isValid);
-      log('📞 Phone validation: "$raw" ($countryCode) -> valid: $isValid');
+      _authDebugLog('Phone validation updated: valid=$isValid');
     }
   }
 
@@ -113,7 +120,7 @@ class _PhoneNumberState extends State<PhoneNumber> {
           body: BlocListener<PhoneAuthBloc, PhoneAuthState>(
             listener: (context, state) {
               if (state is PhoneAuthCodeSentSuccess) {
-                log('phone auth code sent success listener called');
+                _authDebugLog('Phone auth code sent; opening OTP screen');
                 if (mounted) {
                   setState(() {
                     _isLoading = false;
@@ -136,13 +143,7 @@ class _PhoneNumberState extends State<PhoneNumber> {
               }
 
               if (state is PhoneAuthError) {
-                log('');
-                log('═══════════════════════════════════════════════════════');
-                log('❌ PHONE AUTH ERROR');
-                log('═══════════════════════════════════════════════════════');
                 log('Error: ${state.error}');
-                log('═══════════════════════════════════════════════════════');
-                log('');
 
                 if (mounted) {
                   setState(() {
@@ -450,12 +451,11 @@ class _PhoneNumberState extends State<PhoneNumber> {
                                         Colors.white.withValues(alpha: 0.15),
                                     onPressed: isValidNumber && !_isLoading
                                         ? () {
-                                            log('');
-                                            log('🚀🚀🚀 BUTTON CLICKED! 🚀🚀🚀');
-                                            log('Button state: isValidNumber=$isValidNumber, isLoading=$_isLoading');
-                                            log('Phone input: "${phoneNumberController.text}"');
-                                            log('Country code: $countryCode');
-                                            log('');
+                                            _authDebugLog(
+                                              'Phone auth button tapped: '
+                                              'isValid=$isValidNumber '
+                                              'isLoading=$_isLoading',
+                                            );
 
                                             setState(() {
                                               _isLoading = true;
@@ -472,33 +472,21 @@ class _PhoneNumberState extends State<PhoneNumber> {
                                             final fullPhoneNumber =
                                                 countryCode + cleanPhoneNumber;
 
-                                            log('');
-                                            log('═══════════════════════════════════════════════════════');
-                                            log('📱 PHONE AUTH REQUEST - BUTTON CLICKED');
-                                            log('═══════════════════════════════════════════════════════');
-                                            log('Country Code: $countryCode');
-                                            log('User Input: "${phoneNumberController.text}"');
-                                            log('Cleaned Input: "$cleanPhoneNumber"');
-                                            log('Full Number (sent to Firebase): "$fullPhoneNumber"');
-                                            log('');
-                                            log('💡 COPY THIS EXACT NUMBER to Firebase Console test numbers:');
-                                            log('   "$fullPhoneNumber"');
-                                            log('');
-                                            log('🔍 Next: Watch for "🎯 EVENT RECEIVED IN BLOC!" log');
-                                            log('═══════════════════════════════════════════════════════');
-                                            log('');
+                                            _authDebugLog(
+                                              'Phone auth request prepared: '
+                                              'country=$countryCode '
+                                              'digits=${cleanPhoneNumber.length}',
+                                            );
 
                                             final bloc =
                                                 BlocProvider.of<PhoneAuthBloc>(
                                               builderContext,
                                             );
-                                            log('📤 Adding SendOtpToPhoneEvent to bloc...');
                                             bloc.add(
                                               SendOtpToPhoneEvent(
                                                 phoneNumber: fullPhoneNumber,
                                               ),
                                             );
-                                            log('✅ Event added to bloc');
                                           }
                                         : null,
                                   ),

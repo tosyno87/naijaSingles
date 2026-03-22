@@ -84,15 +84,12 @@ class AuthRouter {
       if (!isComplete && _isBlankProfile(profileData)) {
         log(
           'AuthRouter: blank/incomplete profile detected '
-          '— signing out and returning to welcome',
+          '— routing to onboarding',
         );
         AuthFlowTelemetry.track(
-          'auth_router_blank_profile_signout',
+          'auth_router_blank_profile_onboarding',
           data: {'uid': user.uid},
         );
-        if (!context.mounted) return;
-        await _signOutAndGoWelcome(context);
-        return;
       }
 
       if (!context.mounted) return;

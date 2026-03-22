@@ -35,6 +35,10 @@ import 'services/secure_storage_service.dart';
 Future<void> main() async {
   const bool preserveDebugSessionForE2E =
       bool.fromEnvironment('PRESERVE_DEBUG_SESSION_FOR_E2E');
+  const bool strictReleaseFirebaseGuard = bool.fromEnvironment(
+    'STRICT_RELEASE_FIREBASE_GUARD',
+    defaultValue: true,
+  );
   WidgetsFlutterBinding.ensureInitialized();
   await EasyLocalization.ensureInitialized();
 
@@ -74,6 +78,37 @@ Future<void> main() async {
       log('ℹ️ Firebase already initialized by native SDK — using existing app');
     } else {
       log('❌ Firebase initialization error: $e');
+    }
+  }
+
+  // Startup self-check: always log active env/build/project and enforce
+  // production Firebase project in release.
+  if (Firebase.apps.isNotEmpty) {
+    final activeProjectId = Firebase.app().options.projectId;
+    const buildMode = kReleaseMode
+        ? 'release'
+        : kProfileMode
+            ? 'profile'
+            : 'debug';
+
+    log(
+      '🚦 Startup config: '
+      'env=$currentEnvironment build=$buildMode project=$activeProjectId',
+    );
+
+    if (kReleaseMode && strictReleaseFirebaseGuard) {
+      if (!isProduction) {
+        throw StateError(
+          'Release build must use ENV=production. '
+          'Current ENV=$currentEnvironment.',
+        );
+      }
+      if (activeProjectId != productionProjectId) {
+        throw StateError(
+          'Release Firebase project mismatch. '
+          'Expected "$productionProjectId", got "$activeProjectId".',
+        );
+      }
     }
   }
 

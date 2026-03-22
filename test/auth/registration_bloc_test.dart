@@ -21,6 +21,7 @@ void main() {
     });
 
     final userModel = UserModel(id: '1', name: 'test', userGender: 'Male');
+    final incompleteUserModel = UserModel(id: '1', name: 'test');
     final firebaseUser = MockFirebaseUser();
 
     blocTest<RegistrationBloc, RegistrationStates>(
@@ -56,6 +57,28 @@ void main() {
     );
 
     blocTest<RegistrationBloc, RegistrationStates>(
+      'emits [Loading, AlreadyRegistered] for existing but incomplete profile and never calls ensureMinimalUserDocument',
+      build: () {
+        when(() => firebaseUser.uid).thenReturn('test-user-id');
+        when(() => repo.getCurrentUser()).thenAnswer((_) async => firebaseUser);
+        when(() => firebaseUser.displayName).thenReturn('name');
+        when(() => repo.userDetails(any())).thenAnswer((_) async => true);
+        when(() => repo.getRegisterUser())
+            .thenAnswer((_) async => incompleteUserModel);
+        return bloc;
+      },
+      act: (bloc) =>
+          bloc.add(const CheckRegistration(token: 't', isLogin: true)),
+      expect: () => [
+        RegistrationLoading(),
+        AlreadyRegistered(user: incompleteUserModel),
+      ],
+      verify: (_) {
+        verifyNever(() => repo.ensureMinimalUserDocument(firebaseUser));
+      },
+    );
+
+    blocTest<RegistrationBloc, RegistrationStates>(
       'emits [Loading, NewRegistration] when no data found (signup)',
       build: () {
         when(() => firebaseUser.uid).thenReturn('test-user-id');
@@ -66,8 +89,7 @@ void main() {
             .thenAnswer((_) async {});
         return bloc;
       },
-      act: (bloc) =>
-          bloc.add(const CheckRegistration(token: 't', isLogin: false)),
+      act: (bloc) => bloc.add(const CheckRegistration(token: 't')),
       expect: () => [
         RegistrationLoading(),
         NewRegistration(token: 't', user: firebaseUser),

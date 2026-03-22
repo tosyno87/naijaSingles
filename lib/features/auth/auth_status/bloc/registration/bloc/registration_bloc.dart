@@ -64,40 +64,25 @@ class RegistrationBloc extends Bloc<RegistrationEvents, RegistrationStates> {
                 log('✅ User already registered with complete profile: ${usr.name}');
                 emit(AlreadyRegistered(user: usr));
               } else {
-                // User document exists but profile is incomplete - ensure minimal doc then treat as new registration
-                log('⚠️ User document exists but profile is incomplete - treating as new registration');
-                try {
-                  await phoneAuthRepository.ensureMinimalUserDocument(user);
-                  emit(NewRegistration(token: event.token, user: user));
-                } on Object catch (e) {
-                  log('❌ Failed to ensure minimal user doc: $e');
-                  emit(
-                    const RegistrationFailed(
-                      message:
-                          'Could not set up your account. Please try again.',
-                    ),
-                  );
-                }
+                // Existing Firestore user with incomplete profile should continue
+                // onboarding. Never rewrite the doc here (can be denied by rules).
+                log(
+                  '⚠️ User document exists but profile is incomplete - '
+                  'routing as existing session to onboarding',
+                );
+                emit(AlreadyRegistered(user: usr));
               }
             } on Object catch (getUserError) {
               log('❌ Error getting user data: $getUserError');
               log('❌ Error type: ${getUserError.runtimeType}');
 
-              // If userDetails returned true but we can't get user data,
-              // there might be a data inconsistency
-              // In this case, treat as new registration to allow onboarding
-              log('⚠️ User document exists but cannot retrieve data - treating as new registration');
-              try {
-                await phoneAuthRepository.ensureMinimalUserDocument(user);
-                emit(NewRegistration(token: event.token, user: user));
-              } on Object catch (e) {
-                log('❌ Failed to ensure minimal user doc: $e');
-                emit(
-                  const RegistrationFailed(
-                    message: 'Could not set up your account. Please try again.',
-                  ),
-                );
-              }
+              // If doc existence check passed but parsing failed, keep session and
+              // route through AuthRouter; do not attempt a privileged rewrite.
+              log(
+                '⚠️ User document exists but could not be parsed - '
+                'routing as existing session',
+              );
+              emit(AlreadyRegistered(user: _fallbackUserFromAuth(user)));
             }
           } else {
             log('📝 User not found in database - new registration');
@@ -196,4 +181,10 @@ class RegistrationBloc extends Bloc<RegistrationEvents, RegistrationStates> {
     });
   }
   PhoneAuthRepository phoneAuthRepository;
+
+  UserModel _fallbackUserFromAuth(User user) => UserModel(
+        id: user.uid,
+        name: user.displayName ?? '',
+        phoneNumber: user.phoneNumber ?? '',
+      );
 }

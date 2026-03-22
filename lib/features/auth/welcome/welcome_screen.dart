@@ -8,7 +8,9 @@ import 'package:flutter/services.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:vector_math/vector_math_64.dart' show Vector3;
 
+import '../../../common/utils/auth_flow_telemetry.dart';
 import '../../../common/utils/auth_router.dart';
+import '../../../common/widgets/build_stamp.dart';
 import '../auth_method/auth_method_selection_screen.dart';
 import '../auth_method/sign_in_method_selection_screen.dart';
 
@@ -109,6 +111,7 @@ class _WelcomeScreenState extends State<WelcomeScreen>
     try {
       await Future.delayed(const Duration(milliseconds: 100));
       if (!mounted) return;
+      AuthFlowTelemetry.track('welcome_check_started');
 
       // Session-first launch behavior:
       // - Returning signed-in users go straight to app home
@@ -122,9 +125,17 @@ class _WelcomeScreenState extends State<WelcomeScreen>
             'Invalid/stale auth session detected '
             '(anonymous or unsupported provider). Signing out.',
           );
+          AuthFlowTelemetry.track(
+            'welcome_stale_session_signout',
+            data: {'uid': currentUser.uid},
+          );
           await FirebaseAuth.instance.signOut();
         } else {
           log('User has active session — routing via AuthRouter');
+          AuthFlowTelemetry.track(
+            'welcome_session_found',
+            data: {'uid': currentUser.uid},
+          );
           await AuthRouter.navigateAfterAuth(context);
           return;
         }
@@ -135,9 +146,14 @@ class _WelcomeScreenState extends State<WelcomeScreen>
           _isLoading = false;
         });
         log('No active session — showing Welcome (Create Account / Log in)');
+        AuthFlowTelemetry.track('welcome_shown_no_session');
       }
     } on Object catch (e) {
       log('Error checking auth status: $e');
+      AuthFlowTelemetry.track(
+        'welcome_check_failed',
+        data: {'error': e.runtimeType.toString()},
+      );
       if (mounted) {
         setState(() {
           _isLoading = false;
@@ -355,6 +371,12 @@ class _WelcomeScreenState extends State<WelcomeScreen>
                 ],
               ),
             ),
+          ),
+
+          const Positioned(
+            right: 12,
+            bottom: 12,
+            child: BuildStamp(compact: true),
           ),
         ],
       ),

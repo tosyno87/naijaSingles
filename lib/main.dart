@@ -20,6 +20,7 @@ import 'common/constants/theme.dart';
 import 'common/data/repo/phone_auth_repo.dart';
 import 'common/routes/route_name.dart';
 import 'common/routes/router.dart';
+import 'common/utils/migration_session_guard.dart';
 import 'common/utils/observer.dart';
 import 'config/secure_config.dart';
 import 'features/auth/auth_status/bloc/authstatus_bloc.dart';
@@ -33,6 +34,12 @@ import 'services/crashlytics_service.dart';
 import 'services/secure_storage_service.dart';
 
 Future<void> main() async {
+  const bool preserveDebugSessionForE2E =
+      bool.fromEnvironment('PRESERVE_DEBUG_SESSION_FOR_E2E');
+  const bool strictReleaseFirebaseGuard = bool.fromEnvironment(
+    'STRICT_RELEASE_FIREBASE_GUARD',
+    defaultValue: true,
+  );
   WidgetsFlutterBinding.ensureInitialized();
   await EasyLocalization.ensureInitialized();
 
@@ -75,6 +82,42 @@ Future<void> main() async {
     }
   }
 
+  // Startup self-check: always log active env/build/project and enforce
+  // production Firebase project in release.
+  await MigrationSessionGuard.enforceIfRequired(
+    auth: FirebaseAuth.instance,
+    storage: SecureStorageService(),
+  );
+
+  if (Firebase.apps.isNotEmpty) {
+    final activeProjectId = Firebase.app().options.projectId;
+    const buildMode = kReleaseMode
+        ? 'release'
+        : kProfileMode
+            ? 'profile'
+            : 'debug';
+
+    log(
+      '🚦 Startup config: '
+      'env=$currentEnvironment build=$buildMode project=$activeProjectId',
+    );
+
+    if (kReleaseMode && strictReleaseFirebaseGuard) {
+      if (!isProduction) {
+        throw StateError(
+          'Release build must use ENV=production. '
+          'Current ENV=$currentEnvironment.',
+        );
+      }
+      if (activeProjectId != productionProjectId) {
+        throw StateError(
+          'Release Firebase project mismatch. '
+          'Expected "$productionProjectId", got "$activeProjectId".',
+        );
+      }
+    }
+  }
+
   // App Check (non-blocking — failures must not poison Storage)
   try {
     await FirebaseAppCheck.instance.activate(
@@ -100,12 +143,16 @@ Future<void> main() async {
     log('❌ Crashlytics initialization error: $e');
   }
 
-  // Initialize Notification Service
-  try {
-    await NotificationService.initialize();
-    log('🔔 Notification Service initialized');
-  } on Object catch (e) {
-    log('❌ Notification Service initialization error: $e');
+  // Initialize Notification Service (skip in launch harness mode for deterministic startup)
+  if (!preserveDebugSessionForE2E) {
+    try {
+      await NotificationService.initialize();
+      log('🔔 Notification Service initialized');
+    } on Object catch (e) {
+      log('❌ Notification Service initialization error: $e');
+    }
+  } else {
+    log('🧪 Skipping Notification Service initialization for E2E harness');
   }
 
   // Seed events only in debug mode to prevent fake data in production
@@ -166,10 +213,14 @@ Future<void> main() async {
   // This ensures new builds start with no user authenticated
   try {
     final currentUser = FirebaseAuth.instance.currentUser;
-    if (currentUser != null && kDebugMode) {
+    if (currentUser != null && kDebugMode && !preserveDebugSessionForE2E) {
       log('🧹 Signing out existing user for clean start: ${currentUser.uid}');
       await FirebaseAuth.instance.signOut();
       log('✅ Signed out - app will start with no authenticated user');
+    } else if (currentUser != null &&
+        kDebugMode &&
+        preserveDebugSessionForE2E) {
+      log('🧪 Preserving debug auth session for E2E harness: ${currentUser.uid}');
     }
   } on Object catch (e) {
     log('⚠️ Error signing out existing user: $e');

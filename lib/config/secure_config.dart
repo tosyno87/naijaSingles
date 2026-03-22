@@ -6,6 +6,7 @@ import '../common/utils/app_logger.dart';
 /// This prevents API keys and other secrets from being committed to source control
 class SecureConfig {
   static bool _initialized = false;
+  static bool _dotenvLoaded = false;
 
   /// Initialize the configuration by loading environment variables
   static Future<void> initialize() async {
@@ -14,21 +15,24 @@ class SecureConfig {
     try {
       await dotenv.load();
       _initialized = true;
+      _dotenvLoaded = true;
       if (kDebugMode) {
         AppLogger.info('✅ Secure configuration loaded successfully');
       }
     } on Object catch (e) {
+      _initialized = true;
+      _dotenvLoaded = false;
+      // .env is optional at runtime because Firebase can use firebase_options.dart.
+      // Keep this as info-level in debug to avoid noisy false alarms.
       if (kDebugMode) {
-        AppLogger.warning('⚠️ Failed to load .env file', error: e);
-        AppLogger.warning('⚠️ Make sure to create .env file from env.example');
-      }
-      // In production, .env file may not be bundled - use fallback values
-      // Firebase will use firebase_options.dart which has hardcoded values
-      if (kReleaseMode) {
+        AppLogger.info(
+          'ℹ️ .env not loaded; using firebase_options.dart defaults',
+        );
+        AppLogger.debug('SecureConfig .env load error: $e');
+      } else if (kReleaseMode) {
         AppLogger.warning(
           '⚠️ .env file not found in production - using Firebase defaults',
         );
-        _initialized = true; // Mark as initialized to allow fallback behavior
       }
     }
   }
@@ -113,6 +117,14 @@ class SecureConfig {
         return;
       }
       throw Exception('SecureConfig not initialized. Call initialize() first.');
+    }
+    if (!_dotenvLoaded) {
+      if (kDebugMode) {
+        AppLogger.info(
+          'ℹ️ SecureConfig validation skipped; using firebase_options.dart',
+        );
+      }
+      return;
     }
 
     final requiredKeys = [

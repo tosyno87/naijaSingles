@@ -292,7 +292,7 @@ void main() {
         await tester.pumpAndSettle();
       }
 
-      expect(find.text('Tell us more about you'), findsOneWidget);
+      expect(find.text('Additional Info'), findsOneWidget);
       expect(
           tester.widget<ElevatedButton>(find.byType(ElevatedButton)).onPressed,
           isNull);

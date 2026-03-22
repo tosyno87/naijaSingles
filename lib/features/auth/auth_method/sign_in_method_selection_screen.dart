@@ -6,9 +6,11 @@ import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:google_fonts/google_fonts.dart';
 
+import '../../../common/routes/route_name.dart';
 import '../../../common/utils/auth_router.dart';
 import '../../../common/utils/privacy_policy_screen.dart';
 import '../../../common/utils/terms_of_service_screen.dart';
+import '../../../common/widgets/build_stamp.dart';
 import '../../../common/widgets/custom_snackbar.dart';
 import '../google_login/google_login_bloc.dart';
 import '../google_login/google_login_events.dart';
@@ -381,13 +383,9 @@ class SignInMethodSelectionScreen extends StatelessWidget {
                       GestureDetector(
                         onTap: () {
                           unawaited(
-                            Navigator.pushReplacement(
+                            Navigator.pushReplacementNamed(
                               context,
-                              MaterialPageRoute(
-                                builder: (context) => PhoneNumber(
-                                  updatePhoneNumber: false,
-                                ),
-                              ),
+                              RouteName.authMethodSelection,
                             ),
                           );
                         },
@@ -406,6 +404,12 @@ class SignInMethodSelectionScreen extends StatelessWidget {
                 ],
               ),
             ),
+          ),
+
+          const Positioned(
+            right: 12,
+            bottom: 12,
+            child: BuildStamp(compact: true),
           ),
         ],
       ),

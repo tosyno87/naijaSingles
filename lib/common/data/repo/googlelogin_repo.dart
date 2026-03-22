@@ -61,11 +61,12 @@ class GoogleLoginRepositoryImpl implements GoogleLoginRepository {
     final userRef = firebaseFireStoreInstance.collection('users').doc(user.uid);
     final doc = await userRef.get();
     if (doc.exists && doc.data() != null && doc.data()!.isNotEmpty) {
+      // Keep existing docs updates limited to mutable fields.
+      // Firestore rules block updates to `email` and can lock `name`
+      // after onboarding completion.
       await userRef.update({
         'lastActive': FieldValue.serverTimestamp(),
         'lastSignIn': FieldValue.serverTimestamp(),
-        'email': user.email,
-        'name': user.displayName ?? '',
         'photoUrl': user.photoURL ?? '',
       });
     } else {

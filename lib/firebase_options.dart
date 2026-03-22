@@ -8,17 +8,25 @@ import 'package:flutter/foundation.dart'
     show defaultTargetPlatform, kIsWeb, TargetPlatform, debugPrint;
 
 import 'config/secure_config.dart';
+import 'firebase_options_next_production.dart';
 import 'firebase_options_staging.dart';
 
 /// Build with --dart-define=ENV=production for prod, otherwise defaults to staging.
 const String _env = String.fromEnvironment('ENV', defaultValue: 'staging');
+const String productionProjectId = 'naijasingles-74a75';
+const String nextProductionEnvironment = 'next-production';
 bool get isProduction => _env == 'production';
+bool get isNextProduction => _env == nextProductionEnvironment;
+String get currentEnvironment => _env;
 
 /// Default Firebase configuration options for the current platform
 class DefaultFirebaseOptions {
   static FirebaseOptions get currentPlatform {
-    if (!isProduction) {
+    if (!isProduction && !isNextProduction) {
       return StagingFirebaseOptions.currentPlatform;
+    }
+    if (isNextProduction) {
+      return NextProductionFirebaseOptions.currentPlatform;
     }
     if (kIsWeb) {
       return web;
@@ -65,7 +73,7 @@ class DefaultFirebaseOptions {
         apiKey: 'AIzaSyAwsU8j3acGo_cKOECbgsXHd3-qvvLn_Fw',
         appId: '1:888697307756:web:95ea92b8c7288e31704e49',
         messagingSenderId: '888697307756',
-        projectId: 'naijasingles-74a75',
+        projectId: productionProjectId,
         authDomain: 'naijasingles-74a75.firebaseapp.com',
         storageBucket: 'naijasingles-74a75.appspot.com',
       );
@@ -89,7 +97,7 @@ class DefaultFirebaseOptions {
         apiKey: 'AIzaSyAwsU8j3acGo_cKOECbgsXHd3-qvvLn_Fw',
         appId: '1:888697307756:android:a62a339c4079bebc704e49',
         messagingSenderId: '888697307756',
-        projectId: 'naijasingles-74a75',
+        projectId: productionProjectId,
         storageBucket: 'naijasingles-74a75.appspot.com',
       );
     }
@@ -118,7 +126,7 @@ class DefaultFirebaseOptions {
         apiKey: 'AIzaSyAwsU8j3acGo_cKOECbgsXHd3-qvvLn_Fw',
         appId: '1:888697307756:ios:95ea92b8c7288e31704e49',
         messagingSenderId: '888697307756',
-        projectId: 'naijasingles-74a75',
+        projectId: productionProjectId,
         storageBucket: 'naijasingles-74a75.appspot.com',
         iosClientId:
             '888697307756-c0gm1rhh6f0dd7fh8f3geqbn12ctmmho.apps.googleusercontent.com',
@@ -146,7 +154,7 @@ class DefaultFirebaseOptions {
         apiKey: 'AIzaSyAwsU8j3acGo_cKOECbgsXHd3-qvvLn_Fw',
         appId: '1:888697307756:ios:95ea92b8c7288e31704e49',
         messagingSenderId: '888697307756',
-        projectId: 'naijasingles-74a75',
+        projectId: productionProjectId,
         storageBucket: 'naijasingles-74a75.appspot.com',
         iosClientId:
             '888697307756-c0gm1rhh6f0dd7fh8f3geqbn12ctmmho.apps.googleusercontent.com',

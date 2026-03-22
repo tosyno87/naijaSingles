@@ -20,6 +20,7 @@ import 'common/constants/theme.dart';
 import 'common/data/repo/phone_auth_repo.dart';
 import 'common/routes/route_name.dart';
 import 'common/routes/router.dart';
+import 'common/utils/migration_session_guard.dart';
 import 'common/utils/observer.dart';
 import 'config/secure_config.dart';
 import 'features/auth/auth_status/bloc/authstatus_bloc.dart';
@@ -83,6 +84,11 @@ Future<void> main() async {
 
   // Startup self-check: always log active env/build/project and enforce
   // production Firebase project in release.
+  await MigrationSessionGuard.enforceIfRequired(
+    auth: FirebaseAuth.instance,
+    storage: SecureStorageService(),
+  );
+
   if (Firebase.apps.isNotEmpty) {
     final activeProjectId = Firebase.app().options.projectId;
     const buildMode = kReleaseMode

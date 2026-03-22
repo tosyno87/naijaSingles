@@ -6,6 +6,7 @@ cd "$ROOT_DIR"
 
 FIREBASE_OPTIONS_FILE="lib/firebase_options.dart"
 STAGING_OPTIONS_FILE="lib/firebase_options_staging.dart"
+NEXT_PROD_OPTIONS_FILE="lib/firebase_options_next_production.dart"
 PRODUCTION_WORKFLOW=".github/workflows/production.yml"
 
 if [[ ! -f "$FIREBASE_OPTIONS_FILE" ]]; then
@@ -15,6 +16,11 @@ fi
 
 if [[ ! -f "$STAGING_OPTIONS_FILE" ]]; then
   echo "::error::Missing $STAGING_OPTIONS_FILE"
+  exit 1
+fi
+
+if [[ ! -f "$NEXT_PROD_OPTIONS_FILE" ]]; then
+  echo "::error::Missing $NEXT_PROD_OPTIONS_FILE"
   exit 1
 fi
 
@@ -39,6 +45,11 @@ if grep -q "projectId: '$PROD_PROJECT_ID'" "$STAGING_OPTIONS_FILE"; then
   exit 1
 fi
 
+if ! grep -q "NEXT_PROD_PROJECT_ID" "$NEXT_PROD_OPTIONS_FILE"; then
+  echo "::error::$NEXT_PROD_OPTIONS_FILE must read project ID from NEXT_PROD_PROJECT_ID define"
+  exit 1
+fi
+
 IOS_BUILD_LINES="$(grep -n "flutter build ios --release" "$PRODUCTION_WORKFLOW" || true)"
 if [[ -z "$IOS_BUILD_LINES" ]]; then
   echo "::error::No iOS release build command found in $PRODUCTION_WORKFLOW"
@@ -56,6 +67,11 @@ done <<< "$IOS_BUILD_LINES"
 
 if grep -q "dart-define=ENV=staging" "$PRODUCTION_WORKFLOW"; then
   echo "::error::Production workflow must not build with ENV=staging"
+  exit 1
+fi
+
+if grep -q "dart-define=ENV=next-production" "$PRODUCTION_WORKFLOW"; then
+  echo "::error::Production workflow must not build with ENV=next-production"
   exit 1
 fi
 

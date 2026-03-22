@@ -8,19 +8,25 @@ import 'package:flutter/foundation.dart'
     show defaultTargetPlatform, kIsWeb, TargetPlatform, debugPrint;
 
 import 'config/secure_config.dart';
+import 'firebase_options_next_production.dart';
 import 'firebase_options_staging.dart';
 
 /// Build with --dart-define=ENV=production for prod, otherwise defaults to staging.
 const String _env = String.fromEnvironment('ENV', defaultValue: 'staging');
 const String productionProjectId = 'naijasingles-74a75';
+const String nextProductionEnvironment = 'next-production';
 bool get isProduction => _env == 'production';
+bool get isNextProduction => _env == nextProductionEnvironment;
 String get currentEnvironment => _env;
 
 /// Default Firebase configuration options for the current platform
 class DefaultFirebaseOptions {
   static FirebaseOptions get currentPlatform {
-    if (!isProduction) {
+    if (!isProduction && !isNextProduction) {
       return StagingFirebaseOptions.currentPlatform;
+    }
+    if (isNextProduction) {
+      return NextProductionFirebaseOptions.currentPlatform;
     }
     if (kIsWeb) {
       return web;

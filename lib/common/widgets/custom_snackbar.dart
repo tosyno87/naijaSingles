@@ -25,7 +25,10 @@ class CustomSnackbar {
   // }
 
   static void showSnackBarSimple(String msg, BuildContext context) {
-    ScaffoldMessenger.of(context)
+    final messenger = ScaffoldMessenger.maybeOf(context);
+    if (messenger == null) return;
+
+    messenger
       ..hideCurrentSnackBar()
       ..showSnackBar(
         SnackBar(
@@ -38,13 +41,7 @@ class CustomSnackbar {
           ),
           action: SnackBarAction(
             label: 'DISMISS',
-            onPressed: () {
-              try {
-                ScaffoldMessenger.of(context).clearSnackBars();
-              } on Object {
-                rethrow;
-              }
-            },
+            onPressed: messenger.clearSnackBars,
           ),
         ),
       );

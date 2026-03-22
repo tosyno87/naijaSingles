@@ -1,7 +1,9 @@
+import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 
 import '../../env.dart';
+import '../../firebase_options.dart';
 
 /// Internal build stamp for QA and TestFlight verification.
 ///
@@ -20,7 +22,13 @@ class BuildStamp extends StatelessWidget {
       return const SizedBox.shrink();
     }
 
-    final label = 'v${Environment.appVersion} • ${Environment.environment}';
+    final projectId =
+        Firebase.apps.isNotEmpty ? Firebase.app().options.projectId : '';
+    final label = [
+      'v${Environment.appVersion}',
+      'env=$currentEnvironment',
+      if (projectId.isNotEmpty) 'project=$projectId',
+    ].join(' • ');
 
     return IgnorePointer(
       child: Container(

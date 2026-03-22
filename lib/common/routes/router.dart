@@ -1,5 +1,6 @@
 import 'dart:async';
 
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
@@ -87,23 +88,23 @@ class _FirebaseCallbackHandlerState extends State<_FirebaseCallbackHandler> {
 }
 
 abstract class AppRouter {
+  static const bool _verboseRouterLogs = bool.fromEnvironment(
+    'VERBOSE_ROUTER_LOGS',
+  );
+
+  static void _routeLog(String message) {
+    if (kDebugMode && _verboseRouterLogs) {
+      debugPrint(message);
+    }
+  }
+
   // register here for routes
   static Map<String, WidgetBuilder> allRoutes = {
-    // Root route - redirect to welcome (splash removed to eliminate flash)
-    '/': (context) => const WelcomeScreen(),
+    // Root route is kept inert because initialRoute('/welcome') still
+    // constructs '/' first. Rendering Welcome here caused duplicate auth checks.
+    '/': (context) => const SizedBox.shrink(),
     RouteName.splashScreen: (context) => const Splash(),
-    RouteName.welcomeScreen: (context) {
-      debugPrint('🎯 WelcomeScreen route builder called');
-      try {
-        const widget = WelcomeScreen();
-        debugPrint('✅ WelcomeScreen widget created successfully');
-        return widget;
-      } on Object catch (e, stackTrace) {
-        debugPrint('❌ Error creating WelcomeScreen: $e');
-        debugPrint('Stack trace: $stackTrace');
-        rethrow;
-      }
-    },
+    RouteName.welcomeScreen: (context) => const WelcomeScreen(),
     RouteName.loginScreen: (context) =>
         const EmailLoginScreen(), // Redirect to EmailLoginScreen
     RouteName.tabScreen: (context) => const Tabbar(),
@@ -399,20 +400,20 @@ abstract class AppRouter {
     final String routeName = settings.name ?? '';
 
     // Debug logging to help identify route issues
-    debugPrint('🔍 Router: Attempting to navigate to route: "$routeName"');
+    _routeLog('🔍 Router: Attempting to navigate to route: "$routeName"');
 
     // Handle Firebase Authentication deep link callbacks silently
     // Firebase phone auth uses /link?deep_link_id=... to redirect back to app after reCAPTCHA
     // The route name includes the full path with query parameters
     if (routeName.startsWith('/link')) {
-      debugPrint(
+      _routeLog(
         '✅ Router: Handling Firebase auth callback deep link: $routeName',
       );
 
       // Simplified check: if route starts with /link and contains deep_link_id, treat as Firebase callback
       // This prevents "Page Not Found" errors - Firebase will handle the callback automatically
       if (routeName.contains('deep_link_id')) {
-        debugPrint(
+        _routeLog(
           '✅ Router: Firebase auth callback detected, processing silently',
         );
 
@@ -433,21 +434,21 @@ abstract class AppRouter {
     final WidgetBuilder? builder = allRoutes[routeName];
 
     if (builder != null) {
-      debugPrint('✅ Router: Found route "$routeName", navigating...');
+      _routeLog('✅ Router: Found route "$routeName", navigating...');
       return MaterialPageRoute(
         builder: (context) {
           try {
-            debugPrint('🏗️ Router: Building widget for route "$routeName"');
+            _routeLog('🏗️ Router: Building widget for route "$routeName"');
             final widget = builder(context);
-            debugPrint(
+            _routeLog(
               '✅ Router: Widget built successfully for route "$routeName"',
             );
             return widget;
           } on Object catch (e, stackTrace) {
-            debugPrint(
+            _routeLog(
               '❌ Router: Error building widget for route "$routeName": $e',
             );
-            debugPrint('Stack trace: $stackTrace');
+            _routeLog('Stack trace: $stackTrace');
             // Return error widget instead of crashing
             return Scaffold(
               backgroundColor: Colors.white,
@@ -484,7 +485,7 @@ abstract class AppRouter {
       );
     }
 
-    debugPrint('❌ Router: Route "$routeName" not found, showing error page');
+    _routeLog('❌ Router: Route "$routeName" not found, showing error page');
 
     // Return a user-friendly error page with navigation options
     return MaterialPageRoute(

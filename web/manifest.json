@@ -1,11 +1,11 @@
 {
-    "name": "NaijaSingles",
-    "short_name": "NaijaSingles",
+    "name": "Afropeep",
+    "short_name": "Afropeep",
     "start_url": ".",
     "display": "standalone",
     "background_color": "#0175C2",
     "theme_color": "#0175C2",
-    "description": "Connect with Nigerian singles for dating, friendship, and networking",
+    "description": "Dating, friendship, and community for the African diaspora",
     "orientation": "portrait-primary",
     "prefer_related_applications": false,
     "icons": [

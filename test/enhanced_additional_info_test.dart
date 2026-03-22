@@ -42,7 +42,7 @@ void main() {
       await tester.pumpAndSettle();
 
       // Verify the screen renders (may need to scroll for some content)
-      expect(find.text('Tell us more about you'), findsOneWidget);
+      expect(find.text('Final step to improve your matches.'), findsOneWidget);
       expect(find.text('Height'), findsOneWidget);
     });
 
@@ -54,7 +54,7 @@ void main() {
       await tester.pumpAndSettle();
 
       expect(find.byType(SingleChildScrollView), findsAtLeastNWidgets(1));
-      expect(find.text('Tell us more about you'), findsOneWidget);
+      expect(find.text('Final step to improve your matches.'), findsOneWidget);
     });
 
     testWidgets('Screen renders with scroll view', (WidgetTester tester) async {
@@ -64,7 +64,7 @@ void main() {
       await tester.pumpAndSettle();
 
       expect(find.byType(SingleChildScrollView), findsAtLeastNWidgets(1));
-      expect(find.text('Tell us more about you'), findsOneWidget);
+      expect(find.text('Final step to improve your matches.'), findsOneWidget);
     });
 
     testWidgets('Info card is present', (WidgetTester tester) async {
@@ -73,7 +73,7 @@ void main() {
       );
       await tester.pumpAndSettle();
 
-      expect(find.text('Tell us more about you'), findsOneWidget);
+      expect(find.text('Final step to improve your matches.'), findsOneWidget);
     });
   });
 

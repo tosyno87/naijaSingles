@@ -337,6 +337,12 @@ jobs:
     needs: [code-quality, unit-tests-coverage, build-validation]
 
     steps:
+    - name: Checkout code
+      uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5
+
+    - name: Verify release Firebase config
+      run: ./scripts/verify_release_firebase_config.sh
+
     - name: Verify all gates passed
       run: |
         echo "code-quality: ${{ needs.code-quality.result }}"

@@ -129,7 +129,6 @@ class _OtpPageState extends State<OtpPage> {
     const Color backgroundColor = Colors.white; // White background (MVP color)
     const Color primaryColor = Color(0xFF008037); // Deep green MVP color
     const Color textColor = Color(0xFF2D2D2D); // Dark text
-    const Color subtextColor = Color(0xFF6E6E6E); // Gray for subtext
     const Color iconBackgroundColor =
         Color(0xFFDFF5E2); // Light green for icon background
 
@@ -171,7 +170,7 @@ class _OtpPageState extends State<OtpPage> {
                 onPressed: () => Navigator.of(context).pop(),
               ),
               title: Text(
-                'Verify Phone'.tr().toString(),
+                'Verify Your Number'.tr().toString(),
                 style: GoogleFonts.montserrat(
                   fontSize: 20,
                   fontWeight: FontWeight.w600,
@@ -214,7 +213,7 @@ class _OtpPageState extends State<OtpPage> {
 
                     // Title
                     Text(
-                      'Enter verification code'.tr().toString(),
+                      'Enter the code sent to '.tr().toString(),
                       style: GoogleFonts.montserrat(
                         fontSize: 24,
                         fontWeight: FontWeight.w600,
@@ -226,24 +225,13 @@ class _OtpPageState extends State<OtpPage> {
                     const SizedBox(height: 12),
 
                     // Subtitle with phone number
-                    RichText(
+                    Text(
+                      widget.phoneNumber,
                       textAlign: TextAlign.center,
-                      text: TextSpan(
-                        text: 'We sent a code to '.tr().toString(),
-                        style: GoogleFonts.montserrat(
-                          fontSize: 16,
-                          color: subtextColor,
-                        ),
-                        children: [
-                          TextSpan(
-                            text: widget.phoneNumber,
-                            style: GoogleFonts.montserrat(
-                              fontSize: 16,
-                              fontWeight: FontWeight.w600,
-                              color: primaryColor,
-                            ),
-                          ),
-                        ],
+                      style: GoogleFonts.montserrat(
+                        fontSize: 16,
+                        fontWeight: FontWeight.w600,
+                        color: primaryColor,
                       ),
                     ),
 
@@ -282,7 +270,7 @@ class _OtpPageState extends State<OtpPage> {
                             _currentOtpCode = value;
                             widget.codeController = value;
                           });
-                          log('📝 OTP changed: length=${value.length}, code=$value');
+                          log('📝 OTP changed: length=${value.length}');
                         },
                         appContext: context,
                       ),
@@ -429,7 +417,7 @@ class _OtpPageState extends State<OtpPage> {
                                   : Colors.transparent,
                             ),
                             child: Text(
-                              'Verify'.tr().toString(),
+                              'VERIFY'.tr().toString(),
                               style: GoogleFonts.montserrat(
                                 fontSize: 18,
                                 fontWeight: FontWeight.bold,
@@ -452,9 +440,12 @@ class _OtpPageState extends State<OtpPage> {
                                 if (value != null && !_hasNavigated) {
                                   log('Got token after phone verification, dispatching CheckRegistration');
                                   BlocProvider.of<RegistrationBloc>(context)
-                                      .add(CheckRegistration(
-                                          token: value,
-                                          isLogin: widget.isLogin));
+                                      .add(
+                                    CheckRegistration(
+                                      token: value,
+                                      isLogin: widget.isLogin,
+                                    ),
+                                  );
                                 } else if (value == null) {
                                   log('Error: Token is null after phone verification');
                                   CustomSnackbar.showSnackBarSimple(

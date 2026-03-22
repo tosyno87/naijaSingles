@@ -5,6 +5,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 
 import '../routes/route_name.dart';
+import 'auth_flow_telemetry.dart';
 import 'profile_completion_guard.dart';
 
 /// Centralized post-auth navigation.
@@ -33,6 +34,7 @@ class AuthRouter {
     final user = FirebaseAuth.instance.currentUser;
     if (user == null) {
       log('AuthRouter: no authenticated user — returning to welcome');
+      AuthFlowTelemetry.track('auth_router_no_user');
       if (context.mounted) {
         await Navigator.of(context).pushNamedAndRemoveUntil(
           RouteName.welcomeScreen,
@@ -46,6 +48,10 @@ class AuthRouter {
       log(
         'AuthRouter: invalid/stale auth session detected '
         '(anonymous or unsupported provider) — signing out to welcome',
+      );
+      AuthFlowTelemetry.track(
+        'auth_router_invalid_session',
+        data: {'uid': user.uid},
       );
       await _signOutAndGoWelcome(context);
       return;
@@ -64,6 +70,10 @@ class AuthRouter {
           'AuthRouter: authenticated session has no user profile document '
           '— signing out and returning to welcome',
         );
+        AuthFlowTelemetry.track(
+          'auth_router_missing_profile',
+          data: {'uid': user.uid},
+        );
         if (!context.mounted) return;
         await _signOutAndGoWelcome(context);
         return;
@@ -74,11 +84,12 @@ class AuthRouter {
       if (!isComplete && _isBlankProfile(profileData)) {
         log(
           'AuthRouter: blank/incomplete profile detected '
-          '— signing out and returning to welcome',
+          '— routing to onboarding',
         );
-        if (!context.mounted) return;
-        await _signOutAndGoWelcome(context);
-        return;
+        AuthFlowTelemetry.track(
+          'auth_router_blank_profile_onboarding',
+          data: {'uid': user.uid},
+        );
       }
 
       if (!context.mounted) return;
@@ -88,6 +99,14 @@ class AuthRouter {
 
       log('AuthRouter: profile ${isComplete ? "complete" : "incomplete"} '
           '→ navigating to $destination');
+      AuthFlowTelemetry.track(
+        'auth_router_navigate',
+        data: {
+          'uid': user.uid,
+          'isComplete': isComplete,
+          'destination': destination,
+        },
+      );
 
       await Navigator.of(context).pushNamedAndRemoveUntil(
         destination,
@@ -106,6 +125,15 @@ class AuthRouter {
       log(
         'AuthRouter: Firestore lookup failed ($e) — '
         'fallback to $fallbackDestination (isLikelyNewUser: $isLikelyNewUser)',
+      );
+      AuthFlowTelemetry.track(
+        'auth_router_firestore_lookup_failed',
+        data: {
+          'uid': user.uid,
+          'error': e.runtimeType.toString(),
+          'isLikelyNewUser': isLikelyNewUser,
+          'fallbackDestination': fallbackDestination,
+        },
       );
       if (context.mounted) {
         await Navigator.of(context).pushNamedAndRemoveUntil(

@@ -2,6 +2,7 @@
   "projects": {
     "default": "naijasingles-staging",
     "staging": "naijasingles-staging",
-    "production": "naijasingles-74a75"
+    "production": "naijasingles-74a75",
+    "next-production": "afropeep-prod-74a75"
   }
 }

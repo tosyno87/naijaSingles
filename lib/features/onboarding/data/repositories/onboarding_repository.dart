@@ -25,6 +25,22 @@ class OnboardingRepository {
     final snapshot = await userRef.get();
     if (snapshot.exists) {
       essentialData.remove('createdAt');
+      final existing = snapshot.data() ?? <String, dynamic>{};
+
+      final isIdentityLocked = existing['onboardingCompleted'] == true ||
+          existing['profileSetupComplete'] == true ||
+          existing['isProfileComplete'] == true;
+
+      // Firestore rules lock name/dateOfBirth after onboarding is marked complete.
+      // Keep existing locked values to make retries idempotent.
+      if (isIdentityLocked) {
+        if (existing.containsKey('name')) {
+          essentialData['name'] = existing['name'];
+        }
+        if (existing.containsKey('dateOfBirth')) {
+          essentialData['dateOfBirth'] = existing['dateOfBirth'];
+        }
+      }
     }
 
     await userRef.set(essentialData, SetOptions(merge: true));

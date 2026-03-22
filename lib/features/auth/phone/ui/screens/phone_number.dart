@@ -36,7 +36,8 @@ class PhoneNumber extends StatefulWidget {
 }
 
 class _PhoneNumberState extends State<PhoneNumber> {
-  static const bool _verboseAuthLogs = bool.fromEnvironment('VERBOSE_AUTH_LOGS');
+  static const bool _verboseAuthLogs =
+      bool.fromEnvironment('VERBOSE_AUTH_LOGS');
   final _scaffoldKey = GlobalKey<ScaffoldState>();
   bool isValidNumber = false;
   bool _isLoading = false;

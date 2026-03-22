@@ -41,7 +41,8 @@ class PhoneAuthBloc extends Bloc<PhoneAuthEvent, PhoneAuthState> {
   }
   final PhoneAuthRepository phoneAuthRepository;
   final auth = firebaseAuthInstance;
-  static const bool _verboseAuthLogs = bool.fromEnvironment('VERBOSE_AUTH_LOGS');
+  static const bool _verboseAuthLogs =
+      bool.fromEnvironment('VERBOSE_AUTH_LOGS');
 
   void _authDebugLog(String message) {
     if (_verboseAuthLogs) {

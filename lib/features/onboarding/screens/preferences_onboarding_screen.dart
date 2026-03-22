@@ -40,13 +40,11 @@ class _PreferencesOnboardingScreenState
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Text('Dating Preferences', style: OnboardingTheme.titleStyle),
-              const SizedBox(height: OnboardingTheme.titleToSubtitle),
               Text(
-                'Help us find your perfect match',
+                'Help us find your perfect match.',
                 style: OnboardingTheme.subtitleStyle,
               ),
-              const SizedBox(height: OnboardingTheme.subtitleToField),
+              const SizedBox(height: 20),
               Text(
                 "I'm interested in",
                 style: OnboardingTheme.sectionLabelStyle,

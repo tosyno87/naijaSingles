@@ -1,147 +1,349 @@
 import 'dart:async';
 
+import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:google_fonts/google_fonts.dart';
 
+import '../../../common/routes/route_name.dart';
 import '../../../common/utils/auth_router.dart';
+import '../../../common/utils/privacy_policy_screen.dart';
+import '../../../common/utils/terms_of_service_screen.dart';
+import '../../../common/widgets/build_stamp.dart';
 import '../../../common/widgets/custom_snackbar.dart';
 import '../google_login/google_login_bloc.dart';
 import '../google_login/google_login_events.dart';
 import '../google_login/google_login_states.dart';
-import '../phone/ui/screens/phone_number.dart';
-import 'sign_in_method_selection_screen.dart';
 
 class AuthMethodSelectionScreen extends StatelessWidget {
   const AuthMethodSelectionScreen({super.key});
 
   @override
   Widget build(BuildContext context) {
-    // Set system UI overlay style for status bar
     SystemChrome.setSystemUIOverlayStyle(
-      SystemUiOverlayStyle.dark.copyWith(
+      SystemUiOverlayStyle.light.copyWith(
         statusBarColor: Colors.transparent,
       ),
     );
 
-    // Define colors based on Afrocentric design guidelines
-    const Color backgroundColor = Colors.white; // White background (MVP color)
-    const Color primaryColor = Color(0xFF008037); // Green accent
-    const Color googleBlue = Color(0xFF3B82F6); // Google blue
-    const Color textColor = Color(0xFF2D2D2D); // Dark text
-    const Color textLightBrown = Color(0xFF666666); // Light gray for subtitle
+    const Color googleBlue = Color(0xFF4285F4);
+
+    final size = MediaQuery.sizeOf(context);
+    final screenWidth = size.width;
+    final screenHeight = size.height;
+    final buttonWidth = screenWidth * 0.80;
+    final bottomPadding = MediaQuery.of(context).padding.bottom;
+    final topBrandOffset = screenHeight * 0.12;
 
     return Scaffold(
-      backgroundColor: backgroundColor,
+      extendBodyBehindAppBar: true,
+      backgroundColor: Colors.black,
       appBar: AppBar(
         backgroundColor: Colors.transparent,
         elevation: 0,
         leading: IconButton(
-          icon: const Icon(Icons.arrow_back_ios, color: primaryColor),
+          icon: const Icon(
+            Icons.arrow_back_ios,
+            color: Colors.white,
+            size: 20,
+          ),
           onPressed: () => Navigator.pop(context),
         ),
       ),
       body: Stack(
+        fit: StackFit.expand,
         children: [
-          // Background texture watermark
-          Positioned.fill(
-            child: Opacity(
-              opacity: 0.05,
-              child: Container(
-                color: Colors.transparent,
+          Image.asset(
+            'assets/images/backgrounds/welcome_couple.png',
+            fit: BoxFit.cover,
+            errorBuilder: (context, error, stackTrace) => Container(
+              decoration: const BoxDecoration(
+                gradient: LinearGradient(
+                  begin: Alignment.topCenter,
+                  end: Alignment.bottomCenter,
+                  colors: [Color(0xFF1A3D2B), Color(0xFF006B2E)],
+                ),
               ),
             ),
           ),
-
-          // Main content
+          Positioned(
+            top: 0,
+            left: 0,
+            right: 0,
+            height: screenHeight * 0.28,
+            child: const DecoratedBox(
+              decoration: BoxDecoration(
+                gradient: LinearGradient(
+                  begin: Alignment.topCenter,
+                  end: Alignment.bottomCenter,
+                  colors: [
+                    Color(0x73000000),
+                    Color(0x00000000),
+                  ],
+                ),
+              ),
+            ),
+          ),
+          Positioned(
+            left: 0,
+            right: 0,
+            bottom: 0,
+            height: screenHeight * 0.55,
+            child: const DecoratedBox(
+              decoration: BoxDecoration(
+                gradient: LinearGradient(
+                  begin: Alignment.topCenter,
+                  end: Alignment.bottomCenter,
+                  colors: [
+                    Color(0x00000000),
+                    Color(0xA6000000),
+                  ],
+                ),
+              ),
+            ),
+          ),
           SafeArea(
             child: Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 24),
+              padding: EdgeInsets.fromLTRB(
+                24,
+                0,
+                24,
+                bottomPadding > 0 ? bottomPadding : 24,
+              ),
               child: Column(
+                crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: [
-                  const SizedBox(height: 24),
-
-                  // Header text - Bold Montserrat
-                  Text(
-                    'Create Your Account',
-                    textAlign: TextAlign.center,
-                    style: GoogleFonts.montserrat(
-                      fontSize: 24,
-                      fontWeight: FontWeight.bold,
-                      color: textColor,
-                    ),
-                  ),
-
-                  const SizedBox(height: 12),
-
-                  // Subtitle - Regular Montserrat, light brown
-                  Text(
-                    "Choose how you'd like to sign up",
-                    textAlign: TextAlign.center,
-                    style: GoogleFonts.montserrat(
-                      fontSize: 16,
-                      fontWeight: FontWeight.normal,
-                      color: textLightBrown,
-                    ),
-                  ),
-
-                  const SizedBox(height: 48),
-
-                  // Phone Number Button
-                  _buildAuthMethodButton(
-                    context: context,
-                    icon: Icons.phone_android,
-                    text: 'Continue with phone',
-                    color: primaryColor,
-                    onTap: () {
-                      unawaited(
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                            builder: (context) => PhoneNumber(
-                              updatePhoneNumber: false,
-                            ),
+                  SizedBox(height: topBrandOffset),
+                  Center(
+                    child: Text(
+                      'Afropeep',
+                      style: GoogleFonts.plusJakartaSans(
+                        fontSize: 42,
+                        fontWeight: FontWeight.w700,
+                        color: Colors.white,
+                        letterSpacing: -0.3,
+                        shadows: [
+                          Shadow(
+                            color: Colors.black.withValues(alpha: 0.15),
+                            blurRadius: 8,
+                            offset: const Offset(0, 1),
                           ),
-                        ),
-                      );
-                    },
-                  ),
-
-                  const SizedBox(height: 16),
-
-                  // Google Sign In Button
-                  BlocProvider(
-                    create: (context) => GoogleLoginBloc(),
-                    child: BlocConsumer<GoogleLoginBloc, GoogleLoginStates>(
-                      listener: (context, state) {
-                        if (state is GoogleLoginSuccess) {
-                          unawaited(AuthRouter.navigateAfterAuth(context));
-                        } else if (state is GoogleLoginFailed) {
-                          CustomSnackbar.showSnackBarSimple(
-                            state.message,
-                            context,
-                          );
-                        }
-                      },
-                      builder: (context, state) => _buildAuthMethodButton(
-                        context: context,
-                        icon: Icons.g_mobiledata_rounded,
-                        text: 'Continue with Google',
-                        color: googleBlue,
-                        isLoading: state is GoogleLoginLoading,
-                        onTap: () {
-                          BlocProvider.of<GoogleLoginBloc>(context).add(
-                            const GoogleLoginRequested(),
-                          );
-                        },
+                        ],
                       ),
                     ),
                   ),
-
                   const Spacer(),
-
-                  // Already have an account? Sign in
+                  SizedBox(
+                    width: buttonWidth,
+                    child: Text.rich(
+                      TextSpan(
+                        style: GoogleFonts.montserrat(
+                          fontSize: 14,
+                          fontWeight: FontWeight.w400,
+                          height: 1.4,
+                          color: const Color(0xB3FFFFFF),
+                        ),
+                        children: [
+                          const TextSpan(
+                            text: 'By continuing, you agree to our ',
+                          ),
+                          TextSpan(
+                            text: 'Terms',
+                            style: const TextStyle(
+                              fontWeight: FontWeight.w600,
+                              decoration: TextDecoration.underline,
+                              color: Color(0xB3FFFFFF),
+                            ),
+                            recognizer: TapGestureRecognizer()
+                              ..onTap = () {
+                                unawaited(
+                                  Navigator.push(
+                                    context,
+                                    MaterialPageRoute(
+                                      builder: (_) =>
+                                          const TermsOfServiceScreen(),
+                                    ),
+                                  ),
+                                );
+                              },
+                          ),
+                          const TextSpan(text: ' and '),
+                          TextSpan(
+                            text: 'Privacy Policy',
+                            style: const TextStyle(
+                              fontWeight: FontWeight.w600,
+                              decoration: TextDecoration.underline,
+                              color: Color(0xB3FFFFFF),
+                            ),
+                            recognizer: TapGestureRecognizer()
+                              ..onTap = () {
+                                unawaited(
+                                  Navigator.push(
+                                    context,
+                                    MaterialPageRoute(
+                                      builder: (_) =>
+                                          const PrivacyPolicyScreen(),
+                                    ),
+                                  ),
+                                );
+                              },
+                          ),
+                          const TextSpan(text: '.'),
+                        ],
+                      ),
+                      textAlign: TextAlign.center,
+                    ),
+                  ),
+                  const SizedBox(height: 24),
+                  Center(
+                    child: SizedBox(
+                      width: buttonWidth,
+                      height: 56,
+                      child: Material(
+                        color: Colors.transparent,
+                        child: InkWell(
+                          onTap: () {
+                            unawaited(
+                              Navigator.pushReplacementNamed(
+                                context,
+                                RouteName.phoneNumberScreen,
+                                arguments: {'isSignIn': false},
+                              ),
+                            );
+                          },
+                          borderRadius: BorderRadius.circular(28),
+                          child: Stack(
+                            fit: StackFit.expand,
+                            children: [
+                              Container(
+                                decoration: BoxDecoration(
+                                  borderRadius: BorderRadius.circular(28),
+                                  gradient: const LinearGradient(
+                                    begin: Alignment.topCenter,
+                                    end: Alignment.bottomCenter,
+                                    colors: [
+                                      Color(0xFF22D879),
+                                      Color(0xFF18B866),
+                                      Color(0xFF0E7C45),
+                                    ],
+                                    stops: [0.0, 0.5, 1.0],
+                                  ),
+                                  boxShadow: [
+                                    BoxShadow(
+                                      color: const Color(0xFF18B866)
+                                          .withValues(alpha: 0.28),
+                                      blurRadius: 20,
+                                      offset: const Offset(0, 6),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                              Container(
+                                decoration: BoxDecoration(
+                                  borderRadius: BorderRadius.circular(28),
+                                  gradient: LinearGradient(
+                                    begin: Alignment.topCenter,
+                                    end: const Alignment(0, -0.3),
+                                    colors: [
+                                      Colors.white.withValues(alpha: 0.12),
+                                      Colors.transparent,
+                                    ],
+                                  ),
+                                ),
+                              ),
+                              Center(
+                                child: Padding(
+                                  padding: const EdgeInsets.symmetric(
+                                    horizontal: 24,
+                                    vertical: 15,
+                                  ),
+                                  child: Text(
+                                    'Continue with phone',
+                                    style: GoogleFonts.montserrat(
+                                      fontSize: 17,
+                                      fontWeight: FontWeight.w600,
+                                      letterSpacing: 0.3,
+                                      color: Colors.white,
+                                    ),
+                                  ),
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ),
+                    ),
+                  ),
+                  const SizedBox(height: 12),
+                  Center(
+                    child: SizedBox(
+                      width: buttonWidth,
+                      child: BlocProvider(
+                        create: (context) => GoogleLoginBloc(),
+                        child: BlocConsumer<GoogleLoginBloc, GoogleLoginStates>(
+                          listener: (context, state) {
+                            if (state is GoogleLoginSuccess) {
+                              unawaited(AuthRouter.navigateAfterAuth(context));
+                            } else if (state is GoogleLoginFailed) {
+                              CustomSnackbar.showSnackBarSimple(
+                                state.message,
+                                context,
+                              );
+                            }
+                          },
+                          builder: (context, state) => TextButton.icon(
+                            onPressed: state is GoogleLoginLoading
+                                ? null
+                                : () {
+                                    context.read<GoogleLoginBloc>().add(
+                                          const GoogleLoginRequested(),
+                                        );
+                                  },
+                            icon: state is GoogleLoginLoading
+                                ? const SizedBox(
+                                    width: 18,
+                                    height: 18,
+                                    child: CircularProgressIndicator(
+                                      strokeWidth: 2,
+                                      color: Colors.white,
+                                    ),
+                                  )
+                                : Icon(
+                                    Icons.g_mobiledata_rounded,
+                                    color: Colors.white.withValues(alpha: 0.9),
+                                    size: 28,
+                                  ),
+                            label: Text(
+                              'Continue with Google',
+                              style: GoogleFonts.montserrat(
+                                fontSize: 15,
+                                fontWeight: FontWeight.w500,
+                                letterSpacing: 0.3,
+                                color: Colors.white.withValues(alpha: 0.9),
+                              ),
+                            ),
+                            style: TextButton.styleFrom(
+                              foregroundColor:
+                                  Colors.white.withValues(alpha: 0.9),
+                              padding: const EdgeInsets.symmetric(
+                                vertical: 14,
+                                horizontal: 24,
+                              ),
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(999),
+                                side: BorderSide(
+                                  color: googleBlue.withValues(alpha: 0.45),
+                                ),
+                              ),
+                              backgroundColor: const Color(0x1AFFFFFF),
+                            ),
+                          ),
+                        ),
+                      ),
+                    ),
+                  ),
+                  const SizedBox(height: 24),
                   Row(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
@@ -149,101 +351,42 @@ class AuthMethodSelectionScreen extends StatelessWidget {
                         'Already have an account? ',
                         style: GoogleFonts.montserrat(
                           fontSize: 14,
-                          color: textColor,
+                          fontWeight: FontWeight.w400,
+                          color: const Color(0xB3FFFFFF),
                         ),
                       ),
                       GestureDetector(
                         onTap: () {
                           unawaited(
-                            Navigator.push(
+                            Navigator.pushReplacementNamed(
                               context,
-                              MaterialPageRoute(
-                                builder: (context) =>
-                                    const SignInMethodSelectionScreen(),
-                              ),
+                              RouteName.signInMethodSelection,
                             ),
                           );
                         },
                         child: Text(
                           'Sign in',
                           style: GoogleFonts.montserrat(
-                            fontSize: 14,
+                            fontSize: 15,
                             fontWeight: FontWeight.w600,
-                            color: primaryColor,
+                            letterSpacing: 0.3,
+                            color: Colors.white,
                           ),
                         ),
                       ),
                     ],
                   ),
-
-                  const SizedBox(height: 24),
                 ],
               ),
             ),
+          ),
+          const Positioned(
+            right: 12,
+            bottom: 12,
+            child: BuildStamp(compact: true),
           ),
         ],
       ),
     );
   }
-
-  Widget _buildAuthMethodButton({
-    required BuildContext context,
-    required IconData icon,
-    required String text,
-    required Color color,
-    required VoidCallback onTap,
-    bool isLoading = false,
-  }) =>
-      Container(
-        width: double.infinity,
-        height: 56, // 56dp height as specified
-        margin: const EdgeInsets.symmetric(horizontal: 8),
-        decoration: BoxDecoration(
-          borderRadius: BorderRadius.circular(16), // 16dp radius as specified
-          boxShadow: [
-            BoxShadow(
-              color: Colors.white.withValues(alpha: 0.5), // Soft cream shadow
-              blurRadius: 8,
-              offset: const Offset(0, 4),
-            ),
-          ],
-        ),
-        child: ElevatedButton(
-          onPressed: isLoading ? null : onTap,
-          style: ElevatedButton.styleFrom(
-            backgroundColor: color,
-            foregroundColor: Colors.white,
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(16),
-            ),
-            elevation: 2,
-            padding: const EdgeInsets.symmetric(horizontal: 16),
-          ),
-          child: isLoading
-              ? const SizedBox(
-                  height: 24,
-                  width: 24,
-                  child: CircularProgressIndicator(
-                    color: Colors.white,
-                    strokeWidth: 2,
-                  ),
-                )
-              : Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Icon(icon, size: 24, color: Colors.white),
-                    const SizedBox(width: 12),
-                    Text(
-                      text,
-                      style: GoogleFonts.montserrat(
-                        // Montserrat font as specified
-                        fontSize: 16,
-                        fontWeight: FontWeight.w600,
-                        color: Colors.white,
-                      ),
-                    ),
-                  ],
-                ),
-        ),
-      );
 }

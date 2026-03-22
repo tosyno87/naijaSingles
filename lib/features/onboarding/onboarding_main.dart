@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:google_fonts/google_fonts.dart';
 
+import '../../common/widgets/build_stamp.dart';
 import 'bloc/onboarding_bloc.dart';
 import 'onboarding_theme.dart';
 import 'screens/basic_info_screen.dart';
@@ -49,6 +50,8 @@ class _OnboardingMainState extends State<OnboardingMain> {
   }
 
   void _nextPage() {
+    FocusManager.instance.primaryFocus?.unfocus();
+
     final bloc = context.read<OnboardingBloc>();
     final data = bloc.state.data;
 
@@ -163,6 +166,8 @@ class _OnboardingMainState extends State<OnboardingMain> {
   }
 
   void _previousPage() {
+    FocusManager.instance.primaryFocus?.unfocus();
+
     if (_currentPage > 0) {
       unawaited(
         _pageController.previousPage(
@@ -200,7 +205,10 @@ class _OnboardingMainState extends State<OnboardingMain> {
   @override
   Widget build(BuildContext context) {
     final bottomSafe = MediaQuery.of(context).padding.bottom;
-    final bottomPadding = math.max(16, bottomSafe).toDouble();
+    final keyboardInset = MediaQuery.of(context).viewInsets.bottom;
+    final bottomPadding = keyboardInset > 0
+        ? keyboardInset + 12
+        : math.max(16, bottomSafe).toDouble();
 
     return Scaffold(
       backgroundColor: OnboardingTheme.background,
@@ -227,121 +235,137 @@ class _OnboardingMainState extends State<OnboardingMain> {
         centerTitle: true,
         actions: const [],
       ),
-      body: Column(
+      body: Stack(
         children: [
-          // Progress indicator
-          Padding(
-            padding: const EdgeInsets.symmetric(
-              horizontal: OnboardingTheme.horizontalPadding,
-            ),
-            child: LinearProgressIndicator(
-              value: (_currentPage + 1) / _totalPages,
-              backgroundColor: OnboardingTheme.progressTrack,
-              color: OnboardingTheme.primaryGreen,
-              minHeight: OnboardingTheme.progressHeight,
-              borderRadius:
-                  BorderRadius.circular(OnboardingTheme.progressRadius),
-            ),
-          ),
+          Column(
+            children: [
+              // Progress indicator
+              Padding(
+                padding: const EdgeInsets.symmetric(
+                  horizontal: OnboardingTheme.horizontalPadding,
+                ),
+                child: LinearProgressIndicator(
+                  value: (_currentPage + 1) / _totalPages,
+                  backgroundColor: OnboardingTheme.progressTrack,
+                  color: OnboardingTheme.primaryGreen,
+                  minHeight: OnboardingTheme.progressHeight,
+                  borderRadius:
+                      BorderRadius.circular(OnboardingTheme.progressRadius),
+                ),
+              ),
 
-          // Page content
-          Expanded(
-            child: PageView(
-              controller: _pageController,
-              physics: const NeverScrollableScrollPhysics(),
-              onPageChanged: (index) {
-                setState(() {
-                  _currentPage = index;
-                });
-              },
-              children: const [
-                BasicInfoScreen(),
-                EnhancedPhotoUploadScreen(),
-                LocationScreen(),
-                TribeSelectionScreen(),
-                EnhancedBioScreen(),
-                EnhancedInterestsScreen(),
-                PreferencesOnboardingScreen(),
-                EnhancedAdditionalInfoScreen(),
-              ],
-            ),
-          ),
+              // Page content
+              Expanded(
+                child: PageView(
+                  controller: _pageController,
+                  physics: const NeverScrollableScrollPhysics(),
+                  onPageChanged: (index) {
+                    FocusManager.instance.primaryFocus?.unfocus();
+                    setState(() {
+                      _currentPage = index;
+                    });
+                  },
+                  children: const [
+                    BasicInfoScreen(),
+                    EnhancedPhotoUploadScreen(),
+                    LocationScreen(),
+                    TribeSelectionScreen(),
+                    EnhancedBioScreen(),
+                    EnhancedInterestsScreen(),
+                    PreferencesOnboardingScreen(),
+                    EnhancedAdditionalInfoScreen(),
+                  ],
+                ),
+              ),
 
-          // Bottom CTA
-          Padding(
-            padding: EdgeInsets.only(
-              left: OnboardingTheme.horizontalPadding,
-              right: OnboardingTheme.horizontalPadding,
-              top: 16,
-              bottom: bottomPadding,
-            ),
-            child: BlocBuilder<OnboardingBloc, OnboardingState>(
-              buildWhen: (prev, curr) => prev.data != curr.data || prev != curr,
-              builder: (context, state) {
-                final data = state.data;
-                bool canContinue = false;
+              // Bottom CTA
+              AnimatedPadding(
+                duration: const Duration(milliseconds: 220),
+                curve: Curves.easeOut,
+                padding: EdgeInsets.only(
+                  left: OnboardingTheme.horizontalPadding,
+                  right: OnboardingTheme.horizontalPadding,
+                  top: 16,
+                  bottom: bottomPadding,
+                ),
+                child: BlocBuilder<OnboardingBloc, OnboardingState>(
+                  buildWhen: (prev, curr) =>
+                      prev.data != curr.data || prev != curr,
+                  builder: (context, state) {
+                    final data = state.data;
+                    bool canContinue = false;
 
-                if (data != null) {
-                  switch (_currentPage) {
-                    case 0:
-                      canContinue = data.isBasicInfoComplete;
-                    case 1:
-                      canContinue = data.isPhotoUploaded;
-                    case 2:
-                      canContinue = data.locationName != null &&
-                          data.locationName!.trim().isNotEmpty;
-                    case 3:
-                      canContinue = data.nationality != null &&
-                          data.nationality!.isNotEmpty;
-                    case 4:
-                      canContinue = data.bio.trim().length >= _minBioLength;
-                    case 5:
-                      canContinue = data.interests.length >= _minInterests;
-                    case 6:
-                      canContinue = data.interestedIn.isNotEmpty;
-                    case 7:
-                      canContinue = data.lookingFor.trim().isNotEmpty &&
-                          data.relationshipIntent.trim().isNotEmpty;
-                  }
-                }
+                    if (data != null) {
+                      switch (_currentPage) {
+                        case 0:
+                          canContinue = data.isBasicInfoComplete;
+                        case 1:
+                          canContinue = data.isPhotoUploaded;
+                        case 2:
+                          canContinue = data.locationName != null &&
+                              data.locationName!.trim().isNotEmpty;
+                        case 3:
+                          canContinue = data.nationality != null &&
+                              data.nationality!.isNotEmpty;
+                        case 4:
+                          canContinue = data.bio.trim().length >= _minBioLength;
+                        case 5:
+                          canContinue = data.interests.length >= _minInterests;
+                        case 6:
+                          canContinue = data.interestedIn.isNotEmpty;
+                        case 7:
+                          canContinue = data.lookingFor.trim().isNotEmpty &&
+                              data.relationshipIntent.trim().isNotEmpty;
+                      }
+                    }
 
-                return SizedBox(
-                  width: double.infinity,
-                  height: OnboardingTheme.buttonHeight,
-                  child: DecoratedBox(
-                    decoration: BoxDecoration(
-                      gradient:
-                          canContinue ? OnboardingTheme.buttonGradient : null,
-                      color: canContinue
-                          ? null
-                          : OnboardingTheme.primaryGreen.withValues(alpha: 0.4),
-                      borderRadius:
-                          BorderRadius.circular(OnboardingTheme.buttonRadius),
-                    ),
-                    child: ElevatedButton(
-                      onPressed: canContinue ? _nextPage : null,
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: Colors.transparent,
-                        shadowColor: Colors.transparent,
-                        foregroundColor: Colors.white,
-                        disabledBackgroundColor: Colors.transparent,
-                        disabledForegroundColor: Colors.white60,
-                        shape: RoundedRectangleBorder(
+                    return SizedBox(
+                      width: double.infinity,
+                      height: OnboardingTheme.buttonHeight,
+                      child: DecoratedBox(
+                        decoration: BoxDecoration(
+                          gradient: canContinue
+                              ? OnboardingTheme.buttonGradient
+                              : null,
+                          color: canContinue
+                              ? null
+                              : OnboardingTheme.primaryGreen
+                                  .withValues(alpha: 0.4),
                           borderRadius: BorderRadius.circular(
                             OnboardingTheme.buttonRadius,
                           ),
                         ),
-                        elevation: 0,
+                        child: ElevatedButton(
+                          onPressed: canContinue ? _nextPage : null,
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: Colors.transparent,
+                            shadowColor: Colors.transparent,
+                            foregroundColor: Colors.white,
+                            disabledBackgroundColor: Colors.transparent,
+                            disabledForegroundColor: Colors.white60,
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(
+                                OnboardingTheme.buttonRadius,
+                              ),
+                            ),
+                            elevation: 0,
+                          ),
+                          child: Text(
+                            _currentPage < _totalPages - 1 ? 'Next' : 'Finish',
+                            style: OnboardingTheme.buttonTextStyle,
+                          ),
+                        ),
                       ),
-                      child: Text(
-                        _currentPage < _totalPages - 1 ? 'Next' : 'Finish',
-                        style: OnboardingTheme.buttonTextStyle,
-                      ),
-                    ),
-                  ),
-                );
-              },
-            ),
+                    );
+                  },
+                ),
+              ),
+            ],
+          ),
+          const Positioned(
+            right: 12,
+            bottom: 12,
+            child: BuildStamp(compact: true),
           ),
         ],
       ),

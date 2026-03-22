@@ -29,9 +29,9 @@ void main() {
       await tester.tap(find.text('Create Account'));
       await tester.pumpAndSettle();
 
-      expect(find.text('Create Your Account'), findsOneWidget);
       expect(find.text('Continue with phone'), findsOneWidget);
       expect(find.text('Continue with Google'), findsOneWidget);
+      expect(find.text('Already have an account? '), findsOneWidget);
     });
   });
 }

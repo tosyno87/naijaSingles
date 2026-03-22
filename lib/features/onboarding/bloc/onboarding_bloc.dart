@@ -9,6 +9,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:image_picker/image_picker.dart';
 
 import '../../../common/bloc/user/user_bloc.dart';
+import '../../../common/utils/auth_flow_telemetry.dart';
 import '../../../common/widgets/loading_transition_screen.dart';
 import '../../../services/bulk_photo_picker_service.dart';
 import '../../../services/profile_image_cropper_service.dart';
@@ -507,10 +508,22 @@ class OnboardingBloc extends Bloc<OnboardingEvent, OnboardingState> {
     final user = FirebaseAuth.instance.currentUser;
     if (user == null) {
       emit(const OnboardingSaveFailure('User not authenticated'));
+      AuthFlowTelemetry.track(
+        'onboarding_save_failed',
+        data: {
+          'reason': 'user_not_authenticated',
+        },
+      );
       return;
     }
 
     emit(OnboardingLoading(data));
+    AuthFlowTelemetry.track(
+      'onboarding_save_started',
+      data: {
+        'uid': user.uid,
+      },
+    );
 
     if (context != null && context.mounted) {
       unawaited(
@@ -531,6 +544,12 @@ class OnboardingBloc extends Bloc<OnboardingEvent, OnboardingState> {
       }
 
       emit(const OnboardingSaveSuccess());
+      AuthFlowTelemetry.track(
+        'onboarding_save_success',
+        data: {
+          'uid': user.uid,
+        },
+      );
 
       userBloc.add(const UserRefreshUserDetails());
       await Future.delayed(const Duration(milliseconds: 300));
@@ -543,21 +562,67 @@ class OnboardingBloc extends Bloc<OnboardingEvent, OnboardingState> {
       }
     } on Object catch (err) {
       log('Error saving user data: $err');
-      emit(OnboardingSaveFailure(err.toString()));
+      final errorCode = _classifyOnboardingError(err);
+      final userMessage = _userMessageForOnboardingError(errorCode);
+      emit(OnboardingSaveFailure(userMessage));
+      AuthFlowTelemetry.track(
+        'onboarding_save_failed',
+        data: {
+          'uid': user.uid,
+          'reason': errorCode,
+          'errorType': err.runtimeType.toString(),
+        },
+      );
       if (context != null && context.mounted) {
         final navigator = Navigator.of(context, rootNavigator: true);
         if (navigator.canPop()) {
           navigator.pop();
         }
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text(
-              'Could not complete profile setup. Please try again.',
-            ),
+          SnackBar(
+            content: Text(userMessage),
           ),
         );
       }
       // Do not navigate to main app on failure; user stays on onboarding to retry.
+    }
+  }
+
+  String _classifyOnboardingError(Object error) {
+    if (error is TimeoutException) return 'timeout';
+    if (error is FirebaseException) {
+      switch (error.code) {
+        case 'permission-denied':
+          return 'permission_denied';
+        case 'unavailable':
+          return 'network_unavailable';
+        case 'deadline-exceeded':
+          return 'deadline_exceeded';
+        case 'unauthenticated':
+          return 'unauthenticated';
+        default:
+          return 'firebase_${error.code}';
+      }
+    }
+    if (error is FirebaseAuthException) return 'auth_${error.code}';
+    return 'unknown';
+  }
+
+  String _userMessageForOnboardingError(String reason) {
+    switch (reason) {
+      case 'permission_denied':
+        return 'We could not save your profile due to a permissions issue. '
+            'Please restart the app and try again.';
+      case 'network_unavailable':
+      case 'deadline_exceeded':
+      case 'timeout':
+        return 'Network issue while saving profile. Please check connection '
+            'and tap Finish again.';
+      case 'unauthenticated':
+      case 'auth-user-token-expired':
+        return 'Your session expired. Please sign in again to finish setup.';
+      default:
+        return 'Could not complete profile setup. Please try again.';
     }
   }
 }

@@ -126,14 +126,12 @@ class _EnhancedAdditionalInfoScreenState
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Text('Tell us more about you', style: OnboardingTheme.titleStyle),
-              const SizedBox(height: OnboardingTheme.titleToSubtitle),
               Text(
-                'Help us create better matches for you',
+                'Final step to improve your matches.',
                 style: OnboardingTheme.subtitleStyle,
               ),
 
-              const SizedBox(height: 16),
+              const SizedBox(height: 12),
 
               Container(
                 padding:

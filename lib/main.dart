@@ -33,6 +33,8 @@ import 'services/crashlytics_service.dart';
 import 'services/secure_storage_service.dart';
 
 Future<void> main() async {
+  const bool preserveDebugSessionForE2E =
+      bool.fromEnvironment('PRESERVE_DEBUG_SESSION_FOR_E2E');
   WidgetsFlutterBinding.ensureInitialized();
   await EasyLocalization.ensureInitialized();
 
@@ -100,12 +102,16 @@ Future<void> main() async {
     log('❌ Crashlytics initialization error: $e');
   }
 
-  // Initialize Notification Service
-  try {
-    await NotificationService.initialize();
-    log('🔔 Notification Service initialized');
-  } on Object catch (e) {
-    log('❌ Notification Service initialization error: $e');
+  // Initialize Notification Service (skip in launch harness mode for deterministic startup)
+  if (!preserveDebugSessionForE2E) {
+    try {
+      await NotificationService.initialize();
+      log('🔔 Notification Service initialized');
+    } on Object catch (e) {
+      log('❌ Notification Service initialization error: $e');
+    }
+  } else {
+    log('🧪 Skipping Notification Service initialization for E2E harness');
   }
 
   // Seed events only in debug mode to prevent fake data in production
@@ -166,10 +172,14 @@ Future<void> main() async {
   // This ensures new builds start with no user authenticated
   try {
     final currentUser = FirebaseAuth.instance.currentUser;
-    if (currentUser != null && kDebugMode) {
+    if (currentUser != null && kDebugMode && !preserveDebugSessionForE2E) {
       log('🧹 Signing out existing user for clean start: ${currentUser.uid}');
       await FirebaseAuth.instance.signOut();
       log('✅ Signed out - app will start with no authenticated user');
+    } else if (currentUser != null &&
+        kDebugMode &&
+        preserveDebugSessionForE2E) {
+      log('🧪 Preserving debug auth session for E2E harness: ${currentUser.uid}');
     }
   } on Object catch (e) {
     log('⚠️ Error signing out existing user: $e');

@@ -2,16 +2,19 @@ import 'package:firebase_core/firebase_core.dart' show FirebaseOptions;
 import 'package:flutter/foundation.dart'
     show defaultTargetPlatform, kIsWeb, TargetPlatform;
 
-const String _nextProdProjectId = String.fromEnvironment('NEXT_PROD_PROJECT_ID');
+const String _nextProdProjectId =
+    String.fromEnvironment('NEXT_PROD_PROJECT_ID');
 const String _nextProdStorageBucket = String.fromEnvironment(
   'NEXT_PROD_STORAGE_BUCKET',
 );
 const String _nextProdMessagingSenderId = String.fromEnvironment(
   'NEXT_PROD_MESSAGING_SENDER_ID',
 );
-const String _nextProdAuthDomain = String.fromEnvironment('NEXT_PROD_AUTH_DOMAIN');
+const String _nextProdAuthDomain =
+    String.fromEnvironment('NEXT_PROD_AUTH_DOMAIN');
 
-const String _nextProdWebApiKey = String.fromEnvironment('NEXT_PROD_WEB_API_KEY');
+const String _nextProdWebApiKey =
+    String.fromEnvironment('NEXT_PROD_WEB_API_KEY');
 const String _nextProdWebAppId = String.fromEnvironment('NEXT_PROD_WEB_APP_ID');
 
 const String _nextProdAndroidApiKey = String.fromEnvironment(

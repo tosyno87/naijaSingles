@@ -116,6 +116,32 @@ void main() {
     );
 
     blocTest<GoogleLoginBloc, GoogleLoginStates>(
+      'emits [GoogleLoginLoading, GoogleLoginSuccess] when ensureUserDocument is permission-denied',
+      build: () {
+        when(() => mockRepo.signInWithGoogle()).thenAnswer(
+          (_) async => MockUser(uid: 'uid-1', displayName: 'Test'),
+        );
+        when(() => mockRepo.ensureUserDocument(any())).thenThrow(
+          FirebaseException(
+            plugin: 'cloud_firestore',
+            code: 'permission-denied',
+            message: 'The caller does not have permission',
+          ),
+        );
+        return GoogleLoginBloc(repository: mockRepo);
+      },
+      act: (bloc) => bloc.add(const GoogleLoginRequested()),
+      expect: () => [
+        GoogleLoginLoading(),
+        isA<GoogleLoginSuccess>(),
+      ],
+      verify: (_) {
+        verify(() => mockRepo.signInWithGoogle()).called(1);
+        verify(() => mockRepo.ensureUserDocument(any())).called(1);
+      },
+    );
+
+    blocTest<GoogleLoginBloc, GoogleLoginStates>(
       'emits [GoogleLoginLoading, GoogleLoginFailed] when ensureUserDocument throws after successful sign-in',
       build: () {
         when(() => mockRepo.signInWithGoogle()).thenAnswer(

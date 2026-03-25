@@ -65,9 +65,9 @@ class _EmailPasswordResetScreenState extends State<EmailPasswordResetScreen> {
           builder: (context, state) => SafeArea(
             child: Padding(
               padding: const EdgeInsets.symmetric(horizontal: 24),
-              child: Center(
-                child: SingleChildScrollView(
-                  child: Form(
+              child: SingleChildScrollView(
+                keyboardDismissBehavior: ScrollViewKeyboardDismissBehavior.onDrag,
+                child: Form(
                     key: _formKey,
                     child: Column(
                       mainAxisAlignment: MainAxisAlignment.center,
@@ -158,7 +158,6 @@ class _EmailPasswordResetScreenState extends State<EmailPasswordResetScreen> {
                       ],
                     ),
                   ),
-                ),
               ),
             ),
           ),

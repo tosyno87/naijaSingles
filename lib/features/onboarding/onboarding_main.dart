@@ -5,7 +5,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:google_fonts/google_fonts.dart';
 
-import '../../common/widgets/build_stamp.dart';
 import 'bloc/onboarding_bloc.dart';
 import 'onboarding_theme.dart';
 import 'screens/basic_info_screen.dart';
@@ -128,25 +127,13 @@ class _OnboardingMainState extends State<OnboardingMain> {
       }
     } else if (_currentPage == 7) {
       final missingPurpose = data.lookingFor.trim().isEmpty;
-      final missingIntent = data.relationshipIntent.trim().isEmpty;
-      if (missingPurpose && missingIntent) {
+      final requiresRelationshipIntent = data.lookingFor == 'Dating';
+      final missingIntent =
+          requiresRelationshipIntent && data.relationshipIntent.trim().isEmpty;
+      if (missingPurpose || missingIntent) {
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(
             content: Text('Please complete all required fields on this page'),
-          ),
-        );
-        return;
-      }
-      if (missingPurpose) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Please select what brings you here')),
-        );
-        return;
-      }
-      if (missingIntent) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text('Please select your relationship goals'),
           ),
         );
         return;
@@ -204,13 +191,12 @@ class _OnboardingMainState extends State<OnboardingMain> {
 
   @override
   Widget build(BuildContext context) {
-    final bottomSafe = MediaQuery.of(context).padding.bottom;
     final keyboardInset = MediaQuery.of(context).viewInsets.bottom;
-    final bottomPadding = keyboardInset > 0
-        ? keyboardInset + 12
-        : math.max(16, bottomSafe).toDouble();
+    final bottomSafe = MediaQuery.of(context).padding.bottom;
+    final bottomPadding = math.max(16, bottomSafe).toDouble();
 
     return Scaffold(
+      resizeToAvoidBottomInset: false,
       backgroundColor: OnboardingTheme.background,
       appBar: AppBar(
         backgroundColor: Colors.transparent,
@@ -278,7 +264,6 @@ class _OnboardingMainState extends State<OnboardingMain> {
                 ),
               ),
 
-              // Bottom CTA
               AnimatedPadding(
                 duration: const Duration(milliseconds: 220),
                 curve: Curves.easeOut,
@@ -286,7 +271,8 @@ class _OnboardingMainState extends State<OnboardingMain> {
                   left: OnboardingTheme.horizontalPadding,
                   right: OnboardingTheme.horizontalPadding,
                   top: 16,
-                  bottom: bottomPadding,
+                  bottom:
+                      keyboardInset > 0 ? keyboardInset + 12 : bottomPadding,
                 ),
                 child: BlocBuilder<OnboardingBloc, OnboardingState>(
                   buildWhen: (prev, curr) =>
@@ -314,8 +300,11 @@ class _OnboardingMainState extends State<OnboardingMain> {
                         case 6:
                           canContinue = data.interestedIn.isNotEmpty;
                         case 7:
+                          final requiresRelationshipIntent =
+                              data.lookingFor == 'Dating';
                           canContinue = data.lookingFor.trim().isNotEmpty &&
-                              data.relationshipIntent.trim().isNotEmpty;
+                              (!requiresRelationshipIntent ||
+                                  data.relationshipIntent.trim().isNotEmpty);
                       }
                     }
 
@@ -361,11 +350,6 @@ class _OnboardingMainState extends State<OnboardingMain> {
                 ),
               ),
             ],
-          ),
-          const Positioned(
-            right: 12,
-            bottom: 12,
-            child: BuildStamp(compact: true),
           ),
         ],
       ),

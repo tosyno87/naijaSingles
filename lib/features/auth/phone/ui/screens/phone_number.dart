@@ -233,9 +233,10 @@ class _PhoneNumberState extends State<PhoneNumber> {
                 SafeArea(
                   child: Padding(
                     padding: const EdgeInsets.symmetric(horizontal: 24),
-                    child: Center(
-                      child: SingleChildScrollView(
-                        child: Column(
+                  child: SingleChildScrollView(
+                    keyboardDismissBehavior:
+                        ScrollViewKeyboardDismissBehavior.onDrag,
+                    child: Column(
                           mainAxisAlignment: MainAxisAlignment.center,
                           children: [
                             const AuthIconContainer(
@@ -548,7 +549,6 @@ class _PhoneNumberState extends State<PhoneNumber> {
                           ],
                         ),
                       ),
-                    ),
                   ),
                 ),
               ],

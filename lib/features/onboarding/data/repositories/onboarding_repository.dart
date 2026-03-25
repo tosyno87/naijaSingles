@@ -20,34 +20,61 @@ class OnboardingRepository {
 
     AppLogger.info('🔍 Saving essential user data to Firestore...');
 
-    // Firestore rules lock `createdAt` after initial creation.
-    // Keep it only on first write; never attempt to mutate it later.
-    final snapshot = await userRef.get();
-    if (snapshot.exists) {
-      essentialData.remove('createdAt');
-      final existing = snapshot.data() ?? <String, dynamic>{};
+    Future<void> writeWithSnapshot(
+      DocumentSnapshot<Map<String, dynamic>> snap,
+      Map<String, dynamic> sourceData,
+    ) async {
+      final payload = _sanitizeForUserRules(
+        input: Map<String, dynamic>.from(sourceData),
+        existing: snap.data() ?? <String, dynamic>{},
+        isExistingDoc: snap.exists,
+      )..['updatedAt'] = FieldValue.serverTimestamp();
 
-      final isIdentityLocked = existing['onboardingCompleted'] == true ||
-          existing['profileSetupComplete'] == true ||
-          existing['isProfileComplete'] == true;
-
-      // Firestore rules lock name/dateOfBirth after onboarding is marked complete.
-      // Keep existing locked values to make retries idempotent.
-      if (isIdentityLocked) {
-        if (existing.containsKey('name')) {
-          essentialData['name'] = existing['name'];
-        }
-        if (existing.containsKey('dateOfBirth')) {
-          essentialData['dateOfBirth'] = existing['dateOfBirth'];
-        }
+      if (snap.exists) {
+        await userRef.update(payload);
+      } else {
+        await userRef.set(payload, SetOptions(merge: true));
       }
     }
 
-    await userRef.set(essentialData, SetOptions(merge: true));
+    final currentUser = FirebaseAuth.instance.currentUser;
+    if (currentUser != null) {
+      // Reduce transient auth/rules propagation race after fresh sign-in.
+      await currentUser.getIdToken(true);
+    }
 
-    await userRef.update({
-      'updatedAt': FieldValue.serverTimestamp(),
-    });
+    Future<void> saveAttempt() async {
+      final snapshot = await userRef.get();
+      await writeWithSnapshot(snapshot, essentialData);
+    }
+
+    try {
+      await saveAttempt();
+    } on FirebaseException catch (e) {
+      if (e.code != 'permission-denied' && e.code != 'unauthenticated') {
+        rethrow;
+      }
+      AppLogger.warning(
+        '⚠️ Onboarding save denied; refreshing token and retrying once',
+      );
+      if (currentUser != null) {
+        await currentUser.getIdToken(true);
+      }
+      await Future<void>.delayed(const Duration(milliseconds: 350));
+      try {
+        await saveAttempt();
+      } on FirebaseException catch (retryError) {
+        if (retryError.code != 'permission-denied') {
+          rethrow;
+        }
+        AppLogger.warning(
+          '⚠️ Onboarding write still denied; trying legacy-compatible payload',
+        );
+        final snapshot = await userRef.get();
+        final legacyPayload = _buildLegacyCompatibleData(data);
+        await writeWithSnapshot(snapshot, legacyPayload);
+      }
+    }
 
     final user = FirebaseAuth.instance.currentUser;
     if (user != null) {
@@ -55,6 +82,59 @@ class OnboardingRepository {
     }
 
     AppLogger.info('✅ Essential user data saved successfully');
+  }
+
+  Map<String, dynamic> _buildLegacyCompatibleData(OnboardingData d) => {
+        'name': d.fullName,
+        'dateOfBirth': d.dateOfBirth?.toIso8601String(),
+        'age': d.age,
+        'gender': d.gender,
+        'bio': d.bio,
+        'interests': d.interests,
+        'height': d.height,
+        'lookingFor': d.lookingFor,
+        'relationshipIntent': d.relationshipIntent,
+        'interestedIn': d.interestedIn,
+        'ageRange': {
+          'min': d.ageRange[0].toString(),
+          'max': d.ageRange[1].toString(),
+        },
+        'maxDistance': d.maxDistance,
+        'locationName': d.locationName,
+        'latitude': d.latitude ?? 6.5244,
+        'longitude': d.longitude ?? 3.3792,
+        'onboardingCompleted': true,
+        'profileSetupComplete': true,
+        'isProfileComplete': true,
+      };
+
+  Map<String, dynamic> _sanitizeForUserRules({
+    required Map<String, dynamic> input,
+    required Map<String, dynamic> existing,
+    required bool isExistingDoc,
+  }) {
+    // Immutable/server-managed fields blocked by Firestore rules.
+    input.remove('uid');
+    input.remove('email');
+    input.remove('signInMethod');
+    input.remove('isDiscoverable');
+
+    if (isExistingDoc) {
+      // Rule blocks mutating createdAt after create.
+      input.remove('createdAt');
+    }
+
+    final isIdentityLocked = existing['onboardingCompleted'] == true ||
+        existing['profileSetupComplete'] == true ||
+        existing['isProfileComplete'] == true;
+
+    if (isIdentityLocked) {
+      // Never attempt to change locked identity fields on retries.
+      input.remove('name');
+      input.remove('dateOfBirth');
+    }
+
+    return input;
   }
 
   Future<void> uploadProfilePictures({
@@ -208,9 +288,8 @@ class OnboardingRepository {
       'locationName': d.locationName,
       'latitude': d.latitude ?? 6.5244,
       'longitude': d.longitude ?? 3.3792,
-      // Canonical flag + legacy synonyms. All three must be set so the
-      // Firestore security rule isLockedIdentityFieldUpdate() activates
-      // regardless of which flag name a query or rule references.
+      // Canonical flag + legacy synonyms for queries and older clients.
+      // Firestore identity lock uses onboardingCompleted only (see firestore.rules).
       'onboardingCompleted': true,
       'profileSetupComplete': true,
       'isProfileComplete': true,

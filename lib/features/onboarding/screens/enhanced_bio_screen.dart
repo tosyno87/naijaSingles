@@ -37,9 +37,10 @@ class _EnhancedBioScreenState extends State<EnhancedBioScreen> {
 
   @override
   Widget build(BuildContext context) => OnboardingTheme.constrainedContent(
-        child: SingleChildScrollView(
-          padding: OnboardingTheme.pagePadding,
-          child: Column(
+      child: SingleChildScrollView(
+        keyboardDismissBehavior: ScrollViewKeyboardDismissBehavior.onDrag,
+        padding: OnboardingTheme.pagePadding,
+        child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Text('Tell your story', style: OnboardingTheme.titleStyle),
@@ -51,6 +52,7 @@ class _EnhancedBioScreenState extends State<EnhancedBioScreen> {
               const SizedBox(height: OnboardingTheme.subtitleToField),
               TextField(
                 controller: _bioController,
+                onTapOutside: (_) => FocusScope.of(context).unfocus(),
                 style: OnboardingTheme.fieldTextStyle.copyWith(height: 1.5),
                 maxLines: 8,
                 maxLength: _maxLength,

@@ -100,9 +100,9 @@ class _PhoneNumberState extends State<PhoneNumber> {
       body: SafeArea(
         child: Padding(
           padding: const EdgeInsets.symmetric(horizontal: 24),
-          child: Center(
-            child: SingleChildScrollView(
-              child: Column(
+          child: SingleChildScrollView(
+            keyboardDismissBehavior: ScrollViewKeyboardDismissBehavior.onDrag,
+            child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
                   // Phone icon with Afrocentric style
@@ -307,7 +307,6 @@ class _PhoneNumberState extends State<PhoneNumber> {
                   const SizedBox(height: 24),
                 ],
               ),
-            ),
           ),
         ),
       ),

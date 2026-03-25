@@ -66,98 +66,99 @@ class _EmailPasswordResetScreenState extends State<EmailPasswordResetScreen> {
             child: Padding(
               padding: const EdgeInsets.symmetric(horizontal: 24),
               child: SingleChildScrollView(
-                keyboardDismissBehavior: ScrollViewKeyboardDismissBehavior.onDrag,
+                keyboardDismissBehavior:
+                    ScrollViewKeyboardDismissBehavior.onDrag,
                 child: Form(
-                    key: _formKey,
-                    child: Column(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        // Lock reset icon using reusable widget
-                        const AuthIconContainer(
-                          icon: Icons.lock_reset_outlined,
-                        ),
+                  key: _formKey,
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      // Lock reset icon using reusable widget
+                      const AuthIconContainer(
+                        icon: Icons.lock_reset_outlined,
+                      ),
 
-                        const SizedBox(height: 32),
+                      const SizedBox(height: 32),
 
-                        // Header
-                        Text(
-                          'Forgot Your Password?',
-                          style: GoogleFonts.montserrat(
-                            fontSize: 24,
-                            fontWeight: FontWeight.w600,
-                            color: AppColors.primaryGreen,
-                          ),
-                          textAlign: TextAlign.center,
+                      // Header
+                      Text(
+                        'Forgot Your Password?',
+                        style: GoogleFonts.montserrat(
+                          fontSize: 24,
+                          fontWeight: FontWeight.w600,
+                          color: AppColors.primaryGreen,
                         ),
-                        const SizedBox(height: 12),
-                        Text(
-                          'Enter your email address and we\'ll send you a link to reset your password',
+                        textAlign: TextAlign.center,
+                      ),
+                      const SizedBox(height: 12),
+                      Text(
+                        'Enter your email address and we\'ll send you a link to reset your password',
+                        style: GoogleFonts.montserrat(
+                          fontSize: 16,
+                          color: AppColors.textSecondary,
+                        ),
+                        textAlign: TextAlign.center,
+                      ),
+                      const SizedBox(height: 40),
+
+                      // Email Field using reusable widget
+                      AfropeepTextField(
+                        controller: _emailController,
+                        hintText: 'Email',
+                        prefixIcon: Icons.email_outlined,
+                        keyboardType: TextInputType.emailAddress,
+                        onChanged: () => setState(() {}),
+                        validationChecker: (text) =>
+                            RegExp(r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$')
+                                .hasMatch(text),
+                        validator: (value) {
+                          if (value == null || value.isEmpty) {
+                            return 'Please enter your email';
+                          }
+                          if (!RegExp(r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$')
+                              .hasMatch(value)) {
+                            return 'Please enter a valid email address';
+                          }
+                          return null;
+                        },
+                      ),
+
+                      const SizedBox(height: 40),
+
+                      // Send Reset Link Button using reusable widget
+                      AfropeepPrimaryButton(
+                        text: 'Send Reset Link',
+                        isLoading: state is EmailAuthLoading,
+                        onPressed: () {
+                          if (_formKey.currentState!.validate()) {
+                            context.read<EmailAuthBloc>().add(
+                                  EmailPasswordResetRequested(
+                                    email: _emailController.text.trim(),
+                                  ),
+                                );
+                          }
+                        },
+                      ),
+
+                      const SizedBox(height: 24),
+
+                      // Back to Login
+                      TextButton(
+                        onPressed: () {
+                          Navigator.pop(context);
+                        },
+                        child: Text(
+                          'Back to Login',
                           style: GoogleFonts.montserrat(
-                            fontSize: 16,
+                            fontSize: 14,
+                            fontWeight: FontWeight.w500,
                             color: AppColors.textSecondary,
                           ),
-                          textAlign: TextAlign.center,
                         ),
-                        const SizedBox(height: 40),
-
-                        // Email Field using reusable widget
-                        AfropeepTextField(
-                          controller: _emailController,
-                          hintText: 'Email',
-                          prefixIcon: Icons.email_outlined,
-                          keyboardType: TextInputType.emailAddress,
-                          onChanged: () => setState(() {}),
-                          validationChecker: (text) =>
-                              RegExp(r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$')
-                                  .hasMatch(text),
-                          validator: (value) {
-                            if (value == null || value.isEmpty) {
-                              return 'Please enter your email';
-                            }
-                            if (!RegExp(r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$')
-                                .hasMatch(value)) {
-                              return 'Please enter a valid email address';
-                            }
-                            return null;
-                          },
-                        ),
-
-                        const SizedBox(height: 40),
-
-                        // Send Reset Link Button using reusable widget
-                        AfropeepPrimaryButton(
-                          text: 'Send Reset Link',
-                          isLoading: state is EmailAuthLoading,
-                          onPressed: () {
-                            if (_formKey.currentState!.validate()) {
-                              context.read<EmailAuthBloc>().add(
-                                    EmailPasswordResetRequested(
-                                      email: _emailController.text.trim(),
-                                    ),
-                                  );
-                            }
-                          },
-                        ),
-
-                        const SizedBox(height: 24),
-
-                        // Back to Login
-                        TextButton(
-                          onPressed: () {
-                            Navigator.pop(context);
-                          },
-                          child: Text(
-                            'Back to Login',
-                            style: GoogleFonts.montserrat(
-                              fontSize: 14,
-                              fontWeight: FontWeight.w500,
-                              color: AppColors.textSecondary,
-                            ),
-                          ),
-                        ),
-                      ],
-                    ),
+                      ),
+                    ],
                   ),
+                ),
               ),
             ),
           ),

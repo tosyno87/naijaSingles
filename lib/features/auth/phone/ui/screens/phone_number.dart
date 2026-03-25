@@ -233,322 +233,318 @@ class _PhoneNumberState extends State<PhoneNumber> {
                 SafeArea(
                   child: Padding(
                     padding: const EdgeInsets.symmetric(horizontal: 24),
-                  child: SingleChildScrollView(
-                    keyboardDismissBehavior:
-                        ScrollViewKeyboardDismissBehavior.onDrag,
-                    child: Column(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            const AuthIconContainer(
-                              icon: Icons.phone_android,
-                              backgroundColor: Color(0x33FFFFFF),
-                              iconColor: Colors.white,
-                            ),
-                            const SizedBox(height: 32),
-                            if (kDebugMode && Platform.isIOS)
-                              Container(
-                                margin: const EdgeInsets.only(bottom: 20),
-                                padding: const EdgeInsets.all(12),
-                                decoration: BoxDecoration(
-                                  color: Colors.blue.shade50
-                                      .withValues(alpha: 0.15),
-                                  borderRadius: BorderRadius.circular(8),
-                                  border: Border.all(
-                                    color: Colors.blue.shade200
-                                        .withValues(alpha: 0.4),
-                                  ),
-                                ),
-                                child: Row(
-                                  children: [
-                                    Icon(
-                                      Icons.info_outline,
-                                      color: Colors.blue.shade200,
-                                      size: 20,
-                                    ),
-                                    const SizedBox(width: 8),
-                                    Expanded(
-                                      child: Text(
-                                        '💡 iOS Simulator: Use test phone numbers from Firebase Console',
-                                        style: GoogleFonts.montserrat(
-                                          fontSize: 12,
-                                          color: Colors.blue.shade100,
-                                        ),
-                                      ),
-                                    ),
-                                  ],
-                                ),
-                              ),
-                            Text(
-                              'Enter your phone number',
-                              style: GoogleFonts.montserrat(
-                                fontSize: 24,
-                                fontWeight: FontWeight.w600,
-                                color: Colors.white,
-                              ),
-                              textAlign: TextAlign.center,
-                            ),
-                            const SizedBox(height: 12),
-                            Text(
-                              "We'll send you a verification code",
-                              style: GoogleFonts.montserrat(
-                                fontSize: 16,
-                                color: const Color(0xB3FFFFFF),
-                              ),
-                              textAlign: TextAlign.center,
-                            ),
-                            const SizedBox(height: 40),
+                    child: SingleChildScrollView(
+                      keyboardDismissBehavior:
+                          ScrollViewKeyboardDismissBehavior.onDrag,
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          const AuthIconContainer(
+                            icon: Icons.phone_android,
+                            backgroundColor: Color(0x33FFFFFF),
+                            iconColor: Colors.white,
+                          ),
+                          const SizedBox(height: 32),
+                          if (kDebugMode && Platform.isIOS)
                             Container(
-                              height: 60,
+                              margin: const EdgeInsets.only(bottom: 20),
+                              padding: const EdgeInsets.all(12),
                               decoration: BoxDecoration(
-                                color: Colors.white.withValues(alpha: 0.92),
-                                borderRadius: BorderRadius.circular(16),
+                                color:
+                                    Colors.blue.shade50.withValues(alpha: 0.15),
+                                borderRadius: BorderRadius.circular(8),
                                 border: Border.all(
-                                  color: isValidNumber
-                                      ? AppColors.primaryGreen
-                                      : Colors.grey.shade300,
-                                  width: isValidNumber ? 1.5 : 1,
+                                  color: Colors.blue.shade200
+                                      .withValues(alpha: 0.4),
                                 ),
                               ),
                               child: Row(
                                 children: [
-                                  Container(
-                                    padding: const EdgeInsets.only(left: 8),
-                                    child: CountryCodePicker(
-                                      onChanged: (CountryCode code) {
-                                        if (mounted) {
-                                          setState(() {
-                                            countryCode = code.dialCode ?? '+1';
-                                            _regionCode = code.code ?? 'US';
-                                            _validatePhoneNumber();
-                                          });
-                                        }
-                                      },
-                                      initialSelection: 'US',
-                                      favorite: const [
-                                        'US',
-                                        'GH',
-                                        'ZA',
-                                        'KE',
-                                        'US',
-                                        'GB',
-                                      ],
-                                      textStyle: GoogleFonts.montserrat(
-                                        color: AppColors.textPrimary,
-                                        fontSize: 16,
-                                        fontWeight: FontWeight.w500,
-                                      ),
-                                      dialogTextStyle: GoogleFonts.montserrat(
-                                        color: Colors.black,
-                                        fontSize: 16,
-                                      ),
-                                      searchStyle: GoogleFonts.montserrat(
-                                        color: Colors.black,
-                                        fontSize: 16,
-                                      ),
-                                      dialogBackgroundColor: Colors.white,
-                                      boxDecoration: BoxDecoration(
-                                        color: Colors.white,
-                                        borderRadius: BorderRadius.circular(8),
-                                      ),
-                                      barrierColor: Colors.black54,
-                                      backgroundColor: Colors.white,
-                                      dialogSize: Size(
-                                        MediaQuery.of(context).size.width * 0.9,
-                                        MediaQuery.of(context).size.height *
-                                            0.7,
-                                      ),
-                                      headerTextStyle: GoogleFonts.montserrat(
-                                        color: Colors.black,
-                                        fontSize: 18,
-                                        fontWeight: FontWeight.bold,
-                                      ),
-                                      searchDecoration: InputDecoration(
-                                        hintText: 'Search country',
-                                        hintStyle: GoogleFonts.montserrat(
-                                          color: Colors.grey.shade600,
-                                          fontSize: 16,
-                                        ),
-                                        prefixIcon: const Icon(
-                                          Icons.search,
-                                          color: AppColors.primaryGreen,
-                                        ),
-                                        filled: true,
-                                        fillColor: Colors.white,
-                                        border: OutlineInputBorder(
-                                          borderRadius:
-                                              BorderRadius.circular(12),
-                                          borderSide: BorderSide(
-                                            color: Colors.grey.shade300,
-                                          ),
-                                        ),
-                                        enabledBorder: OutlineInputBorder(
-                                          borderRadius:
-                                              BorderRadius.circular(12),
-                                          borderSide: BorderSide(
-                                            color: Colors.grey.shade300,
-                                          ),
-                                        ),
-                                        focusedBorder: OutlineInputBorder(
-                                          borderRadius:
-                                              BorderRadius.circular(12),
-                                          borderSide: const BorderSide(
-                                            color: AppColors.primaryGreen,
-                                            width: 1.5,
-                                          ),
-                                        ),
-                                        contentPadding:
-                                            const EdgeInsets.symmetric(
-                                          horizontal: 16,
-                                          vertical: 12,
-                                        ),
-                                      ),
-                                    ),
+                                  Icon(
+                                    Icons.info_outline,
+                                    color: Colors.blue.shade200,
+                                    size: 20,
                                   ),
-                                  Container(
-                                    height: 30,
-                                    width: 1,
-                                    color: Colors.grey.withValues(alpha: 0.3),
-                                  ),
+                                  const SizedBox(width: 8),
                                   Expanded(
-                                    child: TextField(
-                                      controller: phoneNumberController,
-                                      keyboardType: TextInputType.phone,
+                                    child: Text(
+                                      '💡 iOS Simulator: Use test phone numbers from Firebase Console',
                                       style: GoogleFonts.montserrat(
-                                        fontSize: 16,
-                                        color: AppColors.textPrimary,
-                                        fontWeight: FontWeight.w500,
+                                        fontSize: 12,
+                                        color: Colors.blue.shade100,
                                       ),
-                                      decoration: InputDecoration(
-                                        hintText: 'Phone number',
-                                        hintStyle: GoogleFonts.montserrat(
-                                          color: Colors.grey,
-                                          fontWeight: FontWeight.w400,
-                                        ),
-                                        border: InputBorder.none,
-                                        contentPadding:
-                                            const EdgeInsets.symmetric(
-                                          horizontal: 16,
-                                          vertical: 16,
-                                        ),
-                                      ),
-                                      inputFormatters: [
-                                        FilteringTextInputFormatter.digitsOnly,
-                                        _PhoneNumberFormatter(),
-                                      ],
                                     ),
                                   ),
                                 ],
                               ),
                             ),
-                            const SizedBox(height: 40),
-                            Center(
-                              child: SizedBox(
-                                width: buttonWidth,
-                                child: Builder(
-                                  builder: (builderContext) =>
-                                      AfropeepPrimaryButton(
-                                    text: 'Continue',
-                                    isLoading: _isLoading,
-                                    disabledBackgroundColor:
-                                        Colors.white.withValues(alpha: 0.15),
-                                    onPressed: isValidNumber && !_isLoading
-                                        ? () {
-                                            _authDebugLog(
-                                              'Phone auth button tapped: '
-                                              'isValid=$isValidNumber '
-                                              'isLoading=$_isLoading',
-                                            );
-
-                                            setState(() {
-                                              _isLoading = true;
-                                            });
-
-                                            final cleanPhoneNumber =
-                                                phoneNumberController.text
-                                                    .replaceAll(' ', '')
-                                                    .replaceAll('-', '')
-                                                    .replaceAll('(', '')
-                                                    .replaceAll(')', '')
-                                                    .trim();
-
-                                            final fullPhoneNumber =
-                                                countryCode + cleanPhoneNumber;
-
-                                            _authDebugLog(
-                                              'Phone auth request prepared: '
-                                              'country=$countryCode '
-                                              'digits=${cleanPhoneNumber.length}',
-                                            );
-
-                                            final bloc =
-                                                BlocProvider.of<PhoneAuthBloc>(
-                                              builderContext,
-                                            );
-                                            bloc.add(
-                                              SendOtpToPhoneEvent(
-                                                phoneNumber: fullPhoneNumber,
-                                              ),
-                                            );
-                                          }
-                                        : null,
-                                  ),
-                                ),
+                          Text(
+                            'Enter your phone number',
+                            style: GoogleFonts.montserrat(
+                              fontSize: 24,
+                              fontWeight: FontWeight.w600,
+                              color: Colors.white,
+                            ),
+                            textAlign: TextAlign.center,
+                          ),
+                          const SizedBox(height: 12),
+                          Text(
+                            "We'll send you a verification code",
+                            style: GoogleFonts.montserrat(
+                              fontSize: 16,
+                              color: const Color(0xB3FFFFFF),
+                            ),
+                            textAlign: TextAlign.center,
+                          ),
+                          const SizedBox(height: 40),
+                          Container(
+                            height: 60,
+                            decoration: BoxDecoration(
+                              color: Colors.white.withValues(alpha: 0.92),
+                              borderRadius: BorderRadius.circular(16),
+                              border: Border.all(
+                                color: isValidNumber
+                                    ? AppColors.primaryGreen
+                                    : Colors.grey.shade300,
+                                width: isValidNumber ? 1.5 : 1,
                               ),
                             ),
-                            const SizedBox(height: 24),
-                            Text(
-                              'By continuing, you agree to receive SMS messages for verification and may be subject to carrier fees.',
-                              textAlign: TextAlign.center,
-                              style: GoogleFonts.montserrat(
-                                fontSize: 12,
-                                color: const Color(0x99FFFFFF),
-                              ),
-                            ),
-                            const SizedBox(height: 40),
-                            Row(
-                              mainAxisAlignment: MainAxisAlignment.center,
+                            child: Row(
                               children: [
-                                Text(
-                                  widget.isSignIn
-                                      ? "Don't have an account? "
-                                      : 'Already have an account? ',
-                                  style: GoogleFonts.montserrat(
-                                    fontSize: 14,
-                                    color: const Color(0xB3FFFFFF),
+                                Container(
+                                  padding: const EdgeInsets.only(left: 8),
+                                  child: CountryCodePicker(
+                                    onChanged: (CountryCode code) {
+                                      if (mounted) {
+                                        setState(() {
+                                          countryCode = code.dialCode ?? '+1';
+                                          _regionCode = code.code ?? 'US';
+                                          _validatePhoneNumber();
+                                        });
+                                      }
+                                    },
+                                    initialSelection: 'US',
+                                    favorite: const [
+                                      'US',
+                                      'GH',
+                                      'ZA',
+                                      'KE',
+                                      'US',
+                                      'GB',
+                                    ],
+                                    textStyle: GoogleFonts.montserrat(
+                                      color: AppColors.textPrimary,
+                                      fontSize: 16,
+                                      fontWeight: FontWeight.w500,
+                                    ),
+                                    dialogTextStyle: GoogleFonts.montserrat(
+                                      color: Colors.black,
+                                      fontSize: 16,
+                                    ),
+                                    searchStyle: GoogleFonts.montserrat(
+                                      color: Colors.black,
+                                      fontSize: 16,
+                                    ),
+                                    dialogBackgroundColor: Colors.white,
+                                    boxDecoration: BoxDecoration(
+                                      color: Colors.white,
+                                      borderRadius: BorderRadius.circular(8),
+                                    ),
+                                    barrierColor: Colors.black54,
+                                    backgroundColor: Colors.white,
+                                    dialogSize: Size(
+                                      MediaQuery.of(context).size.width * 0.9,
+                                      MediaQuery.of(context).size.height * 0.7,
+                                    ),
+                                    headerTextStyle: GoogleFonts.montserrat(
+                                      color: Colors.black,
+                                      fontSize: 18,
+                                      fontWeight: FontWeight.bold,
+                                    ),
+                                    searchDecoration: InputDecoration(
+                                      hintText: 'Search country',
+                                      hintStyle: GoogleFonts.montserrat(
+                                        color: Colors.grey.shade600,
+                                        fontSize: 16,
+                                      ),
+                                      prefixIcon: const Icon(
+                                        Icons.search,
+                                        color: AppColors.primaryGreen,
+                                      ),
+                                      filled: true,
+                                      fillColor: Colors.white,
+                                      border: OutlineInputBorder(
+                                        borderRadius: BorderRadius.circular(12),
+                                        borderSide: BorderSide(
+                                          color: Colors.grey.shade300,
+                                        ),
+                                      ),
+                                      enabledBorder: OutlineInputBorder(
+                                        borderRadius: BorderRadius.circular(12),
+                                        borderSide: BorderSide(
+                                          color: Colors.grey.shade300,
+                                        ),
+                                      ),
+                                      focusedBorder: OutlineInputBorder(
+                                        borderRadius: BorderRadius.circular(12),
+                                        borderSide: const BorderSide(
+                                          color: AppColors.primaryGreen,
+                                          width: 1.5,
+                                        ),
+                                      ),
+                                      contentPadding:
+                                          const EdgeInsets.symmetric(
+                                        horizontal: 16,
+                                        vertical: 12,
+                                      ),
+                                    ),
                                   ),
                                 ),
-                                GestureDetector(
-                                  onTap: () {
-                                    if (widget.isSignIn) {
-                                      unawaited(
-                                        Navigator.pushReplacementNamed(
-                                          context,
-                                          '/auth_method_selection',
-                                        ),
-                                      );
-                                    } else {
-                                      unawaited(
-                                        Navigator.pushReplacementNamed(
-                                          context,
-                                          '/sign_in_method_selection',
-                                        ),
-                                      );
-                                    }
-                                  },
-                                  child: Text(
-                                    widget.isSignIn ? 'Create one' : 'Sign in',
+                                Container(
+                                  height: 30,
+                                  width: 1,
+                                  color: Colors.grey.withValues(alpha: 0.3),
+                                ),
+                                Expanded(
+                                  child: TextField(
+                                    controller: phoneNumberController,
+                                    keyboardType: TextInputType.phone,
                                     style: GoogleFonts.montserrat(
-                                      fontSize: 14,
-                                      fontWeight: FontWeight.w600,
-                                      color: Colors.white,
+                                      fontSize: 16,
+                                      color: AppColors.textPrimary,
+                                      fontWeight: FontWeight.w500,
                                     ),
+                                    decoration: InputDecoration(
+                                      hintText: 'Phone number',
+                                      hintStyle: GoogleFonts.montserrat(
+                                        color: Colors.grey,
+                                        fontWeight: FontWeight.w400,
+                                      ),
+                                      border: InputBorder.none,
+                                      contentPadding:
+                                          const EdgeInsets.symmetric(
+                                        horizontal: 16,
+                                        vertical: 16,
+                                      ),
+                                    ),
+                                    inputFormatters: [
+                                      FilteringTextInputFormatter.digitsOnly,
+                                      _PhoneNumberFormatter(),
+                                    ],
                                   ),
                                 ),
                               ],
                             ),
-                          ],
-                        ),
+                          ),
+                          const SizedBox(height: 40),
+                          Center(
+                            child: SizedBox(
+                              width: buttonWidth,
+                              child: Builder(
+                                builder: (builderContext) =>
+                                    AfropeepPrimaryButton(
+                                  text: 'Continue',
+                                  isLoading: _isLoading,
+                                  disabledBackgroundColor:
+                                      Colors.white.withValues(alpha: 0.15),
+                                  onPressed: isValidNumber && !_isLoading
+                                      ? () {
+                                          _authDebugLog(
+                                            'Phone auth button tapped: '
+                                            'isValid=$isValidNumber '
+                                            'isLoading=$_isLoading',
+                                          );
+
+                                          setState(() {
+                                            _isLoading = true;
+                                          });
+
+                                          final cleanPhoneNumber =
+                                              phoneNumberController.text
+                                                  .replaceAll(' ', '')
+                                                  .replaceAll('-', '')
+                                                  .replaceAll('(', '')
+                                                  .replaceAll(')', '')
+                                                  .trim();
+
+                                          final fullPhoneNumber =
+                                              countryCode + cleanPhoneNumber;
+
+                                          _authDebugLog(
+                                            'Phone auth request prepared: '
+                                            'country=$countryCode '
+                                            'digits=${cleanPhoneNumber.length}',
+                                          );
+
+                                          final bloc =
+                                              BlocProvider.of<PhoneAuthBloc>(
+                                            builderContext,
+                                          );
+                                          bloc.add(
+                                            SendOtpToPhoneEvent(
+                                              phoneNumber: fullPhoneNumber,
+                                            ),
+                                          );
+                                        }
+                                      : null,
+                                ),
+                              ),
+                            ),
+                          ),
+                          const SizedBox(height: 24),
+                          Text(
+                            'By continuing, you agree to receive SMS messages for verification and may be subject to carrier fees.',
+                            textAlign: TextAlign.center,
+                            style: GoogleFonts.montserrat(
+                              fontSize: 12,
+                              color: const Color(0x99FFFFFF),
+                            ),
+                          ),
+                          const SizedBox(height: 40),
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              Text(
+                                widget.isSignIn
+                                    ? "Don't have an account? "
+                                    : 'Already have an account? ',
+                                style: GoogleFonts.montserrat(
+                                  fontSize: 14,
+                                  color: const Color(0xB3FFFFFF),
+                                ),
+                              ),
+                              GestureDetector(
+                                onTap: () {
+                                  if (widget.isSignIn) {
+                                    unawaited(
+                                      Navigator.pushReplacementNamed(
+                                        context,
+                                        '/auth_method_selection',
+                                      ),
+                                    );
+                                  } else {
+                                    unawaited(
+                                      Navigator.pushReplacementNamed(
+                                        context,
+                                        '/sign_in_method_selection',
+                                      ),
+                                    );
+                                  }
+                                },
+                                child: Text(
+                                  widget.isSignIn ? 'Create one' : 'Sign in',
+                                  style: GoogleFonts.montserrat(
+                                    fontSize: 14,
+                                    fontWeight: FontWeight.w600,
+                                    color: Colors.white,
+                                  ),
+                                ),
+                              ),
+                            ],
+                          ),
+                        ],
                       ),
+                    ),
                   ),
                 ),
               ],

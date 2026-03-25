@@ -37,10 +37,10 @@ class _EnhancedBioScreenState extends State<EnhancedBioScreen> {
 
   @override
   Widget build(BuildContext context) => OnboardingTheme.constrainedContent(
-      child: SingleChildScrollView(
-        keyboardDismissBehavior: ScrollViewKeyboardDismissBehavior.onDrag,
-        padding: OnboardingTheme.pagePadding,
-        child: Column(
+        child: SingleChildScrollView(
+          keyboardDismissBehavior: ScrollViewKeyboardDismissBehavior.onDrag,
+          padding: OnboardingTheme.pagePadding,
+          child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Text('Tell your story', style: OnboardingTheme.titleStyle),

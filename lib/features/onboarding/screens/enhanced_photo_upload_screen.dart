@@ -63,7 +63,7 @@ class _EnhancedPhotoUploadScreenState extends State<EnhancedPhotoUploadScreen> {
             Text('Add your best photos', style: OnboardingTheme.titleStyle),
             const SizedBox(height: OnboardingTheme.titleToSubtitle),
             Text(
-              'Upload at least 1 photo. Profiles with 3+ photos get more matches.',
+              'Add at least 1 photo to continue. Profiles with 3+ photos get more matches.',
               style: OnboardingTheme.subtitleStyle,
             ),
             const SizedBox(height: 8),
@@ -100,7 +100,7 @@ class _EnhancedPhotoUploadScreenState extends State<EnhancedPhotoUploadScreen> {
                 );
               }),
             ),
-            const SizedBox(height: OnboardingTheme.fieldToBottom),
+            const SizedBox(height: 16),
           ],
         ),
       ),
@@ -147,16 +147,16 @@ class _EnhancedPhotoUploadScreenState extends State<EnhancedPhotoUploadScreen> {
                   ),
                 if (isMainPhoto && photo != null)
                   Positioned(
-                    top: 8,
-                    left: 8,
+                    top: 10,
+                    left: 10,
                     child: Container(
                       padding: const EdgeInsets.symmetric(
-                        horizontal: 8,
+                        horizontal: 10,
                         vertical: 4,
                       ),
                       decoration: BoxDecoration(
                         color: OnboardingTheme.primaryGreen,
-                        borderRadius: BorderRadius.circular(12),
+                        borderRadius: BorderRadius.circular(14),
                       ),
                       child: Row(
                         mainAxisSize: MainAxisSize.min,
@@ -166,7 +166,7 @@ class _EnhancedPhotoUploadScreenState extends State<EnhancedPhotoUploadScreen> {
                           Text(
                             'Main',
                             style: GoogleFonts.montserrat(
-                              fontSize: 11,
+                              fontSize: 10.5,
                               fontWeight: FontWeight.w600,
                               color: Colors.white,
                             ),
@@ -177,24 +177,26 @@ class _EnhancedPhotoUploadScreenState extends State<EnhancedPhotoUploadScreen> {
                   ),
                 if (photo != null)
                   Positioned(
-                    top: 8,
-                    right: 8,
-                    child: GestureDetector(
+                    top: 10,
+                    right: 10,
+                    child: InkWell(
+                      borderRadius: BorderRadius.circular(16),
                       onTap: () => _removePhoto(index),
                       child: Container(
                         width: OnboardingTheme.minTapTarget,
                         height: OnboardingTheme.minTapTarget,
-                        alignment: Alignment.topRight,
+                        alignment: Alignment.center,
                         child: Container(
-                          padding: const EdgeInsets.all(6),
+                          width: 32,
+                          height: 32,
                           decoration: BoxDecoration(
-                            color: Colors.black.withValues(alpha: 0.7),
+                            color: Colors.black.withValues(alpha: 0.72),
                             shape: BoxShape.circle,
                           ),
                           child: const Icon(
                             Icons.close,
                             color: Colors.white,
-                            size: 16,
+                            size: 18,
                           ),
                         ),
                       ),

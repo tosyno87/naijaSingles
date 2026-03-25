@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:google_sign_in/google_sign_in.dart';
@@ -59,26 +61,42 @@ class GoogleLoginRepositoryImpl implements GoogleLoginRepository {
   @override
   Future<void> ensureUserDocument(User user) async {
     final userRef = firebaseFireStoreInstance.collection('users').doc(user.uid);
-    final doc = await userRef.get();
-    if (doc.exists && doc.data() != null && doc.data()!.isNotEmpty) {
-      // Keep existing docs updates limited to mutable fields.
-      // Firestore rules block updates to `email` and can lock `name`
-      // after onboarding completion.
-      await userRef.update({
-        'lastActive': FieldValue.serverTimestamp(),
-        'lastSignIn': FieldValue.serverTimestamp(),
-        'photoUrl': user.photoURL ?? '',
-      });
-    } else {
-      await userRef.set({
-        'email': user.email,
-        'name': user.displayName,
-        'photoUrl': user.photoURL,
-        'createdAt': FieldValue.serverTimestamp(),
-        'lastActive': FieldValue.serverTimestamp(),
-        'signInMethod': 'google',
-        'onboardingCompleted': false,
-      });
+
+    Future<void> upsert() async {
+      final doc = await userRef.get();
+      if (doc.exists && doc.data() != null && doc.data()!.isNotEmpty) {
+        // Keep existing docs updates limited to mutable fields.
+        // Firestore rules block updates to `email` and can lock `name`
+        // after onboarding completion.
+        await userRef.update({
+          'lastActive': FieldValue.serverTimestamp(),
+          'lastSignIn': FieldValue.serverTimestamp(),
+          'photoUrl': user.photoURL ?? '',
+        });
+      } else {
+        await userRef.set({
+          'email': user.email,
+          'name': user.displayName,
+          'photoUrl': user.photoURL,
+          'createdAt': FieldValue.serverTimestamp(),
+          'lastActive': FieldValue.serverTimestamp(),
+          'signInMethod': 'google',
+          'onboardingCompleted': false,
+        });
+      }
+    }
+
+    try {
+      // Reduce transient auth propagation race right after sign-in.
+      await user.getIdToken(true);
+      await upsert();
+    } on FirebaseException catch (e) {
+      if (e.code != 'permission-denied') rethrow;
+
+      // Retry once after token refresh + short delay.
+      await user.getIdToken(true);
+      await Future<void>.delayed(const Duration(milliseconds: 300));
+      await upsert();
     }
   }
 

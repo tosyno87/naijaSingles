@@ -60,184 +60,184 @@ class _EmailSignupScreenState extends State<EmailSignupScreen> {
             builder: (context, state) => SafeArea(
               child: Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 24),
-                child: Center(
-                  child: SingleChildScrollView(
-                    child: Form(
-                      key: _formKey,
-                      child: Column(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          // Email icon using reusable widget
-                          const AuthIconContainer(
-                            icon: Icons.email_outlined,
+                child: SingleChildScrollView(
+                  keyboardDismissBehavior:
+                      ScrollViewKeyboardDismissBehavior.onDrag,
+                  child: Form(
+                    key: _formKey,
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        // Email icon using reusable widget
+                        const AuthIconContainer(
+                          icon: Icons.email_outlined,
+                        ),
+
+                        const SizedBox(height: 32),
+
+                        // Header
+                        Text(
+                          'Sign up with Email',
+                          style: GoogleFonts.montserrat(
+                            fontSize: 24,
+                            fontWeight: FontWeight.w600,
+                            color: AppColors.primaryGreen,
                           ),
+                          textAlign: TextAlign.center,
+                        ),
+                        const SizedBox(height: 12),
+                        Text(
+                          'Enter your email and create a password to get started',
+                          style: GoogleFonts.montserrat(
+                            fontSize: 16,
+                            color: AppColors.textSecondary,
+                          ),
+                          textAlign: TextAlign.center,
+                        ),
+                        const SizedBox(height: 40),
 
-                          const SizedBox(height: 32),
+                        // Email field using reusable widget
+                        AfropeepTextField(
+                          controller: _emailController,
+                          hintText: 'Email',
+                          prefixIcon: Icons.email_outlined,
+                          keyboardType: TextInputType.emailAddress,
+                          onChanged: () => setState(() {}),
+                          validationChecker: (text) =>
+                              RegExp(r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$')
+                                  .hasMatch(text),
+                          validator: (value) {
+                            if (value == null || value.isEmpty) {
+                              return 'Please enter your email';
+                            }
+                            if (!RegExp(r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$')
+                                .hasMatch(value)) {
+                              return 'Please enter a valid email address';
+                            }
+                            return null;
+                          },
+                        ),
+                        const SizedBox(height: 20),
 
-                          // Header
-                          Text(
-                            'Sign up with Email',
-                            style: GoogleFonts.montserrat(
-                              fontSize: 24,
-                              fontWeight: FontWeight.w600,
-                              color: AppColors.primaryGreen,
+                        // Password field using reusable widget
+                        AfropeepTextField(
+                          controller: _passwordController,
+                          hintText: 'Password',
+                          prefixIcon: Icons.lock_outline,
+                          obscureText: _obscurePassword,
+                          onChanged: () => setState(() {}),
+                          validationChecker: (text) => text.length >= 6,
+                          suffixIcon: IconButton(
+                            icon: Icon(
+                              _obscurePassword
+                                  ? Icons.visibility_off
+                                  : Icons.visibility,
+                              color: Colors.grey.shade600,
                             ),
-                            textAlign: TextAlign.center,
-                          ),
-                          const SizedBox(height: 12),
-                          Text(
-                            'Enter your email and create a password to get started',
-                            style: GoogleFonts.montserrat(
-                              fontSize: 16,
-                              color: AppColors.textSecondary,
-                            ),
-                            textAlign: TextAlign.center,
-                          ),
-                          const SizedBox(height: 40),
-
-                          // Email field using reusable widget
-                          AfropeepTextField(
-                            controller: _emailController,
-                            hintText: 'Email',
-                            prefixIcon: Icons.email_outlined,
-                            keyboardType: TextInputType.emailAddress,
-                            onChanged: () => setState(() {}),
-                            validationChecker: (text) =>
-                                RegExp(r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$')
-                                    .hasMatch(text),
-                            validator: (value) {
-                              if (value == null || value.isEmpty) {
-                                return 'Please enter your email';
-                              }
-                              if (!RegExp(r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$')
-                                  .hasMatch(value)) {
-                                return 'Please enter a valid email address';
-                              }
-                              return null;
-                            },
-                          ),
-                          const SizedBox(height: 20),
-
-                          // Password field using reusable widget
-                          AfropeepTextField(
-                            controller: _passwordController,
-                            hintText: 'Password',
-                            prefixIcon: Icons.lock_outline,
-                            obscureText: _obscurePassword,
-                            onChanged: () => setState(() {}),
-                            validationChecker: (text) => text.length >= 6,
-                            suffixIcon: IconButton(
-                              icon: Icon(
-                                _obscurePassword
-                                    ? Icons.visibility_off
-                                    : Icons.visibility,
-                                color: Colors.grey.shade600,
-                              ),
-                              onPressed: () {
-                                setState(() {
-                                  _obscurePassword = !_obscurePassword;
-                                });
-                              },
-                            ),
-                            validator: (value) {
-                              if (value == null || value.isEmpty) {
-                                return 'Please enter a password';
-                              }
-                              if (value.length < 6) {
-                                return 'Password must be at least 6 characters';
-                              }
-                              return null;
-                            },
-                          ),
-                          const SizedBox(height: 20),
-
-                          // Confirm Password Field using reusable widget
-                          AfropeepTextField(
-                            controller: _confirmPasswordController,
-                            hintText: 'Confirm Password',
-                            prefixIcon: Icons.lock_outline,
-                            obscureText: _obscureConfirmPassword,
-                            onChanged: () => setState(() {}),
-                            validationChecker: (text) =>
-                                text == _passwordController.text &&
-                                text.isNotEmpty,
-                            suffixIcon: IconButton(
-                              icon: Icon(
-                                _obscureConfirmPassword
-                                    ? Icons.visibility_off
-                                    : Icons.visibility,
-                                color: Colors.grey.shade600,
-                              ),
-                              onPressed: () {
-                                setState(() {
-                                  _obscureConfirmPassword =
-                                      !_obscureConfirmPassword;
-                                });
-                              },
-                            ),
-                            validator: (value) {
-                              if (value == null || value.isEmpty) {
-                                return 'Please confirm your password';
-                              }
-                              if (value != _passwordController.text) {
-                                return 'Passwords do not match';
-                              }
-                              return null;
-                            },
-                          ),
-                          const SizedBox(height: 40),
-
-                          // Create Account Button using reusable widget
-                          AfropeepPrimaryButton(
-                            text: 'Create Account',
-                            isLoading: state is EmailAuthLoading,
                             onPressed: () {
-                              if (_formKey.currentState!.validate()) {
-                                context.read<EmailAuthBloc>().add(
-                                      EmailSignUpRequested(
-                                        email: _emailController.text.trim(),
-                                        password: _passwordController.text,
-                                      ),
-                                    );
-                              }
+                              setState(() {
+                                _obscurePassword = !_obscurePassword;
+                              });
                             },
                           ),
+                          validator: (value) {
+                            if (value == null || value.isEmpty) {
+                              return 'Please enter a password';
+                            }
+                            if (value.length < 6) {
+                              return 'Password must be at least 6 characters';
+                            }
+                            return null;
+                          },
+                        ),
+                        const SizedBox(height: 20),
 
-                          const SizedBox(height: 40),
+                        // Confirm Password Field using reusable widget
+                        AfropeepTextField(
+                          controller: _confirmPasswordController,
+                          hintText: 'Confirm Password',
+                          prefixIcon: Icons.lock_outline,
+                          obscureText: _obscureConfirmPassword,
+                          onChanged: () => setState(() {}),
+                          validationChecker: (text) =>
+                              text == _passwordController.text &&
+                              text.isNotEmpty,
+                          suffixIcon: IconButton(
+                            icon: Icon(
+                              _obscureConfirmPassword
+                                  ? Icons.visibility_off
+                                  : Icons.visibility,
+                              color: Colors.grey.shade600,
+                            ),
+                            onPressed: () {
+                              setState(() {
+                                _obscureConfirmPassword =
+                                    !_obscureConfirmPassword;
+                              });
+                            },
+                          ),
+                          validator: (value) {
+                            if (value == null || value.isEmpty) {
+                              return 'Please confirm your password';
+                            }
+                            if (value != _passwordController.text) {
+                              return 'Passwords do not match';
+                            }
+                            return null;
+                          },
+                        ),
+                        const SizedBox(height: 40),
 
-                          // Already have an account
-                          Row(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children: [
-                              Text(
-                                'Already have an account? ',
-                                style: GoogleFonts.montserrat(
-                                  fontSize: 14,
-                                  color: AppColors.textPrimary,
-                                ),
-                              ),
-                              GestureDetector(
-                                onTap: () {
-                                  unawaited(
-                                    Navigator.pushReplacementNamed(
-                                      context,
-                                      '/email_login',
+                        // Create Account Button using reusable widget
+                        AfropeepPrimaryButton(
+                          text: 'Create Account',
+                          isLoading: state is EmailAuthLoading,
+                          onPressed: () {
+                            if (_formKey.currentState!.validate()) {
+                              context.read<EmailAuthBloc>().add(
+                                    EmailSignUpRequested(
+                                      email: _emailController.text.trim(),
+                                      password: _passwordController.text,
                                     ),
                                   );
-                                },
-                                child: Text(
-                                  'Log In',
-                                  style: GoogleFonts.montserrat(
-                                    fontSize: 14,
-                                    fontWeight: FontWeight.w600,
-                                    color: AppColors.primaryGreen,
+                            }
+                          },
+                        ),
+
+                        const SizedBox(height: 40),
+
+                        // Already have an account
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            Text(
+                              'Already have an account? ',
+                              style: GoogleFonts.montserrat(
+                                fontSize: 14,
+                                color: AppColors.textPrimary,
+                              ),
+                            ),
+                            GestureDetector(
+                              onTap: () {
+                                unawaited(
+                                  Navigator.pushReplacementNamed(
+                                    context,
+                                    '/email_login',
                                   ),
+                                );
+                              },
+                              child: Text(
+                                'Log In',
+                                style: GoogleFonts.montserrat(
+                                  fontSize: 14,
+                                  fontWeight: FontWeight.w600,
+                                  color: AppColors.primaryGreen,
                                 ),
                               ),
-                            ],
-                          ),
-                        ],
-                      ),
+                            ),
+                          ],
+                        ),
+                      ],
                     ),
                   ),
                 ),

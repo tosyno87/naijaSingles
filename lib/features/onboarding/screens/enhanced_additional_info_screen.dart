@@ -40,12 +40,6 @@ class _EnhancedAdditionalInfoScreenState
       'icon': Icons.business_center,
       'color': Colors.green.shade400,
     },
-    {
-      'label': 'All of the Above',
-      'value': 'All of the Above',
-      'icon': Icons.explore,
-      'color': Colors.purple.shade400,
-    },
   ];
 
   final List<Map<String, dynamic>> _relationshipIntentOptions = [
@@ -110,8 +104,6 @@ class _EnhancedAdditionalInfoScreenState
         displayValue = 'Friendship & Social';
       case 'Networking':
         displayValue = 'Professional Networking';
-      case 'Mixed':
-        displayValue = 'All of the Above';
       default:
         displayValue = '';
     }
@@ -211,6 +203,9 @@ class _EnhancedAdditionalInfoScreenState
                 onChanged: (value) {
                   setState(() {
                     _platformPurpose = value;
+                    if (!_shouldShowRelationshipGoals()) {
+                      _relationshipIntent = '';
+                    }
                   });
                   String controllerValue;
                   switch (value) {
@@ -220,49 +215,58 @@ class _EnhancedAdditionalInfoScreenState
                       controllerValue = 'Friendship';
                     case 'Professional Networking':
                       controllerValue = 'Networking';
-                    case 'All of the Above':
-                      controllerValue = 'Mixed';
                     default:
-                      controllerValue = 'Dating';
+                      controllerValue = '';
                   }
-                  context.read<OnboardingBloc>().add(
-                        OnboardingLookingForUpdated(controllerValue),
-                      );
+                  if (controllerValue.isNotEmpty) {
+                    context.read<OnboardingBloc>().add(
+                          OnboardingLookingForUpdated(controllerValue),
+                        );
+                  }
+                  if (!_shouldShowRelationshipGoals()) {
+                    context.read<OnboardingBloc>().add(
+                          const OnboardingRelationshipIntentUpdated(''),
+                        );
+                  }
                 },
               ),
 
-              const SizedBox(height: OnboardingTheme.fieldToSection),
+              if (_shouldShowRelationshipGoals()) ...[
+                const SizedBox(height: OnboardingTheme.fieldToSection),
 
-              // 3. Relationship Goals
-              Text(
-                'Relationship goals',
-                style: OnboardingTheme.sectionLabelStyle,
-              ),
-              const SizedBox(height: 4),
-              Text(
-                'What are you hoping to find?',
-                style: OnboardingTheme.helperStyle,
-              ),
-              const SizedBox(height: OnboardingTheme.labelToField),
-              _buildDropdown(
-                value: _relationshipIntent,
-                options: _relationshipIntentOptions,
-                hint: 'Select your relationship goals',
-                onChanged: (value) {
-                  setState(() {
-                    _relationshipIntent = value;
-                  });
-                  context.read<OnboardingBloc>().add(
-                        OnboardingRelationshipIntentUpdated(value),
-                      );
-                },
-              ),
+                // 3. Relationship Goals (dating-only)
+                Text(
+                  'Relationship goals',
+                  style: OnboardingTheme.sectionLabelStyle,
+                ),
+                const SizedBox(height: 4),
+                Text(
+                  'What are you hoping to find?',
+                  style: OnboardingTheme.helperStyle,
+                ),
+                const SizedBox(height: OnboardingTheme.labelToField),
+                _buildDropdown(
+                  value: _relationshipIntent,
+                  options: _relationshipIntentOptions,
+                  hint: 'Select your relationship goals',
+                  onChanged: (value) {
+                    setState(() {
+                      _relationshipIntent = value;
+                    });
+                    context.read<OnboardingBloc>().add(
+                          OnboardingRelationshipIntentUpdated(value),
+                        );
+                  },
+                ),
+              ],
 
               const SizedBox(height: OnboardingTheme.fieldToBottom),
             ],
           ),
         ),
       );
+
+  bool _shouldShowRelationshipGoals() => _platformPurpose == 'Dating & Romance';
 
   Widget _buildDropdown({
     required String value,

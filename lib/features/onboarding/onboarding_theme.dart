@@ -201,7 +201,8 @@ class OnboardingTheme {
   // ---------------------------------------------------------------------------
   // Constrained content wrapper for tablet
   // ---------------------------------------------------------------------------
-  static Widget constrainedContent({required Widget child}) => Center(
+  static Widget constrainedContent({required Widget child}) => Align(
+        alignment: Alignment.topCenter,
         child: ConstrainedBox(
           constraints: const BoxConstraints(maxWidth: maxContentWidth),
           child: child,

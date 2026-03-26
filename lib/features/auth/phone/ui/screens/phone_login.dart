@@ -100,213 +100,212 @@ class _PhoneNumberState extends State<PhoneNumber> {
       body: SafeArea(
         child: Padding(
           padding: const EdgeInsets.symmetric(horizontal: 24),
-          child: Center(
-            child: SingleChildScrollView(
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  // Phone icon with Afrocentric style
-                  Container(
-                    width: 100,
-                    height: 100,
-                    decoration: BoxDecoration(
-                      color: iconBackgroundColor,
-                      shape: BoxShape.circle,
-                      boxShadow: [
-                        BoxShadow(
-                          color: primaryColor.withValues(alpha: 0.2),
-                          blurRadius: 15,
-                          offset: const Offset(0, 5),
-                        ),
-                      ],
-                    ),
-                    child: const Icon(
-                      Icons.phone_android,
-                      color: primaryColor,
-                      size: 50,
-                    ),
-                  ),
-
-                  const SizedBox(height: 32),
-
-                  Text(
-                    'Enter your phone number',
-                    style: GoogleFonts.montserrat(
-                      fontSize: 24,
-                      fontWeight: FontWeight.w600,
-                      color: primaryColor,
-                    ),
-                    textAlign: TextAlign.center,
-                  ),
-                  const SizedBox(height: 12),
-                  Text(
-                    "We'll send you a verification code",
-                    style: GoogleFonts.montserrat(
-                      fontSize: 16,
-                      color: subtextColor,
-                    ),
-                    textAlign: TextAlign.center,
-                  ),
-                  const SizedBox(height: 40),
-
-                  // Phone number input with country code
-                  DecoratedBox(
-                    decoration: BoxDecoration(
-                      color: Colors.white,
-                      borderRadius: BorderRadius.circular(16),
-                      boxShadow: [
-                        BoxShadow(
-                          color: Colors.black.withValues(alpha: 0.05),
-                          blurRadius: 10,
-                          offset: const Offset(0, 5),
-                        ),
-                      ],
-                    ),
-                    child: Row(
-                      children: [
-                        // Country code dropdown
-                        Container(
-                          padding: const EdgeInsets.symmetric(horizontal: 16),
-                          decoration: BoxDecoration(
-                            border: Border(
-                              right: BorderSide(
-                                color: Colors.grey.withValues(alpha: 0.3),
-                              ),
-                            ),
-                          ),
-                          child: DropdownButton<String>(
-                            value: _selectedCountryCode,
-                            icon: const Icon(Icons.arrow_drop_down),
-                            elevation: 16,
-                            style: GoogleFonts.montserrat(
-                              fontSize: 16,
-                              color: textColor,
-                            ),
-                            underline: Container(
-                              height: 0,
-                            ),
-                            onChanged: (String? newValue) {
-                              setState(() {
-                                _selectedCountryCode = newValue!;
-                              });
-                            },
-                            items: _countryCodes
-                                .map<DropdownMenuItem<String>>(
-                                  (Map<String, String> value) =>
-                                      DropdownMenuItem<String>(
-                                    value: value['code'],
-                                    child: Text(
-                                      "${value['code']} (${value['name']})",
-                                    ),
-                                  ),
-                                )
-                                .toList(),
-                          ),
-                        ),
-
-                        // Phone number input
-                        Expanded(
-                          child: TextField(
-                            controller: _phoneController,
-                            keyboardType: TextInputType.phone,
-                            style: GoogleFonts.montserrat(
-                              fontSize: 16,
-                              color: textColor,
-                            ),
-                            decoration: InputDecoration(
-                              hintText: 'Phone number',
-                              hintStyle: GoogleFonts.montserrat(
-                                color: Colors.grey,
-                              ),
-                              border: InputBorder.none,
-                              contentPadding: const EdgeInsets.symmetric(
-                                horizontal: 16,
-                                vertical: 16,
-                              ),
-                            ),
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-
-                  const SizedBox(height: 40),
-
-                  // Continue Button - Styled like phone signup
-                  SizedBox(
-                    width: double.infinity,
-                    height: 56,
-                    child: ElevatedButton(
-                      onPressed: _isLoading ? null : _verifyPhoneNumber,
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor:
-                            _isLoading ? Colors.grey.shade400 : primaryColor,
-                        foregroundColor: Colors.white,
-                        disabledBackgroundColor: Colors.grey.shade400,
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(16),
-                        ),
-                        elevation: _isLoading ? 1 : 3,
-                        shadowColor: _isLoading
-                            ? Colors.transparent
-                            : primaryColor.withValues(alpha: 0.3),
+          child: SingleChildScrollView(
+            keyboardDismissBehavior: ScrollViewKeyboardDismissBehavior.onDrag,
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                // Phone icon with Afrocentric style
+                Container(
+                  width: 100,
+                  height: 100,
+                  decoration: BoxDecoration(
+                    color: iconBackgroundColor,
+                    shape: BoxShape.circle,
+                    boxShadow: [
+                      BoxShadow(
+                        color: primaryColor.withValues(alpha: 0.2),
+                        blurRadius: 15,
+                        offset: const Offset(0, 5),
                       ),
-                      child: _isLoading
-                          ? const SizedBox(
-                              height: 24,
-                              width: 24,
-                              child: CircularProgressIndicator(
-                                color: Colors.white,
-                                strokeWidth: 2,
-                              ),
-                            )
-                          : Text(
-                              'Continue',
-                              style: GoogleFonts.montserrat(
-                                fontSize: 18,
-                                fontWeight: FontWeight.bold,
-                              ),
-                            ),
-                    ),
+                    ],
                   ),
+                  child: const Icon(
+                    Icons.phone_android,
+                    color: primaryColor,
+                    size: 50,
+                  ),
+                ),
 
-                  const SizedBox(height: 40),
+                const SizedBox(height: 32),
 
-                  // Don't have an account? Sign up
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
+                Text(
+                  'Enter your phone number',
+                  style: GoogleFonts.montserrat(
+                    fontSize: 24,
+                    fontWeight: FontWeight.w600,
+                    color: primaryColor,
+                  ),
+                  textAlign: TextAlign.center,
+                ),
+                const SizedBox(height: 12),
+                Text(
+                  "We'll send you a verification code",
+                  style: GoogleFonts.montserrat(
+                    fontSize: 16,
+                    color: subtextColor,
+                  ),
+                  textAlign: TextAlign.center,
+                ),
+                const SizedBox(height: 40),
+
+                // Phone number input with country code
+                DecoratedBox(
+                  decoration: BoxDecoration(
+                    color: Colors.white,
+                    borderRadius: BorderRadius.circular(16),
+                    boxShadow: [
+                      BoxShadow(
+                        color: Colors.black.withValues(alpha: 0.05),
+                        blurRadius: 10,
+                        offset: const Offset(0, 5),
+                      ),
+                    ],
+                  ),
+                  child: Row(
                     children: [
-                      Text(
-                        "Don't have an account? ",
-                        style: GoogleFonts.montserrat(
-                          fontSize: 14,
-                          color: textColor,
+                      // Country code dropdown
+                      Container(
+                        padding: const EdgeInsets.symmetric(horizontal: 16),
+                        decoration: BoxDecoration(
+                          border: Border(
+                            right: BorderSide(
+                              color: Colors.grey.withValues(alpha: 0.3),
+                            ),
+                          ),
+                        ),
+                        child: DropdownButton<String>(
+                          value: _selectedCountryCode,
+                          icon: const Icon(Icons.arrow_drop_down),
+                          elevation: 16,
+                          style: GoogleFonts.montserrat(
+                            fontSize: 16,
+                            color: textColor,
+                          ),
+                          underline: Container(
+                            height: 0,
+                          ),
+                          onChanged: (String? newValue) {
+                            setState(() {
+                              _selectedCountryCode = newValue!;
+                            });
+                          },
+                          items: _countryCodes
+                              .map<DropdownMenuItem<String>>(
+                                (Map<String, String> value) =>
+                                    DropdownMenuItem<String>(
+                                  value: value['code'],
+                                  child: Text(
+                                    "${value['code']} (${value['name']})",
+                                  ),
+                                ),
+                              )
+                              .toList(),
                         ),
                       ),
-                      GestureDetector(
-                        onTap: () {
-                          unawaited(
-                            Navigator.pushReplacementNamed(
-                              context,
-                              '/welcome',
-                            ),
-                          );
-                        },
-                        child: Text(
-                          'Sign Up',
+
+                      // Phone number input
+                      Expanded(
+                        child: TextField(
+                          controller: _phoneController,
+                          keyboardType: TextInputType.phone,
                           style: GoogleFonts.montserrat(
-                            fontSize: 14,
-                            fontWeight: FontWeight.w600,
-                            color: primaryColor,
+                            fontSize: 16,
+                            color: textColor,
+                          ),
+                          decoration: InputDecoration(
+                            hintText: 'Phone number',
+                            hintStyle: GoogleFonts.montserrat(
+                              color: Colors.grey,
+                            ),
+                            border: InputBorder.none,
+                            contentPadding: const EdgeInsets.symmetric(
+                              horizontal: 16,
+                              vertical: 16,
+                            ),
                           ),
                         ),
                       ),
                     ],
                   ),
+                ),
 
-                  const SizedBox(height: 24),
-                ],
-              ),
+                const SizedBox(height: 40),
+
+                // Continue Button - Styled like phone signup
+                SizedBox(
+                  width: double.infinity,
+                  height: 56,
+                  child: ElevatedButton(
+                    onPressed: _isLoading ? null : _verifyPhoneNumber,
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor:
+                          _isLoading ? Colors.grey.shade400 : primaryColor,
+                      foregroundColor: Colors.white,
+                      disabledBackgroundColor: Colors.grey.shade400,
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(16),
+                      ),
+                      elevation: _isLoading ? 1 : 3,
+                      shadowColor: _isLoading
+                          ? Colors.transparent
+                          : primaryColor.withValues(alpha: 0.3),
+                    ),
+                    child: _isLoading
+                        ? const SizedBox(
+                            height: 24,
+                            width: 24,
+                            child: CircularProgressIndicator(
+                              color: Colors.white,
+                              strokeWidth: 2,
+                            ),
+                          )
+                        : Text(
+                            'Continue',
+                            style: GoogleFonts.montserrat(
+                              fontSize: 18,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                  ),
+                ),
+
+                const SizedBox(height: 40),
+
+                // Don't have an account? Sign up
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Text(
+                      "Don't have an account? ",
+                      style: GoogleFonts.montserrat(
+                        fontSize: 14,
+                        color: textColor,
+                      ),
+                    ),
+                    GestureDetector(
+                      onTap: () {
+                        unawaited(
+                          Navigator.pushReplacementNamed(
+                            context,
+                            '/welcome',
+                          ),
+                        );
+                      },
+                      child: Text(
+                        'Sign Up',
+                        style: GoogleFonts.montserrat(
+                          fontSize: 14,
+                          fontWeight: FontWeight.w600,
+                          color: primaryColor,
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+
+                const SizedBox(height: 24),
+              ],
             ),
           ),
         ),

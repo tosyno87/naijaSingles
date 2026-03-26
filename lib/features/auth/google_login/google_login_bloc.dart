@@ -34,7 +34,20 @@ class GoogleLoginBloc extends Bloc<GoogleLoginEvents, GoogleLoginStates> {
         return;
       }
       log('Google sign-in successful: ${user.displayName}');
-      await _repository.ensureUserDocument(user);
+      try {
+        await _repository.ensureUserDocument(user);
+      } on FirebaseException catch (e) {
+        if (e.code == 'permission-denied') {
+          // Do not block authenticated users from entering the app when
+          // profile reconciliation is denied by rules or transient auth races.
+          log(
+            'Google profile reconciliation denied by Firestore rules; '
+            'continuing with authenticated session',
+          );
+        } else {
+          rethrow;
+        }
+      }
       emit(GoogleLoginSuccess(user: user));
     } on SocketException {
       log('Google sign-in failed: No Internet Connection');

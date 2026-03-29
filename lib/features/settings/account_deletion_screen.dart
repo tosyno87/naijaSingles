@@ -146,8 +146,7 @@ class _AccountDeletionScreenState extends State<AccountDeletionScreen> {
                   ),
                 ],
               ),
-        bottomNavigationBar:
-            user != null ? _buildStickyFooter() : null,
+        bottomNavigationBar: user != null ? _buildStickyFooter() : null,
       ),
     );
   }
@@ -174,9 +173,7 @@ class _AccountDeletionScreenState extends State<AccountDeletionScreen> {
             height: 52,
             width: double.infinity,
             child: ElevatedButton(
-              onPressed: enabled
-                  ? () => unawaited(_onFooterPrimary())
-                  : null,
+              onPressed: enabled ? () => unawaited(_onFooterPrimary()) : null,
               style: ElevatedButton.styleFrom(
                 backgroundColor: enabled ? bg : disabledBg,
                 foregroundColor: Colors.white,
@@ -184,8 +181,7 @@ class _AccountDeletionScreenState extends State<AccountDeletionScreen> {
                 disabledForegroundColor: Colors.white,
                 elevation: enabled ? 2 : 0,
                 shape: RoundedRectangleBorder(
-                  borderRadius:
-                      BorderRadius.circular(AppSpacing.buttonRadius),
+                  borderRadius: BorderRadius.circular(AppSpacing.buttonRadius),
                 ),
               ),
               child: _isDeleting
@@ -234,7 +230,8 @@ class _AccountDeletionScreenState extends State<AccountDeletionScreen> {
         child: Row(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            const Icon(Icons.warning_amber_rounded, color: errorColor, size: 28),
+            const Icon(Icons.warning_amber_rounded,
+                color: errorColor, size: 28),
             const SizedBox(width: AppSpacing.sm),
             Expanded(
               child: Column(
@@ -323,13 +320,11 @@ class _AccountDeletionScreenState extends State<AccountDeletionScreen> {
                   focusedBorder: OutlineInputBorder(
                     borderRadius:
                         BorderRadius.circular(AppSpacing.buttonRadius),
-                    borderSide:
-                        const BorderSide(color: primaryColor, width: 2),
+                    borderSide: const BorderSide(color: primaryColor, width: 2),
                   ),
                   contentPadding: const EdgeInsets.all(AppSpacing.md),
                 ),
-                style:
-                    GoogleFonts.montserrat(fontSize: 16, color: textPrimary),
+                style: GoogleFonts.montserrat(fontSize: 16, color: textPrimary),
               ),
             ],
           ],
@@ -518,8 +513,7 @@ class _AccountDeletionScreenState extends State<AccountDeletionScreen> {
         ),
       );
 
-  bool get _canBackendDelete =>
-      !_isDeleting && _confirmedPermanentDelete;
+  bool get _canBackendDelete => !_isDeleting && _confirmedPermanentDelete;
 
   Future<void> _openSupportEmailGeneric() async {
     await AccountDeletionAnalytics.logSupportTapped('generic');

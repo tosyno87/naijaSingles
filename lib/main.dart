@@ -128,8 +128,8 @@ Future<void> main() async {
   // debug providers + registered tokens in Console, or relax enforcement server-side.
   try {
     const bool nonRelease = !kReleaseMode;
-    final bool useDebugAppCheck = nonRelease &&
-        (useAppCheckDebugProvider || !isProduction);
+    final bool useDebugAppCheck =
+        nonRelease && (useAppCheckDebugProvider || !isProduction);
 
     if (useDebugAppCheck) {
       await FirebaseAppCheck.instance.activate(

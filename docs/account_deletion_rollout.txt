@@ -1,0 +1,88 @@
+Backend-driven account deletion — rollout checklist
+
+Primary product path (current app): signed-in user calls **deleteAccountDirect** (checkbox + fresh ID token). OTP callables remain for legacy flows or tooling but are not the in-app default.
+
+1. Firebase App Check: enable for production clients when ready. Deletion callables read
+   ACCOUNT_DELETION_ENFORCE_APPCHECK (see below). Use App Check debug providers in dev builds.
+
+2. Set Cloud Function environment variables (see functions/env.account-deletion.sample):
+   - DELETION_OTP_PEPPER (required for OTP callables, min 16 chars)
+   - SENDGRID_API_KEY + SENDGRID_FROM_EMAIL for email OTP (if using OTP path)
+   - ACCOUNT_DELETION_ENFORCE_APPCHECK — optional; default is enforced (true).
+     * Production: true (or omit) once App Check is stable on all shipped clients.
+     * Staging / troubleshooting: set **false** and redeploy to avoid callable rejection
+       before business logic when App Check tokens are missing or misconfigured
+       (symptom: **unauthenticated** on the callable).
+   - Phone deletion OTP path uses Firebase client PhoneAuth only (confirmDeletionAfterPhoneProof);
+     there is no backend/Twilio SMS OTP for account deletion.
+
+   After changing env vars, redeploy functions. Cold starts log
+   account_deletion_callable_config with enforceAppCheck true/false in Cloud Logging.
+
+3. Deploy Cloud Functions to each Firebase project. Callable names:
+   - **deleteAccountDirect** — primary in-app deletion (IP abuse bucket: **directDelete** counters, not phoneProof).
+   - startDeletionOtp, confirmDeletionOtp — email OTP path
+   - confirmDeletionAfterPhoneProof — phone proof path
+
+4. Firestore TTL — enable with **gcloud** (or run `./scripts/enable_account_deletion_firestore_ttl.sh` after `export GCP_PROJECT_ID=...`).
+
+   Prerequisites: latest gcloud (`gcloud components update`), correct project, and permission to update Firestore indexes / TTL (e.g. `roles/datastore.indexAdmin`).
+
+   ```bash
+   export GCP_PROJECT_ID=your-firebase-project-id
+   # Default database; use --database=NAME if you use a named Native database
+   DB='(default)'
+
+   gcloud firestore fields ttls update expireAt \
+     --collection-group=accountDeletionAbuse \
+     --database="$DB" \
+     --project="$GCP_PROJECT_ID" \
+     --enable-ttl
+
+   gcloud firestore fields ttls update expiresAt \
+     --collection-group=accountDeletionVerifications \
+     --database="$DB" \
+     --project="$GCP_PROJECT_ID" \
+     --enable-ttl
+   ```
+
+   Non-blocking (returns before the long-running operation finishes):
+
+   ```bash
+   gcloud firestore fields ttls update expireAt \
+     --collection-group=accountDeletionAbuse --database="$DB" --project="$GCP_PROJECT_ID" \
+     --enable-ttl --async
+   ```
+
+   Verify:
+
+   ```bash
+   gcloud firestore fields ttls list --project="$GCP_PROJECT_ID" --database="$DB"
+   gcloud firestore operations list --project="$GCP_PROJECT_ID" --database="$DB"
+   ```
+
+   Policies:
+   - **accountDeletionAbuse** / **expireAt** — sliding 7-day expiry set by Cloud Functions on each IP counter update (separate fields per abuse kind, including **directDelete** vs **phoneProof**).
+   - **accountDeletionVerifications** / **expiresAt** — matches the OTP challenge document field written by callables.
+
+   Deletion after expiry is usually within **24 hours**, not immediate.
+
+5. Ship mobile/web builds that use callables only (no client writes to accountDeletions).
+
+6. Staging: run end-to-end **deleteAccountDirect** (confirm checkbox, delete); optionally exercise OTP/phone paths if you still support them. Monitor Function logs.
+
+7. Production: monitor Firebase Functions logs for **deleteAccountDirect** and any OTP/phone callables you use; failed codes vs successful deletes; support volume.
+
+---
+
+Post-cutover (current architecture)
+
+- accountDeletions: client create/update is denied in firestore.rules; audit rows are written only by Cloud Functions (Admin SDK).
+- runtimeConfig/featureFlags.useBackendAccountDeletion is no longer read by security rules; you may keep the field for analytics or remove it.
+- Legacy app builds that relied on client-side Auth delete + Firestore pending writes will fail rules once users update; minimum supported build should be the callables-only release.
+
+SLO / observability (quick pointers)
+
+- Cloud Logging: filter JSON payload text `account_deletion_otp_sent`, `account_deletion_otp_confirm_fail`, `account_deletion_confirm_ok`, `account_deletion_auth_delete_failed`, `account_deletion_risk`. For direct delete, **account_deletion_confirm_ok** should reflect the direct path (callable **deleteAccountDirect**); OTP-specific lines apply only to OTP flows.
+- Client: Firebase Analytics events deletion_phase_entered, deletion_otp_sent, **deletion_call_failed**, deletion_completed, deletion_support_tapped (see app implementation). **deletion_call_failed** logs any deletion **callable** failure (e.g. **deleteAccountDirect**). **deletion_completed** uses **method: direct** when the user completes **deleteAccountDirect**. Update GA4 explorations that still reference the old name **deletion_otp_failed**.
+- GA4: build an exploration funnel from deletion_phase_entered steps **confirmDeletion** → **deleting** → **done** (done may appear as **deletion_completed** with method **direct**). Add verifyIdentity only if you still route users through OTP in a given build.

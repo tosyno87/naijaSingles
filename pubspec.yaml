@@ -45,6 +45,7 @@ dependencies:
   equatable: ^2.0.7              # Updated to latest
   firebase_app_check: ^0.4.1+5   # App Check for backend protection
   firebase_auth: ^6.0.1          # Updated to latest
+  firebase_analytics: ^12.0.0
   firebase_core: ^4.0.0         # Updated to latest
   firebase_crashlytics: ^5.0.1   # Crash reporting and analytics
   firebase_messaging: ^16.0.0    # Updated to latest

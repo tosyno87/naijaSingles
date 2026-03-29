@@ -16,6 +16,10 @@ import 'profile_completion_guard.dart';
 class AuthRouter {
   AuthRouter._();
 
+  /// Coalesces overlapping [navigateAfterAuth] calls (e.g. two mounted welcomes
+  /// after a shared gate) so only one stack replacement runs.
+  static Future<void>? _navigateAfterAuthInFlight;
+
   static const Duration _newAccountWindow = Duration(minutes: 2);
   static const Set<String> _supportedProviderIds = <String>{
     'phone',
@@ -31,6 +35,22 @@ class AuthRouter {
   /// Clears the entire back stack so the user cannot press Back into the
   /// auth flow.
   static Future<void> navigateAfterAuth(BuildContext context) async {
+    if (_navigateAfterAuthInFlight != null) {
+      await _navigateAfterAuthInFlight;
+      return;
+    }
+    final Future<void> run = _navigateAfterAuthImpl(context);
+    _navigateAfterAuthInFlight = run;
+    try {
+      await run;
+    } finally {
+      if (identical(_navigateAfterAuthInFlight, run)) {
+        _navigateAfterAuthInFlight = null;
+      }
+    }
+  }
+
+  static Future<void> _navigateAfterAuthImpl(BuildContext context) async {
     final user = FirebaseAuth.instance.currentUser;
     if (user == null) {
       log('AuthRouter: no authenticated user — returning to welcome');

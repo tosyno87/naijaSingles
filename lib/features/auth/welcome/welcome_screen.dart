@@ -24,6 +24,11 @@ class WelcomeScreen extends StatefulWidget {
 class _WelcomeScreenState extends State<WelcomeScreen>
     with TickerProviderStateMixin {
   bool _isLoading = true;
+
+  /// Two [WelcomeScreen]s can mount back-to-back (e.g. sign-out + router). Only
+  /// the leader runs telemetry and auth routing; followers await the same gate.
+  static Completer<void>? _sharedWelcomeAuthGate;
+
   static const Set<String> _supportedProviderIds = <String>{
     'phone',
     'google.com',
@@ -108,15 +113,60 @@ class _WelcomeScreenState extends State<WelcomeScreen>
   }
 
   Future<void> _checkAuthStatus() async {
+    final Completer<void>? existingGate = _sharedWelcomeAuthGate;
+    if (existingGate != null) {
+      await existingGate.future;
+      if (!mounted) {
+        return;
+      }
+      await _syncWelcomeUiAfterSharedAuthProbe();
+      return;
+    }
+
+    final Completer<void> gate = Completer<void>();
+    _sharedWelcomeAuthGate = gate;
     try {
-      await Future.delayed(const Duration(milliseconds: 100));
-      if (!mounted) return;
+      await _runLeaderWelcomeAuthProbe();
+    } finally {
+      if (!gate.isCompleted) {
+        gate.complete();
+      }
+      if (identical(_sharedWelcomeAuthGate, gate)) {
+        _sharedWelcomeAuthGate = null;
+      }
+    }
+  }
+
+  /// Follower instances: align UI with post-probe auth state (no duplicate telemetry).
+  Future<void> _syncWelcomeUiAfterSharedAuthProbe() async {
+    if (!mounted) {
+      return;
+    }
+    final User? currentUser = FirebaseAuth.instance.currentUser;
+    if (currentUser != null && !_shouldTreatAsSignedOut(currentUser)) {
+      log('User has active session — routing via AuthRouter');
+      await AuthRouter.navigateAfterAuth(context);
+      return;
+    }
+    if (mounted) {
+      setState(() {
+        _isLoading = false;
+      });
+    }
+  }
+
+  Future<void> _runLeaderWelcomeAuthProbe() async {
+    try {
+      await Future<void>.delayed(const Duration(milliseconds: 100));
+      if (!mounted) {
+        return;
+      }
       AuthFlowTelemetry.track('welcome_check_started');
 
       // Session-first launch behavior:
       // - Returning signed-in users go straight to app home
       // - Users without a session see auth entry options
-      final currentUser = FirebaseAuth.instance.currentUser;
+      final User? currentUser = FirebaseAuth.instance.currentUser;
       if (currentUser != null) {
         // Defensive cleanup for stale/invalid auth sessions that may persist
         // across TestFlight updates. These users should see auth entry.

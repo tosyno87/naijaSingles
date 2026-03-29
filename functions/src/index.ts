@@ -17,6 +17,12 @@ import {
   aggregateMetrics,
 } from './handlers/matchQualityHandlers';
 import {onAuthUserDeleted} from './handlers/authCleanupHandlers';
+import {
+  confirmDeletionAfterPhoneProof,
+  confirmDeletionOtp,
+  deleteAccountDirect,
+  startDeletionOtp,
+} from './handlers/accountDeletionCallables';
 
 admin.initializeApp();
 
@@ -41,6 +47,12 @@ export const createTestUsers = isTestEnvEnabled
 
 export {validateIngestion, aggregateMetrics};
 export {onAuthUserDeleted};
+export {
+  startDeletionOtp,
+  confirmDeletionOtp,
+  confirmDeletionAfterPhoneProof,
+  deleteAccountDirect,
+};
 
 export const healthCheck = onRequest((req, res) => {
   res.status(200).json({
@@ -82,4 +94,3 @@ export const seedMatchTuningConfig = onRequest(async (req, res) => {
   await docRef.set({payload, updatedAt: admin.firestore.FieldValue.serverTimestamp()});
   res.status(200).json({status: 'seeded', version: payload.version});
 });
-

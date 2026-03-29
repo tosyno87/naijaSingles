@@ -1188,6 +1188,10 @@ async function run() {
         theme: 'dark',
       });
 
+      await setDoc(doc(db, 'runtimeConfig/featureFlags'), {
+        useBackendAccountDeletion: false,
+      });
+
       // accountDeletions: not seeded; tests create accountDeletions/userA and update it
 
       await setDoc(doc(db, 'security_logs/slog_a'), {
@@ -1329,77 +1333,73 @@ async function run() {
     pass('userSettings: non-owner cannot write settings');
 
     // ── accountDeletions collection ─────────────────────────────────────────
-    // Create: doc id must equal auth.uid, userId must match, status in ['pending','aborted'], no deletedAt.
-    // Update: only status -> 'aborted' allowed (affectedKeys hasOnly ['status']); completed/deletedAt server-only.
+    // Server-only writes; owner read when doc exists (e.g. after callable wrote pending).
 
-    await assertSucceeds(
+    await assertFails(
       setDoc(doc(userADb, 'accountDeletions/userA'), {
         userId: 'userA',
         reason: 'Testing',
         status: 'pending',
       }),
     );
-    pass('accountDeletions: user can create own record with status pending');
+    pass('accountDeletions: client cannot create (server-only)');
 
-    // Rule requires doc id == auth.uid; use userB so we test create (new doc) with status aborted
-    await assertSucceeds(
+    await assertFails(
       setDoc(doc(userBDb, 'accountDeletions/userB'), {
         userId: 'userB',
         reason: 'Testing',
         status: 'aborted',
       }),
     );
-    pass('accountDeletions: user can create own record with status aborted');
+    pass('accountDeletions: client cannot create aborted doc');
 
-    await assertFails(
-      setDoc(doc(userADb, 'accountDeletions/del_spoof'), {
-        userId: 'userB',
-        reason: 'Spoofed',
-        status: 'pending',
-      }),
-    );
-    pass('accountDeletions: cannot create with spoofed userId');
-
-    await assertFails(
-      setDoc(doc(userADb, 'accountDeletions/del_completed'), {
+    await testEnv.withSecurityRulesDisabled(async (context) => {
+      const db = context.firestore();
+      await setDoc(doc(db, 'accountDeletions/userA'), {
         userId: 'userA',
-        status: 'completed',
-      }),
-    );
-    pass('accountDeletions: cannot create with status completed (server-only)');
+        reason: 'Seeded',
+        status: 'pending',
+      });
+    });
 
     await assertFails(
-      setDoc(doc(userADb, 'accountDeletions/del_with_ts'), {
-        userId: 'userA',
-        status: 'pending',
-        deletedAt: new Date(),
-      }),
-    );
-    pass('accountDeletions: cannot create with deletedAt (server-only)');
-
-    await assertSucceeds(
       updateDoc(doc(userADb, 'accountDeletions/userA'), { status: 'aborted' }),
     );
-    pass('accountDeletions: user can update own record to status aborted only');
-
-    await assertFails(
-      updateDoc(doc(userADb, 'accountDeletions/userA'), {
-        status: 'aborted',
-        reason: 'Changed',
-      }),
-    );
-    pass('accountDeletions: cannot update any field other than status to aborted');
-
-    await assertFails(
-      updateDoc(doc(userADb, 'accountDeletions/userA'), { status: 'completed' }),
-    );
-    pass('accountDeletions: cannot update to status completed (server-only)');
+    pass('accountDeletions: client cannot update (server-only)');
 
     await assertSucceeds(getDoc(doc(userADb, 'accountDeletions/userA')));
     pass('accountDeletions: user can read own deletion record');
 
     await assertFails(getDoc(doc(userBDb, 'accountDeletions/userA')));
     pass('accountDeletions: other user cannot read deletion record');
+
+    // ── accountDeletionAbuse (server-only) ───────────────────────────────────
+
+    await assertFails(
+      setDoc(doc(userADb, 'accountDeletionAbuse/ip_hash_test'), {
+        count: 1,
+      }),
+    );
+    pass('accountDeletionAbuse: client cannot write');
+
+    await assertFails(
+      getDoc(doc(userADb, 'accountDeletionAbuse/ip_hash_test')),
+    );
+    pass('accountDeletionAbuse: client cannot read');
+
+    // ── accountDeletionVerifications (server-only) ───────────────────────────
+
+    await assertFails(
+      setDoc(doc(userADb, 'accountDeletionVerifications/userA'), {
+        uid: 'userA',
+      }),
+    );
+    pass('accountDeletionVerifications: client cannot create');
+
+    await assertFails(
+      getDoc(doc(userADb, 'accountDeletionVerifications/userA')),
+    );
+    pass('accountDeletionVerifications: client cannot read');
 
     // ── security_logs collection ────────────────────────────────────────────
 

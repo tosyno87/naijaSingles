@@ -1,19 +1,25 @@
 import 'dart:async';
 
-import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:cloud_functions/cloud_functions.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:pin_code_fields/pin_code_fields.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 import '../../common/constants/app_colors.dart';
 import '../../common/constants/app_spacing.dart';
-import '../../common/data/repo/googlelogin_repo.dart';
-import '../../common/data/repo/phone_auth_repo.dart';
+import '../../common/constants/theme.dart';
 import '../../common/routes/route_name.dart';
 import '../../common/utils/account_deletion_scope.dart';
 import '../../common/utils/app_logger.dart';
+import '../../config/app_config.dart';
+import '../../services/account_deletion_analytics.dart';
+import '../../services/crashlytics_service.dart';
+import 'data/account_deletion_client_meta.dart';
+import 'data/account_deletion_functions_error.dart';
+import 'data/account_deletion_functions_service.dart';
 
+/// Backend [deleteAccountDirect]: signed-in user + checkbox + fresh ID token only.
 class AccountDeletionScreen extends StatefulWidget {
   const AccountDeletionScreen({super.key});
 
@@ -23,34 +29,23 @@ class AccountDeletionScreen extends StatefulWidget {
 
 class _AccountDeletionScreenState extends State<AccountDeletionScreen> {
   final FirebaseAuth _auth = FirebaseAuth.instance;
-  final FirebaseFirestore _firestore = FirebaseFirestore.instance;
-  final GoogleLoginRepository _googleLoginRepository =
-      GoogleLoginRepositoryImpl();
-  final _passwordController = TextEditingController();
-  final _reasonController = TextEditingController();
+  final TextEditingController _reasonController = TextEditingController();
 
-  // Afropeep MVP Color Scheme
   static const Color primaryColor = AppColors.primaryGreen;
   static const Color cardColor = AppColors.cardColor;
   static const Color errorColor = Color(0xFFFF5A5F);
-  static const Color warningColor = Color(0xFFFF9500);
   static const Color textPrimary = AppColors.textPrimary;
   static const Color textSecondary = AppColors.textSecondary;
   static final Color textLight = Colors.grey.shade600;
 
-  bool _isDeleting = false;
-  bool _passwordVisible = false;
-  String _selectedReason = '';
-  bool _confirmDeletion = false;
-  bool _understandConsequences = false;
-  bool _isPhoneUser = false;
-  bool _isEmailUser = false;
-  bool _isGoogleUser = false;
+  final AccountDeletionFunctionsService _deletionFunctions =
+      AccountDeletionFunctionsService();
 
-  // Phone re-auth for account deletion (when requires-recent-login)
-  String? _verificationIdForReauth;
-  final TextEditingController _reauthOtpController = TextEditingController();
-  bool _isSendingReauthCode = false;
+  String _selectedReason = '';
+  bool _confirmedPermanentDelete = false;
+
+  bool _isDeleting = false;
+  String? _lastCallableErrorCode;
 
   final List<String> _deletionReasons = [
     'Found someone special',
@@ -64,58 +59,45 @@ class _AccountDeletionScreenState extends State<AccountDeletionScreen> {
 
   @override
   void dispose() {
-    _passwordController.removeListener(_onPasswordChanged);
-    _passwordController.dispose();
     _reasonController.dispose();
-    _reauthOtpController.dispose();
     super.dispose();
   }
 
   @override
   void initState() {
     super.initState();
-    // React to password input so delete button enables as user types (AFR-21)
-    _passwordController.addListener(_onPasswordChanged);
-    // Check auth provider after the first frame to ensure state is ready
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      _checkAuthProvider();
+      unawaited(AccountDeletionAnalytics.logPhaseEntered('confirmDeletion'));
     });
   }
 
-  void _onPasswordChanged() {
-    if (mounted) setState(() {});
+  String _providerSummary(User? user) {
+    if (user == null) {
+      return 'unknown';
+    }
+    final ids = user.providerData.map((p) => p.providerId).toList();
+    return ids.isEmpty ? 'none' : ids.join(', ');
   }
 
-  void _checkAuthProvider() {
-    final user = _auth.currentUser;
-    if (user != null) {
-      final providerData = user.providerData;
-      final isPhone = providerData.any((info) => info.providerId == 'phone');
-      final isEmail = providerData.any((info) => info.providerId == 'password');
-      final isGoogle =
-          providerData.any((info) => info.providerId == 'google.com');
-
-      if (_isPhoneUser != isPhone ||
-          _isEmailUser != isEmail ||
-          _isGoogleUser != isGoogle) {
-        setState(() {
-          _isPhoneUser = isPhone;
-          _isEmailUser = isEmail;
-          _isGoogleUser = isGoogle;
-        });
-        AppLogger.debug(
-          'Auth provider: isPhone=$_isPhoneUser, isEmail=$_isEmailUser, isGoogle=$_isGoogleUser',
-        );
-      } else {
-        _isPhoneUser = isPhone;
-        _isEmailUser = isEmail;
-        _isGoogleUser = isGoogle;
-      }
+  String _footerLabel() {
+    if (_isDeleting) {
+      return 'Deleting...';
     }
+    return 'Delete account permanently';
+  }
+
+  bool get _footerEnabled => !_isDeleting && _confirmedPermanentDelete;
+
+  Future<void> _onFooterPrimary() async {
+    await _onBackendFinalDelete();
   }
 
   @override
-  Widget build(BuildContext context) => Scaffold(
+  Widget build(BuildContext context) {
+    final user = _auth.currentUser;
+    return Theme(
+      data: MyThemes.lightTheme,
+      child: Scaffold(
         backgroundColor: AppColors.backgroundColor,
         appBar: AppBar(
           backgroundColor: AppColors.backgroundColor,
@@ -125,7 +107,7 @@ class _AccountDeletionScreenState extends State<AccountDeletionScreen> {
             onPressed: () => Navigator.pop(context),
           ),
           title: Text(
-            'Delete Account',
+            'Delete account',
             style: GoogleFonts.montserrat(
               fontSize: 20,
               fontWeight: FontWeight.bold,
@@ -134,149 +116,145 @@ class _AccountDeletionScreenState extends State<AccountDeletionScreen> {
           ),
           centerTitle: true,
         ),
-        body: SingleChildScrollView(
-          padding: AppSpacing.pagePadding,
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              // Warning Header
-              _buildWarningHeader(),
-              const SizedBox(height: AppSpacing.lg),
+        body: user == null
+            ? const Center(child: Text('Not signed in'))
+            : Column(
+                children: [
+                  Expanded(
+                    child: SingleChildScrollView(
+                      padding: EdgeInsets.fromLTRB(
+                        AppSpacing.pagePadding.left,
+                        AppSpacing.pagePadding.top,
+                        AppSpacing.pagePadding.right,
+                        AppSpacing.pagePadding.bottom + 96,
+                      ),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          _buildWarningHeader(),
+                          const SizedBox(height: AppSpacing.md),
+                          _buildWhatGetsRemovedCompact(),
+                          const SizedBox(height: AppSpacing.lg),
+                          _buildDeletionReasonSection(),
+                          const SizedBox(height: AppSpacing.lg),
+                          _buildConfirmationSection(),
+                          const SizedBox(height: AppSpacing.lg),
+                          _buildAlternativeOptionsSection(),
+                        ],
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+        bottomNavigationBar:
+            user != null ? _buildStickyFooter() : null,
+      ),
+    );
+  }
 
-              // What Gets Deleted
-              _buildWhatGetsDeletedSection(),
-              const SizedBox(height: AppSpacing.lg),
+  Widget _buildStickyFooter() {
+    final pad = MediaQuery.paddingOf(context).bottom;
+    final enabled = _footerEnabled;
+    final bg = !_isDeleting ? errorColor : primaryColor;
+    final disabledBg = Colors.grey.shade400;
 
-              // Deletion Reason
-              _buildDeletionReasonSection(),
-              const SizedBox(height: AppSpacing.lg),
-
-              // Password/Phone/Other Confirmation (based on auth provider)
-              if (_isPhoneUser)
-                _buildPhoneConfirmationSection()
-              else if (_isEmailUser)
-                _buildPasswordConfirmationSection()
-              else
-                _buildOtherProviderSection(),
-              const SizedBox(height: AppSpacing.lg),
-
-              // Confirmation Checkboxes
-              _buildConfirmationSection(),
-              const SizedBox(height: AppSpacing.lg),
-
-              // Delete Button
-              _buildDeleteButton(),
-              const SizedBox(height: AppSpacing.md),
-
-              // Alternative Options
-              _buildAlternativeOptionsSection(),
-            ],
+    return Material(
+      elevation: 8,
+      color: AppColors.backgroundColor,
+      child: SafeArea(
+        top: false,
+        child: Padding(
+          padding: EdgeInsets.fromLTRB(
+            AppSpacing.pagePadding.left,
+            12,
+            AppSpacing.pagePadding.right,
+            12 + pad,
+          ),
+          child: SizedBox(
+            height: 52,
+            width: double.infinity,
+            child: ElevatedButton(
+              onPressed: enabled
+                  ? () => unawaited(_onFooterPrimary())
+                  : null,
+              style: ElevatedButton.styleFrom(
+                backgroundColor: enabled ? bg : disabledBg,
+                foregroundColor: Colors.white,
+                disabledBackgroundColor: disabledBg,
+                disabledForegroundColor: Colors.white,
+                elevation: enabled ? 2 : 0,
+                shape: RoundedRectangleBorder(
+                  borderRadius:
+                      BorderRadius.circular(AppSpacing.buttonRadius),
+                ),
+              ),
+              child: _isDeleting
+                  ? Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        const SizedBox(
+                          width: 22,
+                          height: 22,
+                          child: CircularProgressIndicator(
+                            strokeWidth: 2,
+                            color: Colors.white,
+                          ),
+                        ),
+                        const SizedBox(width: AppSpacing.sm),
+                        Text(
+                          _footerLabel(),
+                          style: GoogleFonts.montserrat(
+                            fontSize: 16,
+                            fontWeight: FontWeight.w600,
+                          ),
+                        ),
+                      ],
+                    )
+                  : Text(
+                      _footerLabel(),
+                      style: GoogleFonts.montserrat(
+                        fontSize: 16,
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
+            ),
           ),
         ),
-      );
+      ),
+    );
+  }
 
   Widget _buildWarningHeader() => Container(
-        padding: const EdgeInsets.all(20),
+        padding: const EdgeInsets.all(16),
         decoration: BoxDecoration(
           color: errorColor.withValues(alpha: 0.05),
           borderRadius: BorderRadius.circular(AppSpacing.cardRadius),
-          border: Border.all(color: errorColor.withValues(alpha: 0.3)),
+          border: Border.all(color: errorColor.withValues(alpha: 0.25)),
         ),
-        child: Column(
-          children: [
-            Container(
-              width: 80,
-              height: 80,
-              decoration: BoxDecoration(
-                color: errorColor.withValues(alpha: 0.1),
-                shape: BoxShape.circle,
-              ),
-              child: const Icon(
-                Icons.warning,
-                size: 40,
-                color: errorColor,
-              ),
-            ),
-            const SizedBox(height: AppSpacing.md),
-            Text(
-              'Delete Your Account?',
-              style: GoogleFonts.montserrat(
-                fontSize: 24,
-                fontWeight: FontWeight.bold,
-                color: textPrimary,
-              ),
-              textAlign: TextAlign.center,
-            ),
-            const SizedBox(height: AppSpacing.sm),
-            Text(
-              'This action cannot be undone. Once you delete your account, all your data will be permanently removed from our servers.',
-              style: GoogleFonts.montserrat(
-                fontSize: 16,
-                color: textSecondary,
-                height: 1.5,
-              ),
-              textAlign: TextAlign.center,
-            ),
-          ],
-        ),
-      );
-
-  Widget _buildWhatGetsDeletedSection() => Container(
-        padding: const EdgeInsets.all(20),
-        decoration: BoxDecoration(
-          color: cardColor,
-          borderRadius: BorderRadius.circular(AppSpacing.cardRadius),
-          boxShadow: [
-            BoxShadow(
-              color: Colors.black.withValues(alpha: 0.06),
-              blurRadius: 10,
-              offset: const Offset(0, 3),
-            ),
-          ],
-        ),
-        child: Column(
+        child: Row(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Row(
-              children: [
-                const Icon(Icons.delete_forever, color: errorColor, size: 24),
-                const SizedBox(width: AppSpacing.buttonRadius),
-                Text(
-                  'What Gets Deleted',
-                  style: GoogleFonts.montserrat(
-                    fontSize: 18,
-                    fontWeight: FontWeight.w600,
-                    color: textPrimary,
-                  ),
-                ),
-              ],
-            ),
-            const SizedBox(height: AppSpacing.md),
-            _buildDeletionItem('👤 Your profile and photos'),
-            _buildDeletionItem('💬 All your messages and conversations'),
-            _buildDeletionItem('❤️ Your matches and likes'),
-            _buildDeletionItem('📍 Location and preference data'),
-            _buildDeletionItem('📊 Activity history and analytics'),
-            _buildDeletionItem('💳 Subscription and payment history'),
-            const SizedBox(height: AppSpacing.md),
-            Container(
-              padding: const EdgeInsets.all(AppSpacing.buttonRadius),
-              decoration: BoxDecoration(
-                color: warningColor.withValues(alpha: 0.1),
-                borderRadius: BorderRadius.circular(AppSpacing.sm),
-              ),
-              child: Row(
+            const Icon(Icons.warning_amber_rounded, color: errorColor, size: 28),
+            const SizedBox(width: AppSpacing.sm),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  const Icon(Icons.info, color: warningColor, size: 20),
-                  const SizedBox(width: AppSpacing.sm),
-                  Expanded(
-                    child: Text(
-                      'This process may take up to 30 days to complete as we ensure all data is properly removed from our systems.',
-                      style: GoogleFonts.montserrat(
-                        fontSize: 13,
-                        color: textPrimary,
-                        fontWeight: FontWeight.w500,
-                      ),
+                  Text(
+                    'Permanent deletion',
+                    style: GoogleFonts.montserrat(
+                      fontSize: 17,
+                      fontWeight: FontWeight.bold,
+                      color: textPrimary,
+                    ),
+                  ),
+                  const SizedBox(height: 6),
+                  Text(
+                    'No recovery. You will be signed out and your account cannot be restored.',
+                    style: GoogleFonts.montserrat(
+                      fontSize: 14,
+                      color: textSecondary,
+                      height: 1.35,
                     ),
                   ),
                 ],
@@ -286,22 +264,12 @@ class _AccountDeletionScreenState extends State<AccountDeletionScreen> {
         ),
       );
 
-  Widget _buildDeletionItem(String text) => Padding(
-        padding: const EdgeInsets.only(bottom: AppSpacing.sm),
-        child: Row(
-          children: [
-            const Icon(Icons.check_circle, color: errorColor, size: 16),
-            const SizedBox(width: AppSpacing.sm),
-            Expanded(
-              child: Text(
-                text,
-                style: GoogleFonts.montserrat(
-                  fontSize: 14,
-                  color: textSecondary,
-                ),
-              ),
-            ),
-          ],
+  Widget _buildWhatGetsRemovedCompact() => Text(
+        'We remove your profile, photos, messages, matches, and related activity from the app when you finish.',
+        style: GoogleFonts.montserrat(
+          fontSize: 13,
+          color: textSecondary,
+          height: 1.4,
         ),
       );
 
@@ -329,11 +297,11 @@ class _AccountDeletionScreenState extends State<AccountDeletionScreen> {
                 color: textPrimary,
               ),
             ),
-            const SizedBox(height: AppSpacing.sm),
+            const SizedBox(height: AppSpacing.xs),
             Text(
-              'Help us improve by telling us why you\'re deleting your account (optional)',
+              'Optional feedback',
               style: GoogleFonts.montserrat(
-                fontSize: 14,
+                fontSize: 13,
                 color: textSecondary,
               ),
             ),
@@ -345,7 +313,7 @@ class _AccountDeletionScreenState extends State<AccountDeletionScreen> {
                 controller: _reasonController,
                 maxLines: 3,
                 decoration: InputDecoration(
-                  hintText: 'Please tell us more...',
+                  hintText: 'Tell us more (optional detail)…',
                   hintStyle: GoogleFonts.montserrat(color: textLight),
                   border: OutlineInputBorder(
                     borderRadius:
@@ -355,11 +323,13 @@ class _AccountDeletionScreenState extends State<AccountDeletionScreen> {
                   focusedBorder: OutlineInputBorder(
                     borderRadius:
                         BorderRadius.circular(AppSpacing.buttonRadius),
-                    borderSide: const BorderSide(color: primaryColor, width: 2),
+                    borderSide:
+                        const BorderSide(color: primaryColor, width: 2),
                   ),
                   contentPadding: const EdgeInsets.all(AppSpacing.md),
                 ),
-                style: GoogleFonts.montserrat(fontSize: 16, color: textPrimary),
+                style:
+                    GoogleFonts.montserrat(fontSize: 16, color: textPrimary),
               ),
             ],
           ],
@@ -368,7 +338,6 @@ class _AccountDeletionScreenState extends State<AccountDeletionScreen> {
 
   Widget _buildReasonTile(String reason) {
     final isSelected = _selectedReason == reason;
-
     return GestureDetector(
       onTap: () => setState(() => _selectedReason = reason),
       child: Container(
@@ -418,157 +387,6 @@ class _AccountDeletionScreenState extends State<AccountDeletionScreen> {
     );
   }
 
-  Widget _buildPasswordConfirmationSection() => Container(
-        padding: const EdgeInsets.all(20),
-        decoration: BoxDecoration(
-          color: cardColor,
-          borderRadius: BorderRadius.circular(AppSpacing.cardRadius),
-          boxShadow: [
-            BoxShadow(
-              color: Colors.black.withValues(alpha: 0.06),
-              blurRadius: 10,
-              offset: const Offset(0, 3),
-            ),
-          ],
-        ),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(
-              'Confirm Your Password',
-              style: GoogleFonts.montserrat(
-                fontSize: 18,
-                fontWeight: FontWeight.w600,
-                color: textPrimary,
-              ),
-            ),
-            const SizedBox(height: AppSpacing.sm),
-            Text(
-              'Enter your password to confirm account deletion',
-              style: GoogleFonts.montserrat(
-                fontSize: 14,
-                color: textSecondary,
-              ),
-            ),
-            const SizedBox(height: AppSpacing.md),
-            TextFormField(
-              controller: _passwordController,
-              obscureText: !_passwordVisible,
-              decoration: InputDecoration(
-                hintText: 'Enter your password',
-                hintStyle: GoogleFonts.montserrat(color: textLight),
-                border: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(AppSpacing.buttonRadius),
-                  borderSide: BorderSide(color: Colors.grey.shade300),
-                ),
-                focusedBorder: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(AppSpacing.buttonRadius),
-                  borderSide: const BorderSide(color: primaryColor, width: 2),
-                ),
-                contentPadding: const EdgeInsets.symmetric(
-                  horizontal: AppSpacing.md,
-                  vertical: AppSpacing.buttonRadius,
-                ),
-                prefixIcon: const Icon(Icons.lock, color: primaryColor),
-                suffixIcon: IconButton(
-                  icon: Icon(
-                    _passwordVisible ? Icons.visibility : Icons.visibility_off,
-                    color: textLight,
-                  ),
-                  onPressed: () =>
-                      setState(() => _passwordVisible = !_passwordVisible),
-                ),
-              ),
-              style: GoogleFonts.montserrat(fontSize: 16, color: textPrimary),
-            ),
-          ],
-        ),
-      );
-
-  Widget _buildOtherProviderSection() => Container(
-        padding: const EdgeInsets.all(20),
-        decoration: BoxDecoration(
-          color: cardColor,
-          borderRadius: BorderRadius.circular(AppSpacing.cardRadius),
-          boxShadow: [
-            BoxShadow(
-              color: Colors.black.withValues(alpha: 0.06),
-              blurRadius: 10,
-              offset: const Offset(0, 3),
-            ),
-          ],
-        ),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Row(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                const Icon(Icons.login, color: primaryColor, size: 22),
-                const SizedBox(width: AppSpacing.sm),
-                Expanded(
-                  child: Text(
-                    'Signed in with Google or another provider',
-                    style: GoogleFonts.montserrat(
-                      fontSize: 18,
-                      fontWeight: FontWeight.w600,
-                      color: textPrimary,
-                    ),
-                  ),
-                ),
-              ],
-            ),
-            const SizedBox(height: AppSpacing.buttonRadius),
-            Text(
-              _isGoogleUser
-                  ? 'If you signed in a while ago, we may ask you to confirm with Google before deleting.'
-                  : 'For security, sign out and sign back in, then return to this screen to delete your account.',
-              style: GoogleFonts.montserrat(
-                fontSize: 14,
-                color: textSecondary,
-                height: 1.4,
-              ),
-            ),
-            const SizedBox(height: AppSpacing.md),
-            SizedBox(
-              width: double.infinity,
-              child: OutlinedButton.icon(
-                onPressed: () async {
-                  await _auth.signOut();
-                  if (mounted) {
-                    await Navigator.of(context).pushNamedAndRemoveUntil(
-                      RouteName.welcomeScreen,
-                      (route) => false,
-                    );
-                  }
-                },
-                icon: const Icon(Icons.logout, size: 20),
-                label: Text(
-                  _isGoogleUser
-                      ? 'Sign out (fallback)'
-                      : 'Sign out and return to sign-in',
-                  style: GoogleFonts.montserrat(
-                    fontWeight: FontWeight.w600,
-                    fontSize: 14,
-                  ),
-                ),
-                style: OutlinedButton.styleFrom(
-                  foregroundColor: primaryColor,
-                  side: const BorderSide(color: primaryColor),
-                  padding: const EdgeInsets.symmetric(
-                    vertical: AppSpacing.buttonRadius,
-                  ),
-                  shape: RoundedRectangleBorder(
-                    borderRadius:
-                        BorderRadius.circular(AppSpacing.buttonRadius),
-                  ),
-                ),
-              ),
-            ),
-          ],
-        ),
-      );
-
   Widget _buildConfirmationSection() => Container(
         padding: const EdgeInsets.all(20),
         decoration: BoxDecoration(
@@ -586,28 +404,30 @@ class _AccountDeletionScreenState extends State<AccountDeletionScreen> {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Text(
-              'Final Confirmation',
+              'Confirm delete',
               style: GoogleFonts.montserrat(
                 fontSize: 18,
                 fontWeight: FontWeight.w600,
                 color: textPrimary,
               ),
             ),
+            const SizedBox(height: AppSpacing.sm),
+            Text(
+              'No grace period—you cannot restore the account after this.',
+              style: GoogleFonts.montserrat(
+                fontSize: 13,
+                color: textSecondary,
+                height: 1.4,
+              ),
+            ),
             const SizedBox(height: AppSpacing.md),
             _buildCheckboxTile(
-              value: _understandConsequences,
+              value: _confirmedPermanentDelete,
               onChanged: (value) =>
-                  setState(() => _understandConsequences = value ?? false),
-              title: 'I understand that this action cannot be undone',
-              subtitle: 'All my data will be permanently deleted',
-            ),
-            const SizedBox(height: AppSpacing.buttonRadius),
-            _buildCheckboxTile(
-              value: _confirmDeletion,
-              onChanged: (value) =>
-                  setState(() => _confirmDeletion = value ?? false),
-              title: 'I want to permanently delete my account',
-              subtitle: 'I confirm that I want to proceed with deletion',
+                  setState(() => _confirmedPermanentDelete = value ?? false),
+              title: 'I understand this permanently deletes my account',
+              subtitle:
+                  'I cannot recover my profile, messages, or matches after this.',
             ),
           ],
         ),
@@ -654,64 +474,6 @@ class _AccountDeletionScreenState extends State<AccountDeletionScreen> {
         ],
       );
 
-  Widget _buildDeleteButton() {
-    // Phone and "other" (e.g. Google) users don't need password; email users do
-    final isOtherProvider = !_isPhoneUser && !_isEmailUser;
-    final passwordValid =
-        _isPhoneUser || isOtherProvider || _passwordController.text.isNotEmpty;
-
-    final canDelete =
-        passwordValid && _understandConsequences && _confirmDeletion;
-
-    return SizedBox(
-      width: double.infinity,
-      child: ElevatedButton(
-        onPressed: canDelete && !_isDeleting ? _deleteAccount : null,
-        style: ElevatedButton.styleFrom(
-          backgroundColor:
-              canDelete && !_isDeleting ? errorColor : Colors.grey.shade400,
-          foregroundColor: Colors.white,
-          disabledBackgroundColor: Colors.grey.shade400,
-          disabledForegroundColor: Colors.white,
-          padding: const EdgeInsets.symmetric(vertical: AppSpacing.md),
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(AppSpacing.buttonRadius),
-          ),
-          elevation: canDelete && !_isDeleting ? 2 : 0,
-        ),
-        child: _isDeleting
-            ? Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  const SizedBox(
-                    width: 20,
-                    height: 20,
-                    child: CircularProgressIndicator(
-                      color: Colors.white,
-                      strokeWidth: 2,
-                    ),
-                  ),
-                  const SizedBox(width: AppSpacing.buttonRadius),
-                  Text(
-                    'Deleting Account...',
-                    style: GoogleFonts.montserrat(
-                      fontSize: 16,
-                      fontWeight: FontWeight.w600,
-                    ),
-                  ),
-                ],
-              )
-            : Text(
-                'Delete My Account Permanently',
-                style: GoogleFonts.montserrat(
-                  fontSize: 16,
-                  fontWeight: FontWeight.w600,
-                ),
-              ),
-      ),
-    );
-  }
-
   Widget _buildAlternativeOptionsSection() => Container(
         padding: AppSpacing.cardPadding,
         decoration: BoxDecoration(
@@ -722,505 +484,248 @@ class _AccountDeletionScreenState extends State<AccountDeletionScreen> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Row(
-              children: [
-                const Icon(Icons.lightbulb, color: primaryColor, size: 20),
-                const SizedBox(width: AppSpacing.sm),
-                Text(
-                  'Consider These Alternatives',
+            Text(
+              'Other options',
+              style: GoogleFonts.montserrat(
+                fontSize: 14,
+                fontWeight: FontWeight.w600,
+                color: textPrimary,
+              ),
+            ),
+            const SizedBox(height: AppSpacing.xs),
+            Text(
+              'Take a break or contact support if you need help.',
+              style: GoogleFonts.montserrat(
+                fontSize: 13,
+                color: textSecondary,
+                height: 1.35,
+              ),
+            ),
+            Align(
+              alignment: Alignment.centerLeft,
+              child: TextButton(
+                onPressed: () => unawaited(_openSupportEmailGeneric()),
+                child: Text(
+                  'Contact support',
                   style: GoogleFonts.montserrat(
-                    fontSize: 16,
+                    color: primaryColor,
                     fontWeight: FontWeight.w600,
-                    color: textPrimary,
                   ),
                 ),
-              ],
+              ),
             ),
-            const SizedBox(height: AppSpacing.buttonRadius),
-            _buildAlternativeItem(
-              '📴 Temporarily deactivate your account instead',
-            ),
-            _buildAlternativeItem('🔒 Update your privacy settings'),
-            _buildAlternativeItem('⚙️ Adjust your matching preferences'),
-            _buildAlternativeItem('💬 Contact support for help with issues'),
           ],
         ),
       );
 
-  Widget _buildAlternativeItem(String text) => Padding(
-        padding: const EdgeInsets.only(bottom: AppSpacing.xs),
-        child: Text(
-          text,
-          style: GoogleFonts.montserrat(
-            fontSize: 14,
-            color: textSecondary,
-            height: 1.4,
-          ),
-        ),
-      );
+  bool get _canBackendDelete =>
+      !_isDeleting && _confirmedPermanentDelete;
 
-  Future<void> _deleteAccount() async {
-    setState(() => _isDeleting = true);
+  Future<void> _openSupportEmailGeneric() async {
+    await AccountDeletionAnalytics.logSupportTapped('generic');
+    final User? u = _auth.currentUser;
+    final subject = Uri.encodeComponent('Afropeep – account deletion help');
+    final body = Uri.encodeComponent(
+      'I need help with account deletion.\n'
+      'UID: ${u?.uid ?? "unknown"}\n'
+      'Sign-in methods: ${_providerSummary(u)}\n'
+      'Last error code (if any): ${_lastCallableErrorCode ?? "none"}\n'
+      'Platform: ${accountDeletionClientMeta()["platform"]}\n'
+      'App version: ${accountDeletionClientMeta()["appVersion"]}\n',
+    );
+    await _launchMailto(subject: subject, body: body);
+  }
 
-    try {
-      final user = _auth.currentUser;
-      if (user == null) {
-        throw Exception('No user logged in');
-      }
-
-      // Check auth provider and re-authenticate accordingly.
-      // Only treat as email user if they signed in with password; Google/OAuth users
-      // must use the "other" flow (sign out and sign back in) for re-auth.
-      final providerData = user.providerData;
-      final isPhoneUser =
-          providerData.any((info) => info.providerId == 'phone');
-      final isEmailUser =
-          providerData.any((info) => info.providerId == 'password');
-      final isGoogleUser =
-          providerData.any((info) => info.providerId == 'google.com');
-
-      AppLogger.debug(
-        'Delete account: isPhoneUser=$isPhoneUser, isEmailUser=$isEmailUser, isGoogleUser=$isGoogleUser',
-      );
-
-      // Write audit pending first (while still authenticated); then delete Auth; CF sets completed and cleans up.
-      if (isPhoneUser) {
-        AppLogger.debug('Phone user: audit pending, then delete');
-        AccountDeletionScope.inProgress = true;
-        try {
-          final uid = user.uid;
-          final email = user.email;
-          final phoneNumber = user.phoneNumber;
-          await _writeAuditRecordPending(
-            userId: uid,
-            authProvider: 'phone',
-            email: email,
-            phoneNumber: phoneNumber,
-          );
-          await user.delete();
-          await _auth.signOut();
-          if (mounted) _showDeletionSuccessDialog();
-          return;
-        } on Object catch (e) {
-          if (e is FirebaseAuthException && e.code == 'requires-recent-login') {
-            AppLogger.warning('Requires recent login - showing phone re-auth');
-            AccountDeletionScope.inProgress = false;
-            setState(() => _isDeleting = false);
-            if (mounted) _showPhoneReauthDialog(user);
-            return;
-          }
-          AccountDeletionScope.inProgress = false;
-          await _writeAuditRecordAborted(user.uid);
-          rethrow;
-        }
-      } else if (isEmailUser && user.email != null) {
-        AppLogger.debug('Email user: reauth, audit pending, then delete');
-        AccountDeletionScope.inProgress = true;
-        try {
-          final credential = EmailAuthProvider.credential(
-            email: user.email!,
-            password: _passwordController.text,
-          );
-          await user.reauthenticateWithCredential(credential);
-          final uid = user.uid;
-          final email = user.email;
-          final phoneNumber = user.phoneNumber;
-          await _writeAuditRecordPending(
-            userId: uid,
-            authProvider: 'email',
-            email: email,
-            phoneNumber: phoneNumber,
-          );
-          await user.delete();
-          await _auth.signOut();
-          if (mounted) _showDeletionSuccessDialog();
-          return;
-        } on Object catch (_) {
-          AccountDeletionScope.inProgress = false;
-          await _writeAuditRecordAborted(user.uid);
-          rethrow;
-        }
-      } else {
-        AppLogger.debug('Other auth provider: audit pending, then delete');
-        AccountDeletionScope.inProgress = true;
-        try {
-          final uid = user.uid;
-          final email = user.email;
-          final phoneNumber = user.phoneNumber;
-          await _writeAuditRecordPending(
-            userId: uid,
-            authProvider: 'other',
-            email: email,
-            phoneNumber: phoneNumber,
-          );
-          await user.delete();
-          await _auth.signOut();
-          if (mounted) _showDeletionSuccessDialog();
-          return;
-        } on Object catch (e) {
-          if (e is FirebaseAuthException && e.code == 'requires-recent-login') {
-            if (isGoogleUser) {
-              await _handleGoogleReauthAndRetryDelete(user);
-              return;
-            }
-
-            AccountDeletionScope.inProgress = false;
-            setState(() => _isDeleting = false);
-            await _writeAuditRecordAborted(user.uid);
-            if (mounted) {
-              _showSnackBar(
-                'For security, please sign out and sign back in, then return to Delete Account to try again.',
-              );
-              await showDialog(
-                context: context,
-                builder: (ctx) => AlertDialog(
-                  title: const Text('Re-authentication required'),
-                  content: const Text(
-                    'Sign out now, then sign back in and go to Delete Account to complete deletion.',
-                  ),
-                  actions: [
-                    TextButton(
-                      onPressed: () => Navigator.pop(ctx),
-                      child: const Text('Cancel'),
-                    ),
-                    ElevatedButton(
-                      onPressed: () async {
-                        Navigator.pop(ctx);
-                        await _auth.signOut();
-                        if (mounted) {
-                          await Navigator.of(context).pushNamedAndRemoveUntil(
-                            RouteName.welcomeScreen,
-                            (route) => false,
-                          );
-                        }
-                      },
-                      child: const Text('Sign out'),
-                    ),
-                  ],
-                ),
-              );
-            }
-            return;
-          }
-          AccountDeletionScope.inProgress = false;
-          await _writeAuditRecordAborted(user.uid);
-          rethrow;
-        }
-      }
-    } on Object catch (e) {
-      AccountDeletionScope.inProgress = false;
-      final uid = _auth.currentUser?.uid;
-      if (uid != null) await _writeAuditRecordAborted(uid);
-      AppLogger.error('Error deleting account', error: e);
-      AppLogger.debug('Error type: ${e.runtimeType}');
-      if (e is FirebaseAuthException) {
-        AppLogger.error(
-          'Firebase Auth Error: code=${e.code}, message=${e.message}',
-          error: e,
-        );
-      }
-      setState(() => _isDeleting = false);
-
-      if (mounted) {
-        String errorMessage = 'Failed to delete account.';
-        if (e is FirebaseAuthException) {
-          if (e.code == 'requires-recent-login') {
-            errorMessage =
-                'For security, please sign out and sign back in, then try again.';
-          } else if (e.code == 'wrong-password' ||
-              e.code == 'invalid-credential') {
-            errorMessage =
-                'Incorrect password or expired session. Please try again.';
-          } else {
-            errorMessage = 'Error: ${e.message ?? e.code}';
-          }
-        } else {
-          errorMessage = e.toString();
-        }
-
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text(
-              errorMessage,
-              style: GoogleFonts.montserrat(color: Colors.white),
-            ),
-            backgroundColor: errorColor,
-            behavior: SnackBarBehavior.floating,
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(AppSpacing.sm),
-            ),
-            duration: const Duration(seconds: 5),
-          ),
-        );
-      }
+  Future<void> _launchMailto({
+    required String subject,
+    required String body,
+  }) async {
+    final uri = Uri.parse(
+      'mailto:${AppConfig.supportEmail}?subject=$subject&body=$body',
+    );
+    if (await canLaunchUrl(uri)) {
+      await launchUrl(uri);
+    } else if (mounted) {
+      _showSnackBar('Could not open email app.');
     }
   }
 
-  /// Shows dialog to re-authenticate phone user (send OTP then verify).
-  void _showPhoneReauthDialog(User user) {
-    final phone = user.phoneNumber ?? '';
-    unawaited(
-      showDialog(
-        context: context,
-        barrierDismissible: false,
-        builder: (ctx) => AlertDialog(
-          backgroundColor: cardColor,
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(AppSpacing.cardRadius),
-          ),
-          title: Text(
-            'Re-authentication required',
-            style: GoogleFonts.montserrat(
-              fontWeight: FontWeight.w600,
-              color: textPrimary,
-            ),
-          ),
-          content: Text(
-            'For security, we need to verify your phone number before deleting your account. We\'ll send a code to $phone.',
-            style: GoogleFonts.montserrat(color: textSecondary, fontSize: 14),
-          ),
-          actions: [
-            TextButton(
-              onPressed: () => Navigator.pop(ctx),
-              child: Text(
-                'Cancel',
-                style: GoogleFonts.montserrat(color: textSecondary),
-              ),
-            ),
-            ElevatedButton(
-              onPressed: _isSendingReauthCode
-                  ? null
-                  : () async {
-                      Navigator.pop(ctx);
-                      await _sendReauthCode(user);
-                    },
-              style: ElevatedButton.styleFrom(backgroundColor: primaryColor),
-              child: _isSendingReauthCode
-                  ? const SizedBox(
-                      width: 20,
-                      height: 20,
-                      child: CircularProgressIndicator(
-                        strokeWidth: 2,
-                        color: Colors.white,
-                      ),
-                    )
-                  : Text(
-                      'Send code',
-                      style: GoogleFonts.montserrat(color: Colors.white),
-                    ),
-            ),
-          ],
-        ),
-      ),
-    );
+  String _mapFunctionsException(FirebaseFunctionsException e) {
+    final AccountDeletionFunctionsDetails? d =
+        AccountDeletionFunctionsDetails.fromException(e);
+    final String? extra = d?.userMessageSuffix();
+
+    if (e.code == 'not-found') {
+      final String lower = (e.message ?? '').toLowerCase();
+      if (lower.contains('verification') ||
+          lower.contains('active') ||
+          lower.contains('request a new')) {
+        return 'No active verification. Request a new code from the previous step.';
+      }
+      return 'Deletion service is temporarily unavailable. Please try again shortly.';
+    }
+
+    String base = e.message ?? 'Something went wrong. Please try again.';
+    switch (e.code) {
+      case 'resource-exhausted':
+        base = e.message ?? 'Too many requests. Please wait and try again.';
+        break;
+      case 'permission-denied':
+        base = e.message ?? 'Session check failed. Please sign in again.';
+        break;
+      case 'failed-precondition':
+        base = e.message ?? 'Request could not be completed.';
+        break;
+      case 'unauthenticated':
+        base = _auth.currentUser == null
+            ? 'Session expired. Please sign in again.'
+            : 'Could not verify this request. If this keeps happening, '
+                'ask your admin to set ACCOUNT_DELETION_ENFORCE_APPCHECK=false '
+                'on non-prod functions or fix App Check.';
+        break;
+      default:
+        break;
+    }
+    if (extra != null && extra.isNotEmpty) {
+      return '$base $extra';
+    }
+    return base;
   }
 
-  Future<void> _sendReauthCode(User user) async {
-    final phone = user.phoneNumber?.trim();
-    if (phone == null || phone.isEmpty) {
+  Future<void> _onBackendFinalDelete() async {
+    if (!_canBackendDelete) {
+      return;
+    }
+    setState(() {
+      _isDeleting = true;
+    });
+    AccountDeletionScope.inProgress = true;
+    await AccountDeletionAnalytics.logPhaseEntered('deleting');
+    final bool hasSession = await _ensureDeletionAuthSession();
+    if (!hasSession) {
+      AccountDeletionScope.inProgress = false;
       if (mounted) {
-        _showSnackBar(
-          'Phone number not found. Please sign out and sign back in.',
-        );
+        setState(() {
+          _isDeleting = false;
+        });
       }
       return;
     }
-    setState(() => _isSendingReauthCode = true);
     try {
-      await PhoneAuthRepository().verifyPhone(
-        phoneNumber: phone,
-        verificationCompleted: (PhoneAuthCredential credential) async {
-          if (!mounted) return;
-          setState(() => _isSendingReauthCode = false);
-          try {
-            await user.reauthenticateWithCredential(credential);
-            await _performDeletionAfterReauth(user);
-          } on Object catch (e) {
-            AppLogger.error('Re-auth verificationCompleted error', error: e);
-            if (mounted) {
-              _showSnackBar('Verification failed. Please try again.');
-            }
-          }
-        },
-        codeSent: (String verificationId, int? resendToken) {
-          if (!mounted) return;
-          setState(() {
-            _isSendingReauthCode = false;
-            _verificationIdForReauth = verificationId;
-          });
-          _showReauthOtpDialog(user);
-        },
-        verificationFailed: (FirebaseAuthException e) {
-          AppLogger.error(
-            'Re-auth verification failed: ${e.code} ${e.message}',
-            error: e,
-          );
-          if (mounted) {
-            setState(() => _isSendingReauthCode = false);
-            _showSnackBar('Failed to send code: ${e.message ?? e.code}');
-          }
-        },
-        codeAutoRetrievalTimeout: (String verificationId) {},
-      );
-    } on Object catch (e) {
-      AppLogger.error('Send reauth code error', error: e);
-      if (mounted) {
-        setState(() => _isSendingReauthCode = false);
-        _showSnackBar('Failed to send code. Please try again.');
+      final String? customReason =
+          _selectedReason == 'Other' ? _reasonController.text.trim() : null;
+      final User? currentUser = _auth.currentUser;
+      if (currentUser == null) {
+        throw StateError('Not signed in');
       }
-    }
-  }
-
-  void _showReauthOtpDialog(User user) {
-    _reauthOtpController.clear();
-    unawaited(
-      showDialog(
-        context: context,
-        barrierDismissible: false,
-        builder: (ctx) => AlertDialog(
-          backgroundColor: cardColor,
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(AppSpacing.cardRadius),
-          ),
-          title: Text(
-            'Enter verification code',
-            style: GoogleFonts.montserrat(
-              fontWeight: FontWeight.w600,
-              color: textPrimary,
-            ),
-          ),
-          content: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Text(
-                'Enter the 6-digit code sent to ${user.phoneNumber}',
-                style:
-                    GoogleFonts.montserrat(color: textSecondary, fontSize: 14),
-              ),
-              const SizedBox(height: AppSpacing.md),
-              PinCodeTextField(
-                appContext: context,
-                length: 6,
-                controller: _reauthOtpController,
-                keyboardType: TextInputType.number,
-                pinTheme: PinTheme(
-                  shape: PinCodeFieldShape.box,
-                  borderRadius: BorderRadius.circular(AppSpacing.sm),
-                  fieldHeight: 48,
-                  fieldWidth: 36,
-                  activeColor: primaryColor,
-                  inactiveColor: textLight,
-                  selectedColor: primaryColor,
-                ),
-                onChanged: (_) {},
-              ),
-            ],
-          ),
-          actions: [
-            TextButton(
-              onPressed: () => Navigator.pop(ctx),
-              child: Text(
-                'Cancel',
-                style: GoogleFonts.montserrat(color: textSecondary),
-              ),
-            ),
-            ElevatedButton(
-              onPressed: () async {
-                final code = _reauthOtpController.text.trim();
-                final vid = _verificationIdForReauth;
-                if (code.length != 6 || vid == null) {
-                  if (mounted) _showSnackBar('Please enter the 6-digit code.');
-                  return;
-                }
-                Navigator.pop(ctx);
-                setState(() => _isDeleting = true);
-                try {
-                  final credential = PhoneAuthProvider.credential(
-                    verificationId: vid,
-                    smsCode: code,
-                  );
-                  await user.reauthenticateWithCredential(credential);
-                  await _performDeletionAfterReauth(user);
-                } on Object catch (e) {
-                  AppLogger.error('Re-auth OTP error', error: e);
-                  setState(() => _isDeleting = false);
-                  if (mounted) {
-                    _showSnackBar('Invalid or expired code. Please try again.');
-                  }
-                }
-              },
-              style: ElevatedButton.styleFrom(backgroundColor: primaryColor),
-              child: Text(
-                'Verify and delete',
-                style: GoogleFonts.montserrat(color: Colors.white),
-              ),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-
-  /// After re-auth: write audit pending, then delete Auth user, sign out. CF sets audit completed and cleans up.
-  Future<void> _performDeletionAfterReauth(
-    User user, {
-    String authProvider = 'phone',
-  }) async {
-    AccountDeletionScope.inProgress = true;
-    try {
-      final uid = user.uid;
-      final email = user.email;
-      final phoneNumber = user.phoneNumber;
-      await _writeAuditRecordPending(
-        userId: uid,
-        authProvider: authProvider,
-        email: email,
-        phoneNumber: phoneNumber,
+      final Map<String, String> meta = accountDeletionClientMeta();
+      final String? idToken = await currentUser.getIdToken(true);
+      if (idToken == null || idToken.isEmpty) {
+        throw StateError('Missing ID token');
+      }
+      await _deletionFunctions.deleteAccountDirect(
+        idToken: idToken,
+        reason: _selectedReason,
+        customReason: customReason,
+        clientMeta: meta,
       );
-      AppLogger.debug('Deleting Firebase Auth user');
-      await user.delete();
       await _auth.signOut();
-      if (mounted) _showDeletionSuccessDialog();
-    } on Object catch (e) {
-      AppLogger.error('Error in _performDeletionAfterReauth', error: e);
-      AccountDeletionScope.inProgress = false;
-      await _writeAuditRecordAborted(user.uid);
-      setState(() => _isDeleting = false);
-      if (mounted) {
-        _showSnackBar('Failed to complete deletion. Please try again.');
-      }
-    }
-  }
-
-  Future<void> _handleGoogleReauthAndRetryDelete(User user) async {
-    try {
-      if (mounted) {
-        _showSnackBar('Re-verifying your account with Google...');
-      }
-
-      final credential =
-          await _googleLoginRepository.getGoogleReauthCredential();
-      if (credential == null) {
-        AccountDeletionScope.inProgress = false;
-        await _writeAuditRecordAborted(user.uid);
-        if (mounted) {
-          setState(() => _isDeleting = false);
-          _showSnackBar('Re-verification cancelled.');
-        }
+      if (!mounted) {
         return;
       }
-
-      await user.reauthenticateWithCredential(credential);
-      await _performDeletionAfterReauth(user, authProvider: 'google');
+      AccountDeletionScope.inProgress = false;
+      await AccountDeletionAnalytics.logCompleted('direct');
+      await AccountDeletionAnalytics.logPhaseEntered('done');
+      _navigateWelcomeAfterDeletion();
+    } on FirebaseFunctionsException catch (e, st) {
+      AccountDeletionScope.inProgress = false;
+      _lastCallableErrorCode = e.code;
+      const String callableName = 'deleteAccountDirect';
+      AppLogger.warning(
+        'Account deletion callable failed: $callableName '
+        'region=${AccountDeletionFunctionsService.callableRegion} code=${e.code}',
+        error: e,
+        stackTrace: st,
+      );
+      await AccountDeletionAnalytics.logCallFailed(e.code);
+      unawaited(
+        CrashlyticsService().logError(
+          e,
+          st,
+          reason: 'account_deletion_$callableName',
+        ),
+      );
+      if (mounted) {
+        setState(() {
+          _isDeleting = false;
+        });
+        _showSnackBar(_mapFunctionsException(e));
+      }
     } on Object catch (e) {
       AccountDeletionScope.inProgress = false;
-      await _writeAuditRecordAborted(user.uid);
+      AppLogger.error('Backend account deletion failed', error: e);
       if (mounted) {
-        setState(() => _isDeleting = false);
-        _showSnackBar('Google re-verification failed. Please try again.');
+        setState(() {
+          _isDeleting = false;
+        });
+        _showSnackBar('Could not complete deletion. Please try again.');
       }
-      AppLogger.error('Google re-auth and retry failed', error: e);
     }
+  }
+
+  Future<bool> _ensureDeletionAuthSession() async {
+    final User? signedInUser = _auth.currentUser;
+    if (signedInUser == null) {
+      if (mounted) {
+        _showSnackBar('Please sign in again to continue account deletion.');
+      }
+      return false;
+    }
+    try {
+      await signedInUser.reload();
+    } on Object catch (_) {
+      // Best-effort refresh: proceed to token refresh below.
+    }
+
+    final User? refreshedUser = _auth.currentUser;
+    if (refreshedUser == null) {
+      if (mounted) {
+        _showSnackBar('Please sign in again to continue account deletion.');
+      }
+      return false;
+    }
+    try {
+      final String? token = await refreshedUser.getIdToken(true);
+      if (token == null || token.isEmpty) {
+        throw StateError('Empty Firebase ID token');
+      }
+      return true;
+    } on Object catch (e, st) {
+      AppLogger.warning(
+        'Could not refresh auth session before deletion callable',
+        error: e,
+        stackTrace: st,
+      );
+      if (mounted) {
+        _showSnackBar(
+          'Your session expired. Please sign in again and try once more.',
+        );
+      }
+      return false;
+    }
+  }
+
+  void _navigateWelcomeAfterDeletion() {
+    if (!mounted) {
+      return;
+    }
+    AccountDeletionScope.inProgress = false;
+    unawaited(
+      Navigator.of(context).pushNamedAndRemoveUntil(
+        RouteName.welcomeScreen,
+        (route) => false,
+      ),
+    );
   }
 
   void _showSnackBar(String message) {
@@ -1236,230 +741,4 @@ class _AccountDeletionScreenState extends State<AccountDeletionScreen> {
       ),
     );
   }
-
-  /// Writes the account deletion audit record as pending (doc id = userId).
-  /// Call before [user.delete()] while still authenticated. Cloud Function sets status to completed after cleanup.
-  /// Propagates errors so we do not delete if the write fails.
-  Future<void> _writeAuditRecordPending({
-    required String userId,
-    required String authProvider,
-    String? email,
-    String? phoneNumber,
-  }) async {
-    await _firestore.collection('accountDeletions').doc(userId).set(
-      {
-        'userId': userId,
-        'email': email,
-        'phoneNumber': phoneNumber,
-        'authProvider': authProvider,
-        'reason': _selectedReason,
-        'customReason':
-            _selectedReason == 'Other' ? _reasonController.text : null,
-        'requestedAt': FieldValue.serverTimestamp(),
-        'status': 'pending',
-      },
-      SetOptions(merge: true),
-    );
-  }
-
-  /// Marks the audit record as aborted (e.g. deletion failed or user gave up). Best-effort; logs and swallows errors.
-  Future<void> _writeAuditRecordAborted(String userId) async {
-    try {
-      await _firestore.collection('accountDeletions').doc(userId).set(
-        {
-          'status': 'aborted',
-        },
-        SetOptions(merge: true),
-      );
-    } on Object catch (e) {
-      AppLogger.warning('Could not write audit aborted', error: e);
-    }
-  }
-
-  void _showDeletionSuccessDialog() {
-    unawaited(
-      showDialog(
-        context: context,
-        barrierDismissible: false,
-        builder: (context) => AlertDialog(
-          backgroundColor: cardColor,
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(AppSpacing.chipRadius),
-          ),
-          elevation: 8,
-          contentPadding: const EdgeInsets.all(AppSpacing.lg),
-          title: Column(
-            children: [
-              Container(
-                width: 80,
-                height: 80,
-                decoration: BoxDecoration(
-                  color: errorColor.withValues(alpha: 0.1),
-                  shape: BoxShape.circle,
-                ),
-                child: const Icon(
-                  Icons.delete_forever,
-                  color: errorColor,
-                  size: 40,
-                ),
-              ),
-              const SizedBox(height: AppSpacing.md),
-              Text(
-                'Account Deleted',
-                style: GoogleFonts.montserrat(
-                  fontWeight: FontWeight.bold,
-                  fontSize: 20,
-                  color: textPrimary,
-                ),
-              ),
-            ],
-          ),
-          content: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Text(
-                'Your account has been permanently deleted. All your data, matches, messages, and photos have been removed from our servers.',
-                style: GoogleFonts.montserrat(
-                  color: textSecondary,
-                  fontSize: 16,
-                  height: 1.5,
-                ),
-                textAlign: TextAlign.center,
-              ),
-              const SizedBox(height: AppSpacing.md),
-              Container(
-                padding: const EdgeInsets.all(AppSpacing.buttonRadius),
-                decoration: BoxDecoration(
-                  color: errorColor.withValues(alpha: 0.05),
-                  borderRadius: BorderRadius.circular(AppSpacing.buttonRadius),
-                  border: Border.all(color: errorColor.withValues(alpha: 0.2)),
-                ),
-                child: Row(
-                  children: [
-                    const Icon(
-                      Icons.warning_amber_rounded,
-                      color: errorColor,
-                      size: 20,
-                    ),
-                    const SizedBox(width: AppSpacing.sm),
-                    Expanded(
-                      child: Text(
-                        'This action cannot be undone. You will need to create a new account to use the app again.',
-                        style: GoogleFonts.montserrat(
-                          color: textSecondary,
-                          fontSize: 13,
-                          fontWeight: FontWeight.w500,
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-            ],
-          ),
-          actions: [
-            SizedBox(
-              width: double.infinity,
-              child: ElevatedButton(
-                onPressed: () {
-                  AccountDeletionScope.inProgress = false;
-                  unawaited(
-                    Navigator.of(context).pushNamedAndRemoveUntil(
-                      RouteName.welcomeScreen,
-                      (route) => false,
-                    ),
-                  );
-                },
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: primaryColor,
-                  foregroundColor: Colors.white,
-                  padding: const EdgeInsets.symmetric(
-                    vertical: AppSpacing.buttonRadius,
-                  ),
-                  shape: RoundedRectangleBorder(
-                    borderRadius:
-                        BorderRadius.circular(AppSpacing.buttonRadius),
-                  ),
-                  elevation: 0,
-                ),
-                child: Text(
-                  'Got it',
-                  style: GoogleFonts.montserrat(
-                    fontWeight: FontWeight.w600,
-                    fontSize: 16,
-                  ),
-                ),
-              ),
-            ),
-          ],
-          actionsPadding: const EdgeInsets.fromLTRB(
-            AppSpacing.lg,
-            0,
-            AppSpacing.lg,
-            AppSpacing.lg,
-          ),
-        ),
-      ),
-    );
-  }
-
-  Widget _buildPhoneConfirmationSection() => Container(
-        padding: const EdgeInsets.all(20),
-        decoration: BoxDecoration(
-          color: cardColor,
-          borderRadius: BorderRadius.circular(AppSpacing.cardRadius),
-          boxShadow: [
-            BoxShadow(
-              color: Colors.black.withValues(alpha: 0.06),
-              blurRadius: 10,
-              offset: const Offset(0, 3),
-            ),
-          ],
-        ),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(
-              'Confirm Account Deletion',
-              style: GoogleFonts.montserrat(
-                fontSize: 18,
-                fontWeight: FontWeight.w600,
-                color: textPrimary,
-              ),
-            ),
-            const SizedBox(height: AppSpacing.sm),
-            Text(
-              'Since you signed up with phone, your account will be deleted immediately after confirmation.',
-              style: GoogleFonts.montserrat(
-                fontSize: 14,
-                color: textSecondary,
-              ),
-            ),
-            const SizedBox(height: AppSpacing.md),
-            Container(
-              padding: const EdgeInsets.all(AppSpacing.buttonRadius),
-              decoration: BoxDecoration(
-                color: warningColor.withValues(alpha: 0.1),
-                borderRadius: BorderRadius.circular(AppSpacing.sm),
-                border: Border.all(color: warningColor.withValues(alpha: 0.3)),
-              ),
-              child: Row(
-                children: [
-                  const Icon(Icons.info_outline, color: warningColor, size: 20),
-                  const SizedBox(width: AppSpacing.sm),
-                  Expanded(
-                    child: Text(
-                      'If you signed in a while ago, we\'ll send a verification code to your phone before deleting.',
-                      style: GoogleFonts.montserrat(
-                        fontSize: 12,
-                        color: textSecondary,
-                      ),
-                    ),
-                  ),
-                ],
-              ),
-            ),
-          ],
-        ),
-      );
 }

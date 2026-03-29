@@ -1,0 +1,12 @@
+{
+  "datingWeights": {
+    "age": 0.79,
+    "location": 0.0,
+    "interest": 0.0,
+    "lifestyle": 0.0,
+    "completeness": 0.21
+  },
+  "locationPerfectMiles": 5.0,
+  "locationDecayMiles": 50.0,
+  "locationFloorScore": 0.2
+}

@@ -1,8 +1,10 @@
 {
   "projects": {
     "default": "naijasingles-staging",
+    "dev": "naijasingles-dev",
     "staging": "naijasingles-staging",
     "production": "naijasingles-74a75",
+    "prod2": "naijasingles-prod2",
     "next-production": "afropeep-prod-74a75"
   }
 }

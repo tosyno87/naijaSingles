@@ -129,6 +129,11 @@ class PaginatedUserService {
   Query _buildUserQuery(UserModel currentUser) {
     Query query = _usersCollection;
 
+    // Firestore rules require this equality on every `users` list query so
+    // discovery cannot scrape non-discoverable / private / paused profiles.
+    query = query.where('isDiscoverable', isEqualTo: true);
+    debugPrint('🔍 isDiscoverable == true (required by security rules)');
+
     debugPrint('🔍 Building query for user: ${currentUser.name}');
     debugPrint('   - showGender: ${currentUser.showGender}');
     debugPrint('   - ageRangeMin: ${currentUser.ageRangeMin}');

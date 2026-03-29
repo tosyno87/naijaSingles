@@ -10,6 +10,7 @@ import '../../common/bloc/user/user_bloc.dart';
 import '../../common/constants/app_colors.dart';
 import '../../common/constants/app_spacing.dart';
 import '../../common/routes/route_name.dart';
+import '../../common/widgets/delete_account_themed_dialog.dart';
 import '../account_status/presentation/bloc/account_status_bloc.dart';
 import '../account_status/presentation/screens/account_status_screen.dart';
 import '../settings/account_deletion_screen.dart';
@@ -558,10 +559,11 @@ class _SettingsScreenState extends State<SettingsScreen> {
 
   void _showDeleteAccountDialog() {
     unawaited(
-      showDialog(
-        context: context,
-        builder: (context) => AlertDialog(
-          backgroundColor: Colors.white,
+      showAccountDeletionThemedDialog<void>(
+        context,
+        (dialogContext) => AlertDialog(
+          backgroundColor: deleteAccountDialogBackgroundColor,
+          surfaceTintColor: Colors.transparent,
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(AppSpacing.cardRadius),
           ),
@@ -579,7 +581,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
             children: [
               // Warning text with high contrast against cardColor
               Text(
-                'This action cannot be undone. Deleting your account will:',
+                'This cannot be undone. Deleting your account will:',
                 style: GoogleFonts.montserrat(
                   fontSize: 16,
                   fontWeight: FontWeight.w500,
@@ -596,10 +598,9 @@ class _SettingsScreenState extends State<SettingsScreen> {
                   border: Border.all(color: Colors.red.shade200),
                 ),
                 child: Text(
-                  '• Remove all your photos and profile information\n'
-                  '• Delete all your matches and conversations\n'
-                  '• Cancel any active subscriptions\n'
-                  '• Make your profile invisible to other users',
+                  '• Remove your profile and photos\n'
+                  '• Delete your matches and messages\n'
+                  '• End active subscription access',
                   style: GoogleFonts.montserrat(
                     fontSize: 14,
                     fontWeight: FontWeight.w400,
@@ -615,7 +616,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
             Padding(
               padding: const EdgeInsets.only(right: AppSpacing.sm),
               child: TextButton(
-                onPressed: () => Navigator.pop(context),
+                onPressed: () => Navigator.pop(dialogContext),
                 style: TextButton.styleFrom(
                   foregroundColor: textSecondary,
                   shape: RoundedRectangleBorder(
@@ -674,9 +675,11 @@ class _SettingsScreenState extends State<SettingsScreen> {
     Navigator.pop(context);
 
     unawaited(
-      showDialog(
-        context: context,
-        builder: (dialogContext) => AlertDialog(
+      showAccountDeletionThemedDialog<void>(
+        context,
+        (dialogContext) => AlertDialog(
+          backgroundColor: deleteAccountDialogBackgroundColor,
+          surfaceTintColor: Colors.transparent,
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(AppSpacing.cardRadius),
           ),

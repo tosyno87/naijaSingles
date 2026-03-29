@@ -758,21 +758,22 @@ service cloud.firestore {
                    request.auth.uid == resource.data.reporterId;
     }
 
-    // Account Deletions collection - for audit logging
-    // Create: client may write pending/aborted with full audit fields once. Update: client may only set status to 'aborted' (no other field changes). completed/deletedAt are server-only.
+    // Server-only OTP challenges for account deletion (Admin SDK / Cloud Functions).
+    match /accountDeletionVerifications/{verificationId} {
+      allow read, write: if false;
+    }
+
+    // Account deletions audit — Admin SDK / Cloud Functions only (callable delete + trigger).
     match /accountDeletions/{deletionId} {
-      allow create: if request.auth != null &&
-                      request.auth.uid == deletionId &&
-                      request.resource.data.userId == request.auth.uid &&
-                      request.resource.data.status in ['pending', 'aborted'] &&
-                      !request.resource.data.keys().hasAny(['deletedAt']);
-      allow update: if request.auth != null &&
-                      request.auth.uid == deletionId &&
-                      request.resource.data.diff(resource.data).affectedKeys().hasOnly(['status']) &&
-                      request.resource.data.status == 'aborted' &&
-                      !request.resource.data.keys().hasAny(['deletedAt']);
+      allow create, update, delete: if false;
       allow read: if request.auth != null &&
+                   request.auth.uid == deletionId &&
                    request.auth.uid == resource.data.userId;
+    }
+
+    // Rate-limit / abuse counters for account deletion callables (Admin SDK only).
+    match /accountDeletionAbuse/{docId} {
+      allow read, write: if false;
     }
 
     // Match Quality Analytics — append-only from authenticated clients.

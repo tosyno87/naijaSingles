@@ -36,6 +36,9 @@ import 'services/secure_storage_service.dart';
 Future<void> main() async {
   const bool preserveDebugSessionForE2E =
       bool.fromEnvironment('PRESERVE_DEBUG_SESSION_FOR_E2E');
+  const bool useAppCheckDebugProvider = bool.fromEnvironment(
+    'USE_APPCHECK_DEBUG_PROVIDER',
+  );
   const bool strictReleaseFirebaseGuard = bool.fromEnvironment(
     'STRICT_RELEASE_FIREBASE_GUARD',
     defaultValue: true,
@@ -119,13 +122,43 @@ Future<void> main() async {
   }
 
   // App Check (non-blocking — failures must not poison Storage)
+  //
+  // Callable `enforceAppCheck: true` rejects requests without a valid token as
+  // `unauthenticated` before handler code runs. Debug/profile builds must use
+  // debug providers + registered tokens in Console, or relax enforcement server-side.
   try {
-    await FirebaseAppCheck.instance.activate(
-      // ignore: deprecated_member_use
-      appleProvider:
-          kDebugMode ? AppleProvider.debug : AppleProvider.deviceCheck,
+    const bool nonRelease = !kReleaseMode;
+    final bool useDebugAppCheck =
+        nonRelease && (useAppCheckDebugProvider || !isProduction);
+
+    if (useDebugAppCheck) {
+      await FirebaseAppCheck.instance.activate(
+        providerAndroid: const AndroidDebugProvider(),
+        providerApple: const AppleDebugProvider(),
+      );
+      final String pid = Firebase.app().options.projectId;
+      log(
+        '🛡️ App Check: debug providers (Android + Apple). '
+        'Register this device’s debug token in Firebase Console → App Check → '
+        'your app → Manage debug tokens (project=$pid).',
+      );
+    } else {
+      await FirebaseAppCheck.instance.activate();
+      if (nonRelease && isProduction) {
+        log(
+          '⚠️ ENV=production in debug/profile without USE_APPCHECK_DEBUG_PROVIDER: '
+          'App Check uses production attestation; simulators often fail. '
+          'Use --dart-define=USE_APPCHECK_DEBUG_PROVIDER=true and register the '
+          'debug token, test on a physical device, or set '
+          'ACCOUNT_DELETION_ENFORCE_APPCHECK=false on Functions and redeploy.',
+        );
+      }
+    }
+    log(
+      '🛡️ Firebase App Check ready '
+      '(debugAppCheck=$useDebugAppCheck, dartDefineDebug=$useAppCheckDebugProvider, '
+      'ENV=$currentEnvironment)',
     );
-    log('🛡️ Firebase App Check activated');
   } on Object catch (e) {
     log('⚠️ App Check activation failed (continuing without it): $e');
   }

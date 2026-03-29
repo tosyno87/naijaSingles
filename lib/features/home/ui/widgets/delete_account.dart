@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 
 import '../../../../common/constants/app_colors.dart';
 import '../../../../common/routes/route_name.dart';
+import '../../../../common/widgets/delete_account_themed_dialog.dart';
 import '../../../../common/widgets/text_button.dart';
 
 /// Delete-account entry from settings. Does not perform deletion here:
@@ -22,56 +23,44 @@ class _DeleteAccountWidgetState extends State<DeleteAccountWidget> {
   Widget build(BuildContext context) => TextButtonWidget(
         text: 'Delete Account',
         onTap: () async {
-          await showDialog<void>(
-            context: context,
-            builder: (BuildContext context) => Theme(
-              data: Theme.of(context).copyWith(
-                colorScheme: Theme.of(context).colorScheme.copyWith(
-                      surface: Colors.white,
-                    ),
-                dialogTheme:
-                    const DialogThemeData(backgroundColor: Colors.white),
-              ),
-              child: AlertDialog(
-                backgroundColor: Colors.white,
-                title: Text('Delete Account'.tr().toString()),
-                content: Column(
-                  mainAxisSize: MainAxisSize.min,
-                  crossAxisAlignment: CrossAxisAlignment.stretch,
-                  children: [
-                    Text('Do you want to delete your account?'.tr().toString()),
-                    const SizedBox(
-                      height: 8,
-                    ),
-                    Text(
-                      "We're sorry to see you go, but we understand your decision. Deleting your account will permanently remove all your personal information and data associated with it."
-                          .tr()
-                          .toString(),
-                    ),
-                  ],
-                ),
-                actions: <Widget>[
-                  TextButton(
-                    onPressed: () {
-                      Navigator.of(context).pop();
-                    },
-                    child: Text(
-                      'No'.tr().toString(),
-                      style: const TextStyle(color: AppColors.primaryGreen),
-                    ),
-                  ),
-                  TextButton(
-                    onPressed: () async {
-                      Navigator.of(context).pop();
-                      _showFinalConfirmationDialog();
-                    },
-                    child: Text(
-                      'Yes'.tr().toString(),
-                      style: const TextStyle(color: AppColors.primaryGreen),
-                    ),
+          await showAccountDeletionThemedDialog<void>(
+            context,
+            (dialogCtx) => AlertDialog(
+              backgroundColor: deleteAccountDialogBackgroundColor,
+              surfaceTintColor: Colors.transparent,
+              title: Text('Delete Account'.tr().toString()),
+              content: Column(
+                mainAxisSize: MainAxisSize.min,
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                children: [
+                  Text('Delete your account permanently?'.tr().toString()),
+                  const SizedBox(height: 8),
+                  Text(
+                    'This removes your profile, matches, and messages. This cannot be undone.'
+                        .tr()
+                        .toString(),
                   ),
                 ],
               ),
+              actions: <Widget>[
+                TextButton(
+                  onPressed: () => Navigator.of(dialogCtx).pop(),
+                  child: Text(
+                    'No'.tr().toString(),
+                    style: const TextStyle(color: AppColors.primaryGreen),
+                  ),
+                ),
+                TextButton(
+                  onPressed: () {
+                    Navigator.of(dialogCtx).pop();
+                    _showFinalConfirmationDialog();
+                  },
+                  child: Text(
+                    'Yes'.tr().toString(),
+                    style: const TextStyle(color: AppColors.primaryGreen),
+                  ),
+                ),
+              ],
             ),
           );
         },
@@ -80,58 +69,51 @@ class _DeleteAccountWidgetState extends State<DeleteAccountWidget> {
 
   void _showFinalConfirmationDialog() {
     unawaited(
-      showDialog<void>(
-        context: context,
-        builder: (BuildContext context) => Theme(
-          data: Theme.of(context).copyWith(
-            colorScheme: Theme.of(context).colorScheme.copyWith(
-                  surface: Colors.white,
-                ),
-            dialogTheme: const DialogThemeData(backgroundColor: Colors.white),
+      showAccountDeletionThemedDialog<void>(
+        context,
+        (dialogCtx) => AlertDialog(
+          backgroundColor: deleteAccountDialogBackgroundColor,
+          surfaceTintColor: Colors.transparent,
+          title: const Text(
+            'Final Confirmation',
+            style: TextStyle(
+              fontSize: 18,
+              fontWeight: FontWeight.bold,
+              color: Colors.red,
+            ),
           ),
-          child: AlertDialog(
-            backgroundColor: Colors.white,
-            title: const Text(
-              'Final Confirmation',
-              style: TextStyle(
-                fontSize: 18,
-                fontWeight: FontWeight.bold,
-                color: Colors.red,
+          content: const Text(
+            'Final check: this permanently deletes your account and data.',
+            style: TextStyle(
+              fontSize: 16,
+              color: Colors.black87,
+            ),
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.of(dialogCtx).pop(),
+              child: const Text(
+                'Cancel',
+                style: TextStyle(color: Colors.grey),
               ),
             ),
-            content: const Text(
-              'Are you sure? This cannot be undone. All your data will be permanently deleted.',
-              style: TextStyle(
-                fontSize: 16,
-                color: Colors.black87,
+            TextButton(
+              onPressed: () {
+                Navigator.of(dialogCtx).pop();
+                if (!mounted) return;
+                unawaited(
+                  Navigator.pushNamed(context, RouteName.accountDeletion),
+                );
+              },
+              child: const Text(
+                'Delete my account',
+                style: TextStyle(
+                  color: Colors.red,
+                  fontWeight: FontWeight.bold,
+                ),
               ),
             ),
-            actions: [
-              TextButton(
-                onPressed: () => Navigator.of(context).pop(),
-                child: const Text(
-                  'Cancel',
-                  style: TextStyle(color: Colors.grey),
-                ),
-              ),
-              TextButton(
-                onPressed: () {
-                  Navigator.of(context).pop();
-                  if (!context.mounted) return;
-                  unawaited(
-                    Navigator.pushNamed(context, RouteName.accountDeletion),
-                  );
-                },
-                child: const Text(
-                  'Delete my account',
-                  style: TextStyle(
-                    color: Colors.red,
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
-              ),
-            ],
-          ),
+          ],
         ),
       ),
     );

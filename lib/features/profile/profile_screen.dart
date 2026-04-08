@@ -9,6 +9,7 @@ import 'package:google_fonts/google_fonts.dart';
 
 import '../../common/constants/app_colors.dart';
 import '../../common/routes/route_name.dart';
+import '../../common/utils/country_flag.dart';
 import '../../common/widgets/state_views/state_views.dart';
 
 import 'edit_profile_screen.dart';
@@ -442,20 +443,13 @@ class _ProfileScreenState extends State<ProfileScreen> {
                         color: primaryColor.withValues(alpha: 0.3),
                       ),
                     ),
-                    child: Row(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        const Icon(Icons.flag, size: 16, color: primaryColor),
-                        const SizedBox(width: 6),
-                        Text(
-                          nationality,
-                          style: GoogleFonts.montserrat(
-                            fontSize: 14,
-                            fontWeight: FontWeight.w600,
-                            color: primaryColor,
-                          ),
-                        ),
-                      ],
+                    child: Text(
+                      '${CountryFlag.flagOrFallback(nationality)} $nationality',
+                      style: GoogleFonts.montserrat(
+                        fontSize: 14,
+                        fontWeight: FontWeight.w600,
+                        color: primaryColor,
+                      ),
                     ),
                   ),
                 if (location.isNotEmpty)

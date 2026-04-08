@@ -76,7 +76,7 @@ void main() {
       await pumpUntilFound(tester, find.text('Ada Obi, 28'));
 
       expect(find.text('Ada Obi, 28'), findsOneWidget);
-      expect(find.text('Nigerian'), findsOneWidget);
+      expect(find.textContaining('Nigerian'), findsOneWidget);
       expect(find.text('London'), findsOneWidget);
       expect(find.text('Hello world'), findsOneWidget);
       expect(find.text('Music'), findsOneWidget);
@@ -99,9 +99,9 @@ void main() {
           ),
         ),
       );
-      await pumpUntilFound(tester, find.text('Ghanaian'));
+      await pumpUntilFound(tester, find.textContaining('Ghanaian'));
 
-      expect(find.text('Ghanaian'), findsOneWidget);
+      expect(find.textContaining('Ghanaian'), findsOneWidget);
       expect(find.textContaining('{'), findsNothing);
     });
 

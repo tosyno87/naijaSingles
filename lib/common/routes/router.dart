@@ -40,7 +40,6 @@ import '../../features/settings/blocked_users_screen.dart';
 import '../../features/settings/feedback_screen.dart';
 import '../../features/settings/help_center_screen.dart';
 import '../../features/settings/language_settings_screen.dart';
-import '../../features/settings/location_settings_screen.dart';
 import '../../features/settings/notification_settings_screen.dart';
 import '../../features/settings/safety_center_screen.dart';
 import '../../features/user/ui/screens/show_gender.dart';
@@ -53,7 +52,6 @@ import '../../features/user/ui/screens/user_nationality.dart';
 import '../../features/user/ui/screens/user_profile.dart';
 import '../../features/user/ui/screens/user_profile_pic_set.dart';
 import '../../features/user/ui/screens/user_search_location.dart';
-import '../../features/user/ui/screens/user_sexual_details.dart';
 import '../../features/user/ui/screens/user_university.dart';
 import '../../models/user_model.dart';
 import '../utils/large_image.dart';
@@ -187,7 +185,6 @@ abstract class AppRouter {
     },
     RouteName.showGenderScreen: (context) => const ShowGender(),
     RouteName.matchPage: (context) => const MatchScreen(),
-    RouteName.sexualorientationScreen: (context) => const SexualOrientation(),
     RouteName.universityScreen: (context) => const UniversityPage(),
     // Redirect Dating to Explore since we're removing the Dating tab
     RouteName.datingHomePage: (context) => const ExploreScreen(),
@@ -310,7 +307,6 @@ abstract class AppRouter {
     RouteName.helpCenter: (context) => const HelpCenterScreen(),
     RouteName.feedbackScreen: (context) => const FeedbackScreen(),
     RouteName.languageSettings: (context) => const LanguageSettingsScreen(),
-    RouteName.locationSettings: (context) => const LocationSettingsScreen(),
     RouteName.accountDeletion: (context) => const AccountDeletionScreen(),
 
     // Events routes

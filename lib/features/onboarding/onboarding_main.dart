@@ -36,9 +36,9 @@ class _OnboardingMainState extends State<OnboardingMain> {
     'Profile Photo',
     'Your Location',
     'Country & Identity',
-    'Tell Your Story',
+    'About You',
     'Your Interests',
-    'Dating Preferences',
+    'Who You See',
     'Additional Info',
   ];
 

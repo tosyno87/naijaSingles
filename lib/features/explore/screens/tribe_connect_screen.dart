@@ -7,6 +7,7 @@ import 'package:google_fonts/google_fonts.dart';
 
 import '../../../common/constants/app_colors.dart';
 import '../../../common/data/repo/user_search_repo.dart';
+import '../../../common/widgets/dating_feedback_snackbar.dart';
 import '../../../common/widgets/state_views/state_views.dart';
 import '../../../models/user_model.dart';
 import '../../../services/super_like_service.dart';
@@ -59,7 +60,7 @@ class _TribeConnectScreenState extends State<TribeConnectScreen> {
           'Connect',
           style: GoogleFonts.montserrat(
             fontSize: 24,
-            fontWeight: FontWeight.w600,
+            fontWeight: FontWeight.bold,
             color: AppColors.textPrimary,
           ),
         ),
@@ -273,58 +274,35 @@ class _TribeConnectScreenState extends State<TribeConnectScreen> {
   }
 
   void _showConnectConfirmation(UserModel user) {
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Text('Liked ${user.name}! 💕'),
-        backgroundColor: AppColors.primaryGreen,
-        duration: const Duration(seconds: 3),
-        behavior: SnackBarBehavior.floating,
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(12),
-        ),
-      ),
+    DatingFeedbackSnackBar.show(
+      context,
+      message: 'Liked ${user.name}! 💕',
+      backgroundColor: AppColors.primaryGreen,
     );
   }
 
   void _showPassConfirmation(UserModel user) {
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Text('Passed on ${user.name}'),
-        backgroundColor: Colors.grey[600],
-        duration: const Duration(seconds: 2),
-        behavior: SnackBarBehavior.floating,
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(12),
-        ),
-      ),
+    DatingFeedbackSnackBar.show(
+      context,
+      message: 'Passed on ${user.name}',
+      backgroundColor: Colors.grey.shade600,
+      duration: const Duration(seconds: 2),
     );
   }
 
   void _showSuperLikeConfirmation(UserModel user) {
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Text('Super Liked ${user.name}! ⭐'),
-        backgroundColor: const Color(0xFF2196F3),
-        duration: const Duration(seconds: 3),
-        behavior: SnackBarBehavior.floating,
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(12),
-        ),
-      ),
+    DatingFeedbackSnackBar.show(
+      context,
+      message: 'Super Liked ${user.name}! ⭐',
+      backgroundColor: const Color(0xFF2196F3),
     );
   }
 
   void _showError(String message) {
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Text(message),
-        backgroundColor: AppColors.error,
-        duration: const Duration(seconds: 3),
-        behavior: SnackBarBehavior.floating,
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(12),
-        ),
-      ),
+    DatingFeedbackSnackBar.show(
+      context,
+      message: message,
+      backgroundColor: AppColors.error,
     );
   }
 }

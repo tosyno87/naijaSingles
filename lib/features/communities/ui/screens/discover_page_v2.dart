@@ -550,7 +550,7 @@ class _DiscoverPageV2State extends State<DiscoverPageV2> {
           message: 'No people found nearby',
           actionLabel: 'Refresh',
           onAction: _loadPeople,
-          height: 220,
+          minHeight: 220,
         ),
       );
     }
@@ -755,7 +755,7 @@ class _DiscoverPageV2State extends State<DiscoverPageV2> {
         message: 'No communities yet',
         actionLabel: 'Browse all communities',
         onAction: _onBrowseCommunities,
-        height: 200,
+        minHeight: 200,
       );
     }
 
@@ -924,13 +924,13 @@ class _DiscoverPageV2State extends State<DiscoverPageV2> {
     required String message,
     required String actionLabel,
     required VoidCallback onAction,
-    double height = 260,
+    double minHeight = 240,
   }) =>
       Semantics(
         button: true,
         label: '$message — $actionLabel',
-        child: SizedBox(
-          height: height,
+        child: ConstrainedBox(
+          constraints: BoxConstraints(minHeight: minHeight),
           child: AppEmptyView(
             title: message,
             actionLabel: actionLabel,

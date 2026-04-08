@@ -19,7 +19,6 @@ import '../../../match/ui/widget/matches_card.dart';
 import '../../../report/report_user.dart';
 import 'gender_sign.dart';
 import 'profile_action_widget.dart';
-import 'sexual_orientation_widget.dart';
 // Removed street view icon import - feature deleted
 import 'unmatch_widget.dart';
 // Removed street view bloc import - feature deleted
@@ -153,21 +152,6 @@ class _InfoState extends State<Info> {
                               ),
                             ),
                           ),
-                          if (widget.user.sexualOrientation!['showOnProfile'])
-                            ListTile(
-                              dense: true,
-                              leading: Image.asset(
-                                'asset/gender.png',
-                                color: AppColors.primaryGreen,
-                                height: 24,
-                              ),
-                              title: FirebasesexualDataWidget(
-                                data: widget
-                                    .user.sexualOrientation!['orientation'],
-                              ),
-                            )
-                          else
-                            Container(),
                           if (widget.user.editInfo!['job_title'] != null)
                             ListTile(
                               dense: true,

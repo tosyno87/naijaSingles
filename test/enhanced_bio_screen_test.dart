@@ -42,7 +42,7 @@ void main() {
       await tester.pumpAndSettle();
 
       // Verify key elements are present (simplified bio screen)
-      expect(find.text('Tell your story'), findsOneWidget);
+      expect(find.text('About you'), findsOneWidget);
       expect(find.byType(TextField), findsOneWidget);
     });
 
@@ -53,7 +53,7 @@ void main() {
       );
       await tester.pumpAndSettle();
 
-      expect(find.text('Tell your story'), findsOneWidget);
+      expect(find.text('About you'), findsOneWidget);
       expect(find.byType(TextField), findsOneWidget);
     });
 
@@ -94,7 +94,7 @@ void main() {
       await tester.pumpAndSettle();
 
       expect(find.byType(SingleChildScrollView), findsOneWidget);
-      expect(find.text('Tell your story'), findsOneWidget);
+      expect(find.text('About you'), findsOneWidget);
     });
   });
 }

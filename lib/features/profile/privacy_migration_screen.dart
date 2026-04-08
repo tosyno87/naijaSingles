@@ -222,7 +222,7 @@ class _PrivacyMigrationScreenState extends State<PrivacyMigrationScreen> {
             _buildFeatureCard(
               Icons.visibility_outlined,
               'Profile Visibility Controls',
-              'Choose what information others can see about you - age, tribe, orientation, and more.',
+              'Choose what information others can see about you — age, tribe, and more.',
             ),
             const SizedBox(height: AppSpacing.sm + AppSpacing.xs),
             _buildFeatureCard(

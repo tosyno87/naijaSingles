@@ -2,6 +2,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 
 import '../../../../common/utils/app_logger.dart';
+import '../../models/like_handle_outcome.dart';
 import '../../models/match_model.dart';
 
 /// Optimized likes service that handles like actions and match creation
@@ -30,14 +31,15 @@ class LikesService {
   static final Map<String, DateTime> _likeCheckTimestamps = {};
   static const Duration _likeCheckCacheDuration = Duration(minutes: 5);
 
-  /// Handle like action with mutual like detection (optimized)
-  /// Returns the match ID if a mutual match is created, null otherwise
-  /// Optimized to use 2-3 Firestore reads maximum
-  Future<String?> handleLike(String fromUserId, String toUserId) async {
+  /// Full outcome of a like attempt (for UI that must not treat `null` matchId as success).
+  Future<LikeHandleOutcome> handleLikeOutcome(
+    String fromUserId,
+    String toUserId,
+  ) async {
     try {
       if (fromUserId.isEmpty || toUserId.isEmpty) {
         AppLogger.debug('Invalid user IDs provided');
-        return null;
+        return const LikeHandleOutcome(status: LikeHandleStatus.invalidInput);
       }
 
       AppLogger.debug('Processing like: $fromUserId → $toUserId');
@@ -50,7 +52,46 @@ class LikesService {
 
       if (mutualLikeResult.isExistingMatch) {
         AppLogger.debug('Match already exists: ${mutualLikeResult.matchId}');
-        return mutualLikeResult.matchId;
+        return LikeHandleOutcome(
+          status: LikeHandleStatus.existingMatch,
+          matchId: mutualLikeResult.matchId,
+        );
+      }
+
+      final forwardLikeId = '${fromUserId}_likes_$toUserId';
+      DocumentSnapshot<Object?>? forwardSnap;
+      try {
+        forwardSnap = await _likesCollection.doc(forwardLikeId).get();
+      } on FirebaseException catch (e) {
+        if (e.code == 'permission-denied') {
+          AppLogger.warning(
+            'Could not read forward like doc; proceeding with like write',
+            error: e,
+          );
+          forwardSnap = null;
+        } else {
+          rethrow;
+        }
+      }
+
+      if (forwardSnap != null && forwardSnap.exists) {
+        if (mutualLikeResult.isMutualLike) {
+          AppLogger.debug(
+            'Forward like exists with mutual; ensuring match exists',
+          );
+          final matchId = await _createMatchOptimized(fromUserId, toUserId);
+          if (matchId != null) {
+            await _triggerMatchNotification(fromUserId, toUserId);
+            return LikeHandleOutcome(
+              status: LikeHandleStatus.matchCreated,
+              matchId: matchId,
+            );
+          }
+          AppLogger.debug('Match ensure failed after existing forward like');
+          return const LikeHandleOutcome(status: LikeHandleStatus.likeRecorded);
+        }
+        AppLogger.debug('Like already sent: $forwardLikeId');
+        return const LikeHandleOutcome(status: LikeHandleStatus.alreadyLiked);
       }
 
       // Step 2: Save the current like (1 write)
@@ -59,25 +100,25 @@ class LikesService {
       if (mutualLikeResult.isMutualLike) {
         AppLogger.debug('Mutual like detected! Creating match...');
 
-        // Step 3: Create match with batch operation (1 write batch)
         final matchId = await _createMatchOptimized(fromUserId, toUserId);
 
         if (matchId != null) {
           AppLogger.debug('Match created successfully: $matchId');
           await _triggerMatchNotification(fromUserId, toUserId);
-          return matchId;
-        } else {
-          AppLogger.debug('Failed to create match');
-          return null;
+          return LikeHandleOutcome(
+            status: LikeHandleStatus.matchCreated,
+            matchId: matchId,
+          );
         }
-      } else {
-        AppLogger.debug('Like saved, waiting for mutual like');
-        return null;
+        AppLogger.debug('Failed to create match');
+        return const LikeHandleOutcome(status: LikeHandleStatus.likeRecorded);
       }
+
+      AppLogger.debug('Like saved, waiting for mutual like');
+      return const LikeHandleOutcome(status: LikeHandleStatus.likeRecorded);
     } on Object catch (e) {
       AppLogger.error('Error handling like', error: e);
 
-      // Provide more specific error messages for logging
       if (e.toString().contains('permission-denied')) {
         AppLogger.debug('Permission denied - check Firestore rules');
       } else if (e.toString().contains('not-found')) {
@@ -87,6 +128,23 @@ class LikesService {
       }
 
       rethrow;
+    }
+  }
+
+  /// Handle like action with mutual like detection (optimized).
+  /// Returns match id when a match exists or was created; otherwise null.
+  /// Prefer [handleLikeOutcome] when the UI must distinguish outcomes.
+  Future<String?> handleLike(String fromUserId, String toUserId) async {
+    final outcome = await handleLikeOutcome(fromUserId, toUserId);
+    switch (outcome.status) {
+      case LikeHandleStatus.existingMatch:
+      case LikeHandleStatus.matchCreated:
+        return outcome.matchId;
+      case LikeHandleStatus.notAuthenticated:
+      case LikeHandleStatus.invalidInput:
+      case LikeHandleStatus.likeRecorded:
+      case LikeHandleStatus.alreadyLiked:
+        return null;
     }
   }
 

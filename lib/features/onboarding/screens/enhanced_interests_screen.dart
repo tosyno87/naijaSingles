@@ -15,7 +15,7 @@ class EnhancedInterestsScreen extends StatefulWidget {
 
 class _EnhancedInterestsScreenState extends State<EnhancedInterestsScreen> {
   List<String> _selectedInterests = [];
-  static const int _maxSelections = 10;
+  static const int _maxSelections = 5;
 
   final Map<String, bool> _categoryExpanded = {
     'creativity': false,
@@ -204,18 +204,8 @@ class _EnhancedInterestsScreenState extends State<EnhancedInterestsScreen> {
               Text('What are you into?', style: OnboardingTheme.titleStyle),
               const SizedBox(height: OnboardingTheme.titleToSubtitle),
               Text(
-                'You like what you like. Now, let everyone know.',
+                'Pick up to $_maxSelections that represent you',
                 style: OnboardingTheme.subtitleStyle,
-              ),
-              const SizedBox(height: 8),
-              Text(
-                '${_selectedInterests.length} / $_maxSelections selected',
-                style: OnboardingTheme.helperStyle.copyWith(
-                  color: _selectedInterests.length >= _maxSelections
-                      ? Colors.orange
-                      : OnboardingTheme.primaryGreen,
-                  fontWeight: FontWeight.w600,
-                ),
               ),
               const SizedBox(height: OnboardingTheme.subtitleToField),
               ..._categories.entries.map((entry) {

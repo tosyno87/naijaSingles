@@ -164,7 +164,7 @@ void main() {
         }
 
         // Now on page 4 — Bio is required.
-        expect(find.text('Tell Your Story'), findsOneWidget);
+        expect(find.text('About You'), findsOneWidget);
         expect(find.text('Skip'), findsNothing);
 
         // Cannot proceed without minimum bio length.
@@ -230,8 +230,8 @@ void main() {
         await tester.tap(find.text('Next'));
         await tester.pumpAndSettle();
 
-        // Should land on page 6 — Dating Preferences (required).
-        expect(find.text('Dating Preferences'), findsWidgets);
+        // Should land on page 6 — Who You See (required).
+        expect(find.text('Who You See'), findsWidgets);
         expect(find.text('Skip'), findsNothing);
       },
     );
@@ -257,7 +257,7 @@ void main() {
         await tester.pumpAndSettle();
       }
 
-      expect(find.text('Dating Preferences'), findsWidgets);
+      expect(find.text('Who You See'), findsWidgets);
       expect(
           tester.widget<ElevatedButton>(find.byType(ElevatedButton)).onPressed,
           isNull);

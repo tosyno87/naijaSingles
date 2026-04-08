@@ -33,14 +33,16 @@ void main() {
   }
 
   group('Enhanced Photo Upload Screen Tests', () {
-    testWidgets('Enhanced photo upload screen renders correctly',
+    testWidgets('renders title, subtitle, and Add photos CTA',
         (WidgetTester tester) async {
       await tester.pumpWidget(
         buildTestWidget(const EnhancedPhotoUploadScreen()),
       );
       await tester.pumpAndSettle();
 
-      expect(find.text('Add your best photos'), findsOneWidget);
+      expect(find.text('Add your photos'), findsOneWidget);
+      expect(find.text('Add at least 3 to get started'), findsOneWidget);
+      expect(find.text('Add photos'), findsOneWidget);
       expect(find.byType(SingleChildScrollView), findsWidgets);
     });
 
@@ -50,17 +52,27 @@ void main() {
       );
       await tester.pumpAndSettle();
 
-      // Verify scrollable photo grid is present
       expect(find.byType(SingleChildScrollView), findsWidgets);
     });
 
-    testWidgets('Screen has app bar and content', (WidgetTester tester) async {
+    testWidgets('bottom sheet shows Camera and Photo Library only',
+        (WidgetTester tester) async {
       await tester.pumpWidget(
         buildTestWidget(const EnhancedPhotoUploadScreen()),
       );
       await tester.pumpAndSettle();
 
-      expect(find.text('Add your best photos'), findsOneWidget);
+      // Tap the first grid cell to open the sheet
+      final firstCell = find.byIcon(Icons.add).first;
+      await tester.tap(firstCell);
+      await tester.pumpAndSettle();
+
+      expect(find.text('Camera'), findsOneWidget);
+      expect(find.text('Photo Library'), findsOneWidget);
+
+      // Removed options should not appear
+      expect(find.text('Choose from Gallery'), findsNothing);
+      expect(find.text('Choose multiple from gallery'), findsNothing);
     });
   });
 

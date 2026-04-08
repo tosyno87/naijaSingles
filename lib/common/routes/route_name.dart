@@ -22,7 +22,6 @@ class RouteName {
 
   // ===== ONBOARDING ROUTES =====
   static const String genderScreen = '/gender';
-  static const String sexualorientationScreen = '/sexual_details';
   static const String showGenderScreen = '/showgender';
   static const String userNameScreen = '/user_name';
   static const String userDobScreen = '/user_dob';
@@ -48,7 +47,6 @@ class RouteName {
   static const String safetyCenter = '/safety_center';
   static const String helpCenter = '/help_center';
   static const String languageSettings = '/language_settings';
-  static const String locationSettings = '/location_settings';
   static const String accountDeletion = '/account_deletion';
   static const String feedbackScreen = '/feedback';
   static const String updatePhoneScreen = '/update_number';

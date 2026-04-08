@@ -495,7 +495,7 @@ class _UserNationalityState extends State<UserNationality> {
                         unawaited(
                           Navigator.pushNamed(
                             context,
-                            RouteName.sexualorientationScreen,
+                            RouteName.showGenderScreen,
                             arguments: widget.userData,
                           ),
                         );

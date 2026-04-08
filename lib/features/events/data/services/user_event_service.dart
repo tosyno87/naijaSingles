@@ -16,9 +16,6 @@ class UserEventService {
   CollectionReference get _eventsCollection => _firestore.collection('events');
   CollectionReference get _userEventsCollection =>
       _firestore.collection('userEvents');
-  CollectionReference get _eventModerationCollection =>
-      _firestore.collection('event_moderation');
-
   bool _isOwnedByCurrentUser(EnhancedEventModel event, String userId) =>
       event.isOwnedBy(userId);
 
@@ -52,9 +49,6 @@ class UserEventService {
 
       // Add to user's events collection
       await _addToUserEvents(currentUser.uid, eventRef.id, 'creator');
-
-      // No moderation needed - events are immediately published
-      // await _createModerationRecord(eventRef.id); // REMOVED
 
       log(
         'Created and published user event: ${eventRef.id}',
@@ -124,8 +118,8 @@ class UserEventService {
           .doc(eventId)
           .update(updatedEvent.toFirestoreJson());
 
-      // Update moderation record
-      await _updateModerationRecord(eventId, 'updated');
+      // event_moderation is server-only (firestore.rules: create/update denied for
+      // clients). Do not write here — a Cloud Function can react to events writes.
 
       log('Updated user event: $eventId', name: 'UserEventService');
     } on Object catch (e) {
@@ -352,8 +346,7 @@ class UserEventService {
         'updatedAt': Timestamp.fromDate(DateTime.now()),
       });
 
-      // Create moderation record
-      await _createModerationRecord(eventId);
+      // event_moderation is server-only (see firestore.rules). No client .set().
 
       log('Published draft event: $eventId', name: 'UserEventService');
     } on Object catch (e) {
@@ -600,25 +593,6 @@ class UserEventService {
     });
   }
 
-  /// Create moderation record for new event
-  Future<void> _createModerationRecord(String eventId) async {
-    await _eventModerationCollection.doc(eventId).set({
-      'status': 'pending',
-      'createdAt': Timestamp.fromDate(DateTime.now()),
-      'notes': '',
-      'reviewedBy': null,
-      'reviewedAt': null,
-    });
-  }
-
-  /// Update moderation record
-  Future<void> _updateModerationRecord(String eventId, String action) async {
-    await _eventModerationCollection.doc(eventId).update({
-      'status': 'pending',
-      'updatedAt': Timestamp.fromDate(DateTime.now()),
-      'notes': 'Event $action by user',
-    });
-  }
 }
 
 // Exception classes

@@ -2,6 +2,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/foundation.dart';
 
+import '../../models/like_handle_outcome.dart';
 import '../../models/match_model.dart';
 import 'likes_service.dart';
 
@@ -19,18 +20,32 @@ class MatchService {
   CollectionReference get _matchesCollection =>
       _firestore.collection('matches');
 
+  /// Distinct outcomes (e.g. unauthenticated vs like recorded vs already liked).
+  Future<LikeHandleOutcome> handleLikeWithOutcome(String toUserId) async {
+    if (currentUserId == null) {
+      debugPrint('No current user logged in');
+      return const LikeHandleOutcome(status: LikeHandleStatus.notAuthenticated);
+    }
+    return _likesService.handleLikeOutcome(currentUserId!, toUserId);
+  }
+
   /// Handle like action with mutual like detection
   /// This is the main method to call when a user likes another user
   /// Returns match ID if mutual match is created, null otherwise.
   /// Returns null when not authenticated (fail gracefully).
   Future<String?> handleLike(String toUserId) async {
     try {
-      if (currentUserId == null) {
-        debugPrint('No current user logged in');
-        return null;
+      final outcome = await handleLikeWithOutcome(toUserId);
+      switch (outcome.status) {
+        case LikeHandleStatus.existingMatch:
+        case LikeHandleStatus.matchCreated:
+          return outcome.matchId;
+        case LikeHandleStatus.notAuthenticated:
+        case LikeHandleStatus.invalidInput:
+        case LikeHandleStatus.likeRecorded:
+        case LikeHandleStatus.alreadyLiked:
+          return null;
       }
-
-      return await _likesService.handleLike(currentUserId!, toUserId);
     } on Object catch (e) {
       debugPrint('Error in handleLike: $e');
       rethrow;

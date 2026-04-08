@@ -2,81 +2,66 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/foundation.dart';
 
-/// Privacy settings for user profile visibility
+/// Privacy settings for user profile visibility.
+///
+/// Several fields are not user-configurable: matches can always message each
+/// other, activity/last-active sync is always on, and orientation is not
+/// exposed via this privacy layer. [fromMap] / [toMap] / [updatePrivacySettings]
+/// enforce that.
 class UserPrivacySettings {
   const UserPrivacySettings({
-    // Communication defaults
+    // Fixed policy (not loaded from Firestore)
     this.allowMessagesFromMatches = true,
-
-    // Activity defaults
     this.showOnlineStatus = true,
     this.showLastActive = true,
+    this.showOrientation = false,
 
     // Profile visibility defaults
     this.showTribe = true,
-    this.showOrientation = false, // More private by default
     this.showAge = true,
     this.hideFromDiscovery = false,
 
-    // Location defaults
+    // Location — always on (Hinge-style: neighborhood + distance for matching).
     this.showLocation = true,
     this.showDistance = true,
   });
 
+  /// Only [showTribe] and [hideFromDiscovery] are read from storage; other
+  /// flags use app policy defaults above.
   factory UserPrivacySettings.fromMap(Map<String, dynamic> map) =>
       UserPrivacySettings(
-        // Communication
-        allowMessagesFromMatches: map['allowMessagesFromMatches'] ?? true,
-
-        // Activity Status
-        showOnlineStatus: map['showOnlineStatus'] ?? true,
-        showLastActive: map['showLastActive'] ?? true,
-
-        // Profile Visibility
         showTribe: map['showTribe'] ?? true,
-        showOrientation: map['showOrientation'] ?? false,
-        showAge: map['showAge'] ?? true,
         hideFromDiscovery: map['hideFromDiscovery'] ?? false,
-
-        // Location Privacy
-        showLocation: map['showLocation'] ?? true,
-        showDistance: map['showDistance'] ?? true,
       );
-  // Communication Settings
+
+  /// Matches can always message (and community chat is separate).
   final bool allowMessagesFromMatches;
 
-  // Activity Status
+  /// Retained for backwards-compatible [toMap]; always true in practice.
   final bool showOnlineStatus;
   final bool showLastActive;
 
-  // Profile Visibility
   final bool showTribe;
+
+  /// Sexual orientation is not published via the public profile from privacy.
   final bool showOrientation;
   final bool showAge;
   final bool hideFromDiscovery;
 
-  // Location Privacy
+  /// Always true — kept for backwards-compatible [toMap] / internal calls.
   final bool showLocation;
   final bool showDistance;
 
   Map<String, dynamic> toMap() => {
-        // Communication
-        'allowMessagesFromMatches': allowMessagesFromMatches,
-
-        // Activity Status
-        'showOnlineStatus': showOnlineStatus,
-        'showLastActive': showLastActive,
-
-        // Profile Visibility
+        'allowMessagesFromMatches': true,
+        'showOnlineStatus': true,
+        'showLastActive': true,
         'showTribe': showTribe,
-        'showOrientation': showOrientation,
-        'showAge': showAge,
+        'showOrientation': false,
+        'showAge': true,
         'hideFromDiscovery': hideFromDiscovery,
-
-        // Location Privacy
-        'showLocation': showLocation,
-        'showDistance': showDistance,
-
+        'showLocation': true,
+        'showDistance': true,
         'updatedAt': FieldValue.serverTimestamp(),
       };
 
@@ -161,21 +146,31 @@ class UserPrivacyService {
         return false;
       }
 
+      final effective = settings.copyWith(
+        showAge: true,
+        showLocation: true,
+        showDistance: true,
+        allowMessagesFromMatches: true,
+        showOnlineStatus: true,
+        showLastActive: true,
+        showOrientation: false,
+      );
+
       final userRef = _firestore.collection('users').doc(currentUserId);
 
       await userRef
           .collection('private')
           .doc('privacy')
-          .set(settings.toMap(), SetOptions(merge: true));
+          .set(effective.toMap(), SetOptions(merge: true));
 
       // Keep the root-level discovery flag in sync so that the Firestore
       // query `where('isDiscoverable', isEqualTo: true)` in
       // DiscoveryService honours the privacy toggle.
       await userRef.update({
-        'isDiscoverable': !settings.hideFromDiscovery,
+        'isDiscoverable': !effective.hideFromDiscovery,
       });
 
-      await _updatePublicProfile(settings);
+      await _updatePublicProfile(effective);
 
       return true;
     } on Object catch (e) {
@@ -220,10 +215,6 @@ class UserPrivacyService {
         publicData['tribe'] = userData['tribe'];
       }
 
-      if (settings.showOrientation) {
-        publicData['sexualOrientation'] = userData['sexualOrientation'];
-      }
-
       if (settings.showLocation) {
         publicData['living_in'] = userData['living_in'];
         publicData['city'] = userData['city'];
@@ -236,9 +227,11 @@ class UserPrivacyService {
         }
       }
 
-      if (settings.showLastActive) {
-        publicData['lastActive'] = userData['lastActive'];
-      }
+      publicData['lastActive'] = userData['lastActive'];
+
+      // Merge does not remove absent keys — scrub legacy orientation from
+      // `users/{id}/public/profile` if it was written by older app versions.
+      publicData['sexualOrientation'] = FieldValue.delete();
 
       // Update the public profile
       await _firestore
@@ -295,11 +288,21 @@ class UserPrivacyService {
         return null;
       }
 
-      return publicDoc.data();
+      return stripLegacySexualOrientation(publicDoc.data()!);
     } on Object catch (e) {
       debugPrint('Error getting filtered user data: $e');
       return null;
     }
+  }
+
+  /// Stale `users/{id}/public/profile` documents may still contain
+  /// [sexualOrientation] from older app versions; never expose it to callers.
+  static Map<String, dynamic> stripLegacySexualOrientation(
+    Map<String, dynamic> data,
+  ) {
+    final out = Map<String, dynamic>.from(data);
+    out.remove('sexualOrientation');
+    return out;
   }
 
   /// Apply default privacy filtering to already-fetched user data.
@@ -313,25 +316,11 @@ class UserPrivacyService {
     final data = Map<String, dynamic>.from(rawData);
     const privacy = UserPrivacySettings();
 
-    if (!privacy.showAge) {
-      data.remove('age');
-      data.remove('dateOfBirth');
-    }
+    // Age and location are always visible for discovery (app policy).
     if (!privacy.showTribe) {
       data.remove('tribe');
     }
-    if (!privacy.showOrientation) {
-      data.remove('sexualOrientation');
-    }
-    if (!privacy.showLocation) {
-      data.remove('living_in');
-      data.remove('city');
-      data.remove('state');
-      data.remove('locationName');
-    }
-    if (!privacy.showLastActive) {
-      data.remove('lastActive');
-    }
+    data.remove('sexualOrientation');
 
     return data;
   }
@@ -358,57 +347,24 @@ class UserPrivacyService {
       filteredData['tribe'] = userData['tribe'];
     }
 
-    if (privacy.showOrientation) {
-      filteredData['sexualOrientation'] = userData['sexualOrientation'];
-    }
-
     if (privacy.showLocation) {
       filteredData['living_in'] = userData['living_in'];
       filteredData['city'] = userData['city'];
       filteredData['state'] = userData['state'];
     }
 
-    if (privacy.showLastActive) {
-      filteredData['lastActive'] = userData['lastActive'];
-    }
+    filteredData['lastActive'] = userData['lastActive'];
 
     return filteredData;
   }
 
-  /// Check if user allows messages from current user
+  /// Whether the current user may message [targetUserId] (mutual match).
   Future<bool> canSendMessage(String targetUserId) async {
     try {
       if (currentUserId == null) {
         return false;
       }
-
-      // Get target user's privacy settings
-      final privacyDoc = await _firestore
-          .collection('users')
-          .doc(targetUserId)
-          .collection('private')
-          .doc('privacy')
-          .get();
-
-      UserPrivacySettings privacy;
-      if (privacyDoc.exists) {
-        privacy = UserPrivacySettings.fromMap(privacyDoc.data()!);
-      } else {
-        privacy = const UserPrivacySettings();
-      }
-
-      // Check if users are matched
-      // This would integrate with your existing match checking logic
-      final bool areMatched =
-          await _checkIfMatched(currentUserId!, targetUserId);
-
-      if (areMatched && privacy.allowMessagesFromMatches) {
-        return true;
-      }
-
-      // For now, only allow messages from matches
-      // This simplifies the messaging system
-      return false;
+      return _checkIfMatched(currentUserId!, targetUserId);
     } on Object catch (e) {
       debugPrint('Error checking message permission: $e');
       return false;
@@ -441,20 +397,8 @@ class UserPrivacyService {
       return 'Profile hidden from discovery';
     }
 
-    if (!settings.showAge) {
-      activeSettings.add('Age hidden');
-    }
     if (!settings.showTribe) {
       activeSettings.add('Tribe hidden');
-    }
-    if (!settings.showOrientation) {
-      activeSettings.add('Orientation private');
-    }
-    if (!settings.showLocation) {
-      activeSettings.add('Location private');
-    }
-    if (!settings.allowMessagesFromMatches) {
-      activeSettings.add('Messages restricted');
     }
 
     if (activeSettings.isEmpty) {

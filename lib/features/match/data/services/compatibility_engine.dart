@@ -7,11 +7,12 @@ import '../../../../models/user_model.dart';
 /// Implements Priority 2: Enhanced Matching Algorithm
 class CompatibilityEngine {
   // Scoring weights (must sum to 1.0)
-  static const double ageWeight = 0.25; // 25%
-  static const double locationWeight = 0.30; // 30%
+  static const double ageWeight = 0.20; // 20%
+  static const double locationWeight = 0.25; // 25%
   static const double interestWeight = 0.20; // 20%
-  static const double activityWeight = 0.15; // 15%
+  static const double activityWeight = 0.10; // 10%
   static const double completenessWeight = 0.10; // 10%
+  static const double cultureWeight = 0.15; // 15% — nationality & tribe
 
   // Scoring parameters
   static const int idealAgeDifference = 3; // Years
@@ -45,6 +46,10 @@ class CompatibilityEngine {
       final completenessScore = _calculateCompletenessScore(user1, user2);
       totalScore += completenessScore * completenessWeight;
 
+      // Nationality & tribe affinity (15%)
+      final cultureScore = _calculateCultureScore(user1, user2);
+      totalScore += cultureScore * cultureWeight;
+
       // Ensure score is within bounds
       totalScore = totalScore.clamp(0.0, 1.0);
 
@@ -52,7 +57,7 @@ class CompatibilityEngine {
         '🎯 Compatibility ${user1.name} ↔ ${user2.name}: ${(totalScore * 100).toStringAsFixed(1)}%',
       );
       debugPrint(
-        '   Age: ${(ageScore * 100).toStringAsFixed(1)}%, Location: ${(locationScore * 100).toStringAsFixed(1)}%, Interest: ${(interestScore * 100).toStringAsFixed(1)}%, Activity: ${(activityScore * 100).toStringAsFixed(1)}%, Completeness: ${(completenessScore * 100).toStringAsFixed(1)}%',
+        '   Age: ${(ageScore * 100).toStringAsFixed(1)}%, Location: ${(locationScore * 100).toStringAsFixed(1)}%, Interest: ${(interestScore * 100).toStringAsFixed(1)}%, Activity: ${(activityScore * 100).toStringAsFixed(1)}%, Completeness: ${(completenessScore * 100).toStringAsFixed(1)}%, Culture: ${(cultureScore * 100).toStringAsFixed(1)}%',
       );
 
       return totalScore;
@@ -84,6 +89,37 @@ class CompatibilityEngine {
       debugPrint('❌ Error calculating age compatibility: $e');
       return 0.5;
     }
+  }
+
+  /// Nationality and tribe overlap (0.0–1.0). Both fields must be present on
+  /// both users to contribute; same nationality/tribe adds more than mismatch.
+  static double _calculateCultureScore(UserModel user1, UserModel user2) {
+    var score = 0.0;
+    final n1 = user1.nationality?.trim();
+    final n2 = user2.nationality?.trim();
+    if (n1 != null &&
+        n1.isNotEmpty &&
+        n2 != null &&
+        n2.isNotEmpty) {
+      if (n1.toLowerCase() == n2.toLowerCase()) {
+        score += 0.6;
+      } else {
+        score += 0.1;
+      }
+    }
+    final t1 = user1.tribe?.trim();
+    final t2 = user2.tribe?.trim();
+    if (t1 != null &&
+        t1.isNotEmpty &&
+        t2 != null &&
+        t2.isNotEmpty) {
+      if (t1.toLowerCase() == t2.toLowerCase()) {
+        score += 0.4;
+      } else {
+        score += 0.05;
+      }
+    }
+    return score.clamp(0.0, 1.0);
   }
 
   /// Calculate location proximity score
@@ -308,12 +344,14 @@ class CompatibilityEngine {
     final interestScore = _calculateInterestScore(user1, user2);
     final activityScore = _calculateActivityScore(user1, user2);
     final completenessScore = _calculateCompletenessScore(user1, user2);
+    final cultureScore = _calculateCultureScore(user1, user2);
 
     final totalScore = (ageScore * ageWeight) +
         (locationScore * locationWeight) +
         (interestScore * interestWeight) +
         (activityScore * activityWeight) +
-        (completenessScore * completenessWeight);
+        (completenessScore * completenessWeight) +
+        (cultureScore * cultureWeight);
 
     return CompatibilityBreakdown(
       totalScore: totalScore,
@@ -322,6 +360,7 @@ class CompatibilityEngine {
       interestScore: interestScore,
       activityScore: activityScore,
       completenessScore: completenessScore,
+      cultureScore: cultureScore,
       user1Completeness: _calculateProfileCompleteness(user1),
       user2Completeness: _calculateProfileCompleteness(user2),
       user1Activity: _calculateUserActivity(user1),
@@ -360,6 +399,7 @@ class CompatibilityBreakdown {
     required this.interestScore,
     required this.activityScore,
     required this.completenessScore,
+    required this.cultureScore,
     required this.user1Completeness,
     required this.user2Completeness,
     required this.user1Activity,
@@ -371,6 +411,7 @@ class CompatibilityBreakdown {
   final double interestScore;
   final double activityScore;
   final double completenessScore;
+  final double cultureScore;
   final double user1Completeness;
   final double user2Completeness;
   final double user1Activity;
@@ -384,6 +425,7 @@ class CompatibilityBreakdown {
       '  Interest: ${(interestScore * 100).toStringAsFixed(1)}%\n'
       '  Activity: ${(activityScore * 100).toStringAsFixed(1)}%\n'
       '  Completeness: ${(completenessScore * 100).toStringAsFixed(1)}%\n'
+      '  Culture: ${(cultureScore * 100).toStringAsFixed(1)}%\n'
       ')';
 }
 

@@ -43,10 +43,10 @@ class _EnhancedBioScreenState extends State<EnhancedBioScreen> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Text('Tell your story', style: OnboardingTheme.titleStyle),
+              Text('About you', style: OnboardingTheme.titleStyle),
               const SizedBox(height: OnboardingTheme.titleToSubtitle),
               Text(
-                'A great bio helps you stand out. Keep it genuine.',
+                'Write a short bio about yourself',
                 style: OnboardingTheme.subtitleStyle,
               ),
               const SizedBox(height: OnboardingTheme.subtitleToField),
@@ -57,7 +57,7 @@ class _EnhancedBioScreenState extends State<EnhancedBioScreen> {
                 maxLines: 8,
                 maxLength: _maxLength,
                 decoration: OnboardingTheme.fieldDecoration(
-                  hint: 'Tell people about yourself...',
+                  hint: 'Love live music, spontaneous road trips, and my mum\'s jollof. Looking for someone who doesn\'t take life too seriously.',
                 ).copyWith(
                   counterStyle: GoogleFonts.montserrat(
                     fontSize: 13,

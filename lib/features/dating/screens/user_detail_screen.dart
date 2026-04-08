@@ -4,8 +4,11 @@ import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import '../../../common/constants/app_colors.dart';
+import '../../../common/utils/country_flag.dart';
+import '../../../common/widgets/dating_feedback_snackbar.dart';
 import '../../../common/widgets/state_views/state_views.dart';
 import '../../../features/match/data/services/match_service.dart';
+import '../../../features/match/models/like_handle_outcome.dart';
 import '../../../models/user_model.dart';
 import '../widgets/mode_specific_profile_sections.dart';
 
@@ -28,6 +31,8 @@ class _UserDetailScreenState extends State<UserDetailScreen> {
   int _currentPhotoIndex = 0;
   final PageController _photoPageController = PageController();
   bool _isLiking = false;
+  bool _checkingLikeStatus = true;
+  bool _alreadyLiked = false;
   final MatchService _matchService = MatchService();
 
   // MVP theme colors
@@ -35,6 +40,26 @@ class _UserDetailScreenState extends State<UserDetailScreen> {
   static const Color cardBackground = Color(0xFFF7E8DA);
   static const Color textDarkBrown = Color(0xFF3A1D0F);
   static const Color textLightBrown = Color(0xFF8B6C59);
+
+  @override
+  void initState() {
+    super.initState();
+    unawaited(_loadExistingLikeState());
+  }
+
+  Future<void> _loadExistingLikeState() async {
+    final id = widget.user.id;
+    if (id == null || id.isEmpty) {
+      if (mounted) setState(() => _checkingLikeStatus = false);
+      return;
+    }
+    final liked = await _matchService.hasUserLiked(id);
+    if (!mounted) return;
+    setState(() {
+      _alreadyLiked = liked;
+      _checkingLikeStatus = false;
+    });
+  }
 
   @override
   void dispose() {
@@ -199,60 +224,115 @@ class _UserDetailScreenState extends State<UserDetailScreen> {
           children: [
             Expanded(
               child: ElevatedButton.icon(
-                onPressed: _isLiking
+                onPressed: (_isLiking ||
+                        _checkingLikeStatus ||
+                        _alreadyLiked)
                     ? null
                     : () async {
                         setState(() => _isLiking = true);
                         try {
-                          final matchId =
-                              await _matchService.handleLike(targetUserId);
+                          final outcome = await _matchService
+                              .handleLikeWithOutcome(targetUserId);
                           if (!mounted) return;
                           setState(() => _isLiking = false);
-                          if (matchId != null) {
-                            ScaffoldMessenger.of(context).showSnackBar(
-                              SnackBar(
-                                content: Text(
-                                  "It's a match! You can message ${widget.user.name?.split(' ').first ?? 'them'} from your matches.",
-                                  style: GoogleFonts.montserrat(),
-                                ),
+
+                          switch (outcome.status) {
+                            case LikeHandleStatus.matchCreated:
+                            case LikeHandleStatus.existingMatch:
+                              if (outcome.matchId != null) {
+                                DatingFeedbackSnackBar.show(
+                                  context,
+                                  message:
+                                      "It's a match! You can message ${widget.user.name?.split(' ').first ?? 'them'} from your matches.",
+                                  backgroundColor: afropeepGreen,
+                                  duration: const Duration(seconds: 4),
+                                  bottomMarginAddition: DatingFeedbackSnackBar
+                                      .marginAboveProfileActions,
+                                );
+                                Navigator.pop(context);
+                              } else {
+                                setState(() => _alreadyLiked = true);
+                                DatingFeedbackSnackBar.show(
+                                  context,
+                                  message: 'You are already matched.',
+                                  backgroundColor: afropeepGreen,
+                                  bottomMarginAddition: DatingFeedbackSnackBar
+                                      .marginAboveProfileActions,
+                                );
+                              }
+                            case LikeHandleStatus.likeRecorded:
+                              setState(() => _alreadyLiked = true);
+                              DatingFeedbackSnackBar.show(
+                                context,
+                                message: 'Like sent!',
                                 backgroundColor: afropeepGreen,
-                              ),
-                            );
-                            Navigator.pop(context);
-                          } else {
-                            ScaffoldMessenger.of(context).showSnackBar(
-                              SnackBar(
-                                content: Text(
-                                  'Like sent!',
-                                  style: GoogleFonts.montserrat(),
-                                ),
+                                bottomMarginAddition: DatingFeedbackSnackBar
+                                    .marginAboveProfileActions,
+                              );
+                            case LikeHandleStatus.alreadyLiked:
+                              setState(() => _alreadyLiked = true);
+                              DatingFeedbackSnackBar.show(
+                                context,
+                                message: 'You already liked this profile.',
                                 backgroundColor: afropeepGreen,
-                              ),
-                            );
+                                bottomMarginAddition: DatingFeedbackSnackBar
+                                    .marginAboveProfileActions,
+                              );
+                            case LikeHandleStatus.notAuthenticated:
+                              DatingFeedbackSnackBar.show(
+                                context,
+                                message: 'Sign in to send a like.',
+                                backgroundColor: Colors.red.shade400,
+                                bottomMarginAddition: DatingFeedbackSnackBar
+                                    .marginAboveProfileActions,
+                              );
+                            case LikeHandleStatus.invalidInput:
+                              DatingFeedbackSnackBar.show(
+                                context,
+                                message: 'Could not send like. Try again.',
+                                backgroundColor: Colors.red.shade400,
+                                bottomMarginAddition: DatingFeedbackSnackBar
+                                    .marginAboveProfileActions,
+                              );
                           }
                         } on Object catch (_) {
                           if (mounted) setState(() => _isLiking = false);
                           if (!mounted) return;
-                          ScaffoldMessenger.of(context).showSnackBar(
-                            SnackBar(
-                              content: Text(
-                                'Could not send like. Try again.',
-                                style: GoogleFonts.montserrat(),
-                              ),
-                              backgroundColor: Colors.red.shade400,
-                            ),
+                          DatingFeedbackSnackBar.show(
+                            context,
+                            message: 'Could not send like. Try again.',
+                            backgroundColor: Colors.red.shade400,
+                            bottomMarginAddition:
+                                DatingFeedbackSnackBar.marginAboveProfileActions,
                           );
                         }
                       },
-                icon: _isLiking
+                icon: _checkingLikeStatus
                     ? const SizedBox(
                         width: 18,
                         height: 18,
                         child: CircularProgressIndicator(strokeWidth: 2),
                       )
-                    : const Icon(Icons.favorite, size: 22),
+                    : _isLiking
+                        ? const SizedBox(
+                            width: 18,
+                            height: 18,
+                            child: CircularProgressIndicator(strokeWidth: 2),
+                          )
+                        : Icon(
+                            _alreadyLiked
+                                ? Icons.favorite
+                                : Icons.favorite_border,
+                            size: 22,
+                          ),
                 label: Text(
-                  _isLiking ? 'Sending...' : 'Like',
+                  _checkingLikeStatus
+                      ? '...'
+                      : _isLiking
+                          ? 'Sending...'
+                          : _alreadyLiked
+                              ? 'Liked'
+                              : 'Like',
                   style: GoogleFonts.montserrat(
                     fontSize: 16,
                     fontWeight: FontWeight.w600,
@@ -261,6 +341,10 @@ class _UserDetailScreenState extends State<UserDetailScreen> {
                 style: ElevatedButton.styleFrom(
                   backgroundColor: afropeepGreen,
                   foregroundColor: Colors.white,
+                  disabledBackgroundColor: _alreadyLiked
+                      ? afropeepGreen.withValues(alpha: 0.5)
+                      : null,
+                  disabledForegroundColor: Colors.white,
                   padding: const EdgeInsets.symmetric(vertical: 14),
                   shape: const RoundedRectangleBorder(
                     borderRadius: BorderRadius.all(Radius.circular(14)),
@@ -461,7 +545,7 @@ class _UserDetailScreenState extends State<UserDetailScreen> {
                       ),
                     ),
                     child: Text(
-                      '🇳🇬 ${widget.user.nationality}',
+                      '${CountryFlag.flagOrFallback(widget.user.nationality)} ${widget.user.nationality}',
                       style: GoogleFonts.montserrat(
                         fontSize: 14,
                         color: afropeepGreen,
@@ -809,7 +893,9 @@ class _UserDetailScreenState extends State<UserDetailScreen> {
     // Add cultural information as interests
     if (widget.user.nationality != null &&
         widget.user.nationality!.isNotEmpty) {
-      interests.add('🇳🇬 ${widget.user.nationality}');
+      interests.add(
+        '${CountryFlag.flagOrFallback(widget.user.nationality)} ${widget.user.nationality}',
+      );
     }
     if (widget.user.tribe != null && widget.user.tribe!.isNotEmpty) {
       interests.add('🏛️ ${widget.user.tribe}');

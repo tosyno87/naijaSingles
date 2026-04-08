@@ -162,10 +162,6 @@ class UserModel {
             : locationData.isNotEmpty
                 ? locationData
                 : {},
-        sexualOrientation: data.containsKey('sexualOrientation') &&
-                data['sexualOrientation'] is Map
-            ? data['sexualOrientation'] as Map
-            : {},
         userGender: safeGet<String>('gender') ??
             safeGet<String>('userGender') ??
             safeGetNested<String>('editInfo', 'userGender', ''),
@@ -269,7 +265,6 @@ class UserModel {
             json['location'] != null ? json['location']['longitude'] ?? 0 : 0,
         coordinates: json['coordinates'] ?? {},
         currentCoordinates: json['currentCoordinates'],
-        sexualOrientation: json['sexualOrientation'],
         userGender: json['gender'] ??
             (json['editInfo'] != null ? json['editInfo']['userGender'] : null),
         living_in: json['living_in'],
@@ -364,7 +359,6 @@ class UserModel {
             : null,
         coordinates: map['coordinates'] as Map?,
         currentCoordinates: map['currentCoordinates'] as Map?,
-        sexualOrientation: map['sexualOrientation'] as Map?,
         userGender: map['gender']?.toString(),
         living_in: map['living_in']?.toString(),
         job_title: map['job_title']?.toString(),
@@ -422,6 +416,7 @@ class UserModel {
   final double? longitude;
   final Map? coordinates;
   final Map? currentCoordinates;
+  /// Always null in-app; legacy Firestore field may still exist for some users.
   final Map? sexualOrientation;
   final String? userGender;
   final String? living_in;

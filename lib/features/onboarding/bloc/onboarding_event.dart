@@ -284,13 +284,14 @@ final class OnboardingProfilePhotoPicked extends OnboardingEvent {
   List<Object?> get props => [source, index];
 }
 
-final class OnboardingProfilePhotosPickedBulk extends OnboardingEvent {
-  const OnboardingProfilePhotosPickedBulk(this.context);
+final class OnboardingBulkPhotosCropAndMerge extends OnboardingEvent {
+  const OnboardingBulkPhotosCropAndMerge(this.photos, this.context);
 
+  final List<File> photos;
   final dynamic context; // BuildContext
 
   @override
-  List<Object?> get props => [context];
+  List<Object?> get props => [photos];
 }
 
 final class OnboardingProfilePhotoRemoved extends OnboardingEvent {

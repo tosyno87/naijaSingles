@@ -46,7 +46,7 @@ Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await EasyLocalization.ensureInitialized();
 
-  // Initialize Secure Configuration first
+  // Initialize Secure Configuration f   ir st
   // Note: In production, .env file may not be bundled - Firebase uses firebase_options.dart
   try {
     await SecureConfig.initialize();

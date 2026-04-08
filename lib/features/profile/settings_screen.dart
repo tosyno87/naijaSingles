@@ -14,9 +14,9 @@ import '../../common/widgets/delete_account_themed_dialog.dart';
 import '../account_status/presentation/bloc/account_status_bloc.dart';
 import '../account_status/presentation/screens/account_status_screen.dart';
 import '../settings/account_deletion_screen.dart';
+import '../settings/discovery_preferences_screen.dart';
 import '../settings/help_center_screen.dart';
 import '../settings/language_settings_screen.dart';
-import '../settings/location_settings_screen.dart';
 import '../settings/password_settings_screen.dart';
 import '../settings/safety_center_screen.dart';
 import 'privacy_settings_screen.dart';
@@ -167,15 +167,15 @@ class _SettingsScreenState extends State<SettingsScreen> {
                 ),
                 _buildDivider(),
                 _buildSettingsItem(
-                  icon: Icons.location_on_outlined,
-                  title: 'Location',
-                  subtitle: 'Update your location settings',
+                  icon: Icons.tune,
+                  title: 'Discovery Preferences',
+                  subtitle: 'Distance, age, and who you see',
                   onTap: () {
                     unawaited(
                       Navigator.push(
                         context,
                         MaterialPageRoute(
-                          builder: (_) => const LocationSettingsScreen(),
+                          builder: (_) => const DiscoveryPreferencesScreen(),
                         ),
                       ),
                     );

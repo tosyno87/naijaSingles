@@ -184,36 +184,12 @@ class _PrivacySettingsScreenState extends State<PrivacySettingsScreen> {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             _buildSectionHeader(
-              Icons.lock_outline_rounded,
-              'Communication',
-              'Control who can message you',
-            ),
-            const SizedBox(height: AppSpacing.sm + AppSpacing.xs),
-            _buildCommunicationSection(),
-            const SizedBox(height: AppSpacing.lg + AppSpacing.xs),
-            _buildSectionHeader(
-              Icons.visibility_outlined,
-              'Activity Status',
-              'Manage your online presence visibility',
-            ),
-            const SizedBox(height: AppSpacing.sm + AppSpacing.xs),
-            _buildActivitySection(),
-            const SizedBox(height: AppSpacing.lg + AppSpacing.xs),
-            _buildSectionHeader(
               Icons.person_outline_rounded,
               'Profile Visibility',
-              'Choose what information others can see',
+              'Age, neighborhood, and approximate distance are always visible, like Hinge — your exact address is never shown',
             ),
             const SizedBox(height: AppSpacing.sm + AppSpacing.xs),
             _buildProfileVisibilitySection(),
-            const SizedBox(height: AppSpacing.lg + AppSpacing.xs),
-            _buildSectionHeader(
-              Icons.location_on_outlined,
-              'Location Privacy',
-              'Control how your location is shared',
-            ),
-            const SizedBox(height: AppSpacing.sm + AppSpacing.xs),
-            _buildLocationPrivacySection(),
             const SizedBox(height: AppSpacing.lg + AppSpacing.xs),
             _buildPrivacySummary(),
             const SizedBox(height: AppSpacing.xxl * 2),
@@ -278,21 +254,13 @@ class _PrivacySettingsScreenState extends State<PrivacySettingsScreen> {
               _settings = _settings.copyWith(showTribe: value);
             }),
           ),
-          _buildToggleItem(
-            'Show Orientation',
-            'Display your sexual orientation',
-            _settings.showOrientation,
-            (value) => setState(() {
-              _settings = _settings.copyWith(showOrientation: value);
-            }),
+          _buildLockedProfileField(
+            'Age',
+            'Always shown on your profile. This helps keep the experience fair and safe for everyone.',
           ),
-          _buildToggleItem(
-            'Show Age',
-            'Display your age on your profile',
-            _settings.showAge,
-            (value) => setState(() {
-              _settings = _settings.copyWith(showAge: value);
-            }),
+          _buildLockedProfileField(
+            'Neighborhood & distance',
+            'Your area and approximate distance to others are always used for matching. Your exact address is never shared.',
           ),
           _buildToggleItem(
             'Hide From Discovery',
@@ -306,60 +274,35 @@ class _PrivacySettingsScreenState extends State<PrivacySettingsScreen> {
         ],
       );
 
-  Widget _buildLocationPrivacySection() => _sectionCard(
-        children: [
-          _buildToggleItem(
-            'Show Location',
-            'Show city and state only',
-            _settings.showLocation,
-            (value) => setState(() {
-              _settings = _settings.copyWith(showLocation: value);
-            }),
+  Widget _buildLockedProfileField(String title, String subtitle) =>
+      ListTile(
+        contentPadding: const EdgeInsets.symmetric(
+          horizontal: AppSpacing.md,
+          vertical: AppSpacing.sm - AppSpacing.xs / 2,
+        ),
+        leading: Icon(
+          Icons.lock_outline_rounded,
+          color: AppColors.textSecondary.withValues(alpha: 0.85),
+          size: 22,
+        ),
+        title: Text(
+          title,
+          style: GoogleFonts.montserrat(
+            fontSize: 15,
+            fontWeight: FontWeight.w600,
+            color: AppColors.textPrimary,
           ),
-          if (_settings.showLocation)
-            _buildToggleItem(
-              'Show Distance',
-              'Show approximate distance (~5 mi / km)',
-              _settings.showDistance,
-              (value) => setState(() {
-                _settings = _settings.copyWith(showDistance: value);
-              }),
+        ),
+        subtitle: Padding(
+          padding: const EdgeInsets.only(top: AppSpacing.xs / 2),
+          child: Text(
+            subtitle,
+            style: GoogleFonts.montserrat(
+              fontSize: 13,
+              color: AppColors.textSecondary,
             ),
-        ],
-      );
-
-  Widget _buildCommunicationSection() => _sectionCard(
-        children: [
-          _buildToggleItem(
-            'Allow Messages from Matches',
-            'Only matched users can message you',
-            _settings.allowMessagesFromMatches,
-            (value) => setState(() {
-              _settings = _settings.copyWith(allowMessagesFromMatches: value);
-            }),
           ),
-        ],
-      );
-
-  Widget _buildActivitySection() => _sectionCard(
-        children: [
-          _buildToggleItem(
-            'Show Online Status',
-            'Show when you\'re currently online',
-            _settings.showOnlineStatus,
-            (value) => setState(() {
-              _settings = _settings.copyWith(showOnlineStatus: value);
-            }),
-          ),
-          _buildToggleItem(
-            'Show Last Active',
-            'Show when you were last online',
-            _settings.showLastActive,
-            (value) => setState(() {
-              _settings = _settings.copyWith(showLastActive: value);
-            }),
-          ),
-        ],
+        ),
       );
 
   // ──────────────────────────────────────────────────────────────────────

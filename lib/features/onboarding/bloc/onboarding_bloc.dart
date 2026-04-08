@@ -54,7 +54,7 @@ class OnboardingBloc extends Bloc<OnboardingEvent, OnboardingState> {
     on<OnboardingSmokingPreferenceUpdated>(_onSmokingPreferenceUpdated);
     on<OnboardingLocationUpdated>(_onLocationUpdated);
     on<OnboardingProfilePhotoPicked>(_onProfilePhotoPicked);
-    on<OnboardingProfilePhotosPickedBulk>(_onProfilePhotosPickedBulk);
+    on<OnboardingBulkPhotosCropAndMerge>(_onBulkPhotosCropAndMerge);
     on<OnboardingProfilePhotoRemoved>(_onProfilePhotoRemoved);
     on<OnboardingProfilePhotosReordered>(_onProfilePhotosReordered);
     on<OnboardingSaveUserData>(_onSaveUserData);
@@ -420,8 +420,8 @@ class OnboardingBloc extends Bloc<OnboardingEvent, OnboardingState> {
     }
   }
 
-  Future<void> _onProfilePhotosPickedBulk(
-    OnboardingProfilePhotosPickedBulk e,
+  Future<void> _onBulkPhotosCropAndMerge(
+    OnboardingBulkPhotosCropAndMerge e,
     Emitter<OnboardingState> emit,
   ) async {
     final data = _data(emit);
@@ -429,16 +429,12 @@ class OnboardingBloc extends Bloc<OnboardingEvent, OnboardingState> {
 
     try {
       final context = e.context as BuildContext;
-      final selected =
-          await BulkPhotoPickerService.pickMultiplePhotos(context: context);
-      if (selected.isEmpty) return;
       if (!context.mounted) return;
 
       final cropped = await BulkPhotoPickerService.cropSelectedPhotos(
-        selectedPhotos: selected,
+        selectedPhotos: e.photos,
         context: context,
       );
-
       if (!context.mounted) return;
 
       final photos = _compactPhotos(List<File?>.from(data.profilePhotos));
@@ -453,7 +449,7 @@ class OnboardingBloc extends Bloc<OnboardingEvent, OnboardingState> {
         ),
       );
     } on Object catch (err) {
-      log('❌ Bulk photo selection: $err');
+      log('❌ Bulk photo crop+merge: $err');
     }
   }
 

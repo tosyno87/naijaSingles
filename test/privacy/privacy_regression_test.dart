@@ -237,42 +237,66 @@ void main() {
   //  4. Privacy settings consistency
   // ───────────────────────────────────────────────────────────────
   group('Privacy settings data integrity', () {
-    test('All fields round-trip through toMap/fromMap', () {
+    test('toMap/fromMap preserves tribe & hideFromDiscovery; policy fixes rest',
+        () {
       const settings = UserPrivacySettings(
-        allowMessagesFromMatches: false,
-        showOnlineStatus: false,
-        showLastActive: false,
         showTribe: false,
-        showOrientation: true,
-        showAge: false,
         hideFromDiscovery: true,
-        showLocation: false,
-        showDistance: false,
       );
 
       final restored = UserPrivacySettings.fromMap(settings.toMap());
 
-      expect(
-          restored.allowMessagesFromMatches, settings.allowMessagesFromMatches);
-      expect(restored.showOnlineStatus, settings.showOnlineStatus);
-      expect(restored.showLastActive, settings.showLastActive);
-      expect(restored.showTribe, settings.showTribe);
-      expect(restored.showOrientation, settings.showOrientation);
-      expect(restored.showAge, settings.showAge);
-      expect(restored.hideFromDiscovery, settings.hideFromDiscovery);
-      expect(restored.showLocation, settings.showLocation);
-      expect(restored.showDistance, settings.showDistance);
+      expect(restored.showTribe, isFalse);
+      expect(restored.hideFromDiscovery, isTrue);
+      expect(restored.allowMessagesFromMatches, isTrue);
+      expect(restored.showOnlineStatus, isTrue);
+      expect(restored.showLastActive, isTrue);
+      expect(restored.showOrientation, isFalse);
+      expect(restored.showAge, isTrue);
+      expect(restored.showLocation, isTrue);
+      expect(restored.showDistance, isTrue);
     });
 
     test('Partial map uses safe defaults', () {
       final settings = UserPrivacySettings.fromMap({
         'showAge': false,
+        'allowMessagesFromMatches': false,
       });
 
-      expect(settings.showAge, isFalse);
+      expect(settings.showAge, isTrue);
       expect(settings.hideFromDiscovery, isFalse);
       expect(settings.allowMessagesFromMatches, isTrue);
       expect(settings.showOnlineStatus, isTrue);
+      expect(settings.showOrientation, isFalse);
+    });
+  });
+
+  // ───────────────────────────────────────────────────────────────
+  //  5. Public profile legacy field scrubbing
+  // ───────────────────────────────────────────────────────────────
+  group('Public profile sexualOrientation scrubbing', () {
+    test('stripLegacySexualOrientation removes key and preserves other fields',
+        () {
+      final scrubbed = UserPrivacyService.stripLegacySexualOrientation({
+        'name': 'A',
+        'sexualOrientation': {'label': 'X'},
+        'bio': 'Hi',
+      });
+
+      expect(scrubbed.containsKey('sexualOrientation'), isFalse);
+      expect(scrubbed['name'], 'A');
+      expect(scrubbed['bio'], 'Hi');
+    });
+
+    test('stripLegacySexualOrientation is a shallow copy (caller map untouched)',
+        () {
+      final original = <String, dynamic>{
+        'sexualOrientation': 'legacy',
+        'tribe': 'Yoruba',
+      };
+      UserPrivacyService.stripLegacySexualOrientation(original);
+
+      expect(original.containsKey('sexualOrientation'), isTrue);
     });
   });
 }

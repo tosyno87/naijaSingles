@@ -313,7 +313,6 @@ class PrivacyAwareUserSearchRepo {
       lookingFor: data['lookingFor']?.toString() ?? 'Dating',
       bio: data['bio']?.toString(),
       accountStatus: data['accountStatus']?.toString(),
-      sexualOrientation: data['sexualOrientation'],
     );
   }
 

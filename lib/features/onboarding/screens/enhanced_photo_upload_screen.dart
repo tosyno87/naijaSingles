@@ -8,6 +8,9 @@ import 'package:image_picker/image_picker.dart';
 
 import '../bloc/onboarding_bloc.dart';
 import '../onboarding_theme.dart';
+import '../widgets/profile_bulk_photo_review_sheet.dart';
+
+enum _PhotoAddChoice { camera, photoLibrary }
 
 /// Enum representing different types of photos for user profiles
 enum PhotoType {
@@ -53,6 +56,7 @@ class _EnhancedPhotoUploadScreenState extends State<EnhancedPhotoUploadScreen> {
 
   Widget _buildContent(BuildContext context, List<File?> uploadedPhotos) {
     final photoCount = uploadedPhotos.where((p) => p != null).length;
+    final emptySlots = uploadedPhotos.where((p) => p == null).length;
 
     return OnboardingTheme.constrainedContent(
       child: SingleChildScrollView(
@@ -60,21 +64,46 @@ class _EnhancedPhotoUploadScreenState extends State<EnhancedPhotoUploadScreen> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text('Add your best photos', style: OnboardingTheme.titleStyle),
+            Text('Add your photos', style: OnboardingTheme.titleStyle),
             const SizedBox(height: OnboardingTheme.titleToSubtitle),
             Text(
-              'Add at least 1 photo to continue. Profiles with 3+ photos get more matches.',
+              'Add at least 3 to get started',
               style: OnboardingTheme.subtitleStyle,
             ),
-            const SizedBox(height: 8),
-            Text(
-              '$photoCount / 9 photos added',
-              style: OnboardingTheme.helperStyle.copyWith(
-                color: OnboardingTheme.primaryGreen,
-                fontWeight: FontWeight.w600,
-              ),
-            ),
             const SizedBox(height: OnboardingTheme.subtitleToField),
+            if (emptySlots > 0)
+              Padding(
+                padding: const EdgeInsets.only(bottom: 16),
+                child: SizedBox(
+                  width: double.infinity,
+                  height: OnboardingTheme.buttonHeight,
+                  child: FilledButton.icon(
+                    onPressed: () => _showAddPhotoOptions(
+                      context,
+                      uploadedPhotos
+                          .indexWhere((p) => p == null)
+                          .clamp(0, 8),
+                    ),
+                    icon: const Icon(Icons.add_a_photo, size: 20),
+                    label: Text(
+                      'Add photos',
+                      style: GoogleFonts.montserrat(
+                        fontWeight: FontWeight.w600,
+                        fontSize: 16,
+                      ),
+                    ),
+                    style: FilledButton.styleFrom(
+                      backgroundColor: OnboardingTheme.primaryGreen,
+                      foregroundColor: Colors.white,
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(
+                          OnboardingTheme.buttonRadius,
+                        ),
+                      ),
+                    ),
+                  ),
+                ),
+              ),
             Wrap(
               spacing: 12,
               runSpacing: 12,
@@ -138,11 +167,25 @@ class _EnhancedPhotoUploadScreenState extends State<EnhancedPhotoUploadScreen> {
                     height: double.infinity,
                   )
                 else
-                  const Center(
-                    child: Icon(
-                      Icons.add_photo_alternate,
-                      size: 48,
-                      color: OnboardingTheme.fieldBorder,
+                  Center(
+                    child: Column(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        const Icon(
+                          Icons.add,
+                          size: 28,
+                          color: OnboardingTheme.primaryGreen,
+                        ),
+                        const SizedBox(height: 4),
+                        Text(
+                          '${index + 1}',
+                          style: GoogleFonts.montserrat(
+                            fontSize: 12,
+                            fontWeight: FontWeight.w600,
+                            color: OnboardingTheme.fieldBorder,
+                          ),
+                        ),
+                      ],
                     ),
                   ),
                 if (isMainPhoto && photo != null)
@@ -208,19 +251,19 @@ class _EnhancedPhotoUploadScreenState extends State<EnhancedPhotoUploadScreen> {
         ),
       );
 
-  Future<void> _showAddPhotoOptions(BuildContext context, int index) async {
-    final bloc = context.read<OnboardingBloc>();
+  Future<void> _showAddPhotoOptions(BuildContext parentContext, int index) async {
+    final bloc = parentContext.read<OnboardingBloc>();
     final photos =
         bloc.state.data?.profilePhotos ?? List<File?>.filled(9, null);
     final firstEmpty = photos.indexWhere((photo) => photo == null);
 
     if (index < photos.length && photos[index] != null) {
-      _showPhotoOptionsBottomSheet(context, index);
+      _showPhotoOptionsBottomSheet(parentContext, index);
       return;
     }
 
     if (firstEmpty != -1 && index != firstEmpty) {
-      ScaffoldMessenger.of(context).showSnackBar(
+      ScaffoldMessenger.of(parentContext).showSnackBar(
         const SnackBar(
           content: Text('Please add photos from left to right.'),
         ),
@@ -228,13 +271,15 @@ class _EnhancedPhotoUploadScreenState extends State<EnhancedPhotoUploadScreen> {
       return;
     }
 
-    final source = await showModalBottomSheet<ImageSource>(
-      context: context,
+    final emptySlots = photos.where((p) => p == null).length;
+
+    final choice = await showModalBottomSheet<_PhotoAddChoice>(
+      context: parentContext,
       backgroundColor: OnboardingTheme.background,
       shape: const RoundedRectangleBorder(
         borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
       ),
-      builder: (context) => SafeArea(
+      builder: (sheetContext) => SafeArea(
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
@@ -253,10 +298,11 @@ class _EnhancedPhotoUploadScreenState extends State<EnhancedPhotoUploadScreen> {
                 color: OnboardingTheme.primaryGreen,
               ),
               title: Text(
-                'Take Photo',
+                'Camera',
                 style: GoogleFonts.montserrat(fontWeight: FontWeight.w500),
               ),
-              onTap: () => Navigator.pop(context, ImageSource.camera),
+              onTap: () =>
+                  Navigator.pop(sheetContext, _PhotoAddChoice.camera),
             ),
             ListTile(
               leading: const Icon(
@@ -264,13 +310,11 @@ class _EnhancedPhotoUploadScreenState extends State<EnhancedPhotoUploadScreen> {
                 color: OnboardingTheme.primaryGreen,
               ),
               title: Text(
-                'Choose from Gallery',
+                'Photo Library',
                 style: GoogleFonts.montserrat(fontWeight: FontWeight.w500),
               ),
-              onTap: () {
-                if (!context.mounted) return;
-                Navigator.pop(context, ImageSource.gallery);
-              },
+              onTap: () =>
+                  Navigator.pop(sheetContext, _PhotoAddChoice.photoLibrary),
             ),
             const SizedBox(height: 8),
           ],
@@ -278,9 +322,40 @@ class _EnhancedPhotoUploadScreenState extends State<EnhancedPhotoUploadScreen> {
       ),
     );
 
-    if (source != null && context.mounted) {
-      bloc.add(OnboardingProfilePhotoPicked(source, index, context));
+    if (!parentContext.mounted || choice == null) return;
+
+    if (choice == _PhotoAddChoice.camera) {
+      bloc.add(
+        OnboardingProfilePhotoPicked(ImageSource.camera, index, parentContext),
+      );
+      return;
     }
+
+    // Photo Library: multi-select, review, then crop+merge via bloc
+    final picker = ImagePicker();
+    final images = await picker.pickMultiImage(
+      maxWidth: 2000,
+      maxHeight: 2000,
+      imageQuality: 95,
+    );
+    if (images.isEmpty || !parentContext.mounted) return;
+
+    final files =
+        images.take(emptySlots).map((x) => File(x.path)).toList();
+
+    final ordered = await showModalBottomSheet<List<File>>(
+      context: parentContext,
+      isScrollControlled: true,
+      backgroundColor: OnboardingTheme.background,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+      ),
+      builder: (_) => ProfileBulkPhotoReviewSheet(photos: files),
+    );
+
+    if (ordered == null || ordered.isEmpty || !parentContext.mounted) return;
+
+    bloc.add(OnboardingBulkPhotosCropAndMerge(ordered, parentContext));
   }
 
   void _showPhotoOptionsBottomSheet(BuildContext parentContext, int index) {
@@ -357,7 +432,7 @@ class _EnhancedPhotoUploadScreenState extends State<EnhancedPhotoUploadScreen> {
                               color: OnboardingTheme.primaryGreen,
                             ),
                             title: Text(
-                              'Take Photo',
+                              'Camera',
                               style: GoogleFonts.montserrat(
                                 fontWeight: FontWeight.w500,
                               ),
@@ -371,7 +446,7 @@ class _EnhancedPhotoUploadScreenState extends State<EnhancedPhotoUploadScreen> {
                               color: OnboardingTheme.primaryGreen,
                             ),
                             title: Text(
-                              'Choose from Gallery',
+                              'Photo Library',
                               style: GoogleFonts.montserrat(
                                 fontWeight: FontWeight.w500,
                               ),

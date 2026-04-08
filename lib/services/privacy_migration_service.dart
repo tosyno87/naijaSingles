@@ -119,10 +119,6 @@ class PrivacyMigrationService {
       publicData['tribe'] = userData['tribe'];
     }
 
-    if (privacy.showOrientation) {
-      publicData['sexualOrientation'] = userData['sexualOrientation'];
-    }
-
     if (privacy.showLocation) {
       // Create privacy-aware location data
       final lat = userData['latitude'] as double?;

@@ -54,10 +54,8 @@ class _DiscoveryPreferencesScreenState
       if (doc.exists) {
         final data = doc.data()!;
         setState(() {
-          _showGender =
-              (data['showGender'] as String?) ?? 'everyone';
-          _maxDistance =
-              (data['maximum_distance'] as num?)?.toDouble() ?? 50;
+          _showGender = (data['showGender'] as String?) ?? 'everyone';
+          _maxDistance = (data['maximum_distance'] as num?)?.toDouble() ?? 50;
 
           _ageRange = _parseAgeRange(data);
           _maxDistance = _maxDistance.clamp(1, 100);

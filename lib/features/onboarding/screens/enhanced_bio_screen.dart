@@ -57,7 +57,8 @@ class _EnhancedBioScreenState extends State<EnhancedBioScreen> {
                 maxLines: 8,
                 maxLength: _maxLength,
                 decoration: OnboardingTheme.fieldDecoration(
-                  hint: 'Love live music, spontaneous road trips, and my mum\'s jollof. Looking for someone who doesn\'t take life too seriously.',
+                  hint:
+                      'Love live music, spontaneous road trips, and my mum\'s jollof. Looking for someone who doesn\'t take life too seriously.',
                 ).copyWith(
                   counterStyle: GoogleFonts.montserrat(
                     fontSize: 13,

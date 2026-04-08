@@ -224,9 +224,7 @@ class _UserDetailScreenState extends State<UserDetailScreen> {
           children: [
             Expanded(
               child: ElevatedButton.icon(
-                onPressed: (_isLiking ||
-                        _checkingLikeStatus ||
-                        _alreadyLiked)
+                onPressed: (_isLiking || _checkingLikeStatus || _alreadyLiked)
                     ? null
                     : () async {
                         setState(() => _isLiking = true);
@@ -302,8 +300,8 @@ class _UserDetailScreenState extends State<UserDetailScreen> {
                             context,
                             message: 'Could not send like. Try again.',
                             backgroundColor: Colors.red.shade400,
-                            bottomMarginAddition:
-                                DatingFeedbackSnackBar.marginAboveProfileActions,
+                            bottomMarginAddition: DatingFeedbackSnackBar
+                                .marginAboveProfileActions,
                           );
                         }
                       },

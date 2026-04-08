@@ -6,7 +6,6 @@ class CountryFlag {
   static const String _fallback = '\u{1F3F3}\u{FE0F}';
 
   static const Map<String, String> _countryToAlpha2 = {
-
     'Afghanistan': 'AF',
     'Albania': 'AL',
     'Algeria': 'DZ',

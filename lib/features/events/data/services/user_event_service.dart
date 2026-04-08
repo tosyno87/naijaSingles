@@ -592,7 +592,6 @@ class UserEventService {
       'events.$eventId': FieldValue.delete(),
     });
   }
-
 }
 
 // Exception classes

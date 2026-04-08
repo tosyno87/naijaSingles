@@ -416,6 +416,7 @@ class UserModel {
   final double? longitude;
   final Map? coordinates;
   final Map? currentCoordinates;
+
   /// Always null in-app; legacy Firestore field may still exist for some users.
   final Map? sexualOrientation;
   final String? userGender;

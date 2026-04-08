@@ -288,7 +288,8 @@ void main() {
       expect(scrubbed['bio'], 'Hi');
     });
 
-    test('stripLegacySexualOrientation is a shallow copy (caller map untouched)',
+    test(
+        'stripLegacySexualOrientation is a shallow copy (caller map untouched)',
         () {
       final original = <String, dynamic>{
         'sexualOrientation': 'legacy',

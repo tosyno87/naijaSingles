@@ -97,10 +97,7 @@ class CompatibilityEngine {
     var score = 0.0;
     final n1 = user1.nationality?.trim();
     final n2 = user2.nationality?.trim();
-    if (n1 != null &&
-        n1.isNotEmpty &&
-        n2 != null &&
-        n2.isNotEmpty) {
+    if (n1 != null && n1.isNotEmpty && n2 != null && n2.isNotEmpty) {
       if (n1.toLowerCase() == n2.toLowerCase()) {
         score += 0.6;
       } else {
@@ -109,10 +106,7 @@ class CompatibilityEngine {
     }
     final t1 = user1.tribe?.trim();
     final t2 = user2.tribe?.trim();
-    if (t1 != null &&
-        t1.isNotEmpty &&
-        t2 != null &&
-        t2.isNotEmpty) {
+    if (t1 != null && t1.isNotEmpty && t2 != null && t2.isNotEmpty) {
       if (t1.toLowerCase() == t2.toLowerCase()) {
         score += 0.4;
       } else {

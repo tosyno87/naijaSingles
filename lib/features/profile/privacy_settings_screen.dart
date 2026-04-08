@@ -274,8 +274,7 @@ class _PrivacySettingsScreenState extends State<PrivacySettingsScreen> {
         ],
       );
 
-  Widget _buildLockedProfileField(String title, String subtitle) =>
-      ListTile(
+  Widget _buildLockedProfileField(String title, String subtitle) => ListTile(
         contentPadding: const EdgeInsets.symmetric(
           horizontal: AppSpacing.md,
           vertical: AppSpacing.sm - AppSpacing.xs / 2,

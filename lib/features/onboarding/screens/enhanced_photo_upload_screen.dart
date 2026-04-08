@@ -55,7 +55,6 @@ class _EnhancedPhotoUploadScreenState extends State<EnhancedPhotoUploadScreen> {
       );
 
   Widget _buildContent(BuildContext context, List<File?> uploadedPhotos) {
-    final photoCount = uploadedPhotos.where((p) => p != null).length;
     final emptySlots = uploadedPhotos.where((p) => p == null).length;
 
     return OnboardingTheme.constrainedContent(
@@ -80,9 +79,7 @@ class _EnhancedPhotoUploadScreenState extends State<EnhancedPhotoUploadScreen> {
                   child: FilledButton.icon(
                     onPressed: () => _showAddPhotoOptions(
                       context,
-                      uploadedPhotos
-                          .indexWhere((p) => p == null)
-                          .clamp(0, 8),
+                      uploadedPhotos.indexWhere((p) => p == null).clamp(0, 8),
                     ),
                     icon: const Icon(Icons.add_a_photo, size: 20),
                     label: Text(
@@ -251,7 +248,8 @@ class _EnhancedPhotoUploadScreenState extends State<EnhancedPhotoUploadScreen> {
         ),
       );
 
-  Future<void> _showAddPhotoOptions(BuildContext parentContext, int index) async {
+  Future<void> _showAddPhotoOptions(
+      BuildContext parentContext, int index) async {
     final bloc = parentContext.read<OnboardingBloc>();
     final photos =
         bloc.state.data?.profilePhotos ?? List<File?>.filled(9, null);
@@ -301,8 +299,7 @@ class _EnhancedPhotoUploadScreenState extends State<EnhancedPhotoUploadScreen> {
                 'Camera',
                 style: GoogleFonts.montserrat(fontWeight: FontWeight.w500),
               ),
-              onTap: () =>
-                  Navigator.pop(sheetContext, _PhotoAddChoice.camera),
+              onTap: () => Navigator.pop(sheetContext, _PhotoAddChoice.camera),
             ),
             ListTile(
               leading: const Icon(
@@ -340,8 +337,7 @@ class _EnhancedPhotoUploadScreenState extends State<EnhancedPhotoUploadScreen> {
     );
     if (images.isEmpty || !parentContext.mounted) return;
 
-    final files =
-        images.take(emptySlots).map((x) => File(x.path)).toList();
+    final files = images.take(emptySlots).map((x) => File(x.path)).toList();
 
     final ordered = await showModalBottomSheet<List<File>>(
       context: parentContext,

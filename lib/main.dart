@@ -17,6 +17,7 @@ import 'common/bloc/language/language_bloc.dart';
 import 'common/bloc/theme/theme_bloc.dart';
 import 'common/bloc/user/user_bloc.dart';
 import 'common/constants/theme.dart';
+import 'common/data/repo/in_app_purchase_repo.dart';
 import 'common/data/repo/phone_auth_repo.dart';
 import 'common/routes/route_name.dart';
 import 'common/routes/router.dart';
@@ -28,6 +29,7 @@ import 'features/events/data/services/seed_events_service.dart';
 import 'features/notifications/data/services/notification_service.dart';
 import 'features/onboarding/bloc/onboarding_bloc.dart';
 import 'features/onboarding/data/repositories/onboarding_repository.dart';
+import 'features/payment/presentation/bloc/subscription_bloc.dart';
 // import 'debug/auto_login_service.dart'; // Uncomment if needed for testing
 import 'firebase_options.dart';
 import 'services/crashlytics_service.dart';
@@ -119,6 +121,8 @@ Future<void> main() async {
         );
       }
     }
+
+    unawaited(InAppPurchaseRepoImpl.logPackagesDiagnostics());
   }
 
   // App Check (non-blocking — failures must not poison Storage)
@@ -315,6 +319,11 @@ Future<void> main() async {
           ),
           BlocProvider<UserBloc>(
             create: (context) => UserBloc(),
+          ),
+          BlocProvider<SubscriptionBloc>(
+            create: (context) => SubscriptionBloc(
+              userBloc: context.read<UserBloc>(),
+            ),
           ),
           BlocProvider<ThemeBloc>(
             create: (context) => ThemeBloc(),

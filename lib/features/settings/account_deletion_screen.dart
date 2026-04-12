@@ -109,8 +109,8 @@ class _AccountDeletionScreenState extends State<AccountDeletionScreen> {
           title: Text(
             'Delete account',
             style: GoogleFonts.montserrat(
-              fontSize: 20,
-              fontWeight: FontWeight.bold,
+              fontSize: 17,
+              fontWeight: FontWeight.w600,
               color: textPrimary,
             ),
           ),

@@ -80,8 +80,8 @@ class _FeedbackScreenState extends State<FeedbackScreen> {
           title: Text(
             'Send Feedback',
             style: GoogleFonts.montserrat(
-              fontSize: 20,
-              fontWeight: FontWeight.bold,
+              fontSize: 17,
+              fontWeight: FontWeight.w600,
               color: textPrimary,
             ),
           ),

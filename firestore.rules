@@ -67,7 +67,13 @@ service cloud.firestore {
                      request.auth.uid == userId &&
                      // Prevent users from changing critical / server-managed fields
                      !request.resource.data.diff(resource.data).affectedKeys()
-                       .hasAny(['createdAt', 'uid', 'email', 'signInMethod', 'isDiscoverable']) &&
+                       .hasAny([
+                         'createdAt', 'uid', 'email', 'signInMethod', 'isDiscoverable',
+                         // Subscription entitlements — only Cloud Functions (Admin SDK).
+                         'isPremium', 'subscriptionDate', 'subscriptionPlanId',
+                         'subscriptionExpiresAt', 'subscriptionStore',
+                         'subscriptionLastVerifiedAt', 'entitlementUnverified'
+                       ]) &&
                      // Once onboarding is complete, lock identity fields.
                      !isLockedIdentityFieldUpdate();
       
@@ -786,6 +792,13 @@ service cloud.firestore {
     // Runtime configuration — read-only for authenticated clients.
     // Writes happen via Admin SDK (seed script / deploy tooling).
     match /runtimeConfig/{docId} {
+      allow read: if request.auth != null;
+      allow write: if false;
+    }
+
+    // IAP product catalog (store product ids, display metadata).
+    // Clients need read to call queryProductDetails; only Admin SDK / Console should write.
+    match /Packages/{packageId} {
       allow read: if request.auth != null;
       allow write: if false;
     }

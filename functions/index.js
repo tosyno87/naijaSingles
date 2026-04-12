@@ -3,6 +3,17 @@ const admin = require('firebase-admin');
 
 admin.initializeApp();
 
+// Global FCM gate: enableAll===false OR muteAll===true blocks (before per-type checks).
+function isPushGloballyBlocked(notificationPrefs) {
+  if (notificationPrefs.enableAllNotifications === false) {
+    return true;
+  }
+  if (notificationPrefs.muteAllNotifications === true) {
+    return true;
+  }
+  return false;
+}
+
 // 🎉 MATCH NOTIFICATIONS - Triggered when match document is created
 exports.onMatchCreated = functions.firestore
   .document('matches/{matchId}')
@@ -185,6 +196,10 @@ async function sendMatchNotification(user, matchedUser) {
   
   // Check notification preferences
   const notificationPrefs = user.notificationPreferences || {};
+  if (isPushGloballyBlocked(notificationPrefs)) {
+    console.log(`Push suppressed (master/mute) for user ${user.id}`);
+    return;
+  }
   if (notificationPrefs.matchNotifications === false) {
     console.log(`Match notifications disabled for user ${user.id}`);
     return;
@@ -254,6 +269,10 @@ async function sendMessageNotification(recipient, sender, messageData, threadId)
   
   // Check notification preferences
   const notificationPrefs = recipient.notificationPreferences || {};
+  if (isPushGloballyBlocked(notificationPrefs)) {
+    console.log(`Push suppressed (master/mute) for user ${recipient.id}`);
+    return;
+  }
   if (notificationPrefs.messageNotifications === false) {
     console.log(`Message notifications disabled for user ${recipient.id}`);
     return;
@@ -330,6 +349,10 @@ async function sendSuperLikeNotification(recipient, sender, superLikeId) {
   
   // Check notification preferences
   const notificationPrefs = recipient.notificationPreferences || {};
+  if (isPushGloballyBlocked(notificationPrefs)) {
+    console.log(`Push suppressed (master/mute) for user ${recipient.id}`);
+    return;
+  }
   if (notificationPrefs.superLikeNotifications === false) {
     console.log(`Super like notifications disabled for user ${recipient.id}`);
     return;
@@ -400,6 +423,10 @@ async function sendLikeNotification(likedUser, liker) {
   
   // Check notification preferences
   const notificationPrefs = likedUser.notificationPreferences || {};
+  if (isPushGloballyBlocked(notificationPrefs)) {
+    console.log(`Push suppressed (master/mute) for user ${likedUser.id}`);
+    return;
+  }
   if (notificationPrefs.likeNotifications === false) {
     console.log(`Like notifications disabled for user ${likedUser.id}`);
     return;

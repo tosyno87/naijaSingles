@@ -9,6 +9,7 @@ import {
   NotificationData,
   NotificationType,
   NotificationStatus,
+  NotificationPreferences,
 } from '../types';
 
 export class NotificationService {
@@ -16,6 +17,25 @@ export class NotificationService {
 
   constructor() {
     this.db = admin.firestore();
+  }
+
+  /**
+   * Global FCM gate (evaluated before per-type flags).
+   *
+   * Precedence (same outcome if both apply — no push):
+   * 1. `enableAllNotifications === false` → block
+   * 2. `muteAllNotifications === true` → block
+   *
+   * Omitted fields default to legacy behavior (all on, not muted).
+   */
+  private isPushGloballyBlocked(prefs: NotificationPreferences): boolean {
+    if (prefs.enableAllNotifications === false) {
+      return true;
+    }
+    if (prefs.muteAllNotifications === true) {
+      return true;
+    }
+    return false;
   }
 
   /**
@@ -30,6 +50,10 @@ export class NotificationService {
 
     // Check notification preferences
     const notificationPrefs = user.notificationPreferences || {};
+    if (this.isPushGloballyBlocked(notificationPrefs)) {
+      console.log(`Push suppressed (master/mute) for user ${user.id}`);
+      return;
+    }
     if (notificationPrefs.matchNotifications === false) {
       console.log(`Match notifications disabled for user ${user.id}`);
       return;
@@ -105,6 +129,10 @@ export class NotificationService {
 
     // Check notification preferences
     const notificationPrefs = recipient.notificationPreferences || {};
+    if (this.isPushGloballyBlocked(notificationPrefs)) {
+      console.log(`Push suppressed (master/mute) for user ${recipient.id}`);
+      return;
+    }
     if (notificationPrefs.messageNotifications === false) {
       console.log(`Message notifications disabled for user ${recipient.id}`);
       return;
@@ -182,6 +210,10 @@ export class NotificationService {
 
     // Check notification preferences
     const notificationPrefs = recipient.notificationPreferences || {};
+    if (this.isPushGloballyBlocked(notificationPrefs)) {
+      console.log(`Push suppressed (master/mute) for user ${recipient.id}`);
+      return;
+    }
     if (notificationPrefs.superLikeNotifications === false) {
       console.log(`Super like notifications disabled for user ${recipient.id}`);
       return;
@@ -256,6 +288,10 @@ export class NotificationService {
 
     // Check notification preferences
     const notificationPrefs = likedUser.notificationPreferences || {};
+    if (this.isPushGloballyBlocked(notificationPrefs)) {
+      console.log(`Push suppressed (master/mute) for user ${likedUser.id}`);
+      return;
+    }
     if (notificationPrefs.likeNotifications === false) {
       console.log(`Like notifications disabled for user ${likedUser.id}`);
       return;

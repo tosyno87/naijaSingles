@@ -5,6 +5,9 @@
 import {NotificationService} from '../notificationService';
 import {User} from '../../types';
 
+// Single messaging instance so service + tests share the same `send` mock.
+const messagingSingleton = {send: jest.fn()};
+
 // Mock Firebase Admin
 jest.mock('firebase-admin', () => ({
   firestore: jest.fn(() => ({
@@ -16,9 +19,7 @@ jest.mock('firebase-admin', () => ({
       })),
     })),
   })),
-  messaging: jest.fn(() => ({
-    send: jest.fn(),
-  })),
+  messaging: jest.fn(() => messagingSingleton),
 }));
 
 describe('NotificationService', () => {
@@ -26,6 +27,7 @@ describe('NotificationService', () => {
   let mockUser: User;
 
   beforeEach(() => {
+    messagingSingleton.send.mockClear();
     notificationService = new NotificationService();
     mockUser = {
       id: 'test-user-id',
@@ -48,12 +50,11 @@ describe('NotificationService', () => {
       };
 
       // Mock the messaging send method
-      const mockMessaging = require('firebase-admin').messaging();
-      mockMessaging.send.mockResolvedValue('message-id');
+      messagingSingleton.send.mockResolvedValue('message-id');
 
       await notificationService.sendMatchNotification(mockUser, matchedUser);
 
-      expect(mockMessaging.send).toHaveBeenCalledWith(
+      expect(messagingSingleton.send).toHaveBeenCalledWith(
         expect.objectContaining({
           notification: {
             title: '🎉 It\'s a Match!',
@@ -71,12 +72,11 @@ describe('NotificationService', () => {
         name: 'Matched User',
       };
 
-      const mockMessaging = require('firebase-admin').messaging();
-      mockMessaging.send.mockClear();
+      messagingSingleton.send.mockClear();
 
       await notificationService.sendMatchNotification(userWithoutToken, matchedUser);
 
-      expect(mockMessaging.send).not.toHaveBeenCalled();
+      expect(messagingSingleton.send).not.toHaveBeenCalled();
     });
 
     it('should not send notification if match notifications are disabled', async () => {
@@ -92,12 +92,51 @@ describe('NotificationService', () => {
         name: 'Matched User',
       };
 
-      const mockMessaging = require('firebase-admin').messaging();
-      mockMessaging.send.mockClear();
+      messagingSingleton.send.mockClear();
 
       await notificationService.sendMatchNotification(userWithDisabledNotifications, matchedUser);
 
-      expect(mockMessaging.send).not.toHaveBeenCalled();
+      expect(messagingSingleton.send).not.toHaveBeenCalled();
+    });
+
+    it('should not send notification if enableAllNotifications is false', async () => {
+      const userMasterOff = {
+        ...mockUser,
+        notificationPreferences: {
+          ...mockUser.notificationPreferences,
+          enableAllNotifications: false,
+        },
+      };
+      const matchedUser: User = {
+        id: 'matched-user-id',
+        name: 'Matched User',
+      };
+
+      messagingSingleton.send.mockClear();
+
+      await notificationService.sendMatchNotification(userMasterOff, matchedUser);
+
+      expect(messagingSingleton.send).not.toHaveBeenCalled();
+    });
+
+    it('should not send notification if muteAllNotifications is true', async () => {
+      const userMuted = {
+        ...mockUser,
+        notificationPreferences: {
+          ...mockUser.notificationPreferences,
+          muteAllNotifications: true,
+        },
+      };
+      const matchedUser: User = {
+        id: 'matched-user-id',
+        name: 'Matched User',
+      };
+
+      messagingSingleton.send.mockClear();
+
+      await notificationService.sendMatchNotification(userMuted, matchedUser);
+
+      expect(messagingSingleton.send).not.toHaveBeenCalled();
     });
   });
 
@@ -112,12 +151,11 @@ describe('NotificationService', () => {
       };
       const threadId = 'test-thread-id';
 
-      const mockMessaging = require('firebase-admin').messaging();
-      mockMessaging.send.mockResolvedValue('message-id');
+      messagingSingleton.send.mockResolvedValue('message-id');
 
       await notificationService.sendMessageNotification(mockUser, sender, messageData, threadId);
 
-      expect(mockMessaging.send).toHaveBeenCalledWith(
+      expect(messagingSingleton.send).toHaveBeenCalledWith(
         expect.objectContaining({
           notification: {
             title: 'Sender User',
@@ -139,16 +177,15 @@ describe('NotificationService', () => {
       };
       const threadId = 'test-thread-id';
 
-      const mockMessaging = require('firebase-admin').messaging();
-      mockMessaging.send.mockResolvedValue('message-id');
+      messagingSingleton.send.mockResolvedValue('message-id');
 
       await notificationService.sendMessageNotification(mockUser, sender, messageData, threadId);
 
-      expect(mockMessaging.send).toHaveBeenCalledWith(
+      expect(messagingSingleton.send).toHaveBeenCalledWith(
         expect.objectContaining({
-          notification: {
-            body: 'a'.repeat(100) + '...',
-          },
+          notification: expect.objectContaining({
+            body: expect.stringMatching(/^a{100}\.\.\.$/),
+          }),
         })
       );
     });

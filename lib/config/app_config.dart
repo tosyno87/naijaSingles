@@ -25,6 +25,20 @@ class AppConfig {
   static const String supportEmail = 'support@naijasingles.com';
   static const String privacyPolicyUrl = 'https://naijasingles.com/privacy';
   static const String termsOfServiceUrl = 'https://naijasingles.com/terms';
+
+  /// Community guidelines (settings / safety).
+  static const String communityGuidelinesUrl =
+      'https://naijasingles.com/community-guidelines';
+
+  /// Android `applicationId` (Google Play) — must match Play Console for receipt checks.
+  static const String androidApplicationId = 'com.app.naijasingles';
+
+  /// Rollout guard: set `--dart-define=SUBSCRIPTION_VERIFY_ROLLOUT=false` only while
+  /// the callable is not live (users will not get premium until verification succeeds).
+  static const bool subscriptionVerifyRollout = bool.fromEnvironment(
+    'SUBSCRIPTION_VERIFY_ROLLOUT',
+    defaultValue: true,
+  );
 }
 
 // Privacy policy and terms URLs

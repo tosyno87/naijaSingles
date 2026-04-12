@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:io';
 
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -12,6 +13,7 @@ class GetInAppProductsBloc
   GetInAppProductsBloc() : super(GetInAppProductsInitialState()) {
     on<RequestInAppProducts>((event, emit) async {
       emit(GetInAppProductsLoadingState());
+      unawaited(InAppPurchaseRepoImpl.logPackagesDiagnostics());
       try {
         final List<ProductDetails> products =
             await inAppPurchaseRepository.getProductsDetailsById();

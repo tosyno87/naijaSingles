@@ -10,6 +10,7 @@ import 'package:google_fonts/google_fonts.dart';
 import '../../common/bloc/user/user_bloc.dart';
 import '../../common/constants/app_colors.dart';
 import '../../common/constants/app_spacing.dart';
+import 'widgets/settings_list/settings_section_header.dart';
 
 class DiscoveryPreferencesScreen extends StatefulWidget {
   const DiscoveryPreferencesScreen({super.key});
@@ -164,15 +165,15 @@ class _DiscoveryPreferencesScreenState
             icon: const Icon(Icons.arrow_back_ios, color: _textPrimary),
             onPressed: () => Navigator.pop(context),
           ),
+          centerTitle: true,
           title: Text(
             'Discovery Preferences',
             style: GoogleFonts.montserrat(
-              fontSize: 20,
-              fontWeight: FontWeight.bold,
+              fontSize: 17,
+              fontWeight: FontWeight.w600,
               color: _textPrimary,
             ),
           ),
-          centerTitle: true,
           actions: [
             TextButton(
               onPressed: _savePreferences,
@@ -207,15 +208,8 @@ class _DiscoveryPreferencesScreenState
   Widget _buildShowMeSection() => Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text(
-            'Show me',
-            style: GoogleFonts.montserrat(
-              fontSize: 18,
-              fontWeight: FontWeight.w600,
-              color: _textPrimary,
-            ),
-          ),
-          const SizedBox(height: AppSpacing.md),
+          const SettingsSectionHeader('Show me'),
+          const SizedBox(height: AppSpacing.sm),
           _buildGenderOption('Men', 'men', Icons.male),
           const SizedBox(height: 12),
           _buildGenderOption('Women', 'women', Icons.female),
@@ -271,14 +265,7 @@ class _DiscoveryPreferencesScreenState
   Widget _buildDistanceSection() => Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text(
-            'Maximum distance',
-            style: GoogleFonts.montserrat(
-              fontSize: 18,
-              fontWeight: FontWeight.w600,
-              color: _textPrimary,
-            ),
-          ),
+          const SettingsSectionHeader('Maximum distance'),
           const SizedBox(height: AppSpacing.sm),
           Text(
             _maxDistance.round() >= 100
@@ -327,14 +314,7 @@ class _DiscoveryPreferencesScreenState
   Widget _buildAgeRangeSection() => Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text(
-            'Age range',
-            style: GoogleFonts.montserrat(
-              fontSize: 18,
-              fontWeight: FontWeight.w600,
-              color: _textPrimary,
-            ),
-          ),
+          const SettingsSectionHeader('Age range'),
           const SizedBox(height: AppSpacing.sm),
           Text(
             '${_ageRange.start.round()} – ${_ageRange.end.round()} years',

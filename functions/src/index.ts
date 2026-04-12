@@ -23,6 +23,7 @@ import {
   deleteAccountDirect,
   startDeletionOtp,
 } from './handlers/accountDeletionCallables';
+import {verifySubscriptionPurchase} from './handlers/subscriptionVerificationHandlers';
 
 admin.initializeApp();
 
@@ -53,6 +54,7 @@ export {
   confirmDeletionAfterPhoneProof,
   deleteAccountDirect,
 };
+export {verifySubscriptionPurchase};
 
 export const healthCheck = onRequest((req, res) => {
   res.status(200).json({

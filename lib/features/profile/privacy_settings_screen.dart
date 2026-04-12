@@ -7,6 +7,7 @@ import '../../common/constants/app_colors.dart';
 import '../../common/constants/app_spacing.dart';
 import '../../common/widgets/state_views/state_views.dart';
 import '../../services/user_privacy_service.dart';
+import '../settings/widgets/settings_list/settings_list.dart';
 
 class PrivacySettingsScreen extends StatefulWidget {
   const PrivacySettingsScreen({super.key});
@@ -118,11 +119,12 @@ class _PrivacySettingsScreenState extends State<PrivacySettingsScreen> {
                 const Icon(Icons.arrow_back_ios, color: AppColors.textPrimary),
             onPressed: () => Navigator.pop(context),
           ),
+          centerTitle: true,
           title: Text(
             'Privacy Settings',
             style: GoogleFonts.montserrat(
-              fontSize: 20,
-              fontWeight: FontWeight.bold,
+              fontSize: 17,
+              fontWeight: FontWeight.w600,
               color: AppColors.textPrimary,
             ),
           ),
@@ -244,34 +246,37 @@ class _PrivacySettingsScreenState extends State<PrivacySettingsScreen> {
         ],
       );
 
-  Widget _buildProfileVisibilitySection() => _sectionCard(
-        children: [
-          _buildToggleItem(
-            'Show Tribe',
-            'Display your tribe or ethnicity',
-            _settings.showTribe,
-            (value) => setState(() {
-              _settings = _settings.copyWith(showTribe: value);
-            }),
-          ),
-          _buildLockedProfileField(
-            'Age',
-            'Always shown on your profile. This helps keep the experience fair and safe for everyone.',
-          ),
-          _buildLockedProfileField(
-            'Neighborhood & distance',
-            'Your area and approximate distance to others are always used for matching. Your exact address is never shared.',
-          ),
-          _buildToggleItem(
-            'Hide From Discovery',
-            'Temporarily remove your profile from the swipe deck',
-            _settings.hideFromDiscovery,
-            (value) => setState(() {
-              _settings = _settings.copyWith(hideFromDiscovery: value);
-            }),
-            isDestructive: true,
-          ),
-        ],
+  Widget _buildProfileVisibilitySection() => settingsSwitchTheme(
+        context: context,
+        child: _sectionCard(
+          children: [
+            SettingsToggleRow(
+              title: 'Show Tribe',
+              subtitle: 'Display your tribe or ethnicity',
+              value: _settings.showTribe,
+              onChanged: (value) => setState(() {
+                _settings = _settings.copyWith(showTribe: value);
+              }),
+            ),
+            _buildLockedProfileField(
+              'Age',
+              'Always shown on your profile. This helps keep the experience fair and safe for everyone.',
+            ),
+            _buildLockedProfileField(
+              'Neighborhood & distance',
+              'Your area and approximate distance to others are always used for matching. Your exact address is never shared.',
+            ),
+            SettingsToggleRow(
+              title: 'Hide From Discovery',
+              subtitle: 'Temporarily remove your profile from the swipe deck',
+              value: _settings.hideFromDiscovery,
+              isDestructive: true,
+              onChanged: (value) => setState(() {
+                _settings = _settings.copyWith(hideFromDiscovery: value);
+              }),
+            ),
+          ],
+        ),
       );
 
   Widget _buildLockedProfileField(String title, String subtitle) => ListTile(
@@ -342,52 +347,6 @@ class _PrivacySettingsScreenState extends State<PrivacySettingsScreen> {
         borderRadius: BorderRadius.circular(AppSpacing.cardRadius),
         child: Column(children: separated),
       ),
-    );
-  }
-
-  Widget _buildToggleItem(
-    String title,
-    String subtitle,
-    bool value,
-    ValueChanged<bool> onChanged, {
-    bool isDestructive = false,
-  }) {
-    final Color activeColor =
-        isDestructive ? Colors.red.shade600 : AppColors.primaryGreen;
-
-    return SwitchListTile.adaptive(
-      contentPadding: const EdgeInsets.symmetric(
-        horizontal: AppSpacing.md,
-        vertical: AppSpacing.sm - AppSpacing.xs / 2,
-      ),
-      title: Text(
-        title,
-        style: GoogleFonts.montserrat(
-          fontSize: 15,
-          fontWeight: FontWeight.w600,
-          color: isDestructive && value
-              ? Colors.red.shade700
-              : AppColors.textPrimary,
-        ),
-      ),
-      subtitle: Padding(
-        padding: const EdgeInsets.only(top: AppSpacing.xs / 2),
-        child: Text(
-          subtitle,
-          style: GoogleFonts.montserrat(
-            fontSize: 13,
-            color: isDestructive && value
-                ? Colors.red.shade400
-                : AppColors.textSecondary,
-          ),
-        ),
-      ),
-      value: value,
-      onChanged: onChanged,
-      activeThumbColor: activeColor,
-      activeTrackColor: activeColor.withValues(alpha: 0.35),
-      inactiveThumbColor: Colors.grey.shade400,
-      inactiveTrackColor: Colors.grey.shade200,
     );
   }
 

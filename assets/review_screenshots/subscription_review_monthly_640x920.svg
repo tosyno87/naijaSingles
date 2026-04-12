@@ -1,0 +1,34 @@
+<svg width="640" height="920" viewBox="0 0 640 920" xmlns="http://www.w3.org/2000/svg">
+  <rect width="640" height="920" fill="#F5F6F8"/>
+  <text x="40" y="46" fill="#111" font-size="16" font-family="-apple-system,Arial">9:41</text>
+  <rect x="220" y="18" width="200" height="40" rx="20" fill="#0F0F14"/>
+
+  <text x="320" y="100" text-anchor="middle" fill="#008940" font-size="36" font-weight="700" font-family="-apple-system,Arial">Get our premium plans</text>
+
+  <rect x="32" y="122" width="576" height="528" rx="14" fill="#FFFFFF" stroke="#E0E3E8"/>
+
+  <circle cx="52" cy="166" r="4" fill="#008940"/>
+  <text x="64" y="170" fill="#181A1F" font-size="16" font-family="-apple-system,Arial">Unlimited swipe</text>
+  <circle cx="52" cy="194" r="4" fill="#008940"/>
+  <text x="64" y="198" fill="#181A1F" font-size="16" font-family="-apple-system,Arial">Search users around your preferred radius</text>
+  <circle cx="52" cy="222" r="4" fill="#008940"/>
+  <text x="64" y="226" fill="#181A1F" font-size="16" font-family="-apple-system,Arial">Priority profile visibility</text>
+  <circle cx="52" cy="250" r="4" fill="#008940"/>
+  <text x="64" y="254" fill="#181A1F" font-size="16" font-family="-apple-system,Arial">See who likes you first</text>
+
+  <text x="48" y="300" fill="#181A1F" font-size="22" font-weight="600" font-family="-apple-system,Arial">Choose your plan</text>
+
+  <rect x="48" y="320" width="258" height="170" rx="12" fill="#E9F7EF" stroke="#008940" stroke-width="2"/>
+  <text x="64" y="356" fill="#181A1F" font-size="28" font-weight="600" font-family="-apple-system,Arial">Monthly</text>
+  <text x="64" y="392" fill="#008940" font-size="24" font-weight="600" font-family="-apple-system,Arial">$4.99 / month</text>
+  <text x="64" y="420" fill="#6D727B" font-size="17" font-family="-apple-system,Arial">Billed monthly</text>
+
+  <rect x="334" y="320" width="258" height="170" rx="12" fill="#FFFFFF" stroke="#E0E3E8"/>
+  <text x="350" y="356" fill="#181A1F" font-size="28" font-weight="600" font-family="-apple-system,Arial">Yearly</text>
+  <text x="350" y="392" fill="#008940" font-size="24" font-weight="600" font-family="-apple-system,Arial">$39.99 / year</text>
+  <text x="350" y="420" fill="#6D727B" font-size="17" font-family="-apple-system,Arial">Best value • Save 33%</text>
+
+  <rect x="140" y="748" width="360" height="64" rx="32" fill="#008940"/>
+  <text x="320" y="790" text-anchor="middle" fill="#FFF" font-size="30" font-weight="700" font-family="-apple-system,Arial">CONTINUE</text>
+  <text x="320" y="846" text-anchor="middle" fill="#2C6AC4" font-size="16" font-family="-apple-system,Arial">Privacy Policy • Terms &amp; Conditions</text>
+</svg>

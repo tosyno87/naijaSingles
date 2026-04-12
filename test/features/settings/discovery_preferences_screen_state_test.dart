@@ -18,8 +18,8 @@ void main() {
     await tester.pump(const Duration(seconds: 1));
 
     expect(find.text('Discovery Preferences'), findsOneWidget);
-    expect(find.text('Show me'), findsOneWidget);
-    expect(find.text('Maximum distance'), findsOneWidget);
-    expect(find.text('Age range'), findsOneWidget);
+    expect(find.text('SHOW ME'), findsOneWidget);
+    expect(find.text('MAXIMUM DISTANCE'), findsOneWidget);
+    expect(find.text('AGE RANGE'), findsOneWidget);
   });
 }

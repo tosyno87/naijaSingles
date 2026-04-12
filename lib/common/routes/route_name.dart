@@ -50,6 +50,12 @@ class RouteName {
   static const String accountDeletion = '/account_deletion';
   static const String feedbackScreen = '/feedback';
   static const String updatePhoneScreen = '/update_number';
+  static const String phoneEmailSettings = '/settings_phone_email';
+  static const String connectedAccountsSettings =
+      '/settings_connected_accounts';
+  static const String emailNotificationsSettings =
+      '/settings_email_notifications';
+  static const String downloadMyData = '/settings_download_my_data';
 
   // ===== EVENTS ROUTES =====
   static const String eventsScreen = '/events';

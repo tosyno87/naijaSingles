@@ -4,7 +4,6 @@ import 'dart:async';
 import 'dart:io';
 import 'dart:math';
 
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -12,14 +11,12 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:in_app_purchase/in_app_purchase.dart';
 import 'package:in_app_purchase_android/in_app_purchase_android.dart';
 import 'package:in_app_purchase_storekit/in_app_purchase_storekit.dart';
-import 'package:in_app_purchase_storekit/store_kit_wrappers.dart';
 import 'package:rflutter_alert/rflutter_alert.dart';
 
 import '../../../common/bloc/theme/theme_bloc.dart';
 import '../../../common/constants/adds.dart';
 import '../../../common/constants/app_colors.dart';
 import '../../../common/constants/app_spacing.dart';
-import '../../../common/constants/constants.dart';
 import '../../../common/data/repo/in_app_purchase_repo.dart';
 import '../../../common/utils/crousle_slider.dart';
 import '../../../common/utils/privacy_page.dart';
@@ -28,8 +25,11 @@ import '../../../common/widgets/custom_snackbar.dart';
 import '../../../common/widgets/state_views/state_views.dart';
 import '../../../config/app_config.dart';
 import '../../../models/user_model.dart';
+import '../../home/ui/tab/tabbar.dart';
+import '../presentation/bloc/subscription_bloc.dart';
 import 'in_app_purchase/buy_products/buyproducts_bloc.dart';
 import 'in_app_purchase/buy_products/buyproducts_events.dart';
+import 'in_app_purchase/buy_products/buyproducts_states.dart';
 import 'in_app_purchase/get_products/getproducts_bloc.dart';
 import 'in_app_purchase/get_products/getproducts_events.dart';
 import 'in_app_purchase/get_products/getproducts_states.dart';
@@ -50,167 +50,159 @@ class Products extends StatefulWidget {
 }
 
 class ProductsState extends State<Products> {
-  /// if the api is available or not.
-  bool isAvailable = true;
-
-  /// products for sale
-  // List<ProductDetails> products = [];
-
-  /// Past purchases
-  List<PurchaseDetails> purchases = [];
-
-  /// Update to purchases
-  StreamSubscription? _streamSubscription;
   ProductDetails? electedPlan;
   ProductDetails? selectedProduct;
 
-  bool _isLoading = true;
-  final InAppPurchase _iap = InAppPurchase.instance;
   final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
   @override
   void initState() {
     super.initState();
     context.read<GetInAppProductsBloc>().add(RequestInAppProducts());
-    unawaited(_initialize());
     // Show payment failure alert.
     if (widget.isPaymentSuccess != null && !widget.isPaymentSuccess!) {
-      WidgetsBinding.instance.addPostFrameCallback((_) async {
-        await Alert(
-          context: context,
-          type: AlertType.error,
-          title: 'Failed'.tr().toString(),
-          desc: 'Oops !! something went wrong. Try Again'.tr().toString(),
-          buttons: [
-            DialogButton(
-              child: Text(
-                'Retry'.tr().toString(),
-                style: const TextStyle(color: Colors.white, fontSize: 20),
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        unawaited(
+          Alert(
+            context: context,
+            type: AlertType.error,
+            title: 'Failed'.tr().toString(),
+            desc: 'Oops !! something went wrong. Try Again'.tr().toString(),
+            buttons: [
+              DialogButton(
+                child: Text(
+                  'Retry'.tr().toString(),
+                  style: const TextStyle(color: Colors.white, fontSize: 20),
+                ),
+                onPressed: () => Navigator.pop(context),
+                width: 120,
               ),
-              onPressed: () => Navigator.pop(context),
-              width: 120,
-            ),
-          ],
-        ).show();
+            ],
+          ).show(),
+        );
       });
     }
-  }
-
-  @override
-  void dispose() {
-    unawaited(_streamSubscription?.cancel());
-    super.dispose();
-  }
-
-  Future<void> _initialize() async {
-    final currentUser = widget.currentUser;
-    if (currentUser == null) return;
-
-    isAvailable = await _iap.isAvailable();
-    debugPrint('available is $isAvailable');
-    if (isAvailable) {
-      /// removing all the pending puchases.
-      if (Platform.isIOS) {
-        final paymentWrapper = SKPaymentQueueWrapper();
-        final transactions = await paymentWrapper.transactions();
-        for (final transaction in transactions) {
-          debugPrint(transaction.transactionState.toString());
-          await paymentWrapper
-              .finishTransaction(transaction)
-              .catchError((onError) {
-            debugPrint('finishTransaction Error $onError');
-          });
-        }
-      }
-
-      _streamSubscription = _iap.purchaseStream.listen((data) async {
-        if (!mounted) return;
-        setState(() {
-          purchases.addAll(data);
-        });
-
-        for (final purchase in purchases) {
-          await InAppPurchaseRepoImpl.verifyPuchase(
-            purchase.productID,
-            purchases,
-            currentUser,
-            widget.items,
-            context,
-          ).whenComplete(() async {
-            await firebaseFireStoreInstance
-                .collection('users')
-                .doc(currentUser.id)
-                .update({
-              'isPremium': true,
-              'subscriptionDate': FieldValue.serverTimestamp(),
-            });
-          });
-        }
-      });
-      _streamSubscription?.onError(
-        (error) {
-          if (!mounted) return;
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(
-              content: error != null
-                  ? Text('$error')
-                  : Text(
-                      'Oops !! something went wrong. Try Again'.tr().toString(),
-                    ),
-            ),
-          );
-        },
-      );
-    }
-    setState(() {
-      _isLoading = false;
-    });
   }
 
   @override
   Widget build(BuildContext context) {
     final isDarkMode = context.watch<ThemeBloc>().isDarkMode;
-    return BlocBuilder<GetInAppProductsBloc, GetInAppProductsStates>(
-      builder: (context, state) {
-        if (state is GetInAppProductsLoadingState) {
-          return const AppLoadingView();
-        } else if (state is GetInAppProductsFailedState) {
-          return Scaffold(
-            body: AppErrorView(
-              message: state.msg ?? 'Failed to load products',
-            ),
-          );
-        } else if (state is GetInAppProductsSuccessState) {
-          return Scaffold(
-            backgroundColor: Theme.of(context).primaryColor,
-            appBar: AppBar(
-              elevation: 0,
-              backgroundColor:
-                  isDarkMode ? const Color(0xff252020) : Colors.white,
-              centerTitle: true,
-              title: Text(
-                'Get our premium plans'.tr().toString(),
-                textAlign: TextAlign.center,
-                style: const TextStyle(
-                  color: AppColors.primaryGreen,
-                  fontSize: 25,
-                  fontWeight: FontWeight.bold,
+    return MultiBlocListener(
+      listeners: [
+        BlocListener<SubscriptionBloc, SubscriptionState>(
+          listenWhen: (previous, current) =>
+              current.shouldNavigateToSuccess &&
+              !previous.shouldNavigateToSuccess,
+          listener: (context, state) {
+            final UserModel? user = widget.currentUser;
+            final String? uid = user?.id;
+            if (uid == null || uid.isEmpty) return;
+            context
+                .read<SubscriptionBloc>()
+                .add(const SubscriptionConsumeNavigateSuccess());
+            unawaited(
+              Navigator.pushReplacement(
+                context,
+                CupertinoPageRoute<void>(
+                  builder: (_) => Tabbar(
+                    isPaymentSuccess: true,
+                    currentUserId: uid,
+                  ),
                 ),
               ),
-              automaticallyImplyLeading: false,
-              actions: [
-                IconButton(
-                  color: isDarkMode ? Colors.white : Colors.black,
-                  icon: const Icon(
-                    Icons.cancel,
-                    size: 25,
+            );
+          },
+        ),
+        BlocListener<SubscriptionBloc, SubscriptionState>(
+          listenWhen: (previous, current) =>
+              current.userMessage != null &&
+              current.userMessage != previous.userMessage,
+          listener: (context, state) {
+            final String? message = state.userMessage;
+            if (message == null) return;
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(content: Text(message)),
+            );
+            context
+                .read<SubscriptionBloc>()
+                .add(const SubscriptionConsumeUserMessage());
+          },
+        ),
+        BlocListener<BuyConsumableInAppProductsBloc, BuyConsumableStates>(
+          listenWhen: (previous, current) => current is BuyConsumableFailedState,
+          listener: (context, state) {
+            if (state is BuyConsumableFailedState) {
+              ScaffoldMessenger.of(context).showSnackBar(
+                SnackBar(
+                  content: Text(
+                    state.msg ?? 'Purchase could not be started. Try again.',
                   ),
-                  onPressed: () {
-                    Navigator.pop(context);
-                  },
                 ),
-              ],
-            ),
-            key: _scaffoldKey,
+              );
+            }
+          },
+        ),
+      ],
+      child: BlocBuilder<GetInAppProductsBloc, GetInAppProductsStates>(
+        builder: (context, state) {
+          if (state is GetInAppProductsLoadingState) {
+            return const AppLoadingView();
+          }
+          if (state is GetInAppProductsFailedState) {
+            return Scaffold(
+              body: AppErrorView(
+                title: 'Plans temporarily unavailable',
+                message: state.msg ?? 'Failed to load products',
+                onRetry: () => context
+                    .read<GetInAppProductsBloc>()
+                    .add(RequestInAppProducts()),
+              ),
+            );
+          }
+          if (state is GetInAppProductsSuccessState) {
+            return Scaffold(
+              backgroundColor: Theme.of(context).primaryColor,
+              appBar: AppBar(
+                elevation: 0,
+                backgroundColor:
+                    isDarkMode ? const Color(0xff252020) : Colors.white,
+                centerTitle: true,
+                title: Text(
+                  'Get our premium plans'.tr().toString(),
+                  textAlign: TextAlign.center,
+                  style: const TextStyle(
+                    color: AppColors.primaryGreen,
+                    fontSize: 25,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+                automaticallyImplyLeading: false,
+                actions: [
+                  IconButton(
+                    color: isDarkMode ? Colors.white : Colors.black,
+                    icon: const Icon(
+                      Icons.cancel,
+                      size: 25,
+                    ),
+                    onPressed: () {
+                      Navigator.pop(context);
+                    },
+                  ),
+                ],
+                bottom: PreferredSize(
+                  preferredSize: const Size.fromHeight(4),
+                  child: BlocBuilder<SubscriptionBloc, SubscriptionState>(
+                    buildWhen: (p, c) =>
+                        p.purchaseInProgress != c.purchaseInProgress,
+                    builder: (context, subState) {
+                      if (!subState.purchaseInProgress) {
+                        return const SizedBox.shrink();
+                      }
+                      return const LinearProgressIndicator(minHeight: 4);
+                    },
+                  ),
+                ),
+              ),
+              key: _scaffoldKey,
             body: SingleChildScrollView(
               child: Column(
                 // mainAxisAlignment: MainAxisAlignment.spaceAround,
@@ -260,13 +252,7 @@ class ProductsState extends State<Products> {
                           CarouselSlider(
                             adds: adds,
                           ),
-                          if (_isLoading)
-                            SizedBox(
-                              height: MediaQuery.of(context).size.width * .8,
-                              child: const Center(child: AppLoadingView()),
-                            )
-                          else
-                            state.result.isNotEmpty
+                          state.result.isNotEmpty
                                 ? Stack(
                                     alignment: Alignment.bottomCenter,
                                     children: [
@@ -419,11 +405,16 @@ class ProductsState extends State<Products> {
                                 : SizedBox(
                                     height:
                                         MediaQuery.of(context).size.width * .8,
-                                    child: AppEmptyView(
-                                      title: 'No active product found!!'
-                                          .tr()
-                                          .toString(),
+                                    child: AppErrorView(
+                                      title: 'Plans temporarily unavailable',
+                                      message:
+                                          'No plans were returned from the store. '
+                                          'Check App Store Connect / Play Console IDs '
+                                          'and try again.',
                                       icon: Icons.shopping_bag_outlined,
+                                      onRetry: () => context
+                                          .read<GetInAppProductsBloc>()
+                                          .add(RequestInAppProducts()),
                                     ),
                                   ),
                         ],
@@ -543,7 +534,7 @@ class ProductsState extends State<Products> {
                           onTap: () => Navigator.push(
                             context,
                             MaterialPageRoute(
-                              builder: (context) => const PrivacyPolicyPage(
+                              builder: (context) => PrivacyPolicyPage(
                                 url: privacyUrl,
                                 tittle: 'Privacy Policy',
                               ),
@@ -558,7 +549,7 @@ class ProductsState extends State<Products> {
                           onTap: () => Navigator.push(
                             context,
                             MaterialPageRoute(
-                              builder: (context) => const PrivacyPolicyPage(
+                              builder: (context) => PrivacyPolicyPage(
                                 url: termConditionUrl,
                                 tittle: 'Terms & Conditions',
                               ),
@@ -571,15 +562,20 @@ class ProductsState extends State<Products> {
                 ],
               ),
             ),
+            );
+          }
+          return Scaffold(
+            body: AppErrorView(
+              title: 'Plans temporarily unavailable',
+              message: 'No product Found'.tr().toString(),
+              icon: Icons.shopping_bag_outlined,
+              onRetry: () => context
+                  .read<GetInAppProductsBloc>()
+                  .add(RequestInAppProducts()),
+            ),
           );
-        }
-        return Scaffold(
-          body: AppEmptyView(
-            title: 'No product Found'.tr().toString(),
-            icon: Icons.shopping_bag_outlined,
-          ),
-        );
-      },
+        },
+      ),
     );
   }
 

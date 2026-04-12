@@ -6,7 +6,12 @@ import '../common/utils/firestore_helpers.dart';
 
 /// Service for managing user settings, blocked users, and preferences
 class SettingsService {
-  static final FirebaseFirestore _firestore = FirebaseFirestore.instance;
+  /// When set (tests only), all Firestore reads/writes in this service use it.
+  @visibleForTesting
+  static FirebaseFirestore? firestoreForTesting;
+
+  static FirebaseFirestore get _firestore =>
+      firestoreForTesting ?? FirebaseFirestore.instance;
   static final FirebaseAuth _auth = FirebaseAuth.instance;
 
   // Collection references
@@ -211,27 +216,90 @@ class SettingsService {
           await _firestore.collection('notificationSettings').doc(userId).get();
 
       if (settingsDoc.exists) {
-        return NotificationSettings.fromMap(settingsDoc.data()!);
-      } else {
-        // Return default settings
-        return NotificationSettings.defaultSettings();
+        final raw = Map<String, dynamic>.from(settingsDoc.data()!);
+        final settings = NotificationSettings.fromMap(raw);
+        if (_settingsRawMissingMasterKeys(raw)) {
+          await updateNotificationSettings(userId, settings);
+        } else {
+          await _backfillUserNotificationPreferencesIfNeeded(userId, settings);
+        }
+        return settings;
       }
+      return NotificationSettings.defaultSettings();
     } on Object catch (e) {
       debugPrint('❌ Error getting notification settings: $e');
       return NotificationSettings.defaultSettings();
     }
   }
 
-  /// Update notification settings
+  static bool _settingsRawMissingMasterKeys(Map<String, dynamic> raw) =>
+      !raw.containsKey('enableAllNotifications') ||
+      !raw.containsKey('muteAllNotifications');
+
+  static bool _prefsMapMissingMasterKeys(Map<String, dynamic>? prefs) {
+    if (prefs == null) return true;
+    return !prefs.containsKey('enableAllNotifications') ||
+        !prefs.containsKey('muteAllNotifications');
+  }
+
+  /// Ensures [users] doc has `notificationPreferences` with master keys so Cloud
+  /// Functions match the resolved [NotificationSettings] document.
+  static Future<void> _backfillUserNotificationPreferencesIfNeeded(
+    String userId,
+    NotificationSettings settings,
+  ) async {
+    try {
+      final userSnap = await _usersCollection.doc(userId).get();
+      if (!userSnap.exists) return;
+      final data = userSnap.data() as Map<String, dynamic>?;
+      if (data == null) return;
+      final rawPrefs = data['notificationPreferences'];
+      Map<String, dynamic>? prefs;
+      if (rawPrefs is Map<String, dynamic>) {
+        prefs = rawPrefs;
+      } else if (rawPrefs is Map) {
+        prefs = Map<String, dynamic>.from(rawPrefs);
+      }
+      if (!_prefsMapMissingMasterKeys(prefs)) return;
+
+      await _usersCollection.doc(userId).set(
+        {
+          'notificationPreferences':
+              settings.normalizedForPersist().toNotificationPreferencesMap(),
+        },
+        SetOptions(merge: true),
+      );
+      debugPrint(
+        '✅ Backfilled users/$userId.notificationPreferences (master keys)',
+      );
+    } on Object catch (e) {
+      debugPrint('⚠️ notificationPreferences backfill skipped: $e');
+    }
+  }
+
+  /// Persists [settings] to `notificationSettings/{userId}` and mirrors the
+  /// push-relevant subset to `users/{userId}.notificationPreferences` (merge).
+  ///
+  /// **Mirror contract:** `toNotificationPreferencesMap()` must stay aligned
+  /// with what Cloud Functions read for FCM gating.
   static Future<bool> updateNotificationSettings(
     String userId,
     NotificationSettings settings,
   ) async {
     try {
+      final persisted = settings.normalizedForPersist();
+
       await _firestore
           .collection('notificationSettings')
           .doc(userId)
-          .set(settings.toMap(), SetOptions(merge: true));
+          .set(persisted.toMap(), SetOptions(merge: true));
+
+      await _usersCollection.doc(userId).set(
+        {
+          'notificationPreferences': persisted.toNotificationPreferencesMap(),
+        },
+        SetOptions(merge: true),
+      );
 
       debugPrint('✅ Notification settings updated for user $userId');
       return true;
@@ -398,13 +466,23 @@ class BlockedUser {
   String toString() => 'BlockedUser(id: $id, name: $name)';
 }
 
-/// Model for notification settings
+/// Notification preferences stored under `notificationSettings/{userId}` and
+/// mirrored to `users/{userId}.notificationPreferences` for Cloud Functions.
+///
+/// **Push send precedence (server, evaluated in order):**
+/// 1. If [enableAllNotifications] is false → no FCM (other flags ignored).
+/// 2. Else if [muteAllNotifications] is true → no FCM.
+/// 3. Else per-type flags (`matchNotifications`, etc.) apply.
+///
+/// If both (1) and (2) could apply, the send is still blocked (same outcome).
 class NotificationSettings {
   const NotificationSettings({
     required this.matchNotifications,
     required this.messageNotifications,
     required this.likeNotifications,
     required this.superLikeNotifications,
+    required this.enableAllNotifications,
+    required this.muteAllNotifications,
     required this.soundEnabled,
     required this.vibrationEnabled,
     required this.quietHoursStart,
@@ -417,6 +495,8 @@ class NotificationSettings {
         messageNotifications: true,
         likeNotifications: true,
         superLikeNotifications: true,
+        enableAllNotifications: true,
+        muteAllNotifications: false,
         soundEnabled: true,
         vibrationEnabled: true,
         quietHoursStart: '22:00',
@@ -430,6 +510,8 @@ class NotificationSettings {
         messageNotifications: map['messageNotifications'] ?? true,
         likeNotifications: map['likeNotifications'] ?? true,
         superLikeNotifications: map['superLikeNotifications'] ?? true,
+        enableAllNotifications: map['enableAllNotifications'] ?? true,
+        muteAllNotifications: map['muteAllNotifications'] ?? false,
         soundEnabled: map['soundEnabled'] ?? true,
         vibrationEnabled: map['vibrationEnabled'] ?? true,
         quietHoursStart: map['quietHoursStart'] ?? '22:00',
@@ -440,6 +522,8 @@ class NotificationSettings {
   final bool messageNotifications;
   final bool likeNotifications;
   final bool superLikeNotifications;
+  final bool enableAllNotifications;
+  final bool muteAllNotifications;
   final bool soundEnabled;
   final bool vibrationEnabled;
   final String quietHoursStart;
@@ -451,6 +535,8 @@ class NotificationSettings {
         'messageNotifications': messageNotifications,
         'likeNotifications': likeNotifications,
         'superLikeNotifications': superLikeNotifications,
+        'enableAllNotifications': enableAllNotifications,
+        'muteAllNotifications': muteAllNotifications,
         'soundEnabled': soundEnabled,
         'vibrationEnabled': vibrationEnabled,
         'quietHoursStart': quietHoursStart,
@@ -458,11 +544,31 @@ class NotificationSettings {
         'quietHoursEnabled': quietHoursEnabled,
       };
 
+  /// Persisted shape: super-like channel follows [likeNotifications].
+  NotificationSettings normalizedForPersist() => copyWith(
+        superLikeNotifications: likeNotifications,
+      );
+
+  /// Subset synced to the user root document for backend push logic.
+  Map<String, dynamic> toNotificationPreferencesMap() {
+    final normalized = normalizedForPersist();
+    return {
+      'matchNotifications': normalized.matchNotifications,
+      'messageNotifications': normalized.messageNotifications,
+      'likeNotifications': normalized.likeNotifications,
+      'superLikeNotifications': normalized.superLikeNotifications,
+      'enableAllNotifications': normalized.enableAllNotifications,
+      'muteAllNotifications': normalized.muteAllNotifications,
+    };
+  }
+
   NotificationSettings copyWith({
     bool? matchNotifications,
     bool? messageNotifications,
     bool? likeNotifications,
     bool? superLikeNotifications,
+    bool? enableAllNotifications,
+    bool? muteAllNotifications,
     bool? soundEnabled,
     bool? vibrationEnabled,
     String? quietHoursStart,
@@ -475,6 +581,10 @@ class NotificationSettings {
         likeNotifications: likeNotifications ?? this.likeNotifications,
         superLikeNotifications:
             superLikeNotifications ?? this.superLikeNotifications,
+        enableAllNotifications:
+            enableAllNotifications ?? this.enableAllNotifications,
+        muteAllNotifications:
+            muteAllNotifications ?? this.muteAllNotifications,
         soundEnabled: soundEnabled ?? this.soundEnabled,
         vibrationEnabled: vibrationEnabled ?? this.vibrationEnabled,
         quietHoursStart: quietHoursStart ?? this.quietHoursStart,

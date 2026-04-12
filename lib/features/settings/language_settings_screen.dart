@@ -8,6 +8,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 import '../../common/constants/app_colors.dart';
 import '../../common/constants/app_spacing.dart';
 import '../../common/widgets/state_views/state_views.dart';
+import 'widgets/settings_list/settings_section_header.dart';
 
 class LanguageSettingsScreen extends StatefulWidget {
   const LanguageSettingsScreen({super.key});
@@ -288,8 +289,8 @@ class _LanguageSettingsScreenState extends State<LanguageSettingsScreen> {
           title: Text(
             'Language Settings',
             style: GoogleFonts.montserrat(
-              fontSize: 20,
-              fontWeight: FontWeight.bold,
+              fontSize: 17,
+              fontWeight: FontWeight.w600,
               color: textPrimary,
             ),
           ),
@@ -380,15 +381,8 @@ class _LanguageSettingsScreenState extends State<LanguageSettingsScreen> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text(
-          'Available Languages',
-          style: GoogleFonts.montserrat(
-            fontSize: 20,
-            fontWeight: FontWeight.bold,
-            color: textPrimary,
-          ),
-        ),
-        const SizedBox(height: AppSpacing.buttonRadius),
+        const SettingsSectionHeader('Available languages'),
+        const SizedBox(height: AppSpacing.sm),
         ...availableLanguages
             .map((language) => _buildLanguageCard(language, true)),
       ],
@@ -404,15 +398,8 @@ class _LanguageSettingsScreenState extends State<LanguageSettingsScreen> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text(
-          'Coming Soon',
-          style: GoogleFonts.montserrat(
-            fontSize: 20,
-            fontWeight: FontWeight.bold,
-            color: textPrimary,
-          ),
-        ),
-        const SizedBox(height: AppSpacing.buttonRadius),
+        const SettingsSectionHeader('Coming soon'),
+        const SizedBox(height: AppSpacing.sm),
         ...comingSoonLanguages
             .map((language) => _buildLanguageCard(language, false)),
       ],

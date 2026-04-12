@@ -13,7 +13,6 @@ import '../../common/utils/country_flag.dart';
 import '../../common/widgets/state_views/state_views.dart';
 
 import 'edit_profile_screen.dart';
-import 'privacy_settings_screen.dart';
 import 'settings_screen.dart';
 
 class ProfileScreen extends StatefulWidget {
@@ -129,16 +128,6 @@ class _ProfileScreenState extends State<ProfileScreen> {
                       ),
                     );
                     break;
-                  case 'privacy':
-                    unawaited(
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (_) => const PrivacySettingsScreen(),
-                        ),
-                      ),
-                    );
-                    break;
                   case 'settings':
                     unawaited(
                       Navigator.push(
@@ -163,22 +152,12 @@ class _ProfileScreenState extends State<ProfileScreen> {
                   ),
                 ),
                 const PopupMenuItem(
-                  value: 'privacy',
-                  child: Row(
-                    children: [
-                      Icon(Icons.privacy_tip_outlined, color: primaryColor),
-                      SizedBox(width: 12),
-                      Text('Privacy Settings'),
-                    ],
-                  ),
-                ),
-                const PopupMenuItem(
                   value: 'settings',
                   child: Row(
                     children: [
                       Icon(Icons.settings_outlined, color: primaryColor),
                       SizedBox(width: 12),
-                      Text('Settings'),
+                      Text('Account Settings'),
                     ],
                   ),
                 ),

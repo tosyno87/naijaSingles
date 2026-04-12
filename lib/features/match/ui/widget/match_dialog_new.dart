@@ -6,6 +6,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:google_fonts/google_fonts.dart';
 
+import '../../../../common/utils/remote_image_url.dart';
 import '../../../../models/user_model.dart';
 import '../../../chat/ui/screens/chat_page.dart';
 import '../../../home/bloc/searchuser_bloc.dart';
@@ -25,21 +26,50 @@ class MatchDialogPage extends StatefulWidget {
 }
 
 class _MatchDialogPageState extends State<MatchDialogPage> {
-  late ImageProvider currentUserImage;
-  late ImageProvider matchedUserImage;
-
-  @override
-  void initState() {
-    super.initState();
-    currentUserImage =
-        CachedNetworkImageProvider(widget.currentUser.imageUrl?.first ?? '');
-    matchedUserImage =
-        CachedNetworkImageProvider(widget.matchedUser.imageUrl?.first ?? '');
+  String _firstPhotoUrl(UserModel user) {
+    final Object? raw = user.imageUrl;
+    if (raw is! List || raw.isEmpty) return '';
+    return raw.first?.toString() ?? '';
   }
 
-  @override
-  void dispose() {
-    super.dispose();
+  Widget _buildMatchAvatar(UserModel user, double size) {
+    final String url = _firstPhotoUrl(user);
+    if (isPlaceholderOrUnreliableImageUrl(url)) {
+      return ClipOval(
+        child: Container(
+          width: size,
+          height: size,
+          color: Colors.grey.shade400,
+          child: Icon(
+            Icons.person,
+            size: size * 0.45,
+            color: Colors.white70,
+          ),
+        ),
+      );
+    }
+    return ClipOval(
+      child: CachedNetworkImage(
+        imageUrl: url,
+        width: size,
+        height: size,
+        fit: BoxFit.cover,
+        placeholder: (context, _) => Container(
+          width: size,
+          height: size,
+          color: Colors.grey.shade300,
+          child: const Center(
+            child: CircularProgressIndicator(strokeWidth: 2),
+          ),
+        ),
+        errorWidget: (context, _, __) => Container(
+          width: size,
+          height: size,
+          color: Colors.grey.shade400,
+          child: Icon(Icons.person, size: size * 0.45, color: Colors.white70),
+        ),
+      ),
+    );
   }
 
   @override
@@ -84,32 +114,10 @@ class _MatchDialogPageState extends State<MatchDialogPage> {
                 Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    ClipOval(
-                      child: Container(
-                        width: 150,
-                        height: 150,
-                        decoration: BoxDecoration(
-                          image: DecorationImage(
-                            image: currentUserImage,
-                            fit: BoxFit.cover,
-                          ),
-                        ),
-                      ),
-                    ),
+                    _buildMatchAvatar(widget.currentUser, 150),
                     Padding(
                       padding: const EdgeInsets.only(top: 90),
-                      child: ClipOval(
-                        child: Container(
-                          width: 160,
-                          height: 160,
-                          decoration: BoxDecoration(
-                            image: DecorationImage(
-                              image: matchedUserImage,
-                              fit: BoxFit.cover,
-                            ),
-                          ),
-                        ),
-                      ),
+                      child: _buildMatchAvatar(widget.matchedUser, 160),
                     ),
                   ],
                 ),

@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
 import '../bloc/theme/theme_bloc.dart';
+import '../utils/remote_image_url.dart';
 
 class CustomCNImage extends StatelessWidget {
   const CustomCNImage({
@@ -24,6 +25,9 @@ class CustomCNImage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final isDarkMode = context.watch<ThemeBloc>().isDarkMode;
+    if (isPlaceholderOrUnreliableImageUrl(imageUrl)) {
+      return _buildLocalPlaceholder(context, isDarkMode);
+    }
     return CachedNetworkImage(
       fit: fit,
       maxHeightDiskCache: 800,
@@ -61,5 +65,22 @@ class CustomCNImage extends StatelessWidget {
       height: height,
       width: width,
     );
+  }
+
+  Widget _buildLocalPlaceholder(BuildContext context, bool isDarkMode) {
+    final Widget inner = ColoredBox(
+      color: isDarkMode ? const Color(0xFF2A2A2A) : Colors.grey.shade300,
+      child: Center(
+        child: Icon(
+          Icons.person,
+          size: main ? 72 : 40,
+          color: isDarkMode ? Colors.white54 : Colors.grey.shade600,
+        ),
+      ),
+    );
+    if (height != null || width != null) {
+      return SizedBox(height: height, width: width, child: inner);
+    }
+    return inner;
   }
 }

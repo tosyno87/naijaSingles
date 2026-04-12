@@ -1,0 +1,46 @@
+<svg width="1290" height="2796" viewBox="0 0 1290 2796" xmlns="http://www.w3.org/2000/svg">
+  <rect width="1290" height="2796" fill="#F5F6F8"/>
+
+  <!-- status bar / notch -->
+  <text x="76" y="100" fill="#111111" font-size="32" font-family="-apple-system, BlinkMacSystemFont, 'SF Pro Display', Arial">9:41</text>
+  <rect x="440" y="54" width="410" height="96" rx="48" fill="#0F0F14"/>
+
+  <!-- title -->
+  <text x="645" y="305" text-anchor="middle" fill="#008940" font-size="62" font-weight="700" font-family="-apple-system, BlinkMacSystemFont, 'SF Pro Display', Arial">Get our premium plans</text>
+
+  <!-- main card -->
+  <rect x="75" y="360" width="1140" height="960" rx="26" fill="#FFFFFF" stroke="#E0E3E8" stroke-width="2"/>
+
+  <!-- bullets -->
+  <circle cx="123" cy="433" r="9" fill="#008940"/>
+  <text x="160" y="445" fill="#181A1F" font-size="36" font-family="-apple-system, BlinkMacSystemFont, 'SF Pro Display', Arial">Unlimited swipe</text>
+
+  <circle cx="123" cy="528" r="9" fill="#008940"/>
+  <text x="160" y="540" fill="#181A1F" font-size="36" font-family="-apple-system, BlinkMacSystemFont, 'SF Pro Display', Arial">Search users around your preferred radius</text>
+
+  <circle cx="123" cy="623" r="9" fill="#008940"/>
+  <text x="160" y="635" fill="#181A1F" font-size="36" font-family="-apple-system, BlinkMacSystemFont, 'SF Pro Display', Arial">Priority profile visibility</text>
+
+  <circle cx="123" cy="718" r="9" fill="#008940"/>
+  <text x="160" y="730" fill="#181A1F" font-size="36" font-family="-apple-system, BlinkMacSystemFont, 'SF Pro Display', Arial">See who likes you first</text>
+
+  <text x="115" y="845" fill="#181A1F" font-size="42" font-weight="600" font-family="-apple-system, BlinkMacSystemFont, 'SF Pro Display', Arial">Choose your plan</text>
+
+  <!-- monthly selected -->
+  <rect x="115" y="905" width="520" height="230" rx="22" fill="#E9F7EF" stroke="#008940" stroke-width="3"/>
+  <text x="150" y="970" fill="#181A1F" font-size="44" font-weight="600" font-family="-apple-system, BlinkMacSystemFont, 'SF Pro Display', Arial">Monthly</text>
+  <text x="150" y="1034" fill="#008940" font-size="38" font-weight="600" font-family="-apple-system, BlinkMacSystemFont, 'SF Pro Display', Arial">$4.99 / month</text>
+  <text x="150" y="1086" fill="#6D727B" font-size="31" font-family="-apple-system, BlinkMacSystemFont, 'SF Pro Display', Arial">Billed monthly</text>
+
+  <!-- yearly -->
+  <rect x="655" y="905" width="520" height="230" rx="22" fill="#FFFFFF" stroke="#E0E3E8" stroke-width="2"/>
+  <text x="690" y="970" fill="#181A1F" font-size="44" font-weight="600" font-family="-apple-system, BlinkMacSystemFont, 'SF Pro Display', Arial">Yearly</text>
+  <text x="690" y="1034" fill="#008940" font-size="38" font-weight="600" font-family="-apple-system, BlinkMacSystemFont, 'SF Pro Display', Arial">$39.99 / year</text>
+  <text x="690" y="1086" fill="#6D727B" font-size="31" font-family="-apple-system, BlinkMacSystemFont, 'SF Pro Display', Arial">Best value • Save 33%</text>
+
+  <!-- CTA -->
+  <rect x="265" y="2496" width="760" height="118" rx="59" fill="#008940"/>
+  <text x="645" y="2572" text-anchor="middle" fill="#FFFFFF" font-size="48" font-weight="700" font-family="-apple-system, BlinkMacSystemFont, 'SF Pro Display', Arial">CONTINUE</text>
+
+  <text x="645" y="2670" text-anchor="middle" fill="#2C6AC4" font-size="30" font-family="-apple-system, BlinkMacSystemFont, 'SF Pro Display', Arial">Privacy Policy • Terms &amp; Conditions</text>
+</svg>

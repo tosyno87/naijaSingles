@@ -19,6 +19,14 @@ export interface NotificationPreferences {
     messageNotifications?: boolean;
     superLikeNotifications?: boolean;
     likeNotifications?: boolean;
+    /**
+     * When false, no FCM (checked before per-type flags). Defaults to on if absent.
+     */
+    enableAllNotifications?: boolean;
+    /**
+     * When true, no FCM (checked after enable-all). Defaults off if absent.
+     */
+    muteAllNotifications?: boolean;
 }
 export interface Match {
     id: string;

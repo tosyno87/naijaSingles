@@ -37,8 +37,8 @@ class _HelpCenterScreenState extends State<HelpCenterScreen> {
           title: Text(
             'Help Center',
             style: GoogleFonts.montserrat(
-              fontSize: 20,
-              fontWeight: FontWeight.bold,
+              fontSize: 17,
+              fontWeight: FontWeight.w600,
               color: textPrimary,
             ),
           ),

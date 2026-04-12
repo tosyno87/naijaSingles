@@ -6,6 +6,16 @@ export declare class NotificationService {
     private db;
     constructor();
     /**
+     * Global FCM gate (evaluated before per-type flags).
+     *
+     * Precedence (same outcome if both apply — no push):
+     * 1. `enableAllNotifications === false` → block
+     * 2. `muteAllNotifications === true` → block
+     *
+     * Omitted fields default to legacy behavior (all on, not muted).
+     */
+    private isPushGloballyBlocked;
+    /**
      * Send match notification
      */
     sendMatchNotification(user: User, matchedUser: User): Promise<void>;

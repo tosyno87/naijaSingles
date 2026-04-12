@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 
 import '../../../common/constants/app_colors.dart';
+import '../../../common/utils/remote_image_url.dart';
 import '../../../models/user_model.dart';
 
 /// Hinge-style profile card that displays all information in a vertical scrollable format
@@ -168,14 +169,6 @@ class _HingeProfileCardState extends State<HingeProfileCard> {
     );
   }
 
-  /// URLs that require network but often fail (e.g. in simulator) or are test placeholders.
-  static bool _isPlaceholderOrUnreliableUrl(String url) {
-    final u = url.toLowerCase();
-    return u.contains('via.placeholder.com') ||
-        u.contains('placeholder.com') ||
-        u.contains('placehold.it');
-  }
-
   Widget _buildPhotoSection(List<String> photos) {
     final screenHeight = MediaQuery.of(context).size.height;
     return SizedBox(
@@ -190,7 +183,7 @@ class _HingeProfileCardState extends State<HingeProfileCard> {
         itemCount: photos.length,
         itemBuilder: (context, index) {
           final photoUrl = photos[index];
-          final usePlaceholder = _isPlaceholderOrUnreliableUrl(photoUrl);
+          final usePlaceholder = isPlaceholderOrUnreliableImageUrl(photoUrl);
 
           return ClipRRect(
             borderRadius: const BorderRadius.vertical(

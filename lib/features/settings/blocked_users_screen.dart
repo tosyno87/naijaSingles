@@ -10,6 +10,8 @@ import '../../common/constants/app_colors.dart';
 import '../../common/constants/app_spacing.dart';
 import '../../common/widgets/state_views/state_views.dart';
 import '../../services/settings_service.dart';
+import 'widgets/settings_list/settings_section_header.dart';
+import 'widgets/settings_list/settings_text_styles.dart';
 
 class BlockedUsersScreen extends StatefulWidget {
   const BlockedUsersScreen({super.key});
@@ -160,7 +162,7 @@ class _BlockedUsersScreenState extends State<BlockedUsersScreen> {
         title: Text(
           'Blocked Users',
           style: GoogleFonts.montserrat(
-            fontSize: 20,
+            fontSize: 17,
             fontWeight: FontWeight.w600,
             color: AppColors.textPrimary,
           ),
@@ -216,18 +218,14 @@ class _BlockedUsersScreenState extends State<BlockedUsersScreen> {
             ),
           ),
 
-          // Blocked users count
+          const SettingsSectionHeader('Your list'),
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: AppSpacing.md),
             child: Align(
               alignment: Alignment.centerLeft,
               child: Text(
                 '${_blockedUsers.length} blocked user${_blockedUsers.length == 1 ? '' : 's'}',
-                style: GoogleFonts.montserrat(
-                  fontSize: 16,
-                  fontWeight: FontWeight.w500,
-                  color: isDarkMode ? Colors.white : Colors.black,
-                ),
+                style: SettingsTextStyles.rowTitle(context),
               ),
             ),
           ),

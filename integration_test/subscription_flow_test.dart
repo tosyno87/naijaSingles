@@ -1,3 +1,6 @@
+// Integration placeholders for premium journeys. Real IAP requires store
+// sandbox accounts, deployed `verifySubscriptionPurchase`, and the checklist
+// in docs/subscription_sandbox_checklist.md.
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:integration_test/integration_test.dart';

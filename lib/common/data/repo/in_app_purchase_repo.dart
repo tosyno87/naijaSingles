@@ -1,6 +1,6 @@
 import 'dart:developer';
-
 import 'package:flutter/cupertino.dart';
+import 'package:flutter/foundation.dart';
 import 'package:in_app_purchase/in_app_purchase.dart';
 import 'package:in_app_purchase_android/in_app_purchase_android.dart';
 import 'package:in_app_purchase_storekit/in_app_purchase_storekit.dart';
@@ -30,14 +30,30 @@ class InAppPurchaseRepoImpl extends InAppPurchaseRepo {
       }
 
       final Set<String> kIds = Set.from(await _fetchPackageIds());
+      if (kIds.isEmpty) {
+        log(
+          '[IAP] No active product IDs from Firestore Packages. '
+          'Add docs with status=true and iosProductId/androidProductId (or legacy id).',
+        );
+        throw Exception('No subscription products configured');
+      }
       final ProductDetailsResponse response =
           await InAppPurchase.instance.queryProductDetails(kIds);
-      if (response.notFoundIDs.isNotEmpty) {
-        log('Not found');
-        throw Exception('No product found');
+      if (response.productDetails.isEmpty) {
+        log(
+          '[IAP] Store returned no products. notFoundIDs=${response.notFoundIDs}',
+        );
+        throw Exception(
+          'Plans temporarily unavailable. Missing IDs: ${response.notFoundIDs.join(", ")}',
+        );
       }
-      final List<ProductDetails> products = response.productDetails;
-      return products;
+      if (response.notFoundIDs.isNotEmpty) {
+        log(
+          '[IAP] Partial catalog: found ${response.productDetails.length} products; '
+          'store missing: ${response.notFoundIDs}',
+        );
+      }
+      return response.productDetails;
     } on Object {
       rethrow;
     }
@@ -51,16 +67,75 @@ class InAppPurchaseRepoImpl extends InAppPurchaseRepo {
     log('=============-----------isPurchaseSuccessfully');
   }
 
+  /// Fetches store product IDs from `Packages` (platform-specific when set).
   Future<List<String>> _fetchPackageIds() async {
-    final List<String> packageId = [];
-
     final value = await firebaseFireStoreInstance
         .collection('Packages')
         .where('status', isEqualTo: true)
         .get();
-    packageId.addAll(value.docs.map((e) => e['id']));
 
-    return packageId;
+    final ids = <String>{};
+    for (final doc in value.docs) {
+      final data = doc.data();
+      final legacy = data['id']?.toString();
+      final ios = data['iosProductId']?.toString();
+      final android = data['androidProductId']?.toString();
+      final storeIds = data['storeIds'];
+      String? forPlatform;
+      if (storeIds is Map) {
+        if (_isIOS) {
+          forPlatform = storeIds['ios']?.toString() ?? storeIds['apple']?.toString();
+        } else if (_isAndroid) {
+          forPlatform =
+              storeIds['android']?.toString() ?? storeIds['play']?.toString();
+        }
+      }
+      if (_isIOS) {
+        final id = forPlatform ?? ios ?? legacy;
+        if (id != null && id.isNotEmpty) ids.add(id);
+      } else if (_isAndroid) {
+        final id = forPlatform ?? android ?? legacy;
+        if (id != null && id.isNotEmpty) ids.add(id);
+      } else {
+        if (legacy != null && legacy.isNotEmpty) ids.add(legacy);
+      }
+    }
+
+    if (ids.isEmpty && kDebugMode) {
+      log(
+        '[IAP] Packages query returned ${value.docs.length} docs but no IDs '
+        'for this platform. Check iosProductId / androidProductId / storeIds / id.',
+      );
+    }
+    return ids.toList();
+  }
+
+  static bool get _isIOS =>
+      !kIsWeb && defaultTargetPlatform == TargetPlatform.iOS;
+
+  static bool get _isAndroid =>
+      !kIsWeb && defaultTargetPlatform == TargetPlatform.android;
+
+  /// Call once after Firebase init to surface misconfiguration in debug logs.
+  static Future<void> logPackagesDiagnostics() async {
+    try {
+      final snap = await firebaseFireStoreInstance
+          .collection('Packages')
+          .where('status', isEqualTo: true)
+          .get();
+      if (snap.docs.isEmpty) {
+        log(
+          '[IAP:diagnostics] No Packages with status=true — paywall will fail until configured.',
+        );
+        return;
+      }
+      log(
+        '[IAP:diagnostics] Active package docs: ${snap.docs.length} '
+        '(platform=${kIsWeb ? "web" : defaultTargetPlatform.name})',
+      );
+    } on Object catch (e) {
+      log('[IAP:diagnostics] Failed to read Packages: $e');
+    }
   }
 
   ///fetch products

@@ -51,8 +51,19 @@ class UserModel {
     this.accountStatus,
     this.deactivatedAt,
     this.deactivationReason,
+    this.isPremium,
+    this.subscriptionPlanId,
+    this.subscriptionExpiresAt,
+    this.subscriptionStore,
     bool? storedDiscoverable,
   }) : _storedDiscoverable = storedDiscoverable;
+
+  static DateTime? _parseSubscriptionExpiry(dynamic value) {
+    if (value == null) return null;
+    if (value is Timestamp) return value.toDate();
+    if (value is DateTime) return value;
+    return DateTime.tryParse(value.toString());
+  }
 
   factory UserModel.fromDocument(DocumentSnapshot doc) {
     try {
@@ -219,6 +230,10 @@ class UserModel {
         storedDiscoverable: safeGet<bool>('isDiscoverable'),
         deactivatedAt: parseDateTimeOrNull(data['deactivatedAt']),
         deactivationReason: safeGet<String>('deactivationReason'),
+        isPremium: safeGet<bool>('isPremium', false),
+        subscriptionPlanId: safeGet<String>('subscriptionPlanId'),
+        subscriptionExpiresAt: _parseSubscriptionExpiry(data['subscriptionExpiresAt']),
+        subscriptionStore: safeGet<String>('subscriptionStore'),
       );
     } on Object catch (e) {
       debugPrint('Error creating UserModel from document ${doc.id}: $e');
@@ -248,6 +263,7 @@ class UserModel {
         languages: [],
         religion: '',
         occupation: '',
+        isPremium: false,
       );
     }
   }
@@ -343,6 +359,12 @@ class UserModel {
             ? DateTime.tryParse(json['deactivatedAt'].toString())
             : null,
         deactivationReason: json['deactivationReason'],
+        isPremium: json['isPremium'] as bool?,
+        subscriptionPlanId: json['subscriptionPlanId']?.toString(),
+        subscriptionExpiresAt: _parseSubscriptionExpiry(
+          json['subscriptionExpiresAt'],
+        ),
+        subscriptionStore: json['subscriptionStore']?.toString(),
       );
 
   /// Create UserModel from Map (for caching)
@@ -407,6 +429,12 @@ class UserModel {
             ? DateTime.tryParse(map['deactivatedAt'].toString())
             : null,
         deactivationReason: map['deactivationReason']?.toString(),
+        isPremium: map['isPremium'] as bool?,
+        subscriptionPlanId: map['subscriptionPlanId']?.toString(),
+        subscriptionExpiresAt: _parseSubscriptionExpiry(
+          map['subscriptionExpiresAt'],
+        ),
+        subscriptionStore: map['subscriptionStore']?.toString(),
       );
   final String? id;
   final String? name;
@@ -456,6 +484,12 @@ class UserModel {
   final String? accountStatus;
   final DateTime? deactivatedAt;
   final String? deactivationReason;
+
+  /// Premium / subscription (server-verified via Cloud Functions).
+  final bool? isPremium;
+  final String? subscriptionPlanId;
+  final DateTime? subscriptionExpiresAt;
+  final String? subscriptionStore;
 
   List? imageUrl = [];
   int? distanceBW;
@@ -514,6 +548,10 @@ class UserModel {
         'accountStatus': accountStatus,
         'deactivatedAt': deactivatedAt?.toIso8601String(),
         'deactivationReason': deactivationReason,
+        'isPremium': isPremium,
+        'subscriptionPlanId': subscriptionPlanId,
+        'subscriptionExpiresAt': subscriptionExpiresAt?.toIso8601String(),
+        'subscriptionStore': subscriptionStore,
       };
 
   // Add missing getters for compatibility with new services
@@ -564,4 +602,7 @@ class UserModel {
 
   /// Whether the account is paused specifically.
   bool get isPaused => accountStatus == 'paused';
+
+  /// Premium access (defaults false when field missing).
+  bool get hasPremiumAccess => isPremium ?? false;
 }

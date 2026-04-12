@@ -37,10 +37,14 @@ import '../../features/profile/edit_profile_screen.dart';
 import '../../features/profile/settings_screen.dart';
 import '../../features/settings/account_deletion_screen.dart';
 import '../../features/settings/blocked_users_screen.dart';
+import '../../features/settings/connected_accounts_settings_screen.dart';
+import '../../features/settings/download_my_data_screen.dart';
+import '../../features/settings/email_notifications_settings_screen.dart';
 import '../../features/settings/feedback_screen.dart';
 import '../../features/settings/help_center_screen.dart';
 import '../../features/settings/language_settings_screen.dart';
 import '../../features/settings/notification_settings_screen.dart';
+import '../../features/settings/phone_email_settings_screen.dart';
 import '../../features/settings/safety_center_screen.dart';
 import '../../features/user/ui/screens/show_gender.dart';
 import '../../features/user/ui/screens/update_user_location.dart';
@@ -308,6 +312,12 @@ abstract class AppRouter {
     RouteName.feedbackScreen: (context) => const FeedbackScreen(),
     RouteName.languageSettings: (context) => const LanguageSettingsScreen(),
     RouteName.accountDeletion: (context) => const AccountDeletionScreen(),
+    RouteName.phoneEmailSettings: (context) => const PhoneEmailSettingsScreen(),
+    RouteName.connectedAccountsSettings: (context) =>
+        const ConnectedAccountsSettingsScreen(),
+    RouteName.emailNotificationsSettings: (context) =>
+        const EmailNotificationsSettingsScreen(),
+    RouteName.downloadMyData: (context) => const DownloadMyDataScreen(),
 
     // Events routes
     RouteName.eventsScreen: (context) => const EventsScreen(),

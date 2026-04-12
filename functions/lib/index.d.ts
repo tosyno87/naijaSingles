@@ -7,6 +7,7 @@
 import { validateIngestion, aggregateMetrics } from './handlers/matchQualityHandlers';
 import { onAuthUserDeleted } from './handlers/authCleanupHandlers';
 import { confirmDeletionAfterPhoneProof, confirmDeletionOtp, deleteAccountDirect, startDeletionOtp } from './handlers/accountDeletionCallables';
+import { verifySubscriptionPurchase } from './handlers/subscriptionVerificationHandlers';
 export declare const onMatchCreated: import("firebase-functions/core").CloudFunction<import("firebase-functions/firestore").FirestoreEvent<import("firebase-functions/firestore").QueryDocumentSnapshot | undefined, {
     matchId: string;
 }>>;
@@ -28,6 +29,7 @@ export declare const createTestUsers: import("firebase-functions/v2/https").Http
 export { validateIngestion, aggregateMetrics };
 export { onAuthUserDeleted };
 export { startDeletionOtp, confirmDeletionOtp, confirmDeletionAfterPhoneProof, deleteAccountDirect, };
+export { verifySubscriptionPurchase };
 export declare const healthCheck: import("firebase-functions/v2/https").HttpsFunction;
 export declare const seedMatchTuningConfig: import("firebase-functions/v2/https").HttpsFunction;
 //# sourceMappingURL=index.d.ts.map

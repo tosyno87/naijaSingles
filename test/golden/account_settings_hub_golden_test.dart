@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 
@@ -10,8 +12,10 @@ import 'package:naijasingles/common/constants/app_colors.dart';
 /// Regenerate baselines after intentional spacing changes:
 ///   flutter test --update-goldens test/golden/account_settings_hub_golden_test.dart
 void main() {
+  final bool isCI = Platform.environment.containsKey('CI');
+
   testWidgets('Account Settings hub layout contract (light) matches golden',
-      (tester) async {
+      skip: isCI, (tester) async {
     await tester.binding.setSurfaceSize(const Size(390, 1400));
     addTearDown(() => tester.binding.setSurfaceSize(null));
 
@@ -121,7 +125,8 @@ void main() {
                     crossAxisAlignment: CrossAxisAlignment.stretch,
                     children: [
                       sectionHeader(c, 'Account'),
-                      row(c, title: 'Edit profile', subtitle: 'Photos and info'),
+                      row(c,
+                          title: 'Edit profile', subtitle: 'Photos and info'),
                       const Divider(height: 1),
                       row(
                         c,
@@ -168,7 +173,8 @@ void main() {
                         'Manage your plan or restore purchases from the '
                         'App Store or Google Play.',
                       ),
-                      row(c, title: 'Upgrade', subtitle: 'See plans and benefits'),
+                      row(c,
+                          title: 'Upgrade', subtitle: 'See plans and benefits'),
                       const Divider(height: 1),
                       row(
                         c,

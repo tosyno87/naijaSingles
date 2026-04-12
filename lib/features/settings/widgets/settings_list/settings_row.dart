@@ -45,7 +45,10 @@ class SettingsRow extends StatelessWidget {
                 mainAxisAlignment: MainAxisAlignment.center,
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text(title, style: titleStyle, maxLines: 1, overflow: TextOverflow.ellipsis),
+                  Text(title,
+                      style: titleStyle,
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis),
                   if (hasSubtitle) ...[
                     const SizedBox(height: 4),
                     Text(

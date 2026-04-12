@@ -232,7 +232,8 @@ class UserModel {
         deactivationReason: safeGet<String>('deactivationReason'),
         isPremium: safeGet<bool>('isPremium', false),
         subscriptionPlanId: safeGet<String>('subscriptionPlanId'),
-        subscriptionExpiresAt: _parseSubscriptionExpiry(data['subscriptionExpiresAt']),
+        subscriptionExpiresAt:
+            _parseSubscriptionExpiry(data['subscriptionExpiresAt']),
         subscriptionStore: safeGet<String>('subscriptionStore'),
       );
     } on Object catch (e) {

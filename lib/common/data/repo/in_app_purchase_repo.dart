@@ -84,7 +84,8 @@ class InAppPurchaseRepoImpl extends InAppPurchaseRepo {
       String? forPlatform;
       if (storeIds is Map) {
         if (_isIOS) {
-          forPlatform = storeIds['ios']?.toString() ?? storeIds['apple']?.toString();
+          forPlatform =
+              storeIds['ios']?.toString() ?? storeIds['apple']?.toString();
         } else if (_isAndroid) {
           forPlatform =
               storeIds['android']?.toString() ?? storeIds['play']?.toString();

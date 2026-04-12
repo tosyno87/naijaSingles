@@ -56,7 +56,8 @@ class ConnectedAccountsSettingsScreen extends StatelessWidget {
             children: [
               if (providers.isEmpty)
                 Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
                   child: Text(
                     'No linked providers found.',
                     style: SettingsTextStyles.rowSubtitle(context),
@@ -66,8 +67,9 @@ class ConnectedAccountsSettingsScreen extends StatelessWidget {
                 ...providers.map((info) {
                   final label = _labelForProvider(info.providerId);
                   final detail = info.email ?? info.phoneNumber ?? info.uid;
-                  final detailLine =
-                      (detail != null && detail.isNotEmpty) ? detail : 'Connected';
+                  final detailLine = (detail != null && detail.isNotEmpty)
+                      ? detail
+                      : 'Connected';
                   return Column(
                     key: ValueKey(info.providerId),
                     children: [

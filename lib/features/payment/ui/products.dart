@@ -128,7 +128,8 @@ class ProductsState extends State<Products> {
           },
         ),
         BlocListener<BuyConsumableInAppProductsBloc, BuyConsumableStates>(
-          listenWhen: (previous, current) => current is BuyConsumableFailedState,
+          listenWhen: (previous, current) =>
+              current is BuyConsumableFailedState,
           listener: (context, state) {
             if (state is BuyConsumableFailedState) {
               ScaffoldMessenger.of(context).showSnackBar(
@@ -203,56 +204,56 @@ class ProductsState extends State<Products> {
                 ),
               ),
               key: _scaffoldKey,
-            body: SingleChildScrollView(
-              child: Column(
-                // mainAxisAlignment: MainAxisAlignment.spaceAround,
-                children: <Widget>[
-                  Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 15),
-                    child: Card(
-                      elevation: 2,
-                      shape: RoundedRectangleBorder(
-                        borderRadius:
-                            BorderRadius.circular(AppSpacing.chipRadius),
-                      ),
-                      child: Column(
-                        mainAxisAlignment: MainAxisAlignment.spaceAround,
-                        children: [
-                          ListTile(
-                            dense: true,
-                            leading: const Icon(
-                              Icons.star,
-                              color: Colors.blue,
-                            ),
-                            title: Text(
-                              'Unlimited swipe.'.tr().toString(),
-                              style: const TextStyle(
-                                fontSize: 16,
-                                fontWeight: FontWeight.w400,
+              body: SingleChildScrollView(
+                child: Column(
+                  // mainAxisAlignment: MainAxisAlignment.spaceAround,
+                  children: <Widget>[
+                    Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 15),
+                      child: Card(
+                        elevation: 2,
+                        shape: RoundedRectangleBorder(
+                          borderRadius:
+                              BorderRadius.circular(AppSpacing.chipRadius),
+                        ),
+                        child: Column(
+                          mainAxisAlignment: MainAxisAlignment.spaceAround,
+                          children: [
+                            ListTile(
+                              dense: true,
+                              leading: const Icon(
+                                Icons.star,
+                                color: Colors.blue,
+                              ),
+                              title: Text(
+                                'Unlimited swipe.'.tr().toString(),
+                                style: const TextStyle(
+                                  fontSize: 16,
+                                  fontWeight: FontWeight.w400,
+                                ),
                               ),
                             ),
-                          ),
-                          ListTile(
-                            dense: true,
-                            leading: const Icon(
-                              Icons.star,
-                              color: Colors.green,
-                            ),
-                            title: Text(
-                              'Search users around'.tr().toString(),
-                              style: const TextStyle(
-                                // Color(0xFF1A1A1A),
-                                fontSize: 16,
-                                fontWeight: FontWeight.w400,
+                            ListTile(
+                              dense: true,
+                              leading: const Icon(
+                                Icons.star,
+                                color: Colors.green,
                               ),
-                            ).tr(
-                              args: ["${widget.items['paid_radius'] ?? ''}"],
+                              title: Text(
+                                'Search users around'.tr().toString(),
+                                style: const TextStyle(
+                                  // Color(0xFF1A1A1A),
+                                  fontSize: 16,
+                                  fontWeight: FontWeight.w400,
+                                ),
+                              ).tr(
+                                args: ["${widget.items['paid_radius'] ?? ''}"],
+                              ),
                             ),
-                          ),
-                          CarouselSlider(
-                            adds: adds,
-                          ),
-                          state.result.isNotEmpty
+                            CarouselSlider(
+                              adds: adds,
+                            ),
+                            state.result.isNotEmpty
                                 ? Stack(
                                     alignment: Alignment.bottomCenter,
                                     children: [
@@ -417,151 +418,152 @@ class ProductsState extends State<Products> {
                                           .add(RequestInAppProducts()),
                                     ),
                                   ),
-                        ],
+                          ],
+                        ),
                       ),
                     ),
-                  ),
-                  Padding(
-                    padding: const EdgeInsets.only(top: 15),
-                    child: selectedProduct != null
-                        ? CustomButton(
-                            text: 'CONTINUE'.tr().toString(),
-                            onTap: () async {
-                              final product = selectedProduct;
-                              if (product == null) return;
-                              BlocProvider.of<BuyConsumableInAppProductsBloc>(
-                                context,
-                              ).add(
-                                RequestBuyConsumableProducts(
-                                  productDetails: product,
-                                ),
-                              );
-                            },
-                            color: AppColors.textPrimary,
-                            active: true,
-                          )
-                        : Padding(
-                            padding: const EdgeInsets.only(bottom: 40),
-                            child: Align(
-                              alignment: Alignment.bottomCenter,
-                              child: InkWell(
-                                onTap: () {
-                                  CustomSnackbar.showSnackBarSimple(
-                                    'You must choose a subscription to continue.'
-                                        .tr()
-                                        .toString(),
-                                    context,
-                                  );
-                                },
-                                child: Container(
-                                  decoration: BoxDecoration(
-                                    color: AppColors.secondaryColor.withValues(
-                                      alpha: (.7 * 255).toDouble(),
-                                    ),
-                                    borderRadius: BorderRadius.circular(25),
+                    Padding(
+                      padding: const EdgeInsets.only(top: 15),
+                      child: selectedProduct != null
+                          ? CustomButton(
+                              text: 'CONTINUE'.tr().toString(),
+                              onTap: () async {
+                                final product = selectedProduct;
+                                if (product == null) return;
+                                BlocProvider.of<BuyConsumableInAppProductsBloc>(
+                                  context,
+                                ).add(
+                                  RequestBuyConsumableProducts(
+                                    productDetails: product,
                                   ),
-                                  height:
-                                      MediaQuery.of(context).size.height * .065,
-                                  width:
-                                      MediaQuery.of(context).size.width * .75,
-                                  child: Center(
-                                    child: Text(
-                                      'CONTINUE'.tr().toString(),
-                                      style: const TextStyle(
-                                        fontSize: 15,
-                                        color: AppColors.textPrimary,
-                                        fontWeight: FontWeight.bold,
+                                );
+                              },
+                              color: AppColors.textPrimary,
+                              active: true,
+                            )
+                          : Padding(
+                              padding: const EdgeInsets.only(bottom: 40),
+                              child: Align(
+                                alignment: Alignment.bottomCenter,
+                                child: InkWell(
+                                  onTap: () {
+                                    CustomSnackbar.showSnackBarSimple(
+                                      'You must choose a subscription to continue.'
+                                          .tr()
+                                          .toString(),
+                                      context,
+                                    );
+                                  },
+                                  child: Container(
+                                    decoration: BoxDecoration(
+                                      color:
+                                          AppColors.secondaryColor.withValues(
+                                        alpha: (.7 * 255).toDouble(),
+                                      ),
+                                      borderRadius: BorderRadius.circular(25),
+                                    ),
+                                    height: MediaQuery.of(context).size.height *
+                                        .065,
+                                    width:
+                                        MediaQuery.of(context).size.width * .75,
+                                    child: Center(
+                                      child: Text(
+                                        'CONTINUE'.tr().toString(),
+                                        style: const TextStyle(
+                                          fontSize: 15,
+                                          color: AppColors.textPrimary,
+                                          fontWeight: FontWeight.bold,
+                                        ),
                                       ),
                                     ),
                                   ),
                                 ),
                               ),
                             ),
-                          ),
-                  ),
-                  // Platform.isIOS
-                  //     ? InkWell(
-                  //         child: Container(
-                  //             decoration: BoxDecoration(
-                  //                 shape: BoxShape.rectangle,
-                  //                 borderRadius: BorderRadius.circular(25),
-                  //                 gradient: LinearGradient(
-                  //                     begin: Alignment.topRight,
-                  //                     end: Alignment.bottomLeft,
-                  //                     colors: [
-                  //                       AppColors.primaryGreen.withValues(alpha: .5),
-                  //                       AppColors.primaryGreen.withValues(alpha: .8),
-                  //                       AppColors.primaryGreen,
-                  //                       AppColors.primaryGreen
-                  // ])),
-                  //             height: MediaQuery.of(context).size.height * .055,
-                  //             width: MediaQuery.of(context).size.width * .55,
-                  //             child: Center(
-                  //                 child: Text(
-                  //               "RESTORE PURCHASE".tr().toString(),
-                  //               style: TextStyle(
-                  //                   fontSize: 15,
-                  //                   color: AppColors.textPrimary,
-                  //                   fontWeight: FontWeight.bold),
-                  //             ))),
-                  //         onTap: () async {
-                  //           // var result = await _getpastPurchases();
-                  //           // if (result.length == 0) {
-                  //           //   showDiadebugPrint(
-                  //           //       context: context,
-                  //           //       builder: (ctx) {
-                  //           //         return AlertDiadebugPrint(
-                  //           //           content:
-                  //           //               Text("No purchase found".tr().toString()),
-                  //           //           title: Text("Past Purchases".tr().toString()),
-                  //           //         );
-                  //           //       });
-                  //           // }
-                  //         },
-                  //       )
-                  //     : Container(),
-
-                  Padding(
-                    padding: const EdgeInsets.all(AppSpacing.sm),
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceAround,
-                      children: <Widget>[
-                        GestureDetector(
-                          child: Text(
-                            'Privacy Policy'.tr().toString(),
-                            style: const TextStyle(color: Colors.blue),
-                          ),
-                          onTap: () => Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                              builder: (context) => PrivacyPolicyPage(
-                                url: privacyUrl,
-                                tittle: 'Privacy Policy',
-                              ),
-                            ),
-                          ),
-                        ),
-                        GestureDetector(
-                          child: Text(
-                            'Terms & Conditions'.tr().toString(),
-                            style: const TextStyle(color: Colors.blue),
-                          ),
-                          onTap: () => Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                              builder: (context) => PrivacyPolicyPage(
-                                url: termConditionUrl,
-                                tittle: 'Terms & Conditions',
-                              ),
-                            ),
-                          ),
-                        ),
-                      ],
                     ),
-                  ),
-                ],
+                    // Platform.isIOS
+                    //     ? InkWell(
+                    //         child: Container(
+                    //             decoration: BoxDecoration(
+                    //                 shape: BoxShape.rectangle,
+                    //                 borderRadius: BorderRadius.circular(25),
+                    //                 gradient: LinearGradient(
+                    //                     begin: Alignment.topRight,
+                    //                     end: Alignment.bottomLeft,
+                    //                     colors: [
+                    //                       AppColors.primaryGreen.withValues(alpha: .5),
+                    //                       AppColors.primaryGreen.withValues(alpha: .8),
+                    //                       AppColors.primaryGreen,
+                    //                       AppColors.primaryGreen
+                    // ])),
+                    //             height: MediaQuery.of(context).size.height * .055,
+                    //             width: MediaQuery.of(context).size.width * .55,
+                    //             child: Center(
+                    //                 child: Text(
+                    //               "RESTORE PURCHASE".tr().toString(),
+                    //               style: TextStyle(
+                    //                   fontSize: 15,
+                    //                   color: AppColors.textPrimary,
+                    //                   fontWeight: FontWeight.bold),
+                    //             ))),
+                    //         onTap: () async {
+                    //           // var result = await _getpastPurchases();
+                    //           // if (result.length == 0) {
+                    //           //   showDiadebugPrint(
+                    //           //       context: context,
+                    //           //       builder: (ctx) {
+                    //           //         return AlertDiadebugPrint(
+                    //           //           content:
+                    //           //               Text("No purchase found".tr().toString()),
+                    //           //           title: Text("Past Purchases".tr().toString()),
+                    //           //         );
+                    //           //       });
+                    //           // }
+                    //         },
+                    //       )
+                    //     : Container(),
+
+                    Padding(
+                      padding: const EdgeInsets.all(AppSpacing.sm),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceAround,
+                        children: <Widget>[
+                          GestureDetector(
+                            child: Text(
+                              'Privacy Policy'.tr().toString(),
+                              style: const TextStyle(color: Colors.blue),
+                            ),
+                            onTap: () => Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (context) => PrivacyPolicyPage(
+                                  url: privacyUrl,
+                                  tittle: 'Privacy Policy',
+                                ),
+                              ),
+                            ),
+                          ),
+                          GestureDetector(
+                            child: Text(
+                              'Terms & Conditions'.tr().toString(),
+                              style: const TextStyle(color: Colors.blue),
+                            ),
+                            onTap: () => Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (context) => PrivacyPolicyPage(
+                                  url: termConditionUrl,
+                                  tittle: 'Terms & Conditions',
+                                ),
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ],
+                ),
               ),
-            ),
             );
           }
           return Scaffold(

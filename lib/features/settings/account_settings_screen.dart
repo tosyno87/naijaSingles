@@ -459,317 +459,318 @@ class _AccountSettingsScreenState extends State<AccountSettingsScreen> {
         ),
       ],
       child: Scaffold(
-      backgroundColor: bg,
-      appBar: AppBar(
         backgroundColor: bg,
-        surfaceTintColor: Colors.transparent,
-        elevation: 0,
-        leading: IconButton(
-          icon: Icon(Icons.arrow_back_ios, color: onSurface, size: 20),
-          onPressed: () => Navigator.pop(context),
-        ),
-        title: Text(
-          'Account Settings',
-          style: GoogleFonts.montserrat(
-            fontSize: 17,
-            fontWeight: FontWeight.w600,
-            color: onSurface,
+        appBar: AppBar(
+          backgroundColor: bg,
+          surfaceTintColor: Colors.transparent,
+          elevation: 0,
+          leading: IconButton(
+            icon: Icon(Icons.arrow_back_ios, color: onSurface, size: 20),
+            onPressed: () => Navigator.pop(context),
           ),
+          title: Text(
+            'Account Settings',
+            style: GoogleFonts.montserrat(
+              fontSize: 17,
+              fontWeight: FontWeight.w600,
+              color: onSurface,
+            ),
+          ),
+          centerTitle: true,
         ),
-        centerTitle: true,
-      ),
-      body: ListView(
-        padding: const EdgeInsets.only(top: 8, bottom: 32),
-        children: [
-          SettingsSection(
-            title: 'Account',
-            children: [
-              SettingsRow(
-                title: 'Edit profile',
-                subtitle: 'Photos and info',
-                onTap: () => unawaited(
-                  Navigator.pushNamed(context, RouteName.editProfileScreen),
-                ),
-              ),
-              _divider(context),
-              SettingsRow(
-                title: 'Phone & email',
-                subtitle: 'Sign-in contact details',
-                onTap: () => unawaited(
-                  Navigator.pushNamed(context, RouteName.phoneEmailSettings),
-                ),
-              ),
-              _divider(context),
-              SettingsRow(
-                title: 'Connected accounts',
-                subtitle: 'Google, Apple, and more',
-                onTap: () => unawaited(
-                  Navigator.pushNamed(
-                    context,
-                    RouteName.connectedAccountsSettings,
+        body: ListView(
+          padding: const EdgeInsets.only(top: 8, bottom: 32),
+          children: [
+            SettingsSection(
+              title: 'Account',
+              children: [
+                SettingsRow(
+                  title: 'Edit profile',
+                  subtitle: 'Photos and info',
+                  onTap: () => unawaited(
+                    Navigator.pushNamed(context, RouteName.editProfileScreen),
                   ),
                 ),
-              ),
-              if (_canManagePassword) ...[
                 _divider(context),
                 SettingsRow(
-                  title: _isPasswordProviderUser
-                      ? 'Change password'
-                      : 'Set password',
-                  subtitle: _isPasswordProviderUser
-                      ? 'Update your password'
-                      : 'Create a password',
-                  onTap: _isPasswordProviderUser
-                      ? _showChangePassword
-                      : () => unawaited(_showSetPassword()),
+                  title: 'Phone & email',
+                  subtitle: 'Sign-in contact details',
+                  onTap: () => unawaited(
+                    Navigator.pushNamed(context, RouteName.phoneEmailSettings),
+                  ),
+                ),
+                _divider(context),
+                SettingsRow(
+                  title: 'Connected accounts',
+                  subtitle: 'Google, Apple, and more',
+                  onTap: () => unawaited(
+                    Navigator.pushNamed(
+                      context,
+                      RouteName.connectedAccountsSettings,
+                    ),
+                  ),
+                ),
+                if (_canManagePassword) ...[
+                  _divider(context),
+                  SettingsRow(
+                    title: _isPasswordProviderUser
+                        ? 'Change password'
+                        : 'Set password',
+                    subtitle: _isPasswordProviderUser
+                        ? 'Update your password'
+                        : 'Create a password',
+                    onTap: _isPasswordProviderUser
+                        ? _showChangePassword
+                        : () => unawaited(_showSetPassword()),
+                  ),
+                ],
+              ],
+            ),
+            _sectionGap(),
+            SettingsSection(
+              title: 'Notifications',
+              children: [
+                SettingsRow(
+                  title: 'Push notifications',
+                  subtitle: 'Matches, messages, likes',
+                  onTap: () => unawaited(
+                    Navigator.pushNamed(
+                        context, RouteName.notificationSettings),
+                  ),
+                ),
+                _divider(context),
+                SettingsRow(
+                  title: 'Email notifications',
+                  subtitle: 'Product updates and tips',
+                  onTap: () => unawaited(
+                    Navigator.pushNamed(
+                      context,
+                      RouteName.emailNotificationsSettings,
+                    ),
+                  ),
                 ),
               ],
-            ],
-          ),
-          _sectionGap(),
-          SettingsSection(
-            title: 'Notifications',
-            children: [
-              SettingsRow(
-                title: 'Push notifications',
-                subtitle: 'Matches, messages, likes',
-                onTap: () => unawaited(
-                  Navigator.pushNamed(context, RouteName.notificationSettings),
-                ),
-              ),
-              _divider(context),
-              SettingsRow(
-                title: 'Email notifications',
-                subtitle: 'Product updates and tips',
-                onTap: () => unawaited(
-                  Navigator.pushNamed(
-                    context,
-                    RouteName.emailNotificationsSettings,
-                  ),
-                ),
-              ),
-            ],
-          ),
-          _sectionGap(),
-          BlocBuilder<UserBloc, UserState>(
-            builder: (context, userState) {
-              final UserModel? user = context.read<UserBloc>().currentUser;
-              final bool premium = user?.hasPremiumAccess ?? false;
-              return SettingsSection(
-                title: 'Subscription',
-                consequence: _subscriptionConsequenceText(user),
-                children: [
-              SettingsRow(
-                title: premium ? 'Change plan' : 'Upgrade',
-                subtitle: premium
-                    ? 'Switch billing period or plan'
-                    : 'See plans and benefits',
-                onTap: () => unawaited(_openUpgradePaywall()),
-              ),
-              _divider(context),
-              SettingsRow(
-                title: 'Manage subscription',
-                subtitle: 'Open store subscriptions',
-                onTap: () => unawaited(_openManageSubscription()),
-              ),
-              _divider(context),
-              SettingsRow(
-                title: 'Restore purchases',
-                subtitle: 'Recover an existing subscription',
-                onTap: _restorePurchases,
-              ),
-                ],
-              );
-            },
-          ),
-          _sectionGap(),
-          SettingsSection(
-            title: 'Legal',
-            children: [
-              SettingsRow(
-                title: 'Privacy policy',
-                onTap: () => unawaited(
-                  Navigator.push<void>(
-                    context,
-                    MaterialPageRoute<void>(
-                      builder: (_) => const PrivacyPolicyScreen(),
+            ),
+            _sectionGap(),
+            BlocBuilder<UserBloc, UserState>(
+              builder: (context, userState) {
+                final UserModel? user = context.read<UserBloc>().currentUser;
+                final bool premium = user?.hasPremiumAccess ?? false;
+                return SettingsSection(
+                  title: 'Subscription',
+                  consequence: _subscriptionConsequenceText(user),
+                  children: [
+                    SettingsRow(
+                      title: premium ? 'Change plan' : 'Upgrade',
+                      subtitle: premium
+                          ? 'Switch billing period or plan'
+                          : 'See plans and benefits',
+                      onTap: () => unawaited(_openUpgradePaywall()),
                     ),
-                  ),
-                ),
-              ),
-              _divider(context),
-              SettingsRow(
-                title: 'Terms',
-                onTap: () => unawaited(
-                  Navigator.push<void>(
-                    context,
-                    MaterialPageRoute<void>(
-                      builder: (_) => const TermsOfServiceScreen(),
+                    _divider(context),
+                    SettingsRow(
+                      title: 'Manage subscription',
+                      subtitle: 'Open store subscriptions',
+                      onTap: () => unawaited(_openManageSubscription()),
                     ),
-                  ),
-                ),
-              ),
-              _divider(context),
-              SettingsRow(
-                title: 'Licenses',
-                onTap: _openLicenses,
-              ),
-              _divider(context),
-              SettingsRow(
-                title: 'Download my data',
-                subtitle: 'Request a copy of your data',
-                onTap: () => unawaited(
-                  Navigator.pushNamed(context, RouteName.downloadMyData),
-                ),
-              ),
-            ],
-          ),
-          _sectionGap(),
-          SettingsSection(
-            title: 'Safety & community',
-            children: [
-              SettingsRow(
-                title: 'Blocked users',
-                onTap: () => unawaited(
-                  Navigator.pushNamed(context, RouteName.blockedUsers),
-                ),
-              ),
-              _divider(context),
-              SettingsRow(
-                title: 'Safety center',
-                onTap: () => unawaited(
-                  Navigator.push<void>(
-                    context,
-                    MaterialPageRoute<void>(
-                      builder: (_) => const SafetyCenterScreen(),
+                    _divider(context),
+                    SettingsRow(
+                      title: 'Restore purchases',
+                      subtitle: 'Recover an existing subscription',
+                      onTap: _restorePurchases,
                     ),
-                  ),
-                ),
-              ),
-              _divider(context),
-              SettingsRow(
-                title: 'Community guidelines',
-                onTap: () => unawaited(_openCommunityGuidelines()),
-              ),
-            ],
-          ),
-          _sectionGap(),
-          SettingsSection(
-            title: 'Privacy',
-            children: [
-              SettingsRow(
-                title: 'Profile privacy',
-                subtitle: 'Who can see you',
-                onTap: () => unawaited(
-                  Navigator.push<void>(
-                    context,
-                    MaterialPageRoute<void>(
-                      builder: (_) => const PrivacySettingsScreen(),
-                    ),
-                  ),
-                ),
-              ),
-            ],
-          ),
-          _sectionGap(),
-          SettingsSection(
-            title: 'Preferences',
-            children: [
-              SettingsRow(
-                title: 'Discovery preferences',
-                subtitle: 'Distance, age, who you see',
-                onTap: () => unawaited(
-                  Navigator.push<void>(
-                    context,
-                    MaterialPageRoute<void>(
-                      builder: (_) => const DiscoveryPreferencesScreen(),
-                    ),
-                  ),
-                ),
-              ),
-              _divider(context),
-              SettingsRow(
-                title: 'Language',
-                subtitle: _languageSubtitle(context),
-                onTap: () => unawaited(
-                  Navigator.pushNamed(context, RouteName.languageSettings),
-                ),
-              ),
-            ],
-          ),
-          _sectionGap(),
-          SettingsSection(
-            title: 'Support',
-            children: [
-              SettingsRow(
-                title: 'Help center',
-                onTap: () => unawaited(
-                  Navigator.push<void>(
-                    context,
-                    MaterialPageRoute<void>(
-                      builder: (_) => const HelpCenterScreen(),
-                    ),
-                  ),
-                ),
-              ),
-              _divider(context),
-              SettingsRow(
-                title: 'Send feedback',
-                onTap: () => unawaited(
-                  Navigator.pushNamed(context, RouteName.feedbackScreen),
-                ),
-              ),
-              _divider(context),
-              SettingsRow(
-                title: 'About',
-                onTap: _showAboutDialog,
-              ),
-            ],
-          ),
-          _sectionGap(),
-          SettingsSection(
-            title: 'Account status',
-            consequence:
-                'Taking a break hides your profile from discovery until you return.',
-            children: [
-              SettingsRow(
-                title: 'Take a break',
-                onTap: () => unawaited(
-                  Navigator.push<void>(
-                    context,
-                    MaterialPageRoute<void>(
-                      builder: (_) => BlocProvider<AccountStatusBloc>(
-                        create: (_) => AccountStatusBloc(),
-                        child: const AccountStatusScreen(),
+                  ],
+                );
+              },
+            ),
+            _sectionGap(),
+            SettingsSection(
+              title: 'Legal',
+              children: [
+                SettingsRow(
+                  title: 'Privacy policy',
+                  onTap: () => unawaited(
+                    Navigator.push<void>(
+                      context,
+                      MaterialPageRoute<void>(
+                        builder: (_) => const PrivacyPolicyScreen(),
                       ),
                     ),
                   ),
                 ),
-              ),
-            ],
-          ),
-          const SizedBox(height: 24),
-          SettingsSection(
-            title: 'Session',
-            children: [
-              SettingsRow(
-                title: 'Log out',
-                destructive: true,
-                showChevron: false,
-                onTap: _showSignOutDialog,
-              ),
-              _divider(context),
-              SettingsRow(
-                title: 'Delete account',
-                subtitle: 'Permanent — cannot be undone',
-                destructive: true,
-                onTap: _showDeleteAccountDialog,
-              ),
-            ],
-          ),
-        ],
+                _divider(context),
+                SettingsRow(
+                  title: 'Terms',
+                  onTap: () => unawaited(
+                    Navigator.push<void>(
+                      context,
+                      MaterialPageRoute<void>(
+                        builder: (_) => const TermsOfServiceScreen(),
+                      ),
+                    ),
+                  ),
+                ),
+                _divider(context),
+                SettingsRow(
+                  title: 'Licenses',
+                  onTap: _openLicenses,
+                ),
+                _divider(context),
+                SettingsRow(
+                  title: 'Download my data',
+                  subtitle: 'Request a copy of your data',
+                  onTap: () => unawaited(
+                    Navigator.pushNamed(context, RouteName.downloadMyData),
+                  ),
+                ),
+              ],
+            ),
+            _sectionGap(),
+            SettingsSection(
+              title: 'Safety & community',
+              children: [
+                SettingsRow(
+                  title: 'Blocked users',
+                  onTap: () => unawaited(
+                    Navigator.pushNamed(context, RouteName.blockedUsers),
+                  ),
+                ),
+                _divider(context),
+                SettingsRow(
+                  title: 'Safety center',
+                  onTap: () => unawaited(
+                    Navigator.push<void>(
+                      context,
+                      MaterialPageRoute<void>(
+                        builder: (_) => const SafetyCenterScreen(),
+                      ),
+                    ),
+                  ),
+                ),
+                _divider(context),
+                SettingsRow(
+                  title: 'Community guidelines',
+                  onTap: () => unawaited(_openCommunityGuidelines()),
+                ),
+              ],
+            ),
+            _sectionGap(),
+            SettingsSection(
+              title: 'Privacy',
+              children: [
+                SettingsRow(
+                  title: 'Profile privacy',
+                  subtitle: 'Who can see you',
+                  onTap: () => unawaited(
+                    Navigator.push<void>(
+                      context,
+                      MaterialPageRoute<void>(
+                        builder: (_) => const PrivacySettingsScreen(),
+                      ),
+                    ),
+                  ),
+                ),
+              ],
+            ),
+            _sectionGap(),
+            SettingsSection(
+              title: 'Preferences',
+              children: [
+                SettingsRow(
+                  title: 'Discovery preferences',
+                  subtitle: 'Distance, age, who you see',
+                  onTap: () => unawaited(
+                    Navigator.push<void>(
+                      context,
+                      MaterialPageRoute<void>(
+                        builder: (_) => const DiscoveryPreferencesScreen(),
+                      ),
+                    ),
+                  ),
+                ),
+                _divider(context),
+                SettingsRow(
+                  title: 'Language',
+                  subtitle: _languageSubtitle(context),
+                  onTap: () => unawaited(
+                    Navigator.pushNamed(context, RouteName.languageSettings),
+                  ),
+                ),
+              ],
+            ),
+            _sectionGap(),
+            SettingsSection(
+              title: 'Support',
+              children: [
+                SettingsRow(
+                  title: 'Help center',
+                  onTap: () => unawaited(
+                    Navigator.push<void>(
+                      context,
+                      MaterialPageRoute<void>(
+                        builder: (_) => const HelpCenterScreen(),
+                      ),
+                    ),
+                  ),
+                ),
+                _divider(context),
+                SettingsRow(
+                  title: 'Send feedback',
+                  onTap: () => unawaited(
+                    Navigator.pushNamed(context, RouteName.feedbackScreen),
+                  ),
+                ),
+                _divider(context),
+                SettingsRow(
+                  title: 'About',
+                  onTap: _showAboutDialog,
+                ),
+              ],
+            ),
+            _sectionGap(),
+            SettingsSection(
+              title: 'Account status',
+              consequence:
+                  'Taking a break hides your profile from discovery until you return.',
+              children: [
+                SettingsRow(
+                  title: 'Take a break',
+                  onTap: () => unawaited(
+                    Navigator.push<void>(
+                      context,
+                      MaterialPageRoute<void>(
+                        builder: (_) => BlocProvider<AccountStatusBloc>(
+                          create: (_) => AccountStatusBloc(),
+                          child: const AccountStatusScreen(),
+                        ),
+                      ),
+                    ),
+                  ),
+                ),
+              ],
+            ),
+            const SizedBox(height: 24),
+            SettingsSection(
+              title: 'Session',
+              children: [
+                SettingsRow(
+                  title: 'Log out',
+                  destructive: true,
+                  showChevron: false,
+                  onTap: _showSignOutDialog,
+                ),
+                _divider(context),
+                SettingsRow(
+                  title: 'Delete account',
+                  subtitle: 'Permanent — cannot be undone',
+                  destructive: true,
+                  onTap: _showDeleteAccountDialog,
+                ),
+              ],
+            ),
+          ],
+        ),
       ),
-    ),
     );
   }
 }

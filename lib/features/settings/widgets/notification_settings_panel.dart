@@ -36,9 +36,8 @@ class NotificationSettingsPanel extends StatelessWidget {
           const SettingsSectionHeader('All notifications'),
           SettingsToggleRow(
             title: 'Enable All Notifications',
-            subtitle: !d.enableAllNotifications
-                ? 'You may miss a connection.'
-                : null,
+            subtitle:
+                !d.enableAllNotifications ? 'You may miss a connection.' : null,
             value: d.enableAllNotifications,
             onChanged: isSaving
                 ? null
@@ -90,8 +89,7 @@ class NotificationSettingsPanel extends StatelessWidget {
                   value: d.likeNotifications,
                   onChanged: channelsLocked || isSaving
                       ? null
-                      : (v) =>
-                          onDraftChanged(d.copyWith(likeNotifications: v)),
+                      : (v) => onDraftChanged(d.copyWith(likeNotifications: v)),
                 ),
               ],
             ),

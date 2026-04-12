@@ -101,7 +101,8 @@ class _EmailNotificationsSettingsScreenState
                   if (_error != null)
                     Padding(
                       padding: const EdgeInsets.all(16),
-                      child: Text(_error!, style: TextStyle(color: Colors.red.shade700)),
+                      child: Text(_error!,
+                          style: TextStyle(color: Colors.red.shade700)),
                     ),
                   SettingsSection(
                     title: 'Email',

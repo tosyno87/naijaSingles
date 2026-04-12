@@ -26,9 +26,11 @@ void main() {
         ),
       );
 
-      final tiles = tester.widgetList<SwitchListTile>(
-        find.byType(SwitchListTile),
-      ).toList();
+      final tiles = tester
+          .widgetList<SwitchListTile>(
+            find.byType(SwitchListTile),
+          )
+          .toList();
 
       // 0: Enable All, 1: Mute, 2–4: Matches/Messages/Likes, 5–6: Sound/Vibration,
       // 7: Quiet hours
@@ -59,9 +61,11 @@ void main() {
         ),
       );
 
-      final tiles = tester.widgetList<SwitchListTile>(
-        find.byType(SwitchListTile),
-      ).toList();
+      final tiles = tester
+          .widgetList<SwitchListTile>(
+            find.byType(SwitchListTile),
+          )
+          .toList();
 
       expect(tiles[2].onChanged, isNotNull);
       expect(tiles[3].onChanged, isNotNull);

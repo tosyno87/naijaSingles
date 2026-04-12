@@ -91,8 +91,9 @@ class SubscriptionState extends Equatable {
         restoreInProgress: restoreInProgress ?? this.restoreInProgress,
         userMessage:
             clearUserMessage ? null : (userMessage ?? this.userMessage),
-        restoreSuccess:
-            clearRestoreSuccess ? null : (restoreSuccess ?? this.restoreSuccess),
+        restoreSuccess: clearRestoreSuccess
+            ? null
+            : (restoreSuccess ?? this.restoreSuccess),
         shouldNavigateToSuccess: clearNavigate
             ? false
             : (shouldNavigateToSuccess ?? this.shouldNavigateToSuccess),

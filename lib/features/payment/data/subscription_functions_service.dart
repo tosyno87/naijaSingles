@@ -5,8 +5,8 @@ import 'package:flutter/foundation.dart';
 class SubscriptionFunctionsService {
   SubscriptionFunctionsService({
     FirebaseFunctions? functions,
-  }) : _functions = functions ??
-            FirebaseFunctions.instanceFor(region: 'us-central1');
+  }) : _functions =
+            functions ?? FirebaseFunctions.instanceFor(region: 'us-central1');
 
   final FirebaseFunctions _functions;
 

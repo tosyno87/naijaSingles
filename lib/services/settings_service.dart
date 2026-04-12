@@ -583,8 +583,7 @@ class NotificationSettings {
             superLikeNotifications ?? this.superLikeNotifications,
         enableAllNotifications:
             enableAllNotifications ?? this.enableAllNotifications,
-        muteAllNotifications:
-            muteAllNotifications ?? this.muteAllNotifications,
+        muteAllNotifications: muteAllNotifications ?? this.muteAllNotifications,
         soundEnabled: soundEnabled ?? this.soundEnabled,
         vibrationEnabled: vibrationEnabled ?? this.vibrationEnabled,
         quietHoursStart: quietHoursStart ?? this.quietHoursStart,

@@ -204,7 +204,9 @@ class InAppPurchaseRepoImpl extends InAppPurchaseRepo {
   }
 
   String getInterval(ProductDetails product) {
-    product as AppStoreProductDetails;
+    if (product is! AppStoreProductDetails) {
+      return '';
+    }
     final SKSubscriptionPeriodUnit periodUnit =
         product.skProduct.subscriptionPeriod!.unit;
     if (SKSubscriptionPeriodUnit.month == periodUnit) {
@@ -217,12 +219,17 @@ class InAppPurchaseRepoImpl extends InAppPurchaseRepo {
   }
 
   String getIntervalAndroid(ProductDetails product) {
-    product as GooglePlayProductDetails;
-    final String? durCode = product.productDetails.subscriptionOfferDetails
-        ?.first.pricingPhases.first.billingPeriod;
-    if (durCode == 'M' || durCode == 'm') {
+    if (product is! GooglePlayProductDetails) {
+      return '';
+    }
+    final String? billingPeriod = product.productDetails
+        .subscriptionOfferDetails?.first.pricingPhases.first.billingPeriod;
+    if (billingPeriod == null) {
+      return '';
+    }
+    if (billingPeriod.contains('M')) {
       return 'Month(s)';
-    } else if (durCode == 'Y' || durCode == 'y') {
+    } else if (billingPeriod.contains('Y')) {
       return 'Year';
     } else {
       return 'Week(s)';

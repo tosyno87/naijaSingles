@@ -1,7 +1,6 @@
 // ignore_for_file: sort_child_properties_last, depend_on_referenced_packages, avoid_positional_boolean_parameters
 
 import 'dart:async';
-import 'dart:io';
 import 'dart:math';
 
 import 'package:easy_localization/easy_localization.dart';
@@ -300,13 +299,46 @@ class ProductsState extends State<Products> {
                                                 },
                                                 children:
                                                     state.result.map((product) {
-                                                  AppStoreProductDetails? iosP;
-                                                  product
-                                                      as GooglePlayProductDetails;
-                                                  if (Platform.isIOS) {
-                                                    iosP = product
-                                                        as AppStoreProductDetails;
-                                                  }
+                                                  final AppStoreProductDetails?
+                                                      iosP =
+                                                      product is AppStoreProductDetails
+                                                          ? product
+                                                          : null;
+                                                  final GooglePlayProductDetails?
+                                                      androidP =
+                                                      product is GooglePlayProductDetails
+                                                          ? product
+                                                          : null;
+                                                  final String interval = iosP !=
+                                                          null
+                                                      ? InAppPurchaseRepoImpl()
+                                                          .getInterval(product)
+                                                      : InAppPurchaseRepoImpl()
+                                                          .getIntervalAndroid(
+                                                          product,
+                                                        );
+                                                  final String intervalCount = iosP !=
+                                                          null
+                                                      ? iosP
+                                                              .skProduct
+                                                              .subscriptionPeriod
+                                                              ?.numberOfUnits
+                                                              .toString() ??
+                                                          ''
+                                                      : androidP
+                                                              ?.productDetails
+                                                              .subscriptionOfferDetails
+                                                              ?.first
+                                                              .pricingPhases
+                                                              .first
+                                                              .billingPeriod
+                                                              .replaceAll(
+                                                            RegExp(
+                                                              r'[^0-9]',
+                                                            ),
+                                                            '',
+                                                          ) ??
+                                                          '';
                                                   return Transform.rotate(
                                                     angle: pi / 2,
                                                     child: Center(
@@ -315,36 +347,9 @@ class ProductsState extends State<Products> {
                                                           productList(
                                                             context: context,
                                                             product: product,
-                                                            interval: Platform
-                                                                    .isIOS
-                                                                ? InAppPurchaseRepoImpl()
-                                                                    .getInterval(
-                                                                    product,
-                                                                  )
-                                                                : InAppPurchaseRepoImpl()
-                                                                    .getIntervalAndroid(
-                                                                    product,
-                                                                  ),
-                                                            intervalCount: Platform
-                                                                        .isIOS &&
-                                                                    iosP != null
-                                                                ? iosP
-                                                                        .skProduct
-                                                                        .subscriptionPeriod
-                                                                        ?.numberOfUnits
-                                                                        .toString() ??
-                                                                    ''
-                                                                : product
-                                                                        .productDetails
-                                                                        .subscriptionOfferDetails
-                                                                        ?.first
-                                                                        .pricingPhases
-                                                                        .first
-                                                                        .billingPeriod
-                                                                        .split(
-                                                                      '',
-                                                                    )[1] ??
-                                                                    '',
+                                                            interval: interval,
+                                                            intervalCount:
+                                                                intervalCount,
                                                             price:
                                                                 product.price,
                                                             onTap: () {

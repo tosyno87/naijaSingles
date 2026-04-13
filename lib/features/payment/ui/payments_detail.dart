@@ -1,10 +1,7 @@
-import 'dart:io';
-
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:in_app_purchase/in_app_purchase.dart';
 import 'package:in_app_purchase_android/in_app_purchase_android.dart';
-import 'package:in_app_purchase_storekit/in_app_purchase_storekit.dart';
 import '../../../common/constants/app_colors.dart';
 import '../../../common/widgets/hookup_circularbar.dart';
 
@@ -64,10 +61,10 @@ class PaymentDetails extends StatelessWidget {
                       physics: const ScrollPhysics(),
                       shrinkWrap: true,
                       children: purchases.map((index) {
-                        index as GooglePlayPurchaseDetails;
-                        if (Platform.isIOS) {
-                          index as AppStorePurchaseDetails;
-                        }
+                        final bool isAutoRenewing =
+                            index is GooglePlayPurchaseDetails
+                                ? index.billingClientPurchase.isAutoRenewing
+                                : true;
                         return Padding(
                           padding: const EdgeInsets.all(8),
                           child: SingleChildScrollView(
@@ -174,13 +171,11 @@ class PaymentDetails extends StatelessWidget {
                                     ),
                                     DataCell(
                                       Text(
-                                        index.billingClientPurchase
-                                                .isAutoRenewing
+                                        isAutoRenewing
                                             ? 'Active'.tr().toString()
                                             : 'Cancelled'.tr().toString(),
                                         style: TextStyle(
-                                          color: index.billingClientPurchase
-                                                  .isAutoRenewing
+                                          color: isAutoRenewing
                                               ? Colors.green
                                               : Colors.red,
                                           fontSize: 15,

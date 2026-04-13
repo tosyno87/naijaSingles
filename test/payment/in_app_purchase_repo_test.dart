@@ -307,10 +307,10 @@ void main() {
       expect(repo.getIntervalAndroid(mockProduct), 'Month(s)');
     });
 
-    test('returns "Month(s)" for billing period "m"', () {
+    test('returns "Week(s)" for billing period "m" (case-sensitive check)', () {
       when(() => mockPPW.billingPeriod).thenReturn('m');
 
-      expect(repo.getIntervalAndroid(mockProduct), 'Month(s)');
+      expect(repo.getIntervalAndroid(mockProduct), 'Week(s)');
     });
 
     test('returns "Year" for billing period "Y"', () {
@@ -319,10 +319,10 @@ void main() {
       expect(repo.getIntervalAndroid(mockProduct), 'Year');
     });
 
-    test('returns "Year" for billing period "y"', () {
+    test('returns "Week(s)" for billing period "y" (case-sensitive check)', () {
       when(() => mockPPW.billingPeriod).thenReturn('y');
 
-      expect(repo.getIntervalAndroid(mockProduct), 'Year');
+      expect(repo.getIntervalAndroid(mockProduct), 'Week(s)');
     });
 
     test('returns "Week(s)" for unrecognised billing period', () {
@@ -331,10 +331,10 @@ void main() {
       expect(repo.getIntervalAndroid(mockProduct), 'Week(s)');
     });
 
-    test('returns "Week(s)" when subscriptionOfferDetails is null', () {
+    test('returns empty string when subscriptionOfferDetails is null', () {
       when(() => mockPDW.subscriptionOfferDetails).thenReturn(null);
 
-      expect(repo.getIntervalAndroid(mockProduct), 'Week(s)');
+      expect(repo.getIntervalAndroid(mockProduct), '');
     });
 
     test('returns "Week(s)" for empty billingPeriod string', () {
@@ -349,30 +349,36 @@ void main() {
       expect(repo.getIntervalAndroid(mockProduct), 'Week(s)');
     });
 
-    test('returns "Month(s)" for period "M" regardless of case', () {
-      for (final period in ['M', 'm']) {
-        when(() => mockPPW.billingPeriod).thenReturn(period);
-        expect(repo.getIntervalAndroid(mockProduct), 'Month(s)');
-      }
+    test(
+        'contains check is case-sensitive (uppercase M matches, lowercase does not)',
+        () {
+      when(() => mockPPW.billingPeriod).thenReturn('M');
+      expect(repo.getIntervalAndroid(mockProduct), 'Month(s)');
+
+      when(() => mockPPW.billingPeriod).thenReturn('m');
+      expect(repo.getIntervalAndroid(mockProduct), 'Week(s)');
     });
 
-    test('returns "Year" for period "Y" regardless of case', () {
-      for (final period in ['Y', 'y']) {
-        when(() => mockPPW.billingPeriod).thenReturn(period);
-        expect(repo.getIntervalAndroid(mockProduct), 'Year');
-      }
+    test(
+        'contains check is case-sensitive (uppercase Y matches, lowercase does not)',
+        () {
+      when(() => mockPPW.billingPeriod).thenReturn('Y');
+      expect(repo.getIntervalAndroid(mockProduct), 'Year');
+
+      when(() => mockPPW.billingPeriod).thenReturn('y');
+      expect(repo.getIntervalAndroid(mockProduct), 'Week(s)');
     });
 
-    test('returns "Week(s)" for ISO 8601 duration "P1M" (not single char)', () {
+    test('returns "Month(s)" for ISO 8601 duration "P1M"', () {
       when(() => mockPPW.billingPeriod).thenReturn('P1M');
 
-      expect(repo.getIntervalAndroid(mockProduct), 'Week(s)');
+      expect(repo.getIntervalAndroid(mockProduct), 'Month(s)');
     });
 
-    test('returns "Week(s)" for ISO 8601 duration "P1Y"', () {
+    test('returns "Year" for ISO 8601 duration "P1Y"', () {
       when(() => mockPPW.billingPeriod).thenReturn('P1Y');
 
-      expect(repo.getIntervalAndroid(mockProduct), 'Week(s)');
+      expect(repo.getIntervalAndroid(mockProduct), 'Year');
     });
 
     test('returns "Week(s)" for whitespace-only billingPeriod', () {

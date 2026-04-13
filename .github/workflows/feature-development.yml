@@ -105,12 +105,11 @@ jobs:
       - name: Setup Xcode
         uses: maxim-lobanov/setup-xcode@c51a66b42363123fa82a6cfe02c60af4281dab93
         with:
-          xcode-version: '15.4'
-          
+          xcode-version: latest-stable
+
       - name: Install CocoaPods
         run: |
-          cd ios
-          sudo gem install cocoapods
+          sudo gem install xcodeproj cocoapods
           
       - name: Cache Flutter dependencies
         uses: actions/cache@6f8efc29b200d32929f49075959781ed54ec270c

@@ -109,7 +109,23 @@ jobs:
 
       - name: Install CocoaPods
         run: |
-          sudo gem install xcodeproj cocoapods
+          sudo gem install bundler
+          cat > Gemfile.pods << 'EOF'
+          source "https://rubygems.org"
+          gem "cocoapods", "1.16.2"
+          # Xcodeproj 1.27.0 (latest gem) fails with objectVersion 70 on newer Xcode.
+          # Use master until a new gem release includes this mapping.
+          gem "xcodeproj", git: "https://github.com/CocoaPods/Xcodeproj.git", branch: "master"
+          EOF
+          BUNDLE_GEMFILE=$PWD/Gemfile.pods bundle install --jobs 4 --retry 3
+          cat > pod << 'EOF'
+          #!/usr/bin/env bash
+          set -euo pipefail
+          BUNDLE_GEMFILE="$(cd "$(dirname "$0")" && pwd)/Gemfile.pods" bundle exec pod "$@"
+          EOF
+          chmod +x pod
+          echo "$PWD" >> "$GITHUB_PATH"
+          cd ios && pod install
           
       - name: Cache Flutter dependencies
         uses: actions/cache@6f8efc29b200d32929f49075959781ed54ec270c

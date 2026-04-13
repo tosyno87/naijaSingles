@@ -105,7 +105,7 @@ jobs:
       - name: Setup Xcode
         uses: maxim-lobanov/setup-xcode@c51a66b42363123fa82a6cfe02c60af4281dab93
         with:
-          xcode-version: latest-stable
+          xcode-version: '15.4'
           
       - name: Install CocoaPods
         run: |

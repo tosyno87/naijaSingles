@@ -82,7 +82,7 @@ jobs:
       - name: Setup Xcode
         uses: maxim-lobanov/setup-xcode@c51a66b42363123fa82a6cfe02c60af4281dab93
         with:
-          xcode-version: '15.4'
+          xcode-version: latest-stable
           
       - name: Create .env file for CI
         # SonarQube: Values are securely injected from GitHub Secrets (not hard-coded)
@@ -116,7 +116,7 @@ jobs:
             
       - name: Install CocoaPods
         run: |
-          sudo gem install cocoapods
+          sudo gem install xcodeproj cocoapods
           cd ios && pod install
 
       - name: Install Fastlane

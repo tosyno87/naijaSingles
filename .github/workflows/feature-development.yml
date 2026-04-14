@@ -125,7 +125,7 @@ jobs:
           EOF
           chmod +x pod
           echo "$PWD" >> "$GITHUB_PATH"
-          cd ios && pod install
+          cd ios && ../pod install
           
       - name: Cache Flutter dependencies
         uses: actions/cache@6f8efc29b200d32929f49075959781ed54ec270c

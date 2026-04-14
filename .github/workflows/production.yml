@@ -132,7 +132,7 @@ jobs:
           EOF
           chmod +x pod
           echo "$PWD" >> "$GITHUB_PATH"
-          cd ios && pod install
+          cd ios && ../pod install
 
       - name: Install Fastlane
         run: |
@@ -388,7 +388,7 @@ jobs:
               flutter pub get
               flutter build ios --release --dart-define=ENV=production --no-codesign
               cd ios
-              pod install
+              ../pod install
               SKIP_FLUTTER_CLEAN=true bundle exec fastlane build_app
               cd ..
               

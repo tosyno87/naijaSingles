@@ -114,25 +114,13 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-flutter-
             
-      - name: Install CocoaPods
+      - name: Install CocoaPods (with patched xcodeproj)
         run: |
-          sudo gem install bundler
-          cat > Gemfile.pods << 'EOF'
-          source "https://rubygems.org"
-          gem "cocoapods", "1.16.2"
-          # Xcodeproj 1.27.0 (latest gem) fails with objectVersion 70 on newer Xcode.
-          # Use master until a new gem release includes this mapping.
-          gem "xcodeproj", git: "https://github.com/CocoaPods/Xcodeproj.git", branch: "master"
-          EOF
-          BUNDLE_GEMFILE=$PWD/Gemfile.pods bundle install --jobs 4 --retry 3
-          cat > pod << 'EOF'
-          #!/usr/bin/env bash
-          set -euo pipefail
-          BUNDLE_GEMFILE="$(cd "$(dirname "$0")" && pwd)/Gemfile.pods" bundle exec pod "$@"
-          EOF
-          chmod +x pod
-          echo "$PWD" >> "$GITHUB_PATH"
-          cd ios && ../pod install
+          git clone --depth 1 https://github.com/CocoaPods/Xcodeproj.git /tmp/xcodeproj
+          cd /tmp/xcodeproj && gem build xcodeproj.gemspec
+          sudo gem install /tmp/xcodeproj/xcodeproj-*.gem --no-document
+          sudo gem install cocoapods --no-document
+          cd $GITHUB_WORKSPACE/ios && pod install
 
       - name: Install Fastlane
         run: |
@@ -388,7 +376,7 @@ jobs:
               flutter pub get
               flutter build ios --release --dart-define=ENV=production --no-codesign
               cd ios
-              ../pod install
+              pod install
               SKIP_FLUTTER_CLEAN=true bundle exec fastlane build_app
               cd ..
               

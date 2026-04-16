@@ -2,7 +2,6 @@ import 'dart:async';
 import 'dart:developer' as developer;
 
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
@@ -14,7 +13,7 @@ import '../../common/constants/constants.dart';
 import '../../common/routes/route_name.dart';
 import '../../common/utils/account_deletion_scope.dart';
 import '../../common/utils/profile_completion_guard.dart';
-import '../../debug/quick_analysis.dart';
+import '../../common/widgets/state_views/app_loading_view.dart';
 import '../../models/user_model.dart';
 import '../account_status/presentation/widgets/account_status_banner.dart';
 import '../communities/ui/screens/discover_page_v2.dart';
@@ -46,9 +45,7 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
   // CONNECT-FIRST NAVIGATION (Connect is the home page)
   List<Widget> get _pages => [
         const ExploreScreen(), // Tab 0: Connect (Dating/Friendship) - HOME PAGE
-        DiscoverPageV2(
-          onSeeAllPeopleTap: () => _switchToTab(0),
-        ), // Tab 1: Discover (Events & Communities)
+        const DiscoverPageV2(), // Tab 1: Discover (Events & Communities)
         const MessagesScreen(), // Tab 2: Messages
         const ProfileScreen(), // Tab 3: Profile
       ];
@@ -233,26 +230,9 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
       // This prevents the wrong screen from appearing
       if (!_hasCheckedRegistration) {
         // Still checking - show loading
-        return Scaffold(
+        return const Scaffold(
           backgroundColor: AppColors.backgroundColor,
-          body: Center(
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                const CircularProgressIndicator(
-                  color: AppColors.primaryGreen,
-                ),
-                const SizedBox(height: 24),
-                Text(
-                  'Loading...',
-                  style: GoogleFonts.montserrat(
-                    fontSize: 16,
-                    color: AppColors.primaryGreen,
-                  ),
-                ),
-              ],
-            ),
-          ),
+          body: AppLoadingView(),
         );
       }
       // Check completed - verify user is authenticated
@@ -274,26 +254,9 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
             }
           }),
         );
-        return Scaffold(
+        return const Scaffold(
           backgroundColor: AppColors.backgroundColor,
-          body: Center(
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                const CircularProgressIndicator(
-                  color: AppColors.primaryGreen,
-                ),
-                const SizedBox(height: 24),
-                Text(
-                  'Redirecting...',
-                  style: GoogleFonts.montserrat(
-                    fontSize: 16,
-                    color: AppColors.primaryGreen,
-                  ),
-                ),
-              ],
-            ),
-          ),
+          body: AppLoadingView(message: 'Redirecting...'),
         );
       }
 
@@ -332,26 +295,9 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
           }),
         );
       }
-      return Scaffold(
+      return const Scaffold(
         backgroundColor: AppColors.backgroundColor,
-        body: Center(
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              const CircularProgressIndicator(
-                color: AppColors.primaryGreen,
-              ),
-              const SizedBox(height: 24),
-              Text(
-                'Setting up your profile...',
-                style: GoogleFonts.montserrat(
-                  fontSize: 16,
-                  color: AppColors.primaryGreen,
-                ),
-              ),
-            ],
-          ),
-        ),
+        body: AppLoadingView(message: 'Setting up your profile...'),
       );
     }
 
@@ -418,23 +364,6 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
                     ),
                   ),
 
-                // Temporary analysis button (remove after testing)
-                if (kDebugMode)
-                  Positioned(
-                    top: MediaQuery.of(context).padding.top + 50,
-                    right: 16,
-                    child: FloatingActionButton(
-                      heroTag: 'analysis_fab',
-                      mini: true,
-                      backgroundColor: Colors.blue.withValues(alpha: 0.8),
-                      child: const Icon(
-                        Icons.analytics,
-                        color: Colors.white,
-                        size: 16,
-                      ),
-                      onPressed: () => _runUserAnalysis(context),
-                    ),
-                  ),
               ],
             ),
           ),
@@ -512,69 +441,4 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
         ),
       );
 
-  // Temporary analysis method (remove after testing)
-  void _runUserAnalysis(BuildContext context) {
-    unawaited(
-      showModalBottomSheet(
-        context: context,
-        builder: (context) => Container(
-          padding: const EdgeInsets.all(16),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            crossAxisAlignment: CrossAxisAlignment.stretch,
-            children: [
-              Text(
-                '📊 User Analysis',
-                style: GoogleFonts.montserrat(
-                  fontSize: 20,
-                  fontWeight: FontWeight.bold,
-                ),
-                textAlign: TextAlign.center,
-              ),
-              const SizedBox(height: 16),
-              ElevatedButton.icon(
-                onPressed: () async {
-                  Navigator.pop(context);
-                  await QuickAnalysis.runQuickAnalysis();
-                  if (context.mounted) {
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      const SnackBar(
-                        content: Text(
-                          'Analysis complete! Check console for results.',
-                        ),
-                      ),
-                    );
-                  }
-                },
-                icon: const Icon(Icons.analytics),
-                label: const Text('Run User Analysis'),
-              ),
-              ElevatedButton.icon(
-                onPressed: () async {
-                  Navigator.pop(context);
-                  await QuickAnalysis.cleanupProfiles();
-                  if (context.mounted) {
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      const SnackBar(
-                        content: Text(
-                          'Cleanup complete! Check console for results.',
-                        ),
-                      ),
-                    );
-                  }
-                },
-                icon: const Icon(Icons.cleaning_services),
-                label: const Text('Cleanup Incomplete Profiles'),
-              ),
-              const SizedBox(height: 16),
-              TextButton(
-                onPressed: () => Navigator.pop(context),
-                child: const Text('Close'),
-              ),
-            ],
-          ),
-        ),
-      ),
-    );
-  }
 }

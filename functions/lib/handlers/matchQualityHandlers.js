@@ -59,12 +59,11 @@ const EXPECTED_TYPES = [
  * Returns a JSON report: event counts by type, schema violations, pass/fail.
  */
 exports.validateIngestion = (0, https_1.onRequest)(async (req, res) => {
-    var _a, _b;
     if (req.method !== 'POST') {
         res.status(405).json({ error: 'Method not allowed' });
         return;
     }
-    const hoursBack = (_b = (_a = req.body) === null || _a === void 0 ? void 0 : _a.hoursBack) !== null && _b !== void 0 ? _b : 48;
+    const hoursBack = req.body?.hoursBack ?? 48;
     const db = admin.firestore();
     const now = admin.firestore.Timestamp.now();
     const windowStart = admin.firestore.Timestamp.fromMillis(now.toMillis() - hoursBack * 60 * 60 * 1000);
@@ -92,7 +91,7 @@ exports.validateIngestion = (0, https_1.onRequest)(async (req, res) => {
             }
         }
     }
-    const missingTypes = EXPECTED_TYPES.filter((t) => { var _a; return ((_a = eventCounts[t]) !== null && _a !== void 0 ? _a : 0) === 0; });
+    const missingTypes = EXPECTED_TYPES.filter((t) => (eventCounts[t] ?? 0) === 0);
     const passed = missingTypes.length === 0 && schemaViolations.length === 0;
     const report = {
         status: passed ? 'pass' : 'fail',
@@ -119,7 +118,6 @@ exports.validateIngestion = (0, https_1.onRequest)(async (req, res) => {
  * Returns JSON matching the MatchExperimentReportInput metrics shape.
  */
 exports.aggregateMetrics = (0, https_1.onRequest)(async (req, res) => {
-    var _a, _b, _c;
     if (req.method !== 'POST') {
         res.status(405).json({ error: 'Method not allowed' });
         return;
@@ -177,7 +175,7 @@ exports.aggregateMetrics = (0, https_1.onRequest)(async (req, res) => {
                 break;
             case 'conversationQuality': {
                 conversationQualityCount++;
-                const meta = (_a = data.metadata) !== null && _a !== void 0 ? _a : {};
+                const meta = data.metadata ?? {};
                 if (typeof meta.responseRate === 'number') {
                     totalResponseRate += meta.responseRate;
                 }
@@ -219,8 +217,8 @@ exports.aggregateMetrics = (0, https_1.onRequest)(async (req, res) => {
             startDate: body.startDate,
             endDate: body.endDate,
         },
-        experimentId: (_b = body.experimentId) !== null && _b !== void 0 ? _b : null,
-        variantId: (_c = body.variantId) !== null && _c !== void 0 ? _c : null,
+        experimentId: body.experimentId ?? null,
+        variantId: body.variantId ?? null,
         totalEvents: snapshot.size,
         breakdown: {
             impressions,

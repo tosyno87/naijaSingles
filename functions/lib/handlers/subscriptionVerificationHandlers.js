@@ -49,20 +49,19 @@ const https_1 = require("firebase-functions/v2/https");
 const google_auth_library_1 = require("google-auth-library");
 const REGION = 'us-central1';
 exports.verifySubscriptionPurchase = (0, https_1.onCall)({ region: REGION }, async (request) => {
-    var _a, _b, _c, _d, _e, _f, _g, _h, _j, _k, _l;
-    if (!((_a = request.auth) === null || _a === void 0 ? void 0 : _a.uid)) {
+    if (!request.auth?.uid) {
         throw new https_1.HttpsError('unauthenticated', 'Sign in required');
     }
     const uid = request.auth.uid;
-    const platform = ((_c = (_b = request.data) === null || _b === void 0 ? void 0 : _b.platform) !== null && _c !== void 0 ? _c : '').toLowerCase();
-    const productId = (_e = (_d = request.data) === null || _d === void 0 ? void 0 : _d.productId) !== null && _e !== void 0 ? _e : '';
-    const packageName = (_g = (_f = request.data) === null || _f === void 0 ? void 0 : _f.packageName) !== null && _g !== void 0 ? _g : 'com.app.naijasingles';
-    const purchaseToken = (_h = request.data) === null || _h === void 0 ? void 0 : _h.purchaseToken;
-    const receiptData = (_j = request.data) === null || _j === void 0 ? void 0 : _j.receiptData;
+    const platform = (request.data?.platform ?? '').toLowerCase();
+    const productId = request.data?.productId ?? '';
+    const packageName = request.data?.packageName ?? 'com.app.naijasingles';
+    const purchaseToken = request.data?.purchaseToken;
+    const receiptData = request.data?.receiptData;
     if (!platform || !productId) {
         throw new https_1.HttpsError('invalid-argument', 'platform and productId are required');
     }
-    const allowUnverified = ((_k = process.env.IAP_ALLOW_UNVERIFIED_SYNC) !== null && _k !== void 0 ? _k : '').toLowerCase() === 'true';
+    const allowUnverified = (process.env.IAP_ALLOW_UNVERIFIED_SYNC ?? '').toLowerCase() === 'true';
     let verified = false;
     let expiresAt = null;
     if (platform === 'android') {
@@ -131,9 +130,9 @@ exports.verifySubscriptionPurchase = (0, https_1.onCall)({ region: REGION }, asy
                     });
                     body = (await resp.json());
                 }
-                if (body.status === 0 && ((_l = body.latest_receipt_info) === null || _l === void 0 ? void 0 : _l.length)) {
+                if (body.status === 0 && body.latest_receipt_info?.length) {
                     const info = body.latest_receipt_info.find((x) => x.product_id === productId);
-                    if (info === null || info === void 0 ? void 0 : info.expires_date_ms) {
+                    if (info?.expires_date_ms) {
                         verified = true;
                         expiresAt = admin.firestore.Timestamp.fromMillis(parseInt(info.expires_date_ms, 10));
                     }

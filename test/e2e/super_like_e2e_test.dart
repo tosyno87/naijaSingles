@@ -36,12 +36,12 @@ void main() {
     test('SuperLikeEligibility reflects free tier limits', () {
       final eligibility = SuperLikeEligibility(
         canSend: true,
-        remainingCount: SuperLikeService.freeSuperLikesPerDay,
+        remainingCount: SuperLikeService.freeSuperLikesPerWeek,
         nextResetTime: DateTime.now().add(const Duration(hours: 12)),
       );
 
       expect(eligibility.canSend, isTrue);
-      expect(eligibility.remainingCount, SuperLikeService.freeSuperLikesPerDay);
+      expect(eligibility.remainingCount, SuperLikeService.freeSuperLikesPerWeek);
       expect(eligibility.timeUntilReset.inHours, greaterThanOrEqualTo(0));
     });
 

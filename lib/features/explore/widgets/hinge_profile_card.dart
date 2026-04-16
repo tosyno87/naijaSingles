@@ -4,11 +4,11 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 
 import '../../../common/constants/app_colors.dart';
+import '../../../common/utils/country_flag.dart';
 import '../../../common/utils/remote_image_url.dart';
 import '../../../models/user_model.dart';
 
-/// Hinge-style profile card that displays all information in a vertical scrollable format
-/// Users can scroll down to see photos, bio, prompts, and details without tapping
+/// Vertical profile card: photos, identity, bio, and details in one scrollable column.
 class HingeProfileCard extends StatefulWidget {
   const HingeProfileCard({
     required this.user,
@@ -97,7 +97,12 @@ class _HingeProfileCardState extends State<HingeProfileCard> {
 
     final photos = imageUrl
         .map((e) => e?.toString() ?? '')
-        .where((url) => url.isNotEmpty && url.trim().isNotEmpty)
+        .where(
+          (url) =>
+              url.isNotEmpty &&
+              url.trim().isNotEmpty &&
+              !isPlaceholderOrUnreliableImageUrl(url),
+        )
         .toList()
         .cast<String>();
 
@@ -252,76 +257,98 @@ class _HingeProfileCardState extends State<HingeProfileCard> {
   }
 
   Widget _buildProfileHeader() {
-    // Get basic info
+    final rawName = widget.user.name ?? '';
+    final name =
+        rawName.trim().isEmpty ? 'Unknown' : rawName.trim();
     final age = widget.user.age;
-    final gender =
-        widget.user.userGender ?? widget.user.editInfo?['userGender'];
-    final height = widget.user.editInfo?['heightDisplay'] ??
-        widget.user.editInfo?['height_ft_in'];
-    final location =
-        widget.user.living_in ?? widget.user.editInfo?['locationName'];
+    final nationality = widget.user.nationality?.trim() ?? '';
+    var location = widget.user.living_in?.trim() ?? '';
+    if (location.isEmpty) {
+      location =
+          widget.user.editInfo?['locationName']?.toString().trim() ?? '';
+    }
 
     return Padding(
       padding: const EdgeInsets.all(20),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          // Name only (age will be in details row)
           Text(
-            widget.user.name ?? 'Unknown',
+            name + (age != null ? ', $age' : ''),
             style: GoogleFonts.montserrat(
               fontSize: 28,
               fontWeight: FontWeight.bold,
               color: AppColors.textPrimary,
             ),
           ),
-          const SizedBox(height: 16),
-          // Hinge-style horizontal basic info row
-          if (age != null ||
-              gender != null ||
-              height != null ||
-              location != null)
-            Row(
+          if (nationality.isNotEmpty || location.isNotEmpty) ...[
+            const SizedBox(height: 12),
+            Wrap(
+              spacing: 8,
+              runSpacing: 8,
               children: [
-                if (age != null)
-                  _buildBasicInfoItem(Icons.cake, age.toString()),
-                if (gender != null) ...[
-                  if (age != null) const SizedBox(width: 16),
-                  _buildBasicInfoItem(Icons.person, gender.toString()),
-                ],
-                if (height != null &&
-                    height.toString().isNotEmpty &&
-                    height.toString() != '0') ...[
-                  if (age != null || gender != null) const SizedBox(width: 16),
-                  _buildBasicInfoItem(Icons.straighten, height.toString()),
-                ],
-                if (location != null) ...[
-                  if (age != null || gender != null || height != null)
-                    const SizedBox(width: 16),
-                  _buildBasicInfoItem(Icons.location_on, location.toString()),
-                ],
+                if (nationality.isNotEmpty)
+                  Container(
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 12,
+                      vertical: 6,
+                    ),
+                    decoration: BoxDecoration(
+                      color: AppColors.primaryGreen.withValues(alpha: 0.1),
+                      borderRadius: BorderRadius.circular(20),
+                      border: Border.all(
+                        color: AppColors.primaryGreen.withValues(alpha: 0.3),
+                      ),
+                    ),
+                    child: Text(
+                      '${CountryFlag.flagOrFallback(nationality)} $nationality',
+                      style: GoogleFonts.montserrat(
+                        fontSize: 14,
+                        fontWeight: FontWeight.w600,
+                        color: AppColors.primaryGreen,
+                      ),
+                    ),
+                  ),
+                if (location.isNotEmpty)
+                  Container(
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 12,
+                      vertical: 6,
+                    ),
+                    decoration: BoxDecoration(
+                      color: AppColors.primaryGreen.withValues(alpha: 0.1),
+                      borderRadius: BorderRadius.circular(20),
+                      border: Border.all(
+                        color: AppColors.primaryGreen.withValues(alpha: 0.3),
+                      ),
+                    ),
+                    child: Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        const Icon(
+                          Icons.location_on,
+                          size: 16,
+                          color: AppColors.primaryGreen,
+                        ),
+                        const SizedBox(width: 6),
+                        Text(
+                          location,
+                          style: GoogleFonts.montserrat(
+                            fontSize: 14,
+                            fontWeight: FontWeight.w600,
+                            color: AppColors.primaryGreen,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
               ],
             ),
+          ],
         ],
       ),
     );
   }
-
-  Widget _buildBasicInfoItem(IconData icon, String text) => Row(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          Icon(icon, size: 18, color: AppColors.textSecondary),
-          const SizedBox(width: 4),
-          Text(
-            text,
-            style: GoogleFonts.montserrat(
-              fontSize: 14,
-              fontWeight: FontWeight.w500,
-              color: AppColors.textPrimary,
-            ),
-          ),
-        ],
-      );
 
   Widget _buildBioSection(String bio) => Padding(
         padding: const EdgeInsets.symmetric(horizontal: 20),
@@ -356,7 +383,37 @@ class _HingeProfileCardState extends State<HingeProfileCard> {
   Widget _buildDetailsSection() {
     final details = <Map<String, dynamic>>[];
 
-    // Work/Profession - briefcase icon (like Hinge)
+    if (widget.user.age != null) {
+      details.add({
+        'icon': Icons.cake,
+        'label': '',
+        'value': widget.user.age.toString(),
+      });
+    }
+
+    final gender =
+        widget.user.userGender ?? widget.user.editInfo?['userGender'];
+    if (gender != null && gender.toString().trim().isNotEmpty) {
+      details.add({
+        'icon': Icons.person,
+        'label': '',
+        'value': gender.toString(),
+      });
+    }
+
+    final height = widget.user.editInfo?['heightDisplay'] ??
+        widget.user.editInfo?['height_ft_in'];
+    if (height != null &&
+        height.toString().trim().isNotEmpty &&
+        height.toString() != '0') {
+      details.add({
+        'icon': Icons.straighten,
+        'label': '',
+        'value': height.toString(),
+      });
+    }
+
+    // Work / profession
     final workTitle = widget.user.job_title ??
         widget.user.profession ??
         widget.user.occupation;
@@ -368,14 +425,14 @@ class _HingeProfileCardState extends State<HingeProfileCard> {
       });
     }
 
-    // Education - graduation cap icon (like Hinge)
+    // Education
     if (widget.user.education != null && widget.user.education!.isNotEmpty) {
       details.add(
         {'icon': Icons.school, 'label': '', 'value': widget.user.education},
       );
     }
 
-    // Religion - book icon (like Hinge)
+    // Religion
     if (widget.user.religion != null && widget.user.religion!.isNotEmpty) {
       details.add({
         'icon': Icons.menu_book,
@@ -384,7 +441,7 @@ class _HingeProfileCardState extends State<HingeProfileCard> {
       });
     }
 
-    // Relationship Intent (Relationship goals) - search icon (like Hinge)
+    // Relationship intent / goals
     final relationshipIntent = widget.user.editInfo?['relationshipIntent'] ??
         widget.user.editInfo?['preferences']?['relationshipIntent'];
     if (relationshipIntent != null &&
@@ -410,7 +467,6 @@ class _HingeProfileCardState extends State<HingeProfileCard> {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           const SizedBox(height: 8),
-          // Hinge-style details: just icon and value, no label
           ...details.map(
             (detail) => Padding(
               padding: const EdgeInsets.only(bottom: 12),

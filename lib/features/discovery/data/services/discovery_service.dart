@@ -488,8 +488,12 @@ class DiscoveryService {
 
       // Apply smart matching with mode-specific compatibility
       if (userList.isNotEmpty) {
-        userList =
-            await _applySmartMatching(currentUser, userList, intentFilter);
+        userList = await _applySmartMatching(
+          currentUser,
+          userList,
+          intentFilter,
+          forceRefresh: forceRefresh,
+        );
       }
 
       AppLogger.debug('Final result: ${userList.length} discoverable users');
@@ -625,8 +629,9 @@ class DiscoveryService {
   static Future<List<UserModel>> _applySmartMatching(
     UserModel currentUser,
     List<UserModel> userList,
-    String? intentFilter,
-  ) async {
+    String? intentFilter, {
+    bool forceRefresh = false,
+  }) async {
     try {
       AppLogger.debug('Applying smart matching for ${userList.length} users');
 
@@ -637,6 +642,7 @@ class DiscoveryService {
         currentUser: currentUser,
         mode: mode,
         pageSize: userList.length,
+        forceRefresh: forceRefresh,
       );
 
       if (result.isSuccess && result.users.isNotEmpty) {
@@ -898,84 +904,189 @@ class DiscoveryService {
     }
   }
 
-  /// Get nearby users stream (real-time)
+  /// Maps a `users` query snapshot to nearby profiles (re-reads CheckedUser each time).
+  static Future<List<UserModel>> _mapNearbyUsersFromUserDocsSnapshot({
+    required QuerySnapshot<Object?> snapshot,
+    required String currentUserId,
+    required UserModel currentUser,
+    required String effectiveMode,
+    required double radiusMiles,
+  }) async {
+    AppLogger.debug('Nearby stream update: ${snapshot.docs.length} user docs');
+
+    final List<UserModel> users = <UserModel>[];
+    final Set<String> checkedUserIds =
+        (await _getCheckedUserIds(currentUserId)).toSet();
+
+    for (final QueryDocumentSnapshot<Object?> doc in snapshot.docs) {
+      try {
+        if (doc.id == currentUserId) continue;
+        if (checkedUserIds.contains(doc.id)) continue;
+        if ((doc.data() as Map<String, dynamic>?)?['isBlocked'] == true) {
+          continue;
+        }
+
+        final UserModel user = UserModel.fromDocument(doc);
+
+        if (!ModeSpecificFilteringService.validateModeMatch(
+          user,
+          effectiveMode,
+        )) {
+          continue;
+        }
+
+        if (!_passesAdditionalFilters(user, currentUser)) {
+          continue;
+        }
+
+        final double? uLat = user.latitude;
+        final double? uLng = user.longitude;
+        final double? cLat = currentUser.latitude;
+        final double? cLng = currentUser.longitude;
+        if (uLat != null && uLng != null && cLat != null && cLng != null) {
+          final double distanceMiles = distance.calculateDistance(
+            cLat,
+            cLng,
+            uLat,
+            uLng,
+          );
+
+          if (distanceMiles <= radiusMiles) {
+            user.distanceBW = distanceMiles.round();
+            users.add(user);
+          }
+        }
+      } on FirebaseException catch (e) {
+        AppLogger.warning(
+          'Firebase error processing nearby user ${doc.id}: ${e.code} - ${e.message}',
+          error: e,
+        );
+        continue;
+      } on Object catch (e) {
+        AppLogger.warning(
+          'Error processing nearby user ${doc.id}',
+          error: e,
+        );
+        continue;
+      }
+    }
+
+    AppLogger.debug(
+      'Nearby stream processed: ${users.length} users within ${radiusMiles}mi',
+    );
+    return users;
+  }
+
+  /// Get nearby users stream (real-time).
+  ///
+  /// Uses the same Firestore constraints as [_getUsersForDiscoveryUnified]
+  /// (age, intent, mode filters) so non-migrated behavior matches one-shot
+  /// discovery. Client-side: mode validation, [_passesAdditionalFilters],
+  /// distance vs [radiusMiles]. Larger [limit] reduces misses from arbitrary
+  /// doc order (still not a true geo query).
+  ///
+  /// Also listens to `users/{uid}/CheckedUser` so likes/passes written outside
+  /// this client (e.g. Connect, another device) refresh the list without
+  /// waiting for a `users` document change.
   static Stream<List<UserModel>> getNearbyUsersStream(
     UserModel currentUser,
-    double radiusMiles,
-  ) {
+    double radiusMiles, {
+    String? intentFilter,
+  }) {
     try {
-      final userId = currentUser.id;
+      final String? userId = currentUser.id;
       if (userId == null) return Stream.value([]);
 
       AppLogger.debug(
         'Starting nearby users stream (radius: ${radiusMiles}mi)',
       );
 
-      final Query query = _firestore
-          .collection('users')
-          .where('isDiscoverable', isEqualTo: true)
-          .limit(50);
+      final String effectiveMode =
+          intentFilter ?? currentUser.lookingFor ?? 'Dating';
+      Query query = _buildOptimizedQuery(currentUser, intentFilter);
+      query = ModeSpecificFilteringService.applyModeSpecificFilters(
+        query,
+        currentUser,
+        effectiveMode,
+      );
+      query = query.limit(100);
 
-      return query.snapshots().asyncMap((snapshot) async {
-        AppLogger.debug('Nearby stream update: ${snapshot.docs.length} users');
+      QuerySnapshot<Object?>? latestUsersSnapshot;
+      final List<StreamSubscription<QuerySnapshot<Object?>>> nearbySubs =
+          <StreamSubscription<QuerySnapshot<Object?>>>[];
 
-        final List<UserModel> users = [];
-        final List<String> checkedUserIds = await _getCheckedUserIds(userId);
+      late final StreamController<List<UserModel>> controller;
 
-        for (var doc in snapshot.docs) {
-          try {
-            if (doc.id == userId) continue;
-            if (checkedUserIds.contains(doc.id)) continue;
-            if ((doc.data() as Map<String, dynamic>?)?['isBlocked'] == true) {
-              continue;
-            }
+      int emitSeq = 0;
 
-            final user = UserModel.fromDocument(doc);
-
-            if (!DiscoveryFiltering.matchesGenderPreference(
-              user,
-              currentUser,
-            )) {
-              continue;
-            }
-
-            final uLat = user.latitude;
-            final uLng = user.longitude;
-            final cLat = currentUser.latitude;
-            final cLng = currentUser.longitude;
-            if (uLat != null && uLng != null && cLat != null && cLng != null) {
-              final distanceMiles = distance.calculateDistance(
-                cLat,
-                cLng,
-                uLat,
-                uLng,
-              );
-
-              if (distanceMiles <= radiusMiles) {
-                user.distanceBW = distanceMiles.round();
-                users.add(user);
-              }
-            }
-          } on FirebaseException catch (e) {
-            AppLogger.warning(
-              'Firebase error processing nearby user ${doc.id}: ${e.code} - ${e.message}',
-              error: e,
-            );
-            continue;
-          } on Object catch (e) {
-            AppLogger.warning(
-              'Error processing nearby user ${doc.id}',
-              error: e,
-            );
-            continue;
-          }
+      Future<void> emit() async {
+        final QuerySnapshot<Object?>? snap = latestUsersSnapshot;
+        if (snap == null || controller.isClosed) return;
+        final int token = ++emitSeq;
+        try {
+          final List<UserModel> list = await _mapNearbyUsersFromUserDocsSnapshot(
+            snapshot: snap,
+            currentUserId: userId,
+            currentUser: currentUser,
+            effectiveMode: effectiveMode,
+            radiusMiles: radiusMiles,
+          );
+          if (controller.isClosed || token != emitSeq) return;
+          controller.add(list);
+        } on Object catch (e, st) {
+          if (controller.isClosed || token != emitSeq) return;
+          controller.addError(e, st);
         }
+      }
 
-        AppLogger.debug(
-          'Nearby stream processed: ${users.length} users within ${radiusMiles}mi',
-        );
-        return users;
-      });
+      controller = StreamController<List<UserModel>>(
+        onListen: () {
+          nearbySubs
+            ..add(
+              query.snapshots().listen(
+                (QuerySnapshot<Object?> snap) {
+                  latestUsersSnapshot = snap;
+                  unawaited(emit());
+                },
+                onError: controller.addError,
+              ),
+            )
+            ..add(
+              _firestore
+                  .collection('users')
+                  .doc(userId)
+                  .collection('CheckedUser')
+                  .snapshots()
+                  .listen(
+                (_) {
+                  AppLogger.debug(
+                    'Nearby stream: CheckedUser changed, re-filtering',
+                  );
+                  unawaited(emit());
+                },
+                onError: (Object e, StackTrace st) {
+                  AppLogger.warning(
+                    'CheckedUser snapshot error (nearby stream): $e',
+                    error: e,
+                    stackTrace: st,
+                  );
+                },
+              ),
+            );
+        },
+        onCancel: () {
+          for (final StreamSubscription<QuerySnapshot<Object?>> s
+              in nearbySubs) {
+            unawaited(s.cancel());
+          }
+          nearbySubs.clear();
+          if (!controller.isClosed) {
+            unawaited(controller.close());
+          }
+        },
+      );
+
+      return controller.stream;
     } on FirebaseException catch (e) {
       AppLogger.error(
         'Firebase error creating nearby stream: ${e.code} - ${e.message}',

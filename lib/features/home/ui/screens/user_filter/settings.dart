@@ -7,7 +7,6 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:share_plus/share_plus.dart';
 
 import '../../../../../common/bloc/streetview/streetview_bloc.dart';
-import '../../../../../common/bloc/theme/theme_bloc.dart';
 import '../../../../../common/constants/app_colors.dart';
 import '../../../../../common/routes/route_name.dart';
 import '../../../../../common/widgets/change_language_widget.dart';
@@ -15,14 +14,12 @@ import '../../../../../common/widgets/custom_snackbar.dart';
 import '../../../../../common/widgets/text_button.dart';
 import '../../../../../common/widgets/theme_change.dart';
 import '../../../../../models/user_model.dart';
+import '../../../../discovery/data/services/discovery_service.dart';
+import '../../../../match/bloc/match_user_bloc.dart';
 import '../../../bloc/searchuser_bloc.dart';
-import '../../widgets/age_range.dart';
 import '../../widgets/delete_account.dart';
-import '../../widgets/distance_widget.dart';
 import '../../widgets/logout_dialog.dart';
-import '../../widgets/show_me.dart';
 import '../../widgets/street_view_enable.dart';
-import '../../widgets/update_address.dart';
 import 'bloc/userfilter_bloc.dart';
 
 class SettingPage extends StatefulWidget {
@@ -132,7 +129,6 @@ class SettingPageState extends State<SettingPage> {
 
   @override
   Widget build(BuildContext context) {
-    final isDarkMode = context.watch<ThemeBloc>().isDarkMode;
     log(widget.currentUser.toString());
     log('my phone number is ${widget.currentUser.phoneNumber.toString()}');
     return BlocListener<UserfilterBloc, UserfilterState>(
@@ -165,57 +161,53 @@ class SettingPageState extends State<SettingPage> {
           }
         },
         child: Scaffold(
-          // backgroundColor: AppColors.primaryGreen,
+          backgroundColor: Theme.of(context).brightness == Brightness.dark
+              ? Theme.of(context).scaffoldBackgroundColor
+              : AppColors.backgroundColor,
           appBar: AppBar(
             centerTitle: false,
             title: Text(
               'Settings'.tr().toString(),
-              style: const TextStyle(color: Colors.white),
-            ),
-            actions: [
-              IconButton(
-                icon: const Icon(Icons.logout_outlined),
-                onPressed: () async {
-                  showLogoutDialog(context);
-                },
+              style: TextStyle(
+                color: Theme.of(context).colorScheme.onSurface,
+                fontWeight: FontWeight.w600,
               ),
-            ],
+            ),
             elevation: 0,
-            backgroundColor: Theme.of(context).scaffoldBackgroundColor,
+            scrolledUnderElevation: 0.5,
+            backgroundColor: Theme.of(context).brightness == Brightness.dark
+                ? Theme.of(context).scaffoldBackgroundColor
+                : AppColors.backgroundColor,
+            foregroundColor: Theme.of(context).colorScheme.onSurface,
           ),
-          body: DecoratedBox(
-            decoration: BoxDecoration(
-              borderRadius: const BorderRadius.only(
-                topLeft: Radius.circular(20),
-                topRight: Radius.circular(20),
-              ),
-              color: Theme.of(context).primaryColor,
-            ),
-            child: ClipRRect(
-              borderRadius: const BorderRadius.only(
-                topLeft: Radius.circular(20),
-                topRight: Radius.circular(20),
-              ),
-              child: SingleChildScrollView(
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: <Widget>[
-                    Padding(
-                      padding: const EdgeInsets.all(15),
-                      child: Text(
-                        'Account settings'.tr().toString(),
-                        style: TextStyle(
-                          color: isDarkMode
-                              ? Colors.white
-                              : AppColors.primaryGreen,
-                          fontSize: 18,
-                          fontWeight: FontWeight.w500,
-                        ),
+          body: ColoredBox(
+            color: Theme.of(context).brightness == Brightness.dark
+                ? Theme.of(context).scaffoldBackgroundColor
+                : AppColors.backgroundColor,
+            child: SingleChildScrollView(
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: <Widget>[
+                  Padding(
+                    padding: const EdgeInsets.fromLTRB(15, 12, 15, 6),
+                    child: Text(
+                      'Account Settings'.tr().toString(),
+                      style: TextStyle(
+                        color: Theme.of(context).colorScheme.onSurface,
+                        fontSize: 16,
+                        fontWeight: FontWeight.w600,
                       ),
                     ),
+                  ),
 
-                    ListTile(
+                  ListTile(
+                      dense: true,
+                      visualDensity: VisualDensity.compact,
+                      contentPadding: const EdgeInsets.symmetric(
+                        horizontal: 15,
+                        vertical: 4,
+                      ),
                       title: Card(
                         child: Padding(
                           padding: const EdgeInsets.all(15),
@@ -231,7 +223,7 @@ class SettingPageState extends State<SettingPage> {
                                   child: Text(
                                     widget.currentUser.phoneNumber!.isNotEmpty
                                         ? '${widget.currentUser.phoneNumber}'
-                                        : 'Add phone Number'.tr().toString(),
+                                        : 'Add phone number'.tr().toString(),
                                     style: const TextStyle(
                                       color: AppColors.secondaryColor,
                                       fontWeight: FontWeight.w400,
@@ -263,83 +255,17 @@ class SettingPageState extends State<SettingPage> {
                             .toString(),
                       ),
                     ),
-                    Padding(
-                      padding: const EdgeInsets.all(15),
-                      child: Text(
-                        'Discovery settings'.tr().toString(),
-                        style: TextStyle(
-                          color: isDarkMode
-                              ? Colors.white
-                              : AppColors.primaryGreen,
-                          fontSize: 18,
-                          fontWeight: FontWeight.w500,
-                        ),
-                      ),
-                    ),
-                    Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: 15),
-                      child: UpdateAddressWidget(
-                        currentUser: widget.currentUser,
-                        hasSubscription: widget.isPurchased,
-                        items: widget.items,
-                      ),
-                    ),
-                    Padding(
-                      padding: const EdgeInsets.only(
-                        left: 15,
-                      ),
-                      child: Text(
-                        'Change your location to see members in other city'
-                            .tr()
-                            .toString(),
-                        style: TextStyle(
-                          color: isDarkMode
-                              ? AppColors.secondaryColor
-                              : Colors.black54,
-                        ),
-                      ),
-                    ),
-                    Padding(
-                      padding: const EdgeInsets.all(15),
-                      child: ShowmeWidget(
-                        currentUser: widget.currentUser,
-                        changeValues: changeValues,
-                      ),
-                    ),
-                    Padding(
-                      padding: const EdgeInsets.all(15),
-                      child: _ConnectionModeWidget(
-                        currentUser: widget.currentUser,
-                        changeValues: changeValues,
-                      ),
-                    ),
-                    Padding(
-                      padding: const EdgeInsets.all(15),
-                      child: DistanceWidget(
-                        changeValues: changeValues,
-                        currentUser: widget.currentUser,
-                        max: widget.isPurchased
-                            ? paidR.toDouble()
-                            : freeR.toDouble(),
-                      ),
-                    ),
-                    Padding(
-                      padding: const EdgeInsets.all(15),
-                      child: AgeRangeWidget(
-                        currentUser: widget.currentUser,
-                        changeValues: changeValues,
-                      ),
-                    ),
-                    // remove notification should be used here already made notification widget
-
                     const LanguageWidget(),
-
-                    // for streetview setting of users
-                    BlocProvider<StreetViewBloc>(
-                      create: (context) =>
-                          StreetViewBloc(widget.currentUser.id!),
-                      child: StreetViewButtonWigdet(
-                        currentUser: widget.currentUser,
+                    BlocProvider<MatchUserBloc>(
+                      create: (_) => MatchUserBloc(
+                        getMatches: DiscoveryService.getMatches,
+                      ),
+                      child: BlocProvider<StreetViewBloc>(
+                        create: (BuildContext context) =>
+                            StreetViewBloc(widget.currentUser.id!),
+                        child: StreetViewButtonWigdet(
+                          currentUser: widget.currentUser,
+                        ),
                       ),
                     ),
                     // for theme change and set labelLarge
@@ -371,11 +297,8 @@ class SettingPageState extends State<SettingPage> {
                           height: 50,
                           width: 100,
                           child: Image.asset(
-                            'asset/images/logo.png',
+                            'assets/images/afropeep_logo_transparent.png',
                             fit: BoxFit.contain,
-                            color: isDarkMode
-                                ? Colors.white
-                                : AppColors.primaryGreen,
                           ),
                         ),
                       ),
@@ -390,76 +313,6 @@ class SettingPageState extends State<SettingPage> {
             ),
           ),
         ),
-      ),
     );
   }
-}
-
-class _ConnectionModeWidget extends StatefulWidget {
-  const _ConnectionModeWidget({
-    required this.currentUser,
-    required this.changeValues,
-  });
-
-  final UserModel currentUser;
-  final Map<String, dynamic> changeValues;
-
-  @override
-  State<_ConnectionModeWidget> createState() => _ConnectionModeWidgetState();
-}
-
-class _ConnectionModeWidgetState extends State<_ConnectionModeWidget> {
-  static const _modes = <String, String>{
-    'Dating': 'Dating & Romance',
-    'Friendship': 'Friendship & Social',
-    'Networking': 'Professional Networking',
-    'Mixed': 'All of the Above',
-  };
-
-  late String _selected;
-
-  @override
-  void initState() {
-    super.initState();
-    _selected = widget.currentUser.lookingFor ?? 'Dating';
-    if (!_modes.containsKey(_selected)) _selected = 'Dating';
-  }
-
-  @override
-  Widget build(BuildContext context) => Card(
-        child: Padding(
-          padding: const EdgeInsets.all(15),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(
-                'I\'m looking for',
-                style: TextStyle(
-                  fontSize: 16,
-                  fontWeight: FontWeight.w500,
-                  color: Theme.of(context).textTheme.bodyLarge?.color,
-                ),
-              ),
-              const SizedBox(height: 8),
-              ...(_modes.entries.map(
-                (entry) => RadioListTile<String>(
-                  title: Text(entry.value),
-                  value: entry.key,
-                  // ignore: deprecated_member_use
-                  groupValue: _selected,
-                  activeColor: AppColors.primaryGreen,
-                  contentPadding: EdgeInsets.zero,
-                  dense: true,
-                  // ignore: deprecated_member_use
-                  onChanged: (value) {
-                    if (value == null) return;
-                    setState(() => _selected = value);
-                    widget.changeValues['lookingFor'] = value;
-                  },
-                ),
-              )),
-            ],
-          ),
-        ),
-      );
 }

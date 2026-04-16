@@ -1,8 +1,6 @@
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_bloc/flutter_bloc.dart';
 
-import '../../../../common/bloc/theme/theme_bloc.dart';
 import '../../../../common/constants/app_colors.dart';
 import '../../../../models/user_model.dart';
 
@@ -10,10 +8,14 @@ class AgeRangeWidget extends StatefulWidget {
   const AgeRangeWidget({
     required this.currentUser,
     required this.changeValues,
+    this.compact = false,
+    this.onEdited,
     super.key,
   });
   final UserModel currentUser;
   final Map<String, dynamic> changeValues;
+  final bool compact;
+  final VoidCallback? onEdited;
 
   @override
   State<AgeRangeWidget> createState() => _AgeRangeWidgetState();
@@ -22,22 +24,31 @@ class AgeRangeWidget extends StatefulWidget {
 class _AgeRangeWidgetState extends State<AgeRangeWidget> {
   @override
   Widget build(BuildContext context) {
-    final isDarkMode = context.watch<ThemeBloc>().isDarkMode;
+    final bool isDarkMode = Theme.of(context).brightness == Brightness.dark;
     return Card(
       child: Padding(
-        padding: const EdgeInsets.all(8),
+        padding: EdgeInsets.all(widget.compact ? 6 : 8),
         child: ListTile(
+          visualDensity:
+              widget.compact ? VisualDensity.compact : VisualDensity.standard,
+          contentPadding: EdgeInsets.symmetric(
+            horizontal: widget.compact ? 4 : 8,
+          ),
           title: Text(
             'Age range'.tr().toString(),
             style: TextStyle(
-              fontSize: 18,
-              color: isDarkMode ? Colors.white : AppColors.primaryGreen,
-              fontWeight: FontWeight.w500,
+              fontSize: widget.compact ? 15 : 16,
+              fontWeight: FontWeight.w600,
+              color: Theme.of(context).colorScheme.onSurface,
             ),
           ),
           trailing: Text(
             "${widget.currentUser.ageRange!['min']}-${widget.currentUser.ageRange!['max']}",
-            style: const TextStyle(fontSize: 16),
+            style: TextStyle(
+              fontSize: widget.compact ? 16 : 16,
+              fontWeight: FontWeight.w700,
+              color: Theme.of(context).colorScheme.onSurface,
+            ),
           ),
           subtitle: RangeSlider(
             inactiveColor: AppColors.secondaryColor,
@@ -47,13 +58,12 @@ class _AgeRangeWidgetState extends State<AgeRangeWidget> {
             ),
             min: 18,
             max: 100,
-            divisions: 25,
             activeColor: isDarkMode ? Colors.white : AppColors.primaryGreen,
             labels: RangeLabels(
               widget.currentUser.ageRange!['min'].toString(),
               widget.currentUser.ageRange!['max'].toString(),
             ),
-            onChanged: (val) {
+            onChanged: (RangeValues val) {
               widget.changeValues.addAll({
                 'age_range': {
                   'min': '${val.start.truncate()}',
@@ -66,6 +76,7 @@ class _AgeRangeWidgetState extends State<AgeRangeWidget> {
                   'max': val.end.toInt().toString(),
                 };
               });
+              widget.onEdited?.call();
             },
           ),
         ),

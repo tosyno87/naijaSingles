@@ -9,6 +9,7 @@ import '../../../../common/bloc/user/user_bloc.dart';
 import '../../../../config/app_config.dart';
 import '../../../../services/subscription_iap_analytics.dart';
 import '../../data/subscription_functions_service.dart';
+import '../../iap_user_facing_message.dart';
 
 // --- Events ---
 
@@ -234,9 +235,8 @@ class SubscriptionBloc extends Bloc<SubscriptionEvent, SubscriptionState> {
       if (purchase.status == PurchaseStatus.error) {
         emit(state.copyWith(
           purchaseInProgress: false,
-          userMessage:
-              purchase.error?.message ?? 'Purchase failed. Please try again.',
-          lastError: purchase.error?.message,
+          userMessage: userFacingIapStoreErrorMessage(purchase.error),
+          lastError: purchase.error?.toString(),
         ));
         _processedKeys.add(key);
         unawaited(
@@ -313,7 +313,7 @@ class SubscriptionBloc extends Bloc<SubscriptionEvent, SubscriptionState> {
           purchaseInProgress: false,
           restoreInProgress: false,
           lastError: e.toString(),
-          userMessage: 'Could not confirm subscription. $e',
+          userMessage: userFacingSubscriptionVerifyMessage(e),
           restoreSuccess: wasRestore ? false : state.restoreSuccess,
         ));
         unawaited(
@@ -403,7 +403,7 @@ class SubscriptionBloc extends Bloc<SubscriptionEvent, SubscriptionState> {
       emit(state.copyWith(
         restoreInProgress: false,
         restoreSuccess: false,
-        userMessage: 'Restore failed: $e',
+        userMessage: userFacingPurchaseThrowableMessage(e),
       ));
       unawaited(
         SubscriptionIapAnalytics.logRestoreOutcome(

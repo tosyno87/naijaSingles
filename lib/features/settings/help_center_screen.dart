@@ -139,12 +139,12 @@ class _HelpCenterScreenState extends State<HelpCenterScreen> {
           {
             'question': 'How does the Discover screen work?',
             'answer':
-                'The Discover screen shows you profiles based on your location, preferences, and interests. Swipe right to like someone or left to pass. When two people like each other, it\'s a match!',
+                'Discover highlights events, communities, and suggestions near you. To browse people one-on-one, use the Connect tab. When two people like each other, it\'s a match!',
           },
           {
             'question': 'Can I change my location or distance preferences?',
             'answer':
-                'Yes! Go to Settings > Location to update your location. You can also adjust your distance range and other preferences to refine who appears in your Discover feed.',
+                'Yes! Go to Settings > Location to update your location. To change distance, age, who you see, and related filters, open the Connect tab and tap the filter icon, or go to Profile > Edit profile > Dating preferences.',
           },
           {
             'question': 'What is a Super Like?',
@@ -551,7 +551,7 @@ class _HelpCenterScreenState extends State<HelpCenterScreen> {
           'Create your account with email or phone',
           'Add your best photos (at least 3)',
           'Write an engaging bio that shows your personality',
-          'Set your preferences for discovery',
+          'Set your dating preferences from Connect (filter icon) or Edit profile',
           'Explore Discover, Communities, and Events',
         ],
       },
@@ -609,7 +609,7 @@ class _HelpCenterScreenState extends State<HelpCenterScreen> {
         'description': 'Control your profile, privacy, and visibility',
         'steps': [
           'Edit your profile anytime from the Profile tab',
-          'Adjust discovery preferences in Settings',
+          'Adjust dating preferences from Connect (filter) or Edit profile',
           'Pause your account or go incognito for a break',
           'Manage blocked users in Settings > Blocked Users',
           'Delete your account permanently in Settings if needed',

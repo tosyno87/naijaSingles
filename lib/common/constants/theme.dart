@@ -106,6 +106,9 @@ class MyThemes {
           primary: AppColors.primaryGreen,
           secondary: AppColors.accentGreen,
           error: AppColors.error,
+          // Keep surfaces visually white; otherwise [ColorScheme.surfaceTint]
+          // falls back to [primary] and M3 AppBars pick up a pale green wash.
+          surfaceTint: Colors.transparent,
         ),
         textTheme: textTheme,
         elevatedButtonTheme: _elevatedButton,
@@ -140,6 +143,8 @@ class MyThemes {
         appBarTheme: const AppBarTheme(
           backgroundColor: AppColors.backgroundColor,
           elevation: 0,
+          scrolledUnderElevation: 0,
+          surfaceTintColor: Colors.transparent,
           centerTitle: true,
           titleTextStyle: TextStyle(
             color: AppColors.textPrimary,
@@ -165,6 +170,7 @@ class MyThemes {
           secondary: AppColors.accentGreen,
           surface: AppColors.darkSurface,
           error: AppColors.error,
+          surfaceTint: Colors.transparent,
         ),
         textTheme: textTheme,
         elevatedButtonTheme: _elevatedButton,
@@ -201,6 +207,8 @@ class MyThemes {
         appBarTheme: const AppBarTheme(
           backgroundColor: AppColors.darkSurface,
           elevation: 0,
+          scrolledUnderElevation: 0,
+          surfaceTintColor: Colors.transparent,
           centerTitle: true,
           titleTextStyle: TextStyle(
             color: AppColors.darkTextPrimary,

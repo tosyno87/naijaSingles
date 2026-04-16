@@ -90,9 +90,8 @@ class UsersListState extends State<UsersList> with WidgetsBindingObserver {
                     child: Padding(
                       padding: const EdgeInsets.all(10),
                       child: Image.asset(
-                        'asset/images/logo.png',
+                        'assets/images/afropeep_logo_transparent.png',
                         fit: BoxFit.contain,
-                        color: AppColors.primaryGreen,
                       ),
                     ),
                   ),

@@ -7,6 +7,7 @@ import '../../../common/constants/app_colors.dart';
 import '../../../common/utils/country_flag.dart';
 import '../../../common/widgets/dating_feedback_snackbar.dart';
 import '../../../common/widgets/state_views/state_views.dart';
+import '../../../features/communities/models/discover_profile_dismiss_result.dart';
 import '../../../features/match/data/services/match_service.dart';
 import '../../../features/match/models/like_handle_outcome.dart';
 import '../../../models/user_model.dart';
@@ -238,16 +239,14 @@ class _UserDetailScreenState extends State<UserDetailScreen> {
                             case LikeHandleStatus.matchCreated:
                             case LikeHandleStatus.existingMatch:
                               if (outcome.matchId != null) {
-                                DatingFeedbackSnackBar.show(
+                                Navigator.pop(
                                   context,
-                                  message:
-                                      "It's a match! You can message ${widget.user.name?.split(' ').first ?? 'them'} from your matches.",
-                                  backgroundColor: afropeepGreen,
-                                  duration: const Duration(seconds: 4),
-                                  bottomMarginAddition: DatingFeedbackSnackBar
-                                      .marginAboveProfileActions,
+                                  DiscoverProfileDismissResult(
+                                    userId: targetUserId,
+                                    removedFromQueue: true,
+                                    wasMatch: true,
+                                  ),
                                 );
-                                Navigator.pop(context);
                               } else {
                                 setState(() => _alreadyLiked = true);
                                 DatingFeedbackSnackBar.show(
@@ -260,12 +259,12 @@ class _UserDetailScreenState extends State<UserDetailScreen> {
                               }
                             case LikeHandleStatus.likeRecorded:
                               setState(() => _alreadyLiked = true);
-                              DatingFeedbackSnackBar.show(
+                              Navigator.pop(
                                 context,
-                                message: 'Like sent!',
-                                backgroundColor: afropeepGreen,
-                                bottomMarginAddition: DatingFeedbackSnackBar
-                                    .marginAboveProfileActions,
+                                DiscoverProfileDismissResult(
+                                  userId: targetUserId,
+                                  removedFromQueue: true,
+                                ),
                               );
                             case LikeHandleStatus.alreadyLiked:
                               setState(() => _alreadyLiked = true);

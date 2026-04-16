@@ -12,11 +12,18 @@ import '../../../../common/constants/app_spacing.dart';
 import '../../../../common/routes/route_name.dart';
 import '../../../../common/widgets/state_views/state_views.dart';
 import '../../../../models/user_model.dart';
+import '../../../../services/privacy_migration_service.dart';
 import '../../../discovery/data/services/discovery_service.dart';
+import '../../../discovery/presentation/screens/discovery_preferences_screen.dart';
 import '../../../events/data/models/event_model.dart';
 import '../../../events/data/services/events_firestore_service.dart';
+import '../../../explore/screens/hinge_profile_viewer_screen.dart';
 import '../../../groups/data/services/unified_group_service.dart';
 import '../../../groups/screens/unified_groups_screen.dart';
+import '../../../home/bloc/searchuser_bloc.dart';
+import '../../../home/ui/screens/user_filter/bloc/userfilter_bloc.dart';
+import '../../models/discover_profile_dismiss_result.dart';
+import '../../utils/discover_people_near_you_display.dart';
 import '../widgets/discover_section_header.dart';
 import '../widgets/discover_skeleton_card.dart';
 import '../widgets/event_card_overlay.dart';
@@ -32,18 +39,17 @@ enum _DiscoverBlock {
 }
 
 class DiscoverPageV2 extends StatefulWidget {
-  const DiscoverPageV2({
-    this.onSeeAllPeopleTap,
-    super.key,
-  });
-
-  final VoidCallback? onSeeAllPeopleTap;
+  const DiscoverPageV2({super.key});
 
   @override
   State<DiscoverPageV2> createState() => _DiscoverPageV2State();
 }
 
 class _DiscoverPageV2State extends State<DiscoverPageV2> {
+  /// Tighter than default [AppEmptyView] padding (~24px less vertical than all-xl).
+  static const EdgeInsets _discoverEmptyContentPadding =
+      EdgeInsets.fromLTRB(AppSpacing.xl, 10, AppSpacing.xl, 10);
+
   static const String _communityPlaceholderAsset =
       'assets/images/placeholders/discover_community_placeholder.png';
 
@@ -69,11 +75,23 @@ class _DiscoverPageV2State extends State<DiscoverPageV2> {
   int _communityCount = 0;
   bool _statsLoading = true;
 
+  StreamSubscription<List<UserModel>>? _peopleSub;
+
   @override
   void initState() {
     super.initState();
     _currentUser = context.read<UserBloc>().currentUser;
     unawaited(_loadAll());
+  }
+
+  @override
+  void dispose() {
+    final StreamSubscription<List<UserModel>>? sub = _peopleSub;
+    _peopleSub = null;
+    if (sub != null) {
+      unawaited(sub.cancel());
+    }
+    super.dispose();
   }
 
   Future<void> _loadAll() => Future.wait([
@@ -87,34 +105,72 @@ class _DiscoverPageV2State extends State<DiscoverPageV2> {
   // Data loaders
   // ---------------------------------------------------------------------------
 
+  void _applyPeopleNearYouList(List<UserModel> list) {
+    if (!mounted) return;
+    setState(() {
+      _people = sortAndCapPeopleNearYou(list);
+      _peopleLoading = false;
+      _peopleError = null;
+    });
+  }
+
+  /// Live stream for non-migrated users; one-shot privacy path when migrated.
   Future<void> _loadPeople() async {
     if (!mounted) return;
+
+    await _peopleSub?.cancel();
+    _peopleSub = null;
+
     setState(() {
       _peopleLoading = true;
       _peopleError = null;
     });
 
+    final UserModel? user = _currentUser;
+    final String? uid = user?.id;
+    if (user == null || uid == null || uid.isEmpty) {
+      if (!mounted) return;
+      setState(() {
+        _people = [];
+        _peopleLoading = false;
+      });
+      return;
+    }
+
     try {
-      final user = _currentUser;
-      if (user == null) {
+      final bool migrated =
+          await PrivacyMigrationService().isUserMigrated(uid);
+
+      if (!mounted) return;
+
+      if (migrated) {
+        // Raw `users` snapshots are not privacy-filtered; keep one-shot path.
+        final List<UserModel> results =
+            await DiscoveryService.getUsersForDiscovery(
+          user,
+          forceRefresh: true,
+        );
         if (!mounted) return;
-        setState(() {
-          _people = [];
-          _peopleLoading = false;
-        });
+        _applyPeopleNearYouList(results);
         return;
       }
 
-      final results = await DiscoveryService.getUsersForDiscovery(
+      final double radiusMiles = (user.maxDistance ?? 100).toDouble();
+      _peopleSub = DiscoveryService.getNearbyUsersStream(
         user,
-        forceRefresh: true,
+        radiusMiles,
+        intentFilter: user.lookingFor,
+      ).listen(
+        _applyPeopleNearYouList,
+        onError: (Object e, StackTrace stackTrace) {
+          log('People stream error: $e', stackTrace: stackTrace);
+          if (!mounted) return;
+          setState(() {
+            _peopleError = 'Could not load people';
+            _peopleLoading = false;
+          });
+        },
       );
-
-      if (!mounted) return;
-      setState(() {
-        _people = results.take(10).toList();
-        _peopleLoading = false;
-      });
     } on Object catch (e) {
       log('Error loading people: $e');
       if (!mounted) return;
@@ -267,19 +323,6 @@ class _DiscoverPageV2State extends State<DiscoverPageV2> {
   // Navigation
   // ---------------------------------------------------------------------------
 
-  void _onSeeAllPeople() {
-    final onSeeAllPeopleTap = widget.onSeeAllPeopleTap;
-    if (onSeeAllPeopleTap != null) {
-      onSeeAllPeopleTap();
-      return;
-    }
-
-    final nav = DefaultTabController.maybeOf(context);
-    if (nav != null && nav.length > 0) {
-      nav.animateTo(0);
-    }
-  }
-
   void _onSeeAllEvents() {
     unawaited(Navigator.pushNamed(context, RouteName.eventsScreen));
   }
@@ -293,14 +336,63 @@ class _DiscoverPageV2State extends State<DiscoverPageV2> {
     );
   }
 
-  void _onTapPerson(UserModel user) {
-    unawaited(
-      Navigator.pushNamed(
-        context,
-        RouteName.userDetailScreen,
-        arguments: user,
+  Future<void> _openDiscoveryPreferences() async {
+    final UserModel? user = _currentUser ?? context.read<UserBloc>().currentUser;
+    if (user == null || !mounted) return;
+
+    await Navigator.push<void>(
+      context,
+      MaterialPageRoute<void>(
+        builder: (BuildContext context) => BlocProvider<UserfilterBloc>(
+          create: (_) => UserfilterBloc(),
+          child: BlocProvider<SearchUserBloc>(
+            create: (_) => SearchUserBloc(),
+            child: DiscoveryPreferencesScreen(
+              currentUser: user,
+              isPurchased: user.hasPremiumAccess,
+              items: const <String, dynamic>{},
+            ),
+          ),
+        ),
       ),
     );
+    if (!mounted) return;
+    await _loadPeople();
+  }
+
+  Future<void> _onTapPerson(UserModel user) async {
+    final UserModel? me = _currentUser;
+    if (me == null) return;
+
+    final DiscoverProfileDismissResult? result =
+        await Navigator.push<DiscoverProfileDismissResult?>(
+      context,
+      MaterialPageRoute<DiscoverProfileDismissResult?>(
+        builder: (BuildContext context) => HingeProfileViewerScreen(
+          currentUser: me,
+          profileUser: user,
+        ),
+      ),
+    );
+    if (!mounted) return;
+    if (result != null && result.removedFromQueue) {
+      final String id = result.userId;
+      setState(() {
+        _people.removeWhere((UserModel u) => u.id == id);
+      });
+      final String message = result.wasMatch
+          ? 'It\'s a match! Say hi from your matches.'
+          : result.wasPass
+              ? 'Passed.'
+              : 'Like sent!';
+      final SnackBar snack = SnackBar(
+        content: Text(
+          message,
+          style: GoogleFonts.montserrat(),
+        ),
+      );
+      ScaffoldMessenger.of(context).showSnackBar(snack);
+    }
   }
 
   void _onTapEvent(EventModel event) {
@@ -378,19 +470,36 @@ class _DiscoverPageV2State extends State<DiscoverPageV2> {
         ),
       );
 
-  List<_DiscoverBlock> _composeBlocks() => const <_DiscoverBlock>[
-        _DiscoverBlock.peopleYouMayLike,
-        _DiscoverBlock.trendingEvent,
-        _DiscoverBlock.communities,
-        _DiscoverBlock.happeningThisWeek,
-        _DiscoverBlock.stats,
-      ];
+  /// Base order; [trendingEvent] is omitted when there are no events so
+  /// [happeningThisWeek] alone shows the canonical empty state (no duplicate).
+  List<_DiscoverBlock> _composeBlocks() {
+    const List<_DiscoverBlock> withTrending = <_DiscoverBlock>[
+      _DiscoverBlock.peopleYouMayLike,
+      _DiscoverBlock.trendingEvent,
+      _DiscoverBlock.communities,
+      _DiscoverBlock.happeningThisWeek,
+      _DiscoverBlock.stats,
+    ];
+    final bool hideTrendingBecauseEventsEmpty = !_eventsLoading &&
+        _eventsError == null &&
+        _events.isEmpty;
+    if (!hideTrendingBecauseEventsEmpty) {
+      return withTrending;
+    }
+    return const <_DiscoverBlock>[
+      _DiscoverBlock.peopleYouMayLike,
+      _DiscoverBlock.communities,
+      _DiscoverBlock.happeningThisWeek,
+      _DiscoverBlock.stats,
+    ];
+  }
 
   List<Widget> _buildMixedDiscoverFeed() {
     final blocks = _composeBlocks();
-    final widgets = <Widget>[const SizedBox(height: 24)];
+    final widgets = <Widget>[const SizedBox(height: 16)];
 
-    for (final block in blocks) {
+    for (var i = 0; i < blocks.length; i++) {
+      final _DiscoverBlock block = blocks[i];
       switch (block) {
         case _DiscoverBlock.trendingEvent:
           widgets.add(_buildTrendingEventBlock());
@@ -403,7 +512,12 @@ class _DiscoverPageV2State extends State<DiscoverPageV2> {
         case _DiscoverBlock.stats:
           widgets.add(_buildStatsBlock());
       }
-      widgets.add(const SizedBox(height: 24));
+      if (i < blocks.length - 1) {
+        final _DiscoverBlock next = blocks[i + 1];
+        final double gap =
+            next == _DiscoverBlock.stats ? 6 : 12;
+        widgets.add(SizedBox(height: gap));
+      }
     }
 
     return widgets;
@@ -414,10 +528,10 @@ class _DiscoverPageV2State extends State<DiscoverPageV2> {
         children: [
           DiscoverSectionHeader(
             title: 'Trending Near You',
-            actionLabel: 'See all nearby',
+            actionLabel: 'Browse events',
             onAction: _onSeeAllEvents,
           ),
-          const SizedBox(height: 12),
+          const SizedBox(height: 8),
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 16),
             child: _buildTrendingEventCard(),
@@ -451,12 +565,8 @@ class _DiscoverPageV2State extends State<DiscoverPageV2> {
       );
     }
     if (_events.isEmpty) {
-      return _buildImageEmpty(
-        assetPath: 'assets/images/placeholders/discover_event_placeholder.png',
-        message: 'No trending events nearby',
-        actionLabel: 'Browse all events',
-        onAction: _onSeeAllEvents,
-      );
+      // Feed omits the trending block when empty; this is a layout fallback only.
+      return const SizedBox.shrink();
     }
     return EventCardOverlay(
       event: _events.first,
@@ -467,10 +577,8 @@ class _DiscoverPageV2State extends State<DiscoverPageV2> {
   Widget _buildPeopleYouMayLikeBlock() => Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          DiscoverSectionHeader(
+          const DiscoverSectionHeader(
             title: 'People Near You',
-            actionLabel: 'See all',
-            onAction: _onSeeAllPeople,
           ),
           const SizedBox(height: 12),
           _buildPeopleSection(),
@@ -482,7 +590,7 @@ class _DiscoverPageV2State extends State<DiscoverPageV2> {
         children: [
           DiscoverSectionHeader(
             title: 'Explore Communities',
-            actionLabel: 'Browse all',
+            actionLabel: 'Browse groups',
             onAction: _onBrowseCommunities,
           ),
           const SizedBox(height: 12),
@@ -507,16 +615,15 @@ class _DiscoverPageV2State extends State<DiscoverPageV2> {
       children: [
         DiscoverSectionHeader(
           title: 'Happening This Week',
-          actionLabel: 'See all nearby',
+          actionLabel: 'View all events',
           onAction: _onSeeAllEvents,
         ),
         const SizedBox(height: 12),
         if (showNonDuplicateEmpty)
           _buildActionableEmpty(
             icon: Icons.event_note_outlined,
-            message: 'No additional events this week',
-            actionLabel: 'Browse all events',
-            onAction: _onSeeAllEvents,
+            message: 'No other events near you this week',
+            subtitle: 'Check all events to find something you like.',
           )
         else
           _buildEventsSection(
@@ -547,10 +654,17 @@ class _DiscoverPageV2State extends State<DiscoverPageV2> {
         child: _buildImageEmpty(
           assetPath:
               'assets/images/placeholders/discover_people_placeholder.png',
-          message: 'No people found nearby',
+          message: 'No people nearby',
+          subtitle: 'Pull to refresh or check back later.',
+          icon: Icons.people_outline,
           actionLabel: 'Refresh',
           onAction: _loadPeople,
+          footerLinkHint:
+              'Who you see depends on your discovery settings.',
+          footerLinkLabel: 'Adjust preferences',
+          onFooterLink: _openDiscoveryPreferences,
           minHeight: 220,
+          compact: true,
         ),
       );
     }
@@ -595,9 +709,10 @@ class _DiscoverPageV2State extends State<DiscoverPageV2> {
         child: _buildImageEmpty(
           assetPath:
               'assets/images/placeholders/discover_happeningthisweek_placeholder.png',
-          message: 'No upcoming events nearby',
-          actionLabel: 'Browse all events',
-          onAction: _onSeeAllEvents,
+          message: 'No events near you this week.',
+          subtitle: 'Check all events to find something you like.',
+          icon: Icons.calendar_today_outlined,
+          minHeight: 200,
         ),
       );
     }
@@ -676,39 +791,6 @@ class _DiscoverPageV2State extends State<DiscoverPageV2> {
                         ),
                       ],
                     ),
-                    const SizedBox(height: 10),
-                    Align(
-                      alignment: Alignment.centerRight,
-                      child: InkWell(
-                        onTap: _onSeeAllEvents,
-                        borderRadius: BorderRadius.circular(8),
-                        child: Padding(
-                          padding: const EdgeInsets.symmetric(
-                            horizontal: 4,
-                            vertical: 2,
-                          ),
-                          child: Row(
-                            mainAxisSize: MainAxisSize.min,
-                            children: [
-                              Text(
-                                'See all nearby',
-                                style: GoogleFonts.montserrat(
-                                  fontSize: 12,
-                                  fontWeight: FontWeight.w600,
-                                  color: AppColors.primaryGreen,
-                                ),
-                              ),
-                              const SizedBox(width: 4),
-                              const Icon(
-                                Icons.arrow_forward_rounded,
-                                size: 14,
-                                color: AppColors.primaryGreen,
-                              ),
-                            ],
-                          ),
-                        ),
-                      ),
-                    ),
                   ],
                 ),
               ),
@@ -753,6 +835,8 @@ class _DiscoverPageV2State extends State<DiscoverPageV2> {
       return _buildImageEmpty(
         assetPath: _communityPlaceholderAsset,
         message: 'No communities yet',
+        subtitle: 'Browse groups to join conversations near you.',
+        icon: Icons.groups_outlined,
         actionLabel: 'Browse all communities',
         onAction: _onBrowseCommunities,
         minHeight: 200,
@@ -835,7 +919,7 @@ class _DiscoverPageV2State extends State<DiscoverPageV2> {
                             padding: const EdgeInsets.symmetric(horizontal: 16),
                           ),
                           child: Text(
-                            'Browse all',
+                            'View community',
                             style: GoogleFonts.montserrat(
                               fontSize: 13,
                               fontWeight: FontWeight.w600,
@@ -905,37 +989,123 @@ class _DiscoverPageV2State extends State<DiscoverPageV2> {
   Widget _buildActionableEmpty({
     required IconData icon,
     required String message,
-    required String actionLabel,
-    required VoidCallback onAction,
+    String? subtitle,
+    String? actionLabel,
+    VoidCallback? onAction,
+    String? secondaryActionLabel,
+    VoidCallback? onSecondaryAction,
     double horizontalPadding = 24,
-  }) =>
-      Padding(
-        padding: EdgeInsets.symmetric(horizontal: horizontalPadding),
-        child: AppEmptyView(
-          title: message,
-          icon: icon,
-          actionLabel: actionLabel,
-          onAction: onAction,
-        ),
+    double liftContentBy = 0,
+  }) {
+    assert(
+      (actionLabel == null && onAction == null) ||
+          (actionLabel != null && onAction != null),
+      'actionLabel and onAction must both be null or both non-null',
+    );
+    Widget child = AppEmptyView(
+      title: message,
+      subtitle: subtitle,
+      icon: icon,
+      actionLabel: actionLabel,
+      onAction: onAction,
+      secondaryActionLabel: secondaryActionLabel,
+      onSecondaryAction: onSecondaryAction,
+      contentPadding: _discoverEmptyContentPadding,
+    );
+    if (liftContentBy != 0) {
+      child = Transform.translate(
+        offset: Offset(0, -liftContentBy),
+        child: child,
       );
+    }
+    return Padding(
+      padding: EdgeInsets.symmetric(horizontal: horizontalPadding),
+      child: child,
+    );
+  }
 
   Widget _buildImageEmpty({
     required String assetPath,
     required String message,
-    required String actionLabel,
-    required VoidCallback onAction,
+    required IconData icon,
+    String? subtitle,
+    String? actionLabel,
+    VoidCallback? onAction,
+    String? secondaryActionLabel,
+    VoidCallback? onSecondaryAction,
+    String? footerLinkLabel,
+    VoidCallback? onFooterLink,
+    String? footerLinkHint,
     double minHeight = 240,
-  }) =>
-      Semantics(
-        button: true,
-        label: '$message — $actionLabel',
-        child: ConstrainedBox(
-          constraints: BoxConstraints(minHeight: minHeight),
-          child: AppEmptyView(
-            title: message,
-            actionLabel: actionLabel,
-            onAction: onAction,
-          ),
+    double liftContentBy = 0,
+    bool compact = false,
+  }) {
+    assert(
+      (actionLabel == null && onAction == null) ||
+          (actionLabel != null && onAction != null),
+      'actionLabel and onAction must both be null or both non-null',
+    );
+    assert(
+      (secondaryActionLabel == null && onSecondaryAction == null) ||
+          (secondaryActionLabel != null && onSecondaryAction != null),
+      'secondaryActionLabel and onSecondaryAction must both be null or both non-null',
+    );
+    assert(
+      (footerLinkLabel == null && onFooterLink == null) ||
+          (footerLinkLabel != null && onFooterLink != null),
+      'footerLinkLabel and onFooterLink must both be null or both non-null',
+    );
+    assert(
+      footerLinkHint == null ||
+          (footerLinkLabel != null && onFooterLink != null),
+      'footerLinkHint requires footerLinkLabel and onFooterLink',
+    );
+    final bool hasPrimary = actionLabel != null && onAction != null;
+    final bool hasFooter = footerLinkLabel != null && onFooterLink != null;
+    final String footerSemantics;
+    if (hasFooter) {
+      final String label = footerLinkLabel;
+      footerSemantics =
+          footerLinkHint != null ? '$footerLinkHint $label' : label;
+    } else {
+      footerSemantics = '';
+    }
+    Widget child = Semantics(
+      button: hasPrimary,
+      label: hasPrimary
+          ? '$message — $actionLabel${hasFooter ? ' — $footerSemantics' : ''}'
+          : '$message${subtitle != null ? ' — $subtitle' : ''}',
+      child: ConstrainedBox(
+        constraints: BoxConstraints(minHeight: minHeight),
+        child: AppEmptyView(
+          title: message,
+          subtitle: subtitle,
+          icon: icon,
+          compactSpacing: compact,
+          actionLabel: actionLabel,
+          onAction: onAction,
+          secondaryActionLabel: secondaryActionLabel,
+          onSecondaryAction: onSecondaryAction,
+          footerLinkLabel: footerLinkLabel,
+          onFooterLink: onFooterLink,
+          footerLinkHint: footerLinkHint,
+          contentPadding: compact
+              ? const EdgeInsets.fromLTRB(
+                  AppSpacing.xl,
+                  AppSpacing.sm,
+                  AppSpacing.xl,
+                  AppSpacing.sm,
+                )
+              : _discoverEmptyContentPadding,
         ),
+      ),
+    );
+    if (liftContentBy != 0) {
+      child = Transform.translate(
+        offset: Offset(0, -liftContentBy),
+        child: child,
       );
+    }
+    return child;
+  }
 }

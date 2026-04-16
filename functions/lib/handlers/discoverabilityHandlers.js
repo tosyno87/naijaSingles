@@ -13,8 +13,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.DiscoverabilityHandlers = void 0;
 const firestore_1 = require("firebase-functions/v2/firestore");
 function computeDiscoverable(data) {
-    var _a;
-    const status = (_a = data.accountStatus) !== null && _a !== void 0 ? _a : 'active';
+    const status = data.accountStatus ?? 'active';
     if (status !== 'active')
         return false;
     if (data.isDeleted === true)
@@ -24,20 +23,17 @@ function computeDiscoverable(data) {
     return true;
 }
 class DiscoverabilityHandlers {
-    constructor() {
-        this.onUserWritten = (0, firestore_1.onDocumentWritten)('users/{userId}', async (event) => {
-            var _a;
-            const after = (_a = event.data) === null || _a === void 0 ? void 0 : _a.after;
-            if (!(after === null || after === void 0 ? void 0 : after.exists))
-                return; // document deleted
-            const data = after.data();
-            const computed = computeDiscoverable(data);
-            if (data.isDiscoverable === computed)
-                return; // already correct
-            await after.ref.update({ isDiscoverable: computed });
-            console.log(`🔄 Synced isDiscoverable=${computed} for user ${event.params.userId}`);
-        });
-    }
+    onUserWritten = (0, firestore_1.onDocumentWritten)('users/{userId}', async (event) => {
+        const after = event.data?.after;
+        if (!after?.exists)
+            return; // document deleted
+        const data = after.data();
+        const computed = computeDiscoverable(data);
+        if (data.isDiscoverable === computed)
+            return; // already correct
+        await after.ref.update({ isDiscoverable: computed });
+        console.log(`🔄 Synced isDiscoverable=${computed} for user ${event.params.userId}`);
+    });
 }
 exports.DiscoverabilityHandlers = DiscoverabilityHandlers;
 //# sourceMappingURL=discoverabilityHandlers.js.map

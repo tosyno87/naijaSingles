@@ -40,6 +40,7 @@ exports.NotificationService = void 0;
 const admin = __importStar(require("firebase-admin"));
 const types_1 = require("../types");
 class NotificationService {
+    db;
     constructor() {
         this.db = admin.firestore();
     }
@@ -354,7 +355,12 @@ class NotificationService {
      */
     async storeInAppNotification(userId, notificationData) {
         try {
-            const payload = Object.assign(Object.assign({}, notificationData), { userId, timestamp: admin.firestore.FieldValue.serverTimestamp(), isRead: false });
+            const payload = {
+                ...notificationData,
+                userId,
+                timestamp: admin.firestore.FieldValue.serverTimestamp(),
+                isRead: false,
+            };
             const batch = this.db.batch();
             // Legacy path — /users/{userId}/notifications (static API)
             const subcollRef = this.db
@@ -362,10 +368,10 @@ class NotificationService {
                 .doc(userId)
                 .collection('notifications')
                 .doc();
-            batch.set(subcollRef, Object.assign(Object.assign({}, payload), { id: subcollRef.id }));
+            batch.set(subcollRef, { ...payload, id: subcollRef.id });
             // Modern path — top-level /notifications (instance API)
             const topLevelRef = this.db.collection('notifications').doc();
-            batch.set(topLevelRef, Object.assign(Object.assign({}, payload), { id: topLevelRef.id }));
+            batch.set(topLevelRef, { ...payload, id: topLevelRef.id });
             await batch.commit();
             console.log(`✅ In-app notification stored for user ${userId} (both paths)`);
             await this.logNotificationAnalytics(userId, notificationData.type, types_1.NotificationStatus.STORED);

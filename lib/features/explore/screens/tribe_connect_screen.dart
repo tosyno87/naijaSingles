@@ -1,10 +1,17 @@
 import 'dart:async';
 
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:google_fonts/google_fonts.dart';
 
+import '../../discovery/presentation/screens/discovery_preferences_screen.dart';
+import '../../home/bloc/searchuser_bloc.dart';
+import '../../home/ui/screens/user_filter/bloc/userfilter_bloc.dart';
+import '../../payment/ui/in_app_purchase/buy_products/buyproducts_bloc.dart';
+import '../../payment/ui/in_app_purchase/get_products/getproducts_bloc.dart';
+import '../../payment/ui/products.dart';
 import '../../../common/constants/app_colors.dart';
 import '../../../common/data/repo/user_search_repo.dart';
 import '../../../common/widgets/dating_feedback_snackbar.dart';
@@ -29,10 +36,89 @@ class TribeConnectScreen extends StatefulWidget {
   State<TribeConnectScreen> createState() => _TribeConnectScreenState();
 }
 
-class _TribeConnectScreenState extends State<TribeConnectScreen> {
+class _TribeConnectScreenState extends State<TribeConnectScreen>
+    with TickerProviderStateMixin {
   final Set<String> _processedUserIds = <String>{};
   final SuperLikeService _superLikeService = SuperLikeService();
   bool _isRefreshing = false;
+  bool _deckBusy = false;
+  String? _pendingExitUid;
+  /// While a dismiss animation runs: `false` = like (up-right), `true` = pass (left).
+  bool _exitTowardsLeft = false;
+
+  late final AnimationController _likeExitController;
+  late final AnimationController _likeEnterController;
+  late final CurvedAnimation _likeExitCurved;
+  late final CurvedAnimation _likeEnterCurved;
+
+  @override
+  void initState() {
+    super.initState();
+    _likeExitController = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 360),
+    );
+    _likeEnterController = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 300),
+      value: 1,
+    );
+    _likeExitCurved = CurvedAnimation(
+      parent: _likeExitController,
+      curve: Curves.easeInCubic,
+    );
+    _likeEnterCurved = CurvedAnimation(
+      parent: _likeEnterController,
+      curve: Curves.easeOutCubic,
+    );
+  }
+
+  @override
+  void dispose() {
+    _resetDeckAnimations();
+    _likeExitCurved.dispose();
+    _likeEnterCurved.dispose();
+    _likeExitController.dispose();
+    _likeEnterController.dispose();
+    super.dispose();
+  }
+
+  void _resetDeckAnimations() {
+    _likeExitController.removeStatusListener(_onCardExitStatus);
+    _likeExitController.stop();
+    _likeExitController.reset();
+    _likeEnterController.value = 1;
+    _pendingExitUid = null;
+    _deckBusy = false;
+    _exitTowardsLeft = false;
+  }
+
+  void _onCardExitStatus(AnimationStatus status) {
+    if (status != AnimationStatus.completed) return;
+    _likeExitController.removeStatusListener(_onCardExitStatus);
+    final String? uid = _pendingExitUid;
+    _pendingExitUid = null;
+    if (uid == null || !mounted) return;
+    final bool wasPass = _exitTowardsLeft;
+    setState(() {
+      _processedUserIds.add(uid);
+      _deckBusy = false;
+      _exitTowardsLeft = false;
+      _likeExitController.reset();
+      _likeEnterController.value = 0;
+    });
+    unawaited(
+      wasPass
+          ? HapticFeedback.lightImpact()
+          : HapticFeedback.selectionClick(),
+    );
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (mounted) {
+        unawaited(_likeEnterController.forward());
+      }
+    });
+    _advanceProfile();
+  }
 
   List<UserModel> get _availableUsers => widget.users
       .where(
@@ -67,10 +153,14 @@ class _TribeConnectScreenState extends State<TribeConnectScreen> {
         centerTitle: true,
         actions: [
           IconButton(
-            onPressed: _showFilters,
-            icon: _buildToolbarIcon(FontAwesomeIcons.sliders),
+            onPressed: () => unawaited(_openDiscoveryPreferences()),
+            tooltip: 'Filters',
+            icon: const FaIcon(
+              FontAwesomeIcons.sliders,
+              size: 20,
+              color: AppColors.textPrimary,
+            ),
           ),
-          const SizedBox(width: 8),
         ],
       );
 
@@ -85,50 +175,71 @@ class _TribeConnectScreenState extends State<TribeConnectScreen> {
       return _buildEmptyState();
     }
 
-    // Hinge-style: Show ONE profile at a time, scrollable vertically for details
-    // Pass/Connect buttons move to next profile
+    // One profile at a time; scroll vertically for full card details.
+    // Like / pass: directional exit motion + next profile enters from below.
     return SingleChildScrollView(
-      child: HingeProfileCard(
-        user: currentProfile,
-        onConnect: () => _handleConnect(currentProfile),
-        onPass: () => _handlePass(currentProfile),
-        onSuperLike: () => _handleSuperLike(currentProfile),
+      child: _wrapDeckMotion(
+        child: AbsorbPointer(
+          absorbing: _deckBusy || _likeExitController.isAnimating,
+          child: HingeProfileCard(
+            user: currentProfile,
+            onConnect: () => _handleConnect(currentProfile),
+            onPass: () => _handlePass(currentProfile),
+            onSuperLike: () => _handleSuperLike(currentProfile),
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _wrapDeckMotion({required Widget child}) => AnimatedBuilder(
+        animation: Listenable.merge(<Listenable>[
+          _likeExitCurved,
+          _likeEnterCurved,
+        ]),
+        builder: (BuildContext context, Widget? _) =>
+            _buildDeckMotionLayer(
+          exitT: _likeExitCurved.value,
+          enterT: _likeEnterCurved.value,
+          child: child,
+        ),
+      );
+
+  /// Next card stays opaque while sliding up (avoids a one-frame flash).
+  Widget _buildDeckMotionLayer({
+    required double exitT,
+    required double enterT,
+    required Widget child,
+  }) {
+    final bool exiting = exitT > 0;
+    final double opacity =
+        exiting ? (1.0 - exitT).clamp(0.0, 1.0) : 1.0;
+    final double scale =
+        exiting ? (1.0 - 0.06 * exitT) : (0.96 + 0.04 * enterT);
+    final Offset offset = exiting
+        ? (_exitTowardsLeft
+            ? Offset(-96 * exitT, -32 * exitT)
+            : Offset(88 * exitT, -72 * exitT))
+        : Offset(0, 28 * (1 - enterT));
+    return Transform.translate(
+      offset: offset,
+      child: Opacity(
+        opacity: opacity,
+        child: Transform.scale(
+          scale: scale,
+          child: child,
+        ),
       ),
     );
   }
 
   Widget _buildEmptyState() => AppEmptyView(
         title: 'No More Profiles',
-        subtitle: 'You\'ve seen all available profiles. Check back later!',
+        subtitle:
+            'You\'ve seen everyone for now. Pull to refresh later or tap Refresh to reload.',
         icon: Icons.explore_off,
         actionLabel: 'Refresh',
         onAction: _isRefreshing ? null : _refreshUsers,
-      );
-
-  Widget _buildToolbarIcon(IconData icon) => Container(
-        width: 38,
-        height: 38,
-        decoration: BoxDecoration(
-          color: Colors.white,
-          borderRadius: BorderRadius.circular(12),
-          border: Border.all(
-            color: const Color(0xFFE8E8EC),
-          ),
-          boxShadow: [
-            BoxShadow(
-              color: Colors.black.withValues(alpha: 0.06),
-              blurRadius: 12,
-              offset: const Offset(0, 4),
-            ),
-          ],
-        ),
-        child: Center(
-          child: FaIcon(
-            icon,
-            size: 16,
-            color: AppColors.textPrimary,
-          ),
-        ),
       );
 
   Future<void> _refreshUsers() async {
@@ -136,6 +247,7 @@ class _TribeConnectScreenState extends State<TribeConnectScreen> {
       _isRefreshing = true;
       _processedUserIds.clear();
     });
+    _resetDeckAnimations();
     try {
       await widget.onFiltersApplied?.call();
     } finally {
@@ -143,61 +255,84 @@ class _TribeConnectScreenState extends State<TribeConnectScreen> {
     }
   }
 
-  void _showFilters() {
-    unawaited(
-      showModalBottomSheet(
-        context: context,
-        backgroundColor: AppColors.backgroundColor,
-        shape: const RoundedRectangleBorder(
-          borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
-        ),
-        builder: (context) => _ConnectFilterSheet(
-          currentUser: widget.currentUser,
-          onApply: () async {
-            setState(_processedUserIds.clear);
-            await widget.onFiltersApplied?.call();
-          },
+  Future<void> _openDiscoveryPreferences() async {
+    await Navigator.push<void>(
+      context,
+      MaterialPageRoute<void>(
+        builder: (BuildContext context) => BlocProvider<UserfilterBloc>(
+          create: (_) => UserfilterBloc(),
+          child: BlocProvider<SearchUserBloc>(
+            create: (_) => SearchUserBloc(),
+            child: DiscoveryPreferencesScreen(
+              currentUser: widget.currentUser,
+              isPurchased: widget.currentUser.hasPremiumAccess,
+              items: const <String, dynamic>{},
+            ),
+          ),
         ),
       ),
     );
+    if (!mounted) return;
+    setState(_processedUserIds.clear);
+    _resetDeckAnimations();
+    await widget.onFiltersApplied?.call();
   }
 
   Future<void> _handleConnect(UserModel user) async {
     final uid = user.id;
     if (uid == null || uid.isEmpty) return;
+    if (_deckBusy || _likeExitController.isAnimating) return;
 
+    setState(() => _deckBusy = true);
     try {
-      setState(() => _processedUserIds.add(uid));
+      final String? matchId =
+          await UserSearchRepo.rightSwipe(widget.currentUser, user);
 
-      final matchId = await UserSearchRepo.rightSwipe(widget.currentUser, user);
+      if (!mounted) return;
 
       if (matchId != null) {
+        setState(() {
+          _processedUserIds.add(uid);
+          _deckBusy = false;
+        });
+        unawaited(HapticFeedback.mediumImpact());
         _showMatchConfirmation(user);
-      } else {
-        _showConnectConfirmation(user);
+        _advanceProfile();
+        return;
       }
 
-      _advanceProfile();
+      _exitTowardsLeft = false;
+      _pendingExitUid = uid;
+      _likeExitController.addStatusListener(_onCardExitStatus);
+      unawaited(_likeExitController.forward());
     } on Object {
-      setState(() => _processedUserIds.remove(uid));
-      _showError('Failed to connect. Please try again.');
+      if (mounted) {
+        setState(() => _deckBusy = false);
+        _showError('Failed to connect. Please try again.');
+      }
     }
   }
 
   Future<void> _handlePass(UserModel user) async {
     final uid = user.id;
     if (uid == null || uid.isEmpty) return;
+    if (_deckBusy || _likeExitController.isAnimating) return;
 
+    setState(() => _deckBusy = true);
     try {
-      setState(() => _processedUserIds.add(uid));
-
       await UserSearchRepo.leftSwipe(widget.currentUser, user);
-      _showPassConfirmation(user);
 
-      _advanceProfile();
+      if (!mounted) return;
+
+      _exitTowardsLeft = true;
+      _pendingExitUid = uid;
+      _likeExitController.addStatusListener(_onCardExitStatus);
+      unawaited(_likeExitController.forward());
     } on Object {
-      setState(() => _processedUserIds.remove(uid));
-      _showError('Failed to pass. Please try again.');
+      if (mounted) {
+        setState(() => _deckBusy = false);
+        _showError('Failed to pass. Please try again.');
+      }
     }
   }
 
@@ -210,6 +345,7 @@ class _TribeConnectScreenState extends State<TribeConnectScreen> {
         currentUid.isEmpty) {
       return;
     }
+    if (_deckBusy || _likeExitController.isAnimating) return;
 
     try {
       setState(() => _processedUserIds.add(uid));
@@ -235,11 +371,19 @@ class _TribeConnectScreenState extends State<TribeConnectScreen> {
         if (result.isInstantMatch) {
           _showMatchConfirmation(user);
         } else {
-          _showSuperLikeConfirmation(user);
+          unawaited(HapticFeedback.mediumImpact());
         }
       } else {
         setState(() => _processedUserIds.remove(uid));
-        _showError(result.error ?? 'Could not send Super Like.');
+        final err = result.error ?? 'Could not send Super Like.';
+        if (err == SuperLikeService.superLikeLimitReachedMessage) {
+          if (!mounted) {
+            return;
+          }
+          await _showDailySuperLikeLimitSheet();
+        } else {
+          _showError(err);
+        }
         return;
       }
 
@@ -273,28 +417,125 @@ class _TribeConnectScreenState extends State<TribeConnectScreen> {
     );
   }
 
-  void _showConnectConfirmation(UserModel user) {
-    DatingFeedbackSnackBar.show(
-      context,
-      message: 'Liked ${user.name}! 💕',
-      backgroundColor: AppColors.primaryGreen,
-    );
-  }
-
-  void _showPassConfirmation(UserModel user) {
-    DatingFeedbackSnackBar.show(
-      context,
-      message: 'Passed on ${user.name}',
-      backgroundColor: Colors.grey.shade600,
-      duration: const Duration(seconds: 2),
-    );
-  }
-
-  void _showSuperLikeConfirmation(UserModel user) {
-    DatingFeedbackSnackBar.show(
-      context,
-      message: 'Super Liked ${user.name}! ⭐',
-      backgroundColor: const Color(0xFF2196F3),
+  /// Weekly Super Like quota exhausted: compact sheet with upgrade path.
+  Future<void> _showDailySuperLikeLimitSheet() async {
+    await showModalBottomSheet<void>(
+      context: context,
+      backgroundColor: Colors.transparent,
+      isScrollControlled: true,
+      builder: (sheetContext) => SafeArea(
+        child: Padding(
+          padding: const EdgeInsets.fromLTRB(12, 0, 12, 16),
+          child: Material(
+            color: AppColors.backgroundColor,
+            borderRadius: const BorderRadius.vertical(top: Radius.circular(28)),
+            clipBehavior: Clip.antiAlias,
+            elevation: 8,
+            shadowColor: Colors.black26,
+            child: Padding(
+              padding: const EdgeInsets.fromLTRB(28, 20, 28, 32),
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                children: [
+                  Center(
+                    child: Container(
+                      width: 40,
+                      height: 4,
+                      margin: const EdgeInsets.only(bottom: 24),
+                      decoration: BoxDecoration(
+                        color: Colors.grey.shade300,
+                        borderRadius: BorderRadius.circular(2),
+                      ),
+                    ),
+                  ),
+                  const Icon(
+                    Icons.star_rounded,
+                    size: 48,
+                    color: Color(0xFF2196F3),
+                  ),
+                  const SizedBox(height: 20),
+                  Text(
+                    'Super Like limit reached',
+                    textAlign: TextAlign.center,
+                    style: GoogleFonts.montserrat(
+                      fontSize: 22,
+                      fontWeight: FontWeight.w700,
+                      color: AppColors.textPrimary,
+                      letterSpacing: -0.2,
+                    ),
+                  ),
+                  const SizedBox(height: 16),
+                  Text(
+                    SuperLikeService.superLikeLimitReachedMessage,
+                    textAlign: TextAlign.center,
+                    style: GoogleFonts.montserrat(
+                      fontSize: 16,
+                      height: 1.45,
+                      color: AppColors.textSecondary,
+                    ),
+                  ),
+                  const SizedBox(height: 28),
+                  ElevatedButton(
+                    onPressed: () {
+                      Navigator.of(sheetContext).pop();
+                      if (!mounted) {
+                        return;
+                      }
+                      unawaited(
+                        Navigator.of(context).push(
+                          MaterialPageRoute<void>(
+                            builder: (_) => MultiBlocProvider(
+                              providers: [
+                                BlocProvider(
+                                  create: (_) => GetInAppProductsBloc(),
+                                ),
+                                BlocProvider(
+                                  create: (_) =>
+                                      BuyConsumableInAppProductsBloc(),
+                                ),
+                              ],
+                              child:
+                                  Products(widget.currentUser, null, const {}),
+                            ),
+                          ),
+                        ),
+                      );
+                    },
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: AppColors.primaryGreen,
+                      foregroundColor: Colors.white,
+                      padding: const EdgeInsets.symmetric(vertical: 14),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                    ),
+                    child: Text(
+                      'Upgrade to Premium',
+                      style: GoogleFonts.montserrat(
+                        fontSize: 16,
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
+                  ),
+                  const SizedBox(height: 8),
+                  TextButton(
+                    onPressed: () => Navigator.of(sheetContext).pop(),
+                    child: Text(
+                      'Not now',
+                      style: GoogleFonts.montserrat(
+                        fontSize: 15,
+                        fontWeight: FontWeight.w600,
+                        color: AppColors.textSecondary,
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ),
+        ),
+      ),
     );
   }
 
@@ -303,182 +544,7 @@ class _TribeConnectScreenState extends State<TribeConnectScreen> {
       context,
       message: message,
       backgroundColor: AppColors.error,
+      bottomMarginAddition: DatingFeedbackSnackBar.marginAboveProfileActions,
     );
   }
-}
-
-/// Bottom-sheet filter for the Connect screen.
-/// Reads the user's current `lookingFor` and persists changes to Firestore
-/// before triggering a data reload via [onApply].
-class _ConnectFilterSheet extends StatefulWidget {
-  const _ConnectFilterSheet({
-    required this.currentUser,
-    required this.onApply,
-  });
-
-  final UserModel currentUser;
-  final Future<void> Function() onApply;
-
-  @override
-  State<_ConnectFilterSheet> createState() => _ConnectFilterSheetState();
-}
-
-class _ConnectFilterSheetState extends State<_ConnectFilterSheet> {
-  static const _modes = <String, _ModeOption>{
-    'Dating': _ModeOption('Dating & Romance', Icons.favorite_outline),
-    'Friendship': _ModeOption('Friendship & Social', Icons.people_outline),
-    'Networking': _ModeOption('Professional Networking', Icons.work_outline),
-    'Mixed': _ModeOption('All of the Above', Icons.explore_outlined),
-  };
-
-  late String _selected;
-  bool _saving = false;
-
-  @override
-  void initState() {
-    super.initState();
-    _selected = widget.currentUser.lookingFor ?? 'Dating';
-    if (!_modes.containsKey(_selected)) _selected = 'Dating';
-  }
-
-  Future<void> _applyFilters() async {
-    final changed = _selected != (widget.currentUser.lookingFor ?? 'Dating');
-
-    if (changed) {
-      setState(() => _saving = true);
-
-      widget.currentUser.lookingFor = _selected;
-      await FirebaseFirestore.instance
-          .collection('users')
-          .doc(widget.currentUser.id)
-          .set({'lookingFor': _selected}, SetOptions(merge: true));
-
-      if (!mounted) return;
-      setState(() => _saving = false);
-    }
-
-    if (!mounted) return;
-    Navigator.pop(context);
-    await widget.onApply();
-  }
-
-  @override
-  Widget build(BuildContext context) => Padding(
-        padding: const EdgeInsets.fromLTRB(24, 24, 24, 32),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(
-              'Filter Your Tribe',
-              style: GoogleFonts.montserrat(
-                fontSize: 20,
-                fontWeight: FontWeight.w600,
-                color: AppColors.textPrimary,
-              ),
-            ),
-            const SizedBox(height: 8),
-            Text(
-              'Show me people looking for:',
-              style: GoogleFonts.montserrat(
-                fontSize: 14,
-                color: AppColors.textSecondary,
-              ),
-            ),
-            const SizedBox(height: 16),
-            ..._modes.entries.map(
-              (e) => _buildModeOption(e.key, e.value),
-            ),
-            const SizedBox(height: 20),
-            SizedBox(
-              width: double.infinity,
-              child: ElevatedButton(
-                onPressed: _saving ? null : _applyFilters,
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: AppColors.primaryGreen,
-                  foregroundColor: Colors.white,
-                  disabledBackgroundColor:
-                      AppColors.primaryGreen.withAlpha(120),
-                  padding: const EdgeInsets.symmetric(vertical: 16),
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(12),
-                  ),
-                ),
-                child: _saving
-                    ? const SizedBox(
-                        height: 20,
-                        width: 20,
-                        child: CircularProgressIndicator(
-                          strokeWidth: 2,
-                          color: Colors.white,
-                        ),
-                      )
-                    : Text(
-                        'Apply Filters',
-                        style: GoogleFonts.montserrat(
-                          fontSize: 16,
-                          fontWeight: FontWeight.w600,
-                        ),
-                      ),
-              ),
-            ),
-          ],
-        ),
-      );
-
-  Widget _buildModeOption(String key, _ModeOption option) {
-    final isSelected = _selected == key;
-    return GestureDetector(
-      onTap: () => setState(() => _selected = key),
-      child: Container(
-        margin: const EdgeInsets.only(bottom: 10),
-        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
-        decoration: BoxDecoration(
-          color: isSelected
-              ? AppColors.primaryGreen.withAlpha(25)
-              : Colors.transparent,
-          borderRadius: BorderRadius.circular(12),
-          border: Border.all(
-            color: isSelected ? AppColors.primaryGreen : Colors.grey.shade300,
-            width: isSelected ? 2 : 1,
-          ),
-        ),
-        child: Row(
-          children: [
-            Icon(
-              option.icon,
-              color:
-                  isSelected ? AppColors.primaryGreen : AppColors.textSecondary,
-              size: 22,
-            ),
-            const SizedBox(width: 12),
-            Expanded(
-              child: Text(
-                option.label,
-                style: GoogleFonts.montserrat(
-                  fontSize: 15,
-                  fontWeight: isSelected ? FontWeight.w600 : FontWeight.w400,
-                  color: isSelected
-                      ? AppColors.primaryGreen
-                      : AppColors.textPrimary,
-                ),
-              ),
-            ),
-            if (isSelected)
-              const Icon(
-                Icons.check_circle,
-                color: AppColors.primaryGreen,
-                size: 22,
-              ),
-          ],
-        ),
-      ),
-    );
-  }
-}
-
-class _ModeOption {
-  const _ModeOption(this.label, this.icon);
-  final String label;
-  final IconData icon;
 }

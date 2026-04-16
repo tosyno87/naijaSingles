@@ -47,132 +47,130 @@ const MAX_USERS_PER_REQUEST = 500;
 const MIN_USERS_PER_REQUEST = 1;
 const DEFAULT_BATCH_SIZE = 10; // Users to create in parallel
 class TestUserHandlers {
-    constructor() {
-        // Test data constants
-        this.maleNames = [
-            'James', 'Michael', 'William', 'David', 'Richard', 'Joseph', 'Thomas',
-            'Christopher', 'Charles', 'Daniel', 'Matthew', 'Anthony', 'Mark', 'Donald',
-            'Steven', 'Paul', 'Andrew', 'Joshua', 'Kenneth', 'Kevin',
-        ];
-        this.femaleNames = [
-            'Mary', 'Patricia', 'Jennifer', 'Linda', 'Elizabeth', 'Barbara', 'Susan',
-            'Jessica', 'Sarah', 'Karen', 'Nancy', 'Lisa', 'Betty', 'Helen', 'Sandra',
-            'Donna', 'Carol', 'Ruth', 'Sharon', 'Michelle',
-        ];
-        this.lastNames = [
-            'Smith', 'Johnson', 'Williams', 'Brown', 'Jones', 'Garcia', 'Miller',
-            'Davis', 'Rodriguez', 'Martinez', 'Hernandez', 'Lopez', 'Gonzalez', 'Wilson',
-            'Anderson', 'Thomas', 'Taylor', 'Moore', 'Jackson', 'Martin',
-        ];
-        this.interests = [
-            'Travel', 'Photography', 'Music', 'Cooking', 'Fitness', 'Reading', 'Movies',
-            'Dancing', 'Sports', 'Art', 'Technology', 'Fashion', 'Food', 'Adventure',
-            'Yoga', 'Gaming', 'Hiking', 'Coffee', 'Wine', 'Volunteering', 'Languages',
-            'Business', 'Education',
-        ];
-        this.occupations = [
-            'Software Engineer', 'Marketing Manager', 'Teacher', 'Doctor', 'Lawyer',
-            'Artist', 'Entrepreneur', 'Sales Representative', 'Designer', 'Consultant',
-            'Nurse', 'Accountant', 'Chef', 'Photographer', 'Writer', 'Engineer',
-            'Business Analyst', 'Project Manager', 'Real Estate Agent', 'Therapist',
-        ];
-        this.educationLevels = [
-            'High School',
-            'Some College',
-            'Bachelor\'s Degree',
-            'Master\'s Degree',
-            'PhD',
-        ];
-        /**
-         * Create test users for development/testing
-         * Requires admin secret token in Authorization header for security
-         */
-        this.createTestUsers = (0, https_1.onRequest)({ timeoutSeconds: 540 }, async (req, res) => {
-            try {
-                const authHeader = req.headers.authorization;
-                const adminSecret = process.env.ADMIN_SECRET;
-                if (!adminSecret) {
-                    logger.error('ADMIN_SECRET is not configured. Set it via: firebase functions:secrets:set ADMIN_SECRET');
-                    res.status(503).json({
-                        success: false,
-                        message: 'Service unavailable. Admin secret is not configured.',
-                    });
-                    return;
-                }
-                if (!authHeader || authHeader !== `Bearer ${adminSecret}`) {
-                    res.status(401).json({
-                        success: false,
-                        message: 'Unauthorized. Provide valid admin secret in Authorization header.',
-                    });
-                    return;
-                }
-                // 2. Input validation
-                const data = req.body || {};
-                const requestedCount = data.count || 60;
-                const validatedCount = Math.min(Math.max(MIN_USERS_PER_REQUEST, requestedCount), MAX_USERS_PER_REQUEST);
-                if (requestedCount !== validatedCount) {
-                    console.warn(`⚠️  Count adjusted from ${requestedCount} to ${validatedCount}`);
-                }
-                // Validate cities if provided
-                const cities = data.cities || [
-                    { name: 'Atlanta, GA', lat: 33.7490, lng: -84.3880, key: 'atlanta' },
-                    { name: 'Miami, FL', lat: 25.7617, lng: -80.1918, key: 'miami' },
-                    { name: 'Houston, TX', lat: 29.7604, lng: -95.3698, key: 'houston' },
-                ];
-                if (cities.length === 0) {
-                    res.status(400).json({
-                        success: false,
-                        message: 'At least one city is required',
-                    });
-                    return;
-                }
-                console.log(`🚀 Creating ${validatedCount} test users across ${cities.length} cities...`);
-                // 3. Generate unique request ID for this batch
-                const requestId = crypto.randomBytes(4).toString('hex');
-                // 4. Calculate distribution
-                const usersPerCity = Math.floor(validatedCount / cities.length);
-                const usersPerGender = Math.floor(usersPerCity / 2);
-                const created = [];
-                const errors = [];
-                let failed = 0;
-                // 5. Process cities in parallel, users in batches
-                for (const city of cities) {
-                    console.log(`🏙️  Creating users for ${city.name}...`);
-                    // Create male users in batches
-                    const maleResults = await this.createUsersInBatches('male', city, usersPerGender, requestId, DEFAULT_BATCH_SIZE);
-                    created.push(...maleResults.created);
-                    errors.push(...maleResults.errors);
-                    failed += maleResults.failed;
-                    // Create female users in batches
-                    const femaleResults = await this.createUsersInBatches('female', city, usersPerGender, requestId, DEFAULT_BATCH_SIZE);
-                    created.push(...femaleResults.created);
-                    errors.push(...femaleResults.errors);
-                    failed += femaleResults.failed;
-                }
-                const message = `Successfully created ${created.length} test users${failed > 0 ? ` (${failed} failed)` : ''}`;
-                console.log(`✅ ${message}`);
-                // Only include userIds for smaller batches to avoid large response
-                const result = {
-                    success: true,
-                    created: created.length,
-                    failed,
-                    userIds: created.length <= 100 ? created : undefined,
-                    message,
-                };
-                res.status(200).json(result);
-            }
-            catch (error) {
-                console.error('❌ Fatal error in createTestUsers:', error);
-                await this.logError('createTestUsers', error, { requestBody: req.body });
-                res.status(500).json({
+    // Test data constants
+    maleNames = [
+        'James', 'Michael', 'William', 'David', 'Richard', 'Joseph', 'Thomas',
+        'Christopher', 'Charles', 'Daniel', 'Matthew', 'Anthony', 'Mark', 'Donald',
+        'Steven', 'Paul', 'Andrew', 'Joshua', 'Kenneth', 'Kevin',
+    ];
+    femaleNames = [
+        'Mary', 'Patricia', 'Jennifer', 'Linda', 'Elizabeth', 'Barbara', 'Susan',
+        'Jessica', 'Sarah', 'Karen', 'Nancy', 'Lisa', 'Betty', 'Helen', 'Sandra',
+        'Donna', 'Carol', 'Ruth', 'Sharon', 'Michelle',
+    ];
+    lastNames = [
+        'Smith', 'Johnson', 'Williams', 'Brown', 'Jones', 'Garcia', 'Miller',
+        'Davis', 'Rodriguez', 'Martinez', 'Hernandez', 'Lopez', 'Gonzalez', 'Wilson',
+        'Anderson', 'Thomas', 'Taylor', 'Moore', 'Jackson', 'Martin',
+    ];
+    interests = [
+        'Travel', 'Photography', 'Music', 'Cooking', 'Fitness', 'Reading', 'Movies',
+        'Dancing', 'Sports', 'Art', 'Technology', 'Fashion', 'Food', 'Adventure',
+        'Yoga', 'Gaming', 'Hiking', 'Coffee', 'Wine', 'Volunteering', 'Languages',
+        'Business', 'Education',
+    ];
+    occupations = [
+        'Software Engineer', 'Marketing Manager', 'Teacher', 'Doctor', 'Lawyer',
+        'Artist', 'Entrepreneur', 'Sales Representative', 'Designer', 'Consultant',
+        'Nurse', 'Accountant', 'Chef', 'Photographer', 'Writer', 'Engineer',
+        'Business Analyst', 'Project Manager', 'Real Estate Agent', 'Therapist',
+    ];
+    educationLevels = [
+        'High School',
+        'Some College',
+        'Bachelor\'s Degree',
+        'Master\'s Degree',
+        'PhD',
+    ];
+    /**
+     * Create test users for development/testing
+     * Requires admin secret token in Authorization header for security
+     */
+    createTestUsers = (0, https_1.onRequest)({ timeoutSeconds: 540 }, async (req, res) => {
+        try {
+            const authHeader = req.headers.authorization;
+            const adminSecret = process.env.ADMIN_SECRET;
+            if (!adminSecret) {
+                logger.error('ADMIN_SECRET is not configured. Set it via: firebase functions:secrets:set ADMIN_SECRET');
+                res.status(503).json({
                     success: false,
-                    message: 'Internal server error',
-                    created: 0,
-                    failed: 0,
+                    message: 'Service unavailable. Admin secret is not configured.',
                 });
+                return;
             }
-        });
-    }
+            if (!authHeader || authHeader !== `Bearer ${adminSecret}`) {
+                res.status(401).json({
+                    success: false,
+                    message: 'Unauthorized. Provide valid admin secret in Authorization header.',
+                });
+                return;
+            }
+            // 2. Input validation
+            const data = req.body || {};
+            const requestedCount = data.count || 60;
+            const validatedCount = Math.min(Math.max(MIN_USERS_PER_REQUEST, requestedCount), MAX_USERS_PER_REQUEST);
+            if (requestedCount !== validatedCount) {
+                console.warn(`⚠️  Count adjusted from ${requestedCount} to ${validatedCount}`);
+            }
+            // Validate cities if provided
+            const cities = data.cities || [
+                { name: 'Atlanta, GA', lat: 33.7490, lng: -84.3880, key: 'atlanta' },
+                { name: 'Miami, FL', lat: 25.7617, lng: -80.1918, key: 'miami' },
+                { name: 'Houston, TX', lat: 29.7604, lng: -95.3698, key: 'houston' },
+            ];
+            if (cities.length === 0) {
+                res.status(400).json({
+                    success: false,
+                    message: 'At least one city is required',
+                });
+                return;
+            }
+            console.log(`🚀 Creating ${validatedCount} test users across ${cities.length} cities...`);
+            // 3. Generate unique request ID for this batch
+            const requestId = crypto.randomBytes(4).toString('hex');
+            // 4. Calculate distribution
+            const usersPerCity = Math.floor(validatedCount / cities.length);
+            const usersPerGender = Math.floor(usersPerCity / 2);
+            const created = [];
+            const errors = [];
+            let failed = 0;
+            // 5. Process cities in parallel, users in batches
+            for (const city of cities) {
+                console.log(`🏙️  Creating users for ${city.name}...`);
+                // Create male users in batches
+                const maleResults = await this.createUsersInBatches('male', city, usersPerGender, requestId, DEFAULT_BATCH_SIZE);
+                created.push(...maleResults.created);
+                errors.push(...maleResults.errors);
+                failed += maleResults.failed;
+                // Create female users in batches
+                const femaleResults = await this.createUsersInBatches('female', city, usersPerGender, requestId, DEFAULT_BATCH_SIZE);
+                created.push(...femaleResults.created);
+                errors.push(...femaleResults.errors);
+                failed += femaleResults.failed;
+            }
+            const message = `Successfully created ${created.length} test users${failed > 0 ? ` (${failed} failed)` : ''}`;
+            console.log(`✅ ${message}`);
+            // Only include userIds for smaller batches to avoid large response
+            const result = {
+                success: true,
+                created: created.length,
+                failed,
+                userIds: created.length <= 100 ? created : undefined,
+                message,
+            };
+            res.status(200).json(result);
+        }
+        catch (error) {
+            console.error('❌ Fatal error in createTestUsers:', error);
+            await this.logError('createTestUsers', error, { requestBody: req.body });
+            res.status(500).json({
+                success: false,
+                message: 'Internal server error',
+                created: 0,
+                failed: 0,
+            });
+        }
+    });
     /**
      * Create users in parallel batches with error handling
      */
@@ -284,7 +282,7 @@ class TestUserHandlers {
         }
         catch (error) {
             // Clean up orphaned Auth user if Firestore write failed
-            if (userRecord === null || userRecord === void 0 ? void 0 : userRecord.uid) {
+            if (userRecord?.uid) {
                 try {
                     await admin.auth().deleteUser(userRecord.uid);
                 }

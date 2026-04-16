@@ -9,7 +9,9 @@ class DatingFeedbackSnackBar {
   /// Extra space above the bottom safe area. Use a larger value when the screen
   /// has a thick bottom bar (e.g. profile detail actions) instead of only the main tab bar.
   static const double marginAboveMainTabBar = 72;
-  static const double marginAboveProfileActions = 96;
+  /// Clears the Connect / profile three-button action row (Pass / Super Like / Like).
+  /// Tuned to keep feedback above actions without covering Pass/Super Like/Like.
+  static const double marginAboveProfileActions = 160;
 
   static void show(
     BuildContext context, {

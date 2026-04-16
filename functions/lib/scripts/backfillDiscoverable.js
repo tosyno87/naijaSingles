@@ -46,8 +46,7 @@ const admin = __importStar(require("firebase-admin"));
 admin.initializeApp();
 const db = admin.firestore();
 function computeDiscoverable(data) {
-    var _a;
-    const status = (_a = data.accountStatus) !== null && _a !== void 0 ? _a : 'active';
+    const status = data.accountStatus ?? 'active';
     if (status !== 'active')
         return false;
     if (data.isDeleted === true)

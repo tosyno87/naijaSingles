@@ -49,8 +49,7 @@ class _HingeProfileViewerScreenState extends State<HingeProfileViewerScreen> {
 
     setState(() => _actionBusy = true);
     try {
-      final String? matchId =
-          await UserSearchRepo.rightSwipe(_me, user);
+      final String? matchId = await UserSearchRepo.rightSwipe(_me, user);
       if (!mounted) return;
 
       if (matchId != null) {
@@ -137,8 +136,9 @@ class _HingeProfileViewerScreenState extends State<HingeProfileViewerScreen> {
     setState(() => _actionBusy = true);
     try {
       final UserModel fromUser = _me;
-      final String? firstPhoto =
-          (fromUser.imageUrl?.isNotEmpty ?? false) ? fromUser.imageUrl![0] : null;
+      final String? firstPhoto = (fromUser.imageUrl?.isNotEmpty ?? false)
+          ? fromUser.imageUrl![0]
+          : null;
 
       final result = await _superLikeService.sendSuperLike(
         fromUserId: currentUid,
@@ -332,8 +332,7 @@ class _HingeProfileViewerScreenState extends State<HingeProfileViewerScreen> {
   Widget build(BuildContext context) {
     final List<String> nameParts =
         (_profile.name ?? '').trim().split(RegExp(r'\s+'));
-    final String title =
-        nameParts.isEmpty ? 'Profile' : nameParts.first;
+    final String title = nameParts.isEmpty ? 'Profile' : nameParts.first;
 
     return Scaffold(
       backgroundColor: AppColors.backgroundColor,

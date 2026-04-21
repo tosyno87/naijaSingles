@@ -90,8 +90,7 @@ class _MessagesScreenState extends State<MessagesScreen> {
           unawaited(
             Navigator.of(context).push(
               MaterialPageRoute(
-                builder: (context) =>
-                    const ExploreScreen(showBackButton: true),
+                builder: (context) => const ExploreScreen(showBackButton: true),
               ),
             ),
           );
@@ -195,7 +194,8 @@ class _MessagesScreenState extends State<MessagesScreen> {
                               decoration: BoxDecoration(
                                 color: AppColors.primaryGreen,
                                 shape: BoxShape.circle,
-                                border: Border.all(color: AppColors.cardColor, width: 2),
+                                border: Border.all(
+                                    color: AppColors.cardColor, width: 2),
                               ),
                             ),
                           ),
@@ -230,8 +230,9 @@ class _MessagesScreenState extends State<MessagesScreen> {
                                 thread.getRelativeTime(),
                                 style: GoogleFonts.montserrat(
                                   fontSize: 12,
-                                  color:
-                                      thread.unread ? AppColors.primaryGreen : AppColors.textTertiary,
+                                  color: thread.unread
+                                      ? AppColors.primaryGreen
+                                      : AppColors.textTertiary,
                                   fontWeight: thread.unread
                                       ? FontWeight.w600
                                       : FontWeight.normal,
@@ -246,8 +247,9 @@ class _MessagesScreenState extends State<MessagesScreen> {
                             overflow: TextOverflow.ellipsis,
                             style: GoogleFonts.montserrat(
                               fontSize: 14,
-                              color:
-                                  thread.unread ? AppColors.textPrimary : AppColors.textSecondary,
+                              color: thread.unread
+                                  ? AppColors.textPrimary
+                                  : AppColors.textSecondary,
                               fontWeight: thread.unread
                                   ? FontWeight.w500
                                   : FontWeight.normal,

@@ -21,6 +21,7 @@ class AppEmptyView extends StatelessWidget {
     this.onSecondaryAction,
     this.footerLinkLabel,
     this.onFooterLink,
+
     /// When set with [footerLinkLabel], shows above the link to anchor it to context.
     this.footerLinkHint,
     this.contentPadding,
@@ -29,17 +30,21 @@ class AppEmptyView extends StatelessWidget {
   final String title;
   final String? subtitle;
   final IconData icon;
+
   /// When null, uses default size or a slightly smaller size when [compactSpacing] is true.
   final double? iconSize;
+
   /// Tighter gaps between icon, title, subtitle, and primary button (~8–12 px less).
   final bool compactSpacing;
   final String? actionLabel;
   final VoidCallback? onAction;
   final String? secondaryActionLabel;
   final VoidCallback? onSecondaryAction;
+
   /// Small text link shown below the primary button (e.g. “Adjust preferences”).
   final String? footerLinkLabel;
   final VoidCallback? onFooterLink;
+
   /// One line of secondary copy tying [footerLinkLabel] to the section (utility row).
   final String? footerLinkHint;
   final EdgeInsetsGeometry? contentPadding;
@@ -61,8 +66,7 @@ class AppEmptyView extends StatelessWidget {
 
     return Center(
       child: SingleChildScrollView(
-        padding:
-            contentPadding ?? const EdgeInsets.all(AppSpacing.xl),
+        padding: contentPadding ?? const EdgeInsets.all(AppSpacing.xl),
         child: Column(
           mainAxisSize: MainAxisSize.min,
           mainAxisAlignment: MainAxisAlignment.center,
@@ -179,8 +183,7 @@ class AppEmptyView extends StatelessWidget {
                 ),
               ],
             ],
-            if (onSecondaryAction != null &&
-                secondaryActionLabel != null) ...[
+            if (onSecondaryAction != null && secondaryActionLabel != null) ...[
               const SizedBox(height: AppSpacing.sm),
               TextButton(
                 onPressed: onSecondaryAction,

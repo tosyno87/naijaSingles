@@ -258,14 +258,12 @@ class _HingeProfileCardState extends State<HingeProfileCard> {
 
   Widget _buildProfileHeader() {
     final rawName = widget.user.name ?? '';
-    final name =
-        rawName.trim().isEmpty ? 'Unknown' : rawName.trim();
+    final name = rawName.trim().isEmpty ? 'Unknown' : rawName.trim();
     final age = widget.user.age;
     final nationality = widget.user.nationality?.trim() ?? '';
     var location = widget.user.living_in?.trim() ?? '';
     if (location.isEmpty) {
-      location =
-          widget.user.editInfo?['locationName']?.toString().trim() ?? '';
+      location = widget.user.editInfo?['locationName']?.toString().trim() ?? '';
     }
 
     return Padding(

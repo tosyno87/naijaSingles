@@ -57,7 +57,8 @@ bool _isUserCanceled(String code, String? message) {
     return true;
   }
   // StoreKit 2 plugin (e.g. code `storekit2_purchase_cancelled`).
-  if (c.contains('purchase_cancel') || c.contains('storekit2_purchase_cancel')) {
+  if (c.contains('purchase_cancel') ||
+      c.contains('storekit2_purchase_cancel')) {
     return true;
   }
   if (m.contains('user canceled') ||

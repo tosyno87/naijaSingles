@@ -246,7 +246,6 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
           });
           log('Loaded ${photoUrls.length} photos from Firestore');
         }
-
       }
 
       // Validate form after loading data
@@ -1089,7 +1088,8 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                               _buildSectionTitle('Preferences'),
                               const SizedBox(height: AppSpacing.md),
                               InkWell(
-                                onTap: () => unawaited(_openDatingPreferences()),
+                                onTap: () =>
+                                    unawaited(_openDatingPreferences()),
                                 borderRadius: BorderRadius.circular(
                                   AppSpacing.buttonRadius,
                                 ),

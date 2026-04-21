@@ -1024,7 +1024,8 @@ class DiscoveryService {
         if (snap == null || controller.isClosed) return;
         final int token = ++emitSeq;
         try {
-          final List<UserModel> list = await _mapNearbyUsersFromUserDocsSnapshot(
+          final List<UserModel> list =
+              await _mapNearbyUsersFromUserDocsSnapshot(
             snapshot: snap,
             currentUserId: userId,
             currentUser: currentUser,

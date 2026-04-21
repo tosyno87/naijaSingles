@@ -144,12 +144,10 @@ class _DiscoveryPreferencesScreenState
   void initState() {
     super.initState();
     freeR = widget.items['free_radius'] != null
-        ? (int.parse(widget.items['free_radius'].toString()) * 0.621371)
-            .round()
+        ? (int.parse(widget.items['free_radius'].toString()) * 0.621371).round()
         : 248;
     paidR = widget.items['paid_radius'] != null
-        ? (int.parse(widget.items['paid_radius'].toString()) * 0.621371)
-            .round()
+        ? (int.parse(widget.items['paid_radius'].toString()) * 0.621371).round()
         : 248;
 
     _initialMaxDistance = widget.currentUser.maxDistance ?? 10;
@@ -317,7 +315,8 @@ class _DiscoveryPreferencesScreenState
                     ),
                     const SizedBox(height: 2),
                     Text(
-                      'Change your location to see members in other cities.'.tr(),
+                      'Change your location to see members in other cities.'
+                          .tr(),
                       style: _helperLineStyle(context),
                     ),
                     const SizedBox(height: 10),
@@ -416,8 +415,7 @@ class _DiscoveryPreferencesScreenState
                             visualDensity: VisualDensity.compact,
                             title: Text('Strict intent'.tr()),
                             subtitle: Text(
-                              'Match my "looking for" mode more strictly.'
-                                  .tr(),
+                              'Match my "looking for" mode more strictly.'.tr(),
                               style: GoogleFonts.montserrat(fontSize: 12),
                             ),
                             value: _strictIntent,

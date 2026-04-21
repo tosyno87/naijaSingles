@@ -363,7 +363,6 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
                       ),
                     ),
                   ),
-
               ],
             ),
           ),
@@ -440,5 +439,4 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
           color: isActive ? AppColors.primaryGreen : const Color(0xFF8E8E93),
         ),
       );
-
 }

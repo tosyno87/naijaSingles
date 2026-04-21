@@ -41,7 +41,8 @@ void main() {
       );
 
       expect(eligibility.canSend, isTrue);
-      expect(eligibility.remainingCount, SuperLikeService.freeSuperLikesPerWeek);
+      expect(
+          eligibility.remainingCount, SuperLikeService.freeSuperLikesPerWeek);
       expect(eligibility.timeUntilReset.inHours, greaterThanOrEqualTo(0));
     });
 

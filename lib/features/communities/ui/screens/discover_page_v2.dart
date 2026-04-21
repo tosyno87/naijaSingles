@@ -138,8 +138,7 @@ class _DiscoverPageV2State extends State<DiscoverPageV2> {
     }
 
     try {
-      final bool migrated =
-          await PrivacyMigrationService().isUserMigrated(uid);
+      final bool migrated = await PrivacyMigrationService().isUserMigrated(uid);
 
       if (!mounted) return;
 
@@ -337,7 +336,8 @@ class _DiscoverPageV2State extends State<DiscoverPageV2> {
   }
 
   Future<void> _openDiscoveryPreferences() async {
-    final UserModel? user = _currentUser ?? context.read<UserBloc>().currentUser;
+    final UserModel? user =
+        _currentUser ?? context.read<UserBloc>().currentUser;
     if (user == null || !mounted) return;
 
     await Navigator.push<void>(
@@ -480,9 +480,8 @@ class _DiscoverPageV2State extends State<DiscoverPageV2> {
       _DiscoverBlock.happeningThisWeek,
       _DiscoverBlock.stats,
     ];
-    final bool hideTrendingBecauseEventsEmpty = !_eventsLoading &&
-        _eventsError == null &&
-        _events.isEmpty;
+    final bool hideTrendingBecauseEventsEmpty =
+        !_eventsLoading && _eventsError == null && _events.isEmpty;
     if (!hideTrendingBecauseEventsEmpty) {
       return withTrending;
     }
@@ -514,8 +513,7 @@ class _DiscoverPageV2State extends State<DiscoverPageV2> {
       }
       if (i < blocks.length - 1) {
         final _DiscoverBlock next = blocks[i + 1];
-        final double gap =
-            next == _DiscoverBlock.stats ? 6 : 12;
+        final double gap = next == _DiscoverBlock.stats ? 6 : 12;
         widgets.add(SizedBox(height: gap));
       }
     }
@@ -659,8 +657,7 @@ class _DiscoverPageV2State extends State<DiscoverPageV2> {
           icon: Icons.people_outline,
           actionLabel: 'Refresh',
           onAction: _loadPeople,
-          footerLinkHint:
-              'Who you see depends on your discovery settings.',
+          footerLinkHint: 'Who you see depends on your discovery settings.',
           footerLinkLabel: 'Adjust preferences',
           onFooterLink: _openDiscoveryPreferences,
           minHeight: 220,

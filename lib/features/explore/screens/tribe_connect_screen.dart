@@ -43,6 +43,7 @@ class _TribeConnectScreenState extends State<TribeConnectScreen>
   bool _isRefreshing = false;
   bool _deckBusy = false;
   String? _pendingExitUid;
+
   /// While a dismiss animation runs: `false` = like (up-right), `true` = pass (left).
   bool _exitTowardsLeft = false;
 
@@ -108,9 +109,7 @@ class _TribeConnectScreenState extends State<TribeConnectScreen>
       _likeEnterController.value = 0;
     });
     unawaited(
-      wasPass
-          ? HapticFeedback.lightImpact()
-          : HapticFeedback.selectionClick(),
+      wasPass ? HapticFeedback.lightImpact() : HapticFeedback.selectionClick(),
     );
     WidgetsBinding.instance.addPostFrameCallback((_) {
       if (mounted) {
@@ -197,8 +196,7 @@ class _TribeConnectScreenState extends State<TribeConnectScreen>
           _likeExitCurved,
           _likeEnterCurved,
         ]),
-        builder: (BuildContext context, Widget? _) =>
-            _buildDeckMotionLayer(
+        builder: (BuildContext context, Widget? _) => _buildDeckMotionLayer(
           exitT: _likeExitCurved.value,
           enterT: _likeEnterCurved.value,
           child: child,
@@ -212,8 +210,7 @@ class _TribeConnectScreenState extends State<TribeConnectScreen>
     required Widget child,
   }) {
     final bool exiting = exitT > 0;
-    final double opacity =
-        exiting ? (1.0 - exitT).clamp(0.0, 1.0) : 1.0;
+    final double opacity = exiting ? (1.0 - exitT).clamp(0.0, 1.0) : 1.0;
     final double scale =
         exiting ? (1.0 - 0.06 * exitT) : (0.96 + 0.04 * enterT);
     final Offset offset = exiting

@@ -210,8 +210,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                             child: _buildEditButton(),
                           ),
                           SizedBox(
-                            height: 52 +
-                                MediaQuery.paddingOf(context).bottom,
+                            height: 52 + MediaQuery.paddingOf(context).bottom,
                           ),
                         ],
                       ),
@@ -455,8 +454,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
   // Hinge-style profile header
   Widget _buildHingeProfileHeader() {
     final nameRaw = _userData?['name']?.toString() ?? 'Your Name';
-    final name =
-        nameRaw.trim().isEmpty ? 'Your Name' : nameRaw.trim();
+    final name = nameRaw.trim().isEmpty ? 'Your Name' : nameRaw.trim();
     final age = _userData?['age'] ?? _calculateAge(_userData?['dateOfBirth']);
     final nationality = _safeStringFromField(_userData?['nationality']);
 

@@ -42,8 +42,9 @@ class _LookingForConnectionCardState extends State<LookingForConnectionCard> {
 
   @override
   Widget build(BuildContext context) {
-    final EdgeInsets pad =
-        widget.compact ? const EdgeInsets.fromLTRB(10, 10, 10, 8) : const EdgeInsets.all(15);
+    final EdgeInsets pad = widget.compact
+        ? const EdgeInsets.fromLTRB(10, 10, 10, 8)
+        : const EdgeInsets.all(15);
     return Card(
       child: Padding(
         padding: pad,
@@ -74,8 +75,9 @@ class _LookingForConnectionCardState extends State<LookingForConnectionCard> {
                 activeColor: AppColors.primaryGreen,
                 contentPadding: EdgeInsets.zero,
                 dense: widget.compact,
-                visualDensity:
-                    widget.compact ? VisualDensity.compact : VisualDensity.standard,
+                visualDensity: widget.compact
+                    ? VisualDensity.compact
+                    : VisualDensity.standard,
                 // ignore: deprecated_member_use
                 onChanged: (String? value) {
                   if (value == null) return;

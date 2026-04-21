@@ -202,117 +202,117 @@ class SettingPageState extends State<SettingPage> {
                   ),
 
                   ListTile(
-                      dense: true,
-                      visualDensity: VisualDensity.compact,
-                      contentPadding: const EdgeInsets.symmetric(
-                        horizontal: 15,
-                        vertical: 4,
-                      ),
-                      title: Card(
-                        child: Padding(
-                          padding: const EdgeInsets.all(15),
-                          child: InkWell(
-                            child: Row(
-                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                              children: <Widget>[
-                                Text('Phone Number'.tr().toString()),
-                                Padding(
-                                  padding: const EdgeInsets.only(
-                                    left: 20,
-                                  ),
-                                  child: Text(
-                                    widget.currentUser.phoneNumber!.isNotEmpty
-                                        ? '${widget.currentUser.phoneNumber}'
-                                        : 'Add phone number'.tr().toString(),
-                                    style: const TextStyle(
-                                      color: AppColors.secondaryColor,
-                                      fontWeight: FontWeight.w400,
-                                    ),
-                                  ),
-                                ),
-                                const Icon(
-                                  Icons.arrow_forward_ios,
-                                  color: AppColors.primaryGreen,
-                                  size: 15,
-                                ),
-                              ],
-                            ),
-                            onTap: () {
-                              unawaited(
-                                Navigator.pushNamed(
-                                  context,
-                                  RouteName.updatePhoneScreen,
-                                  arguments: widget.currentUser,
-                                ),
-                              );
-                            },
-                          ),
-                        ),
-                      ),
-                      subtitle: Text(
-                        'Verify a phone number to secure your account'
-                            .tr()
-                            .toString(),
-                      ),
+                    dense: true,
+                    visualDensity: VisualDensity.compact,
+                    contentPadding: const EdgeInsets.symmetric(
+                      horizontal: 15,
+                      vertical: 4,
                     ),
-                    const LanguageWidget(),
-                    BlocProvider<MatchUserBloc>(
-                      create: (_) => MatchUserBloc(
-                        getMatches: DiscoveryService.getMatches,
-                      ),
-                      child: BlocProvider<StreetViewBloc>(
-                        create: (BuildContext context) =>
-                            StreetViewBloc(widget.currentUser.id!),
-                        child: StreetViewButtonWigdet(
-                          currentUser: widget.currentUser,
+                    title: Card(
+                      child: Padding(
+                        padding: const EdgeInsets.all(15),
+                        child: InkWell(
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: <Widget>[
+                              Text('Phone Number'.tr().toString()),
+                              Padding(
+                                padding: const EdgeInsets.only(
+                                  left: 20,
+                                ),
+                                child: Text(
+                                  widget.currentUser.phoneNumber!.isNotEmpty
+                                      ? '${widget.currentUser.phoneNumber}'
+                                      : 'Add phone number'.tr().toString(),
+                                  style: const TextStyle(
+                                    color: AppColors.secondaryColor,
+                                    fontWeight: FontWeight.w400,
+                                  ),
+                                ),
+                              ),
+                              const Icon(
+                                Icons.arrow_forward_ios,
+                                color: AppColors.primaryGreen,
+                                size: 15,
+                              ),
+                            ],
+                          ),
+                          onTap: () {
+                            unawaited(
+                              Navigator.pushNamed(
+                                context,
+                                RouteName.updatePhoneScreen,
+                                arguments: widget.currentUser,
+                              ),
+                            );
+                          },
                         ),
                       ),
                     ),
-                    // for theme change and set labelLarge
-                    const ChangeThemeButtonWidget(),
-                    TextButtonWidget(
-                      text: 'Invite your friends',
-                      onTap: () async {
-                        await SharePlus.instance.share(
-                          ShareParams(
-                            text:
-                                'check out my website https://deligence.com', //Replace with your dynamic link and msg for invite users
-                          ),
-                        );
-                      },
-                      icon: Icons.share_outlined,
+                    subtitle: Text(
+                      'Verify a phone number to secure your account'
+                          .tr()
+                          .toString(),
                     ),
+                  ),
+                  const LanguageWidget(),
+                  BlocProvider<MatchUserBloc>(
+                    create: (_) => MatchUserBloc(
+                      getMatches: DiscoveryService.getMatches,
+                    ),
+                    child: BlocProvider<StreetViewBloc>(
+                      create: (BuildContext context) =>
+                          StreetViewBloc(widget.currentUser.id!),
+                      child: StreetViewButtonWigdet(
+                        currentUser: widget.currentUser,
+                      ),
+                    ),
+                  ),
+                  // for theme change and set labelLarge
+                  const ChangeThemeButtonWidget(),
+                  TextButtonWidget(
+                    text: 'Invite your friends',
+                    onTap: () async {
+                      await SharePlus.instance.share(
+                        ShareParams(
+                          text:
+                              'check out my website https://deligence.com', //Replace with your dynamic link and msg for invite users
+                        ),
+                      );
+                    },
+                    icon: Icons.share_outlined,
+                  ),
 
-                    TextButtonWidget(
-                      text: 'Logout',
-                      onTap: () async {
-                        showLogoutDialog(context);
-                      },
-                      icon: Icons.logout_outlined,
-                    ),
-                    Padding(
-                      padding: const EdgeInsets.all(20),
-                      child: Center(
-                        child: SizedBox(
-                          height: 50,
-                          width: 100,
-                          child: Image.asset(
-                            'assets/images/afropeep_logo_transparent.png',
-                            fit: BoxFit.contain,
-                          ),
+                  TextButtonWidget(
+                    text: 'Logout',
+                    onTap: () async {
+                      showLogoutDialog(context);
+                    },
+                    icon: Icons.logout_outlined,
+                  ),
+                  Padding(
+                    padding: const EdgeInsets.all(20),
+                    child: Center(
+                      child: SizedBox(
+                        height: 50,
+                        width: 100,
+                        child: Image.asset(
+                          'assets/images/afropeep_logo_transparent.png',
+                          fit: BoxFit.contain,
                         ),
                       ),
                     ),
-                    const DeleteAccountWidget(),
-                    const SizedBox(
-                      height: 80,
-                    ),
-                  ],
-                ),
+                  ),
+                  const DeleteAccountWidget(),
+                  const SizedBox(
+                    height: 80,
+                  ),
+                ],
               ),
             ),
           ),
         ),
+      ),
     );
   }
 }

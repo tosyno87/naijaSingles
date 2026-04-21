@@ -191,8 +191,7 @@ class ProductsState extends State<Products> {
                   content: Text(
                     userFacingPurchaseSnackBarMessage(
                       state.msg,
-                      fallback:
-                          'Purchase could not be started. Try again.',
+                      fallback: 'Purchase could not be started. Try again.',
                     ),
                   ),
                 ),

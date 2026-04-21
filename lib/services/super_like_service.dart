@@ -15,6 +15,7 @@ import 'performance_monitor.dart';
 class SuperLikeService {
   /// Free tier: Super Likes allowed per calendar week (Mon 00:00 local reset).
   static const int freeSuperLikesPerWeek = 1;
+
   /// Premium tier: Super Likes allowed per calendar week.
   static const int premiumSuperLikesPerWeek = 5;
   static const Duration superLikeCooldown = Duration(days: 7);
@@ -578,7 +579,8 @@ class SuperLikeService {
         sentCount: sent.length,
         receivedCount: received.length,
         dailyUsedCount: weekCount,
-        dailyLimit: isPremium ? premiumSuperLikesPerWeek : freeSuperLikesPerWeek,
+        dailyLimit:
+            isPremium ? premiumSuperLikesPerWeek : freeSuperLikesPerWeek,
         responseRate: responseRate,
         matchRate: matchRate,
         isPremium: isPremium,

@@ -14,6 +14,7 @@ class ShowmeWidget extends StatefulWidget {
   });
   final UserModel currentUser;
   final Map<String, dynamic> changeValues;
+
   /// Tighter padding for dense filter screens (e.g. discovery preferences).
   final bool compact;
   final VoidCallback? onEdited;
@@ -54,9 +55,8 @@ class _ShowmeWidgetState extends State<ShowmeWidget> {
     final ColorScheme scheme = Theme.of(context).colorScheme;
     final Color onSurface = scheme.onSurface;
     final bool isDark = Theme.of(context).brightness == Brightness.dark;
-    final Color fieldFill = isDark
-        ? scheme.onSurface.withValues(alpha: 0.10)
-        : Colors.grey.shade50;
+    final Color fieldFill =
+        isDark ? scheme.onSurface.withValues(alpha: 0.10) : Colors.grey.shade50;
     final Color fieldBorder = isDark
         ? scheme.onSurface.withValues(alpha: 0.34)
         : Colors.grey.shade400;

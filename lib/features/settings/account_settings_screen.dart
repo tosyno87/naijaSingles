@@ -28,7 +28,6 @@ import '../account_status/presentation/bloc/account_status_bloc.dart';
 import '../account_status/presentation/screens/account_status_screen.dart';
 import '../profile/privacy_settings_screen.dart';
 import 'account_deletion_screen.dart';
-import 'discovery_preferences_screen.dart';
 import 'help_center_screen.dart';
 import 'password_settings_screen.dart';
 import 'safety_center_screen.dart';
@@ -535,7 +534,9 @@ class _AccountSettingsScreenState extends State<AccountSettingsScreen> {
                   subtitle: 'Matches, messages, likes',
                   onTap: () => unawaited(
                     Navigator.pushNamed(
-                        context, RouteName.notificationSettings),
+                      context,
+                      RouteName.notificationSettings,
+                    ),
                   ),
                 ),
                 _divider(context),
@@ -676,19 +677,6 @@ class _AccountSettingsScreenState extends State<AccountSettingsScreen> {
             SettingsSection(
               title: 'Preferences',
               children: [
-                SettingsRow(
-                  title: 'Discovery preferences',
-                  subtitle: 'Distance, age, who you see',
-                  onTap: () => unawaited(
-                    Navigator.push<void>(
-                      context,
-                      MaterialPageRoute<void>(
-                        builder: (_) => const DiscoveryPreferencesScreen(),
-                      ),
-                    ),
-                  ),
-                ),
-                _divider(context),
                 SettingsRow(
                   title: 'Language',
                   subtitle: _languageSubtitle(context),

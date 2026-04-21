@@ -188,7 +188,7 @@ class _PrivacySettingsScreenState extends State<PrivacySettingsScreen> {
             _buildSectionHeader(
               Icons.person_outline_rounded,
               'Profile Visibility',
-              'Age, neighborhood, and approximate distance are always visible, like Hinge — your exact address is never shown',
+              'Age, neighborhood, and approximate distance are always visible. Your exact address is never shown.',
             ),
             const SizedBox(height: AppSpacing.sm + AppSpacing.xs),
             _buildProfileVisibilitySection(),

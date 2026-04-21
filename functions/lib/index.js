@@ -84,12 +84,11 @@ exports.healthCheck = (0, https_1.onRequest)((req, res) => {
     });
 });
 exports.seedMatchTuningConfig = (0, https_1.onRequest)(async (req, res) => {
-    var _a;
     if (req.method !== 'POST') {
         res.status(405).json({ error: 'Method not allowed' });
         return;
     }
-    const force = ((_a = req.body) === null || _a === void 0 ? void 0 : _a.force) === true;
+    const force = req.body?.force === true;
     const db = admin.firestore();
     const docRef = db.collection('runtimeConfig').doc('matchTuning');
     if (!force) {

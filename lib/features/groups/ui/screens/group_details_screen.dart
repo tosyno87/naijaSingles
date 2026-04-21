@@ -234,36 +234,24 @@ class _GroupDetailsScreenState extends State<GroupDetailsScreen>
               itemBuilder: (context) => [
                 const PopupMenuItem(
                   value: 'edit',
-                  child: Row(
-                    children: [
-                      Icon(Icons.edit),
-                      SizedBox(width: 8),
-                      Text('Edit Group'),
-                    ],
+                  child: Text(
+                    'Edit Group',
+                    style: TextStyle(color: Colors.black87),
                   ),
                 ),
                 const PopupMenuItem(
                   value: 'settings',
-                  child: Row(
-                    children: [
-                      Icon(Icons.settings),
-                      SizedBox(width: 8),
-                      Text('Settings'),
-                    ],
+                  child: Text(
+                    'Settings',
+                    style: TextStyle(color: Colors.black87),
                   ),
                 ),
                 if (_isCreator)
                   const PopupMenuItem(
                     value: 'delete',
-                    child: Row(
-                      children: [
-                        Icon(Icons.delete, color: Colors.red),
-                        SizedBox(width: 8),
-                        Text(
-                          'Delete Group',
-                          style: TextStyle(color: Colors.red),
-                        ),
-                      ],
+                    child: Text(
+                      'Delete Group',
+                      style: TextStyle(color: Colors.red),
                     ),
                   ),
               ],
@@ -622,36 +610,24 @@ class _GroupDetailsScreenState extends State<GroupDetailsScreen>
                   if (!member['isAdmin'])
                     const PopupMenuItem(
                       value: 'make_admin',
-                      child: Row(
-                        children: [
-                          Icon(Icons.admin_panel_settings),
-                          SizedBox(width: 8),
-                          Text('Make Admin'),
-                        ],
+                      child: Text(
+                        'Make Admin',
+                        style: TextStyle(color: Colors.black87),
                       ),
                     ),
                   if (member['isAdmin'])
                     const PopupMenuItem(
                       value: 'remove_admin',
-                      child: Row(
-                        children: [
-                          Icon(Icons.remove_moderator),
-                          SizedBox(width: 8),
-                          Text('Remove Admin'),
-                        ],
+                      child: Text(
+                        'Remove Admin',
+                        style: TextStyle(color: Colors.black87),
                       ),
                     ),
                   const PopupMenuItem(
                     value: 'remove_member',
-                    child: Row(
-                      children: [
-                        Icon(Icons.person_remove, color: Colors.red),
-                        SizedBox(width: 8),
-                        Text(
-                          'Remove Member',
-                          style: TextStyle(color: Colors.red),
-                        ),
-                      ],
+                    child: Text(
+                      'Remove Member',
+                      style: TextStyle(color: Colors.red),
                     ),
                   ),
                 ],

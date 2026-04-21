@@ -47,14 +47,17 @@ function postJson(host, path, headers, body) {
             hostname: host,
             path,
             method: 'POST',
-            headers: Object.assign(Object.assign({}, headers), { 'Content-Type': 'application/json', 'Content-Length': Buffer.byteLength(payload) }),
+            headers: {
+                ...headers,
+                'Content-Type': 'application/json',
+                'Content-Length': Buffer.byteLength(payload),
+            },
         }, (res) => {
             const chunks = [];
             res.on('data', (c) => chunks.push(c));
             res.on('end', () => {
-                var _a;
                 resolve({
-                    status: (_a = res.statusCode) !== null && _a !== void 0 ? _a : 0,
+                    status: res.statusCode ?? 0,
                     body: Buffer.concat(chunks).toString('utf8'),
                 });
             });
@@ -79,9 +82,8 @@ function postForm(host, path, authHeader, formBody) {
             const chunks = [];
             res.on('data', (c) => chunks.push(c));
             res.on('end', () => {
-                var _a;
                 resolve({
-                    status: (_a = res.statusCode) !== null && _a !== void 0 ? _a : 0,
+                    status: res.statusCode ?? 0,
                     body: Buffer.concat(chunks).toString('utf8'),
                 });
             });
@@ -92,17 +94,16 @@ function postForm(host, path, authHeader, formBody) {
     });
 }
 async function sendDeletionOtpEmail(params) {
-    var _a, _b, _c;
-    const apiKey = (_a = process.env.SENDGRID_API_KEY) === null || _a === void 0 ? void 0 : _a.trim();
+    const apiKey = process.env.SENDGRID_API_KEY?.trim();
     if (!apiKey) {
         console.warn('SENDGRID_API_KEY not set; skipping deletion OTP email (dev only)');
         return;
     }
-    const appName = (_b = params.appName) !== null && _b !== void 0 ? _b : 'Afropeep';
+    const appName = params.appName ?? 'Afropeep';
     const body = {
         personalizations: [{ to: [{ email: params.to }] }],
         from: {
-            email: ((_c = process.env.SENDGRID_FROM_EMAIL) === null || _c === void 0 ? void 0 : _c.trim()) || 'noreply@naijasingles.com',
+            email: process.env.SENDGRID_FROM_EMAIL?.trim() || 'noreply@naijasingles.com',
             name: appName,
         },
         subject: `${appName}: Your account deletion code`,
@@ -119,20 +120,18 @@ async function sendDeletionOtpEmail(params) {
     }
 }
 function isTwilioConfigured() {
-    var _a, _b, _c;
-    return Boolean(((_a = process.env.TWILIO_ACCOUNT_SID) === null || _a === void 0 ? void 0 : _a.trim()) &&
-        ((_b = process.env.TWILIO_AUTH_TOKEN) === null || _b === void 0 ? void 0 : _b.trim()) &&
-        ((_c = process.env.TWILIO_FROM_NUMBER) === null || _c === void 0 ? void 0 : _c.trim()));
+    return Boolean(process.env.TWILIO_ACCOUNT_SID?.trim() &&
+        process.env.TWILIO_AUTH_TOKEN?.trim() &&
+        process.env.TWILIO_FROM_NUMBER?.trim());
 }
 async function sendDeletionOtpSms(params) {
-    var _a, _b, _c, _d;
-    const sid = (_a = process.env.TWILIO_ACCOUNT_SID) === null || _a === void 0 ? void 0 : _a.trim();
-    const token = (_b = process.env.TWILIO_AUTH_TOKEN) === null || _b === void 0 ? void 0 : _b.trim();
-    const from = (_c = process.env.TWILIO_FROM_NUMBER) === null || _c === void 0 ? void 0 : _c.trim();
+    const sid = process.env.TWILIO_ACCOUNT_SID?.trim();
+    const token = process.env.TWILIO_AUTH_TOKEN?.trim();
+    const from = process.env.TWILIO_FROM_NUMBER?.trim();
     if (!sid || !token || !from) {
         throw new Error('Twilio is not configured for SMS OTP');
     }
-    const appName = (_d = params.appName) !== null && _d !== void 0 ? _d : 'Afropeep';
+    const appName = params.appName ?? 'Afropeep';
     const authHeader = Buffer.from(`${sid}:${token}`).toString('base64');
     const formBody = new URLSearchParams({
         To: params.toE164,

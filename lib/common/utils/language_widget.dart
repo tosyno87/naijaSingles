@@ -77,16 +77,12 @@ class _LanguageSelectionDropdownState extends State<LanguageSelectionDropdown> {
               .snapshots(),
           builder: (context, snapshot) {
             if (!snapshot.hasData) {
-              return const Center(
-                child: Text('Language not found'),
-              );
+              return const SizedBox.shrink();
             }
 
             final data = snapshot.data!.data() as Map<String, dynamic>?;
             if (data == null) {
-              return const Center(
-                child: Text('Language not found'),
-              );
+              return const SizedBox.shrink();
             }
 
             final List<String> languages = data.keys

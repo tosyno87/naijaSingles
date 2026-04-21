@@ -5,6 +5,7 @@ import 'dart:io';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
 import '../../../../../common/data/repo/in_app_purchase_repo.dart';
+import '../../../iap_user_facing_message.dart';
 import 'buyproducts_barrel.dart';
 
 class BuyConsumableInAppProductsBloc
@@ -20,8 +21,11 @@ class BuyConsumableInAppProductsBloc
       } on SocketException {
         emit(BuyConsumableFailedState(msg: 'No Internet Connection'));
       } on Object catch (e) {
-        emit(BuyConsumableFailedState(msg: e.toString()));
-        rethrow;
+        emit(
+          BuyConsumableFailedState(
+            msg: userFacingPurchaseThrowableMessage(e),
+          ),
+        );
       }
     });
   }
@@ -42,7 +46,9 @@ class BuyConsumableInAppProductsBloc
         yield BuyConsumableFailedState(msg: 'No Internet Connection');
       } on Object catch (e) {
         log(e.toString());
-        yield BuyConsumableFailedState(msg: e.toString());
+        yield BuyConsumableFailedState(
+          msg: userFacingPurchaseThrowableMessage(e),
+        );
       }
     }
   }

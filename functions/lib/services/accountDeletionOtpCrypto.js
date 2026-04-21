@@ -10,7 +10,7 @@ const crypto_1 = require("crypto");
 const OTP_LENGTH = 6;
 const SCRYPT_KEY_LEN = 32;
 function generateNumericOtp() {
-    const n = (0, crypto_1.randomInt)(0, 1000000);
+    const n = (0, crypto_1.randomInt)(0, 1_000_000);
     return n.toString().padStart(OTP_LENGTH, '0');
 }
 function hashOtp(code, pepper) {
@@ -30,7 +30,7 @@ function verifyOtp(code, pepper, saltB64, hashB64) {
             return false;
         return (0, crypto_1.timingSafeEqual)(actual, expected);
     }
-    catch (_a) {
+    catch {
         return false;
     }
 }

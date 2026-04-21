@@ -7,6 +7,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:intl/intl.dart';
@@ -14,6 +15,10 @@ import 'package:intl/intl.dart';
 import '../../common/constants/app_colors.dart';
 import '../../common/constants/app_spacing.dart';
 import '../../common/widgets/state_views/state_views.dart';
+import '../../models/user_model.dart';
+import '../discovery/presentation/screens/discovery_preferences_screen.dart';
+import '../home/bloc/searchuser_bloc.dart';
+import '../home/ui/screens/user_filter/bloc/userfilter_bloc.dart';
 import '../onboarding/widgets/afropeep_height_dropdown.dart';
 
 // Using centralized AppColors instead of local constants
@@ -43,14 +48,9 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
   // Track if user has completed onboarding (gender/age locked after first save)
   bool _hasCompletedOnboarding = false;
 
-  // Preference values
-  String _interestedIn = 'Female';
-  RangeValues _ageRange = const RangeValues(18, 35);
-
   // New fields
   String _heightFtIn = HeightData.defaultHeightFtIn;
   int _heightCm = HeightData.defaultHeightCm;
-  String _lookingFor = 'Dating';
   String _relationshipIntent = 'Not sure yet';
 
   // Photos
@@ -67,7 +67,6 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
     'Non-binary',
     'Prefer not to say',
   ];
-  final List<String> _interestedInOptions = ['Male', 'Female', 'Everyone'];
 
   final List<String> _tribes = [
     'Yoruba',
@@ -219,14 +218,16 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
             }
           });
         }
-        if (userData['lookingFor'] != null) {
-          setState(() {
-            _lookingFor = userData['lookingFor'];
-          });
-        }
         if (userData['relationshipIntent'] != null) {
           setState(() {
             _relationshipIntent = userData['relationshipIntent'];
+          });
+        } else if (userData['preferences'] is Map &&
+            (userData['preferences'] as Map)['relationshipIntent'] != null) {
+          setState(() {
+            _relationshipIntent =
+                (userData['preferences'] as Map)['relationshipIntent']
+                    .toString();
           });
         }
 
@@ -244,27 +245,6 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
             }
           });
           log('Loaded ${photoUrls.length} photos from Firestore');
-        }
-
-        // Load preferences
-        if (userData['preferences'] != null) {
-          final prefs = userData['preferences'];
-
-          if (prefs['interestedIn'] != null) {
-            setState(() {
-              _interestedIn = prefs['interestedIn'];
-            });
-          }
-
-          if (prefs['ageRange'] != null && prefs['ageRange'] is List) {
-            final range = List<int>.from(prefs['ageRange']);
-            if (range.length == 2) {
-              setState(() {
-                _ageRange =
-                    RangeValues(range[0].toDouble(), range[1].toDouble());
-              });
-            }
-          }
         }
       }
 
@@ -513,6 +493,23 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
         }
       }
 
+      // Merge `preferences` with Firestore so discovery-only keys
+      // (ageRange, interestedIn, lookingFor, etc.) are not overwritten here.
+      final DocumentSnapshot<Map<String, dynamic>> latestDoc =
+          await _firestore.collection('users').doc(user.uid).get();
+      final Map<String, dynamic> mergedPreferences = <String, dynamic>{};
+      final Object? prefsRaw = latestDoc.data()?['preferences'];
+      if (prefsRaw is Map) {
+        mergedPreferences.addAll(
+          Map<String, dynamic>.from(
+            prefsRaw.map(
+              (Object? k, Object? v) => MapEntry(k.toString(), v),
+            ),
+          ),
+        );
+      }
+      mergedPreferences['relationshipIntent'] = _relationshipIntent;
+
       // Create user data map — exclude identity fields that the server
       // locks after onboarding so we never trip the Firestore rule or
       // risk a format-mismatch comparison blocking a legitimate save.
@@ -526,14 +523,8 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
         'height_ft_in': _heightFtIn,
         'height_cm': _heightCm,
         'heightDisplay': _heightFtIn,
-        'lookingFor': _lookingFor,
         'relationshipIntent': _relationshipIntent,
-        'preferences': {
-          'interestedIn': _interestedIn,
-          'ageRange': [_ageRange.start.round(), _ageRange.end.round()],
-          'lookingFor': _lookingFor,
-          'relationshipIntent': _relationshipIntent,
-        },
+        'preferences': mergedPreferences,
         'lastUpdated': DateTime.now().toIso8601String(),
       };
 
@@ -600,6 +591,31 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
     }
   }
 
+  Future<void> _openDatingPreferences() async {
+    final User? authUser = _auth.currentUser;
+    if (authUser == null) return;
+    final DocumentSnapshot<Map<String, dynamic>> doc =
+        await _firestore.collection('users').doc(authUser.uid).get();
+    if (!mounted || !doc.exists) return;
+    final UserModel currentUser = UserModel.fromDocument(doc);
+    await Navigator.push<void>(
+      context,
+      MaterialPageRoute<void>(
+        builder: (BuildContext context) => BlocProvider<UserfilterBloc>(
+          create: (_) => UserfilterBloc(),
+          child: BlocProvider<SearchUserBloc>(
+            create: (_) => SearchUserBloc(),
+            child: DiscoveryPreferencesScreen(
+              currentUser: currentUser,
+              isPurchased: currentUser.hasPremiumAccess,
+              items: const <String, dynamic>{},
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+
   Future<void> _recordProfileUpdateFailure({
     required String stage,
     required String errorType,
@@ -625,63 +641,6 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
       log('Failed to persist profile update diagnostics: $logError');
     }
   }
-
-  Widget _buildInterestedInSelector() => Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text(
-            'Interested In',
-            style: GoogleFonts.montserrat(
-              fontSize: 16,
-              fontWeight: FontWeight.w500,
-              color: AppColors.textPrimary,
-            ),
-          ),
-          const SizedBox(height: AppSpacing.sm),
-          Wrap(
-            spacing: AppSpacing.sm,
-            runSpacing: AppSpacing.sm,
-            children: _interestedInOptions.map((option) {
-              final isSelected = _interestedIn == option;
-
-              return ChoiceChip(
-                label: Text(
-                  option,
-                  style: GoogleFonts.montserrat(
-                    color: isSelected ? Colors.white : AppColors.textPrimary,
-                    fontWeight:
-                        isSelected ? FontWeight.w500 : FontWeight.normal,
-                  ),
-                ),
-                selected: isSelected,
-                selectedColor: AppColors.primaryGreen,
-                backgroundColor: AppColors.backgroundColor,
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(AppSpacing.chipRadius),
-                  side: BorderSide(
-                    color: isSelected
-                        ? AppColors.primaryGreen
-                        : Colors.grey.shade300,
-                  ),
-                ),
-                onSelected: (selected) {
-                  if (selected) {
-                    setState(() {
-                      _interestedIn = option;
-                      _validateForm();
-                    });
-                  }
-                },
-                elevation: isSelected ? 2 : 0,
-                padding: const EdgeInsets.symmetric(
-                  horizontal: AppSpacing.md,
-                  vertical: AppSpacing.sm,
-                ),
-              );
-            }).toList(),
-          ),
-        ],
-      );
 
   Widget _buildDateOfBirthSelector() => InkWell(
         onTap: () async {
@@ -1128,11 +1087,66 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
 
                               _buildSectionTitle('Preferences'),
                               const SizedBox(height: AppSpacing.md),
-
-                              _buildInterestedInSelector(),
-                              const SizedBox(height: AppSpacing.md),
-
-                              _buildAgeRangeSelector(),
+                              InkWell(
+                                onTap: () =>
+                                    unawaited(_openDatingPreferences()),
+                                borderRadius: BorderRadius.circular(
+                                  AppSpacing.buttonRadius,
+                                ),
+                                child: Container(
+                                  width: double.infinity,
+                                  padding: const EdgeInsets.symmetric(
+                                    horizontal: AppSpacing.md,
+                                    vertical: AppSpacing.md,
+                                  ),
+                                  decoration: BoxDecoration(
+                                    color: Colors.white,
+                                    borderRadius: BorderRadius.circular(
+                                      AppSpacing.buttonRadius,
+                                    ),
+                                    border: Border.all(
+                                      color: Colors.grey.shade300,
+                                    ),
+                                  ),
+                                  child: Row(
+                                    children: [
+                                      const Icon(
+                                        Icons.tune,
+                                        color: AppColors.primaryGreen,
+                                      ),
+                                      const SizedBox(width: AppSpacing.md),
+                                      Expanded(
+                                        child: Column(
+                                          crossAxisAlignment:
+                                              CrossAxisAlignment.start,
+                                          children: [
+                                            Text(
+                                              'Dating preferences',
+                                              style: GoogleFonts.montserrat(
+                                                fontSize: 16,
+                                                fontWeight: FontWeight.w600,
+                                                color: AppColors.textPrimary,
+                                              ),
+                                            ),
+                                            const SizedBox(height: 4),
+                                            Text(
+                                              'Distance, age, who you see, and more',
+                                              style: GoogleFonts.montserrat(
+                                                fontSize: 13,
+                                                color: AppColors.textSecondary,
+                                              ),
+                                            ),
+                                          ],
+                                        ),
+                                      ),
+                                      Icon(
+                                        Icons.chevron_right,
+                                        color: Colors.grey.shade600,
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                              ),
                               const SizedBox(height: AppSpacing.xl),
 
                               // Save button with better visibility and feedback
@@ -1500,86 +1514,6 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
               onChanged: (_) => _validateForm(),
             ),
           ],
-        ],
-      );
-
-  Widget _buildAgeRangeSelector() => Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Text(
-                'Age Range',
-                style: GoogleFonts.montserrat(
-                  fontSize: 16,
-                  fontWeight: FontWeight.w500,
-                  color: AppColors.textPrimary,
-                ),
-              ),
-              Container(
-                padding: const EdgeInsets.symmetric(
-                  horizontal: AppSpacing.buttonRadius,
-                  vertical: AppSpacing.xs,
-                ),
-                decoration: BoxDecoration(
-                  color: AppColors.primaryGreen.withValues(alpha: 0.1),
-                  borderRadius: BorderRadius.circular(AppSpacing.cardRadius),
-                ),
-                child: Text(
-                  '${_ageRange.start.round()} - ${_ageRange.end.round()} years',
-                  style: GoogleFonts.montserrat(
-                    fontSize: 14,
-                    fontWeight: FontWeight.w500,
-                    color: AppColors.primaryGreen,
-                  ),
-                ),
-              ),
-            ],
-          ),
-          const SizedBox(height: AppSpacing.md),
-          SliderTheme(
-            data: SliderThemeData(
-              activeTrackColor: AppColors.primaryGreen,
-              inactiveTrackColor: Colors.grey.shade300,
-              thumbColor: Colors.white,
-              thumbShape: const RoundSliderThumbShape(
-                enabledThumbRadius: 8,
-                elevation: 4,
-              ),
-              overlayColor: AppColors.primaryGreen.withValues(alpha: 0.2),
-              trackHeight: 4,
-              rangeThumbShape: const RoundRangeSliderThumbShape(
-                enabledThumbRadius: 8,
-                elevation: 4,
-              ),
-              rangeTrackShape: const RoundedRectRangeSliderTrackShape(),
-              rangeValueIndicatorShape:
-                  const PaddleRangeSliderValueIndicatorShape(),
-              valueIndicatorColor: AppColors.primaryGreen,
-              valueIndicatorTextStyle: GoogleFonts.montserrat(
-                color: Colors.white,
-                fontSize: 12,
-              ),
-              showValueIndicator: ShowValueIndicator.onDrag,
-            ),
-            child: RangeSlider(
-              values: _ageRange,
-              min: 18,
-              max: 70,
-              divisions: 52,
-              labels: RangeLabels(
-                '${_ageRange.start.round()}',
-                '${_ageRange.end.round()}',
-              ),
-              onChanged: (values) {
-                setState(() {
-                  _ageRange = values;
-                  _validateForm(); // Add form validation trigger
-                });
-              },
-            ),
-          ),
         ],
       );
 

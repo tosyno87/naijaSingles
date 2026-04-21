@@ -12,21 +12,22 @@ Widget settingsSwitchTheme({
     data: SwitchThemeData(
       thumbColor: WidgetStateProperty.resolveWith((states) {
         if (states.contains(WidgetState.disabled)) {
-          return dark ? Colors.grey.shade600 : Colors.grey.shade400;
+          // Dark: lighter thumb on mid track so the control does not disappear.
+          return dark ? Colors.grey.shade300 : Colors.grey.shade400;
         }
         if (states.contains(WidgetState.selected)) {
           return AppColors.primaryGreen;
         }
-        return dark ? Colors.grey.shade500 : Colors.grey.shade400;
+        return dark ? Colors.grey.shade400 : Colors.grey.shade400;
       }),
       trackColor: WidgetStateProperty.resolveWith((states) {
         if (states.contains(WidgetState.disabled)) {
-          return dark ? Colors.grey.shade800 : Colors.grey.shade300;
+          return dark ? Colors.grey.shade600 : Colors.grey.shade300;
         }
         if (states.contains(WidgetState.selected)) {
           return AppColors.primaryGreen.withValues(alpha: 0.38);
         }
-        return dark ? Colors.grey.shade700 : Colors.grey.shade300;
+        return dark ? Colors.grey.shade600 : Colors.grey.shade300;
       }),
       trackOutlineColor: WidgetStateProperty.all(Colors.transparent),
     ),

@@ -368,36 +368,24 @@ class _MemberManagementScreenState extends State<MemberManagementScreen>
                   if (!isAdmin && !isCreator)
                     const PopupMenuItem(
                       value: 'promote',
-                      child: Row(
-                        children: [
-                          Icon(
-                            Icons.admin_panel_settings,
-                            color: AppColors.primaryGreen,
-                          ),
-                          SizedBox(width: AppSpacing.sm),
-                          Text('Promote to Admin'),
-                        ],
+                      child: Text(
+                        'Promote to Admin',
+                        style: TextStyle(color: AppColors.primaryGreen),
                       ),
                     ),
                   if (isAdmin && !isCreator)
                     const PopupMenuItem(
                       value: 'demote',
-                      child: Row(
-                        children: [
-                          Icon(Icons.person, color: Colors.orange),
-                          SizedBox(width: AppSpacing.sm),
-                          Text('Demote to Member'),
-                        ],
+                      child: Text(
+                        'Demote to Member',
+                        style: TextStyle(color: Colors.orange),
                       ),
                     ),
                   const PopupMenuItem(
                     value: 'remove',
-                    child: Row(
-                      children: [
-                        Icon(Icons.person_remove, color: Colors.red),
-                        SizedBox(width: AppSpacing.sm),
-                        Text('Remove from Group'),
-                      ],
+                    child: Text(
+                      'Remove from Group',
+                      style: TextStyle(color: Colors.red),
                     ),
                   ),
                 ],

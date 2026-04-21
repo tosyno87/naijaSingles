@@ -314,7 +314,7 @@ class SignInMethodSelectionScreen extends StatelessWidget {
                               );
                             }
                           },
-                          builder: (context, state) => TextButton.icon(
+                          builder: (context, state) => TextButton(
                             onPressed: state is GoogleLoginLoading
                                 ? null
                                 : () {
@@ -323,7 +323,7 @@ class SignInMethodSelectionScreen extends StatelessWidget {
                                       const GoogleLoginRequested(),
                                     );
                                   },
-                            icon: state is GoogleLoginLoading
+                            child: state is GoogleLoginLoading
                                 ? const SizedBox(
                                     width: 18,
                                     height: 18,
@@ -332,20 +332,17 @@ class SignInMethodSelectionScreen extends StatelessWidget {
                                       color: Colors.white,
                                     ),
                                   )
-                                : Icon(
-                                    Icons.g_mobiledata_rounded,
-                                    color: Colors.white.withValues(alpha: 0.9),
-                                    size: 28,
+                                : Text(
+                                    'Continue with Google',
+                                    style: GoogleFonts.montserrat(
+                                      fontSize: 15,
+                                      fontWeight: FontWeight.w500,
+                                      letterSpacing: 0.3,
+                                      color: Colors.white.withValues(
+                                        alpha: 0.9,
+                                      ),
+                                    ),
                                   ),
-                            label: Text(
-                              'Continue with Google',
-                              style: GoogleFonts.montserrat(
-                                fontSize: 15,
-                                fontWeight: FontWeight.w500,
-                                letterSpacing: 0.3,
-                                color: Colors.white.withValues(alpha: 0.9),
-                              ),
-                            ),
                             style: TextButton.styleFrom(
                               foregroundColor:
                                   Colors.white.withValues(alpha: 0.9),

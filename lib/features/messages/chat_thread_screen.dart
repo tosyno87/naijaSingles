@@ -193,32 +193,23 @@ class _ChatThreadScreenState extends State<ChatThreadScreen> {
             itemBuilder: (context) => [
               const PopupMenuItem(
                 value: 'block',
-                child: Row(
-                  children: [
-                    Icon(Icons.block, color: Colors.red),
-                    SizedBox(width: 8),
-                    Text('Block User'),
-                  ],
+                child: Text(
+                  'Block User',
+                  style: TextStyle(color: Colors.red),
                 ),
               ),
               const PopupMenuItem(
                 value: 'report',
-                child: Row(
-                  children: [
-                    Icon(Icons.report, color: Colors.orange),
-                    SizedBox(width: 8),
-                    Text('Report User'),
-                  ],
+                child: Text(
+                  'Report User',
+                  style: TextStyle(color: Colors.orange),
                 ),
               ),
               const PopupMenuItem(
                 value: 'clear',
-                child: Row(
-                  children: [
-                    Icon(Icons.clear_all, color: Colors.grey),
-                    SizedBox(width: 8),
-                    Text('Clear Chat'),
-                  ],
+                child: Text(
+                  'Clear Chat',
+                  style: TextStyle(color: Colors.black87),
                 ),
               ),
             ],

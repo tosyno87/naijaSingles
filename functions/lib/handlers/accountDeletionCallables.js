@@ -35,7 +35,6 @@ var __importStar = (this && this.__importStar) || (function () {
         return result;
     };
 })();
-var _a;
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.deleteAccountDirect = exports.confirmDeletionAfterPhoneProof = exports.confirmDeletionOtp = exports.startDeletionOtp = void 0;
 exports.extractClientIp = extractClientIp;
@@ -50,7 +49,7 @@ const accountDeletionOtpCrypto_1 = require("../services/accountDeletionOtpCrypto
 const accountDeletionMessaging_1 = require("../services/accountDeletionMessaging");
 const REGION = 'us-central1';
 /** When false, App Check is not enforced on deletion callables (dev/staging only). */
-const ENFORCE_APPCHECK = ((_a = process.env.ACCOUNT_DELETION_ENFORCE_APPCHECK) !== null && _a !== void 0 ? _a : 'true').toLowerCase() !==
+const ENFORCE_APPCHECK = (process.env.ACCOUNT_DELETION_ENFORCE_APPCHECK ?? 'true').toLowerCase() !==
     'false';
 // One log per cold start so operators can confirm App Check gate in Cloud Logging.
 console.log(JSON.stringify({
@@ -79,14 +78,21 @@ const MAX_DIRECT_DELETE_PER_IP_PER_WINDOW = 40;
  */
 const ABUSE_DOC_TTL_MS = 7 * 24 * 60 * 60 * 1000;
 function logMetric(event, payload = {}) {
-    console.log(JSON.stringify(Object.assign(Object.assign({ event }, payload), { ts: new Date().toISOString() })));
+    console.log(JSON.stringify({
+        event,
+        ...payload,
+        ts: new Date().toISOString(),
+    }));
 }
 function logDeletionRisk(payload) {
-    console.log(JSON.stringify(Object.assign(Object.assign({ event: 'account_deletion_risk' }, payload), { ts: new Date().toISOString() })));
+    console.log(JSON.stringify({
+        event: 'account_deletion_risk',
+        ...payload,
+        ts: new Date().toISOString(),
+    }));
 }
 function getPepper() {
-    var _a;
-    const p = (_a = process.env.DELETION_OTP_PEPPER) === null || _a === void 0 ? void 0 : _a.trim();
+    const p = process.env.DELETION_OTP_PEPPER?.trim();
     if (!p || p.length < 16) {
         throw new https_1.HttpsError('failed-precondition', 'Server misconfiguration: DELETION_OTP_PEPPER');
     }
@@ -107,7 +113,6 @@ function hashIp(ip) {
 }
 /** Exported for unit tests (Express-style rawRequest shapes). */
 function extractClientIp(request) {
-    var _a, _b, _c;
     const raw = request.rawRequest;
     if (!raw || typeof raw !== 'object') {
         return null;
@@ -116,7 +121,7 @@ function extractClientIp(request) {
     if (typeof req.get === 'function') {
         const xff = req.get('x-forwarded-for');
         if (xff) {
-            const first = (_a = xff.split(',')[0]) === null || _a === void 0 ? void 0 : _a.trim();
+            const first = xff.split(',')[0]?.trim();
             if (first) {
                 return first;
             }
@@ -125,7 +130,7 @@ function extractClientIp(request) {
     if (req.ip) {
         return req.ip;
     }
-    return (_c = (_b = req.socket) === null || _b === void 0 ? void 0 : _b.remoteAddress) !== null && _c !== void 0 ? _c : null;
+    return req.socket?.remoteAddress ?? null;
 }
 function ipHashShort(ip) {
     return hashIp(ip).slice(0, 16);
@@ -155,12 +160,11 @@ async function enforceIpDeletionLimit(db, ip, kind) {
                 ? 'phoneProofWindowAt'
                 : 'directDeleteWindowAt';
     await db.runTransaction(async (tx) => {
-        var _a, _b, _c, _d;
         const snap = await tx.get(ref);
-        const data = (_a = snap.data()) !== null && _a !== void 0 ? _a : {};
+        const data = snap.data() ?? {};
         const now = Date.now();
-        let windowStart = (_c = (_b = data[windowField]) === null || _b === void 0 ? void 0 : _b.toMillis()) !== null && _c !== void 0 ? _c : 0;
-        let count = (_d = data[countField]) !== null && _d !== void 0 ? _d : 0;
+        let windowStart = data[windowField]?.toMillis() ?? 0;
+        let count = data[countField] ?? 0;
         if (now - windowStart > IP_WINDOW_MS) {
             windowStart = now;
             count = 0;
@@ -200,15 +204,14 @@ function scrubClientMeta(raw) {
 }
 /** Exported for unit tests (invoke with mocked `firebase-admin`). */
 async function startDeletionOtpHandler(request) {
-    var _a, _b, _c, _d, _e;
     const cr = request;
-    if (!((_a = request.auth) === null || _a === void 0 ? void 0 : _a.uid)) {
+    if (!request.auth?.uid) {
         throw new https_1.HttpsError('unauthenticated', 'Sign in required');
     }
     const uid = request.auth.uid;
-    const payload = ((_b = request.data) !== null && _b !== void 0 ? _b : {});
+    const payload = (request.data ?? {});
     const channelRaw = payload.channel;
-    const channel = channelRaw !== null && channelRaw !== void 0 ? channelRaw : 'email';
+    const channel = channelRaw ?? 'email';
     if (channel !== 'email') {
         throw new https_1.HttpsError('invalid-argument', 'Use email for this step. Phone accounts verify with a text code in the app, then confirm deletion.');
     }
@@ -232,14 +235,14 @@ async function startDeletionOtpHandler(request) {
     const pepper = getPepper();
     const snap = await ref.get();
     const data = snap.data();
-    if (data === null || data === void 0 ? void 0 : data.lockedUntil) {
+    if (data?.lockedUntil) {
         const lockedUntil = data.lockedUntil;
         if (lockedUntil.toMillis() > now) {
             const retryAfterSeconds = Math.max(1, Math.ceil((lockedUntil.toMillis() - now) / 1000));
             throw new https_1.HttpsError('resource-exhausted', 'Too many incorrect codes. Try again later.', { retryAfterSeconds });
         }
     }
-    if (data === null || data === void 0 ? void 0 : data.lastSentAt) {
+    if (data?.lastSentAt) {
         const last = data.lastSentAt.toMillis();
         if (now - last < RESEND_COOLDOWN_MS) {
             const retryAfterSeconds = Math.max(1, Math.ceil((RESEND_COOLDOWN_MS - (now - last)) / 1000));
@@ -253,7 +256,7 @@ async function startDeletionOtpHandler(request) {
     const code = (0, accountDeletionOtpCrypto_1.generateNumericOtp)();
     const { saltB64, hashB64 } = (0, accountDeletionOtpCrypto_1.hashOtp)(code, pepper);
     const expiresAt = admin.firestore.Timestamp.fromMillis(now + OTP_TTL_MS);
-    const nextResend = (_c = data === null || data === void 0 ? void 0 : data.resendCount) !== null && _c !== void 0 ? _c : 0;
+    const nextResend = data?.resendCount ?? 0;
     await ref.set({
         uid,
         channel,
@@ -276,11 +279,11 @@ async function startDeletionOtpHandler(request) {
         logMetric('account_deletion_otp_send_failed', {
             uid,
             channel,
-            error: String((_d = err.message) !== null && _d !== void 0 ? _d : err),
+            error: String(err.message ?? err),
         });
         await ref.set({
             sendErrorAt: admin.firestore.FieldValue.serverTimestamp(),
-            sendErrorMessage: String((_e = err.message) !== null && _e !== void 0 ? _e : err),
+            sendErrorMessage: String(err.message ?? err),
         }, { merge: true });
         throw new https_1.HttpsError('internal', 'Could not send your code. Try again or use another verification method.');
     }
@@ -297,15 +300,14 @@ exports.startDeletionOtp = (0, https_1.onCall)({
 }, startDeletionOtpHandler);
 /** Exported for unit tests (invoke with mocked `firebase-admin`). */
 async function confirmDeletionOtpHandler(request) {
-    var _a, _b, _c, _d, _e, _f, _g;
     const cr = request;
-    if (!((_a = request.auth) === null || _a === void 0 ? void 0 : _a.uid)) {
+    if (!request.auth?.uid) {
         throw new https_1.HttpsError('unauthenticated', 'Sign in required');
     }
     const uid = request.auth.uid;
-    const payload = ((_b = request.data) !== null && _b !== void 0 ? _b : {});
-    const code = String((_c = payload.code) !== null && _c !== void 0 ? _c : '').replace(/\D/g, '');
-    const reasonRaw = String((_d = payload.reason) !== null && _d !== void 0 ? _d : '').trim();
+    const payload = (request.data ?? {});
+    const code = String(payload.code ?? '').replace(/\D/g, '');
+    const reasonRaw = String(payload.reason ?? '').trim();
     const customReason = payload.customReason != null ? String(payload.customReason).trim() : '';
     const clientMeta = scrubClientMeta(payload.clientMeta);
     if (code.length !== 6) {
@@ -359,7 +361,7 @@ async function confirmDeletionOtpHandler(request) {
         throw new https_1.HttpsError('failed-precondition', 'Code expired. Request a new one.');
     }
     const ok = (0, accountDeletionOtpCrypto_1.verifyOtp)(code, pepper, v.salt, v.codeHash);
-    const prevAttempts = (_e = v.attemptCount) !== null && _e !== void 0 ? _e : 0;
+    const prevAttempts = v.attemptCount ?? 0;
     const attempts = prevAttempts + 1;
     if (!ok) {
         const updates = {
@@ -382,7 +384,6 @@ async function confirmDeletionOtpHandler(request) {
         throw new https_1.HttpsError('permission-denied', 'That code does not match. Check and try again.', { attemptsRemaining });
     }
     await db.runTransaction(async (tx) => {
-        var _a, _b, _c;
         const s = await tx.get(vRef);
         if (!s.exists) {
             throw new https_1.HttpsError('not-found', 'No active verification. Request a new code.');
@@ -393,7 +394,7 @@ async function confirmDeletionOtpHandler(request) {
         }
         const stillOk = (0, accountDeletionOtpCrypto_1.verifyOtp)(code, pepper, fresh.salt, fresh.codeHash);
         if (!stillOk) {
-            const attemptsRemaining = Math.max(0, MAX_ATTEMPTS - ((_a = fresh.attemptCount) !== null && _a !== void 0 ? _a : 0) - 1);
+            const attemptsRemaining = Math.max(0, MAX_ATTEMPTS - (fresh.attemptCount ?? 0) - 1);
             throw new https_1.HttpsError('permission-denied', 'That code does not match. Check and try again.', { attemptsRemaining });
         }
         tx.set(vRef, {
@@ -404,8 +405,8 @@ async function confirmDeletionOtpHandler(request) {
         const auditRef = db.collection('accountDeletions').doc(uid);
         tx.set(auditRef, {
             userId: uid,
-            email: (_b = user.email) !== null && _b !== void 0 ? _b : null,
-            phoneNumber: (_c = user.phoneNumber) !== null && _c !== void 0 ? _c : null,
+            email: user.email ?? null,
+            phoneNumber: user.phoneNumber ?? null,
             authProvider,
             reason,
             customReason: customReason.length > 0 ? customReason : null,
@@ -424,13 +425,13 @@ async function confirmDeletionOtpHandler(request) {
         console.error('confirmDeletionOtp deleteUser failed', err);
         logMetric('account_deletion_auth_delete_failed', {
             uid,
-            error: String((_f = err.message) !== null && _f !== void 0 ? _f : err),
+            error: String(err.message ?? err),
         });
         const auditRef = db.collection('accountDeletions').doc(uid);
         await auditRef.set({
             status: 'failed',
             failureStage: 'auth_delete',
-            failureMessage: String((_g = err.message) !== null && _g !== void 0 ? _g : err),
+            failureMessage: String(err.message ?? err),
             failedAt: admin.firestore.FieldValue.serverTimestamp(),
         }, { merge: true });
         throw new https_1.HttpsError('internal', 'Could not complete account deletion. Please contact support.');
@@ -446,11 +447,10 @@ exports.confirmDeletionOtp = (0, https_1.onCall)({
  * (phone provider + recent auth_time) and deletes the user.
  */
 async function confirmDeletionAfterPhoneProofHandler(request) {
-    var _a, _b, _c, _d, _e, _f, _g, _h;
     const cr = request;
-    const payload = ((_a = request.data) !== null && _a !== void 0 ? _a : {});
-    const idToken = String((_b = payload.idToken) !== null && _b !== void 0 ? _b : '').trim();
-    const reasonRaw = String((_c = payload.reason) !== null && _c !== void 0 ? _c : '').trim();
+    const payload = (request.data ?? {});
+    const idToken = String(payload.idToken ?? '').trim();
+    const reasonRaw = String(payload.reason ?? '').trim();
     const customReason = payload.customReason != null ? String(payload.customReason).trim() : '';
     const clientMeta = scrubClientMeta(payload.clientMeta);
     if (!idToken) {
@@ -468,7 +468,7 @@ async function confirmDeletionAfterPhoneProofHandler(request) {
     try {
         decoded = await auth.verifyIdToken(idToken, true);
     }
-    catch (_j) {
+    catch {
         throw new https_1.HttpsError('permission-denied', 'Invalid or expired session. Verify your phone again.');
     }
     const uid = decoded.uid;
@@ -485,7 +485,7 @@ async function confirmDeletionAfterPhoneProofHandler(request) {
         clientMeta,
         callableAuthPresent: request.auth != null,
     });
-    const signInProvider = (_d = decoded.firebase) === null || _d === void 0 ? void 0 : _d.sign_in_provider;
+    const signInProvider = decoded.firebase?.sign_in_provider;
     if (signInProvider !== 'phone') {
         throw new https_1.HttpsError('failed-precondition', 'Recent phone verification required. Finish the text code step in the app.');
     }
@@ -501,8 +501,8 @@ async function confirmDeletionAfterPhoneProofHandler(request) {
     const auditRef = db.collection('accountDeletions').doc(uid);
     await auditRef.set({
         userId: uid,
-        email: (_e = user.email) !== null && _e !== void 0 ? _e : null,
-        phoneNumber: (_f = user.phoneNumber) !== null && _f !== void 0 ? _f : null,
+        email: user.email ?? null,
+        phoneNumber: user.phoneNumber ?? null,
         authProvider,
         reason,
         customReason: customReason.length > 0 ? customReason : null,
@@ -520,12 +520,12 @@ async function confirmDeletionAfterPhoneProofHandler(request) {
         logMetric('account_deletion_auth_delete_failed', {
             uid,
             method: 'phone_proof',
-            error: String((_g = err.message) !== null && _g !== void 0 ? _g : err),
+            error: String(err.message ?? err),
         });
         await auditRef.set({
             status: 'failed',
             failureStage: 'auth_delete',
-            failureMessage: String((_h = err.message) !== null && _h !== void 0 ? _h : err),
+            failureMessage: String(err.message ?? err),
             failedAt: admin.firestore.FieldValue.serverTimestamp(),
         }, { merge: true });
         throw new https_1.HttpsError('internal', 'Could not complete account deletion. Please contact support.');
@@ -541,11 +541,10 @@ exports.confirmDeletionAfterPhoneProof = (0, https_1.onCall)({
  * Verifies ID token and deletes immediately.
  */
 async function deleteAccountDirectHandler(request) {
-    var _a, _b, _c, _d, _e, _f, _g, _h, _j;
     const cr = request;
-    const payload = ((_a = request.data) !== null && _a !== void 0 ? _a : {});
-    const idToken = String((_b = payload.idToken) !== null && _b !== void 0 ? _b : '').trim();
-    const reasonRaw = String((_c = payload.reason) !== null && _c !== void 0 ? _c : '').trim();
+    const payload = (request.data ?? {});
+    const idToken = String(payload.idToken ?? '').trim();
+    const reasonRaw = String(payload.reason ?? '').trim();
     const customReason = payload.customReason != null ? String(payload.customReason).trim() : '';
     const clientMeta = scrubClientMeta(payload.clientMeta);
     if (!idToken) {
@@ -563,11 +562,11 @@ async function deleteAccountDirectHandler(request) {
     try {
         decoded = await auth.verifyIdToken(idToken, true);
     }
-    catch (_k) {
+    catch {
         throw new https_1.HttpsError('permission-denied', 'Invalid or expired session. Please sign in again.');
     }
     const uid = decoded.uid;
-    if (((_d = request.auth) === null || _d === void 0 ? void 0 : _d.uid) && request.auth.uid !== uid) {
+    if (request.auth?.uid && request.auth.uid !== uid) {
         throw new https_1.HttpsError('permission-denied', 'Session does not match the signed-in account.');
     }
     const db = admin.firestore();
@@ -580,7 +579,7 @@ async function deleteAccountDirectHandler(request) {
         uid,
         ipHashShort: ip ? ipHashShort(ip) : null,
         appCheck: cr.app != null ? 'present' : 'absent',
-        callableAuthPresent: ((_e = request.auth) === null || _e === void 0 ? void 0 : _e.uid) != null,
+        callableAuthPresent: request.auth?.uid != null,
         clientMeta,
     });
     const user = await auth.getUser(uid);
@@ -588,8 +587,8 @@ async function deleteAccountDirectHandler(request) {
     const auditRef = db.collection('accountDeletions').doc(uid);
     await auditRef.set({
         userId: uid,
-        email: (_f = user.email) !== null && _f !== void 0 ? _f : null,
-        phoneNumber: (_g = user.phoneNumber) !== null && _g !== void 0 ? _g : null,
+        email: user.email ?? null,
+        phoneNumber: user.phoneNumber ?? null,
         authProvider,
         reason,
         customReason: customReason.length > 0 ? customReason : null,
@@ -607,12 +606,12 @@ async function deleteAccountDirectHandler(request) {
         logMetric('account_deletion_auth_delete_failed', {
             uid,
             method: 'direct',
-            error: String((_h = err.message) !== null && _h !== void 0 ? _h : err),
+            error: String(err.message ?? err),
         });
         await auditRef.set({
             status: 'failed',
             failureStage: 'auth_delete',
-            failureMessage: String((_j = err.message) !== null && _j !== void 0 ? _j : err),
+            failureMessage: String(err.message ?? err),
             failedAt: admin.firestore.FieldValue.serverTimestamp(),
         }, { merge: true });
         throw new https_1.HttpsError('internal', 'Could not complete account deletion. Please contact support.');

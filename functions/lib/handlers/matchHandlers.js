@@ -42,50 +42,52 @@ const admin = __importStar(require("firebase-admin"));
 const userService_1 = require("../services/userService");
 const notificationService_1 = require("../services/notificationService");
 class MatchHandlers {
+    userService;
+    notificationService;
     constructor() {
-        this.onMatchCreated = (0, firestore_1.onDocumentCreated)('matches/{matchId}', async (event) => {
-            const snap = event.data;
-            if (!snap)
-                return;
-            const matchData = snap.data();
-            const matchId = event.params.matchId;
-            console.log(`🎉 New match created: ${matchId}`, matchData);
-            try {
-                const users = matchData.users || [];
-                if (users.length !== 2) {
-                    console.log('Invalid match - not exactly 2 users');
-                    return;
-                }
-                // Get both users' data in parallel
-                const [userA, userB] = await Promise.all([
-                    this.userService.getUserById(users[0]),
-                    this.userService.getUserById(users[1])
-                ]);
-                if (!userA || !userB) {
-                    console.log('One or both users not found');
-                    return;
-                }
-                // Validate users
-                if (!this.userService.validateUser(userA) || !this.userService.validateUser(userB)) {
-                    console.log('Invalid user data');
-                    return;
-                }
-                // Send match notifications to both users
-                await Promise.all([
-                    this.notificationService.sendMatchNotification(userA, userB),
-                    this.notificationService.sendMatchNotification(userB, userA)
-                ]);
-                console.log('✅ Match notifications sent successfully');
-            }
-            catch (error) {
-                console.error('❌ Error sending match notification:', error);
-                // Log error to Firestore for monitoring
-                await this.logError('match_created', error, { matchId, matchData });
-            }
-        });
         this.userService = new userService_1.UserService();
         this.notificationService = new notificationService_1.NotificationService();
     }
+    onMatchCreated = (0, firestore_1.onDocumentCreated)('matches/{matchId}', async (event) => {
+        const snap = event.data;
+        if (!snap)
+            return;
+        const matchData = snap.data();
+        const matchId = event.params.matchId;
+        console.log(`🎉 New match created: ${matchId}`, matchData);
+        try {
+            const users = matchData.users || [];
+            if (users.length !== 2) {
+                console.log('Invalid match - not exactly 2 users');
+                return;
+            }
+            // Get both users' data in parallel
+            const [userA, userB] = await Promise.all([
+                this.userService.getUserById(users[0]),
+                this.userService.getUserById(users[1])
+            ]);
+            if (!userA || !userB) {
+                console.log('One or both users not found');
+                return;
+            }
+            // Validate users
+            if (!this.userService.validateUser(userA) || !this.userService.validateUser(userB)) {
+                console.log('Invalid user data');
+                return;
+            }
+            // Send match notifications to both users
+            await Promise.all([
+                this.notificationService.sendMatchNotification(userA, userB),
+                this.notificationService.sendMatchNotification(userB, userA)
+            ]);
+            console.log('✅ Match notifications sent successfully');
+        }
+        catch (error) {
+            console.error('❌ Error sending match notification:', error);
+            // Log error to Firestore for monitoring
+            await this.logError('match_created', error, { matchId, matchData });
+        }
+    });
     /**
      * Log errors to Firestore for monitoring
      */

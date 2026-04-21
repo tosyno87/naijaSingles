@@ -39,6 +39,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.UserService = void 0;
 const admin = __importStar(require("firebase-admin"));
 class UserService {
+    db;
     constructor() {
         this.db = admin.firestore();
     }
@@ -52,7 +53,7 @@ class UserService {
                 console.log(`User not found: ${userId}`);
                 return null;
             }
-            return Object.assign({ id: userId }, userDoc.data());
+            return { id: userId, ...userDoc.data() };
         }
         catch (error) {
             console.error(`Error getting user ${userId}:`, error);
@@ -73,7 +74,7 @@ class UserService {
                     .get();
                 userDocs.forEach(doc => {
                     if (doc.exists) {
-                        users.push(Object.assign({ id: doc.id }, doc.data()));
+                        users.push({ id: doc.id, ...doc.data() });
                     }
                 });
             }

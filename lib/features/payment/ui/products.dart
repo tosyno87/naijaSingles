@@ -19,6 +19,7 @@ import '../../../common/widgets/state_views/state_views.dart';
 import '../../../config/app_config.dart';
 import '../../../models/user_model.dart';
 import '../../home/ui/tab/tabbar.dart';
+import '../iap_user_facing_message.dart';
 import '../presentation/bloc/subscription_bloc.dart';
 import 'in_app_purchase/buy_products/buyproducts_bloc.dart';
 import 'in_app_purchase/buy_products/buyproducts_events.dart';
@@ -188,7 +189,10 @@ class ProductsState extends State<Products> {
               ScaffoldMessenger.of(context).showSnackBar(
                 SnackBar(
                   content: Text(
-                    state.msg ?? 'Purchase could not be started. Try again.',
+                    userFacingPurchaseSnackBarMessage(
+                      state.msg,
+                      fallback: 'Purchase could not be started. Try again.',
+                    ),
                   ),
                 ),
               );
@@ -199,7 +203,10 @@ class ProductsState extends State<Products> {
       child: BlocBuilder<GetInAppProductsBloc, GetInAppProductsStates>(
         builder: (context, state) {
           if (state is GetInAppProductsLoadingState) {
-            return const AppLoadingView();
+            return const Scaffold(
+              backgroundColor: AppColors.backgroundColor,
+              body: AppLoadingView(),
+            );
           }
           if (state is GetInAppProductsFailedState) {
             return Scaffold(

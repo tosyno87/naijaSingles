@@ -96,12 +96,6 @@ class _SimpleGoogleSignInButtonState extends State<SimpleGoogleSignInButton> {
         child: Row(
           mainAxisSize: MainAxisSize.min,
           children: [
-            Image.asset(
-              'asset/auth/google_logo.png',
-              height: 24,
-              width: 24,
-            ),
-            const SizedBox(width: 12),
             if (_isLoading)
               const SizedBox(
                 height: 16,

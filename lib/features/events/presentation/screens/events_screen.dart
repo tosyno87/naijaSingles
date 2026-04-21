@@ -142,25 +142,6 @@ class _EventsScreenState extends State<EventsScreen> {
                 ],
               ),
             ),
-            floatingActionButton: Semantics(
-              button: true,
-              label: 'Create Event'.tr(),
-              child: FloatingActionButton(
-                heroTag: 'events_screen_fab',
-                onPressed: () {
-                  unawaited(
-                    Navigator.pushNamed(
-                      context,
-                      RouteName.eventTemplateSelection,
-                    ),
-                  );
-                },
-                backgroundColor: AppColors.primaryGreen,
-                foregroundColor: Colors.white,
-                child: const Icon(Icons.add),
-              ),
-            ),
-            floatingActionButtonLocation: FloatingActionButtonLocation.endFloat,
           ),
         ),
       );

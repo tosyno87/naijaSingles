@@ -26,15 +26,6 @@ class _MessagesScreenState extends State<MessagesScreen> {
   final ChatService _chatService = ChatService();
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
 
-  // Afropeep MVP Color Scheme
-  static const Color primaryColor = Color(0xFF008037); // Deep green
-  static const Color cardColor = Color(0xFFFFFFFF); // White for cards
-  static const Color errorColor = Color(0xFFFF5A5F); // Red for errors/delete
-  static const Color successColor = Color(0xFF4CAF50); // Green for success
-  static final Color textPrimary = Colors.brown.shade800;
-  static final Color textSecondary = Colors.brown.shade600;
-  static final Color textLight = Colors.grey.shade600;
-
   @override
   Widget build(BuildContext context) => Scaffold(
         backgroundColor: AppColors.backgroundColor,
@@ -48,7 +39,7 @@ class _MessagesScreenState extends State<MessagesScreen> {
             style: GoogleFonts.montserrat(
               fontSize: 24,
               fontWeight: FontWeight.bold,
-              color: textPrimary,
+              color: AppColors.textPrimary,
             ),
           ),
           centerTitle: true,
@@ -89,24 +80,21 @@ class _MessagesScreenState extends State<MessagesScreen> {
         },
       );
 
-  Widget _buildEmptyState() => Center(
-        child: AppEmptyView(
-          title: 'No messages yet',
-          subtitle:
-              'Start matching with people to begin conversations and make meaningful connections.',
-          icon: Icons.chat_bubble_outline,
-          actionLabel: 'Start Matching',
-          onAction: () {
-            unawaited(
-              Navigator.of(context).push(
-                MaterialPageRoute(
-                  builder: (context) =>
-                      const ExploreScreen(showBackButton: true),
-                ),
+  Widget _buildEmptyState() => AppEmptyView(
+        title: 'No messages yet',
+        subtitle:
+            'Start matching with people to begin conversations and make meaningful connections.',
+        icon: Icons.chat_bubble_outline,
+        actionLabel: 'Start Matching',
+        onAction: () {
+          unawaited(
+            Navigator.of(context).push(
+              MaterialPageRoute(
+                builder: (context) => const ExploreScreen(showBackButton: true),
               ),
-            );
-          },
-        ),
+            ),
+          );
+        },
       );
 
   Widget _buildMessagesList(List<MessageThreadInfo> threads) =>
@@ -128,7 +116,7 @@ class _MessagesScreenState extends State<MessagesScreen> {
           padding: const EdgeInsets.only(right: 20),
           margin: const EdgeInsets.symmetric(horizontal: 12, vertical: 2),
           decoration: BoxDecoration(
-            color: errorColor,
+            color: AppColors.error,
             borderRadius: BorderRadius.circular(16),
           ),
           child: const Icon(
@@ -141,7 +129,7 @@ class _MessagesScreenState extends State<MessagesScreen> {
         child: Container(
           margin: const EdgeInsets.symmetric(horizontal: 12, vertical: 2),
           decoration: BoxDecoration(
-            color: cardColor,
+            color: AppColors.cardColor,
             borderRadius: BorderRadius.circular(16),
             boxShadow: [
               BoxShadow(
@@ -204,9 +192,10 @@ class _MessagesScreenState extends State<MessagesScreen> {
                               width: 12,
                               height: 12,
                               decoration: BoxDecoration(
-                                color: primaryColor,
+                                color: AppColors.primaryGreen,
                                 shape: BoxShape.circle,
-                                border: Border.all(color: cardColor, width: 2),
+                                border: Border.all(
+                                    color: AppColors.cardColor, width: 2),
                               ),
                             ),
                           ),
@@ -231,7 +220,7 @@ class _MessagesScreenState extends State<MessagesScreen> {
                                       fontWeight: thread.unread
                                           ? FontWeight.bold
                                           : FontWeight.w600,
-                                      color: textPrimary,
+                                      color: AppColors.textPrimary,
                                     ),
                                     overflow: TextOverflow.ellipsis,
                                   ),
@@ -241,8 +230,9 @@ class _MessagesScreenState extends State<MessagesScreen> {
                                 thread.getRelativeTime(),
                                 style: GoogleFonts.montserrat(
                                   fontSize: 12,
-                                  color:
-                                      thread.unread ? primaryColor : textLight,
+                                  color: thread.unread
+                                      ? AppColors.primaryGreen
+                                      : AppColors.textTertiary,
                                   fontWeight: thread.unread
                                       ? FontWeight.w600
                                       : FontWeight.normal,
@@ -257,8 +247,9 @@ class _MessagesScreenState extends State<MessagesScreen> {
                             overflow: TextOverflow.ellipsis,
                             style: GoogleFonts.montserrat(
                               fontSize: 14,
-                              color:
-                                  thread.unread ? textPrimary : textSecondary,
+                              color: thread.unread
+                                  ? AppColors.textPrimary
+                                  : AppColors.textSecondary,
                               fontWeight: thread.unread
                                   ? FontWeight.w500
                                   : FontWeight.normal,
@@ -302,7 +293,7 @@ class _MessagesScreenState extends State<MessagesScreen> {
       context: context,
       barrierDismissible: false, // Prevent dismissing by tapping outside
       builder: (context) => AlertDialog(
-        backgroundColor: cardColor,
+        backgroundColor: AppColors.cardColor,
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
         elevation: 8,
         contentPadding: const EdgeInsets.all(24),
@@ -312,12 +303,12 @@ class _MessagesScreenState extends State<MessagesScreen> {
               width: 60,
               height: 60,
               decoration: BoxDecoration(
-                color: errorColor.withValues(alpha: 0.1),
+                color: AppColors.error.withValues(alpha: 0.1),
                 shape: BoxShape.circle,
               ),
               child: const Icon(
                 Icons.delete_outline,
-                color: errorColor,
+                color: AppColors.error,
                 size: 30,
               ),
             ),
@@ -327,7 +318,7 @@ class _MessagesScreenState extends State<MessagesScreen> {
               style: GoogleFonts.montserrat(
                 fontWeight: FontWeight.bold,
                 fontSize: 20,
-                color: textPrimary,
+                color: AppColors.textPrimary,
               ),
               textAlign: TextAlign.center,
             ),
@@ -339,7 +330,7 @@ class _MessagesScreenState extends State<MessagesScreen> {
             Text(
               'Are you sure you want to delete your conversation with ${thread.otherUserName}?',
               style: GoogleFonts.montserrat(
-                color: textSecondary,
+                color: AppColors.textSecondary,
                 fontSize: 16,
                 height: 1.5,
               ),
@@ -349,17 +340,17 @@ class _MessagesScreenState extends State<MessagesScreen> {
             Container(
               padding: const EdgeInsets.all(12),
               decoration: BoxDecoration(
-                color: errorColor.withValues(alpha: 0.05),
+                color: AppColors.error.withValues(alpha: 0.05),
                 borderRadius: BorderRadius.circular(12),
                 border: Border.all(
-                  color: errorColor.withValues(alpha: 0.2),
+                  color: AppColors.error.withValues(alpha: 0.2),
                 ),
               ),
               child: Row(
                 children: [
                   const Icon(
                     Icons.warning_amber_rounded,
-                    color: errorColor,
+                    color: AppColors.error,
                     size: 20,
                   ),
                   const SizedBox(width: 8),
@@ -367,7 +358,7 @@ class _MessagesScreenState extends State<MessagesScreen> {
                     child: Text(
                       'This will also unmatch you both. This action cannot be undone.',
                       style: GoogleFonts.montserrat(
-                        color: errorColor,
+                        color: AppColors.error,
                         fontSize: 13,
                         fontWeight: FontWeight.w500,
                       ),
@@ -393,14 +384,14 @@ class _MessagesScreenState extends State<MessagesScreen> {
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(12),
                       side: BorderSide(
-                        color: textSecondary.withValues(alpha: 0.3),
+                        color: AppColors.textSecondary.withValues(alpha: 0.3),
                       ),
                     ),
                   ),
                   child: Text(
                     'Cancel',
                     style: GoogleFonts.montserrat(
-                      color: textSecondary,
+                      color: AppColors.textSecondary,
                       fontWeight: FontWeight.w600,
                       fontSize: 16,
                     ),
@@ -419,7 +410,7 @@ class _MessagesScreenState extends State<MessagesScreen> {
                     await _deleteChatThread(thread);
                   },
                   style: ElevatedButton.styleFrom(
-                    backgroundColor: errorColor,
+                    backgroundColor: AppColors.error,
                     foregroundColor: Colors.white,
                     padding: const EdgeInsets.symmetric(vertical: 12),
                     shape: RoundedRectangleBorder(
@@ -454,7 +445,7 @@ class _MessagesScreenState extends State<MessagesScreen> {
         context: context,
         barrierDismissible: false,
         builder: (context) => AlertDialog(
-          backgroundColor: cardColor,
+          backgroundColor: AppColors.cardColor,
           shape:
               RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
           elevation: 8,
@@ -466,7 +457,7 @@ class _MessagesScreenState extends State<MessagesScreen> {
                 width: 80,
                 height: 80,
                 decoration: BoxDecoration(
-                  color: primaryColor.withValues(alpha: 0.1),
+                  color: AppColors.primaryGreen.withValues(alpha: 0.1),
                   shape: BoxShape.circle,
                 ),
                 child: const Center(
@@ -474,7 +465,7 @@ class _MessagesScreenState extends State<MessagesScreen> {
                     width: 40,
                     height: 40,
                     child: CircularProgressIndicator(
-                      color: primaryColor,
+                      color: AppColors.primaryGreen,
                       strokeWidth: 3,
                     ),
                   ),
@@ -486,7 +477,7 @@ class _MessagesScreenState extends State<MessagesScreen> {
                 style: GoogleFonts.montserrat(
                   fontSize: 18,
                   fontWeight: FontWeight.bold,
-                  color: textPrimary,
+                  color: AppColors.textPrimary,
                 ),
                 textAlign: TextAlign.center,
               ),
@@ -495,7 +486,7 @@ class _MessagesScreenState extends State<MessagesScreen> {
                 'Please wait while we remove your conversation and unmatch you both...',
                 style: GoogleFonts.montserrat(
                   fontSize: 14,
-                  color: textSecondary,
+                  color: AppColors.textSecondary,
                   height: 1.4,
                 ),
                 textAlign: TextAlign.center,
@@ -523,7 +514,7 @@ class _MessagesScreenState extends State<MessagesScreen> {
                 'Conversation deleted and users unmatched',
                 style: GoogleFonts.montserrat(color: Colors.white),
               ),
-              backgroundColor: successColor,
+              backgroundColor: AppColors.success,
               behavior: SnackBarBehavior.floating,
               shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(8),
@@ -605,7 +596,7 @@ class _MessagesScreenState extends State<MessagesScreen> {
           context: context,
           barrierDismissible: false,
           builder: (context) => AlertDialog(
-            backgroundColor: cardColor,
+            backgroundColor: AppColors.cardColor,
             shape:
                 RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
             elevation: 8,
@@ -617,7 +608,7 @@ class _MessagesScreenState extends State<MessagesScreen> {
                   width: 80,
                   height: 80,
                   decoration: BoxDecoration(
-                    color: primaryColor.withValues(alpha: 0.1),
+                    color: AppColors.primaryGreen.withValues(alpha: 0.1),
                     shape: BoxShape.circle,
                   ),
                   child: const Center(
@@ -625,7 +616,7 @@ class _MessagesScreenState extends State<MessagesScreen> {
                       width: 40,
                       height: 40,
                       child: CircularProgressIndicator(
-                        color: primaryColor,
+                        color: AppColors.primaryGreen,
                         strokeWidth: 3,
                       ),
                     ),
@@ -637,7 +628,7 @@ class _MessagesScreenState extends State<MessagesScreen> {
                   style: GoogleFonts.montserrat(
                     fontSize: 18,
                     fontWeight: FontWeight.bold,
-                    color: textPrimary,
+                    color: AppColors.textPrimary,
                   ),
                   textAlign: TextAlign.center,
                 ),
@@ -646,7 +637,7 @@ class _MessagesScreenState extends State<MessagesScreen> {
                   'Please wait while we fetch the user profile...',
                   style: GoogleFonts.montserrat(
                     fontSize: 14,
-                    color: textSecondary,
+                    color: AppColors.textSecondary,
                     height: 1.4,
                   ),
                   textAlign: TextAlign.center,

@@ -19,11 +19,13 @@ class UpdateAddressWidget extends StatefulWidget {
     required this.currentUser,
     required this.hasSubscription,
     required this.items,
+    this.compact = false,
     super.key,
   });
   final UserModel currentUser;
   final bool hasSubscription;
   final Map items;
+  final bool compact;
 
   @override
   State<UpdateAddressWidget> createState() => _UpdateAddressWidgetState();
@@ -48,81 +50,146 @@ class _UpdateAddressWidgetState extends State<UpdateAddressWidget> {
   }
 
   @override
-  Widget build(BuildContext context) => Card(
-        child: ExpansionTile(
-          iconColor: AppColors.primaryGreen,
-          textColor: AppColors.primaryGreen,
-          key: UniqueKey(),
-          leading: Text(
-            'Current location :'.tr().toString(),
-            style: const TextStyle(
-              fontSize: 14,
-            ),
-          ),
-          title: Text(
-            widget.currentUser.address ?? ''.tr().toString(),
-            style: const TextStyle(
-              color: AppColors.secondaryColor,
-              fontSize: 14,
-              fontWeight: FontWeight.w500,
-            ),
-          ),
-          children: <Widget>[
-            Padding(
-              padding: const EdgeInsets.symmetric(vertical: 15),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: <Widget>[
-                  const Icon(
-                    Icons.location_on,
-                    color: AppColors.primaryGreen,
-                    size: 20,
-                  ),
-                  InkWell(
-                    child: Text(
-                      'Change location'.tr().toString(),
-                      textAlign: TextAlign.center,
-                      style: const TextStyle(
-                        color: AppColors.primaryGreen,
-                        fontSize: 16,
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                    onTap: () async {
-                      log('hasSubscription $widget.hasSubscription');
-                      if (widget.hasSubscription) {
-                        final address = await Navigator.pushNamed(
-                          context,
-                          RouteName.updateLocationScreen,
-                          arguments: selectedLocation,
-                        );
-                        if (!context.mounted) return;
-                        log('after pop address is ${address.toString()}');
-                        if (address != null) {
-                          _updateAddress(address as Map);
+  Widget build(BuildContext context) {
+    final ColorScheme scheme = Theme.of(context).colorScheme;
+    final bool isDark = Theme.of(context).brightness == Brightness.dark;
+    final Color chevronColor =
+        isDark ? AppColors.primaryGreenLight : AppColors.primaryGreen;
+    final Color labelColor = isDark
+        ? scheme.onSurface.withValues(alpha: 0.78)
+        : const Color(0xFF505050);
+    final Color addressColor = scheme.onSurface;
+    final String addressLine = (widget.currentUser.address ?? '').trim().isEmpty
+        ? 'Tap to search or choose your area'.tr()
+        : widget.currentUser.address!.trim();
 
-                          context.read<SearchUserBloc>().add(
-                                LoadUserEvent(currentUser: widget.currentUser),
-                              );
-                        }
-                      } else {
-                        await showSubscriptionDialog(
-                          context: context,
-                          currentUser: widget.currentUser,
-                          items: widget.items,
-                        );
-                      }
-                    },
-                  ),
-                ],
+    return Card(
+      child: ExpansionTile(
+        iconColor: chevronColor,
+        collapsedIconColor: chevronColor,
+        textColor: AppColors.primaryGreen,
+        key: UniqueKey(),
+        tilePadding: EdgeInsets.symmetric(
+          horizontal: widget.compact ? 10 : 14,
+          vertical: widget.compact ? 4 : 6,
+        ),
+        trailing: Icon(
+          Icons.arrow_drop_down,
+          size: 28,
+          color: chevronColor,
+        ),
+        leading: Icon(
+          Icons.location_on_outlined,
+          color: AppColors.primaryGreen,
+          size: widget.compact ? 22 : 24,
+        ),
+        title: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: <Widget>[
+            Text(
+              'Current location:'.tr(),
+              style: TextStyle(
+                fontSize: widget.compact ? 12 : 13,
+                fontWeight: FontWeight.w600,
+                color: labelColor,
               ),
             ),
-            const SizedBox(
-              height: 20,
+            const SizedBox(height: 2),
+            Text(
+              addressLine,
+              maxLines: 2,
+              overflow: TextOverflow.ellipsis,
+              style: TextStyle(
+                color: addressColor,
+                fontSize: widget.compact ? 15 : 15,
+                fontWeight: FontWeight.w600,
+                height: 1.25,
+              ),
             ),
           ],
         ),
-      );
+        subtitle: Padding(
+          padding: const EdgeInsets.only(top: 2),
+          child: Row(
+            children: <Widget>[
+              Icon(
+                Icons.edit_outlined,
+                size: 15,
+                color: AppColors.primaryGreen.withValues(alpha: 0.9),
+              ),
+              const SizedBox(width: 6),
+              Expanded(
+                child: Text(
+                  'Search or update your area'.tr(),
+                  style: TextStyle(
+                    fontSize: widget.compact ? 12 : 13,
+                    fontWeight: FontWeight.w500,
+                    color: AppColors.primaryGreen,
+                  ),
+                ),
+              ),
+            ],
+          ),
+        ),
+        children: <Widget>[
+          Padding(
+            padding: EdgeInsets.symmetric(
+              vertical: widget.compact ? 10 : 15,
+            ),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: <Widget>[
+                const Icon(
+                  Icons.location_on,
+                  color: AppColors.primaryGreen,
+                  size: 20,
+                ),
+                InkWell(
+                  child: Text(
+                    'Change location'.tr().toString(),
+                    textAlign: TextAlign.center,
+                    style: const TextStyle(
+                      color: AppColors.primaryGreen,
+                      fontSize: 16,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                  onTap: () async {
+                    log('hasSubscription $widget.hasSubscription');
+                    if (widget.hasSubscription) {
+                      final address = await Navigator.pushNamed(
+                        context,
+                        RouteName.updateLocationScreen,
+                        arguments: selectedLocation,
+                      );
+                      if (!context.mounted) return;
+                      log('after pop address is ${address.toString()}');
+                      if (address != null) {
+                        _updateAddress(address as Map);
+
+                        context.read<SearchUserBloc>().add(
+                              LoadUserEvent(currentUser: widget.currentUser),
+                            );
+                      }
+                    } else {
+                      await showSubscriptionDialog(
+                        context: context,
+                        currentUser: widget.currentUser,
+                        items: widget.items,
+                      );
+                    }
+                  },
+                ),
+              ],
+            ),
+          ),
+          const SizedBox(
+            height: 20,
+          ),
+        ],
+      ),
+    );
+  }
 
   void _updateAddress(Map<dynamic, dynamic> address) {
     unawaited(

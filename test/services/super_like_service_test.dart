@@ -5,18 +5,18 @@ import 'package:naijasingles/services/super_like_service.dart';
 
 void main() {
   group('SuperLikeService constants', () {
-    test('freeSuperLikesPerDay is 1', () {
-      expect(SuperLikeService.freeSuperLikesPerDay, 1);
+    test('freeSuperLikesPerWeek is 1', () {
+      expect(SuperLikeService.freeSuperLikesPerWeek, 1);
     });
 
-    test('premiumSuperLikesPerDay is 5', () {
-      expect(SuperLikeService.premiumSuperLikesPerDay, 5);
+    test('premiumSuperLikesPerWeek is 5', () {
+      expect(SuperLikeService.premiumSuperLikesPerWeek, 5);
     });
 
-    test('superLikeCooldown is 24 hours', () {
+    test('superLikeCooldown is 7 days', () {
       expect(
         SuperLikeService.superLikeCooldown,
-        const Duration(hours: 24),
+        const Duration(days: 7),
       );
     });
 
@@ -29,8 +29,8 @@ void main() {
 
     test('premium limit is strictly greater than free limit', () {
       expect(
-        SuperLikeService.premiumSuperLikesPerDay,
-        greaterThan(SuperLikeService.freeSuperLikesPerDay),
+        SuperLikeService.premiumSuperLikesPerWeek,
+        greaterThan(SuperLikeService.freeSuperLikesPerWeek),
       );
     });
   });
@@ -133,13 +133,16 @@ void main() {
     test('canSend false includes reason', () {
       final eligibility = SuperLikeEligibility(
         canSend: false,
-        reason: 'Daily super like limit reached (1/1)',
+        reason: SuperLikeService.superLikeLimitReachedMessage,
         remainingCount: 0,
         nextResetTime: DateTime(2026, 3, 5),
       );
 
       expect(eligibility.canSend, isFalse);
-      expect(eligibility.reason, contains('Daily super like limit'));
+      expect(
+        eligibility.reason,
+        SuperLikeService.superLikeLimitReachedMessage,
+      );
       expect(eligibility.remainingCount, 0);
     });
 
@@ -261,12 +264,12 @@ void main() {
         expect(stats.isPremium, isFalse);
       });
 
-      test('uses free daily limit', () {
+      test('uses free weekly limit', () {
         final stats = SuperLikeStats.empty();
 
         expect(
           stats.dailyLimit,
-          SuperLikeService.freeSuperLikesPerDay,
+          SuperLikeService.freeSuperLikesPerWeek,
         );
       });
 
@@ -275,7 +278,7 @@ void main() {
 
         expect(
           stats.remainingToday,
-          SuperLikeService.freeSuperLikesPerDay,
+          SuperLikeService.freeSuperLikesPerWeek,
         );
         expect(stats.canSendMore, isTrue);
       });
@@ -296,7 +299,7 @@ void main() {
 
       expect(str, contains('Sent: 3'));
       expect(str, contains('Received: 2'));
-      expect(str, contains('Daily Used: 1/5'));
+      expect(str, contains('Week Used: 1/5'));
       expect(str, contains('50.0%'));
       expect(str, contains('25.0%'));
       expect(str, contains('Premium: true'));

@@ -4,6 +4,9 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
+import '../constants/app_colors.dart';
+import '../widgets/state_views/app_loading_view.dart';
+
 import '../../features/auth/auth_method/auth_method_selection_screen.dart';
 import '../../features/auth/auth_method/sign_in_method_selection_screen.dart';
 import '../../features/auth/email_password/ui/screens/email_login_screen.dart';
@@ -203,23 +206,9 @@ abstract class AppRouter {
       if (arguments == null || arguments is! Map) {
         // Return a loading screen instead of trying to navigate back
         // This prevents any flash of "Page Not Found" screen
-        return Scaffold(
-          backgroundColor: Colors.white,
-          body: Center(
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                const CircularProgressIndicator(
-                  color: Color(0xFF008037),
-                ),
-                const SizedBox(height: 16),
-                Text(
-                  'Loading...',
-                  style: Theme.of(context).textTheme.bodyLarge,
-                ),
-              ],
-            ),
-          ),
+        return const Scaffold(
+          backgroundColor: AppColors.backgroundColor,
+          body: AppLoadingView(message: 'Loading...'),
         );
       }
 

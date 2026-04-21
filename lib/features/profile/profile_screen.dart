@@ -38,8 +38,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
   // Simplified color scheme
   static const Color primaryColor = Color(0xFF008037);
   static const Color cardColor = Color(0xFFFFFBF5);
-  static final Color textPrimary = Colors.brown.shade800;
-  static final Color textSecondary = Colors.brown.shade600;
+  static const Color textPrimary = AppColors.textPrimary;
+  static const Color textSecondary = AppColors.textSecondary;
 
   StreamSubscription<DocumentSnapshot>? _userDataSubscription;
 
@@ -100,23 +100,27 @@ class _ProfileScreenState extends State<ProfileScreen> {
         appBar: AppBar(
           backgroundColor: AppColors.backgroundColor,
           elevation: 0,
+          surfaceTintColor: Colors.transparent,
           automaticallyImplyLeading: false,
           title: Text(
             'Profile',
             style: GoogleFonts.montserrat(
               fontSize: 24,
               fontWeight: FontWeight.bold,
-              color: textPrimary,
+              color: AppColors.textPrimary,
             ),
           ),
           centerTitle: true,
           actions: [
             PopupMenuButton<String>(
-              icon: Icon(Icons.more_vert, color: textPrimary),
-              color: cardColor,
-              elevation: 8,
+              icon: const Icon(Icons.more_vert, color: AppColors.textPrimary),
+              color: Colors.white,
+              elevation: 10,
+              offset: const Offset(0, 52),
+              constraints: const BoxConstraints(minWidth: 210, maxWidth: 230),
               shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(12),
+                borderRadius: BorderRadius.circular(16),
+                side: const BorderSide(color: Color(0x14000000)),
               ),
               onSelected: (value) {
                 switch (value) {
@@ -143,22 +147,24 @@ class _ProfileScreenState extends State<ProfileScreen> {
               itemBuilder: (context) => [
                 const PopupMenuItem(
                   value: 'events',
-                  child: Row(
-                    children: [
-                      Icon(Icons.event, color: primaryColor),
-                      SizedBox(width: 12),
-                      Text('Events'),
-                    ],
+                  child: Text(
+                    'Events',
+                    style: TextStyle(
+                      color: AppColors.textPrimary,
+                      fontSize: 18,
+                      fontWeight: FontWeight.w600,
+                    ),
                   ),
                 ),
                 const PopupMenuItem(
                   value: 'settings',
-                  child: Row(
-                    children: [
-                      Icon(Icons.settings_outlined, color: primaryColor),
-                      SizedBox(width: 12),
-                      Text('Account Settings'),
-                    ],
+                  child: Text(
+                    'Account Settings',
+                    style: TextStyle(
+                      color: AppColors.textPrimary,
+                      fontSize: 18,
+                      fontWeight: FontWeight.w600,
+                    ),
                   ),
                 ),
               ],
@@ -203,25 +209,29 @@ class _ProfileScreenState extends State<ProfileScreen> {
                             padding: const EdgeInsets.all(20),
                             child: _buildEditButton(),
                           ),
-                          const SizedBox(height: 32),
+                          SizedBox(
+                            height: 52 + MediaQuery.paddingOf(context).bottom,
+                          ),
                         ],
                       ),
                     ),
                   ),
       );
 
+  Future<void> _openEditProfile() async {
+    await Navigator.push<void>(
+      context,
+      MaterialPageRoute<void>(
+        builder: (_) => const EditProfileScreen(),
+      ),
+    );
+  }
+
   Widget _buildEditButton() => SizedBox(
         width: double.infinity,
         height: 56,
         child: ElevatedButton(
-          onPressed: () async {
-            await Navigator.push(
-              context,
-              MaterialPageRoute(
-                builder: (_) => const EditProfileScreen(),
-              ),
-            );
-          },
+          onPressed: _openEditProfile,
           style: ElevatedButton.styleFrom(
             backgroundColor: primaryColor,
             foregroundColor: Colors.white,
@@ -302,20 +312,20 @@ class _ProfileScreenState extends State<ProfileScreen> {
 
     return SizedBox(
       height: MediaQuery.of(context).size.height * 0.6,
-      child: PageView.builder(
-        controller: _photoPageController,
-        itemCount: photos.length,
-        onPageChanged: (index) {
-          setState(() {
-            _currentPhotoIndex = index;
-          });
-        },
-        itemBuilder: (context, index) => GestureDetector(
-          onTap: () => _showFullScreenPhoto(photos, index),
-          child: Stack(
-            fit: StackFit.expand,
-            children: [
-              CachedNetworkImage(
+      child: Stack(
+        fit: StackFit.expand,
+        children: [
+          PageView.builder(
+            controller: _photoPageController,
+            itemCount: photos.length,
+            onPageChanged: (index) {
+              setState(() {
+                _currentPhotoIndex = index;
+              });
+            },
+            itemBuilder: (context, index) => GestureDetector(
+              onTap: () => _showFullScreenPhoto(photos, index),
+              child: CachedNetworkImage(
                 imageUrl: photos[index].toString(),
                 fit: BoxFit.cover,
                 placeholder: (context, url) => const Center(
@@ -326,33 +336,96 @@ class _ProfileScreenState extends State<ProfileScreen> {
                   child: const Icon(Icons.broken_image_outlined, size: 60),
                 ),
               ),
-              // Photo indicator dots at bottom
-              if (photos.length > 1)
-                Positioned(
-                  bottom: 20,
-                  left: 0,
-                  right: 0,
+            ),
+          ),
+          if (photos.length > 1)
+            Positioned(
+              top: 10,
+              left: 10,
+              right: 10,
+              child: DecoratedBox(
+                decoration: BoxDecoration(
+                  color: Colors.black.withValues(alpha: 0.4),
+                  borderRadius: BorderRadius.circular(6),
+                  border: Border.all(
+                    color: Colors.white.withValues(alpha: 0.16),
+                  ),
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.black.withValues(alpha: 0.28),
+                      blurRadius: 6,
+                      offset: const Offset(0, 1),
+                    ),
+                  ],
+                ),
+                child: Padding(
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 8,
+                    vertical: 5,
+                  ),
                   child: Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
                     children: List.generate(
                       photos.length,
-                      (dotIndex) => Container(
-                        margin: const EdgeInsets.symmetric(horizontal: 4),
-                        width: 8,
-                        height: 8,
-                        decoration: BoxDecoration(
-                          color: dotIndex == _currentPhotoIndex
-                              ? Colors.white
-                              : Colors.white.withValues(alpha: 0.5),
-                          shape: BoxShape.circle,
+                      (i) => Expanded(
+                        child: Padding(
+                          padding: const EdgeInsets.symmetric(horizontal: 2),
+                          child: AnimatedContainer(
+                            duration: const Duration(milliseconds: 200),
+                            curve: Curves.easeOut,
+                            height: 3,
+                            decoration: BoxDecoration(
+                              color: i == _currentPhotoIndex
+                                  ? Colors.white
+                                  : Colors.white.withValues(alpha: 0.32),
+                              borderRadius: BorderRadius.circular(2),
+                            ),
+                          ),
                         ),
                       ),
                     ),
                   ),
                 ),
-            ],
-          ),
-        ),
+              ),
+            ),
+          if (photos.length == 1)
+            Positioned(
+              top: 12,
+              right: 12,
+              child: Material(
+                color: Colors.black.withValues(alpha: 0.48),
+                borderRadius: BorderRadius.circular(20),
+                child: InkWell(
+                  onTap: _openEditProfile,
+                  borderRadius: BorderRadius.circular(20),
+                  child: Padding(
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 12,
+                      vertical: 8,
+                    ),
+                    child: Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        const Icon(
+                          Icons.add_a_photo_outlined,
+                          size: 16,
+                          color: Colors.white,
+                        ),
+                        const SizedBox(width: 6),
+                        Text(
+                          'Add more photos',
+                          style: GoogleFonts.montserrat(
+                            fontSize: 12,
+                            fontWeight: FontWeight.w600,
+                            color: Colors.white,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+              ),
+            ),
+        ],
       ),
     );
   }
@@ -380,7 +453,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
 
   // Hinge-style profile header
   Widget _buildHingeProfileHeader() {
-    final name = _userData?['name'] ?? 'Your Name';
+    final nameRaw = _userData?['name']?.toString() ?? 'Your Name';
+    final name = nameRaw.trim().isEmpty ? 'Your Name' : nameRaw.trim();
     final age = _userData?['age'] ?? _calculateAge(_userData?['dateOfBirth']);
     final nationality = _safeStringFromField(_userData?['nationality']);
 
@@ -393,7 +467,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
     }
 
     return Padding(
-      padding: const EdgeInsets.all(20),
+      padding: const EdgeInsets.fromLTRB(20, 6, 20, 20),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -402,7 +476,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
             style: GoogleFonts.montserrat(
               fontSize: 28,
               fontWeight: FontWeight.bold,
-              color: textPrimary,
+              color: AppColors.textPrimary,
             ),
           ),
           if (nationality.isNotEmpty || location.isNotEmpty) ...[
@@ -416,10 +490,10 @@ class _ProfileScreenState extends State<ProfileScreen> {
                     padding:
                         const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
                     decoration: BoxDecoration(
-                      color: primaryColor.withValues(alpha: 0.1),
+                      color: AppColors.primaryGreen.withValues(alpha: 0.1),
                       borderRadius: BorderRadius.circular(20),
                       border: Border.all(
-                        color: primaryColor.withValues(alpha: 0.3),
+                        color: AppColors.primaryGreen.withValues(alpha: 0.3),
                       ),
                     ),
                     child: Text(
@@ -427,7 +501,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                       style: GoogleFonts.montserrat(
                         fontSize: 14,
                         fontWeight: FontWeight.w600,
-                        color: primaryColor,
+                        color: AppColors.primaryGreen,
                       ),
                     ),
                   ),
@@ -436,10 +510,10 @@ class _ProfileScreenState extends State<ProfileScreen> {
                     padding:
                         const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
                     decoration: BoxDecoration(
-                      color: primaryColor.withValues(alpha: 0.1),
+                      color: AppColors.primaryGreen.withValues(alpha: 0.1),
                       borderRadius: BorderRadius.circular(20),
                       border: Border.all(
-                        color: primaryColor.withValues(alpha: 0.3),
+                        color: AppColors.primaryGreen.withValues(alpha: 0.3),
                       ),
                     ),
                     child: Row(
@@ -448,7 +522,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                         const Icon(
                           Icons.location_on,
                           size: 16,
-                          color: primaryColor,
+                          color: AppColors.primaryGreen,
                         ),
                         const SizedBox(width: 6),
                         Text(
@@ -456,7 +530,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                           style: GoogleFonts.montserrat(
                             fontSize: 14,
                             fontWeight: FontWeight.w600,
-                            color: primaryColor,
+                            color: AppColors.primaryGreen,
                           ),
                         ),
                       ],

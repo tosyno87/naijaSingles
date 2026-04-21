@@ -33,7 +33,7 @@ class _BlockByAdminState extends State<BlockByAdmin> {
                         height: 50,
                         width: 100,
                         child: Image.asset(
-                          'asset/images/logo.png',
+                          'assets/images/afropeep_logo_transparent.png',
                           fit: BoxFit.contain,
                         ),
                       ),

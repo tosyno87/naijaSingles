@@ -13,10 +13,17 @@ import 'performance_monitor.dart';
 /// Super like service that provides premium highlighting and instant notifications
 /// Implements Priority 3: User Experience Enhancements
 class SuperLikeService {
-  static const int freeSuperLikesPerDay = 1;
-  static const int premiumSuperLikesPerDay = 5;
-  static const Duration superLikeCooldown = Duration(hours: 24);
+  /// Free tier: Super Likes allowed per calendar week (Mon 00:00 local reset).
+  static const int freeSuperLikesPerWeek = 1;
+
+  /// Premium tier: Super Likes allowed per calendar week.
+  static const int premiumSuperLikesPerWeek = 5;
+  static const Duration superLikeCooldown = Duration(days: 7);
   static const Duration superLikeHighlightDuration = Duration(days: 3);
+
+  /// Shown in UI when the weekly Super Like quota is exhausted ([canSendSuperLike]).
+  static const String superLikeLimitReachedMessage =
+      "You've reached this week's Super Like limit.";
 
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
   final MatchService _matchService = MatchService();
@@ -28,27 +35,38 @@ class SuperLikeService {
       _firestore.collection('superLikes');
   CollectionReference get _likesCollection => _firestore.collection('likes');
 
-  // In-memory cache: avoids re-querying Firestore for the daily count within
-  // the same session. Firestore remains the source of truth — the cache is
-  // populated on first read and incremented optimistically on each send.
-  final Map<String, int> _dailyCountCache = {};
-  DateTime _dailyCountCacheDate = DateTime(0);
+  // In-memory cache: avoids re-querying Firestore for the weekly count within
+  // the same ISO week. Firestore remains the source of truth.
+  final Map<String, int> _weeklyCountCache = {};
+  DateTime _weeklyCountCacheWeekStart = DateTime(0);
 
-  int? _getCachedDailyCount(String userId) {
-    final today = DateTime.now();
-    final todayDate = DateTime(today.year, today.month, today.day);
-    if (_dailyCountCacheDate != todayDate) {
-      _dailyCountCache.clear();
-      _dailyCountCacheDate = todayDate;
-      return null;
-    }
-    return _dailyCountCache[userId];
+  /// Monday 00:00 local for the week containing [local].
+  static DateTime _mondayStartOfWeek(DateTime local) {
+    final dateOnly = DateTime(local.year, local.month, local.day);
+    return dateOnly.subtract(Duration(days: local.weekday - 1));
   }
 
-  void _setCachedDailyCount(String userId, int count) {
-    final today = DateTime.now();
-    _dailyCountCacheDate = DateTime(today.year, today.month, today.day);
-    _dailyCountCache[userId] = count;
+  /// Next Monday 00:00 local after the week containing [local].
+  static DateTime _nextMondayMidnight(DateTime local) =>
+      _mondayStartOfWeek(local).add(const Duration(days: 7));
+
+  /// When the current weekly Super Like quota resets (next Monday 00:00 local).
+  static DateTime nextWeeklyQuotaResetLocal() =>
+      _nextMondayMidnight(DateTime.now());
+
+  int? _getCachedWeeklyCount(String userId) {
+    final weekStart = _mondayStartOfWeek(DateTime.now());
+    if (_weeklyCountCacheWeekStart != weekStart) {
+      _weeklyCountCache.clear();
+      _weeklyCountCacheWeekStart = weekStart;
+      return null;
+    }
+    return _weeklyCountCache[userId];
+  }
+
+  void _setCachedWeeklyCount(String userId, int count) {
+    _weeklyCountCacheWeekStart = _mondayStartOfWeek(DateTime.now());
+    _weeklyCountCache[userId] = count;
   }
 
   /// Send a super like to another user.
@@ -133,7 +151,7 @@ class SuperLikeService {
           // ── Phase 3: batched write (super like + usage in one round-trip) ──
           final superLikeRef = _superLikesCollection.doc();
           final usageRef = _firestore.collection('superLikeUsage').doc();
-          final cachedCount = _getCachedDailyCount(fromUserId) ?? 0;
+          final cachedCount = _getCachedWeeklyCount(fromUserId) ?? 0;
 
           final batch = _firestore.batch();
           batch.set(superLikeRef, {
@@ -158,11 +176,11 @@ class SuperLikeService {
           batch.set(usageRef, {
             'userId': fromUserId,
             'timestamp': FieldValue.serverTimestamp(),
-            'dailyCount': cachedCount + 1,
+            'countThisWeek': cachedCount + 1,
           });
           await batch.commit();
 
-          _setCachedDailyCount(fromUserId, cachedCount + 1);
+          _setCachedWeeklyCount(fromUserId, cachedCount + 1);
 
           // Notification delivery is handled by the onSuperLikeCreated
           // Cloud Function that triggers on the /superLikes doc we just wrote.
@@ -220,18 +238,18 @@ class SuperLikeService {
   Future<SuperLikeEligibility> canSendSuperLike(String userId) async {
     try {
       final results = await Future.wait([
-        getDailySuperLikeCount(userId),
+        getWeeklySuperLikeCount(userId),
         _isPremiumUser(userId),
       ]);
-      final dailyCount = results[0] as int;
+      final weekCount = results[0] as int;
       final isPremium = results[1] as bool;
-      final dailyLimit =
-          isPremium ? premiumSuperLikesPerDay : freeSuperLikesPerDay;
+      final weekLimit =
+          isPremium ? premiumSuperLikesPerWeek : freeSuperLikesPerWeek;
 
-      if (dailyCount >= dailyLimit) {
+      if (weekCount >= weekLimit) {
         return SuperLikeEligibility(
           canSend: false,
-          reason: 'Daily super like limit reached ($dailyCount/$dailyLimit)',
+          reason: superLikeLimitReachedMessage,
           remainingCount: 0,
           nextResetTime: _getNextResetTime(),
         );
@@ -239,7 +257,7 @@ class SuperLikeService {
 
       return SuperLikeEligibility(
         canSend: true,
-        remainingCount: dailyLimit - dailyCount,
+        remainingCount: weekLimit - weekCount,
         nextResetTime: _getNextResetTime(),
       );
     } on FirebaseException catch (e) {
@@ -267,40 +285,38 @@ class SuperLikeService {
     }
   }
 
-  /// Get daily super like count for a user.
+  /// Super likes sent by [userId] since Monday 00:00 local (current ISO week).
   ///
-  /// Returns a session-cached value when available (same calendar day).
-  /// Falls back to a Firestore query and populates the cache on miss.
-  Future<int> getDailySuperLikeCount(String userId) async {
-    final cached = _getCachedDailyCount(userId);
+  /// Session-cached per week; Firestore is source of truth on cache miss.
+  Future<int> getWeeklySuperLikeCount(String userId) async {
+    final cached = _getCachedWeeklyCount(userId);
     if (cached != null) {
       return cached;
     }
 
     try {
-      final today = DateTime.now();
-      final startOfDay = DateTime(today.year, today.month, today.day);
+      final weekStart = _mondayStartOfWeek(DateTime.now());
 
       final querySnapshot = await _superLikesCollection
           .where('fromUserId', isEqualTo: userId)
           .where(
             'timestamp',
-            isGreaterThanOrEqualTo: Timestamp.fromDate(startOfDay),
+            isGreaterThanOrEqualTo: Timestamp.fromDate(weekStart),
           )
           .get();
 
       final count = querySnapshot.docs.length;
-      _setCachedDailyCount(userId, count);
+      _setCachedWeeklyCount(userId, count);
       return count;
     } on FirebaseException catch (e) {
       AppLogger.error(
-        'Firebase error getting daily super like count',
+        'Firebase error getting weekly super like count',
         error: e,
       );
       return 0;
     } on Object catch (e) {
       AppLogger.error(
-        'Unexpected error getting daily super like count',
+        'Unexpected error getting weekly super like count',
         error: e,
       );
       return 0;
@@ -540,18 +556,15 @@ class SuperLikeService {
     }
   }
 
-  /// Get next reset time for super likes
-  DateTime _getNextResetTime() {
-    final now = DateTime.now();
-    return DateTime(now.year, now.month, now.day + 1);
-  }
+  /// Next Monday 00:00 local when the weekly Super Like quota resets.
+  DateTime _getNextResetTime() => nextWeeklyQuotaResetLocal();
 
   /// Get super like statistics for a user
   Future<SuperLikeStats> getSuperLikeStats(String userId) async {
     try {
       final sent = await getSentSuperLikes(userId);
       final received = await getReceivedSuperLikes(userId);
-      final dailyCount = await getDailySuperLikeCount(userId);
+      final weekCount = await getWeeklySuperLikeCount(userId);
       final isPremium = await _isPremiumUser(userId);
 
       // Calculate response rate
@@ -565,8 +578,9 @@ class SuperLikeService {
       return SuperLikeStats(
         sentCount: sent.length,
         receivedCount: received.length,
-        dailyUsedCount: dailyCount,
-        dailyLimit: isPremium ? premiumSuperLikesPerDay : freeSuperLikesPerDay,
+        dailyUsedCount: weekCount,
+        dailyLimit:
+            isPremium ? premiumSuperLikesPerWeek : freeSuperLikesPerWeek,
         responseRate: responseRate,
         matchRate: matchRate,
         isPremium: isPremium,
@@ -779,11 +793,11 @@ class SuperLikeStats {
         sentCount: 0,
         receivedCount: 0,
         dailyUsedCount: 0,
-        dailyLimit: SuperLikeService.freeSuperLikesPerDay,
+        dailyLimit: SuperLikeService.freeSuperLikesPerWeek,
         responseRate: 0,
         matchRate: 0,
         isPremium: false,
-        nextResetTime: DateTime.now().add(const Duration(days: 1)),
+        nextResetTime: SuperLikeService.nextWeeklyQuotaResetLocal(),
       );
   final int sentCount;
   final int receivedCount;
@@ -794,6 +808,7 @@ class SuperLikeStats {
   final bool isPremium;
   final DateTime nextResetTime;
 
+  /// Remaining Super Likes for the current weekly quota (field names kept for compatibility).
   int get remainingToday => (dailyLimit - dailyUsedCount).clamp(0, dailyLimit);
   bool get canSendMore => remainingToday > 0;
 
@@ -801,7 +816,7 @@ class SuperLikeStats {
   String toString() => 'SuperLikeStats(\n'
       '  Sent: $sentCount\n'
       '  Received: $receivedCount\n'
-      '  Daily Used: $dailyUsedCount/$dailyLimit\n'
+      '  Week Used: $dailyUsedCount/$dailyLimit\n'
       '  Response Rate: ${(responseRate * 100).toStringAsFixed(1)}%\n'
       '  Match Rate: ${(matchRate * 100).toStringAsFixed(1)}%\n'
       '  Premium: $isPremium\n'

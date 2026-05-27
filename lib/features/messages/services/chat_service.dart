@@ -181,7 +181,11 @@ class ChatService {
   Future<void> setTyping(String threadId, {required bool isTyping}) async {
     final uid = currentUserId;
     if (uid == null) return;
-    await _chatThreadsCollection.doc(threadId).collection('typing').doc(uid).set(
+    await _chatThreadsCollection
+        .doc(threadId)
+        .collection('typing')
+        .doc(uid)
+        .set(
       {
         'isTyping': isTyping,
         'updatedAt': FieldValue.serverTimestamp(),
@@ -297,8 +301,7 @@ class ChatService {
             'timestamp': FieldValue.serverTimestamp(),
             'read': false,
             'deliveredAt': FieldValue.serverTimestamp(),
-            if (replyToMessageId != null)
-              'replyToMessageId': replyToMessageId,
+            if (replyToMessageId != null) 'replyToMessageId': replyToMessageId,
           };
 
           // Add the message
@@ -451,8 +454,8 @@ class ChatService {
                 text: data['text'] ?? '',
                 timestamp: parseDateTime(data['timestamp']),
                 isRead: data['read'] ?? false,
-                imageUrl: data['imageUrl'] as String? ??
-                    data['mediaUrl'] as String?,
+                imageUrl:
+                    data['imageUrl'] as String? ?? data['mediaUrl'] as String?,
                 messageType: data['messageType'] as String? ?? 'text',
               );
             }).toList(),
@@ -592,7 +595,8 @@ class ChatService {
             text: data['text'] ?? '',
             timestamp: parseDateTime(data['timestamp']),
             isRead: data['read'] ?? false,
-            imageUrl: data['imageUrl'] as String? ?? data['mediaUrl'] as String?,
+            imageUrl:
+                data['imageUrl'] as String? ?? data['mediaUrl'] as String?,
             messageType: data['messageType'] as String? ?? 'text',
           );
         }).toList();

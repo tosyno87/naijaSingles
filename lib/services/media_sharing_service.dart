@@ -26,8 +26,7 @@ class MediaSharingService {
   FirebaseStorage? _storage;
   final ImagePicker _imagePicker = ImagePicker();
 
-  FirebaseStorage get _storageInstance =>
-      _storage ?? FirebaseStorage.instance;
+  FirebaseStorage get _storageInstance => _storage ?? FirebaseStorage.instance;
 
   /// Share image in chat
   Future<MediaMessage> shareImage({

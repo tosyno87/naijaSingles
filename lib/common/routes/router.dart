@@ -399,7 +399,6 @@ abstract class AppRouter {
       }
       return LikesReceivedScreen(currentUser: arguments);
     },
-
   };
 
   /// Generate route method for MaterialApp

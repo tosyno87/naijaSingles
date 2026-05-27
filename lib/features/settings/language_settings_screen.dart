@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'dart:developer';
 
+import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -59,20 +60,46 @@ class _LanguageSettingsScreenState extends State<LanguageSettingsScreen> {
       'isAvailable': true,
     },
     {
+      'code': 'es',
+      'name': 'Spanish',
+      'nativeName': 'Español',
+      'flag': '🇪🇸',
+      'isAvailable': true,
+    },
+    {
       'code': 'fr',
       'name': 'French',
       'nativeName': 'Français',
       'flag': '🇫🇷',
-      'isAvailable': false, // Coming soon
+      'isAvailable': true,
     },
     {
-      'code': 'ar',
-      'name': 'Arabic',
-      'nativeName': 'العربية',
-      'flag': '🇸🇦',
-      'isAvailable': false, // Coming soon
+      'code': 'de',
+      'name': 'German',
+      'nativeName': 'Deutsch',
+      'flag': '🇩🇪',
+      'isAvailable': true,
     },
   ];
+
+  Locale _localeForCode(String code) {
+    switch (code) {
+      case 'yo':
+        return const Locale('yo', 'NG');
+      case 'ig':
+        return const Locale('ig', 'NG');
+      case 'ha':
+        return const Locale('ha', 'NG');
+      case 'es':
+        return const Locale('es', 'ES');
+      case 'fr':
+        return const Locale('fr', 'FR');
+      case 'de':
+        return const Locale('de', 'DE');
+      default:
+        return const Locale('en', 'US');
+    }
+  }
 
   @override
   void initState() {
@@ -133,9 +160,9 @@ class _LanguageSettingsScreenState extends State<LanguageSettingsScreen> {
         );
       }
 
-      // Note: In a full implementation, you would trigger app-wide language change here
-      // For now, we'll show a restart dialog
-      _showRestartDialog();
+      if (mounted) {
+        await context.setLocale(_localeForCode(languageCode));
+      }
     } on Object catch (e) {
       log('Error changing language: $e');
       setState(() => _isSaving = false);
@@ -206,36 +233,6 @@ class _LanguageSettingsScreenState extends State<LanguageSettingsScreen> {
                 textAlign: TextAlign.center,
               ),
               const SizedBox(height: AppSpacing.md),
-              Container(
-                padding: const EdgeInsets.all(AppSpacing.buttonRadius),
-                decoration: BoxDecoration(
-                  color: primaryColor.withValues(alpha: 0.05),
-                  borderRadius: BorderRadius.circular(AppSpacing.buttonRadius),
-                  border: Border.all(
-                    color: primaryColor.withValues(alpha: 0.2),
-                  ),
-                ),
-                child: Row(
-                  children: [
-                    const Icon(
-                      Icons.info_outline,
-                      color: primaryColor,
-                      size: 20,
-                    ),
-                    const SizedBox(width: AppSpacing.sm),
-                    Expanded(
-                      child: Text(
-                        'Full localization support is coming soon!',
-                        style: GoogleFonts.montserrat(
-                          color: primaryColor,
-                          fontSize: 13,
-                          fontWeight: FontWeight.w500,
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
-              ),
             ],
           ),
           actions: [

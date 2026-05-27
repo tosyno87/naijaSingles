@@ -4,6 +4,7 @@ import 'dart:developer' as dev;
 import 'package:flutter/material.dart';
 import 'package:flutter_contacts/flutter_contacts.dart';
 import 'package:permission_handler/permission_handler.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 /// Industry-standard contact invitation service
 /// Features:
@@ -151,34 +152,52 @@ class ContactInvitationService {
     };
   }
 
-  /// Send SMS invitation (placeholder - would integrate with SMS service)
+  /// Opens the device SMS composer with a pre-filled invitation message.
   Future<bool> sendSMSInvitation({
     required String phoneNumber,
     required String message,
   }) async {
     try {
-      dev.log('Sending SMS invitation to $phoneNumber');
-      dev.log('SMS Message: $message');
-      return true;
+      final uri = Uri(
+        scheme: 'sms',
+        path: phoneNumber,
+        queryParameters: <String, String>{'body': message},
+      );
+      return await _launchExternal(uri);
     } on Object catch (e) {
       dev.log('Error sending SMS: $e');
       return false;
     }
   }
 
-  /// Send email invitation (placeholder - would integrate with email service)
+  /// Opens the device email composer with a pre-filled invitation.
   Future<bool> sendEmailInvitation({
     required String email,
     required String subject,
     required String message,
   }) async {
     try {
-      dev.log('Sending email invitation to $email');
-      dev.log('Email Subject: $subject');
-      dev.log('Email Message: $message');
-      return true;
+      final uri = Uri(
+        scheme: 'mailto',
+        path: email,
+        queryParameters: <String, String>{
+          'subject': subject,
+          'body': message,
+        },
+      );
+      return await _launchExternal(uri);
     } on Object catch (e) {
       dev.log('Error sending email: $e');
+      return false;
+    }
+  }
+
+  Future<bool> _launchExternal(Uri uri) async {
+    try {
+      final launched = await launchUrl(uri, mode: LaunchMode.externalApplication);
+      return launched;
+    } on Object catch (e) {
+      dev.log('Error launching invitation URI: $e');
       return false;
     }
   }

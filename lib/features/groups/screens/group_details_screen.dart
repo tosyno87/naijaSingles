@@ -19,6 +19,7 @@ import '../../../widgets/group_notification_toggle.dart';
 import '../../../widgets/group_report_modal.dart';
 import '../../group_chat/screens/group_chat_screen.dart';
 import '../data/services/unified_group_service.dart';
+import '../widgets/group_posts_section.dart';
 import '../widgets/invite_members_modal.dart';
 import '../widgets/message_bubble.dart';
 import '../widgets/message_shimmer.dart';
@@ -363,6 +364,11 @@ class _GroupDetailsScreenState extends State<GroupDetailsScreen> {
           children: [
             _buildGroupHeader(),
             _buildGroupInfo(),
+            if (widget.group.id != null)
+              GroupPostsSection(
+                groupId: widget.group.id!,
+                isMember: widget.isMember,
+              ),
             _buildMemberSection(),
             _buildActionButtons(),
             const SizedBox(height: 20),

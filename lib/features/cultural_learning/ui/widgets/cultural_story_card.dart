@@ -254,10 +254,19 @@ class CulturalStoryCard extends StatelessWidget {
                       // Read more button
                       TextButton(
                         onPressed: () {
-                          ScaffoldMessenger.of(context).showSnackBar(
-                            const SnackBar(
-                              content: Text('Story details coming soon!'),
-                              backgroundColor: Color(0xFF008037),
+                          showDialog<void>(
+                            context: context,
+                            builder: (ctx) => AlertDialog(
+                              title: Text(title),
+                              content: SingleChildScrollView(
+                                child: Text(content),
+                              ),
+                              actions: [
+                                TextButton(
+                                  onPressed: () => Navigator.pop(ctx),
+                                  child: const Text('Close'),
+                                ),
+                              ],
                             ),
                           );
                         },

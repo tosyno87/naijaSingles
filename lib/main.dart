@@ -33,6 +33,7 @@ import 'features/payment/presentation/bloc/subscription_bloc.dart';
 // import 'debug/auto_login_service.dart'; // Uncomment if needed for testing
 import 'firebase_options.dart';
 import 'services/crashlytics_service.dart';
+import 'services/deep_link_service.dart';
 import 'services/secure_storage_service.dart';
 
 Future<void> main() async {
@@ -347,7 +348,7 @@ Future<void> main() async {
   );
 }
 
-class MyApp extends StatelessWidget {
+class MyApp extends StatefulWidget {
   const MyApp({super.key});
 
   // Global navigator key for notification navigation
@@ -355,9 +356,30 @@ class MyApp extends StatelessWidget {
       GlobalKey<NavigatorState>();
 
   @override
+  State<MyApp> createState() => _MyAppState();
+}
+
+class _MyAppState extends State<MyApp> {
+  final DeepLinkService _deepLinkService = DeepLinkService();
+
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      unawaited(_deepLinkService.initialize());
+    });
+  }
+
+  @override
+  void dispose() {
+    unawaited(_deepLinkService.dispose());
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
     // Set navigator key for notification service
-    NotificationService.navigatorKey = navigatorKey;
+    NotificationService.navigatorKey = MyApp.navigatorKey;
 
     return BlocBuilder<ThemeBloc, ThemeState>(
       builder: (context, themeState) {
@@ -366,7 +388,7 @@ class MyApp extends StatelessWidget {
             themeState.isDarkMode; // Default to light mode if not loaded
 
         return MaterialApp(
-          navigatorKey: navigatorKey, // Add navigator key
+          navigatorKey: MyApp.navigatorKey,
           title: 'Afropeep',
           debugShowCheckedModeBanner: false,
           theme: isDarkMode ? MyThemes.darkTheme : MyThemes.lightTheme,

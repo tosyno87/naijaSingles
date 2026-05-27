@@ -1,11 +1,13 @@
 import 'dart:async';
 import 'dart:io';
 
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:google_fonts/google_fonts.dart';
 
 import '../../../common/constants/app_colors.dart';
+import '../../../services/profile_sharing_service.dart';
 import '../bloc/onboarding_bloc.dart';
 import '../bloc/onboarding_data.dart';
 
@@ -786,14 +788,14 @@ class _ProfilePreviewScreenState extends State<ProfilePreviewScreen> {
       );
 
   void _shareProfile() {
-    // Implement profile sharing functionality
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Text(
-          'Profile sharing feature coming soon!',
-          style: GoogleFonts.montserrat(),
-        ),
-        backgroundColor: afropeepGreen,
+    final userId = FirebaseAuth.instance.currentUser?.uid;
+    if (userId == null) return;
+    final data = context.read<OnboardingBloc>().state.data;
+    final name = (data?.fullName.isNotEmpty ?? false) ? data!.fullName : 'My profile';
+    unawaited(
+      ProfileSharingService().shareProfile(
+        userId: userId,
+        displayName: name,
       ),
     );
   }

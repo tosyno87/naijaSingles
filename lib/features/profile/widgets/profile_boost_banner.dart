@@ -7,7 +7,6 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:in_app_purchase/in_app_purchase.dart';
 
 import '../../../common/constants/app_colors.dart';
-import '../../../common/constants/app_spacing.dart';
 import '../../../models/user_model.dart';
 import '../../../services/profile_boost_purchase_service.dart';
 import '../../../services/profile_boost_service.dart';
@@ -154,79 +153,139 @@ class _ProfileBoostBannerState extends State<ProfileBoostBanner> {
     if (_loading) return const SizedBox.shrink();
 
     final active = _remaining != null;
+    final title = active ? 'Boost active' : 'Boost profile';
+    final subtitle = active
+        ? '${_formatRemaining(_remaining!)} left in Connect'
+        : 'Get seen more in Connect for 1 hour';
+
     return Container(
       margin: const EdgeInsets.fromLTRB(
-        AppSpacing.md,
+        20,
         0,
-        AppSpacing.md,
-        AppSpacing.md,
+        20,
+        12,
       ),
-      padding: const EdgeInsets.all(AppSpacing.md),
+      padding: const EdgeInsets.fromLTRB(14, 12, 12, 12),
       decoration: BoxDecoration(
-        gradient: LinearGradient(
-          colors: active
-              ? [AppColors.primaryGreen, AppColors.primaryGreenLight]
-              : [const Color(0xFF1E3A5F), const Color(0xFF008037)],
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(14),
+        border: Border.all(
+          color: active
+              ? AppColors.primaryGreen.withValues(alpha: 0.28)
+              : const Color(0x14000000),
         ),
-        borderRadius: BorderRadius.circular(16),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withValues(alpha: 0.05),
+            blurRadius: 12,
+            offset: const Offset(0, 4),
+          ),
+        ],
       ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
+      child: Row(
         children: [
-          Text(
-            active ? 'Boost active' : 'Boost your profile',
-            style: GoogleFonts.montserrat(
-              color: Colors.white,
-              fontSize: 18,
-              fontWeight: FontWeight.bold,
+          Container(
+            width: 38,
+            height: 38,
+            decoration: BoxDecoration(
+              color: AppColors.primaryGreen.withValues(alpha: 0.1),
+              shape: BoxShape.circle,
+            ),
+            child: const Icon(
+              Icons.trending_up_rounded,
+              color: AppColors.primaryGreen,
+              size: 20,
             ),
           ),
-          const SizedBox(height: 6),
-          Text(
-            active
-                ? 'Time left: ${_formatRemaining(_remaining!)}'
-                : 'Be seen by more people in Connect for 1 hour.',
-            style: GoogleFonts.montserrat(
-              color: Colors.white.withValues(alpha: 0.9),
-              fontSize: 14,
-            ),
-          ),
-          const SizedBox(height: 12),
-          Row(
-            children: [
-              if (!active)
-                Expanded(
-                  child: OutlinedButton(
-                    onPressed: _purchasing ? null : _purchaseBoost,
-                    style: OutlinedButton.styleFrom(
-                      foregroundColor: Colors.white,
-                      side: const BorderSide(color: Colors.white),
-                    ),
-                    child: _purchasing
-                        ? const SizedBox(
-                            width: 18,
-                            height: 18,
-                            child: CircularProgressIndicator(
-                              strokeWidth: 2,
-                              color: Colors.white,
-                            ),
-                          )
-                        : const Text('Get boost'),
+          const SizedBox(width: 12),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Text(
+                  title,
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                  style: GoogleFonts.montserrat(
+                    color: AppColors.textPrimary,
+                    fontSize: 14,
+                    fontWeight: FontWeight.w700,
                   ),
                 ),
-              if (!active) const SizedBox(width: 8),
-              TextButton(
-                onPressed: _openProducts,
-                child: Text(
-                  'View plans',
+                const SizedBox(height: 3),
+                Text(
+                  subtitle,
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
                   style: GoogleFonts.montserrat(
-                    color: Colors.white,
-                    fontWeight: FontWeight.w600,
+                    color: AppColors.textSecondary,
+                    fontSize: 12,
+                    height: 1.2,
                   ),
+                ),
+              ],
+            ),
+          ),
+          const SizedBox(width: 10),
+          if (active)
+            TextButton(
+              onPressed: _openProducts,
+              style: TextButton.styleFrom(
+                foregroundColor: AppColors.primaryGreen,
+                padding: const EdgeInsets.symmetric(horizontal: 8),
+                minimumSize: const Size(0, 36),
+                tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+              ),
+              child: Text(
+                'Plans',
+                style: GoogleFonts.montserrat(
+                  fontSize: 13,
+                  fontWeight: FontWeight.w700,
                 ),
               ),
-            ],
-          ),
+            )
+          else
+            FilledButton(
+              onPressed: _purchasing ? null : _purchaseBoost,
+              style: FilledButton.styleFrom(
+                backgroundColor: AppColors.primaryGreen,
+                foregroundColor: Colors.white,
+                padding: const EdgeInsets.symmetric(horizontal: 14),
+                minimumSize: const Size(0, 38),
+                tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(999),
+                ),
+              ),
+              child: _purchasing
+                  ? const SizedBox(
+                      width: 16,
+                      height: 16,
+                      child: CircularProgressIndicator(
+                        strokeWidth: 2,
+                        color: Colors.white,
+                      ),
+                    )
+                  : Text(
+                      'Boost',
+                      style: GoogleFonts.montserrat(
+                        fontSize: 13,
+                        fontWeight: FontWeight.w700,
+                      ),
+                    ),
+            ),
+          if (!active)
+            IconButton(
+              onPressed: _openProducts,
+              tooltip: 'View plans',
+              visualDensity: VisualDensity.compact,
+              icon: const Icon(
+                Icons.info_outline_rounded,
+                color: AppColors.textTertiary,
+                size: 20,
+              ),
+            ),
         ],
       ),
     );

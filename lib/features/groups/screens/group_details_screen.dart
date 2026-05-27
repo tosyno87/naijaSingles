@@ -364,11 +364,10 @@ class _GroupDetailsScreenState extends State<GroupDetailsScreen> {
           children: [
             _buildGroupHeader(),
             _buildGroupInfo(),
-            if (widget.group.id != null)
-              GroupPostsSection(
-                groupId: widget.group.id!,
-                isMember: widget.isMember,
-              ),
+            GroupPostsSection(
+              groupId: widget.group.id,
+              isMember: widget.isMember,
+            ),
             _buildMemberSection(),
             _buildActionButtons(),
             const SizedBox(height: 20),

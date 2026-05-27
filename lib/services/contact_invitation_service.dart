@@ -194,7 +194,8 @@ class ContactInvitationService {
 
   Future<bool> _launchExternal(Uri uri) async {
     try {
-      final launched = await launchUrl(uri, mode: LaunchMode.externalApplication);
+      final launched =
+          await launchUrl(uri, mode: LaunchMode.externalApplication);
       return launched;
     } on Object catch (e) {
       dev.log('Error launching invitation URI: $e');

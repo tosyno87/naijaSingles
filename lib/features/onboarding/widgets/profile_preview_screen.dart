@@ -791,7 +791,8 @@ class _ProfilePreviewScreenState extends State<ProfilePreviewScreen> {
     final userId = FirebaseAuth.instance.currentUser?.uid;
     if (userId == null) return;
     final data = context.read<OnboardingBloc>().state.data;
-    final name = (data?.fullName.isNotEmpty ?? false) ? data!.fullName : 'My profile';
+    final name =
+        (data?.fullName.isNotEmpty ?? false) ? data!.fullName : 'My profile';
     unawaited(
       ProfileSharingService().shareProfile(
         userId: userId,

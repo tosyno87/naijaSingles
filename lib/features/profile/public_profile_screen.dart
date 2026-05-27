@@ -29,8 +29,10 @@ class _PublicProfileScreenState extends State<PublicProfileScreen> {
 
   Future<void> _load() async {
     try {
-      final doc =
-          await FirebaseFirestore.instance.collection('users').doc(widget.userId).get();
+      final doc = await FirebaseFirestore.instance
+          .collection('users')
+          .doc(widget.userId)
+          .get();
       if (!doc.exists) {
         setState(() {
           _error = 'Profile not found';

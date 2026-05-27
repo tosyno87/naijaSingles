@@ -5,12 +5,16 @@ class Message {
     required this.text,
     required this.timestamp,
     required this.isRead,
+    this.imageUrl,
+    this.messageType = 'text',
   });
   final String id;
   final String senderId;
   final String text;
   final DateTime timestamp;
   final bool isRead;
+  final String? imageUrl;
+  final String messageType;
 }
 
 class MessageThreadInfo {

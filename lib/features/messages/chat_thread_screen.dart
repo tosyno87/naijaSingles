@@ -6,10 +6,12 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:image_picker/image_picker.dart';
 
 import '../../common/constants/app_colors.dart';
 import '../../common/widgets/state_views/state_views.dart';
 import '../../models/user_model.dart';
+import '../../services/media_sharing_service.dart';
 import '../../services/settings_service.dart';
 import '../chat_shared/models/chat_message_view_model.dart';
 import '../chat_shared/ui/widgets/chat_bubble.dart';
@@ -17,6 +19,7 @@ import '../chat_shared/ui/widgets/chat_composer.dart';
 import '../dating/screens/user_detail_screen.dart';
 import 'message_model.dart';
 import 'services/chat_service.dart';
+import 'widgets/pre_meet_safety_sheet.dart';
 
 class ChatThreadScreen extends StatefulWidget {
   const ChatThreadScreen({
@@ -39,8 +42,15 @@ class _ChatThreadScreenState extends State<ChatThreadScreen> {
   final TextEditingController _messageController = TextEditingController();
   final ScrollController _scrollController = ScrollController();
   final ChatService _chatService = ChatService();
+  final MediaSharingService _mediaService = MediaSharingService();
+  final ImagePicker _imagePicker = ImagePicker();
   String? _currentUserId;
   bool _hasText = false;
+  Timer? _typingDebounce;
+  bool _showSearch = false;
+  String _searchQuery = '';
+  String? _replyToMessageId;
+  String? _replyPreview;
 
   @override
   void initState() {
@@ -55,6 +65,11 @@ class _ChatThreadScreenState extends State<ChatThreadScreen> {
           _hasText = hasText;
         });
       }
+      _typingDebounce?.cancel();
+      unawaited(_chatService.setTyping(widget.threadId, isTyping: true));
+      _typingDebounce = Timer(const Duration(seconds: 2), () {
+        unawaited(_chatService.setTyping(widget.threadId, isTyping: false));
+      });
     });
 
     unawaited(_chatService.markThreadAsRead(widget.threadId));
@@ -67,6 +82,8 @@ class _ChatThreadScreenState extends State<ChatThreadScreen> {
 
   @override
   void dispose() {
+    _typingDebounce?.cancel();
+    unawaited(_chatService.setTyping(widget.threadId, isTyping: false));
     _messageController.dispose();
     _scrollController.dispose();
     super.dispose();
@@ -81,6 +98,25 @@ class _ChatThreadScreenState extends State<ChatThreadScreen> {
           curve: Curves.easeOut,
         ),
       );
+    }
+  }
+
+  Future<void> _pickAndSendImage() async {
+    try {
+      final picked = await _imagePicker.pickImage(
+        source: ImageSource.gallery,
+        imageQuality: 85,
+      );
+      if (picked == null) return;
+      await _mediaService.shareImage(
+        threadId: widget.threadId,
+        imagePath: picked.path,
+      );
+      if (mounted) {
+        Future.delayed(const Duration(milliseconds: 100), _scrollToBottom);
+      }
+    } on Object catch (error) {
+      _showErrorSnackBar('Could not send image: $error');
     }
   }
 
@@ -99,7 +135,17 @@ class _ChatThreadScreenState extends State<ChatThreadScreen> {
     }
 
     try {
-      final success = await _chatService.sendMessage(widget.threadId, text);
+      final success = await _chatService.sendMessage(
+        widget.threadId,
+        text,
+        replyToMessageId: _replyToMessageId,
+      );
+      if (success) {
+        setState(() {
+          _replyToMessageId = null;
+          _replyPreview = null;
+        });
+      }
       if (success) {
         _messageController.clear();
         Future.delayed(const Duration(milliseconds: 100), _scrollToBottom);
@@ -157,12 +203,24 @@ class _ChatThreadScreenState extends State<ChatThreadScreen> {
                       ),
                       overflow: TextOverflow.ellipsis,
                     ),
-                    Text(
-                      'Tap to view profile',
-                      style: GoogleFonts.montserrat(
-                        fontSize: 11,
-                        color: AppColors.primaryGreen,
+                    StreamBuilder<List<String>>(
+                      stream: _chatService.watchOtherUsersTyping(
+                        widget.threadId,
                       ),
+                      builder: (context, snapshot) {
+                        final typing = snapshot.data?.isNotEmpty ?? false;
+                        return Text(
+                          typing ? 'typing...' : 'Tap to view profile',
+                          style: GoogleFonts.montserrat(
+                            fontSize: 11,
+                            color: typing
+                                ? AppColors.primaryGreen
+                                : AppColors.textSecondary,
+                            fontStyle:
+                                typing ? FontStyle.italic : FontStyle.normal,
+                          ),
+                        );
+                      },
                     ),
                   ],
                 ),
@@ -171,6 +229,13 @@ class _ChatThreadScreenState extends State<ChatThreadScreen> {
           ),
         ),
         actions: [
+          IconButton(
+            icon: Icon(
+              _showSearch ? Icons.close : Icons.search,
+              color: AppColors.primaryGreen,
+            ),
+            onPressed: () => setState(() => _showSearch = !_showSearch),
+          ),
           IconButton(
             icon: const Icon(Icons.info_outline, color: AppColors.primaryGreen),
             onPressed: _showUserProfile,
@@ -188,9 +253,16 @@ class _ChatThreadScreenState extends State<ChatThreadScreen> {
                 case 'clear':
                   _showClearChatDialog();
                   break;
+                case 'safety':
+                  unawaited(PreMeetSafetySheet.show(context));
+                  break;
               }
             },
             itemBuilder: (context) => [
+              const PopupMenuItem(
+                value: 'safety',
+                child: Text('Safety tips'),
+              ),
               const PopupMenuItem(
                 value: 'block',
                 child: Text(
@@ -218,6 +290,17 @@ class _ChatThreadScreenState extends State<ChatThreadScreen> {
       ),
       body: Column(
         children: [
+          if (_showSearch)
+            Padding(
+              padding: const EdgeInsets.fromLTRB(16, 8, 16, 0),
+              child: TextField(
+                decoration: const InputDecoration(
+                  hintText: 'Search in conversation',
+                  prefixIcon: Icon(Icons.search),
+                ),
+                onChanged: (value) => setState(() => _searchQuery = value),
+              ),
+            ),
           // Chat messages
           Expanded(
             child: StreamBuilder<List<Message>>(
@@ -235,7 +318,13 @@ class _ChatThreadScreenState extends State<ChatThreadScreen> {
                   );
                 }
 
-                final messages = snapshot.data ?? [];
+                var messages = snapshot.data ?? [];
+                if (_searchQuery.isNotEmpty) {
+                  final q = _searchQuery.toLowerCase();
+                  messages = messages
+                      .where((m) => m.text.toLowerCase().contains(q))
+                      .toList();
+                }
 
                 if (messages.isEmpty) {
                   return AppEmptyView(
@@ -273,13 +362,17 @@ class _ChatThreadScreenState extends State<ChatThreadScreen> {
                       senderAvatarUrl: isMe ? null : widget.avatarUrl,
                       isRead: message.isRead,
                       showReadReceipt: true,
+                      imageUrl: message.imageUrl,
                     );
 
                     return Column(
                       children: [
                         if (showDateSeparator)
                           _buildDateSeparator(message.timestamp),
-                        ChatBubble(message: vm),
+                        GestureDetector(
+                          onLongPress: () => _showMessageActions(message.id),
+                          child: ChatBubble(message: vm),
+                        ),
                       ],
                     );
                   },
@@ -288,10 +381,35 @@ class _ChatThreadScreenState extends State<ChatThreadScreen> {
             ),
           ),
 
+          if (_replyPreview != null)
+            Container(
+              color: Colors.grey.shade100,
+              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+              child: Row(
+                children: [
+                  Expanded(
+                    child: Text(
+                      'Replying: $_replyPreview',
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                  ),
+                  IconButton(
+                    icon: const Icon(Icons.close),
+                    onPressed: () => setState(() {
+                      _replyToMessageId = null;
+                      _replyPreview = null;
+                    }),
+                  ),
+                ],
+              ),
+            ),
           ChatComposer(
             controller: _messageController,
             onSend: _sendMessage,
             hasText: _hasText,
+            showAttachButton: true,
+            onAttachTap: _pickAndSendImage,
             showEmojiButton: true,
             onEmojiTap: _showEmojiPicker,
           ),
@@ -1096,6 +1214,44 @@ class _ChatThreadScreenState extends State<ChatThreadScreen> {
   }
 
   // Show error snackbar
+  Future<void> _showMessageActions(String messageId) async {
+    final action = await showModalBottomSheet<String>(
+      context: context,
+      builder: (ctx) => SafeArea(
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            ListTile(
+              leading: const Icon(Icons.reply),
+              title: const Text('Reply'),
+              onTap: () => Navigator.pop(ctx, 'reply'),
+            ),
+            ListTile(
+              leading: const Icon(Icons.emoji_emotions_outlined),
+              title: const Text('React'),
+              onTap: () => Navigator.pop(ctx, 'react'),
+            ),
+          ],
+        ),
+      ),
+    );
+    if (!mounted || action == null) return;
+    if (action == 'reply') {
+      setState(() {
+        _replyToMessageId = messageId;
+        _replyPreview = _messageController.text.isNotEmpty
+            ? _messageController.text
+            : 'message';
+      });
+    } else if (action == 'react') {
+      await _chatService.addReaction(
+        threadId: widget.threadId,
+        messageId: messageId,
+        emoji: '❤️',
+      );
+    }
+  }
+
   void _showErrorSnackBar(String message) {
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(

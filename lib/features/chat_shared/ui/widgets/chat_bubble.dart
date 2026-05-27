@@ -105,7 +105,20 @@ class ChatBubble extends StatelessWidget {
               padding: const EdgeInsets.only(bottom: 4),
               child: Text(message.senderName!, style: tokens.senderNameStyle()),
             ),
-          Text(message.text, style: tokens.messageStyle(isOwn: isOwn)),
+          if (message.imageUrl != null) ...[
+            ClipRRect(
+              borderRadius: BorderRadius.circular(12),
+              child: Image.network(
+                message.imageUrl!,
+                width: 220,
+                fit: BoxFit.cover,
+                errorBuilder: (_, __, ___) => const Icon(Icons.broken_image),
+              ),
+            ),
+            if (message.text.isNotEmpty) const SizedBox(height: 6),
+          ],
+          if (message.text.isNotEmpty)
+            Text(message.text, style: tokens.messageStyle(isOwn: isOwn)),
           const SizedBox(height: 6),
           _timestampRow(tokens, isOwn),
         ],

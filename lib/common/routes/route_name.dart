@@ -38,6 +38,7 @@ class RouteName {
   static const String matchPage = '/match';
   static const String chatPageScreen = '/chat_page';
   static const String userDetailScreen = '/user_detail';
+  static const String likesReceived = '/likes_received';
 
   // ===== SETTINGS ROUTES =====
   static const String settingPage = '/setting';

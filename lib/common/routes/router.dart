@@ -31,6 +31,7 @@ import '../../features/explore/explore_screen.dart';
 import '../../features/group_chat/screens/group_list_screen.dart';
 import '../../features/groups/screens/unified_groups_screen.dart';
 import '../../features/home/main_navigation_screen.dart';
+import '../../features/likes_received/presentation/likes_received_screen.dart';
 import '../../features/home/ui/screens/splash.dart';
 import '../../features/home/ui/screens/user_filter/settings.dart';
 import '../../features/home/ui/tab/tabbar.dart';
@@ -387,6 +388,16 @@ abstract class AppRouter {
           'Invalid user type passed to UserDetailScreen: ${arguments.runtimeType}',
         );
       }
+    },
+
+    RouteName.likesReceived: (context) {
+      final arguments = ModalRoute.of(context)?.settings.arguments;
+      if (arguments is! UserModel) {
+        return const Scaffold(
+          body: Center(child: Text('Sign in to view likes')),
+        );
+      }
+      return LikesReceivedScreen(currentUser: arguments);
     },
   };
 

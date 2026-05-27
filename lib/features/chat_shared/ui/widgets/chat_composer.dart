@@ -21,11 +21,15 @@ class ChatComposer extends StatelessWidget {
     this.submitOnEnter = false,
     this.maxLines = 4,
     this.hintText = 'Type a message...',
+    this.showAttachButton = false,
+    this.onAttachTap,
   });
 
   final TextEditingController controller;
   final VoidCallback onSend;
   final bool hasText;
+  final bool showAttachButton;
+  final VoidCallback? onAttachTap;
   final bool showEmojiButton;
   final VoidCallback? onEmojiTap;
   final bool animateSendButton;
@@ -53,6 +57,11 @@ class ChatComposer extends StatelessWidget {
       child: SafeArea(
         child: Row(
           children: [
+            if (showAttachButton)
+              IconButton(
+                icon: const Icon(Icons.image_outlined, color: Colors.grey),
+                onPressed: onAttachTap,
+              ),
             if (showEmojiButton)
               IconButton(
                 icon: const Icon(

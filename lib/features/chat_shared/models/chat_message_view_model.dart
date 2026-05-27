@@ -12,10 +12,12 @@ class ChatMessageViewModel {
     this.isRead = false,
     this.isSystemMessage = false,
     this.showReadReceipt = false,
+    this.imageUrl,
   });
 
   final String id;
   final String text;
+  final String? imageUrl;
   final DateTime timestamp;
   final String senderId;
   final bool isOwnMessage;

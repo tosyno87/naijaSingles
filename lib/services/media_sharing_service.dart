@@ -23,8 +23,11 @@ class MediaSharingService {
 
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
   final FirebaseAuth _auth = FirebaseAuth.instance;
-  final FirebaseStorage _storage = FirebaseStorage.instance;
+  FirebaseStorage? _storage;
   final ImagePicker _imagePicker = ImagePicker();
+
+  FirebaseStorage get _storageInstance =>
+      _storage ?? FirebaseStorage.instance;
 
   /// Share image in chat
   Future<MediaMessage> shareImage({
@@ -332,7 +335,7 @@ class MediaSharingService {
     try {
       final file = File(imagePath);
       final fileName = 'images/${DateTime.now().millisecondsSinceEpoch}.jpg';
-      final ref = _storage.ref().child(fileName);
+      final ref = _storageInstance.ref().child(fileName);
 
       final uploadTask = await ref.putFile(file);
       return await uploadTask.ref.getDownloadURL();
@@ -347,7 +350,7 @@ class MediaSharingService {
     try {
       final file = File(videoPath);
       final fileName = 'videos/${DateTime.now().millisecondsSinceEpoch}.mp4';
-      final ref = _storage.ref().child(fileName);
+      final ref = _storageInstance.ref().child(fileName);
 
       final uploadTask = await ref.putFile(file);
       return await uploadTask.ref.getDownloadURL();
@@ -362,7 +365,7 @@ class MediaSharingService {
     try {
       final file = File(audioPath);
       final fileName = 'audio/${DateTime.now().millisecondsSinceEpoch}.m4a';
-      final ref = _storage.ref().child(fileName);
+      final ref = _storageInstance.ref().child(fileName);
 
       final uploadTask = await ref.putFile(file);
       return await uploadTask.ref.getDownloadURL();
@@ -378,7 +381,7 @@ class MediaSharingService {
       final file = File(filePath);
       final fileName =
           'files/${DateTime.now().millisecondsSinceEpoch}_${file.path.split('/').last}';
-      final ref = _storage.ref().child(fileName);
+      final ref = _storageInstance.ref().child(fileName);
 
       final uploadTask = await ref.putFile(file);
       return await uploadTask.ref.getDownloadURL();

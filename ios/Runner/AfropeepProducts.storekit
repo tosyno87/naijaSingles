@@ -1,7 +1,35 @@
 {
   "identifier" : "F7B3E7A0-1234-4A5B-9C8D-AFROPEEP0001",
-  "type" : "subscriptions",
-  "version" : 2,
+  "nonRenewingSubscriptions" : [
+
+  ],
+  "products" : [
+    {
+      "displayPrice" : "4.99",
+      "familyShareable" : false,
+      "internalID" : "6762096199",
+      "localizations" : [
+        {
+          "description" : "Get more visibility in Connect for one hour.",
+          "displayName" : "Profile Boost (1 hour)",
+          "locale" : "en_US"
+        }
+      ],
+      "productID" : "com.afropeep.boost.1h",
+      "referenceName" : "Profile Boost 1h",
+      "type" : "Consumable"
+    }
+  ],
+  "settings" : {
+    "_failTransactionsEnabled" : false,
+    "_storeKitErrors" : [
+      {
+        "current" : null,
+        "enabled" : false,
+        "name" : "Load Products"
+      }
+    ]
+  },
   "subscriptionGroups" : [
     {
       "id" : "22028873",
@@ -61,14 +89,5 @@
       ]
     }
   ],
-  "settings" : {
-    "_failTransactionsEnabled" : false,
-    "_storeKitErrors" : [
-      {
-        "current" : null,
-        "enabled" : false,
-        "name" : "Load Products"
-      }
-    ]
-  }
+  "version" : 2
 }

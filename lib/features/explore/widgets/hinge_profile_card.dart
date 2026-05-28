@@ -376,7 +376,63 @@ class _HingeProfileCardState extends State<HingeProfileCard> {
         ),
       );
 
-  Widget _buildPromptsSection() => const SizedBox.shrink();
+  Widget _buildPromptsSection() {
+    final prompts = <MapEntry<String, String>>[];
+    if (widget.user.bio != null && widget.user.bio!.trim().isNotEmpty) {
+      prompts.add(MapEntry('About me', widget.user.bio!.trim()));
+    }
+    if (widget.user.lookingFor != null &&
+        widget.user.lookingFor!.trim().isNotEmpty) {
+      prompts.add(MapEntry('Looking for', widget.user.lookingFor!.trim()));
+    }
+    if (widget.user.tribe != null && widget.user.tribe!.trim().isNotEmpty) {
+      prompts.add(MapEntry('Heritage', widget.user.tribe!.trim()));
+    }
+    if (prompts.isEmpty) return const SizedBox.shrink();
+
+    return Padding(
+      padding: const EdgeInsets.only(top: 16),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: prompts
+            .map(
+              (entry) => Container(
+                width: double.infinity,
+                margin: const EdgeInsets.only(bottom: 10),
+                padding: const EdgeInsets.all(14),
+                decoration: BoxDecoration(
+                  color: Colors.grey.shade100,
+                  borderRadius: BorderRadius.circular(12),
+                  border: Border.all(color: Colors.grey.shade300),
+                ),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      entry.key,
+                      style: GoogleFonts.montserrat(
+                        fontSize: 12,
+                        fontWeight: FontWeight.w600,
+                        color: AppColors.primaryGreen,
+                      ),
+                    ),
+                    const SizedBox(height: 6),
+                    Text(
+                      entry.value,
+                      style: GoogleFonts.montserrat(
+                        fontSize: 15,
+                        color: AppColors.textPrimary,
+                        height: 1.35,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            )
+            .toList(),
+      ),
+    );
+  }
 
   Widget _buildDetailsSection() {
     final details = <Map<String, dynamic>>[];

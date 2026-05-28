@@ -38,6 +38,8 @@ import '../../features/home/ui/tab/tabbar.dart';
 import '../../features/match/ui/screen/match_page.dart';
 import '../../features/onboarding/onboarding_main.dart';
 import '../../features/profile/edit_profile_screen.dart';
+import '../../features/profile/public_profile_screen.dart';
+import '../../services/deep_link_service.dart';
 import '../../features/profile/settings_screen.dart';
 import '../../features/settings/account_deletion_screen.dart';
 import '../../features/settings/blocked_users_screen.dart';
@@ -399,6 +401,17 @@ abstract class AppRouter {
       }
       return LikesReceivedScreen(currentUser: arguments);
     },
+
+    RouteName.publicProfile: (context) {
+      final arguments = ModalRoute.of(context)?.settings.arguments;
+      final userId = arguments is String ? arguments : null;
+      if (userId == null || userId.isEmpty) {
+        return const Scaffold(
+          body: Center(child: Text('Invalid profile link')),
+        );
+      }
+      return PublicProfileScreen(userId: userId);
+    },
   };
 
   /// Generate route method for MaterialApp
@@ -407,6 +420,21 @@ abstract class AppRouter {
 
     // Debug logging to help identify route issues
     _routeLog('🔍 Router: Attempting to navigate to route: "$routeName"');
+
+    // Profile deep link: /profile/{userId} or https://afropeep.app/profile/{userId}
+    if (routeName.startsWith(DeepLinkService.profilePathPrefix) &&
+        routeName.length > DeepLinkService.profilePathPrefix.length) {
+      final userId = routeName
+          .substring(DeepLinkService.profilePathPrefix.length)
+          .split('/')
+          .first;
+      if (userId.isNotEmpty) {
+        return MaterialPageRoute<void>(
+          settings: settings,
+          builder: (_) => PublicProfileScreen(userId: userId),
+        );
+      }
+    }
 
     // Handle Firebase Authentication deep link callbacks silently
     // Firebase phone auth uses /link?deep_link_id=... to redirect back to app after reCAPTCHA

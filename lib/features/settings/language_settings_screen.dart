@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'dart:developer';
 
+import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -59,20 +60,46 @@ class _LanguageSettingsScreenState extends State<LanguageSettingsScreen> {
       'isAvailable': true,
     },
     {
+      'code': 'es',
+      'name': 'Spanish',
+      'nativeName': 'Español',
+      'flag': '🇪🇸',
+      'isAvailable': true,
+    },
+    {
       'code': 'fr',
       'name': 'French',
       'nativeName': 'Français',
       'flag': '🇫🇷',
-      'isAvailable': false, // Coming soon
+      'isAvailable': true,
     },
     {
-      'code': 'ar',
-      'name': 'Arabic',
-      'nativeName': 'العربية',
-      'flag': '🇸🇦',
-      'isAvailable': false, // Coming soon
+      'code': 'de',
+      'name': 'German',
+      'nativeName': 'Deutsch',
+      'flag': '🇩🇪',
+      'isAvailable': true,
     },
   ];
+
+  Locale _localeForCode(String code) {
+    switch (code) {
+      case 'yo':
+        return const Locale('yo', 'NG');
+      case 'ig':
+        return const Locale('ig', 'NG');
+      case 'ha':
+        return const Locale('ha', 'NG');
+      case 'es':
+        return const Locale('es', 'ES');
+      case 'fr':
+        return const Locale('fr', 'FR');
+      case 'de':
+        return const Locale('de', 'DE');
+      default:
+        return const Locale('en', 'US');
+    }
+  }
 
   @override
   void initState() {
@@ -133,9 +160,9 @@ class _LanguageSettingsScreenState extends State<LanguageSettingsScreen> {
         );
       }
 
-      // Note: In a full implementation, you would trigger app-wide language change here
-      // For now, we'll show a restart dialog
-      _showRestartDialog();
+      if (mounted) {
+        await context.setLocale(_localeForCode(languageCode));
+      }
     } on Object catch (e) {
       log('Error changing language: $e');
       setState(() => _isSaving = false);
@@ -156,124 +183,6 @@ class _LanguageSettingsScreenState extends State<LanguageSettingsScreen> {
         );
       }
     }
-  }
-
-  void _showRestartDialog() {
-    unawaited(
-      showDialog(
-        context: context,
-        barrierDismissible: false,
-        builder: (context) => AlertDialog(
-          backgroundColor: cardColor,
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(AppSpacing.chipRadius),
-          ),
-          elevation: 8,
-          contentPadding: const EdgeInsets.all(AppSpacing.lg),
-          title: Column(
-            children: [
-              Container(
-                width: 60,
-                height: 60,
-                decoration: BoxDecoration(
-                  color: primaryColor.withValues(alpha: 0.1),
-                  shape: BoxShape.circle,
-                ),
-                child:
-                    const Icon(Icons.language, color: primaryColor, size: 30),
-              ),
-              const SizedBox(height: AppSpacing.md),
-              Text(
-                'Language Changed',
-                style: GoogleFonts.montserrat(
-                  fontWeight: FontWeight.bold,
-                  fontSize: 20,
-                  color: textPrimary,
-                ),
-              ),
-            ],
-          ),
-          content: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Text(
-                'The language has been changed successfully. Please restart the app to see the changes take effect.',
-                style: GoogleFonts.montserrat(
-                  color: textSecondary,
-                  fontSize: 16,
-                  height: 1.5,
-                ),
-                textAlign: TextAlign.center,
-              ),
-              const SizedBox(height: AppSpacing.md),
-              Container(
-                padding: const EdgeInsets.all(AppSpacing.buttonRadius),
-                decoration: BoxDecoration(
-                  color: primaryColor.withValues(alpha: 0.05),
-                  borderRadius: BorderRadius.circular(AppSpacing.buttonRadius),
-                  border: Border.all(
-                    color: primaryColor.withValues(alpha: 0.2),
-                  ),
-                ),
-                child: Row(
-                  children: [
-                    const Icon(
-                      Icons.info_outline,
-                      color: primaryColor,
-                      size: 20,
-                    ),
-                    const SizedBox(width: AppSpacing.sm),
-                    Expanded(
-                      child: Text(
-                        'Full localization support is coming soon!',
-                        style: GoogleFonts.montserrat(
-                          color: primaryColor,
-                          fontSize: 13,
-                          fontWeight: FontWeight.w500,
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-            ],
-          ),
-          actions: [
-            SizedBox(
-              width: double.infinity,
-              child: ElevatedButton(
-                onPressed: () => Navigator.pop(context),
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: primaryColor,
-                  foregroundColor: Colors.white,
-                  padding: const EdgeInsets.symmetric(
-                    vertical: AppSpacing.buttonRadius,
-                  ),
-                  shape: RoundedRectangleBorder(
-                    borderRadius:
-                        BorderRadius.circular(AppSpacing.buttonRadius),
-                  ),
-                  elevation: 0,
-                ),
-                child: Text(
-                  'Got it',
-                  style: GoogleFonts.montserrat(
-                    fontWeight: FontWeight.w600,
-                    fontSize: 16,
-                  ),
-                ),
-              ),
-            ),
-          ],
-          actionsPadding: const EdgeInsets.fromLTRB(
-            AppSpacing.lg,
-            0,
-            AppSpacing.lg,
-            AppSpacing.lg,
-          ),
-        ),
-      ),
-    );
   }
 
   @override

@@ -7,6 +7,7 @@ import '../../../features/match/data/services/match_service.dart';
 import '../../../models/user_model.dart';
 import '../../../services/cached_user_service.dart';
 import '../../../services/paginated_user_service.dart';
+import 'discovery_boost_sort.dart';
 import '../../constants/constants.dart';
 import '../../utils/distance.dart' as distance;
 
@@ -36,6 +37,22 @@ class UserSearchRepo {
     final doc = await db.collection('Item_access').get();
     if (doc.docs.isNotEmpty) {
       items = doc.docs[0].data();
+    }
+  }
+
+  static Future<Set<String>> _activeBoostedUserIds() async {
+    try {
+      final snapshot = await docRef
+          .where(
+            'boostExpiresAt',
+            isGreaterThan: Timestamp.now(),
+          )
+          .limit(100)
+          .get();
+      return snapshot.docs.map((doc) => doc.id).toSet();
+    } on Object catch (e) {
+      debugPrint('⚠️ Could not load boosted users: $e');
+      return {};
     }
   }
 
@@ -225,9 +242,15 @@ class UserSearchRepo {
       debugPrint('🎯 Effective intent filter: $effectiveIntent');
 
       // Use consolidated discovery service for better performance and consistency
-      final users = await DiscoveryService.getUsersForDiscovery(
+      var users = await DiscoveryService.getUsersForDiscovery(
         currentUser,
         intentFilter: effectiveIntent,
+      );
+
+      final boostedIds = await _activeBoostedUserIds();
+      users = sortUsersWithBoostPriority(
+        users: users,
+        boostedUserIds: boostedIds,
       );
 
       debugPrint('✅ Retrieved ${users.length} users from unified service');

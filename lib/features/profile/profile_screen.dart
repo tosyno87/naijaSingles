@@ -12,8 +12,12 @@ import '../../common/routes/route_name.dart';
 import '../../common/utils/country_flag.dart';
 import '../../common/widgets/state_views/state_views.dart';
 
+import '../../models/user_model.dart';
+import '../../services/profile_boost_purchase_service.dart';
+import '../../services/profile_boost_service.dart';
 import 'edit_profile_screen.dart';
 import 'settings_screen.dart';
+import 'widgets/profile_boost_banner.dart';
 
 class ProfileScreen extends StatefulWidget {
   const ProfileScreen({super.key, this.auth, this.firestore});
@@ -189,6 +193,21 @@ class _ProfileScreenState extends State<ProfileScreen> {
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
+                          ProfileBoostBanner(
+                            currentUser: UserModel(
+                              id: _auth.currentUser?.uid,
+                              name: _userData?['name']?.toString(),
+                            ),
+                            boostService: ProfileBoostService(
+                              firestore: _firestore,
+                            ),
+                            purchaseService: ProfileBoostPurchaseService(
+                              firestore: _firestore,
+                              boostService: ProfileBoostService(
+                                firestore: _firestore,
+                              ),
+                            ),
+                          ),
                           // Hinge-style large photo section (full width, no padding)
                           _buildHingePhotoSection(),
 

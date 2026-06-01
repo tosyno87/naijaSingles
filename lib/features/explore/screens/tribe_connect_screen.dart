@@ -17,7 +17,9 @@ import '../../../common/data/repo/user_search_repo.dart';
 import '../../../common/widgets/dating_feedback_snackbar.dart';
 import '../../../common/widgets/state_views/state_views.dart';
 import '../../../models/user_model.dart';
+import '../../../common/routes/route_name.dart';
 import '../../../services/super_like_service.dart';
+import '../../../services/undo_service.dart';
 import '../widgets/hinge_profile_card.dart';
 import '../widgets/match_confirmation_modal.dart';
 
@@ -40,6 +42,8 @@ class _TribeConnectScreenState extends State<TribeConnectScreen>
     with TickerProviderStateMixin {
   final Set<String> _processedUserIds = <String>{};
   final SuperLikeService _superLikeService = SuperLikeService();
+  final UndoService _undoService = UndoService();
+  UserModel? _lastPassedUser;
   bool _isRefreshing = false;
   bool _deckBusy = false;
   String? _pendingExitUid;
@@ -116,6 +120,9 @@ class _TribeConnectScreenState extends State<TribeConnectScreen>
         unawaited(_likeEnterController.forward());
       }
     });
+    if (wasPass) {
+      unawaited(_offerUndoPass());
+    }
     _advanceProfile();
   }
 
@@ -151,6 +158,17 @@ class _TribeConnectScreenState extends State<TribeConnectScreen>
         ),
         centerTitle: true,
         actions: [
+          IconButton(
+            onPressed: () => Navigator.of(context).pushNamed(
+              RouteName.likesReceived,
+              arguments: widget.currentUser,
+            ),
+            tooltip: 'Likes You',
+            icon: const Icon(
+              Icons.favorite_border,
+              color: AppColors.textPrimary,
+            ),
+          ),
           IconButton(
             onPressed: () => unawaited(_openDiscoveryPreferences()),
             tooltip: 'Filters',
@@ -318,6 +336,16 @@ class _TribeConnectScreenState extends State<TribeConnectScreen>
     setState(() => _deckBusy = true);
     try {
       await UserSearchRepo.leftSwipe(widget.currentUser, user);
+
+      final currentUid = widget.currentUser.id;
+      if (currentUid != null && currentUid.isNotEmpty) {
+        await _undoService.recordSwipeAction(
+          userId: currentUid,
+          targetUserId: uid,
+          direction: SwipeDirection.left,
+        );
+        _lastPassedUser = user;
+      }
 
       if (!mounted) return;
 
@@ -543,5 +571,60 @@ class _TribeConnectScreenState extends State<TribeConnectScreen>
       backgroundColor: AppColors.error,
       bottomMarginAddition: DatingFeedbackSnackBar.marginAboveProfileActions,
     );
+  }
+
+  Future<void> _offerUndoPass() async {
+    final currentUid = widget.currentUser.id;
+    final passedUser = _lastPassedUser;
+    if (currentUid == null || passedUser?.id == null || !mounted) return;
+
+    final canUndo = await _undoService.canUndoLastSwipe(currentUid);
+    if (!canUndo || !mounted) return;
+
+    ScaffoldMessenger.of(context).hideCurrentSnackBar();
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text(
+          'Passed on ${passedUser!.name ?? 'this profile'}',
+          style: GoogleFonts.montserrat(color: Colors.white),
+        ),
+        duration: UndoService.undoWindow,
+        action: SnackBarAction(
+          label: 'UNDO',
+          textColor: Colors.amberAccent,
+          onPressed: () => unawaited(_undoLastPass(passedUser)),
+        ),
+      ),
+    );
+  }
+
+  Future<void> _undoLastPass(UserModel passedUser) async {
+    final currentUid = widget.currentUser.id;
+    final passedUid = passedUser.id;
+    if (currentUid == null || passedUid == null || !mounted) return;
+
+    final result = await _undoService.undoLastSwipe(currentUid);
+    if (!mounted) return;
+
+    if (result.isSuccess) {
+      setState(() {
+        _processedUserIds.remove(passedUid);
+        _lastPassedUser = null;
+        _deckBusy = false;
+      });
+      _resetDeckAnimations();
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(
+            'Pass undone',
+            style: GoogleFonts.montserrat(color: Colors.white),
+          ),
+          backgroundColor: AppColors.primaryGreen,
+        ),
+      );
+      return;
+    }
+
+    _showError(result.error ?? 'Could not undo pass');
   }
 }

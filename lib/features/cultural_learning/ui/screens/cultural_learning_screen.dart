@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+
 import '../../../../common/constants/app_colors.dart';
+import '../../../events/data/models/event_model.dart';
+import '../../../events/data/services/events_firestore_service.dart';
 import '../widgets/cultural_story_card.dart';
 import '../widgets/language_exchange_card.dart';
 
@@ -245,34 +248,47 @@ class _CulturalLearningScreenState extends State<CulturalLearningScreen>
         ],
       );
 
-  Widget _buildCulturalEventsTab() => Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Icon(
-              Icons.event_note,
-              size: 64,
-              color: Colors.grey[400],
-            ),
-            const SizedBox(height: 16),
-            Text(
-              'Cultural Events',
-              style: GoogleFonts.montserrat(
-                fontSize: 18,
-                fontWeight: FontWeight.w600,
-                color: Colors.grey[600],
-              ),
-            ),
-            const SizedBox(height: 8),
-            Text(
-              'Discover cultural events and celebrations\ncoming soon!',
+  Widget _buildCulturalEventsTab() {
+    final service = EventsFirestoreService();
+    return FutureBuilder<List<EventModel>>(
+      future: service.fetchEvents(limit: 30),
+      builder: (context, snapshot) {
+        if (snapshot.connectionState == ConnectionState.waiting) {
+          return const Center(child: CircularProgressIndicator());
+        }
+        final events = (snapshot.data ?? [])
+            .where(
+              (e) =>
+                  e.category.toLowerCase().contains('cultural') ||
+                  e.category.toLowerCase().contains('festival') ||
+                  e.name.toLowerCase().contains('afro'),
+            )
+            .toList();
+        if (events.isEmpty) {
+          return Center(
+            child: Text(
+              'No cultural events nearby yet. Check Discover for more.',
               textAlign: TextAlign.center,
-              style: GoogleFonts.montserrat(
-                fontSize: 14,
-                color: Colors.grey[500],
-              ),
+              style: GoogleFonts.montserrat(color: Colors.grey[600]),
             ),
-          ],
-        ),
-      );
+          );
+        }
+        return ListView.builder(
+          padding: const EdgeInsets.all(16),
+          itemCount: events.length,
+          itemBuilder: (context, index) {
+            final event = events[index];
+            return ListTile(
+              leading: const Icon(Icons.event, color: Color(0xFF008037)),
+              title: Text(event.name, style: GoogleFonts.montserrat()),
+              subtitle: Text(
+                event.location.city ?? event.category,
+                style: GoogleFonts.montserrat(fontSize: 12),
+              ),
+            );
+          },
+        );
+      },
+    );
+  }
 }

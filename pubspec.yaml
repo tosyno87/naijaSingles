@@ -96,6 +96,7 @@ dependencies:
   timeago: ^3.7.1
   bloc_concurrency: ^0.3.0
   vector_math: ^2.2.0              # Explicit dep for Matrix4 non-deprecated helpers (scaleByVector3, etc.)
+  app_links: ^6.4.1
   
   # Industry Standard Features Dependencies
   # local_auth: ^2.3.0                    # Biometric authentication (temporarily disabled due to intl conflict)

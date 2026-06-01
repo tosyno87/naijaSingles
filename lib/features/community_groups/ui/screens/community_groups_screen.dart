@@ -119,28 +119,6 @@ class _CommunityGroupsScreenState extends State<CommunityGroupsScreen> {
             ],
           ),
         ),
-        floatingActionButton: FloatingActionButton.extended(
-          heroTag: 'community_groups_fab',
-          onPressed: () {
-            // TODO(dev): Navigate to create group screen
-            ScaffoldMessenger.of(context).showSnackBar(
-              const SnackBar(
-                content: Text('Create Group feature coming soon!'),
-                backgroundColor: AppColors.primaryGreen,
-              ),
-            );
-          },
-          backgroundColor: AppColors.primaryGreen,
-          foregroundColor: Colors.white,
-          icon: const Icon(Icons.group_add),
-          label: Text(
-            'Create Group',
-            style: GoogleFonts.montserrat(
-              fontSize: 16,
-              fontWeight: FontWeight.w600,
-            ),
-          ),
-        ),
       );
 
   Widget _buildHeader() => Container(

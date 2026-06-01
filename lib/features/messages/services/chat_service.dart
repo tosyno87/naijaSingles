@@ -177,7 +177,71 @@ class ChatService {
     }
   }
 
-  Future<bool> sendMessage(String threadId, String text) =>
+  /// Updates typing indicator for the current user in a thread.
+  Future<void> setTyping(String threadId, {required bool isTyping}) async {
+    final uid = currentUserId;
+    if (uid == null) return;
+    await _chatThreadsCollection
+        .doc(threadId)
+        .collection('typing')
+        .doc(uid)
+        .set(
+      {
+        'isTyping': isTyping,
+        'updatedAt': FieldValue.serverTimestamp(),
+      },
+      SetOptions(merge: true),
+    );
+  }
+
+  /// Emits user IDs currently typing (excluding current user).
+  Stream<List<String>> watchOtherUsersTyping(String threadId) {
+    final uid = currentUserId;
+    if (uid == null) return const Stream<List<String>>.empty();
+
+    return _chatThreadsCollection
+        .doc(threadId)
+        .collection('typing')
+        .snapshots()
+        .map((snapshot) {
+      final now = DateTime.now();
+      return snapshot.docs
+          .where((doc) => doc.id != uid)
+          .where((doc) {
+            final data = doc.data();
+            if (data['isTyping'] != true) return false;
+            final updatedAt = parseDateTime(data['updatedAt']);
+            return now.difference(updatedAt).inSeconds < 8;
+          })
+          .map((doc) => doc.id)
+          .toList();
+    });
+  }
+
+  Future<void> addReaction({
+    required String threadId,
+    required String messageId,
+    required String emoji,
+  }) async {
+    final uid = currentUserId;
+    if (uid == null) return;
+    await _chatThreadsCollection
+        .doc(threadId)
+        .collection('messages')
+        .doc(messageId)
+        .set(
+      {
+        'reactions': {uid: emoji},
+      },
+      SetOptions(merge: true),
+    );
+  }
+
+  Future<bool> sendMessage(
+    String threadId,
+    String text, {
+    String? replyToMessageId,
+  }) =>
       PerformanceMonitor.measure('send_message', () async {
         try {
           if (currentUserId == null) return false;
@@ -233,8 +297,11 @@ class ChatService {
           final messageData = {
             'senderId': currentUserId,
             'text': text.trim(),
+            'messageType': 'text',
             'timestamp': FieldValue.serverTimestamp(),
             'read': false,
+            'deliveredAt': FieldValue.serverTimestamp(),
+            if (replyToMessageId != null) 'replyToMessageId': replyToMessageId,
           };
 
           // Add the message
@@ -387,6 +454,9 @@ class ChatService {
                 text: data['text'] ?? '',
                 timestamp: parseDateTime(data['timestamp']),
                 isRead: data['read'] ?? false,
+                imageUrl:
+                    data['imageUrl'] as String? ?? data['mediaUrl'] as String?,
+                messageType: data['messageType'] as String? ?? 'text',
               );
             }).toList(),
           );
@@ -525,6 +595,9 @@ class ChatService {
             text: data['text'] ?? '',
             timestamp: parseDateTime(data['timestamp']),
             isRead: data['read'] ?? false,
+            imageUrl:
+                data['imageUrl'] as String? ?? data['mediaUrl'] as String?,
+            messageType: data['messageType'] as String? ?? 'text',
           );
         }).toList();
         if (!qualityTracked && latestMessages!.length >= 2) {

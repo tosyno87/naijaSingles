@@ -6,7 +6,8 @@ import 'package:naijasingles/features/messages/services/chat_service.dart';
 
 void main() {
   group('ChatService', () {
-    test('streams current user threads ordered by most recent update', () async {
+    test('streams current user threads ordered by most recent update',
+        () async {
       final firestore = FakeFirebaseFirestore();
       final auth = MockFirebaseAuth(
         signedIn: true,

@@ -639,13 +639,13 @@ class ChatService {
   // Threads involving blocked users are filtered out as defense in depth
   // (the block flow also deletes the thread document).
   Stream<List<MessageThreadInfo>> getChatThreadsStream() {
-    if (currentUserId == null) {
+    final userId = currentUserId;
+    if (userId == null) {
       return Stream.value([]);
     }
 
     return _chatThreadsCollection
-        .where('userIds', arrayContains: currentUserId)
-        .orderBy('lastUpdated', descending: true)
+        .where('userIds', arrayContains: userId)
         .snapshots()
         .handleError((error) {
       AppLogger.error('Error in getChatThreadsStream', error: error);
@@ -656,19 +656,19 @@ class ChatService {
         // thread document was not yet deleted (race condition / legacy data).
         final blockedSnapshot = await _firestore
             .collection('users')
-            .doc(currentUserId)
+            .doc(userId)
             .collection('blockedlist')
             .get();
         final blockedIds = blockedSnapshot.docs.map((doc) => doc.id).toSet();
 
-        return snapshot.docs
+        final threads = snapshot.docs
             .map((doc) {
               try {
                 final data = doc.data() as Map<String, dynamic>;
 
                 final userIds = List<String>.from(data['userIds'] ?? []);
                 final otherUserId = userIds.firstWhere(
-                  (id) => id != currentUserId,
+                  (id) => id != userId,
                   orElse: () => '',
                 );
 
@@ -681,7 +681,7 @@ class ChatService {
 
                 final unreadCount =
                     data['unreadCount'] as Map<String, dynamic>?;
-                final unread = (unreadCount?[currentUserId] ?? 0) > 0;
+                final unread = (unreadCount?[userId] ?? 0) > 0;
 
                 return MessageThreadInfo(
                   threadId: doc.id,
@@ -726,7 +726,10 @@ class ChatService {
                   thread.otherUserId.isNotEmpty &&
                   !blockedIds.contains(thread.otherUserId),
             )
-            .toList();
+            .toList()
+          ..sort((a, b) => b.timestamp.compareTo(a.timestamp));
+
+        return threads;
       } on FirebaseException catch (e) {
         AppLogger.error(
           'Firebase error mapping chat threads: ${e.code} - ${e.message}',

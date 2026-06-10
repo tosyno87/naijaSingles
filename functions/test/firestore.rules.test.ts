@@ -111,6 +111,21 @@ describe('firestore.rules', () => {
     );
   });
 
+  test('owner can write verifications subcollection by type', async () => {
+    const db = testEnv.authenticatedContext('owner-user').firestore();
+    await assertSucceeds(
+      db
+        .collection('users')
+        .doc('owner-user')
+        .collection('verifications')
+        .doc('profilePhoto')
+        .set({
+          type: 'profilePhoto',
+          status: 'verified',
+        }),
+    );
+  });
+
   test('non-owner cannot read verification subcollection metadata', async () => {
     await testEnv.withSecurityRulesDisabled(async (context) => {
       await context

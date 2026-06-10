@@ -134,8 +134,13 @@ service cloud.firestore {
         allow read, write: if request.auth != null && request.auth.uid == userId;
       }
 
-      // Profile verification metadata — owner only.
+      // Profile verification metadata — owner only (image upload path).
       match /verification/{verificationId} {
+        allow read, write: if request.auth != null && request.auth.uid == userId;
+      }
+
+      // Profile verification status by type (ProfileVerificationService).
+      match /verifications/{verificationId} {
         allow read, write: if request.auth != null && request.auth.uid == userId;
       }
     }

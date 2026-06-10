@@ -6,7 +6,6 @@ import 'package:equatable/equatable.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
-import '../../../../common/constants/constants.dart';
 import '../../../../common/data/repo/phone_auth_repo.dart';
 import '../../../../services/secure_storage_service.dart';
 
@@ -22,7 +21,6 @@ class AuthstatusBloc extends Bloc<AuthstatusEvent, AuthstatusState> {
     on<LogoutEvent>(_logout);
   }
   final PhoneAuthRepository phoneAuthRepository;
-  final auth = firebaseAuthInstance;
 
 //for logout
   Future<void> _logout(LogoutEvent event, Emitter<AuthstatusState> emit) async {
@@ -61,7 +59,7 @@ class AuthstatusBloc extends Bloc<AuthstatusEvent, AuthstatusState> {
         log('Is signed in check: $issingedin');
 
         if (issingedin) {
-          final user = auth.currentUser;
+          final user = await phoneAuthRepository.getCurrentUser();
           if (user != null) {
             log('User signed in successfully: ${user.uid}');
             log("Phone number: ${user.phoneNumber ?? 'No phone number'}");

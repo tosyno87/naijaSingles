@@ -63,6 +63,39 @@ service firebase.storage {
       allow read: if isSignedIn();
     }
 
+    // Profile verification images — owner only.
+    match /verification/{userId}/{allPaths=**} {
+      allow read: if isSignedIn() && request.auth.uid == userId;
+      allow write: if isSignedIn() &&
+                   request.auth.uid == userId &&
+                   isImageUpload() &&
+                   isReasonableImageSize();
+    }
+
+    // Chat media for legacy /chats threads.
+    match /chats/{chatId}/{allPaths=**} {
+      allow read: if isSignedIn()
+                  && firestore.exists(/databases/(default)/documents/chats/$(chatId))
+                  && request.auth.uid in firestore.get(/databases/(default)/documents/chats/$(chatId)).data.users;
+      allow write: if isSignedIn()
+                   && firestore.exists(/databases/(default)/documents/chats/$(chatId))
+                   && request.auth.uid in firestore.get(/databases/(default)/documents/chats/$(chatId)).data.users
+                   && isImageUpload()
+                   && isReasonableImageSize();
+    }
+
+    // Chat media for chatThreads collection.
+    match /chatThreads/{threadId}/{allPaths=**} {
+      allow read: if isSignedIn()
+                  && firestore.exists(/databases/(default)/documents/chatThreads/$(threadId))
+                  && request.auth.uid in firestore.get(/databases/(default)/documents/chatThreads/$(threadId)).data.userIds;
+      allow write: if isSignedIn()
+                   && firestore.exists(/databases/(default)/documents/chatThreads/$(threadId))
+                   && request.auth.uid in firestore.get(/databases/(default)/documents/chatThreads/$(threadId)).data.userIds
+                   && isImageUpload()
+                   && isReasonableImageSize();
+    }
+
     // Legacy group avatar paths (without owner prefix) remain read-only.
     match /group_avatars/{allPaths=**} {
       allow read: if isSignedIn();

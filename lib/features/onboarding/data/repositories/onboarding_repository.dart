@@ -5,6 +5,7 @@ import 'dart:io';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_storage/firebase_storage.dart';
+import 'package:flutter/foundation.dart';
 
 import '../../../../common/utils/app_logger.dart';
 import '../../bloc/onboarding_data.dart';
@@ -89,12 +90,18 @@ class OnboardingRepository {
         'dateOfBirth': d.dateOfBirth?.toIso8601String(),
         'age': d.age,
         'gender': d.gender,
+        'userGender': d.gender,
+        'showGender': d.interestedIn,
         'bio': d.bio,
         'interests': d.interests,
         'height': d.height,
         'lookingFor': d.lookingFor,
         'relationshipIntent': d.relationshipIntent,
         'interestedIn': d.interestedIn,
+        'editInfo': {
+          'userGender': d.gender,
+          'userName': d.fullName,
+        },
         'ageRange': {
           'min': d.ageRange[0].toString(),
           'max': d.ageRange[1].toString(),
@@ -295,4 +302,8 @@ class OnboardingRepository {
       'isProfileComplete': true,
     };
   }
+
+  @visibleForTesting
+  Map<String, dynamic> buildEssentialDataForTesting(OnboardingData data) =>
+      _buildEssentialData(data);
 }

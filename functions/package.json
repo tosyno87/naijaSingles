@@ -10,6 +10,7 @@
     "deploy": "npm run build && firebase deploy --only functions",
     "logs": "firebase functions:log",
     "test": "jest",
+    "test:rules": "firebase emulators:exec --only firestore,storage \"npm test -- --testPathPattern=rules.test.ts\"",
     "test:watch": "jest --watch",
     "test:coverage": "jest --coverage",
     "lint": "eslint --ext .ts .",
@@ -26,6 +27,7 @@
     "google-auth-library": "^9.15.1"
   },
   "devDependencies": {
+    "@firebase/rules-unit-testing": "^4.0.1",
     "@types/jest": "^29.5.0",
     "@types/node": "^22.19.17",
     "@typescript-eslint/eslint-plugin": "^6.21.0",

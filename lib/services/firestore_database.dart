@@ -32,24 +32,21 @@ class FireStoreClass {
       final UploadTask uploadTask = storageReference.putFile(file);
 
       try {
-        await uploadTask;
-        final fileURL = await storageReference.getDownloadURL();
-        try {
-          log('Updating profile picture with URL: $fileURL');
-          await firebaseFireStoreInstance
-              .collection('users')
-              .doc(currentUserId)
-              .set(
-            {
-              'Pictures': [fileURL],
-            },
-            SetOptions(merge: true),
-          );
-        } on Object catch (e) {
-          log('Error updating Firestore with image URL: $e');
-        }
+        final snapshot = await uploadTask;
+        final fileURL = await snapshot.ref.getDownloadURL();
+        log('Updating profile picture with URL: $fileURL');
+        await firebaseFireStoreInstance
+            .collection('users')
+            .doc(currentUserId)
+            .set(
+          {
+            'Pictures': FieldValue.arrayUnion([fileURL]),
+          },
+          SetOptions(merge: true),
+        );
       } on Object catch (e) {
         log('Error in upload task: $e');
+        return null;
       }
       return uploadTask;
     } on Object catch (e) {
@@ -85,14 +82,18 @@ class FireStoreClass {
         final TaskSnapshot snapshot = await uploadTask;
         final String downloadUrl = await snapshot.ref.getDownloadURL();
 
-        // Update user document with verification status
-        await firebaseFireStoreInstance.collection('users').doc(userId).set(
+        // Keep verification metadata in a private subcollection, not on the
+        // public profile root document.
+        await firebaseFireStoreInstance
+            .collection('users')
+            .doc(userId)
+            .collection('verification')
+            .doc('current')
+            .set(
           {
-            'verification': {
-              'status': 'pending',
-              'imageUrl': downloadUrl,
-              'submittedAt': FieldValue.serverTimestamp(),
-            },
+            'status': 'pending',
+            'imageUrl': downloadUrl,
+            'submittedAt': FieldValue.serverTimestamp(),
           },
           SetOptions(merge: true),
         );
@@ -134,46 +135,25 @@ class FireStoreClass {
       final UploadTask uploadTask = storageReference.putFile(file);
 
       try {
-        await uploadTask;
-        final fileURL = await storageReference.getDownloadURL();
+        final snapshot = await uploadTask;
+        final fileURL = await snapshot.ref.getDownloadURL();
 
-        // Initialize Pictures array if it doesn't exist
-        final DocumentSnapshot userDoc = await firebaseFireStoreInstance
+        if (checktype == 'profile') {
+          log('Updating profile picture with URL: $fileURL');
+        }
+
+        await firebaseFireStoreInstance
             .collection('users')
             .doc(currentUser.id)
-            .get();
-
-        List<String> pictures = [];
-        if (userDoc.exists && userDoc.data() is Map<String, dynamic>) {
-          final Map<String, dynamic> userData =
-              userDoc.data() as Map<String, dynamic>;
-          if (userData.containsKey('Pictures') &&
-              userData['Pictures'] is List) {
-            pictures = List<String>.from(userData['Pictures']);
-          }
-        }
-
-        // Add new image URL
-        pictures.add(fileURL);
-
-        try {
-          if (checktype == 'profile') {
-            log('Updating profile picture with URL: $fileURL');
-            await firebaseFireStoreInstance
-                .collection('users')
-                .doc(currentUser.id)
-                .set({'Pictures': pictures}, SetOptions(merge: true));
-          } else {
-            await firebaseFireStoreInstance
-                .collection('users')
-                .doc(currentUser.id)
-                .update({'Pictures': pictures});
-          }
-        } on Object catch (e) {
-          log('Error updating Firestore with image URL: $e');
-        }
+            .set(
+          {
+            'Pictures': FieldValue.arrayUnion([fileURL]),
+          },
+          SetOptions(merge: true),
+        );
       } on Object catch (e) {
         log('Error in upload task: $e');
+        return null;
       }
       return uploadTask;
     } on Object catch (e) {

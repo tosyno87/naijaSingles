@@ -45,6 +45,7 @@ class UpdateNumber extends StatelessWidget {
                   style: const TextStyle(
                     fontSize: 16,
                     fontWeight: FontWeight.bold,
+                    color: AppColors.textOnPrimary,
                   ),
                 ),
               ),
@@ -87,10 +88,10 @@ class UpdateNumber extends StatelessWidget {
                   currentUser.phoneNumber!.isNotEmpty
                       ? 'Verified phone number'.tr().toString()
                       : ' Add Verified phone number'.tr().toString(),
-                  style: const TextStyle(
+                  style: TextStyle(
                     fontSize: 13,
                     fontWeight: FontWeight.w400,
-                    color: AppColors.secondaryColor,
+                    color: AppColors.textOnPrimary.withValues(alpha: 0.85),
                   ),
                 ),
               ),

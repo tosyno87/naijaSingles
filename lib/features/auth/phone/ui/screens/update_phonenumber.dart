@@ -96,10 +96,10 @@ class UpdateNumber extends StatelessWidget {
               hasPhone
                   ? 'Verified phone number'.tr().toString()
                   : ' Add Verified phone number'.tr().toString(),
-              style: TextStyle(
+              style: const TextStyle(
                 fontSize: 13,
                 fontWeight: FontWeight.w400,
-                color: AppColors.textOnPrimary.withValues(alpha: 0.9),
+                color: AppColors.textOnPrimary,
               ),
             ),
             const SizedBox(height: 24),

@@ -1,0 +1,117 @@
+---
+description: "Workflow when user pastes an app screenshot or reports a UI bug during testing. Triage, branch from develop, investigate, fix, verify."
+alwaysApply: true
+---
+
+# Screenshot & In-App Issue Workflow
+
+When the user pastes a **screenshot**, screen recording, or describes something they see **while testing the app**, follow this workflow before writing code.
+
+## 1. Triage the Screenshot (do not code yet)
+
+1. **Describe what you see** — screen, visible widgets, text, errors, layout issues.
+2. **State the problem** — what is wrong vs expected (spacing, crash, wrong data, missing element, etc.).
+3. **Classify the work:**
+   - `fix/` — bug, crash, visual regression, broken flow
+   - `feature/` — new capability or meaningful UX addition
+   - `refactor/` — structural change, no user-visible change
+   - `chore/` — tooling, deps, config only
+4. **Ask at most 1–2 questions** only if blocked (e.g. expected behavior is ambiguous).
+
+## 2. Git Setup (always before changes)
+
+Work from the **repository root** (directory with `pubspec.yaml`).
+
+```bash
+git fetch origin
+git checkout develop
+git pull origin develop
+git checkout -b fix/short-kebab-description   # or feature/, refactor/, chore/
+```
+
+Rules:
+- **Never** commit directly to `develop` or `main`.
+- Branch names: lowercase kebab-case, prefixed by type (`fix/login-button-overflow`).
+- **Do not commit or push** unless the user explicitly asks.
+- Hotfixes to production: branch from `main` as `fix/critical-description`, then back-merge to `develop`.
+
+## 3. Investigate in the Codebase
+
+Trace the issue top-down before editing:
+
+1. Read `PROJECT_CONTEXT.md` if the feature area is unfamiliar.
+2. **Locate the screen** — search `lib/features/` by visible text, route name, or AppBar title.
+3. **Trace the stack:**
+   ```
+   Screen (presentation/screens/)
+     → Widgets (presentation/widgets/)
+     → BLoC (presentation/bloc/)
+     → Repository (data/repositories/)
+     → Service / Firebase (data/services/)
+   ```
+4. **Find existing patterns** — grep for similar widgets, BLoCs, or fixes; reuse, don't reinvent.
+5. **Check data layer** if the issue is wrong/missing content (Firestore rules, model parsing, stream listeners).
+
+Use the Dart MCP server for analysis and tests when available.
+
+## 4. Implement the Fix
+
+### Scope
+- **Minimal diff** — fix only what the screenshot/issue shows; no drive-by refactors.
+- Match surrounding code style, naming, and architecture.
+
+### Architecture (AfroPeep)
+- Feature modules under `lib/features/{feature}/` with `data/`, `domain/`, `presentation/`.
+- **BLoC** for shared/async state; local `StatefulWidget` state only for trivial UI-only toggles.
+- **Repository pattern** for Firebase and API access — no direct Firestore calls from widgets.
+- **Null safety** (Dart 3.5+), `const` constructors where possible.
+
+### UI & Design
+- Material 3 components.
+- Brand: green accents, background `#FFF6E5`, Montserrat typography.
+- Responsive layouts; test overflow on small screens.
+- Accessibility: semantics labels on interactive elements.
+
+### Security
+- Never hardcode secrets; use `.env` / env config.
+- Validate user input; respect Firestore security rules.
+
+## 5. Verify Before Handing Off
+
+Run from repo root:
+
+```bash
+flutter analyze
+flutter test                                    # all tests
+flutter test test/path/to_relevant_test.dart    # focused, when applicable
+```
+
+Provide **manual retest steps** the user can follow on the same screen shown in the screenshot.
+
+For UI changes, note iOS vs Android if platform-specific (safe area, keyboard, fonts).
+
+## 6. Report Back
+
+Structure the response as:
+
+1. **What was wrong** — root cause in plain language.
+2. **What changed** — files and behavior (use code citations for key edits).
+3. **How to verify** — numbered steps matching the original screen.
+4. **Branch name** — so the user knows where work lives.
+5. **Next steps** — offer commit/PR only if the user wants to ship; use `/pr` or `gh pr create` targeting `develop`.
+
+## Quick Reference
+
+| Issue type | Branch prefix | PR target |
+|------------|---------------|-----------|
+| Bug / visual fix | `fix/` | `develop` |
+| New feature | `feature/` | `develop` |
+| Production hotfix | `fix/` (from `main`) | `main`, then merge to `develop` |
+| Refactor | `refactor/` | `develop` |
+
+| Layer | Location |
+|-------|----------|
+| Screens | `lib/features/*/presentation/screens/` |
+| BLoC | `lib/features/*/presentation/bloc/` |
+| Repos | `lib/features/*/data/repositories/` |
+| Theme | `lib/core/` |

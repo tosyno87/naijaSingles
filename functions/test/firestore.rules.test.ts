@@ -180,6 +180,36 @@ describe('firestore.rules', () => {
     await assertFails(db.collection('calls').doc('call-3').get());
   });
 
+  test('matched user can read a private profile when legacy match exists', async () => {
+    await testEnv.withSecurityRulesDisabled(async (context) => {
+      const adminDb = context.firestore();
+      await adminDb.collection('users').doc('matcher-a').set({
+        name: 'Matcher A',
+        isProfilePrivate: false,
+        isDeleted: false,
+        accountStatus: 'active',
+      });
+      await adminDb.collection('users').doc('matcher-b').set({
+        name: 'Matcher B',
+        isProfilePrivate: true,
+        isDeleted: false,
+        accountStatus: 'active',
+      });
+      await adminDb
+        .collection('users')
+        .doc('matcher-a')
+        .collection('Matches')
+        .doc('matcher-b')
+        .set({
+          Matches: 'matcher-b',
+          userName: 'Matcher B',
+        });
+    });
+
+    const db = testEnv.authenticatedContext('matcher-a').firestore();
+    await assertSucceeds(db.collection('users').doc('matcher-b').get());
+  });
+
   test('unknown top-level collection is denied', async () => {
     const db = testEnv.authenticatedContext('any-user').firestore();
     await assertFails(

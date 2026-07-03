@@ -1,11 +1,18 @@
 rules_version = '2';
 service cloud.firestore {
   match /databases/{database}/documents {
+    function hasLegacyMatchWith(userId) {
+      return exists(/databases/$(database)/documents/users/$(request.auth.uid)/Matches/$(userId)) ||
+             exists(/databases/$(database)/documents/users/$(userId)/Matches/$(request.auth.uid));
+    }
+
     function canReadUserProfile(userId) {
       return request.auth != null &&
              (
                // Owner always reads own profile document.
                request.auth.uid == userId ||
+               // Matched users can read each other's profiles for chat context.
+               hasLegacyMatchWith(userId) ||
                (
                 // Non-owners can read active/public profiles.
                 // Paused and incognito profiles are blocked here so that

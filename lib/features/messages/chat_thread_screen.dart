@@ -10,7 +10,6 @@ import 'package:image_picker/image_picker.dart';
 
 import '../../common/constants/app_colors.dart';
 import '../../common/widgets/state_views/state_views.dart';
-import '../../models/user_model.dart';
 import '../../services/media_sharing_service.dart';
 import '../../services/settings_service.dart';
 import '../chat_shared/models/chat_message_view_model.dart';
@@ -19,6 +18,7 @@ import '../chat_shared/ui/widgets/chat_composer.dart';
 import '../dating/screens/user_detail_screen.dart';
 import 'message_model.dart';
 import 'services/chat_service.dart';
+import 'services/matched_user_profile_loader.dart';
 import 'widgets/pre_meet_safety_sheet.dart';
 
 class ChatThreadScreen extends StatefulWidget {
@@ -606,13 +606,13 @@ class _ChatThreadScreenState extends State<ChatThreadScreen> {
         ),
       );
 
-      // Fetch user data from Firestore
-      final userDoc = await FirebaseFirestore.instance
-          .collection('users')
-          .doc(widget.otherUserId)
-          .get();
+      final userModel = await MatchedUserProfileLoader.load(
+        firestore: FirebaseFirestore.instance,
+        userId: widget.otherUserId!,
+        fallbackName: widget.userName,
+        fallbackAvatarUrl: widget.avatarUrl,
+      );
 
-      // Close loading dialog
       if (mounted) {
         Navigator.pop(context);
       }
@@ -621,45 +621,15 @@ class _ChatThreadScreenState extends State<ChatThreadScreen> {
         return;
       }
 
-      if (userDoc.exists) {
-        final userData = userDoc.data() as Map<String, dynamic>;
-
-        // Convert Firestore data to UserModel
-        final userModel = UserModel(
-          id: widget.otherUserId,
-          name: userData['name'] ?? widget.userName,
-          age: userData['age'] ?? 0,
-          imageUrl: List<String>.from(
-            userData['photos'] ?? userData['imageUrl'] ?? [],
+      unawaited(
+        Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (context) => UserDetailScreen(user: userModel),
           ),
-          address: userData['locationName'] ?? userData['address'],
-          distanceBW: userData['distanceBW'],
-          editInfo: userData['editInfo'] ?? {},
-        );
-
-        // Navigate to profile screen
-        unawaited(
-          Navigator.push(
-            context,
-            MaterialPageRoute(
-              builder: (context) => UserDetailScreen(user: userModel),
-            ),
-          ),
-        );
-      } else {
-        // Show error if user not found
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text(
-              'User profile not found',
-              style: GoogleFonts.montserrat(color: Colors.white),
-            ),
-            backgroundColor: Colors.red,
-          ),
-        );
-      }
+        ),
+      );
     } on Object catch (e) {
-      // Close loading dialog if still open
       if (mounted) {
         Navigator.pop(context);
       }
@@ -668,13 +638,19 @@ class _ChatThreadScreenState extends State<ChatThreadScreen> {
       if (!mounted) {
         return;
       }
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text(
-            'Failed to load profile',
-            style: GoogleFonts.montserrat(color: Colors.white),
+
+      final fallbackUser = MatchedUserProfileLoader.buildFallback(
+        userId: widget.otherUserId!,
+        fallbackName: widget.userName,
+        fallbackAvatarUrl: widget.avatarUrl,
+      );
+
+      unawaited(
+        Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (context) => UserDetailScreen(user: fallbackUser),
           ),
-          backgroundColor: Colors.red,
         ),
       );
     }

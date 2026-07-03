@@ -154,6 +154,7 @@ class _MessagesScreenState extends State<MessagesScreen> {
                     Stack(
                       children: [
                         GestureDetector(
+                          behavior: HitTestBehavior.opaque,
                           onTap: () => _viewUserProfile(thread),
                           child: Container(
                             width: 60,
@@ -212,19 +213,16 @@ class _MessagesScreenState extends State<MessagesScreen> {
                           Row(
                             children: [
                               Expanded(
-                                child: GestureDetector(
-                                  onTap: () => _viewUserProfile(thread),
-                                  child: Text(
-                                    thread.otherUserName,
-                                    style: GoogleFonts.montserrat(
-                                      fontSize: 17,
-                                      fontWeight: thread.unread
-                                          ? FontWeight.bold
-                                          : FontWeight.w600,
-                                      color: AppColors.textPrimary,
-                                    ),
-                                    overflow: TextOverflow.ellipsis,
+                                child: Text(
+                                  thread.otherUserName,
+                                  style: GoogleFonts.montserrat(
+                                    fontSize: 17,
+                                    fontWeight: thread.unread
+                                        ? FontWeight.bold
+                                        : FontWeight.w600,
+                                    color: AppColors.textPrimary,
                                   ),
+                                  overflow: TextOverflow.ellipsis,
                                 ),
                               ),
                               Text(
@@ -666,7 +664,10 @@ class _MessagesScreenState extends State<MessagesScreen> {
         Navigator.push(
           context,
           MaterialPageRoute(
-            builder: (context) => UserDetailScreen(user: userModel),
+            builder: (context) => UserDetailScreen(
+              user: userModel,
+              showLikeActions: false,
+            ),
           ),
         ),
       );
@@ -688,7 +689,10 @@ class _MessagesScreenState extends State<MessagesScreen> {
         Navigator.push(
           context,
           MaterialPageRoute(
-            builder: (context) => UserDetailScreen(user: fallbackUser),
+            builder: (context) => UserDetailScreen(
+              user: fallbackUser,
+              showLikeActions: false,
+            ),
           ),
         ),
       );

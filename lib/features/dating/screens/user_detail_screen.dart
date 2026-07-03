@@ -20,9 +20,13 @@ class UserDetailScreen extends StatefulWidget {
     required this.user,
     super.key,
     this.selectedMode,
+    this.showLikeActions = true,
   });
   final UserModel user;
   final String? selectedMode;
+
+  /// Hide like/pass actions when viewing someone you are already messaging.
+  final bool showLikeActions;
 
   @override
   State<UserDetailScreen> createState() => _UserDetailScreenState();
@@ -34,7 +38,7 @@ class _UserDetailScreenState extends State<UserDetailScreen> {
   bool _isLiking = false;
   bool _checkingLikeStatus = true;
   bool _alreadyLiked = false;
-  final MatchService _matchService = MatchService();
+  MatchService? _matchService;
 
   // MVP theme colors
   static const Color afropeepGreen = Color(0xFF008037); // MVP green
@@ -45,7 +49,11 @@ class _UserDetailScreenState extends State<UserDetailScreen> {
   @override
   void initState() {
     super.initState();
-    unawaited(_loadExistingLikeState());
+    if (widget.showLikeActions) {
+      unawaited(_loadExistingLikeState());
+    } else {
+      _checkingLikeStatus = false;
+    }
   }
 
   Future<void> _loadExistingLikeState() async {
@@ -54,7 +62,7 @@ class _UserDetailScreenState extends State<UserDetailScreen> {
       if (mounted) setState(() => _checkingLikeStatus = false);
       return;
     }
-    final liked = await _matchService.hasUserLiked(id);
+    final liked = await (_matchService ??= MatchService()).hasUserLiked(id);
     if (!mounted) return;
     setState(() {
       _alreadyLiked = liked;
@@ -195,7 +203,7 @@ class _UserDetailScreenState extends State<UserDetailScreen> {
               ],
             ),
           ),
-          _buildBottomActionBar(),
+          if (widget.showLikeActions) _buildBottomActionBar(),
         ],
       ),
     );
@@ -230,7 +238,8 @@ class _UserDetailScreenState extends State<UserDetailScreen> {
                     : () async {
                         setState(() => _isLiking = true);
                         try {
-                          final outcome = await _matchService
+                          final outcome = await (_matchService ??=
+                                  MatchService())
                               .handleLikeWithOutcome(targetUserId);
                           if (!mounted) return;
                           setState(() => _isLiking = false);
@@ -907,8 +916,8 @@ class _UserDetailScreenState extends State<UserDetailScreen> {
       interests.add('💼 ${widget.user.occupation}');
     }
 
-    // Add default interests if none found
-    if (interests.isEmpty) {
+    // Placeholder interests only for discovery previews with sparse data.
+    if (interests.isEmpty && widget.showLikeActions) {
       interests.addAll(['Dating', 'Music', 'Travel']);
     }
 

@@ -625,7 +625,10 @@ class _ChatThreadScreenState extends State<ChatThreadScreen> {
         Navigator.push(
           context,
           MaterialPageRoute(
-            builder: (context) => UserDetailScreen(user: userModel),
+            builder: (context) => UserDetailScreen(
+              user: userModel,
+              showLikeActions: false,
+            ),
           ),
         ),
       );
@@ -649,7 +652,10 @@ class _ChatThreadScreenState extends State<ChatThreadScreen> {
         Navigator.push(
           context,
           MaterialPageRoute(
-            builder: (context) => UserDetailScreen(user: fallbackUser),
+            builder: (context) => UserDetailScreen(
+              user: fallbackUser,
+              showLikeActions: false,
+            ),
           ),
         ),
       );

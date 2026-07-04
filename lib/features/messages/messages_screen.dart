@@ -8,12 +8,12 @@ import 'package:google_fonts/google_fonts.dart';
 
 import '../../common/constants/app_colors.dart';
 import '../../common/widgets/state_views/state_views.dart';
-import '../../models/user_model.dart'; // Import UserModel
 import '../dating/screens/user_detail_screen.dart'; // Import for profile viewing
 import '../explore/explore_screen.dart'; // Import ExploreScreen directly
 import 'chat_thread_screen.dart';
 import 'message_model.dart';
 import 'services/chat_service.dart';
+import 'services/matched_user_profile_loader.dart';
 
 class MessagesScreen extends StatefulWidget {
   const MessagesScreen({super.key});
@@ -154,7 +154,8 @@ class _MessagesScreenState extends State<MessagesScreen> {
                     Stack(
                       children: [
                         GestureDetector(
-                          onTap: () => _viewUserProfile(thread.otherUserId),
+                          behavior: HitTestBehavior.opaque,
+                          onTap: () => _viewUserProfile(thread),
                           child: Container(
                             width: 60,
                             height: 60,
@@ -195,7 +196,9 @@ class _MessagesScreenState extends State<MessagesScreen> {
                                 color: AppColors.primaryGreen,
                                 shape: BoxShape.circle,
                                 border: Border.all(
-                                    color: AppColors.cardColor, width: 2),
+                                  color: AppColors.cardColor,
+                                  width: 2,
+                                ),
                               ),
                             ),
                           ),
@@ -210,20 +213,16 @@ class _MessagesScreenState extends State<MessagesScreen> {
                           Row(
                             children: [
                               Expanded(
-                                child: GestureDetector(
-                                  onTap: () =>
-                                      _viewUserProfile(thread.otherUserId),
-                                  child: Text(
-                                    thread.otherUserName,
-                                    style: GoogleFonts.montserrat(
-                                      fontSize: 17,
-                                      fontWeight: thread.unread
-                                          ? FontWeight.bold
-                                          : FontWeight.w600,
-                                      color: AppColors.textPrimary,
-                                    ),
-                                    overflow: TextOverflow.ellipsis,
+                                child: Text(
+                                  thread.otherUserName,
+                                  style: GoogleFonts.montserrat(
+                                    fontSize: 17,
+                                    fontWeight: thread.unread
+                                        ? FontWeight.bold
+                                        : FontWeight.w600,
+                                    color: AppColors.textPrimary,
                                   ),
+                                  overflow: TextOverflow.ellipsis,
                                 ),
                               ),
                               Text(
@@ -586,7 +585,7 @@ class _MessagesScreenState extends State<MessagesScreen> {
   }
 
   // Method to view user profile from messages
-  Future<void> _viewUserProfile(String userId) async {
+  Future<void> _viewUserProfile(MessageThreadInfo thread) async {
     if (!mounted) return;
 
     try {
@@ -648,75 +647,52 @@ class _MessagesScreenState extends State<MessagesScreen> {
         ),
       );
 
-      // Fetch user data from Firestore
-      final userDoc = await _firestore.collection('users').doc(userId).get();
+      final userModel = await MatchedUserProfileLoader.load(
+        firestore: _firestore,
+        userId: thread.otherUserId,
+        fallbackName: thread.otherUserName,
+        fallbackAvatarUrl: thread.avatarUrl,
+      );
 
-      // Close loading dialog
       if (mounted && Navigator.canPop(context)) {
         Navigator.pop(context);
       }
 
       if (!mounted) return;
 
-      if (userDoc.exists) {
-        final userData = userDoc.data() as Map<String, dynamic>;
-
-        // Convert Firestore data to UserModel
-        final userModel = UserModel(
-          id: userId,
-          name: userData['name'] ?? 'Unknown User',
-          age: userData['age'] ?? 0,
-          imageUrl: List<String>.from(
-            userData['photos'] ?? userData['imageUrl'] ?? [],
-          ),
-          address: userData['locationName'] ?? userData['address'],
-          distanceBW: userData['distanceBW'],
-          editInfo: userData['editInfo'] ?? {},
-        );
-
-        // Navigate to profile screen
-        unawaited(
-          Navigator.push(
-            context,
-            MaterialPageRoute(
-              builder: (context) => UserDetailScreen(user: userModel),
+      unawaited(
+        Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (context) => UserDetailScreen(
+              user: userModel,
+              showLikeActions: false,
             ),
           ),
-        );
-      } else {
-        // Show error if user not found
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text(
-              'User profile not found',
-              style: GoogleFonts.montserrat(color: Colors.white),
-            ),
-            backgroundColor: Colors.red,
-            behavior: SnackBarBehavior.floating,
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(8),
-            ),
-          ),
-        );
-      }
+        ),
+      );
     } on Object catch (e) {
-      // Close loading dialog if still open
       if (mounted && Navigator.canPop(context)) {
         Navigator.pop(context);
       }
 
       log('Error loading user profile: $e');
       if (!mounted) return;
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text(
-            'Failed to load profile',
-            style: GoogleFonts.montserrat(color: Colors.white),
-          ),
-          backgroundColor: Colors.red,
-          behavior: SnackBarBehavior.floating,
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(8),
+
+      final fallbackUser = MatchedUserProfileLoader.buildFallback(
+        userId: thread.otherUserId,
+        fallbackName: thread.otherUserName,
+        fallbackAvatarUrl: thread.avatarUrl,
+      );
+
+      unawaited(
+        Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (context) => UserDetailScreen(
+              user: fallbackUser,
+              showLikeActions: false,
+            ),
           ),
         ),
       );

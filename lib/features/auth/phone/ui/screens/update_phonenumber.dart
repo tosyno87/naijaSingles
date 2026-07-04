@@ -1,131 +1,138 @@
 import 'dart:async';
 
+import 'package:dlibphonenumber/dlibphonenumber.dart' hide PhoneNumber;
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 
 import '../../../../../common/constants/app_colors.dart';
+import '../../../../../common/widgets/afropeep_app_bar.dart';
 import '../../../../../models/user_model.dart';
 import 'phone_number.dart';
+
+String _formatDisplayPhone(String raw) {
+  final trimmed = raw.trim();
+  if (trimmed.isEmpty) {
+    return trimmed;
+  }
+
+  try {
+    final phoneUtil = PhoneNumberUtil.instance;
+    if (trimmed.startsWith('+')) {
+      final parsed = phoneUtil.parse(trimmed, null);
+      return phoneUtil.format(parsed, PhoneNumberFormat.international);
+    }
+
+    final digits = trimmed.replaceAll(RegExp(r'\D'), '');
+    if (digits.length == 11 && digits.startsWith('1')) {
+      final parsed = phoneUtil.parse('+$digits', null);
+      return phoneUtil.format(parsed, PhoneNumberFormat.international);
+    }
+
+    final parsed = phoneUtil.parse(digits, 'US');
+    return phoneUtil.format(parsed, PhoneNumberFormat.international);
+  } on Object {
+    return trimmed;
+  }
+}
 
 class UpdateNumber extends StatelessWidget {
   const UpdateNumber(this.currentUser, {super.key});
   final UserModel currentUser;
 
   @override
-  Widget build(BuildContext context) => Scaffold(
+  Widget build(BuildContext context) {
+    final bool hasPhone = currentUser.phoneNumber!.isNotEmpty;
+    final String displayPhone =
+        hasPhone ? _formatDisplayPhone(currentUser.phoneNumber!) : '';
+
+    return Scaffold(
+      backgroundColor: Theme.of(context).primaryColor,
+      appBar: AfropeepAppBar(
+        title: 'Phone number'.tr().toString(),
+        titleColor: AppColors.textOnPrimary,
+        backButtonColor: AppColors.textOnPrimary,
         backgroundColor: Theme.of(context).primaryColor,
-        appBar: AppBar(
-          title: Text(
-            'Phone number settings'.tr().toString(),
-            style: const TextStyle(color: Colors.white),
-          ),
-          leading: IconButton(
-            icon: const Icon(Icons.arrow_back_ios),
-            color: Colors.white,
-            onPressed: () => Navigator.pop(context),
-          ),
-          backgroundColor: Theme.of(context).scaffoldBackgroundColor,
-          elevation: 0,
-        ),
-        body: DecoratedBox(
-          decoration: BoxDecoration(
-            borderRadius: const BorderRadius.only(
-              topLeft: Radius.circular(20),
-              topRight: Radius.circular(20),
-            ),
-            color: Theme.of(context).primaryColor,
-          ),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: <Widget>[
-              Padding(
-                padding: const EdgeInsets.all(20),
-                child: Text(
-                  'Phone number'.tr().toString(),
-                  style: const TextStyle(
-                    fontSize: 16,
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
-              ),
-              Card(
-                child: ListTile(
-                  onTap: currentUser.phoneNumber!.isNotEmpty
-                      ? null
-                      : () {
-                          unawaited(
-                            Navigator.pushReplacement(
-                              context,
-                              MaterialPageRoute(
-                                builder: (context) => PhoneNumber(
-                                  updatePhoneNumber: true,
-                                ),
+        centerTitle: false,
+      ),
+      body: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 16),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: <Widget>[
+            const SizedBox(height: 8),
+            Card(
+              child: ListTile(
+                onTap: hasPhone
+                    ? null
+                    : () {
+                        unawaited(
+                          Navigator.pushReplacement(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) => PhoneNumber(
+                                updatePhoneNumber: true,
                               ),
                             ),
-                          );
-                        },
-                  title: Text(
-                    currentUser.phoneNumber!.isNotEmpty
-                        ? '${currentUser.phoneNumber}'
-                        : 'Add new Phone number'.tr().toString(),
-                    style: const TextStyle(
-                      fontSize: 15,
-                      fontWeight: FontWeight.w400,
-                    ),
-                  ),
-                  trailing: Icon(
-                    currentUser.phoneNumber!.isNotEmpty
-                        ? Icons.done
-                        : Icons.add_call,
-                    color: AppColors.primaryGreen,
-                  ),
-                ),
-              ),
-              Padding(
-                padding: const EdgeInsets.only(left: 15),
-                child: Text(
-                  currentUser.phoneNumber!.isNotEmpty
-                      ? 'Verified phone number'.tr().toString()
-                      : ' Add Verified phone number'.tr().toString(),
-                  style: const TextStyle(
-                    fontSize: 13,
-                    fontWeight: FontWeight.w400,
-                    color: AppColors.secondaryColor,
-                  ),
-                ),
-              ),
-              Padding(
-                padding: const EdgeInsets.all(18),
-                child: Center(
-                  child: InkWell(
-                    child: Card(
-                      child: Padding(
-                        padding: const EdgeInsets.all(18),
-                        child: Text(
-                          currentUser.phoneNumber!.isNotEmpty
-                              ? 'Update my phone number'.tr().toString()
-                              : 'Add new phone number'.tr().toString(),
-                          style: const TextStyle(
-                            fontSize: 14,
-                            fontWeight: FontWeight.w500,
-                            color: AppColors.primaryGreen,
                           ),
-                        ),
-                      ),
+                        );
+                      },
+                title: Text(
+                  hasPhone
+                      ? displayPhone
+                      : 'Add new Phone number'.tr().toString(),
+                  style: const TextStyle(
+                    fontSize: 15,
+                    fontWeight: FontWeight.w400,
+                  ),
+                ),
+                trailing: Icon(
+                  hasPhone ? Icons.done : Icons.add_call,
+                  color: AppColors.primaryGreen,
+                ),
+              ),
+            ),
+            const SizedBox(height: 8),
+            Text(
+              hasPhone
+                  ? 'Verified phone number'.tr().toString()
+                  : ' Add Verified phone number'.tr().toString(),
+              style: const TextStyle(
+                fontSize: 13,
+                fontWeight: FontWeight.w400,
+                color: AppColors.textOnPrimary,
+              ),
+            ),
+            const SizedBox(height: 24),
+            Card(
+              child: InkWell(
+                borderRadius: BorderRadius.circular(20),
+                onTap: () => Navigator.pushReplacement(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => PhoneNumber(
+                      updatePhoneNumber: true,
                     ),
-                    onTap: () => Navigator.pushReplacement(
-                      context,
-                      MaterialPageRoute(
-                        builder: (context) => PhoneNumber(
-                          updatePhoneNumber: true,
-                        ),
-                      ),
+                  ),
+                ),
+                child: Padding(
+                  padding: const EdgeInsets.symmetric(vertical: 18),
+                  child: Text(
+                    hasPhone
+                        ? 'Update my phone number'.tr().toString()
+                        : 'Add new phone number'.tr().toString(),
+                    textAlign: TextAlign.center,
+                    style: const TextStyle(
+                      fontSize: 14,
+                      fontWeight: FontWeight.w500,
+                      color: AppColors.primaryGreen,
                     ),
                   ),
                 ),
               ),
-            ],
-          ),
+            ),
+          ],
         ),
-      );
+      ),
+    );
+  }
 }

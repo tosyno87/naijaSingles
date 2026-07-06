@@ -114,6 +114,12 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-flutter-
             
+      - name: Setup Ruby for Fastlane
+        uses: ruby/setup-ruby@v1
+        with:
+          ruby-version: '3.3.6'
+          bundler-cache: true
+
       - name: Install CocoaPods (with patched xcodeproj)
         run: |
           git clone --depth 1 https://github.com/CocoaPods/Xcodeproj.git /tmp/xcodeproj
@@ -121,15 +127,6 @@ jobs:
           sudo gem install /tmp/xcodeproj/xcodeproj-*.gem --no-document
           sudo gem install cocoapods --no-document
           cd $GITHUB_WORKSPACE/ios && pod install
-
-      - name: Install Fastlane
-        run: |
-          # Create Gemfile to pin Fastlane version and avoid OpenSSL curve issues
-          cat > Gemfile << 'EOF'
-          source "https://rubygems.org"
-          gem "fastlane", "2.220.0"
-          EOF
-          bundle install
 
       - name: Setup Code Signing with Fastlane Match
         env:

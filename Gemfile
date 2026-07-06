@@ -1,11 +1,11 @@
 # Gemfile for NaijaSingles - African Diaspora Dating App
 source "https://rubygems.org"
 
-# Fastlane for iOS and Android deployment automation
-gem "fastlane"
+# Pin Ruby for CI (macOS runners default to 3.4+ which breaks older fastlane setups).
+ruby "3.3.6"
 
-# Ruby version
-ruby ">= 2.7.0"
+# Fastlane for iOS and Android deployment automation
+gem "fastlane", ">= 2.228.0"
 
 # Additional gems for enhanced functionality
 gem "cocoapods", ">= 1.15.0" # For iOS dependency management (updated to support activesupport 6.x)

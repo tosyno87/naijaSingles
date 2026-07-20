@@ -82,7 +82,10 @@ class ParticipantProfileResolver {
 
   /// Creates bidirectional `users/{uid}/Matches/{other}` mirrors so
   /// [canReadUserProfile] / [hasLegacyMatchWith] allow live profile reads.
-  /// Safe for seeded QA threads that only have top-level `matches` docs.
+  ///
+  /// Only writes after proving a top-level `matches` / legacy `Matches`
+  /// document exists for the pair — never invents match state from a chat
+  /// thread alone (seeded/forged threads must not gain profile-read access).
   Future<void> ensureMatchMirrors({
     required String currentUserId,
     required String otherUserId,
@@ -93,18 +96,24 @@ class ParticipantProfileResolver {
       return;
     }
 
-    final DocumentReference<Map<String, dynamic>> mine = _firestore
-        .collection('users')
-        .doc(currentUserId)
-        .collection('Matches')
-        .doc(otherUserId);
-    final DocumentReference<Map<String, dynamic>> theirs = _firestore
-        .collection('users')
-        .doc(otherUserId)
-        .collection('Matches')
-        .doc(currentUserId);
-
     try {
+      final bool matched =
+          await _hasTopLevelMatch(currentUserId, otherUserId);
+      if (!matched) {
+        return;
+      }
+
+      final DocumentReference<Map<String, dynamic>> mine = _firestore
+          .collection('users')
+          .doc(currentUserId)
+          .collection('Matches')
+          .doc(otherUserId);
+      final DocumentReference<Map<String, dynamic>> theirs = _firestore
+          .collection('users')
+          .doc(otherUserId)
+          .collection('Matches')
+          .doc(currentUserId);
+
       final List<DocumentSnapshot<Map<String, dynamic>>> snaps =
           await Future.wait(<Future<DocumentSnapshot<Map<String, dynamic>>>>[
         mine.get(),
@@ -136,6 +145,40 @@ class ParticipantProfileResolver {
     } on FirebaseException catch (_) {
       // Best-effort; profile resolve will fall back to thread cache.
     }
+  }
+
+  /// True when [userId1] and [userId2] appear together in top-level match docs.
+  Future<bool> _hasTopLevelMatch(String userId1, String userId2) async {
+    final QuerySnapshot<Map<String, dynamic>> modern = await _firestore
+        .collection('matches')
+        .where('users', arrayContains: userId1)
+        .get();
+    for (final QueryDocumentSnapshot<Map<String, dynamic>> doc in modern.docs) {
+      final List<String> users =
+          List<String>.from(doc.data()['users'] as List? ?? const <String>[]);
+      if (users.contains(userId2)) {
+        return true;
+      }
+    }
+
+    final QuerySnapshot<Map<String, dynamic>> legacy = await _firestore
+        .collection('Matches')
+        .where('users', arrayContains: userId1)
+        .get();
+    for (final QueryDocumentSnapshot<Map<String, dynamic>> doc in legacy.docs) {
+      final Map<String, dynamic> data = doc.data();
+      final List<String> users =
+          List<String>.from(data['users'] as List? ?? const <String>[]);
+      if (users.contains(userId2)) {
+        return true;
+      }
+      if ((data['user1'] == userId1 && data['user2'] == userId2) ||
+          (data['user1'] == userId2 && data['user2'] == userId1)) {
+        return true;
+      }
+    }
+
+    return false;
   }
 
   /// Updates denormalized thread fields when live values differ from cache.

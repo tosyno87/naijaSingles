@@ -42,10 +42,12 @@ class DiscoveryFiltering {
 
     switch (normalized) {
       case 'man':
+      case 'men':
       case 'male':
       case 'm':
         return 'male';
       case 'woman':
+      case 'women':
       case 'female':
       case 'f':
         return 'female';

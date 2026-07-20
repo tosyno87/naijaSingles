@@ -7,7 +7,27 @@ void main() {
     test('normalizeGender maps common aliases', () {
       expect(DiscoveryFiltering.normalizeGender('Male'), 'male');
       expect(DiscoveryFiltering.normalizeGender('woman'), 'female');
+      expect(DiscoveryFiltering.normalizeGender('men'), 'male');
+      expect(DiscoveryFiltering.normalizeGender('women'), 'female');
       expect(DiscoveryFiltering.normalizeGender('both'), 'everyone');
+    });
+
+    test('matchesGenderPreference maps plural showGender preferences', () {
+      final currentUser = UserModel(
+        id: 'current',
+        name: 'Current',
+        showGender: 'women',
+      );
+      final candidate = UserModel(
+        id: 'candidate',
+        name: 'Candidate',
+        userGender: 'female',
+      );
+
+      expect(
+        DiscoveryFiltering.matchesGenderPreference(candidate, currentUser),
+        isTrue,
+      );
     });
 
     test('matchesGenderPreference allows everyone preference', () {

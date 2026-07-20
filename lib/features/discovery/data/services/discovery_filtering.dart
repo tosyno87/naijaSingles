@@ -2,6 +2,39 @@ import '../../../../models/user_model.dart';
 
 /// Shared filtering helpers for discovery queries and stream pipelines.
 class DiscoveryFiltering {
+  /// Synonyms accepted when the seeker filters by a primary intent.
+  static const Map<String, Set<String>> _intentSynonyms = {
+    'dating': {'dating', 'romance', 'relationship', 'love', 'marriage'},
+    'friendship': {'friendship', 'friends', 'social'},
+    'networking': {'networking', 'business', 'professional'},
+  };
+
+  /// Whether [candidate] should appear for the seeker's [intentFilter].
+  ///
+  /// Missing/blank/`Mixed` intents are treated as compatible so incomplete
+  /// profiles (common after migration) are not wiped from the deck.
+  static bool matchesLookingForIntent(
+    UserModel candidate,
+    String? intentFilter,
+  ) {
+    final String seeker =
+        (intentFilter ?? '').trim().toLowerCase();
+    if (seeker.isEmpty || seeker == 'mixed') {
+      return true;
+    }
+
+    final String theirs = (candidate.lookingFor ?? '').trim().toLowerCase();
+    if (theirs.isEmpty || theirs == 'mixed') {
+      return true;
+    }
+    if (theirs == seeker) {
+      return true;
+    }
+
+    final Set<String>? synonyms = _intentSynonyms[seeker];
+    return synonyms != null && synonyms.contains(theirs);
+  }
+
   /// Normalize gender values from profile/query fields to a common form.
   static String normalizeGender(String? value) {
     final normalized = value?.trim().toLowerCase() ?? '';

@@ -1,5 +1,8 @@
+import 'dart:async';
+
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:google_fonts/google_fonts.dart';
 
@@ -51,6 +54,10 @@ class _DiscoveryPreferencesScreenState
   bool _strictDistance = false;
   bool _strictIntent = false;
   bool _verifiedOnly = false;
+
+  /// Brief in-button confirmation after a successful apply (no snackbar).
+  bool _showAppliedConfirm = false;
+  Timer? _appliedConfirmTimer;
 
   /// Bumps when filters reset so [LookingForConnectionCard] rebuilds its selection.
   int _lookingForCardKey = 0;
@@ -166,6 +173,12 @@ class _DiscoveryPreferencesScreenState
     }
   }
 
+  @override
+  void dispose() {
+    _appliedConfirmTimer?.cancel();
+    super.dispose();
+  }
+
   void _resetFilters() {
     setState(() {
       changeValues.clear();
@@ -210,10 +223,7 @@ class _DiscoveryPreferencesScreenState
 
   void _applyFilters() {
     if (!_hasPendingEdits()) {
-      CustomSnackbar.showSnackBarSimple(
-        'No changes to save'.tr(),
-        context,
-      );
+      // Silent no-op (Tinder/Hinge-style) — no dismissible snackbar.
       return;
     }
     context.read<UserfilterBloc>().add(
@@ -234,16 +244,20 @@ class _DiscoveryPreferencesScreenState
             context,
           );
         } else if (state is UserFilterUpdated) {
-          CustomSnackbar.showSnackBarSimple(
-            'Preferences updated'.tr(),
-            context,
-          );
+          unawaited(HapticFeedback.lightImpact());
           changeValues.clear();
+          _appliedConfirmTimer?.cancel();
           setState(() {
             _strictAge = false;
             _strictDistance = false;
             _strictIntent = false;
             _verifiedOnly = false;
+            _showAppliedConfirm = true;
+          });
+          _appliedConfirmTimer = Timer(const Duration(milliseconds: 1600), () {
+            if (mounted) {
+              setState(() => _showAppliedConfirm = false);
+            }
           });
         }
       },
@@ -453,22 +467,47 @@ class _DiscoveryPreferencesScreenState
                   child: SizedBox(
                     width: double.infinity,
                     child: ElevatedButton(
-                      onPressed: _applyFilters,
+                      onPressed: _showAppliedConfirm ? null : _applyFilters,
                       style: ElevatedButton.styleFrom(
-                        backgroundColor: AppColors.primaryGreen,
+                        backgroundColor: _showAppliedConfirm
+                            ? AppColors.primaryGreen.withValues(alpha: 0.85)
+                            : AppColors.primaryGreen,
                         foregroundColor: Colors.white,
+                        disabledBackgroundColor:
+                            AppColors.primaryGreen.withValues(alpha: 0.85),
+                        disabledForegroundColor: Colors.white,
                         elevation: 0,
                         padding: const EdgeInsets.symmetric(vertical: 16),
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(12),
                         ),
                       ),
-                      child: Text(
-                        'Apply filters'.tr(),
-                        style: GoogleFonts.montserrat(
-                          fontSize: 16,
-                          fontWeight: FontWeight.w600,
-                        ),
+                      child: AnimatedSwitcher(
+                        duration: const Duration(milliseconds: 200),
+                        child: _showAppliedConfirm
+                            ? Row(
+                                key: const ValueKey<String>('applied'),
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: [
+                                  const Icon(Icons.check, size: 20),
+                                  const SizedBox(width: 8),
+                                  Text(
+                                    'Applied'.tr(),
+                                    style: GoogleFonts.montserrat(
+                                      fontSize: 16,
+                                      fontWeight: FontWeight.w600,
+                                    ),
+                                  ),
+                                ],
+                              )
+                            : Text(
+                                key: const ValueKey<String>('apply'),
+                                'Apply filters'.tr(),
+                                style: GoogleFonts.montserrat(
+                                  fontSize: 16,
+                                  fontWeight: FontWeight.w600,
+                                ),
+                              ),
                       ),
                     ),
                   ),

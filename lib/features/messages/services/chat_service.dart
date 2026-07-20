@@ -9,6 +9,7 @@ import '../../../features/match/data/analytics/match_quality_reporter.dart';
 import '../../../services/performance_monitor.dart';
 import '../message_model.dart';
 import 'conversation_quality_metrics.dart';
+import 'participant_profile_resolver.dart';
 
 class ChatService {
   ChatService({
@@ -93,6 +94,9 @@ class ChatService {
 
       // Fetch both users' profiles in parallel for names and avatars
       String currentUserName = 'User';
+      String resolvedOtherUserName = otherUserName.trim().isNotEmpty
+          ? otherUserName.trim()
+          : 'User';
       String? currentUserAvatar;
       String? otherUserAvatar;
       try {
@@ -108,15 +112,29 @@ class ChatService {
           final photos = data?['photos'] as List<dynamic>?;
           if (photos != null && photos.isNotEmpty) {
             currentUserAvatar = photos.first as String?;
+          } else {
+            final pictures = data?['Pictures'] as List<dynamic>?;
+            if (pictures != null && pictures.isNotEmpty) {
+              currentUserAvatar = pictures.first as String?;
+            }
           }
         }
 
         final otherUserDoc = results[1];
         if (otherUserDoc.exists) {
           final data = otherUserDoc.data();
+          final liveName = data?['name'] as String?;
+          if (liveName != null && liveName.trim().isNotEmpty) {
+            resolvedOtherUserName = liveName.trim();
+          }
           final photos = data?['photos'] as List<dynamic>?;
           if (photos != null && photos.isNotEmpty) {
             otherUserAvatar = photos.first as String?;
+          } else {
+            final pictures = data?['Pictures'] as List<dynamic>?;
+            if (pictures != null && pictures.isNotEmpty) {
+              otherUserAvatar = pictures.first as String?;
+            }
           }
         }
       } on FirebaseException catch (e) {
@@ -140,11 +158,11 @@ class ChatService {
         'userIds': [currentUserId, otherUserId],
         'userNames': {
           currentUserId: currentUserName,
-          otherUserId: otherUserName,
+          otherUserId: resolvedOtherUserName,
         },
         if (userAvatars.isNotEmpty) 'userAvatars': userAvatars,
         'lastMessage': null,
-        'lastMessageText': 'Say hi to $otherUserName!',
+        'lastMessageText': 'Say hi to $resolvedOtherUserName!',
         'lastMessageSenderId': null,
         'lastUpdated': FieldValue.serverTimestamp(),
         'createdAt': FieldValue.serverTimestamp(),
@@ -729,7 +747,52 @@ class ChatService {
             .toList()
           ..sort((a, b) => b.timestamp.compareTo(a.timestamp));
 
-        return threads;
+        final ParticipantProfileResolver resolver =
+            ParticipantProfileResolver(firestore: _firestore);
+
+        final List<MessageThreadInfo> enriched = await Future.wait(
+          threads.map((thread) async {
+            try {
+              await resolver.ensureMatchMirrors(
+                currentUserId: userId,
+                otherUserId: thread.otherUserId,
+              );
+
+              final ParticipantDisplayInfo display = await resolver.resolve(
+                userId: thread.otherUserId,
+                cachedName: thread.otherUserName,
+                cachedAvatarUrl: thread.avatarUrl,
+              );
+
+              if (display.fromLiveProfile &&
+                  !ParticipantProfileResolver.isPlaceholderName(display.name)) {
+                unawaited(
+                  resolver.writeThroughThreadCache(
+                    threadId: thread.threadId,
+                    userId: thread.otherUserId,
+                    name: display.name,
+                    avatarUrl: display.avatarUrl,
+                    cachedName: thread.otherUserName,
+                    cachedAvatarUrl: thread.avatarUrl,
+                  ),
+                );
+              }
+
+              return thread.copyWith(
+                otherUserName: display.name,
+                avatarUrl: display.avatarUrl ?? thread.avatarUrl,
+              );
+            } on Object catch (e) {
+              AppLogger.error(
+                'Error enriching thread participant profile',
+                error: e,
+              );
+              return thread;
+            }
+          }),
+        );
+
+        return enriched;
       } on FirebaseException catch (e) {
         AppLogger.error(
           'Firebase error mapping chat threads: ${e.code} - ${e.message}',

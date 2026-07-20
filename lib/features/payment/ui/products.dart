@@ -28,7 +28,7 @@ import 'in_app_purchase/get_products/getproducts_bloc.dart';
 import 'in_app_purchase/get_products/getproducts_events.dart';
 import 'in_app_purchase/get_products/getproducts_states.dart';
 
-class Products extends StatefulWidget {
+class Products extends StatelessWidget {
   const Products(
     this.currentUser,
     this.isPaymentSuccess,
@@ -40,10 +40,65 @@ class Products extends StatefulWidget {
   final Map items;
 
   @override
-  ProductsState createState() => ProductsState();
+  Widget build(BuildContext context) {
+    // Call sites sometimes push [Products] without IAP blocs (e.g. location
+    // upsell). Provide them here when missing so paywalls never red-screen.
+    final bool hasGetBloc = _blocAvailable<GetInAppProductsBloc>(context);
+    final bool hasBuyBloc =
+        _blocAvailable<BuyConsumableInAppProductsBloc>(context);
+
+    Widget child = _ProductsBody(
+      currentUser: currentUser,
+      isPaymentSuccess: isPaymentSuccess,
+      items: items,
+    );
+
+    if (!hasGetBloc || !hasBuyBloc) {
+      child = MultiBlocProvider(
+        providers: [
+          if (!hasGetBloc)
+            BlocProvider<GetInAppProductsBloc>(
+              create: (_) => GetInAppProductsBloc(),
+            ),
+          if (!hasBuyBloc)
+            BlocProvider<BuyConsumableInAppProductsBloc>(
+              create: (_) => BuyConsumableInAppProductsBloc(),
+            ),
+        ],
+        child: child,
+      );
+    }
+    return child;
+  }
+
+  static bool _blocAvailable<T extends StateStreamableSource<Object?>>(
+    BuildContext context,
+  ) {
+    try {
+      BlocProvider.of<T>(context, listen: false);
+      return true;
+    } on Object {
+      return false;
+    }
+  }
 }
 
-class ProductsState extends State<Products> {
+class _ProductsBody extends StatefulWidget {
+  const _ProductsBody({
+    required this.currentUser,
+    required this.isPaymentSuccess,
+    required this.items,
+  });
+
+  final bool? isPaymentSuccess;
+  final UserModel? currentUser;
+  final Map items;
+
+  @override
+  State<_ProductsBody> createState() => _ProductsBodyState();
+}
+
+class _ProductsBodyState extends State<_ProductsBody> {
   ProductDetails? selectedProduct;
 
   @override

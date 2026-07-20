@@ -37,6 +37,28 @@ class MessageThreadInfo {
   final bool unread;
   final String? avatarUrl;
 
+  MessageThreadInfo copyWith({
+    String? threadId,
+    String? otherUserId,
+    String? otherUserName,
+    String? lastMessage,
+    String? lastMessageSenderId,
+    DateTime? timestamp,
+    bool? unread,
+    String? avatarUrl,
+  }) =>
+      MessageThreadInfo(
+        threadId: threadId ?? this.threadId,
+        otherUserId: otherUserId ?? this.otherUserId,
+        otherUserName: otherUserName ?? this.otherUserName,
+        lastMessage: lastMessage ?? this.lastMessage,
+        lastMessageSenderId:
+            lastMessageSenderId ?? this.lastMessageSenderId,
+        timestamp: timestamp ?? this.timestamp,
+        unread: unread ?? this.unread,
+        avatarUrl: avatarUrl ?? this.avatarUrl,
+      );
+
   // Helper method to format timestamp as relative time
   String getRelativeTime() {
     final now = DateTime.now();

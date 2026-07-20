@@ -2,9 +2,12 @@ import 'dart:async';
 
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
-import '../../../../common/constants/app_colors.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 
+import '../../../../common/constants/app_colors.dart';
 import '../../../../models/user_model.dart';
+import '../../../payment/ui/in_app_purchase/buy_products/buyproducts_bloc.dart';
+import '../../../payment/ui/in_app_purchase/get_products/getproducts_bloc.dart';
 import '../../../payment/ui/products.dart';
 
 Future<void> showSubscriptionDialog({
@@ -56,8 +59,18 @@ Future<void> showSubscriptionDialog({
                       Navigator.push(
                         context,
                         MaterialPageRoute(
-                          builder: (context) =>
-                              Products(currentUser, null, items),
+                          builder: (context) => MultiBlocProvider(
+                            providers: [
+                              BlocProvider(
+                                create: (_) => GetInAppProductsBloc(),
+                              ),
+                              BlocProvider(
+                                create: (_) =>
+                                    BuyConsumableInAppProductsBloc(),
+                              ),
+                            ],
+                            child: Products(currentUser, null, items),
+                          ),
                         ),
                       ),
                     );

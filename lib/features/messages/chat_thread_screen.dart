@@ -19,6 +19,7 @@ import '../dating/screens/user_detail_screen.dart';
 import 'message_model.dart';
 import 'services/chat_service.dart';
 import 'services/matched_user_profile_loader.dart';
+import 'services/participant_profile_resolver.dart';
 import 'widgets/pre_meet_safety_sheet.dart';
 
 class ChatThreadScreen extends StatefulWidget {
@@ -44,6 +45,8 @@ class _ChatThreadScreenState extends State<ChatThreadScreen> {
   final ChatService _chatService = ChatService();
   final MediaSharingService _mediaService = MediaSharingService();
   final ImagePicker _imagePicker = ImagePicker();
+  final ParticipantProfileResolver _participantResolver =
+      ParticipantProfileResolver();
   String? _currentUserId;
   bool _hasText = false;
   Timer? _typingDebounce;
@@ -51,11 +54,17 @@ class _ChatThreadScreenState extends State<ChatThreadScreen> {
   String _searchQuery = '';
   String? _replyToMessageId;
   String? _replyPreview;
+  int _lastMessageCount = 0;
+  String? _lastMessageId;
+  late String _displayName;
+  String? _displayAvatarUrl;
 
   @override
   void initState() {
     super.initState();
     _currentUserId = FirebaseAuth.instance.currentUser?.uid;
+    _displayName = widget.userName;
+    _displayAvatarUrl = widget.avatarUrl;
 
     // Listen to text changes for send button animation
     _messageController.addListener(() {
@@ -73,11 +82,56 @@ class _ChatThreadScreenState extends State<ChatThreadScreen> {
     });
 
     unawaited(_chatService.markThreadAsRead(widget.threadId));
+    unawaited(_resolveParticipantDisplay());
 
     // Scroll to bottom when messages load
     WidgetsBinding.instance.addPostFrameCallback((_) {
       _scrollToBottom();
     });
+  }
+
+  Future<void> _resolveParticipantDisplay() async {
+    final String? otherUserId = widget.otherUserId;
+    if (otherUserId == null || otherUserId.isEmpty) {
+      return;
+    }
+
+    try {
+      await _participantResolver.ensureMatchMirrors(
+        currentUserId: _currentUserId ?? '',
+        otherUserId: otherUserId,
+      );
+
+      final ParticipantDisplayInfo display =
+          await _participantResolver.resolve(
+        userId: otherUserId,
+        cachedName: widget.userName,
+        cachedAvatarUrl: widget.avatarUrl,
+      );
+
+      if (!mounted) return;
+
+      setState(() {
+        _displayName = display.name;
+        _displayAvatarUrl = display.avatarUrl ?? widget.avatarUrl;
+      });
+
+      if (display.fromLiveProfile &&
+          !ParticipantProfileResolver.isPlaceholderName(display.name)) {
+        unawaited(
+          _participantResolver.writeThroughThreadCache(
+            threadId: widget.threadId,
+            userId: otherUserId,
+            name: display.name,
+            avatarUrl: display.avatarUrl,
+            cachedName: widget.userName,
+            cachedAvatarUrl: widget.avatarUrl,
+          ),
+        );
+      }
+    } on Object catch (e) {
+      log('Error resolving chat participant display: $e');
+    }
   }
 
   @override
@@ -179,8 +233,8 @@ class _ChatThreadScreenState extends State<ChatThreadScreen> {
                 tag: 'avatar-${widget.threadId}',
                 child: CircleAvatar(
                   radius: 16,
-                  backgroundImage: widget.avatarUrl != null
-                      ? NetworkImage(widget.avatarUrl ?? '')
+                  backgroundImage: _displayAvatarUrl != null
+                      ? NetworkImage(_displayAvatarUrl ?? '')
                       : const AssetImage(
                           'assets/images/placeholder_profile.jpg',
                         ) as ImageProvider,
@@ -194,7 +248,7 @@ class _ChatThreadScreenState extends State<ChatThreadScreen> {
                   mainAxisSize: MainAxisSize.min,
                   children: [
                     Text(
-                      widget.userName,
+                      _displayName,
                       style: GoogleFonts.montserrat(
                         // Use Montserrat for MVP
                         fontSize: 16,
@@ -329,14 +383,23 @@ class _ChatThreadScreenState extends State<ChatThreadScreen> {
                 if (messages.isEmpty) {
                   return AppEmptyView(
                     title: 'No Messages Yet',
-                    subtitle: 'Say hi to ${widget.userName}!',
+                    subtitle: 'Say hi to $_displayName!',
                     icon: Icons.chat_bubble_outline,
                   );
                 }
 
-                WidgetsBinding.instance.addPostFrameCallback((_) {
-                  _scrollToBottom();
-                });
+                final String? newestId =
+                    messages.isNotEmpty ? messages.last.id : null;
+                final bool shouldScroll =
+                    messages.length != _lastMessageCount ||
+                        newestId != _lastMessageId;
+                if (shouldScroll) {
+                  _lastMessageCount = messages.length;
+                  _lastMessageId = newestId;
+                  WidgetsBinding.instance.addPostFrameCallback((_) {
+                    _scrollToBottom();
+                  });
+                }
 
                 return ListView.builder(
                   controller: _scrollController,
@@ -359,7 +422,7 @@ class _ChatThreadScreenState extends State<ChatThreadScreen> {
                       timestamp: message.timestamp,
                       senderId: message.senderId,
                       isOwnMessage: isMe,
-                      senderAvatarUrl: isMe ? null : widget.avatarUrl,
+                      senderAvatarUrl: isMe ? null : _displayAvatarUrl,
                       isRead: message.isRead,
                       showReadReceipt: true,
                       imageUrl: message.imageUrl,
@@ -609,9 +672,35 @@ class _ChatThreadScreenState extends State<ChatThreadScreen> {
       final userModel = await MatchedUserProfileLoader.load(
         firestore: FirebaseFirestore.instance,
         userId: widget.otherUserId!,
-        fallbackName: widget.userName,
-        fallbackAvatarUrl: widget.avatarUrl,
+        fallbackName: _displayName,
+        fallbackAvatarUrl: _displayAvatarUrl,
       );
+
+      final String? loadedName = userModel.name;
+      final String? loadedAvatar =
+          (userModel.imageUrl != null && userModel.imageUrl!.isNotEmpty)
+              ? userModel.imageUrl!.first as String?
+              : null;
+      if (loadedName != null && loadedName.trim().isNotEmpty) {
+        unawaited(
+          _participantResolver.writeThroughThreadCache(
+            threadId: widget.threadId,
+            userId: widget.otherUserId!,
+            name: loadedName.trim(),
+            avatarUrl: loadedAvatar,
+            cachedName: _displayName,
+            cachedAvatarUrl: _displayAvatarUrl,
+          ),
+        );
+        if (mounted) {
+          setState(() {
+            _displayName = loadedName.trim();
+            if (loadedAvatar != null && loadedAvatar.isNotEmpty) {
+              _displayAvatarUrl = loadedAvatar;
+            }
+          });
+        }
+      }
 
       if (mounted) {
         Navigator.pop(context);
@@ -644,8 +733,8 @@ class _ChatThreadScreenState extends State<ChatThreadScreen> {
 
       final fallbackUser = MatchedUserProfileLoader.buildFallback(
         userId: widget.otherUserId!,
-        fallbackName: widget.userName,
-        fallbackAvatarUrl: widget.avatarUrl,
+        fallbackName: _displayName,
+        fallbackAvatarUrl: _displayAvatarUrl,
       );
 
       unawaited(
@@ -739,7 +828,7 @@ class _ChatThreadScreenState extends State<ChatThreadScreen> {
 
               // Title with Poppins font
               Text(
-                'Block ${widget.userName}?',
+                'Block $_displayName?',
                 style: GoogleFonts.montserrat(
                   fontSize: 20,
                   fontWeight: FontWeight.w600,
@@ -894,7 +983,7 @@ class _ChatThreadScreenState extends State<ChatThreadScreen> {
                 ),
                 const SizedBox(height: 20),
                 Text(
-                  'Report ${widget.userName}?',
+                  'Report $_displayName?',
                   style: GoogleFonts.montserrat(
                     fontSize: 20,
                     fontWeight: FontWeight.w600,
@@ -1367,7 +1456,7 @@ class _ChatThreadScreenState extends State<ChatThreadScreen> {
                   const SizedBox(width: 12),
                   Expanded(
                     child: Text(
-                      '${widget.userName} has been blocked',
+                      '$_displayName has been blocked',
                       style: GoogleFonts.montserrat(
                         color: Colors.white,
                         fontWeight: FontWeight.w500,

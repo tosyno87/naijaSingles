@@ -77,7 +77,8 @@ class _SwipeCardListState extends State<SwipeCardList> {
                   ? AppEmptyView(
                       title: "There's no one new around you.".tr().toString(),
                       subtitle:
-                          'Try expanding your distance or refreshing discovery.',
+                          'Widen distance, set Show me to Everyone, or choose '
+                          'All of the Above under looking for — then refresh.',
                       icon: Icons.explore_off,
                       actionLabel: 'Refresh',
                       onAction: () {

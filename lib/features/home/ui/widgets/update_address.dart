@@ -155,7 +155,7 @@ class _UpdateAddressWidgetState extends State<UpdateAddressWidget> {
                     ),
                   ),
                   onTap: () async {
-                    log('hasSubscription $widget.hasSubscription');
+                    log('hasSubscription ${widget.hasSubscription}');
                     if (widget.hasSubscription) {
                       final address = await Navigator.pushNamed(
                         context,

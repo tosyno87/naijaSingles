@@ -47,6 +47,26 @@ class CustomSnackbar {
       );
   }
 
+  /// Short, non-blocking toast (no DISMISS) for success / soft feedback.
+  static void showSnackBarQuiet(String msg, BuildContext context) {
+    final messenger = ScaffoldMessenger.maybeOf(context);
+    if (messenger == null) return;
+
+    messenger
+      ..hideCurrentSnackBar()
+      ..showSnackBar(
+        SnackBar(
+          duration: const Duration(seconds: 2),
+          backgroundColor: Colors.black87,
+          behavior: SnackBarBehavior.floating,
+          content: Text(
+            msg,
+            style: GoogleFonts.montserrat(color: Colors.white),
+          ),
+        ),
+      );
+  }
+
   // static showSnackBarSimple(msg, context) {
   //   ScaffoldMessenger.of(context).removeCurrentSnackBar();
   //   ScaffoldMessenger.of(context).showSnackBar(

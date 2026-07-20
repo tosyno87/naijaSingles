@@ -28,6 +28,18 @@ class SearchUserBloc extends Bloc<SearchUserEvent, SearchUserState> {
         );
         discoverLoadTimer.stop();
 
+        if (userList.isEmpty) {
+          final user = event.currentUser;
+          log(
+            '📭 Discovery empty — showGender=${user.showGender}, '
+            'lookingFor=${user.lookingFor}, '
+            'maxDistanceKm=${user.maxDistance}, '
+            'ageRange=${user.ageRange}, '
+            'lat=${user.latitude}, lng=${user.longitude}, '
+            'address=${user.address}',
+          );
+        }
+
         final currentUserId = event.currentUser.id;
         final mode = event.currentUser.lookingFor ?? 'Dating';
         if (currentUserId != null) {

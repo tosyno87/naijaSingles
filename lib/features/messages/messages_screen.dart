@@ -14,6 +14,7 @@ import 'chat_thread_screen.dart';
 import 'message_model.dart';
 import 'services/chat_service.dart';
 import 'services/matched_user_profile_loader.dart';
+import 'services/participant_profile_resolver.dart';
 
 class MessagesScreen extends StatefulWidget {
   const MessagesScreen({super.key});
@@ -25,6 +26,8 @@ class MessagesScreen extends StatefulWidget {
 class _MessagesScreenState extends State<MessagesScreen> {
   final ChatService _chatService = ChatService();
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
+  final ParticipantProfileResolver _participantResolver =
+      ParticipantProfileResolver();
 
   @override
   Widget build(BuildContext context) => Scaffold(
@@ -653,6 +656,24 @@ class _MessagesScreenState extends State<MessagesScreen> {
         fallbackName: thread.otherUserName,
         fallbackAvatarUrl: thread.avatarUrl,
       );
+
+      final String? loadedName = userModel.name;
+      final String? loadedAvatar =
+          (userModel.imageUrl != null && userModel.imageUrl!.isNotEmpty)
+              ? userModel.imageUrl!.first as String?
+              : null;
+      if (loadedName != null && loadedName.trim().isNotEmpty) {
+        unawaited(
+          _participantResolver.writeThroughThreadCache(
+            threadId: thread.threadId,
+            userId: thread.otherUserId,
+            name: loadedName.trim(),
+            avatarUrl: loadedAvatar,
+            cachedName: thread.otherUserName,
+            cachedAvatarUrl: thread.avatarUrl,
+          ),
+        );
+      }
 
       if (mounted && Navigator.canPop(context)) {
         Navigator.pop(context);

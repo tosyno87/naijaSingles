@@ -2,6 +2,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 
+import '../../../features/discovery/data/services/discovery_filtering.dart';
 import '../../../models/user_model.dart';
 import '../../../services/location_privacy_service.dart';
 import '../../../services/user_privacy_service.dart';
@@ -92,18 +93,34 @@ class PrivacyAwareUserSearchRepo {
         userList = await _getFallbackUsers(currentUser, checkedUserIds);
       }
 
-      // Apply intent filtering in-memory (same logic as the unified path).
-      if (effectiveIntent != null &&
-          effectiveIntent.isNotEmpty &&
-          effectiveIntent != 'Mixed') {
-        userList = userList
-            .where(
-              (u) =>
-                  u.lookingFor == null ||
-                  u.lookingFor == effectiveIntent ||
-                  u.lookingFor == 'Mixed',
-            )
-            .toList();
+      final int beforeGender = userList.length;
+      userList = userList
+          .where(
+            (UserModel u) =>
+                DiscoveryFiltering.matchesGenderPreference(u, currentUser),
+          )
+          .toList();
+      if (beforeGender != userList.length) {
+        debugPrint(
+          '📋 Gender filter (${currentUser.showGender}): '
+          '$beforeGender → ${userList.length}',
+        );
+      }
+
+      final int beforeIntent = userList.length;
+      userList = userList
+          .where(
+            (UserModel u) => DiscoveryFiltering.matchesLookingForIntent(
+              u,
+              effectiveIntent,
+            ),
+          )
+          .toList();
+      if (beforeIntent != userList.length) {
+        debugPrint(
+          '📋 Intent filter ($effectiveIntent): '
+          '$beforeIntent → ${userList.length}',
+        );
       }
 
       AppLogger.debug('Privacy-aware list size: ${userList.length}');
@@ -224,7 +241,12 @@ class PrivacyAwareUserSearchRepo {
           if (calculatedDistance <= currentUser.maxDistance! &&
               temp.id != currentUser.id &&
               !temp.isBlocked!) {
-            debugPrint('📋 Adding fallback user: ${temp.name}');
+            debugPrint(
+              '📋 Adding fallback user: ${temp.name} '
+              '(lookingFor=${temp.lookingFor}, '
+              'gender=${temp.userGender}, '
+              'distance=${temp.distanceBW})',
+            );
             userList.add(temp);
           }
         } on Object catch (e) {
@@ -310,7 +332,10 @@ class PrivacyAwareUserSearchRepo {
       longitude: longitude,
       imageUrl: _extractPhotos(data),
       isBlocked: data['isBlocked'] ?? false,
-      lookingFor: data['lookingFor']?.toString() ?? 'Dating',
+      lookingFor: () {
+        final raw = data['lookingFor']?.toString().trim();
+        return (raw == null || raw.isEmpty) ? 'Dating' : raw;
+      }(),
       bio: data['bio']?.toString(),
       accountStatus: data['accountStatus']?.toString(),
     );

@@ -94,9 +94,8 @@ class ChatService {
 
       // Fetch both users' profiles in parallel for names and avatars
       String currentUserName = 'User';
-      String resolvedOtherUserName = otherUserName.trim().isNotEmpty
-          ? otherUserName.trim()
-          : 'User';
+      String resolvedOtherUserName =
+          otherUserName.trim().isNotEmpty ? otherUserName.trim() : 'User';
       String? currentUserAvatar;
       String? otherUserAvatar;
       try {

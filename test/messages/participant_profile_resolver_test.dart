@@ -28,7 +28,8 @@ void main() {
     });
 
     test('treats placeholder labels as empty', () {
-      expect(ParticipantProfileResolver.isPlaceholderName('Phone User'), isTrue);
+      expect(
+          ParticipantProfileResolver.isPlaceholderName('Phone User'), isTrue);
       expect(ParticipantProfileResolver.isPlaceholderName('User'), isTrue);
       expect(ParticipantProfileResolver.isPlaceholderName('Obatos'), isFalse);
     });
@@ -47,7 +48,8 @@ void main() {
         'https://cdn.example/b.jpg',
       );
       expect(
-        ParticipantProfileResolver.readFirstPhotoForTest({'photos': <String>[]}),
+        ParticipantProfileResolver.readFirstPhotoForTest(
+            {'photos': <String>[]}),
         isNull,
       );
     });

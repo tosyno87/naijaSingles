@@ -97,8 +97,7 @@ class ParticipantProfileResolver {
     }
 
     try {
-      final bool matched =
-          await _hasTopLevelMatch(currentUserId, otherUserId);
+      final bool matched = await _hasTopLevelMatch(currentUserId, otherUserId);
       if (!matched) {
         return;
       }

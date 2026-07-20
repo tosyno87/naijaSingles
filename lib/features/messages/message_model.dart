@@ -52,8 +52,7 @@ class MessageThreadInfo {
         otherUserId: otherUserId ?? this.otherUserId,
         otherUserName: otherUserName ?? this.otherUserName,
         lastMessage: lastMessage ?? this.lastMessage,
-        lastMessageSenderId:
-            lastMessageSenderId ?? this.lastMessageSenderId,
+        lastMessageSenderId: lastMessageSenderId ?? this.lastMessageSenderId,
         timestamp: timestamp ?? this.timestamp,
         unread: unread ?? this.unread,
         avatarUrl: avatarUrl ?? this.avatarUrl,

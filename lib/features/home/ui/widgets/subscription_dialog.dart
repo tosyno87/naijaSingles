@@ -65,8 +65,7 @@ Future<void> showSubscriptionDialog({
                                 create: (_) => GetInAppProductsBloc(),
                               ),
                               BlocProvider(
-                                create: (_) =>
-                                    BuyConsumableInAppProductsBloc(),
+                                create: (_) => BuyConsumableInAppProductsBloc(),
                               ),
                             ],
                             child: Products(currentUser, null, items),

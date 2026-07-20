@@ -17,8 +17,7 @@ class DiscoveryFiltering {
     UserModel candidate,
     String? intentFilter,
   ) {
-    final String seeker =
-        (intentFilter ?? '').trim().toLowerCase();
+    final String seeker = (intentFilter ?? '').trim().toLowerCase();
     if (seeker.isEmpty || seeker == 'mixed') {
       return true;
     }

@@ -102,8 +102,7 @@ class _ChatThreadScreenState extends State<ChatThreadScreen> {
         otherUserId: otherUserId,
       );
 
-      final ParticipantDisplayInfo display =
-          await _participantResolver.resolve(
+      final ParticipantDisplayInfo display = await _participantResolver.resolve(
         userId: otherUserId,
         cachedName: widget.userName,
         cachedAvatarUrl: widget.avatarUrl,

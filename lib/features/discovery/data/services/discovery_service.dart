@@ -542,14 +542,16 @@ class DiscoveryService {
     // 'Mixed' means "All of the Above" — these users should appear in every
     // mode, and a 'Mixed' current-user should see everyone.
     if (intentFilter != null && intentFilter.isNotEmpty) {
-      if (intentFilter == 'Mixed') {
+      final List<String> intentValues =
+          DiscoveryFiltering.lookingForQueryValues(intentFilter);
+      if (intentValues.isEmpty) {
         AppLogger.debug('Intent is Mixed — showing all intents');
       } else {
         query = query.where(
           'lookingFor',
-          whereIn: [intentFilter, 'Mixed'],
+          whereIn: intentValues,
         );
-        AppLogger.debug('Filtering by intent: $intentFilter + Mixed');
+        AppLogger.debug('Filtering by intent whereIn: $intentValues');
       }
     }
 

@@ -748,6 +748,8 @@ class ChatService {
 
         final ParticipantProfileResolver resolver =
             ParticipantProfileResolver(firestore: _firestore);
+        final Set<String> matchedPeerIds =
+            await resolver.loadMatchedPeerIds(userId);
 
         final List<MessageThreadInfo> enriched = await Future.wait(
           threads.map((thread) async {
@@ -755,6 +757,7 @@ class ChatService {
               await resolver.ensureMatchMirrors(
                 currentUserId: userId,
                 otherUserId: thread.otherUserId,
+                matchedPeerIds: matchedPeerIds,
               );
 
               final ParticipantDisplayInfo display = await resolver.resolve(

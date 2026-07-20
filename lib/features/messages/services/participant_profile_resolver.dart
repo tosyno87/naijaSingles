@@ -86,9 +86,13 @@ class ParticipantProfileResolver {
   /// Only writes after proving a top-level `matches` / legacy `Matches`
   /// document exists for the pair — never invents match state from a chat
   /// thread alone (seeded/forged threads must not gain profile-read access).
+  ///
+  /// Pass [matchedPeerIds] from [loadMatchedPeerIds] when enriching many
+  /// threads so each call is an O(1) set lookup instead of a full match scan.
   Future<void> ensureMatchMirrors({
     required String currentUserId,
     required String otherUserId,
+    Set<String>? matchedPeerIds,
   }) async {
     if (currentUserId.isEmpty ||
         otherUserId.isEmpty ||
@@ -97,11 +101,6 @@ class ParticipantProfileResolver {
     }
 
     try {
-      final bool matched = await _hasTopLevelMatch(currentUserId, otherUserId);
-      if (!matched) {
-        return;
-      }
-
       final DocumentReference<Map<String, dynamic>> mine = _firestore
           .collection('users')
           .doc(currentUserId)
@@ -118,9 +117,34 @@ class ParticipantProfileResolver {
         mine.get(),
         theirs.get(),
       ]);
+      final DocumentSnapshot<Map<String, dynamic>> mineSnap = snaps[0];
+      final DocumentSnapshot<Map<String, dynamic>> theirsSnap = snaps[1];
+
+      // Both mirrors present — nothing to do (no top-level scan).
+      if (mineSnap.exists && theirsSnap.exists) {
+        return;
+      }
+
+      // One-sided local mirror: repair the opposite without re-scanning matches.
+      // Local mirror implies a prior verified write or match creation path.
+      if (mineSnap.exists && !theirsSnap.exists) {
+        await theirs.set(<String, Object?>{
+          'Matches': currentUserId,
+          'userId': currentUserId,
+          'timestamp': FieldValue.serverTimestamp(),
+        });
+        return;
+      }
+
+      final bool matched = matchedPeerIds != null
+          ? matchedPeerIds.contains(otherUserId)
+          : await _hasTopLevelMatch(currentUserId, otherUserId);
+      if (!matched) {
+        return;
+      }
 
       final List<Future<void>> writes = <Future<void>>[];
-      if (!snaps[0].exists) {
+      if (!mineSnap.exists) {
         writes.add(
           mine.set(<String, Object?>{
             'Matches': otherUserId,
@@ -129,7 +153,7 @@ class ParticipantProfileResolver {
           }),
         );
       }
-      if (!snaps[1].exists) {
+      if (!theirsSnap.exists) {
         writes.add(
           theirs.set(<String, Object?>{
             'Matches': currentUserId,
@@ -146,38 +170,63 @@ class ParticipantProfileResolver {
     }
   }
 
+  /// Loads peer user IDs from top-level `matches` / `Matches` once per snapshot.
+  Future<Set<String>> loadMatchedPeerIds(String currentUserId) async {
+    if (currentUserId.isEmpty) {
+      return <String>{};
+    }
+
+    final Set<String> peers = <String>{};
+    try {
+      final QuerySnapshot<Map<String, dynamic>> modern = await _firestore
+          .collection('matches')
+          .where('users', arrayContains: currentUserId)
+          .get();
+      for (final QueryDocumentSnapshot<Map<String, dynamic>> doc
+          in modern.docs) {
+        final List<String> users =
+            List<String>.from(doc.data()['users'] as List? ?? const <String>[]);
+        for (final String id in users) {
+          if (id.isNotEmpty && id != currentUserId) {
+            peers.add(id);
+          }
+        }
+      }
+
+      final QuerySnapshot<Map<String, dynamic>> legacy = await _firestore
+          .collection('Matches')
+          .where('users', arrayContains: currentUserId)
+          .get();
+      for (final QueryDocumentSnapshot<Map<String, dynamic>> doc
+          in legacy.docs) {
+        final Map<String, dynamic> data = doc.data();
+        final List<String> users =
+            List<String>.from(data['users'] as List? ?? const <String>[]);
+        for (final String id in users) {
+          if (id.isNotEmpty && id != currentUserId) {
+            peers.add(id);
+          }
+        }
+        final Object? user1 = data['user1'];
+        final Object? user2 = data['user2'];
+        if (user1 == currentUserId && user2 is String && user2.isNotEmpty) {
+          peers.add(user2);
+        } else if (user2 == currentUserId &&
+            user1 is String &&
+            user1.isNotEmpty) {
+          peers.add(user1);
+        }
+      }
+    } on FirebaseException catch (_) {
+      return peers;
+    }
+    return peers;
+  }
+
   /// True when [userId1] and [userId2] appear together in top-level match docs.
   Future<bool> _hasTopLevelMatch(String userId1, String userId2) async {
-    final QuerySnapshot<Map<String, dynamic>> modern = await _firestore
-        .collection('matches')
-        .where('users', arrayContains: userId1)
-        .get();
-    for (final QueryDocumentSnapshot<Map<String, dynamic>> doc in modern.docs) {
-      final List<String> users =
-          List<String>.from(doc.data()['users'] as List? ?? const <String>[]);
-      if (users.contains(userId2)) {
-        return true;
-      }
-    }
-
-    final QuerySnapshot<Map<String, dynamic>> legacy = await _firestore
-        .collection('Matches')
-        .where('users', arrayContains: userId1)
-        .get();
-    for (final QueryDocumentSnapshot<Map<String, dynamic>> doc in legacy.docs) {
-      final Map<String, dynamic> data = doc.data();
-      final List<String> users =
-          List<String>.from(data['users'] as List? ?? const <String>[]);
-      if (users.contains(userId2)) {
-        return true;
-      }
-      if ((data['user1'] == userId1 && data['user2'] == userId2) ||
-          (data['user1'] == userId2 && data['user2'] == userId1)) {
-        return true;
-      }
-    }
-
-    return false;
+    final Set<String> peers = await loadMatchedPeerIds(userId1);
+    return peers.contains(userId2);
   }
 
   /// Updates denormalized thread fields when live values differ from cache.

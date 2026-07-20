@@ -109,5 +109,80 @@ void main() {
         isTrue,
       );
     });
+
+    test('uses preloaded matchedPeerIds without rewriting for non-peers',
+        () async {
+      final FakeFirebaseFirestore firestore = FakeFirebaseFirestore();
+      await firestore.collection('matches').doc('m1').set({
+        'users': <String>['a', 'b'],
+      });
+      final ParticipantProfileResolver resolver =
+          ParticipantProfileResolver(firestore: firestore);
+
+      final Set<String> peers = await resolver.loadMatchedPeerIds('a');
+      expect(peers, contains('b'));
+
+      await resolver.ensureMatchMirrors(
+        currentUserId: 'a',
+        otherUserId: 'forged',
+        matchedPeerIds: peers,
+      );
+      expect(
+        (await firestore
+                .collection('users')
+                .doc('a')
+                .collection('Matches')
+                .doc('forged')
+                .get())
+            .exists,
+        isFalse,
+      );
+
+      await resolver.ensureMatchMirrors(
+        currentUserId: 'a',
+        otherUserId: 'b',
+        matchedPeerIds: peers,
+      );
+      expect(
+        (await firestore
+                .collection('users')
+                .doc('a')
+                .collection('Matches')
+                .doc('b')
+                .get())
+            .exists,
+        isTrue,
+      );
+    });
+
+    test('skips match scan when local mirror already exists', () async {
+      final FakeFirebaseFirestore firestore = FakeFirebaseFirestore();
+      await firestore
+          .collection('users')
+          .doc('a')
+          .collection('Matches')
+          .doc('b')
+          .set({'Matches': 'b'});
+      final ParticipantProfileResolver resolver =
+          ParticipantProfileResolver(firestore: firestore);
+
+      await resolver.ensureMatchMirrors(
+        currentUserId: 'a',
+        otherUserId: 'b',
+        matchedPeerIds: <String>{},
+      );
+
+      // No top-level match and empty peer set — would fail without fast path.
+      expect(
+        (await firestore
+                .collection('users')
+                .doc('a')
+                .collection('Matches')
+                .doc('b')
+                .get())
+            .exists,
+        isTrue,
+      );
+    });
   });
 }

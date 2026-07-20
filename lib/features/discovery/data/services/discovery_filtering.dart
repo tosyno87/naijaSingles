@@ -9,6 +9,29 @@ class DiscoveryFiltering {
     'networking': {'networking', 'business', 'professional'},
   };
 
+  /// Firestore `lookingFor` whereIn values for [intentFilter], including
+  /// title-cased synonyms and `Mixed`. Empty when no query filter should apply.
+  ///
+  /// Firestore whereIn is limited to 10 values; synonym sets stay under that.
+  static List<String> lookingForQueryValues(String? intentFilter) {
+    final String raw = (intentFilter ?? '').trim();
+    if (raw.isEmpty) return const <String>[];
+    final String seeker = raw.toLowerCase();
+    if (seeker == 'mixed') return const <String>[];
+
+    final Set<String> synonyms = _intentSynonyms[seeker] ?? <String>{seeker};
+    final Set<String> values = <String>{'Mixed', raw};
+    for (final String synonym in synonyms) {
+      values.add(_titleCaseIntent(synonym));
+    }
+    return values.toList(growable: false);
+  }
+
+  static String _titleCaseIntent(String value) {
+    if (value.isEmpty) return value;
+    return '${value[0].toUpperCase()}${value.substring(1)}';
+  }
+
   /// Whether [candidate] should appear for the seeker's [intentFilter].
   ///
   /// Missing/blank/`Mixed` intents are treated as compatible so incomplete

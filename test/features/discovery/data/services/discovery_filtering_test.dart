@@ -118,5 +118,21 @@ void main() {
         isTrue,
       );
     });
+
+    test('lookingForQueryValues includes synonyms and Mixed', () {
+      final dating = DiscoveryFiltering.lookingForQueryValues('Dating');
+      expect(dating, containsAll(<String>['Dating', 'Mixed', 'Romance']));
+      expect(dating, isNot(contains('Social')));
+      expect(dating.length, lessThanOrEqualTo(10));
+
+      final networking = DiscoveryFiltering.lookingForQueryValues('Networking');
+      expect(
+        networking,
+        containsAll(<String>['Networking', 'Mixed', 'Professional']),
+      );
+
+      expect(DiscoveryFiltering.lookingForQueryValues('Mixed'), isEmpty);
+      expect(DiscoveryFiltering.lookingForQueryValues(null), isEmpty);
+    });
   });
 }

@@ -112,9 +112,27 @@ class ParticipantProfileResolver {
           .collection('Matches')
           .doc(currentUserId);
 
-      // Fast path: local mirror already unlocks profile reads for this user.
-      final DocumentSnapshot<Map<String, dynamic>> mineSnap = await mine.get();
-      if (mineSnap.exists) {
+      final List<DocumentSnapshot<Map<String, dynamic>>> snaps =
+          await Future.wait(<Future<DocumentSnapshot<Map<String, dynamic>>>>[
+        mine.get(),
+        theirs.get(),
+      ]);
+      final DocumentSnapshot<Map<String, dynamic>> mineSnap = snaps[0];
+      final DocumentSnapshot<Map<String, dynamic>> theirsSnap = snaps[1];
+
+      // Both mirrors present — nothing to do (no top-level scan).
+      if (mineSnap.exists && theirsSnap.exists) {
+        return;
+      }
+
+      // One-sided local mirror: repair the opposite without re-scanning matches.
+      // Local mirror implies a prior verified write or match creation path.
+      if (mineSnap.exists && !theirsSnap.exists) {
+        await theirs.set(<String, Object?>{
+          'Matches': currentUserId,
+          'userId': currentUserId,
+          'timestamp': FieldValue.serverTimestamp(),
+        });
         return;
       }
 
@@ -125,17 +143,16 @@ class ParticipantProfileResolver {
         return;
       }
 
-      final DocumentSnapshot<Map<String, dynamic>> theirsSnap =
-          await theirs.get();
-
       final List<Future<void>> writes = <Future<void>>[];
-      writes.add(
-        mine.set(<String, Object?>{
-          'Matches': otherUserId,
-          'userId': otherUserId,
-          'timestamp': FieldValue.serverTimestamp(),
-        }),
-      );
+      if (!mineSnap.exists) {
+        writes.add(
+          mine.set(<String, Object?>{
+            'Matches': otherUserId,
+            'userId': otherUserId,
+            'timestamp': FieldValue.serverTimestamp(),
+          }),
+        );
+      }
       if (!theirsSnap.exists) {
         writes.add(
           theirs.set(<String, Object?>{
@@ -145,7 +162,9 @@ class ParticipantProfileResolver {
           }),
         );
       }
-      await Future.wait(writes);
+      if (writes.isNotEmpty) {
+        await Future.wait(writes);
+      }
     } on FirebaseException catch (_) {
       // Best-effort; profile resolve will fall back to thread cache.
     }

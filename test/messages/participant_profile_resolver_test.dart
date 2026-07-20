@@ -155,7 +155,42 @@ void main() {
       );
     });
 
-    test('skips match scan when local mirror already exists', () async {
+    test('skips match scan when both mirrors already exist', () async {
+      final FakeFirebaseFirestore firestore = FakeFirebaseFirestore();
+      await firestore
+          .collection('users')
+          .doc('a')
+          .collection('Matches')
+          .doc('b')
+          .set({'Matches': 'b'});
+      await firestore
+          .collection('users')
+          .doc('b')
+          .collection('Matches')
+          .doc('a')
+          .set({'Matches': 'a'});
+      final ParticipantProfileResolver resolver =
+          ParticipantProfileResolver(firestore: firestore);
+
+      await resolver.ensureMatchMirrors(
+        currentUserId: 'a',
+        otherUserId: 'b',
+        matchedPeerIds: <String>{},
+      );
+
+      expect(
+        (await firestore
+                .collection('users')
+                .doc('a')
+                .collection('Matches')
+                .doc('b')
+                .get())
+            .exists,
+        isTrue,
+      );
+    });
+
+    test('repairs missing opposite mirror when local mirror exists', () async {
       final FakeFirebaseFirestore firestore = FakeFirebaseFirestore();
       await firestore
           .collection('users')
@@ -172,13 +207,12 @@ void main() {
         matchedPeerIds: <String>{},
       );
 
-      // No top-level match and empty peer set — would fail without fast path.
       expect(
         (await firestore
                 .collection('users')
-                .doc('a')
-                .collection('Matches')
                 .doc('b')
+                .collection('Matches')
+                .doc('a')
                 .get())
             .exists,
         isTrue,

@@ -1,5 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/foundation.dart';
+
+import '../features/discovery/data/services/discovery_filtering.dart';
 import '../models/user_model.dart';
 
 /// Mode-specific filtering service that applies different filters based on relationship intent
@@ -215,25 +217,15 @@ class ModeSpecificFilteringService {
 
   static bool _validateDatingMatch(UserModel user) {
     final imageCheck = user.imageUrl != null && user.imageUrl!.isNotEmpty;
-    final lookingForCheck = user.lookingFor == null ||
-        user.lookingFor == 'Dating' ||
-        user.lookingFor == 'Mixed';
-    return imageCheck && lookingForCheck;
+    return imageCheck &&
+        DiscoveryFiltering.matchesLookingForIntent(user, 'Dating');
   }
 
-  static bool _validateFriendshipMatch(UserModel user) {
-    final lookingForCheck = user.lookingFor == null ||
-        user.lookingFor == 'Friendship' ||
-        user.lookingFor == 'Mixed';
-    return lookingForCheck;
-  }
+  static bool _validateFriendshipMatch(UserModel user) =>
+      DiscoveryFiltering.matchesLookingForIntent(user, 'Friendship');
 
-  static bool _validateNetworkingMatch(UserModel user) {
-    final lookingForCheck = user.lookingFor == null ||
-        user.lookingFor == 'Networking' ||
-        user.lookingFor == 'Mixed';
-    return lookingForCheck;
-  }
+  static bool _validateNetworkingMatch(UserModel user) =>
+      DiscoveryFiltering.matchesLookingForIntent(user, 'Networking');
 
   /// Get mode-specific search suggestions
   static List<String> getModeSpecificSuggestions(String mode) {

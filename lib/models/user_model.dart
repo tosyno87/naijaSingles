@@ -65,6 +65,12 @@ class UserModel {
     return DateTime.tryParse(value.toString());
   }
 
+  /// Blank/missing lookingFor is common after migration; default to Dating.
+  static String _resolveLookingFor(String? value) {
+    final String trimmed = (value ?? '').trim();
+    return trimmed.isEmpty ? 'Dating' : trimmed;
+  }
+
   factory UserModel.fromDocument(DocumentSnapshot doc) {
     try {
       // Get the document ID as the user ID
@@ -211,8 +217,10 @@ class UserModel {
             safeGetNested<String>('editInfo', 'smokingStatus', ''),
         lastSeen: parseDateTimeOrNull(data['lastSeen']) ??
             parseDateTimeOrNull(data['lastActive']),
-        lookingFor: safeGet<String>('lookingFor') ??
-            safeGetNested<String>('editInfo', 'lookingFor', 'Dating'),
+        lookingFor: _resolveLookingFor(
+          safeGet<String>('lookingFor') ??
+              safeGetNested<String>('editInfo', 'lookingFor'),
+        ),
         // Cultural fields
         nationality: safeGet<String>('nationality') ??
             safeGetNested<String>('editInfo', 'nationality', ''),
@@ -415,7 +423,7 @@ class UserModel {
         lastSeen: map['lastSeen'] != null
             ? DateTime.tryParse(map['lastSeen'].toString())
             : null,
-        lookingFor: map['lookingFor']?.toString() ?? 'Dating',
+        lookingFor: UserModel._resolveLookingFor(map['lookingFor']?.toString()),
         // Cultural fields
         nationality: map['nationality']?.toString(),
         tribe: map['tribe']?.toString(),

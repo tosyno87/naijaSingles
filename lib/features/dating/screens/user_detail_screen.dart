@@ -42,7 +42,8 @@ class _UserDetailScreenState extends State<UserDetailScreen> {
 
   // MVP theme colors
   static const Color afropeepGreen = Color(0xFF008037); // MVP green
-  static const Color cardBackground = Color(0xFFF7E8DA);
+  /// Card fill matches profile sheet (white) — avoid peach mismatch with screen.
+  static const Color cardBackground = Colors.white;
   static const Color textDarkBrown = Color(0xFF3A1D0F);
   static const Color textLightBrown = Color(0xFF8B6C59);
 
@@ -702,7 +703,7 @@ class _UserDetailScreenState extends State<UserDetailScreen> {
           decoration: BoxDecoration(
             color: cardBackground,
             borderRadius: BorderRadius.circular(16),
-            border: Border.all(color: Colors.grey.shade300),
+            border: Border.all(color: Colors.grey.shade200),
           ),
           child: Text(
             bio,
@@ -818,7 +819,7 @@ class _UserDetailScreenState extends State<UserDetailScreen> {
         decoration: BoxDecoration(
           color: cardBackground,
           borderRadius: BorderRadius.circular(12),
-          border: Border.all(color: Colors.grey.shade300),
+          border: Border.all(color: Colors.grey.shade200),
         ),
         child: Row(
           children: [

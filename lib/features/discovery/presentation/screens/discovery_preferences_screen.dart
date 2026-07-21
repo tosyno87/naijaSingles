@@ -236,284 +236,301 @@ class _DiscoveryPreferencesScreenState
 
   @override
   Widget build(BuildContext context) {
-    return BlocListener<UserfilterBloc, UserfilterState>(
-      listener: (BuildContext context, UserfilterState state) {
-        if (state is UserFilterUpdationFailed) {
-          CustomSnackbar.showSnackBarSimple(
-            'Filter not applied..'.tr(),
-            context,
-          );
-        } else if (state is UserFilterUpdated) {
-          unawaited(HapticFeedback.lightImpact());
-          changeValues.clear();
-          _appliedConfirmTimer?.cancel();
-          setState(() {
-            _strictAge = false;
-            _strictDistance = false;
-            _strictIntent = false;
-            _verifiedOnly = false;
-            _showAppliedConfirm = true;
-          });
-          _appliedConfirmTimer = Timer(const Duration(milliseconds: 1600), () {
-            if (mounted) {
-              setState(() => _showAppliedConfirm = false);
-            }
-          });
-        }
-      },
-      child: PopScope(
-        canPop: false,
-        onPopInvokedWithResult: (bool didPop, Object? result) async {
-          if (didPop) return;
-          final bool allow = await _onWillPop();
-          if (allow && context.mounted) {
-            Navigator.of(context).pop();
+    final ThemeData theme = Theme.of(context);
+    final ColorScheme scheme = theme.colorScheme;
+    final bool isDark = theme.brightness == Brightness.dark;
+    final Color pageBackground =
+        isDark ? scheme.surface : AppColors.backgroundColor;
+    final Color onPage = scheme.onSurface;
+    final ThemeData scopedTheme = theme.copyWith(
+      cardTheme: theme.cardTheme.copyWith(
+        color: isDark ? scheme.surfaceContainerHighest : AppColors.cardColor,
+        surfaceTintColor: Colors.transparent,
+      ),
+    );
+
+    return Theme(
+      data: scopedTheme,
+      child: BlocListener<UserfilterBloc, UserfilterState>(
+        listener: (BuildContext context, UserfilterState state) {
+          if (state is UserFilterUpdationFailed) {
+            CustomSnackbar.showSnackBarSimple(
+              'Filter not applied..'.tr(),
+              context,
+            );
+          } else if (state is UserFilterUpdated) {
+            unawaited(HapticFeedback.lightImpact());
+            changeValues.clear();
+            _appliedConfirmTimer?.cancel();
+            setState(() {
+              _strictAge = false;
+              _strictDistance = false;
+              _strictIntent = false;
+              _verifiedOnly = false;
+              _showAppliedConfirm = true;
+            });
+            _appliedConfirmTimer =
+                Timer(const Duration(milliseconds: 1600), () {
+              if (mounted) {
+                setState(() => _showAppliedConfirm = false);
+              }
+            });
           }
         },
-        child: Scaffold(
-          backgroundColor: AppColors.backgroundColor,
-          appBar: AppBar(
-            elevation: 0,
-            backgroundColor: AppColors.backgroundColor,
-            foregroundColor: AppColors.textPrimary,
-            title: Text(
-              'Discovery Filters'.tr(),
-              style: GoogleFonts.montserrat(
-                fontWeight: FontWeight.w600,
-                fontSize: 18,
+        child: PopScope(
+          canPop: false,
+          onPopInvokedWithResult: (bool didPop, Object? result) async {
+            if (didPop) return;
+            final bool allow = await _onWillPop();
+            if (allow && context.mounted) {
+              Navigator.of(context).pop();
+            }
+          },
+          child: Scaffold(
+            backgroundColor: pageBackground,
+            appBar: AppBar(
+              elevation: 0,
+              backgroundColor: pageBackground,
+              foregroundColor: onPage,
+              title: Text(
+                'Discovery Filters'.tr(),
+                style: GoogleFonts.montserrat(
+                  fontWeight: FontWeight.w600,
+                  fontSize: 18,
+                  color: onPage,
+                ),
               ),
+              actions: [
+                TextButton(
+                  onPressed: _resetFilters,
+                  child: Text(
+                    'Reset filters'.tr(),
+                    style: GoogleFonts.montserrat(
+                      color: isDark
+                          ? AppColors.primaryGreenLight
+                          : AppColors.primaryGreen,
+                      fontWeight: FontWeight.w600,
+                    ),
+                  ),
+                ),
+              ],
             ),
-            actions: [
-              TextButton(
-                onPressed: _resetFilters,
-                child: Text(
-                  'Reset filters'.tr(),
-                  style: GoogleFonts.montserrat(
-                    color: AppColors.primaryGreen,
-                    fontWeight: FontWeight.w600,
-                  ),
-                ),
-              ),
-            ],
-          ),
-          body: Column(
-            children: [
-              Expanded(
-                child: ListView(
-                  padding: const EdgeInsets.fromLTRB(
-                    AppSpacing.lg,
-                    AppSpacing.sm,
-                    AppSpacing.lg,
-                    AppSpacing.md,
-                  ),
-                  children: [
-                    Text(
-                      'Discovery'.tr(),
-                      style: GoogleFonts.montserrat(
-                        fontSize: 13,
-                        fontWeight: FontWeight.w600,
-                        color: Theme.of(context).brightness == Brightness.dark
-                            ? Theme.of(context)
-                                .colorScheme
-                                .onSurface
-                                .withValues(alpha: 0.78)
-                            : const Color(0xFF505050),
-                      ),
+            body: Column(
+              children: [
+                Expanded(
+                  child: ListView(
+                    padding: const EdgeInsets.fromLTRB(
+                      AppSpacing.lg,
+                      AppSpacing.sm,
+                      AppSpacing.lg,
+                      AppSpacing.md,
                     ),
-                    const SizedBox(height: 6),
-                    UpdateAddressWidget(
-                      currentUser: widget.currentUser,
-                      hasSubscription: widget.isPurchased,
-                      items: widget.items,
-                      compact: true,
-                    ),
-                    const SizedBox(height: 2),
-                    Text(
-                      'Change your location to see members in other cities.'
-                          .tr(),
-                      style: _helperLineStyle(context),
-                    ),
-                    const SizedBox(height: 10),
-                    ShowmeWidget(
-                      currentUser: widget.currentUser,
-                      changeValues: changeValues,
-                      compact: true,
-                      onEdited: () => setState(() {}),
-                    ),
-                    const SizedBox(height: 8),
-                    LookingForConnectionCard(
-                      key: ValueKey<int>(_lookingForCardKey),
-                      currentUser: widget.currentUser,
-                      changeValues: changeValues,
-                      compact: true,
-                    ),
-                    const SizedBox(height: 8),
-                    DistanceWidget(
-                      currentUser: widget.currentUser,
-                      changeValues: changeValues,
-                      max: widget.isPurchased
-                          ? paidR.toDouble()
-                          : freeR.toDouble(),
-                      compact: true,
-                      onEdited: () => setState(() {}),
-                    ),
-                    const SizedBox(height: 2),
-                    Text(
-                      '${'Showing people within'.tr()} '
-                      '${_distanceMilesRounded()} '
-                      '${'mi'.tr()}',
-                      style: _helperLineStyle(context),
-                    ),
-                    const SizedBox(height: 8),
-                    AgeRangeWidget(
-                      currentUser: widget.currentUser,
-                      changeValues: changeValues,
-                      compact: true,
-                      onEdited: () => setState(() {}),
-                    ),
-                    const SizedBox(height: 2),
-                    Text(
-                      '${'Age range'.tr()}: ${_ageSummary()}',
-                      style: _helperLineStyle(context),
-                    ),
-                    const SizedBox(height: 12),
-                    Text(
-                      'Advanced Filters'.tr(),
-                      style: GoogleFonts.montserrat(
-                        fontSize: 13,
-                        fontWeight: FontWeight.w600,
-                        color: AppColors.textSecondary,
-                      ),
-                    ),
-                    const SizedBox(height: 2),
-                    Text(
-                      'When on, these act as dealbreakers.'.tr(),
-                      style: _helperLineStyle(context),
-                    ),
-                    const SizedBox(height: 6),
-                    settingsSwitchTheme(
-                      context: context,
-                      child: Column(
-                        mainAxisSize: MainAxisSize.min,
-                        children: <Widget>[
-                          SwitchListTile(
-                            contentPadding:
-                                const EdgeInsets.symmetric(horizontal: 4),
-                            visualDensity: VisualDensity.compact,
-                            title: Text('Strict age'.tr()),
-                            subtitle: Text(
-                              'Only show people strictly in this age band.'
-                                  .tr(),
-                              style: GoogleFonts.montserrat(fontSize: 12),
-                            ),
-                            value: _strictAge,
-                            onChanged: (bool v) =>
-                                setState(() => _strictAge = v),
-                          ),
-                          SwitchListTile(
-                            contentPadding:
-                                const EdgeInsets.symmetric(horizontal: 4),
-                            visualDensity: VisualDensity.compact,
-                            title: Text('Strict distance'.tr()),
-                            subtitle: Text(
-                              'Hide people slightly outside your radius.'.tr(),
-                              style: GoogleFonts.montserrat(fontSize: 12),
-                            ),
-                            value: _strictDistance,
-                            onChanged: (bool v) =>
-                                setState(() => _strictDistance = v),
-                          ),
-                          SwitchListTile(
-                            contentPadding:
-                                const EdgeInsets.symmetric(horizontal: 4),
-                            visualDensity: VisualDensity.compact,
-                            title: Text('Strict intent'.tr()),
-                            subtitle: Text(
-                              'Match my "looking for" mode more strictly.'.tr(),
-                              style: GoogleFonts.montserrat(fontSize: 12),
-                            ),
-                            value: _strictIntent,
-                            onChanged: (bool v) =>
-                                setState(() => _strictIntent = v),
-                          ),
-                          SwitchListTile(
-                            contentPadding:
-                                const EdgeInsets.symmetric(horizontal: 4),
-                            visualDensity: VisualDensity.compact,
-                            title: Text('Show only verified profiles'.tr()),
-                            subtitle: Text(
-                              'When available, hide profiles not yet verified.'
-                                  .tr(),
-                              style: GoogleFonts.montserrat(fontSize: 12),
-                            ),
-                            value: _verifiedOnly,
-                            onChanged: (bool v) =>
-                                setState(() => _verifiedOnly = v),
-                          ),
-                        ],
-                      ),
-                    ),
-                    const SizedBox(height: 88),
-                  ],
-                ),
-              ),
-              Material(
-                elevation: 12,
-                shadowColor: Colors.black26,
-                color: AppColors.backgroundColor,
-                child: SafeArea(
-                  top: false,
-                  minimum: const EdgeInsets.fromLTRB(16, 8, 16, 12),
-                  child: SizedBox(
-                    width: double.infinity,
-                    child: ElevatedButton(
-                      onPressed: _showAppliedConfirm ? null : _applyFilters,
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: _showAppliedConfirm
-                            ? AppColors.primaryGreen.withValues(alpha: 0.85)
-                            : AppColors.primaryGreen,
-                        foregroundColor: Colors.white,
-                        disabledBackgroundColor:
-                            AppColors.primaryGreen.withValues(alpha: 0.85),
-                        disabledForegroundColor: Colors.white,
-                        elevation: 0,
-                        padding: const EdgeInsets.symmetric(vertical: 16),
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(12),
+                    children: [
+                      Text(
+                        'Discovery'.tr(),
+                        style: GoogleFonts.montserrat(
+                          fontSize: 13,
+                          fontWeight: FontWeight.w600,
+                          color: onPage.withValues(alpha: isDark ? 0.78 : 0.72),
                         ),
                       ),
-                      child: AnimatedSwitcher(
-                        duration: const Duration(milliseconds: 200),
-                        child: _showAppliedConfirm
-                            ? Row(
-                                key: const ValueKey<String>('applied'),
-                                mainAxisAlignment: MainAxisAlignment.center,
-                                children: [
-                                  const Icon(Icons.check, size: 20),
-                                  const SizedBox(width: 8),
-                                  Text(
-                                    'Applied'.tr(),
-                                    style: GoogleFonts.montserrat(
-                                      fontSize: 16,
-                                      fontWeight: FontWeight.w600,
-                                    ),
-                                  ),
-                                ],
-                              )
-                            : Text(
-                                key: const ValueKey<String>('apply'),
-                                'Apply filters'.tr(),
-                                style: GoogleFonts.montserrat(
-                                  fontSize: 16,
-                                  fontWeight: FontWeight.w600,
-                                ),
+                      const SizedBox(height: 6),
+                      UpdateAddressWidget(
+                        currentUser: widget.currentUser,
+                        hasSubscription: widget.isPurchased,
+                        items: widget.items,
+                        compact: true,
+                      ),
+                      const SizedBox(height: 2),
+                      Text(
+                        'Change your location to see members in other cities.'
+                            .tr(),
+                        style: _helperLineStyle(context),
+                      ),
+                      const SizedBox(height: 10),
+                      ShowmeWidget(
+                        currentUser: widget.currentUser,
+                        changeValues: changeValues,
+                        compact: true,
+                        onEdited: () => setState(() {}),
+                      ),
+                      const SizedBox(height: 8),
+                      LookingForConnectionCard(
+                        key: ValueKey<int>(_lookingForCardKey),
+                        currentUser: widget.currentUser,
+                        changeValues: changeValues,
+                        compact: true,
+                      ),
+                      const SizedBox(height: 8),
+                      DistanceWidget(
+                        currentUser: widget.currentUser,
+                        changeValues: changeValues,
+                        max: widget.isPurchased
+                            ? paidR.toDouble()
+                            : freeR.toDouble(),
+                        compact: true,
+                        onEdited: () => setState(() {}),
+                      ),
+                      const SizedBox(height: 2),
+                      Text(
+                        '${'Showing people within'.tr()} '
+                        '${_distanceMilesRounded()} '
+                        '${'mi'.tr()}',
+                        style: _helperLineStyle(context),
+                      ),
+                      const SizedBox(height: 8),
+                      AgeRangeWidget(
+                        currentUser: widget.currentUser,
+                        changeValues: changeValues,
+                        compact: true,
+                        onEdited: () => setState(() {}),
+                      ),
+                      const SizedBox(height: 2),
+                      Text(
+                        '${'Age range'.tr()}: ${_ageSummary()}',
+                        style: _helperLineStyle(context),
+                      ),
+                      const SizedBox(height: 12),
+                      Text(
+                        'Advanced Filters'.tr(),
+                        style: GoogleFonts.montserrat(
+                          fontSize: 13,
+                          fontWeight: FontWeight.w600,
+                          color: onPage.withValues(alpha: isDark ? 0.78 : 0.72),
+                        ),
+                      ),
+                      const SizedBox(height: 2),
+                      Text(
+                        'When on, these act as dealbreakers.'.tr(),
+                        style: _helperLineStyle(context),
+                      ),
+                      const SizedBox(height: 6),
+                      settingsSwitchTheme(
+                        context: context,
+                        child: Column(
+                          mainAxisSize: MainAxisSize.min,
+                          children: <Widget>[
+                            SwitchListTile(
+                              contentPadding:
+                                  const EdgeInsets.symmetric(horizontal: 4),
+                              visualDensity: VisualDensity.compact,
+                              title: Text('Strict age'.tr()),
+                              subtitle: Text(
+                                'Only show people strictly in this age band.'
+                                    .tr(),
+                                style: GoogleFonts.montserrat(fontSize: 12),
                               ),
+                              value: _strictAge,
+                              onChanged: (bool v) =>
+                                  setState(() => _strictAge = v),
+                            ),
+                            SwitchListTile(
+                              contentPadding:
+                                  const EdgeInsets.symmetric(horizontal: 4),
+                              visualDensity: VisualDensity.compact,
+                              title: Text('Strict distance'.tr()),
+                              subtitle: Text(
+                                'Hide people slightly outside your radius.'
+                                    .tr(),
+                                style: GoogleFonts.montserrat(fontSize: 12),
+                              ),
+                              value: _strictDistance,
+                              onChanged: (bool v) =>
+                                  setState(() => _strictDistance = v),
+                            ),
+                            SwitchListTile(
+                              contentPadding:
+                                  const EdgeInsets.symmetric(horizontal: 4),
+                              visualDensity: VisualDensity.compact,
+                              title: Text('Strict intent'.tr()),
+                              subtitle: Text(
+                                'Match my "looking for" mode more strictly.'
+                                    .tr(),
+                                style: GoogleFonts.montserrat(fontSize: 12),
+                              ),
+                              value: _strictIntent,
+                              onChanged: (bool v) =>
+                                  setState(() => _strictIntent = v),
+                            ),
+                            SwitchListTile(
+                              contentPadding:
+                                  const EdgeInsets.symmetric(horizontal: 4),
+                              visualDensity: VisualDensity.compact,
+                              title: Text('Show only verified profiles'.tr()),
+                              subtitle: Text(
+                                'When available, hide profiles not yet verified.'
+                                    .tr(),
+                                style: GoogleFonts.montserrat(fontSize: 12),
+                              ),
+                              value: _verifiedOnly,
+                              onChanged: (bool v) =>
+                                  setState(() => _verifiedOnly = v),
+                            ),
+                          ],
+                        ),
+                      ),
+                      const SizedBox(height: 88),
+                    ],
+                  ),
+                ),
+                Material(
+                  elevation: 12,
+                  shadowColor: Colors.black26,
+                  color: pageBackground,
+                  child: SafeArea(
+                    top: false,
+                    minimum: const EdgeInsets.fromLTRB(16, 8, 16, 12),
+                    child: SizedBox(
+                      width: double.infinity,
+                      child: ElevatedButton(
+                        onPressed: _showAppliedConfirm ? null : _applyFilters,
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: _showAppliedConfirm
+                              ? AppColors.primaryGreen.withValues(alpha: 0.85)
+                              : AppColors.primaryGreen,
+                          foregroundColor: Colors.white,
+                          disabledBackgroundColor:
+                              AppColors.primaryGreen.withValues(alpha: 0.85),
+                          disabledForegroundColor: Colors.white,
+                          elevation: 0,
+                          padding: const EdgeInsets.symmetric(vertical: 16),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(12),
+                          ),
+                        ),
+                        child: AnimatedSwitcher(
+                          duration: const Duration(milliseconds: 200),
+                          child: _showAppliedConfirm
+                              ? Row(
+                                  key: const ValueKey<String>('applied'),
+                                  mainAxisAlignment: MainAxisAlignment.center,
+                                  children: [
+                                    const Icon(Icons.check, size: 20),
+                                    const SizedBox(width: 8),
+                                    Text(
+                                      'Applied'.tr(),
+                                      style: GoogleFonts.montserrat(
+                                        fontSize: 16,
+                                        fontWeight: FontWeight.w600,
+                                      ),
+                                    ),
+                                  ],
+                                )
+                              : Text(
+                                  key: const ValueKey<String>('apply'),
+                                  'Apply filters'.tr(),
+                                  style: GoogleFonts.montserrat(
+                                    fontSize: 16,
+                                    fontWeight: FontWeight.w600,
+                                  ),
+                                ),
+                        ),
                       ),
                     ),
                   ),
                 ),
-              ),
-            ],
+              ],
+            ),
           ),
         ),
       ),

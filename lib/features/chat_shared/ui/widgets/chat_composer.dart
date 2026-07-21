@@ -55,6 +55,9 @@ class ChatComposer extends StatelessWidget {
         ],
       ),
       child: SafeArea(
+        top: false,
+        left: false,
+        right: false,
         child: Row(
           children: [
             if (showAttachButton)
@@ -75,6 +78,7 @@ class ChatComposer extends StatelessWidget {
                 constraints: BoxConstraints(maxHeight: maxLines * 24.0),
                 child: TextField(
                   controller: controller,
+                  scrollPadding: EdgeInsets.zero,
                   decoration: InputDecoration(
                     hintText: hintText,
                     hintStyle: GoogleFonts.montserrat(
@@ -92,10 +96,12 @@ class ChatComposer extends StatelessWidget {
                       horizontal: 16,
                       vertical: 12,
                     ),
+                    isDense: true,
                   ),
                   style: GoogleFonts.montserrat(
                     fontSize: 14,
                     color: Colors.black87,
+                    height: 1.35,
                   ),
                   maxLines: maxLines,
                   minLines: 1,

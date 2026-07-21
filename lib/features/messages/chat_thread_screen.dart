@@ -58,6 +58,7 @@ class _ChatThreadScreenState extends State<ChatThreadScreen> {
   String? _replyPreview;
   int _lastMessageCount = 0;
   String? _lastMessageId;
+
   /// After the user sends, pin to the live edge even if they were reading history
   /// (Tinder/Hinge-style). Incoming messages still respect [_isNearBottom].
   bool _pinToBottomAfterOwnSend = false;
@@ -463,8 +464,8 @@ class _ChatThreadScreenState extends State<ChatThreadScreen> {
                     final bool pinAfterOwnSend = _pinToBottomAfterOwnSend;
                     final bool newestIsOwn = messages.isNotEmpty &&
                         messages.last.senderId == _currentUserId;
-                    final bool followLiveEdge = _isNearBottom ||
-                        (pinAfterOwnSend && newestIsOwn);
+                    final bool followLiveEdge =
+                        _isNearBottom || (pinAfterOwnSend && newestIsOwn);
                     if (pinAfterOwnSend && newestIsOwn) {
                       _pinToBottomAfterOwnSend = false;
                     }

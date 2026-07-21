@@ -49,7 +49,9 @@ class _ChatThreadScreenState extends State<ChatThreadScreen> {
       ParticipantProfileResolver();
   String? _currentUserId;
   Timer? _typingDebounce;
+  Timer? _typingHeartbeat;
   bool _typingIndicatorActive = false;
+  DateTime? _lastTypingWriteAt;
   bool _showSearch = false;
   String _searchQuery = '';
   String? _replyToMessageId;
@@ -83,6 +85,8 @@ class _ChatThreadScreenState extends State<ChatThreadScreen> {
     final bool hasText = _messageController.text.trim().isNotEmpty;
     if (!hasText) {
       _typingDebounce?.cancel();
+      _typingHeartbeat?.cancel();
+      _typingHeartbeat = null;
       if (_typingIndicatorActive) {
         _typingIndicatorActive = false;
         unawaited(_chatService.setTyping(widget.threadId, isTyping: false));
@@ -90,16 +94,32 @@ class _ChatThreadScreenState extends State<ChatThreadScreen> {
       return;
     }
 
-    // One Firestore write when typing starts; refresh the idle timer only.
-    if (!_typingIndicatorActive) {
-      _typingIndicatorActive = true;
-      unawaited(_chatService.setTyping(widget.threadId, isTyping: true));
-    }
+    // Write on start, then heartbeat every 4s so watchers (8s TTL) stay fresh
+    // without a Firestore write on every keystroke.
+    _publishTypingHeartbeat(force: !_typingIndicatorActive);
+    _typingIndicatorActive = true;
+    _typingHeartbeat ??= Timer.periodic(const Duration(seconds: 4), (_) {
+      if (!_typingIndicatorActive) return;
+      _publishTypingHeartbeat(force: true);
+    });
+
     _typingDebounce?.cancel();
     _typingDebounce = Timer(const Duration(seconds: 2), () {
+      _typingHeartbeat?.cancel();
+      _typingHeartbeat = null;
       _typingIndicatorActive = false;
       unawaited(_chatService.setTyping(widget.threadId, isTyping: false));
     });
+  }
+
+  void _publishTypingHeartbeat({required bool force}) {
+    final DateTime now = DateTime.now();
+    final DateTime? last = _lastTypingWriteAt;
+    if (!force && last != null && now.difference(last).inSeconds < 4) {
+      return;
+    }
+    _lastTypingWriteAt = now;
+    unawaited(_chatService.setTyping(widget.threadId, isTyping: true));
   }
 
   Future<void> _resolveParticipantDisplay() async {
@@ -149,6 +169,7 @@ class _ChatThreadScreenState extends State<ChatThreadScreen> {
   void dispose() {
     _messageController.removeListener(_onComposerTextChanged);
     _typingDebounce?.cancel();
+    _typingHeartbeat?.cancel();
     if (_typingIndicatorActive) {
       unawaited(_chatService.setTyping(widget.threadId, isTyping: false));
     }

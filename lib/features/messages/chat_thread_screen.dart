@@ -202,11 +202,12 @@ class _ChatThreadScreenState extends State<ChatThreadScreen> {
   }
 
   /// With [ListView.reverse], offset 0 is the newest messages.
-  bool get _isScrolledUpIntoHistory {
+  /// True when the user is still "following" the live conversation.
+  bool get _isNearBottom {
     if (!_scrollController.hasClients) {
-      return false;
+      return true;
     }
-    return _scrollController.position.pixels > 80;
+    return _scrollController.position.pixels <= 80;
   }
 
   Future<void> _pickAndSendImage() async {
@@ -452,12 +453,14 @@ class _ChatThreadScreenState extends State<ChatThreadScreen> {
                   if (shouldScroll) {
                     _lastMessageCount = messages.length;
                     _lastMessageId = newestId;
+                    // Capture before the new ListView lays out. After insert,
+                    // reverse-list extent growth can push pixels past 80 even
+                    // when the user was in the follow zone.
+                    final bool followLiveEdge = _isNearBottom;
                     WidgetsBinding.instance.addPostFrameCallback((_) {
                       if (!mounted) return;
-                      // reverse:true keeps newest at offset 0. Only jump when
-                      // the user scrolled up — jumping while already at the
-                      // bottom causes the post-send shake.
-                      if (_isScrolledUpIntoHistory) {
+                      // _scrollToBottom no-ops within 1px of 0 (avoids send shake).
+                      if (followLiveEdge) {
                         _scrollToBottom();
                       }
                     });

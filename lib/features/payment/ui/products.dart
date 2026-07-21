@@ -105,6 +105,12 @@ class _ProductsBodyState extends State<_ProductsBody> {
   void initState() {
     super.initState();
     context.read<GetInAppProductsBloc>().add(RequestInAppProducts());
+    // Keep SubscriptionBloc's purchaseStream listener in sync with the user
+    // shown on this paywall (UserBloc can lag or be UserLoaded(null)).
+    final String? paywallUid = widget.currentUser?.id;
+    if (paywallUid != null && paywallUid.isNotEmpty) {
+      context.read<SubscriptionBloc>().add(SubscriptionUserChanged(paywallUid));
+    }
     if (widget.isPaymentSuccess != null && !widget.isPaymentSuccess!) {
       WidgetsBinding.instance.addPostFrameCallback((_) {
         unawaited(
@@ -491,25 +497,33 @@ class _ProductsBodyState extends State<_ProductsBody> {
                         padding: const EdgeInsets.only(
                           bottom: AppSpacing.sm,
                         ),
-                        child: AfropeepPrimaryButton(
-                          text: selectedProduct != null
-                              ? 'Continue with $selectedLabel'
-                              : 'Select a plan',
-                          onPressed: selectedProduct != null
-                              ? () {
-                                  final product = selectedProduct;
-                                  if (product == null) return;
-                                  BlocProvider.of<
-                                      BuyConsumableInAppProductsBloc>(
-                                    context,
-                                  ).add(
-                                    RequestBuyConsumableProducts(
-                                      productDetails: product,
-                                    ),
-                                  );
-                                }
-                              : null,
-                          borderRadius: AppSpacing.chipRadius,
+                        child: BlocBuilder<BuyConsumableInAppProductsBloc,
+                            BuyConsumableStates>(
+                          buildWhen: (previous, current) =>
+                              previous.runtimeType != current.runtimeType,
+                          builder: (context, buyState) {
+                            final bool buying =
+                                buyState is BuyConsumableLoadingState;
+                            return BlocBuilder<SubscriptionBloc,
+                                SubscriptionState>(
+                              buildWhen: (p, c) =>
+                                  p.purchaseInProgress != c.purchaseInProgress,
+                              builder: (context, subState) {
+                                final bool busy =
+                                    buying || subState.purchaseInProgress;
+                                return AfropeepPrimaryButton(
+                                  text: selectedProduct != null
+                                      ? 'Continue with $selectedLabel'
+                                      : 'Select a plan',
+                                  isLoading: busy,
+                                  onPressed: selectedProduct != null && !busy
+                                      ? () => _startPurchase(context)
+                                      : null,
+                                  borderRadius: AppSpacing.chipRadius,
+                                );
+                              },
+                            );
+                          },
                         ),
                       ),
 
@@ -609,6 +623,30 @@ class _ProductsBodyState extends State<_ProductsBody> {
   // ---------------------------------------------------------------------------
   // Helpers
   // ---------------------------------------------------------------------------
+
+  void _startPurchase(BuildContext context) {
+    final ProductDetails? product = selectedProduct;
+    if (product == null) return;
+
+    final String? uid = widget.currentUser?.id;
+    if (uid == null || uid.isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text(
+            'Please sign in again to subscribe.',
+          ),
+        ),
+      );
+      return;
+    }
+
+    // Re-assert uid so purchaseStream is attached before the store sheet.
+    context.read<SubscriptionBloc>().add(SubscriptionUserChanged(uid));
+
+    context.read<BuyConsumableInAppProductsBloc>().add(
+          RequestBuyConsumableProducts(productDetails: product),
+        );
+  }
 
   Widget _buildBenefitRow(IconData icon, String text, bool isDarkMode) {
     return ConstrainedBox(

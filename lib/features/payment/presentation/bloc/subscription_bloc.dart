@@ -6,6 +6,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:in_app_purchase/in_app_purchase.dart';
 
 import '../../../../common/bloc/user/user_bloc.dart';
+import '../../../../common/data/repo/in_app_purchase_repo.dart';
 import '../../../../config/app_config.dart';
 import '../../../../services/subscription_iap_analytics.dart';
 import '../../data/subscription_functions_service.dart';
@@ -140,6 +141,10 @@ class SubscriptionBloc extends Bloc<SubscriptionEvent, SubscriptionState> {
   StreamSubscription<List<PurchaseDetails>>? _purchaseSub;
   String? _uid;
   final Set<String> _processedKeys = {};
+
+  /// Store updates that arrived before [_uid] was known. Flushed in
+  /// [_onUserChanged] once a non-empty uid is set.
+  final List<PurchaseDetails> _pendingPurchases = [];
   bool _awaitingRestore = false;
   Timer? _restoreTimer;
 
@@ -161,25 +166,36 @@ class SubscriptionBloc extends Bloc<SubscriptionEvent, SubscriptionState> {
     SubscriptionUserChanged event,
     Emitter<SubscriptionState> emit,
   ) async {
-    await _purchaseSub?.cancel();
-    _purchaseSub = null;
-    _uid = event.uid;
-    _processedKeys.clear();
-
-    if (_uid == null) {
-      return;
+    final String? nextUid = event.uid;
+    final bool uidChanged = nextUid != _uid;
+    _uid = nextUid;
+    if (uidChanged) {
+      _processedKeys.clear();
     }
 
-    final available = await InAppPurchase.instance.isAvailable();
-    if (!available) {
-      return;
+    // Attach once. Paywall may re-assert the same uid; do not cancel/rebind
+    // (that can drop in-flight purchase updates).
+    if (_purchaseSub == null) {
+      final available = await InAppPurchase.instance.isAvailable();
+      if (available) {
+        // Official plugin guidance: subscribe to purchaseStream *before*
+        // buy/restore. We may attach before uid is known; batches are buffered.
+        await InAppPurchaseRepoImpl.ensureIosPaymentQueueDelegate();
+        _purchaseSub = InAppPurchase.instance.purchaseStream.listen(
+          (purchases) => add(SubscriptionPurchaseBatch(purchases)),
+          onError: (Object e) =>
+              add(SubscriptionPurchaseStreamFailed(e.toString())),
+        );
+      }
     }
 
-    _purchaseSub = InAppPurchase.instance.purchaseStream.listen(
-      (purchases) => add(SubscriptionPurchaseBatch(purchases)),
-      onError: (Object e) =>
-          add(SubscriptionPurchaseStreamFailed(e.toString())),
-    );
+    // Reprocess anything that arrived while uid was still loading.
+    if (_uid != null && _uid!.isNotEmpty && _pendingPurchases.isNotEmpty) {
+      final List<PurchaseDetails> pending =
+          List<PurchaseDetails>.from(_pendingPurchases);
+      _pendingPurchases.clear();
+      await _processPurchaseBatch(pending, emit);
+    }
   }
 
   void _onPurchaseStreamFailed(
@@ -220,9 +236,29 @@ class SubscriptionBloc extends Bloc<SubscriptionEvent, SubscriptionState> {
     Emitter<SubscriptionState> emit,
   ) async {
     final uid = _uid;
-    if (uid == null) return;
+    if (uid == null || uid.isEmpty) {
+      // Buffer until uid arrives — do not snackbar+drop (store may not re-emit).
+      _pendingPurchases.addAll(event.purchases);
+      final bool showProgress = event.purchases.any(
+        (p) =>
+            p.status == PurchaseStatus.pending ||
+            p.status == PurchaseStatus.purchased ||
+            p.status == PurchaseStatus.restored,
+      );
+      if (showProgress) {
+        emit(state.copyWith(purchaseInProgress: true));
+      }
+      return;
+    }
 
-    for (final purchase in event.purchases) {
+    await _processPurchaseBatch(event.purchases, emit);
+  }
+
+  Future<void> _processPurchaseBatch(
+    List<PurchaseDetails> purchases,
+    Emitter<SubscriptionState> emit,
+  ) async {
+    for (final purchase in purchases) {
       final key =
           '${purchase.purchaseID ?? ""}|${purchase.productID}|${purchase.status.name}';
       if (_processedKeys.contains(key)) continue;

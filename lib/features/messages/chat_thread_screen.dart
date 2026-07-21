@@ -453,13 +453,14 @@ class _ChatThreadScreenState extends State<ChatThreadScreen> {
                   if (shouldScroll) {
                     _lastMessageCount = messages.length;
                     _lastMessageId = newestId;
+                    // Capture before the new ListView lays out. After insert,
+                    // reverse-list extent growth can push pixels past 80 even
+                    // when the user was in the follow zone.
+                    final bool followLiveEdge = _isNearBottom;
                     WidgetsBinding.instance.addPostFrameCallback((_) {
                       if (!mounted) return;
-                      // reverse:true — newest is at offset 0.
-                      // Follow the conversation when near the bottom.
                       // _scrollToBottom no-ops within 1px of 0 (avoids send shake).
-                      // Deep history (scrolled up) does not auto-jump.
-                      if (_isNearBottom) {
+                      if (followLiveEdge) {
                         _scrollToBottom();
                       }
                     });

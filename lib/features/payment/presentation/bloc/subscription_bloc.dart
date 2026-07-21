@@ -142,10 +142,15 @@ class SubscriptionBloc extends Bloc<SubscriptionEvent, SubscriptionState> {
   String? _uid;
   final Set<String> _processedKeys = {};
 
-  /// Store updates that arrived before [_uid] was known. Flushed once a
-  /// non-empty uid is set. Cleared on logout / account switch so entitlements
-  /// are never applied to a different user.
+  /// Store updates that arrived before [_uid] was known (cold start only).
+  /// Cleared on logout / account switch. Never flushed after a signed-out period.
   final List<PurchaseDetails> _pendingPurchases = [];
+
+  /// When true, unsigned store updates may be buffered for the first login
+  /// (app cold start). After logout this is false so post-logout store events
+  /// are dropped instead of applied to the next account.
+  bool _bufferUnsignedPurchases = true;
+
   bool _awaitingRestore = false;
   Timer? _restoreTimer;
 
@@ -178,7 +183,12 @@ class SubscriptionBloc extends Bloc<SubscriptionEvent, SubscriptionState> {
       _pendingPurchases.clear();
       _processedKeys.clear();
     }
+    // Post-logout: never apply anything buffered while signed out.
+    if (!_bufferUnsignedPurchases) {
+      _pendingPurchases.clear();
+    }
     _uid = uid;
+    _bufferUnsignedPurchases = false;
 
     await _ensurePurchaseStreamListening();
 
@@ -212,9 +222,13 @@ class SubscriptionBloc extends Bloc<SubscriptionEvent, SubscriptionState> {
     final String? nextUid = event.uid;
     final bool uidChanged = nextUid != previousUid;
 
-    // Logout / signed-out: never keep store updates for a future account.
+    // Logout / signed-out: drop pending. Only disable unsigned buffering after a
+    // real logout (we previously had a uid) — not on cold-start UserInitial(null).
     if (nextUid == null || nextUid.isEmpty) {
       _pendingPurchases.clear();
+      if (previousUid != null && previousUid.isNotEmpty) {
+        _bufferUnsignedPurchases = false;
+      }
       _uid = nextUid;
       if (uidChanged) {
         _processedKeys.clear();
@@ -230,14 +244,20 @@ class SubscriptionBloc extends Bloc<SubscriptionEvent, SubscriptionState> {
       _pendingPurchases.clear();
     }
 
+    // Login after logout: unsigned batches must not be applied to the new user.
+    if (!_bufferUnsignedPurchases) {
+      _pendingPurchases.clear();
+    }
+
     _uid = nextUid;
+    _bufferUnsignedPurchases = false;
     if (uidChanged) {
       _processedKeys.clear();
     }
 
     await _ensurePurchaseStreamListening();
 
-    // Cold-start / loading race: uid arrived after store updates were buffered.
+    // Cold-start only: uid arrived after store updates were buffered.
     if (_pendingPurchases.isNotEmpty) {
       final List<PurchaseDetails> pending =
           List<PurchaseDetails>.from(_pendingPurchases);
@@ -285,7 +305,10 @@ class SubscriptionBloc extends Bloc<SubscriptionEvent, SubscriptionState> {
   ) async {
     final uid = _uid;
     if (uid == null || uid.isEmpty) {
-      // Buffer until uid arrives — do not snackbar+drop (store may not re-emit).
+      // Cold start only. After logout, drop — do not hand to the next login.
+      if (!_bufferUnsignedPurchases) {
+        return;
+      }
       _pendingPurchases.addAll(event.purchases);
       final bool showProgress = event.purchases.any(
         (p) =>

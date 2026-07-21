@@ -48,8 +48,10 @@ class _ChatThreadScreenState extends State<ChatThreadScreen> {
   final ParticipantProfileResolver _participantResolver =
       ParticipantProfileResolver();
   String? _currentUserId;
-  bool _hasText = false;
   Timer? _typingDebounce;
+  Timer? _typingHeartbeat;
+  bool _typingIndicatorActive = false;
+  DateTime? _lastTypingWriteAt;
   bool _showSearch = false;
   String _searchQuery = '';
   String? _replyToMessageId;
@@ -66,20 +68,9 @@ class _ChatThreadScreenState extends State<ChatThreadScreen> {
     _displayName = widget.userName;
     _displayAvatarUrl = widget.avatarUrl;
 
-    // Listen to text changes for send button animation
-    _messageController.addListener(() {
-      final hasText = _messageController.text.trim().isNotEmpty;
-      if (hasText != _hasText) {
-        setState(() {
-          _hasText = hasText;
-        });
-      }
-      _typingDebounce?.cancel();
-      unawaited(_chatService.setTyping(widget.threadId, isTyping: true));
-      _typingDebounce = Timer(const Duration(seconds: 2), () {
-        unawaited(_chatService.setTyping(widget.threadId, isTyping: false));
-      });
-    });
+    // Do not setState here — rebuilding the message list while typing causes
+    // visible shake. Composer watches the controller via ValueListenableBuilder.
+    _messageController.addListener(_onComposerTextChanged);
 
     unawaited(_chatService.markThreadAsRead(widget.threadId));
     unawaited(_resolveParticipantDisplay());
@@ -88,6 +79,47 @@ class _ChatThreadScreenState extends State<ChatThreadScreen> {
     WidgetsBinding.instance.addPostFrameCallback((_) {
       _scrollToBottom();
     });
+  }
+
+  void _onComposerTextChanged() {
+    final bool hasText = _messageController.text.trim().isNotEmpty;
+    if (!hasText) {
+      _typingDebounce?.cancel();
+      _typingHeartbeat?.cancel();
+      _typingHeartbeat = null;
+      if (_typingIndicatorActive) {
+        _typingIndicatorActive = false;
+        unawaited(_chatService.setTyping(widget.threadId, isTyping: false));
+      }
+      return;
+    }
+
+    // Write on start, then heartbeat every 4s so watchers (8s TTL) stay fresh
+    // without a Firestore write on every keystroke.
+    _publishTypingHeartbeat(force: !_typingIndicatorActive);
+    _typingIndicatorActive = true;
+    _typingHeartbeat ??= Timer.periodic(const Duration(seconds: 4), (_) {
+      if (!_typingIndicatorActive) return;
+      _publishTypingHeartbeat(force: true);
+    });
+
+    _typingDebounce?.cancel();
+    _typingDebounce = Timer(const Duration(seconds: 2), () {
+      _typingHeartbeat?.cancel();
+      _typingHeartbeat = null;
+      _typingIndicatorActive = false;
+      unawaited(_chatService.setTyping(widget.threadId, isTyping: false));
+    });
+  }
+
+  void _publishTypingHeartbeat({required bool force}) {
+    final DateTime now = DateTime.now();
+    final DateTime? last = _lastTypingWriteAt;
+    if (!force && last != null && now.difference(last).inSeconds < 4) {
+      return;
+    }
+    _lastTypingWriteAt = now;
+    unawaited(_chatService.setTyping(widget.threadId, isTyping: true));
   }
 
   Future<void> _resolveParticipantDisplay() async {
@@ -135,23 +167,47 @@ class _ChatThreadScreenState extends State<ChatThreadScreen> {
 
   @override
   void dispose() {
+    _messageController.removeListener(_onComposerTextChanged);
     _typingDebounce?.cancel();
-    unawaited(_chatService.setTyping(widget.threadId, isTyping: false));
+    _typingHeartbeat?.cancel();
+    if (_typingIndicatorActive) {
+      unawaited(_chatService.setTyping(widget.threadId, isTyping: false));
+    }
     _messageController.dispose();
     _scrollController.dispose();
     super.dispose();
   }
 
-  void _scrollToBottom() {
-    if (_scrollController.hasClients) {
+  void _scrollToBottom({bool animated = false}) {
+    if (!_scrollController.hasClients) {
+      return;
+    }
+    // reverse: true ListView — visual bottom is offset 0.
+    const double target = 0;
+    final double current = _scrollController.position.pixels;
+    if ((current - target).abs() < 1.0) {
+      return;
+    }
+    if (animated) {
       unawaited(
         _scrollController.animateTo(
-          _scrollController.position.maxScrollExtent,
-          duration: const Duration(milliseconds: 300),
+          target,
+          duration: const Duration(milliseconds: 250),
           curve: Curves.easeOut,
         ),
       );
+    } else {
+      _scrollController.jumpTo(target);
     }
+  }
+
+  /// With [ListView.reverse], offset 0 is the newest messages.
+  /// True when the user is still "following" the live conversation.
+  bool get _isNearBottom {
+    if (!_scrollController.hasClients) {
+      return true;
+    }
+    return _scrollController.position.pixels <= 80;
   }
 
   Future<void> _pickAndSendImage() async {
@@ -165,9 +221,8 @@ class _ChatThreadScreenState extends State<ChatThreadScreen> {
         threadId: widget.threadId,
         imagePath: picked.path,
       );
-      if (mounted) {
-        Future.delayed(const Duration(milliseconds: 100), _scrollToBottom);
-      }
+      // StreamBuilder scrolls once the new message arrives — avoid a second
+      // competing animateTo that causes the bounce.
     } on Object catch (error) {
       _showErrorSnackBar('Could not send image: $error');
     }
@@ -194,14 +249,16 @@ class _ChatThreadScreenState extends State<ChatThreadScreen> {
         replyToMessageId: _replyToMessageId,
       );
       if (success) {
-        setState(() {
-          _replyToMessageId = null;
-          _replyPreview = null;
-        });
-      }
-      if (success) {
         _messageController.clear();
-        Future.delayed(const Duration(milliseconds: 100), _scrollToBottom);
+        // Avoid rebuilding the message list unless the reply bar must close.
+        if (_replyToMessageId != null || _replyPreview != null) {
+          setState(() {
+            _replyToMessageId = null;
+            _replyPreview = null;
+          });
+        }
+        // reverse ListView already shows the new bubble at the bottom —
+        // do not jumpTo(0); that is what shook the screen on send.
       }
     } on Object catch (error) {
       _showErrorSnackBar(error.toString().replaceAll('Exception: ', ''));
@@ -356,90 +413,104 @@ class _ChatThreadScreenState extends State<ChatThreadScreen> {
             ),
           // Chat messages
           Expanded(
-            child: StreamBuilder<List<Message>>(
-              stream: _chatService.getMessagesStream(widget.threadId),
-              builder: (context, snapshot) {
-                if (snapshot.connectionState == ConnectionState.waiting) {
-                  return const AppLoadingView(message: 'Loading messages...');
-                }
+            child: RepaintBoundary(
+              child: StreamBuilder<List<Message>>(
+                stream: _chatService.getMessagesStream(widget.threadId),
+                builder: (context, snapshot) {
+                  if (snapshot.connectionState == ConnectionState.waiting) {
+                    return const AppLoadingView(message: 'Loading messages...');
+                  }
 
-                if (snapshot.hasError) {
-                  return AppErrorView(
-                    title: 'Unable to load messages',
-                    message: 'Error loading messages',
-                    onRetry: () => setState(() {}),
-                  );
-                }
-
-                var messages = snapshot.data ?? [];
-                if (_searchQuery.isNotEmpty) {
-                  final q = _searchQuery.toLowerCase();
-                  messages = messages
-                      .where((m) => m.text.toLowerCase().contains(q))
-                      .toList();
-                }
-
-                if (messages.isEmpty) {
-                  return AppEmptyView(
-                    title: 'No Messages Yet',
-                    subtitle: 'Say hi to $_displayName!',
-                    icon: Icons.chat_bubble_outline,
-                  );
-                }
-
-                final String? newestId =
-                    messages.isNotEmpty ? messages.last.id : null;
-                final bool shouldScroll =
-                    messages.length != _lastMessageCount ||
-                        newestId != _lastMessageId;
-                if (shouldScroll) {
-                  _lastMessageCount = messages.length;
-                  _lastMessageId = newestId;
-                  WidgetsBinding.instance.addPostFrameCallback((_) {
-                    _scrollToBottom();
-                  });
-                }
-
-                return ListView.builder(
-                  controller: _scrollController,
-                  padding:
-                      const EdgeInsets.symmetric(horizontal: 16, vertical: 20),
-                  itemCount: messages.length,
-                  itemBuilder: (context, index) {
-                    final message = messages[index];
-                    final isMe = message.senderId == _currentUserId;
-
-                    final showDateSeparator = index == 0 ||
-                        !_isSameDay(
-                          messages[index].timestamp,
-                          messages[index - 1].timestamp,
-                        );
-
-                    final vm = ChatMessageViewModel(
-                      id: message.id,
-                      text: message.text,
-                      timestamp: message.timestamp,
-                      senderId: message.senderId,
-                      isOwnMessage: isMe,
-                      senderAvatarUrl: isMe ? null : _displayAvatarUrl,
-                      isRead: message.isRead,
-                      showReadReceipt: true,
-                      imageUrl: message.imageUrl,
+                  if (snapshot.hasError) {
+                    return AppErrorView(
+                      title: 'Unable to load messages',
+                      message: 'Error loading messages',
+                      onRetry: () => setState(() {}),
                     );
+                  }
 
-                    return Column(
-                      children: [
-                        if (showDateSeparator)
-                          _buildDateSeparator(message.timestamp),
-                        GestureDetector(
-                          onLongPress: () => _showMessageActions(message.id),
-                          child: ChatBubble(message: vm),
-                        ),
-                      ],
+                  var messages = snapshot.data ?? [];
+                  if (_searchQuery.isNotEmpty) {
+                    final q = _searchQuery.toLowerCase();
+                    messages = messages
+                        .where((m) => m.text.toLowerCase().contains(q))
+                        .toList();
+                  }
+
+                  if (messages.isEmpty) {
+                    return AppEmptyView(
+                      title: 'No Messages Yet',
+                      subtitle: 'Say hi to $_displayName!',
+                      icon: Icons.chat_bubble_outline,
                     );
-                  },
-                );
-              },
+                  }
+
+                  final String? newestId =
+                      messages.isNotEmpty ? messages.last.id : null;
+                  final bool shouldScroll =
+                      messages.length != _lastMessageCount ||
+                          newestId != _lastMessageId;
+                  if (shouldScroll) {
+                    _lastMessageCount = messages.length;
+                    _lastMessageId = newestId;
+                    // Capture before the new ListView lays out. After insert,
+                    // reverse-list extent growth can push pixels past 80 even
+                    // when the user was in the follow zone.
+                    final bool followLiveEdge = _isNearBottom;
+                    WidgetsBinding.instance.addPostFrameCallback((_) {
+                      if (!mounted) return;
+                      // _scrollToBottom no-ops within 1px of 0 (avoids send shake).
+                      if (followLiveEdge) {
+                        _scrollToBottom();
+                      }
+                    });
+                  }
+
+                  return ListView.builder(
+                    controller: _scrollController,
+                    reverse: true,
+                    physics: const ClampingScrollPhysics(),
+                    padding: const EdgeInsets.symmetric(
+                        horizontal: 16, vertical: 20),
+                    itemCount: messages.length,
+                    itemBuilder: (context, index) {
+                      // reverse: true → index 0 is the newest message.
+                      final int messageIndex = messages.length - 1 - index;
+                      final message = messages[messageIndex];
+                      final isMe = message.senderId == _currentUserId;
+
+                      final showDateSeparator = messageIndex == 0 ||
+                          !_isSameDay(
+                            messages[messageIndex].timestamp,
+                            messages[messageIndex - 1].timestamp,
+                          );
+
+                      final vm = ChatMessageViewModel(
+                        id: message.id,
+                        text: message.text,
+                        timestamp: message.timestamp,
+                        senderId: message.senderId,
+                        isOwnMessage: isMe,
+                        senderAvatarUrl: isMe ? null : _displayAvatarUrl,
+                        isRead: message.isRead,
+                        showReadReceipt: true,
+                        imageUrl: message.imageUrl,
+                      );
+
+                      return Column(
+                        children: [
+                          if (showDateSeparator)
+                            _buildDateSeparator(message.timestamp),
+                          GestureDetector(
+                            onLongPress: () => _showMessageActions(message.id),
+                            child: ChatBubble(message: vm),
+                          ),
+                        ],
+                      );
+                    },
+                  );
+                },
+              ),
             ),
           ),
 
@@ -466,14 +537,20 @@ class _ChatThreadScreenState extends State<ChatThreadScreen> {
                 ],
               ),
             ),
-          ChatComposer(
-            controller: _messageController,
-            onSend: _sendMessage,
-            hasText: _hasText,
-            showAttachButton: true,
-            onAttachTap: _pickAndSendImage,
-            showEmojiButton: true,
-            onEmojiTap: _showEmojiPicker,
+          ValueListenableBuilder<TextEditingValue>(
+            valueListenable: _messageController,
+            builder: (BuildContext context, TextEditingValue value, _) {
+              final bool hasText = value.text.trim().isNotEmpty;
+              return ChatComposer(
+                controller: _messageController,
+                onSend: _sendMessage,
+                hasText: hasText,
+                showAttachButton: true,
+                onAttachTap: _pickAndSendImage,
+                showEmojiButton: true,
+                onEmojiTap: _showEmojiPicker,
+              );
+            },
           ),
         ],
       ),

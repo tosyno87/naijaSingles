@@ -118,8 +118,14 @@ class SubscriptionBloc extends Bloc<SubscriptionEvent, SubscriptionState> {
   SubscriptionBloc({
     required UserBloc userBloc,
     SubscriptionFunctionsService? functionsService,
+    Future<bool> Function()? isStoreAvailable,
+    Stream<List<PurchaseDetails>> Function()? purchaseUpdates,
   })  : _userBloc = userBloc,
         _functions = functionsService ?? SubscriptionFunctionsService(),
+        _isStoreAvailable =
+            isStoreAvailable ?? (() => InAppPurchase.instance.isAvailable()),
+        _purchaseUpdates =
+            purchaseUpdates ?? (() => InAppPurchase.instance.purchaseStream),
         super(const SubscriptionState()) {
     on<SubscriptionUserChanged>(_onUserChanged);
     on<SubscriptionPurchaseBatch>(_onPurchaseBatch);
@@ -135,6 +141,8 @@ class SubscriptionBloc extends Bloc<SubscriptionEvent, SubscriptionState> {
 
   final UserBloc _userBloc;
   final SubscriptionFunctionsService _functions;
+  final Future<bool> Function() _isStoreAvailable;
+  final Stream<List<PurchaseDetails>> Function() _purchaseUpdates;
 
   late final StreamSubscription<UserState> _userSub;
 
@@ -203,11 +211,11 @@ class SubscriptionBloc extends Bloc<SubscriptionEvent, SubscriptionState> {
   Future<void> _ensurePurchaseStreamListening() async {
     if (_purchaseSub != null) return;
 
-    final bool available = await InAppPurchase.instance.isAvailable();
+    final bool available = await _isStoreAvailable();
     if (!available) return;
 
     await InAppPurchaseRepoImpl.ensureIosPaymentQueueDelegate();
-    _purchaseSub = InAppPurchase.instance.purchaseStream.listen(
+    _purchaseSub = _purchaseUpdates().listen(
       (purchases) => add(SubscriptionPurchaseBatch(purchases)),
       onError: (Object e) =>
           add(SubscriptionPurchaseStreamFailed(e.toString())),

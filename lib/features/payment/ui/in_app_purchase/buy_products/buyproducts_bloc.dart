@@ -14,10 +14,10 @@ class BuyConsumableInAppProductsBloc
     on<RequestBuyConsumableProducts>((event, emit) async {
       emit(BuyConsumableLoadingState());
       try {
-        final result = await inAppPurchaseRepository.buyConsumable(
+        await inAppPurchaseRepository.buyConsumable(
           productDetails: event.productDetails,
         );
-        emit(BuyConsumableSuccessState(result: result));
+        emit(BuyConsumableSuccessState(result: true));
       } on SocketException {
         emit(BuyConsumableFailedState(msg: 'No Internet Connection'));
       } on Object catch (e) {
@@ -38,10 +38,10 @@ class BuyConsumableInAppProductsBloc
       yield BuyConsumableLoadingState();
 
       try {
-        final result = await inAppPurchaseRepository.buyConsumable(
+        await inAppPurchaseRepository.buyConsumable(
           productDetails: event.productDetails,
         );
-        yield BuyConsumableSuccessState(result: result);
+        yield BuyConsumableSuccessState(result: true);
       } on SocketException {
         yield BuyConsumableFailedState(msg: 'No Internet Connection');
       } on Object catch (e) {

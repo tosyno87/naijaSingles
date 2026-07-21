@@ -6,6 +6,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:in_app_purchase/in_app_purchase.dart';
 
 import '../../../../common/bloc/user/user_bloc.dart';
+import '../../../../common/data/repo/in_app_purchase_repo.dart';
 import '../../../../config/app_config.dart';
 import '../../../../services/subscription_iap_analytics.dart';
 import '../../data/subscription_functions_service.dart';
@@ -161,12 +162,16 @@ class SubscriptionBloc extends Bloc<SubscriptionEvent, SubscriptionState> {
     SubscriptionUserChanged event,
     Emitter<SubscriptionState> emit,
   ) async {
-    await _purchaseSub?.cancel();
-    _purchaseSub = null;
-    _uid = event.uid;
-    _processedKeys.clear();
+    final String? nextUid = event.uid;
+    final bool uidChanged = nextUid != _uid;
+    _uid = nextUid;
+    if (uidChanged) {
+      _processedKeys.clear();
+    }
 
-    if (_uid == null) {
+    // Already attached — paywall may re-assert the same uid; do not cancel/rebind
+    // (that can drop in-flight purchase updates).
+    if (_purchaseSub != null) {
       return;
     }
 
@@ -175,6 +180,10 @@ class SubscriptionBloc extends Bloc<SubscriptionEvent, SubscriptionState> {
       return;
     }
 
+    // Official plugin guidance: subscribe to purchaseStream *before* buy/restore.
+    // Previously we only listened when uid was non-null, so Continue could appear
+    // to do nothing if UserBloc lagged behind the user passed into Products.
+    await InAppPurchaseRepoImpl.ensureIosPaymentQueueDelegate();
     _purchaseSub = InAppPurchase.instance.purchaseStream.listen(
       (purchases) => add(SubscriptionPurchaseBatch(purchases)),
       onError: (Object e) =>
@@ -220,7 +229,23 @@ class SubscriptionBloc extends Bloc<SubscriptionEvent, SubscriptionState> {
     Emitter<SubscriptionState> emit,
   ) async {
     final uid = _uid;
-    if (uid == null) return;
+    if (uid == null || uid.isEmpty) {
+      // Do not silently drop store updates — that looks like "Continue did nothing".
+      final bool hasTerminal = event.purchases.any(
+        (p) =>
+            p.status == PurchaseStatus.purchased ||
+            p.status == PurchaseStatus.restored ||
+            p.status == PurchaseStatus.error,
+      );
+      if (hasTerminal) {
+        emit(state.copyWith(
+          purchaseInProgress: false,
+          userMessage:
+              'Please sign in again to finish activating Premium.',
+        ));
+      }
+      return;
+    }
 
     for (final purchase in event.purchases) {
       final key =

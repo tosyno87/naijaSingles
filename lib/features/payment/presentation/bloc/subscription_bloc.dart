@@ -142,9 +142,15 @@ class SubscriptionBloc extends Bloc<SubscriptionEvent, SubscriptionState> {
   String? _uid;
   final Set<String> _processedKeys = {};
 
-  /// Store updates that arrived before [_uid] was known. Flushed in
-  /// [_onUserChanged] once a non-empty uid is set.
+  /// Store updates that arrived before [_uid] was known (cold start only).
+  /// Cleared on logout / account switch. Never flushed after a signed-out period.
   final List<PurchaseDetails> _pendingPurchases = [];
+
+  /// When true, unsigned store updates may be buffered for the first login
+  /// (app cold start). After logout this is false so post-logout store events
+  /// are dropped instead of applied to the next account.
+  bool _bufferUnsignedPurchases = true;
+
   bool _awaitingRestore = false;
   Timer? _restoreTimer;
 
@@ -162,35 +168,97 @@ class SubscriptionBloc extends Bloc<SubscriptionEvent, SubscriptionState> {
     }
   }
 
+  /// Awaitable: set [uid] and ensure `purchaseStream` is attached before buy.
+  ///
+  /// Prefer this over fire-and-forget [SubscriptionUserChanged] right before
+  /// starting a store purchase — [SubscriptionUserChanged] returns before the
+  /// async listener setup finishes.
+  Future<void> prepareForPurchase(String uid) async {
+    if (uid.isEmpty) {
+      throw ArgumentError.value(uid, 'uid', 'must be non-empty');
+    }
+
+    final String? previous = _uid;
+    if (previous != null && previous.isNotEmpty && previous != uid) {
+      _pendingPurchases.clear();
+      _processedKeys.clear();
+    }
+    // Post-logout: never apply anything buffered while signed out.
+    if (!_bufferUnsignedPurchases) {
+      _pendingPurchases.clear();
+    }
+    _uid = uid;
+    _bufferUnsignedPurchases = false;
+
+    await _ensurePurchaseStreamListening();
+
+    if (_pendingPurchases.isNotEmpty) {
+      final List<PurchaseDetails> pending =
+          List<PurchaseDetails>.from(_pendingPurchases);
+      _pendingPurchases.clear();
+      add(SubscriptionPurchaseBatch(pending));
+    }
+  }
+
+  Future<void> _ensurePurchaseStreamListening() async {
+    if (_purchaseSub != null) return;
+
+    final bool available = await InAppPurchase.instance.isAvailable();
+    if (!available) return;
+
+    await InAppPurchaseRepoImpl.ensureIosPaymentQueueDelegate();
+    _purchaseSub = InAppPurchase.instance.purchaseStream.listen(
+      (purchases) => add(SubscriptionPurchaseBatch(purchases)),
+      onError: (Object e) =>
+          add(SubscriptionPurchaseStreamFailed(e.toString())),
+    );
+  }
+
   Future<void> _onUserChanged(
     SubscriptionUserChanged event,
     Emitter<SubscriptionState> emit,
   ) async {
+    final String? previousUid = _uid;
     final String? nextUid = event.uid;
-    final bool uidChanged = nextUid != _uid;
+    final bool uidChanged = nextUid != previousUid;
+
+    // Logout / signed-out: drop pending. Only disable unsigned buffering after a
+    // real logout (we previously had a uid) — not on cold-start UserInitial(null).
+    if (nextUid == null || nextUid.isEmpty) {
+      _pendingPurchases.clear();
+      if (previousUid != null && previousUid.isNotEmpty) {
+        _bufferUnsignedPurchases = false;
+      }
+      _uid = nextUid;
+      if (uidChanged) {
+        _processedKeys.clear();
+      }
+      await _ensurePurchaseStreamListening();
+      return;
+    }
+
+    // Account switch: drop any buffered updates from the previous session.
+    if (previousUid != null &&
+        previousUid.isNotEmpty &&
+        previousUid != nextUid) {
+      _pendingPurchases.clear();
+    }
+
+    // Login after logout: unsigned batches must not be applied to the new user.
+    if (!_bufferUnsignedPurchases) {
+      _pendingPurchases.clear();
+    }
+
     _uid = nextUid;
+    _bufferUnsignedPurchases = false;
     if (uidChanged) {
       _processedKeys.clear();
     }
 
-    // Attach once. Paywall may re-assert the same uid; do not cancel/rebind
-    // (that can drop in-flight purchase updates).
-    if (_purchaseSub == null) {
-      final available = await InAppPurchase.instance.isAvailable();
-      if (available) {
-        // Official plugin guidance: subscribe to purchaseStream *before*
-        // buy/restore. We may attach before uid is known; batches are buffered.
-        await InAppPurchaseRepoImpl.ensureIosPaymentQueueDelegate();
-        _purchaseSub = InAppPurchase.instance.purchaseStream.listen(
-          (purchases) => add(SubscriptionPurchaseBatch(purchases)),
-          onError: (Object e) =>
-              add(SubscriptionPurchaseStreamFailed(e.toString())),
-        );
-      }
-    }
+    await _ensurePurchaseStreamListening();
 
-    // Reprocess anything that arrived while uid was still loading.
-    if (_uid != null && _uid!.isNotEmpty && _pendingPurchases.isNotEmpty) {
+    // Cold-start only: uid arrived after store updates were buffered.
+    if (_pendingPurchases.isNotEmpty) {
       final List<PurchaseDetails> pending =
           List<PurchaseDetails>.from(_pendingPurchases);
       _pendingPurchases.clear();
@@ -237,7 +305,10 @@ class SubscriptionBloc extends Bloc<SubscriptionEvent, SubscriptionState> {
   ) async {
     final uid = _uid;
     if (uid == null || uid.isEmpty) {
-      // Buffer until uid arrives — do not snackbar+drop (store may not re-emit).
+      // Cold start only. After logout, drop — do not hand to the next login.
+      if (!_bufferUnsignedPurchases) {
+        return;
+      }
       _pendingPurchases.addAll(event.purchases);
       final bool showProgress = event.purchases.any(
         (p) =>

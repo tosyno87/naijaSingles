@@ -100,6 +100,7 @@ class _ProductsBody extends StatefulWidget {
 
 class _ProductsBodyState extends State<_ProductsBody> {
   ProductDetails? selectedProduct;
+  bool _preparingPurchase = false;
 
   @override
   void initState() {
@@ -509,15 +510,16 @@ class _ProductsBodyState extends State<_ProductsBody> {
                               buildWhen: (p, c) =>
                                   p.purchaseInProgress != c.purchaseInProgress,
                               builder: (context, subState) {
-                                final bool busy =
-                                    buying || subState.purchaseInProgress;
+                                final bool busy = buying ||
+                                    subState.purchaseInProgress ||
+                                    _preparingPurchase;
                                 return AfropeepPrimaryButton(
                                   text: selectedProduct != null
                                       ? 'Continue with $selectedLabel'
                                       : 'Select a plan',
                                   isLoading: busy,
                                   onPressed: selectedProduct != null && !busy
-                                      ? () => _startPurchase(context)
+                                      ? () => unawaited(_startPurchase(context))
                                       : null,
                                   borderRadius: AppSpacing.chipRadius,
                                 );
@@ -624,9 +626,10 @@ class _ProductsBodyState extends State<_ProductsBody> {
   // Helpers
   // ---------------------------------------------------------------------------
 
-  void _startPurchase(BuildContext context) {
+  Future<void> _startPurchase(BuildContext context) async {
     final ProductDetails? product = selectedProduct;
     if (product == null) return;
+    if (_preparingPurchase) return;
 
     final String? uid = widget.currentUser?.id;
     if (uid == null || uid.isEmpty) {
@@ -640,9 +643,28 @@ class _ProductsBodyState extends State<_ProductsBody> {
       return;
     }
 
-    // Re-assert uid so purchaseStream is attached before the store sheet.
-    context.read<SubscriptionBloc>().add(SubscriptionUserChanged(uid));
+    setState(() => _preparingPurchase = true);
+    try {
+      // Await listener attach — fire-and-forget SubscriptionUserChanged can
+      // still be mid-setup when buyNonConsumable presents the store sheet.
+      await context.read<SubscriptionBloc>().prepareForPurchase(uid);
+    } on Object catch (e) {
+      if (!context.mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(
+            userFacingPurchaseThrowableMessage(e),
+          ),
+        ),
+      );
+      return;
+    } finally {
+      if (mounted) {
+        setState(() => _preparingPurchase = false);
+      }
+    }
 
+    if (!context.mounted) return;
     context.read<BuyConsumableInAppProductsBloc>().add(
           RequestBuyConsumableProducts(productDetails: product),
         );

@@ -517,7 +517,7 @@ class _ProductsBodyState extends State<_ProductsBody> {
                                       : 'Select a plan',
                                   isLoading: busy,
                                   onPressed: selectedProduct != null && !busy
-                                      ? () => _startPurchase(context)
+                                      ? () => unawaited(_startPurchase(context))
                                       : null,
                                   borderRadius: AppSpacing.chipRadius,
                                 );
@@ -624,7 +624,7 @@ class _ProductsBodyState extends State<_ProductsBody> {
   // Helpers
   // ---------------------------------------------------------------------------
 
-  void _startPurchase(BuildContext context) {
+  Future<void> _startPurchase(BuildContext context) async {
     final ProductDetails? product = selectedProduct;
     if (product == null) return;
 
@@ -640,9 +640,23 @@ class _ProductsBodyState extends State<_ProductsBody> {
       return;
     }
 
-    // Re-assert uid so purchaseStream is attached before the store sheet.
-    context.read<SubscriptionBloc>().add(SubscriptionUserChanged(uid));
+    try {
+      // Await listener attach — fire-and-forget SubscriptionUserChanged can
+      // still be mid-setup when buyNonConsumable presents the store sheet.
+      await context.read<SubscriptionBloc>().prepareForPurchase(uid);
+    } on Object catch (e) {
+      if (!context.mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(
+            userFacingPurchaseThrowableMessage(e),
+          ),
+        ),
+      );
+      return;
+    }
 
+    if (!context.mounted) return;
     context.read<BuyConsumableInAppProductsBloc>().add(
           RequestBuyConsumableProducts(productDetails: product),
         );

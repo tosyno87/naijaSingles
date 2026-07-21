@@ -142,8 +142,9 @@ class SubscriptionBloc extends Bloc<SubscriptionEvent, SubscriptionState> {
   String? _uid;
   final Set<String> _processedKeys = {};
 
-  /// Store updates that arrived before [_uid] was known. Flushed in
-  /// [_onUserChanged] once a non-empty uid is set.
+  /// Store updates that arrived before [_uid] was known. Flushed once a
+  /// non-empty uid is set. Cleared on logout / account switch so entitlements
+  /// are never applied to a different user.
   final List<PurchaseDetails> _pendingPurchases = [];
   bool _awaitingRestore = false;
   Timer? _restoreTimer;
@@ -162,35 +163,82 @@ class SubscriptionBloc extends Bloc<SubscriptionEvent, SubscriptionState> {
     }
   }
 
+  /// Awaitable: set [uid] and ensure `purchaseStream` is attached before buy.
+  ///
+  /// Prefer this over fire-and-forget [SubscriptionUserChanged] right before
+  /// starting a store purchase — [SubscriptionUserChanged] returns before the
+  /// async listener setup finishes.
+  Future<void> prepareForPurchase(String uid) async {
+    if (uid.isEmpty) {
+      throw ArgumentError.value(uid, 'uid', 'must be non-empty');
+    }
+
+    final String? previous = _uid;
+    if (previous != null && previous.isNotEmpty && previous != uid) {
+      _pendingPurchases.clear();
+      _processedKeys.clear();
+    }
+    _uid = uid;
+
+    await _ensurePurchaseStreamListening();
+
+    if (_pendingPurchases.isNotEmpty) {
+      final List<PurchaseDetails> pending =
+          List<PurchaseDetails>.from(_pendingPurchases);
+      _pendingPurchases.clear();
+      add(SubscriptionPurchaseBatch(pending));
+    }
+  }
+
+  Future<void> _ensurePurchaseStreamListening() async {
+    if (_purchaseSub != null) return;
+
+    final bool available = await InAppPurchase.instance.isAvailable();
+    if (!available) return;
+
+    await InAppPurchaseRepoImpl.ensureIosPaymentQueueDelegate();
+    _purchaseSub = InAppPurchase.instance.purchaseStream.listen(
+      (purchases) => add(SubscriptionPurchaseBatch(purchases)),
+      onError: (Object e) =>
+          add(SubscriptionPurchaseStreamFailed(e.toString())),
+    );
+  }
+
   Future<void> _onUserChanged(
     SubscriptionUserChanged event,
     Emitter<SubscriptionState> emit,
   ) async {
+    final String? previousUid = _uid;
     final String? nextUid = event.uid;
-    final bool uidChanged = nextUid != _uid;
+    final bool uidChanged = nextUid != previousUid;
+
+    // Logout / signed-out: never keep store updates for a future account.
+    if (nextUid == null || nextUid.isEmpty) {
+      _pendingPurchases.clear();
+      _uid = nextUid;
+      if (uidChanged) {
+        _processedKeys.clear();
+      }
+      await _ensurePurchaseStreamListening();
+      return;
+    }
+
+    // Account switch: drop any buffered updates from the previous session.
+    if (previousUid != null &&
+        previousUid.isNotEmpty &&
+        previousUid != nextUid) {
+      _pendingPurchases.clear();
+    }
+
     _uid = nextUid;
     if (uidChanged) {
       _processedKeys.clear();
     }
 
-    // Attach once. Paywall may re-assert the same uid; do not cancel/rebind
-    // (that can drop in-flight purchase updates).
-    if (_purchaseSub == null) {
-      final available = await InAppPurchase.instance.isAvailable();
-      if (available) {
-        // Official plugin guidance: subscribe to purchaseStream *before*
-        // buy/restore. We may attach before uid is known; batches are buffered.
-        await InAppPurchaseRepoImpl.ensureIosPaymentQueueDelegate();
-        _purchaseSub = InAppPurchase.instance.purchaseStream.listen(
-          (purchases) => add(SubscriptionPurchaseBatch(purchases)),
-          onError: (Object e) =>
-              add(SubscriptionPurchaseStreamFailed(e.toString())),
-        );
-      }
-    }
+    await _ensurePurchaseStreamListening();
 
-    // Reprocess anything that arrived while uid was still loading.
-    if (_uid != null && _uid!.isNotEmpty && _pendingPurchases.isNotEmpty) {
+    // Cold-start / loading race: uid arrived after store updates were buffered.
+    if (_pendingPurchases.isNotEmpty) {
       final List<PurchaseDetails> pending =
           List<PurchaseDetails>.from(_pendingPurchases);
       _pendingPurchases.clear();

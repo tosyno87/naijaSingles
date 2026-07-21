@@ -6,6 +6,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:in_app_purchase/in_app_purchase.dart';
 
 import '../../../../common/bloc/user/user_bloc.dart';
+import '../../../../common/data/repo/in_app_purchase_repo.dart';
 import '../../../../config/app_config.dart';
 import '../../../../services/subscription_iap_analytics.dart';
 import '../../data/subscription_functions_service.dart';
@@ -117,8 +118,14 @@ class SubscriptionBloc extends Bloc<SubscriptionEvent, SubscriptionState> {
   SubscriptionBloc({
     required UserBloc userBloc,
     SubscriptionFunctionsService? functionsService,
+    Future<bool> Function()? isStoreAvailable,
+    Stream<List<PurchaseDetails>> Function()? purchaseUpdates,
   })  : _userBloc = userBloc,
         _functions = functionsService ?? SubscriptionFunctionsService(),
+        _isStoreAvailable =
+            isStoreAvailable ?? (() => InAppPurchase.instance.isAvailable()),
+        _purchaseUpdates =
+            purchaseUpdates ?? (() => InAppPurchase.instance.purchaseStream),
         super(const SubscriptionState()) {
     on<SubscriptionUserChanged>(_onUserChanged);
     on<SubscriptionPurchaseBatch>(_onPurchaseBatch);
@@ -134,12 +141,24 @@ class SubscriptionBloc extends Bloc<SubscriptionEvent, SubscriptionState> {
 
   final UserBloc _userBloc;
   final SubscriptionFunctionsService _functions;
+  final Future<bool> Function() _isStoreAvailable;
+  final Stream<List<PurchaseDetails>> Function() _purchaseUpdates;
 
   late final StreamSubscription<UserState> _userSub;
 
   StreamSubscription<List<PurchaseDetails>>? _purchaseSub;
   String? _uid;
   final Set<String> _processedKeys = {};
+
+  /// Store updates that arrived before [_uid] was known (cold start only).
+  /// Cleared on logout / account switch. Never flushed after a signed-out period.
+  final List<PurchaseDetails> _pendingPurchases = [];
+
+  /// When true, unsigned store updates may be buffered for the first login
+  /// (app cold start). After logout this is false so post-logout store events
+  /// are dropped instead of applied to the next account.
+  bool _bufferUnsignedPurchases = true;
+
   bool _awaitingRestore = false;
   Timer? _restoreTimer;
 
@@ -157,29 +176,102 @@ class SubscriptionBloc extends Bloc<SubscriptionEvent, SubscriptionState> {
     }
   }
 
-  Future<void> _onUserChanged(
-    SubscriptionUserChanged event,
-    Emitter<SubscriptionState> emit,
-  ) async {
-    await _purchaseSub?.cancel();
-    _purchaseSub = null;
-    _uid = event.uid;
-    _processedKeys.clear();
-
-    if (_uid == null) {
-      return;
+  /// Awaitable: set [uid] and ensure `purchaseStream` is attached before buy.
+  ///
+  /// Prefer this over fire-and-forget [SubscriptionUserChanged] right before
+  /// starting a store purchase — [SubscriptionUserChanged] returns before the
+  /// async listener setup finishes.
+  Future<void> prepareForPurchase(String uid) async {
+    if (uid.isEmpty) {
+      throw ArgumentError.value(uid, 'uid', 'must be non-empty');
     }
 
-    final available = await InAppPurchase.instance.isAvailable();
-    if (!available) {
-      return;
+    final String? previous = _uid;
+    if (previous != null && previous.isNotEmpty && previous != uid) {
+      _pendingPurchases.clear();
+      _processedKeys.clear();
     }
+    // Post-logout: never apply anything buffered while signed out.
+    if (!_bufferUnsignedPurchases) {
+      _pendingPurchases.clear();
+    }
+    _uid = uid;
+    _bufferUnsignedPurchases = false;
 
-    _purchaseSub = InAppPurchase.instance.purchaseStream.listen(
+    await _ensurePurchaseStreamListening();
+
+    if (_pendingPurchases.isNotEmpty) {
+      final List<PurchaseDetails> pending =
+          List<PurchaseDetails>.from(_pendingPurchases);
+      _pendingPurchases.clear();
+      add(SubscriptionPurchaseBatch(pending));
+    }
+  }
+
+  Future<void> _ensurePurchaseStreamListening() async {
+    if (_purchaseSub != null) return;
+
+    final bool available = await _isStoreAvailable();
+    if (!available) return;
+
+    await InAppPurchaseRepoImpl.ensureIosPaymentQueueDelegate();
+    _purchaseSub = _purchaseUpdates().listen(
       (purchases) => add(SubscriptionPurchaseBatch(purchases)),
       onError: (Object e) =>
           add(SubscriptionPurchaseStreamFailed(e.toString())),
     );
+  }
+
+  Future<void> _onUserChanged(
+    SubscriptionUserChanged event,
+    Emitter<SubscriptionState> emit,
+  ) async {
+    final String? previousUid = _uid;
+    final String? nextUid = event.uid;
+    final bool uidChanged = nextUid != previousUid;
+
+    // Logout / signed-out: drop pending. Only disable unsigned buffering after a
+    // real logout (we previously had a uid) — not on cold-start UserInitial(null).
+    if (nextUid == null || nextUid.isEmpty) {
+      _pendingPurchases.clear();
+      if (previousUid != null && previousUid.isNotEmpty) {
+        _bufferUnsignedPurchases = false;
+      }
+      _uid = nextUid;
+      if (uidChanged) {
+        _processedKeys.clear();
+      }
+      await _ensurePurchaseStreamListening();
+      return;
+    }
+
+    // Account switch: drop any buffered updates from the previous session.
+    if (previousUid != null &&
+        previousUid.isNotEmpty &&
+        previousUid != nextUid) {
+      _pendingPurchases.clear();
+    }
+
+    // Login after logout: unsigned batches must not be applied to the new user.
+    if (!_bufferUnsignedPurchases) {
+      _pendingPurchases.clear();
+    }
+
+    _uid = nextUid;
+    _bufferUnsignedPurchases = false;
+    if (uidChanged) {
+      _processedKeys.clear();
+    }
+
+    await _ensurePurchaseStreamListening();
+
+    // Cold-start only: uid arrived after store updates were buffered.
+    if (_pendingPurchases.isNotEmpty) {
+      final List<PurchaseDetails> pending =
+          List<PurchaseDetails>.from(_pendingPurchases);
+      _pendingPurchases.clear();
+      await _processPurchaseBatch(pending, emit);
+    }
   }
 
   void _onPurchaseStreamFailed(
@@ -220,9 +312,32 @@ class SubscriptionBloc extends Bloc<SubscriptionEvent, SubscriptionState> {
     Emitter<SubscriptionState> emit,
   ) async {
     final uid = _uid;
-    if (uid == null) return;
+    if (uid == null || uid.isEmpty) {
+      // Cold start only. After logout, drop — do not hand to the next login.
+      if (!_bufferUnsignedPurchases) {
+        return;
+      }
+      _pendingPurchases.addAll(event.purchases);
+      final bool showProgress = event.purchases.any(
+        (p) =>
+            p.status == PurchaseStatus.pending ||
+            p.status == PurchaseStatus.purchased ||
+            p.status == PurchaseStatus.restored,
+      );
+      if (showProgress) {
+        emit(state.copyWith(purchaseInProgress: true));
+      }
+      return;
+    }
 
-    for (final purchase in event.purchases) {
+    await _processPurchaseBatch(event.purchases, emit);
+  }
+
+  Future<void> _processPurchaseBatch(
+    List<PurchaseDetails> purchases,
+    Emitter<SubscriptionState> emit,
+  ) async {
+    for (final purchase in purchases) {
       final key =
           '${purchase.purchaseID ?? ""}|${purchase.productID}|${purchase.status.name}';
       if (_processedKeys.contains(key)) continue;

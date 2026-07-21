@@ -8,6 +8,7 @@ import 'package:naijasingles/common/bloc/theme/theme_bloc.dart';
 import 'package:naijasingles/common/bloc/user/user_bloc.dart';
 import 'package:naijasingles/features/payment/presentation/bloc/subscription_bloc.dart';
 import 'package:naijasingles/features/payment/ui/in_app_purchase/buy_products/buyproducts_bloc.dart';
+import 'package:naijasingles/features/payment/ui/in_app_purchase/buy_products/buyproducts_events.dart';
 import 'package:naijasingles/features/payment/ui/in_app_purchase/buy_products/buyproducts_states.dart';
 import 'package:naijasingles/features/payment/ui/in_app_purchase/get_products/getproducts_bloc.dart';
 import 'package:naijasingles/features/payment/ui/in_app_purchase/get_products/getproducts_events.dart';
@@ -33,6 +34,9 @@ class MockBuyConsumableBloc extends Mock
 class FakeGetInAppProductsEvents extends Fake
     implements GetInAppProductsEvents {}
 
+class FakeBuyInAppProductsEvents extends Fake
+    implements BuyInAppProductsEvents {}
+
 // ---------------------------------------------------------------------------
 // Helpers
 // ---------------------------------------------------------------------------
@@ -56,6 +60,7 @@ void main() {
   setUpAll(() async {
     await setupFirebaseForWidgetTests();
     registerFallbackValue(FakeGetInAppProductsEvents());
+    registerFallbackValue(FakeBuyInAppProductsEvents());
   });
 
   late MockThemeBloc themeBloc;
@@ -104,6 +109,7 @@ void main() {
     when(() => buyBloc.state).thenReturn(BuyConsumableInitialState());
     when(() => buyBloc.stream)
         .thenAnswer((_) => const Stream<BuyConsumableStates>.empty());
+    when(() => buyBloc.add(any())).thenReturn(null);
   });
 
   Widget buildSubject() {
@@ -114,7 +120,11 @@ void main() {
         BlocProvider<GetInAppProductsBloc>.value(value: getProductsBloc),
         BlocProvider<BuyConsumableInAppProductsBloc>.value(value: buyBloc),
         BlocProvider<SubscriptionBloc>(
-          create: (_) => SubscriptionBloc(userBloc: userBloc),
+          create: (_) => SubscriptionBloc(
+            userBloc: userBloc,
+            isStoreAvailable: () async => false,
+            purchaseUpdates: () => const Stream<List<PurchaseDetails>>.empty(),
+          ),
         ),
       ],
       child: Products(
@@ -176,6 +186,21 @@ void main() {
         // yearly = $79.99/12 ≈ $6.67/mo vs monthly $9.99/mo → ~33% savings
         expect(find.textContaining('Save'), findsOneWidget);
         expect(find.textContaining('%'), findsOneWidget);
+      },
+    );
+
+    testWidgets(
+      'Continue prepares listener then dispatches buy',
+      (tester) async {
+        await tester.pumpWidget(MaterialApp(home: buildSubject()));
+        await tester.pumpAndSettle();
+
+        await tester.tap(find.text('Continue with Monthly'));
+        // prepareForPurchase awaits store availability; avoid pumpAndSettle.
+        await tester.pump();
+        await tester.pump(const Duration(milliseconds: 200));
+
+        verify(() => buyBloc.add(any())).called(1);
       },
     );
   });

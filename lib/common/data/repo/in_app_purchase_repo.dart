@@ -1,4 +1,5 @@
 import 'dart:developer';
+
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/foundation.dart';
 import 'package:in_app_purchase/in_app_purchase.dart';
@@ -7,13 +8,14 @@ import 'package:in_app_purchase_storekit/in_app_purchase_storekit.dart';
 import 'package:in_app_purchase_storekit/store_kit_wrappers.dart';
 
 import '../../../features/home/ui/tab/tabbar.dart';
+import '../../../features/payment/ios_payment_queue_delegate.dart';
 import '../../../features/payment/ui/products.dart';
 import '../../../models/user_model.dart';
 import '../../constants/constants.dart';
 
 abstract class InAppPurchaseRepo {
   Future<List<ProductDetails>> getProductsDetailsById();
-  Future buyConsumable({required ProductDetails productDetails});
+  Future<void> buyConsumable({required ProductDetails productDetails});
 }
 
 class InAppPurchaseRepoImpl extends InAppPurchaseRepo {
@@ -59,12 +61,56 @@ class InAppPurchaseRepoImpl extends InAppPurchaseRepo {
     }
   }
 
+  static bool _iosPaymentQueueDelegateSet = false;
+
+  /// Ensures the iOS payment-queue delegate is registered once per process.
+  static Future<void> ensureIosPaymentQueueDelegate() async {
+    if (!_isIOS || _iosPaymentQueueDelegateSet) return;
+    try {
+      final InAppPurchaseStoreKitPlatformAddition iosAddition =
+          inApp.getPlatformAddition<InAppPurchaseStoreKitPlatformAddition>();
+      await iosAddition.setDelegate(AfropeepPaymentQueueDelegate());
+      _iosPaymentQueueDelegateSet = true;
+    } on Object catch (e) {
+      log('[IAP] Failed to set StoreKit payment queue delegate: $e');
+    }
+  }
+
+  PurchaseParam _purchaseParamFor(ProductDetails productDetails) {
+    if (productDetails is GooglePlayProductDetails) {
+      final String? offerToken = productDetails.offerToken;
+      // Billing 5+ requires an offer token for subscriptions.
+      return GooglePlayPurchaseParam(
+        productDetails: productDetails,
+        offerToken: offerToken,
+      );
+    }
+    return PurchaseParam(productDetails: productDetails);
+  }
+
   @override
-  Future buyConsumable({required ProductDetails productDetails}) async {
-    final PurchaseParam purchaseParam =
-        PurchaseParam(productDetails: productDetails);
-    await inApp.buyNonConsumable(purchaseParam: purchaseParam);
-    log('=============-----------isPurchaseSuccessfully');
+  Future<void> buyConsumable({required ProductDetails productDetails}) async {
+    final bool available = await inApp.isAvailable();
+    if (!available) {
+      throw StateError('Store is not available on this device.');
+    }
+
+    await ensureIosPaymentQueueDelegate();
+
+    final PurchaseParam purchaseParam = _purchaseParamFor(productDetails);
+    log('[IAP] Starting purchase for ${productDetails.id}');
+
+    final bool started = await inApp.buyNonConsumable(
+      purchaseParam: purchaseParam,
+    );
+    if (!started) {
+      // Plugin returns false when another purchase is pending / sheet not shown.
+      throw StateError(
+        'Purchase could not be started. Wait a moment and try again, '
+        'or restore purchases from Account Settings.',
+      );
+    }
+    log('[IAP] Purchase sheet presented for ${productDetails.id}');
   }
 
   /// Fetches store product IDs from `Packages` (platform-specific when set).

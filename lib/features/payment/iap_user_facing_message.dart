@@ -44,6 +44,10 @@ String userFacingPurchaseFromRawString(String raw) {
   if (_rawLooksCanceled(lower)) {
     return 'Purchase canceled. No charge was made.';
   }
+  if (lower.contains('could not be started') ||
+      lower.contains('store is not available')) {
+    return 'Purchase could not be started. Please try again in a moment.';
+  }
   if (lower.contains('platformexception')) {
     return 'Purchase could not be completed. Please try again.';
   }

@@ -58,6 +58,9 @@ class _ChatThreadScreenState extends State<ChatThreadScreen> {
   String? _replyPreview;
   int _lastMessageCount = 0;
   String? _lastMessageId;
+  /// After the user sends, pin to the live edge even if they were reading history
+  /// (Tinder/Hinge-style). Incoming messages still respect [_isNearBottom].
+  bool _pinToBottomAfterOwnSend = false;
   late String _displayName;
   String? _displayAvatarUrl;
 
@@ -221,8 +224,8 @@ class _ChatThreadScreenState extends State<ChatThreadScreen> {
         threadId: widget.threadId,
         imagePath: picked.path,
       );
-      // StreamBuilder scrolls once the new message arrives — avoid a second
-      // competing animateTo that causes the bounce.
+      // Own send: pin when the new message lands (even if scrolled into history).
+      _pinToBottomAfterOwnSend = true;
     } on Object catch (error) {
       _showErrorSnackBar('Could not send image: $error');
     }
@@ -257,8 +260,9 @@ class _ChatThreadScreenState extends State<ChatThreadScreen> {
             _replyPreview = null;
           });
         }
-        // reverse ListView already shows the new bubble at the bottom —
-        // do not jumpTo(0); that is what shook the screen on send.
+        // Own send always follows the live edge (even when reading history).
+        // StreamBuilder scrolls once; _scrollToBottom no-ops if already at 0.
+        _pinToBottomAfterOwnSend = true;
       }
     } on Object catch (error) {
       _showErrorSnackBar(error.toString().replaceAll('Exception: ', ''));
@@ -456,7 +460,14 @@ class _ChatThreadScreenState extends State<ChatThreadScreen> {
                     // Capture before the new ListView lays out. After insert,
                     // reverse-list extent growth can push pixels past 80 even
                     // when the user was in the follow zone.
-                    final bool followLiveEdge = _isNearBottom;
+                    final bool pinAfterOwnSend = _pinToBottomAfterOwnSend;
+                    final bool newestIsOwn = messages.isNotEmpty &&
+                        messages.last.senderId == _currentUserId;
+                    final bool followLiveEdge = _isNearBottom ||
+                        (pinAfterOwnSend && newestIsOwn);
+                    if (pinAfterOwnSend && newestIsOwn) {
+                      _pinToBottomAfterOwnSend = false;
+                    }
                     WidgetsBinding.instance.addPostFrameCallback((_) {
                       if (!mounted) return;
                       // _scrollToBottom no-ops within 1px of 0 (avoids send shake).

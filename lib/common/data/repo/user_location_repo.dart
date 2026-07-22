@@ -65,8 +65,7 @@ String privacyAwareLocationLabel(List<dynamic> addressComponents) {
   }
 
   final String city = locality.isNotEmpty ? locality : neighborhood;
-  final bool isUsOrCa =
-      countryShort == 'US' ||
+  final bool isUsOrCa = countryShort == 'US' ||
       countryShort == 'CA' ||
       country == 'United States' ||
       country == 'Canada';
@@ -284,8 +283,8 @@ class UserLocationReporistoryImpl implements UserLocationReporistory {
         );
       }
       const geocodeURL = 'https://maps.googleapis.com/maps/api/geocode';
-      final url =
-          Uri.parse('$geocodeURL/json?latlng=$lat,$lng&key=$googleMapsPlacesHttpKey');
+      final url = Uri.parse(
+          '$geocodeURL/json?latlng=$lat,$lng&key=$googleMapsPlacesHttpKey');
 
       final response = await http.get(url).timeout(
         const Duration(seconds: 5),
@@ -522,8 +521,8 @@ class UserLocationReporistoryImpl implements UserLocationReporistory {
         return fallback();
       }
       const geocodeURL = 'https://maps.googleapis.com/maps/api/geocode';
-      final url =
-          Uri.parse('$geocodeURL/json?latlng=$lat,$lng&key=$googleMapsPlacesHttpKey');
+      final url = Uri.parse(
+          '$geocodeURL/json?latlng=$lat,$lng&key=$googleMapsPlacesHttpKey');
 
       final response = await http.get(url).timeout(
         const Duration(seconds: 5),

@@ -65,8 +65,7 @@ class _PlaceSearchPageState extends State<PlaceSearchPage> {
       _results = result.suggestions;
       _loading = false;
       if (result.isDenied) {
-        _error =
-            'Place search blocked by Google API key restrictions. '
+        _error = 'Place search blocked by Google API key restrictions. '
             'Add GOOGLE_MAPS_WEB_API_KEY (Places + Geocoding APIs, '
             'no iOS/Android app restriction), then hot restart.';
       } else if (!result.isOk) {
@@ -114,7 +113,8 @@ class _PlaceSearchPageState extends State<PlaceSearchPage> {
               decoration: InputDecoration(
                 hintText: 'City, neighborhood, or address',
                 hintStyle: GoogleFonts.montserrat(color: Colors.black45),
-                prefixIcon: const Icon(Icons.search, color: AppColors.primaryGreen),
+                prefixIcon:
+                    const Icon(Icons.search, color: AppColors.primaryGreen),
                 filled: true,
                 fillColor: Colors.white,
                 contentPadding: const EdgeInsets.symmetric(

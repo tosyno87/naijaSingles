@@ -182,8 +182,7 @@ class _UpdateAddressWidgetState extends State<UpdateAddressWidget> {
                       ? null
                       : () async {
                           if (widget.hasSubscription) {
-                            final Object? address =
-                                await Navigator.pushNamed(
+                            final Object? address = await Navigator.pushNamed(
                               context,
                               RouteName.updateLocationScreen,
                               arguments: selectedLocation,
@@ -226,8 +225,7 @@ class _UpdateAddressWidgetState extends State<UpdateAddressWidget> {
   /// Persist once, refresh discovery, show inline cue (no snackbar).
   Future<void> _persistAddress(Map<dynamic, dynamic> address) async {
     final Object? position = address['position'];
-    final Object? coordsRaw =
-        position is Map ? position['coordinates'] : null;
+    final Object? coordsRaw = position is Map ? position['coordinates'] : null;
     if (coordsRaw is! List || coordsRaw.length < 2) {
       if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(

@@ -431,8 +431,7 @@ class UpdateLocationState extends State<UpdateLocation> {
                           ),
                           const SizedBox(height: 8),
                           TextButton.icon(
-                            onPressed:
-                                _loadingGps ? null : _useCurrentLocation,
+                            onPressed: _loadingGps ? null : _useCurrentLocation,
                             icon: const Icon(Icons.my_location, size: 18),
                             label: Text(
                               'Use current location',

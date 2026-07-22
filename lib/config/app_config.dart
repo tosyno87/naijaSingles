@@ -57,6 +57,19 @@ String get googleMapsKey {
   return key;
 }
 
+/// Key used for Places Autocomplete / Place Details / Geocoding HTTP.
+/// Prefer [SecureConfig.googleMapsWebApiKey] (no app bundle restriction).
+String get googleMapsPlacesHttpKey {
+  final String key = SecureConfig.googleMapsWebApiKey ?? '';
+  if (key.isEmpty && kDebugMode) {
+    debugPrint(
+      'WARNING: Google Maps Places HTTP key is empty. '
+      'Set GOOGLE_MAPS_WEB_API_KEY (API-restricted, no app restriction).',
+    );
+  }
+  return key;
+}
+
 //for support to user add you mail
 const adminMail = 'support@naijasingles.com';
 // add bucket id from firebase or google-services-json

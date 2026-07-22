@@ -78,7 +78,6 @@ Future<Map<String, dynamic>?> showLocationDialog(
                               },
                               'address': snapshot.data?.toString() ?? '',
                             });
-                            log('new address is $updatedLocation');
                             Navigator.pop(context, updatedLocation);
                           },
                           child: Text(
@@ -137,10 +136,15 @@ Future<String> getAddress(double? lat, double? lng) async {
   try {
     final reverseGeocode = await UserLocationReporistoryImpl()
         .getReverseGeoding(lat: lat ?? 0, lng: lng ?? 0);
-    return reverseGeocode.formattedAddress;
+    final String formatted = reverseGeocode.formattedAddress.trim();
+    if (formatted.isNotEmpty) return formatted;
   } on SocketException {
-    throw Exception('No internet connection'.tr().toString());
-  } on Object {
-    rethrow;
+    // Fall through to coordinate label.
+  } on Object catch (e) {
+    log('getAddress failed: $e');
   }
+  if (lat != null && lng != null) {
+    return 'Selected location (${lat.toStringAsFixed(4)}, ${lng.toStringAsFixed(4)})';
+  }
+  return 'Selected location';
 }

@@ -33,6 +33,7 @@ class UpdateLocationState extends State<UpdateLocation> {
   bool _loadingGps = true;
   bool _saving = false;
   GoogleMapController? googleMapController;
+  int _pinLabelSeq = 0;
 
   String get kGoogleApiKey => googleMapsKey;
 
@@ -266,13 +267,16 @@ class UpdateLocationState extends State<UpdateLocation> {
   }
 
   Future<void> _refreshLabelForPin(LatLng loc) async {
+    final int seq = ++_pinLabelSeq;
     setState(() {
       latitude = loc.latitude;
       longitude = loc.longitude;
     });
     try {
       final String label = await getAddress(loc.latitude, loc.longitude);
-      if (!mounted) return;
+      if (!mounted || seq != _pinLabelSeq) return;
+      // Ignore stale reverse-geocode if the pin moved again.
+      if (latitude != loc.latitude || longitude != loc.longitude) return;
       setState(() => _placeLabel = label);
     } on Object {
       // Keep pin; label can stay stale or use fallback on Set.

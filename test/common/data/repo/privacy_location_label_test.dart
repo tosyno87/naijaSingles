@@ -76,5 +76,32 @@ void main() {
       final Map<String, dynamic>? locality = pickLocalityGeocodeResult(results);
       expect(locality?['place_id'], 'city');
     });
+
+    test('POI-style components still produce a city label', () {
+      final List<dynamic> components = <Map<String, Object?>>[
+        <String, Object?>{
+          'long_name': 'Museum of Fine Arts',
+          'short_name': 'MFA',
+          'types': <String>['point_of_interest', 'establishment'],
+        },
+        <String, Object?>{
+          'long_name': 'Houston',
+          'short_name': 'Houston',
+          'types': <String>['locality', 'political'],
+        },
+        <String, Object?>{
+          'long_name': 'Texas',
+          'short_name': 'TX',
+          'types': <String>['administrative_area_level_1', 'political'],
+        },
+        <String, Object?>{
+          'long_name': 'United States',
+          'short_name': 'US',
+          'types': <String>['country', 'political'],
+        },
+      ];
+
+      expect(privacyAwareLocationLabel(components), 'Houston, TX');
+    });
   });
 }

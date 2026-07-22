@@ -125,6 +125,61 @@ Map<String, dynamic>? pickLocalityGeocodeResult(List<dynamic> results) {
   return null;
 }
 
+const Set<String> _coarsePlaceTypes = <String>{
+  'locality',
+  'postal_town',
+  'administrative_area_level_1',
+  'administrative_area_level_2',
+  'administrative_area_level_3',
+  'country',
+  'political',
+  'geocode',
+};
+
+const Set<String> _preciseComponentTypes = <String>{
+  'street_number',
+  'route',
+  'premise',
+  'subpremise',
+  'plus_code',
+  'neighborhood',
+  'sublocality',
+  'sublocality_level_1',
+  'point_of_interest',
+  'establishment',
+  'park',
+  'airport',
+  'university',
+  'shopping_mall',
+  'store',
+};
+
+/// True when Place Details is already city/region-level (no POI/street pin).
+bool _isAlreadyCoarsePlace(
+  Map<String, dynamic> place,
+  List<dynamic> components,
+) {
+  final Object? typesRaw = place['types'];
+  if (typesRaw is List && typesRaw.isNotEmpty) {
+    final bool allCoarse = typesRaw.every(
+      (Object? t) => _coarsePlaceTypes.contains(t?.toString()),
+    );
+    if (allCoarse) return true;
+  }
+
+  for (final Object? component in components) {
+    if (component is! Map) continue;
+    final List<String> types = List<String>.from(
+      (component['types'] as List?) ?? const <dynamic>[],
+    );
+    for (final String type in types) {
+      if (_preciseComponentTypes.contains(type)) return false;
+    }
+  }
+  // No precise components and no fine place types → treat as coarse.
+  return true;
+}
+
 abstract class UserLocationReporistory {
   const UserLocationReporistory._();
   Future<Map?> getLocationCoordinates();
@@ -425,16 +480,11 @@ class UserLocationReporistoryImpl implements UserLocationReporistory {
           ? place['address_components'] as List<dynamic>
           : <dynamic>[];
       final String label = privacyAwareLocationLabel(components);
-      final bool hasStreet = components.any((Object? c) {
-        if (c is! Map) return false;
-        final List<String> types = List<String>.from(
-          (c['types'] as List?) ?? const <dynamic>[],
-        );
-        return types.contains('street_number') || types.contains('route');
-      });
 
-      // Prefer city/locality center over street pin when the place is precise.
-      if (hasStreet && label != 'Unknown Location') {
+      // Always snap precise Places (street, POI, premise, park, etc.) to the
+      // privacy label's city/region center — not only street_number/route.
+      if (label != 'Unknown Location' &&
+          !_isAlreadyCoarsePlace(place, components)) {
         final Map<String, dynamic>? city = await geocodeAddress(label);
         if (city != null) {
           return city;

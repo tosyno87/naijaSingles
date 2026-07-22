@@ -22,6 +22,7 @@ class _PlaceSearchPageState extends State<PlaceSearchPage> {
   List<PlaceSuggestion> _results = const <PlaceSuggestion>[];
   bool _loading = false;
   String? _error;
+  int _searchSeq = 0;
 
   @override
   void dispose() {
@@ -39,8 +40,9 @@ class _PlaceSearchPageState extends State<PlaceSearchPage> {
 
   Future<void> _search(String input) async {
     final String query = input.trim();
+    final int seq = ++_searchSeq;
     if (query.length < 2) {
-      if (!mounted) return;
+      if (!mounted || seq != _searchSeq) return;
       setState(() {
         _results = const <PlaceSuggestion>[];
         _loading = false;
@@ -56,7 +58,9 @@ class _PlaceSearchPageState extends State<PlaceSearchPage> {
 
     final PlaceAutocompleteResult result =
         await _repo.autocompletePlaces(query);
-    if (!mounted) return;
+    if (!mounted || seq != _searchSeq) return;
+    // Ignore stale responses if the user kept typing.
+    if (query != _controller.text.trim()) return;
     setState(() {
       _results = result.suggestions;
       _loading = false;

@@ -10,7 +10,6 @@ import '../../../../common/data/repo/in_app_purchase_repo.dart';
 import '../../../../config/app_config.dart';
 import '../../../../services/subscription_iap_analytics.dart';
 import '../../data/subscription_functions_service.dart';
-import '../../debug_agent_log.dart';
 import '../../iap_user_facing_message.dart';
 
 // --- Events ---
@@ -381,26 +380,6 @@ class SubscriptionBloc extends Bloc<SubscriptionEvent, SubscriptionState> {
 
       try {
         final bool verifyForRestore = _awaitingRestore;
-        // #region agent log
-        agentDebugLog(
-          hypothesisId: 'A,C,E',
-          location: 'subscription_bloc.dart:_processPurchaseBatch',
-          message: 'before_verify',
-          data: <String, Object?>{
-            'uidPresent': _uid != null && _uid!.isNotEmpty,
-            'uidLen': _uid?.length ?? 0,
-            'productId': purchase.productID,
-            'status': purchase.status.name,
-            'pendingComplete': purchase.pendingCompletePurchase,
-            'tokenLen':
-                purchase.verificationData.serverVerificationData.length,
-            'source': purchase.verificationData.source,
-            'rollout': AppConfig.subscriptionVerifyRollout,
-            'isRestore': verifyForRestore,
-            'platform': _iapPlatformLabel(),
-          },
-        );
-        // #endregion
         await _verifyWithServer(purchase);
 
         if (purchase.pendingCompletePurchase) {
@@ -448,21 +427,6 @@ class SubscriptionBloc extends Bloc<SubscriptionEvent, SubscriptionState> {
         _restoreTimer?.cancel();
         final bool wasRestore = _awaitingRestore;
         _awaitingRestore = false;
-        // #region agent log
-        agentDebugLog(
-          hypothesisId: 'A,B,D',
-          location: 'subscription_bloc.dart:_processPurchaseBatch.catch',
-          message: 'verify_failed',
-          data: <String, Object?>{
-            'errorType': e.runtimeType.toString(),
-            'error': e.toString().length > 400
-                ? e.toString().substring(0, 400)
-                : e.toString(),
-            'productId': purchase.productID,
-            'wasRestore': wasRestore,
-          },
-        );
-        // #endregion
         emit(state.copyWith(
           purchaseInProgress: false,
           restoreInProgress: false,
@@ -493,14 +457,6 @@ class SubscriptionBloc extends Bloc<SubscriptionEvent, SubscriptionState> {
 
   Future<void> _verifyWithServer(PurchaseDetails purchase) async {
     if (!AppConfig.subscriptionVerifyRollout) {
-      // #region agent log
-      agentDebugLog(
-        hypothesisId: 'B',
-        location: 'subscription_bloc.dart:_verifyWithServer',
-        message: 'rollout_disabled',
-        data: const <String, Object?>{'rollout': false},
-      );
-      // #endregion
       throw StateError(
         'SUBSCRIPTION_VERIFY_ROLLOUT=false: turn on the dart-define or deploy '
         'verifySubscriptionPurchase before shipping IAP.',
@@ -512,21 +468,6 @@ class SubscriptionBloc extends Bloc<SubscriptionEvent, SubscriptionState> {
             ? 'android'
             : 'android';
     final token = purchase.verificationData.serverVerificationData;
-    // #region agent log
-    agentDebugLog(
-      hypothesisId: 'C',
-      location: 'subscription_bloc.dart:_verifyWithServer',
-      message: 'calling_callable',
-      data: <String, Object?>{
-        'platform': platform,
-        'productId': purchase.productID,
-        'tokenLen': token.length,
-        'tokenEmpty': token.isEmpty,
-        'sendsReceipt': platform == 'ios',
-        'sendsPurchaseToken': platform == 'android',
-      },
-    );
-    // #endregion
     await _functions.verifySubscriptionPurchase(
       platform: platform,
       productId: purchase.productID,

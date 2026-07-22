@@ -5,7 +5,6 @@ import 'package:flutter/material.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 
 import '../../common/constants/app_colors.dart';
-import '../../config/app_config.dart';
 import '../../models/user_model.dart';
 import '../payment/ui/products.dart';
 
@@ -40,17 +39,8 @@ class GoogleMapWidget extends StatefulWidget {
 class GoogleMapWidgetState extends State<GoogleMapWidget> {
   @override
   Widget build(BuildContext context) {
-    if (googleMapsKey.isEmpty) {
-      return const ColoredBox(
-        color: Color(0xFFE8E8E8),
-        child: Center(
-          child: Text(
-            'Map unavailable — Google Maps API key not configured',
-            textAlign: TextAlign.center,
-          ),
-        ),
-      );
-    }
+    // Native Maps SDK is keyed via platform config (AndroidManifest /
+    // GMSApiKey). Do not gate on the Dart/env Places HTTP key.
     return GoogleMap(
       mapToolbarEnabled: false,
       myLocationButtonEnabled: false,

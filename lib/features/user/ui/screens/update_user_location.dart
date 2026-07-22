@@ -35,8 +35,6 @@ class UpdateLocationState extends State<UpdateLocation> {
   GoogleMapController? googleMapController;
   int _pinLabelSeq = 0;
 
-  String get kGoogleApiKey => googleMapsKey;
-
   @override
   void initState() {
     super.initState();
@@ -128,10 +126,12 @@ class UpdateLocationState extends State<UpdateLocation> {
   }
 
   Future<void> _openPlaceSearch() async {
-    if (kGoogleApiKey.isEmpty) {
+    if (googleMapsPlacesHttpKey.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
-          content: Text('Google Maps API key not configured'),
+          content: Text(
+            'Place search unavailable — set GOOGLE_MAPS_WEB_API_KEY',
+          ),
         ),
       );
       return;
@@ -321,7 +321,9 @@ class UpdateLocationState extends State<UpdateLocation> {
                   child: Stack(
                     fit: StackFit.expand,
                     children: [
-                      if (kGoogleApiKey.isEmpty || target == null)
+                      // Native Maps SDK uses platform keys; only wait for a
+                      // camera target before showing GoogleMap.
+                      if (target == null)
                         ColoredBox(
                           color: isDark
                               ? const Color(0xFF2A2A2A)
@@ -330,9 +332,7 @@ class UpdateLocationState extends State<UpdateLocation> {
                             child: Padding(
                               padding: const EdgeInsets.all(24),
                               child: Text(
-                                kGoogleApiKey.isEmpty
-                                    ? 'Map unavailable — Google Maps API key not configured'
-                                    : 'Fetching your location…',
+                                'Fetching your location…',
                                 textAlign: TextAlign.center,
                                 style: GoogleFonts.montserrat(color: muted),
                               ),

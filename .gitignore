@@ -93,3 +93,7 @@ ios/Runner.xcarchive/
 *.mobileprovision
 
 # Secrets configured Thu Oct  2 20:49:29 EDT 2025
+
+# Local Maps / env secrets
+ios/Flutter/Secrets.xcconfig
+assets/env/app.env

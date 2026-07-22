@@ -38,19 +38,23 @@ class GoogleMapWidget extends StatefulWidget {
 
 class GoogleMapWidgetState extends State<GoogleMapWidget> {
   @override
-  Widget build(BuildContext context) => GoogleMap(
-        mapToolbarEnabled: false,
-        myLocationButtonEnabled: false,
-        compassEnabled: false,
-        scrollGesturesEnabled: false,
-        initialCameraPosition: CameraPosition(
-          target: LatLng(
-            widget.currentUser.latitude!,
-            widget.currentUser.longitude!,
-          ), // Replace with your desired map coordinates
-          zoom: 15,
+  Widget build(BuildContext context) {
+    // Native Maps SDK is keyed via platform config (AndroidManifest /
+    // GMSApiKey). Do not gate on the Dart/env Places HTTP key.
+    return GoogleMap(
+      mapToolbarEnabled: false,
+      myLocationButtonEnabled: false,
+      compassEnabled: false,
+      scrollGesturesEnabled: false,
+      initialCameraPosition: CameraPosition(
+        target: LatLng(
+          widget.currentUser.latitude!,
+          widget.currentUser.longitude!,
         ),
-      );
+        zoom: 15,
+      ),
+    );
+  }
 }
 
 class PremiumDialog extends StatelessWidget {

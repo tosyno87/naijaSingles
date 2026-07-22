@@ -414,10 +414,13 @@ class SubscriptionBloc extends Bloc<SubscriptionEvent, SubscriptionState> {
             ),
           );
         } else {
+          // Navigate only — do not also set userMessage. Paywall listeners
+          // would show a SnackBar and pushReplacement in the same frame,
+          // which asserts '_dependents.isEmpty' while ScaffoldMessenger
+          // tears down. Tabbar shows "Payment Successful!" via isPaymentSuccess.
           emit(state.copyWith(
             purchaseInProgress: false,
             shouldNavigateToSuccess: true,
-            userMessage: 'Welcome to Premium!',
           ));
         }
       } on Object catch (e) {

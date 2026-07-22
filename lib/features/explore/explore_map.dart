@@ -176,7 +176,8 @@ class _ExploreMapWidgetState extends State<ExploreMapWidget>
                       ),
                     )
                   : GoogleMap(
-                      // Simple map view instead of street view
+                      // Native Maps SDK uses the platform key (iOS Secrets /
+                      // Android manifest), not the Dart env Places key.
                       onMapCreated: (GoogleMapController controller) {
                         // Map initialization
                       },

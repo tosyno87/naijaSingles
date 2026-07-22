@@ -260,20 +260,28 @@ class _UpdateAddressWidgetState extends State<UpdateAddressWidget> {
 
     setState(() => _saving = true);
     try {
+      final String savedLabel = label.isEmpty ? 'Selected location' : label;
       await firebaseFireStoreInstance.collection('users').doc(uid).update({
         'location': {
           'latitude': lat,
           'longitude': lng,
-          'address': label.isEmpty ? 'Selected location' : label,
+          'address': savedLabel,
         },
       });
 
+      // latitude/longitude on UserModel are final — reload so discovery
+      // filters around the new coords, not the stale in-memory values.
+      final snap =
+          await firebaseFireStoreInstance.collection('users').doc(uid).get();
       if (!mounted) return;
+
+      final UserModel discoveryUser =
+          snap.exists ? UserModel.fromDocument(snap) : widget.currentUser;
+
       setState(() {
-        widget.currentUser.address =
-            label.isEmpty ? 'Selected location' : label;
+        widget.currentUser.address = savedLabel;
         selectedLocation = {
-          'address': widget.currentUser.address,
+          'address': savedLabel,
           'position': {
             'coordinates': [lng, lat],
           },
@@ -283,7 +291,7 @@ class _UpdateAddressWidgetState extends State<UpdateAddressWidget> {
       _flashUpdatedCue();
 
       context.read<SearchUserBloc>().add(
-            LoadUserEvent(currentUser: widget.currentUser),
+            LoadUserEvent(currentUser: discoveryUser),
           );
     } on Object {
       if (!mounted) return;

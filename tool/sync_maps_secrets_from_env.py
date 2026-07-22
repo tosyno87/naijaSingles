@@ -1,12 +1,13 @@
 #!/usr/bin/env python3
-"""Sync Maps keys from repo-root .env into iOS + Dart local secret files.
+"""Sync Maps keys from repo-root .env into iOS, Android, and Dart local secret files.
 
 Writes (gitignored):
   - ios/Flutter/Secrets.xcconfig
+  - android/local.properties  (merges GOOGLE_MAPS_API_KEY; keeps flutter.sdk etc.)
   - assets/env/app.env
 
 Reads:
-  - GOOGLE_MAPS_API_KEY (required) — Maps SDK / iOS bundle-restricted OK
+  - GOOGLE_MAPS_API_KEY (required) — Maps SDK / iOS-Android app-restricted OK
   - GOOGLE_MAPS_WEB_API_KEY (optional) — Places/Geocoding HTTP; must NOT be
     iOS/Android app-restricted or REST calls return REQUEST_DENIED
 """
@@ -22,6 +23,35 @@ def _read_env_value(env_text: str, key: str) -> str | None:
         if line.startswith(prefix):
             return line.split("=", 1)[1].strip().strip('"').strip("'")
     return None
+
+
+def _upsert_properties(path: Path, updates: dict[str, str]) -> None:
+    """Merge key=value pairs into a Java .properties file without wiping others."""
+    lines: list[str] = []
+    if path.is_file():
+        lines = path.read_text().splitlines()
+
+    seen: set[str] = set()
+    out: list[str] = []
+    for line in lines:
+        stripped = line.strip()
+        if not stripped or stripped.startswith("#") or "=" not in line:
+            out.append(line)
+            continue
+        key, _, _ = line.partition("=")
+        key = key.strip()
+        if key in updates:
+            out.append(f"{key}={updates[key]}")
+            seen.add(key)
+        else:
+            out.append(line)
+
+    for key, value in updates.items():
+        if key not in seen:
+            out.append(f"{key}={value}")
+
+    path.parent.mkdir(parents=True, exist_ok=True)
+    path.write_text("\n".join(out) + ("\n" if out else ""))
 
 
 def main() -> None:
@@ -43,6 +73,9 @@ def main() -> None:
         f"GOOGLE_MAPS_API_KEY={key}\n"
     )
 
+    android_props = root / "android" / "local.properties"
+    _upsert_properties(android_props, {"GOOGLE_MAPS_API_KEY": key})
+
     asset_lines = [f"GOOGLE_MAPS_API_KEY={key}"]
     if web_key:
         asset_lines.append(f"GOOGLE_MAPS_WEB_API_KEY={web_key}")
@@ -55,7 +88,7 @@ def main() -> None:
     print(
         f"Synced Maps key (len={len(key)})"
         + (f" + web key (len={len(web_key)})" if web_key else " (no WEB key)")
-        + f" → {secrets.name} + assets/env/app.env"
+        + f" → {secrets.name} + android/local.properties + assets/env/app.env"
     )
     if not web_key:
         print(

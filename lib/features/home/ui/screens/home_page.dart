@@ -32,6 +32,7 @@ class _HomepageState extends State<Homepage>
   final List<UserModel> removedUsers = [];
   bool _shouldShowMigrationPrompt = false;
   bool _migrationPromptDismissed = false;
+  bool _controllerReady = false;
 
   @override
   bool get wantKeepAlive => true;
@@ -46,7 +47,9 @@ class _HomepageState extends State<Homepage>
   Future<void> _initializeController() async {
     await controller.initialize(context);
     if (!mounted) return;
-    setState(() {});
+    setState(() {
+      _controllerReady = true;
+    });
     context
         .read<SearchUserBloc>()
         .add(LoadUserEvent(currentUser: controller.currentUser));
@@ -62,12 +65,17 @@ class _HomepageState extends State<Homepage>
   }
 
   @override
-  Future<void> didChangeDependencies() async {
-    await firebaseFireStoreInstance
-        .collection('users')
-        .doc(controller.currentUser.id)
-        .update({'lastvisited': DateTime.now()});
+  void didChangeDependencies() {
     super.didChangeDependencies();
+    // [controller.currentUser] is set asynchronously in [initialize].
+    if (!_controllerReady) return;
+    final String? uid = controller.currentUser.id;
+    if (uid == null || uid.isEmpty) return;
+    unawaited(
+      firebaseFireStoreInstance.collection('users').doc(uid).update({
+        'lastvisited': DateTime.now(),
+      }),
+    );
   }
 
   @override

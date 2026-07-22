@@ -87,6 +87,9 @@
 	<string>This app needs permission to save photos to your photo library.</string>
 	<key>NSContactsUsageDescription</key>
 	<string>This app needs access to your contacts to invite friends to groups and communities.</string>
+	<!-- Injected from ios/Flutter/Secrets.xcconfig (GOOGLE_MAPS_API_KEY). -->
+	<key>GMSApiKey</key>
+	<string>$(GOOGLE_MAPS_API_KEY)</string>
 	<key>UIStatusBarHidden</key>
 	<false/>
 	</dict>

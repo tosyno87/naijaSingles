@@ -153,6 +153,8 @@ flutter:
     - assets/images/
     - assets/images/backgrounds/
     - assets/images/placeholders/
+    # Local Maps key file lives here when synced (app.env is gitignored).
+    - assets/env/
     # .env is optional - only included if it exists (gitignored for security)
   # An image asset can refer to one or more resolution-specific "variants", see
   # https://flutter.dev/assets-and-images/#resolution-aware

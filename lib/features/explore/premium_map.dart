@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 
 import '../../common/constants/app_colors.dart';
+import '../../config/app_config.dart';
 import '../../models/user_model.dart';
 import '../payment/ui/products.dart';
 
@@ -38,19 +39,32 @@ class GoogleMapWidget extends StatefulWidget {
 
 class GoogleMapWidgetState extends State<GoogleMapWidget> {
   @override
-  Widget build(BuildContext context) => GoogleMap(
-        mapToolbarEnabled: false,
-        myLocationButtonEnabled: false,
-        compassEnabled: false,
-        scrollGesturesEnabled: false,
-        initialCameraPosition: CameraPosition(
-          target: LatLng(
-            widget.currentUser.latitude!,
-            widget.currentUser.longitude!,
-          ), // Replace with your desired map coordinates
-          zoom: 15,
+  Widget build(BuildContext context) {
+    if (googleMapsKey.isEmpty) {
+      return const ColoredBox(
+        color: Color(0xFFE8E8E8),
+        child: Center(
+          child: Text(
+            'Map unavailable — Google Maps API key not configured',
+            textAlign: TextAlign.center,
+          ),
         ),
       );
+    }
+    return GoogleMap(
+      mapToolbarEnabled: false,
+      myLocationButtonEnabled: false,
+      compassEnabled: false,
+      scrollGesturesEnabled: false,
+      initialCameraPosition: CameraPosition(
+        target: LatLng(
+          widget.currentUser.latitude!,
+          widget.currentUser.longitude!,
+        ),
+        zoom: 15,
+      ),
+    );
+  }
 }
 
 class PremiumDialog extends StatelessWidget {

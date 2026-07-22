@@ -13,6 +13,7 @@ import 'package:google_maps_flutter/google_maps_flutter.dart';
 import '../../common/bloc/theme/theme_bloc.dart';
 import '../../common/constants/app_colors.dart';
 import '../../common/data/repo/user_location_repo.dart';
+import '../../config/app_config.dart';
 import '../../models/user_model.dart';
 import 'bloc/explore_map_bloc.dart';
 
@@ -175,7 +176,17 @@ class _ExploreMapWidgetState extends State<ExploreMapWidget>
                         ],
                       ),
                     )
-                  : GoogleMap(
+                  : googleMapsKey.isEmpty
+                      ? const Center(
+                          child: Padding(
+                            padding: EdgeInsets.all(24),
+                            child: Text(
+                              'Map unavailable — Google Maps API key not configured',
+                              textAlign: TextAlign.center,
+                            ),
+                          ),
+                        )
+                      : GoogleMap(
                       // Simple map view instead of street view
                       onMapCreated: (GoogleMapController controller) {
                         // Map initialization

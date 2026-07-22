@@ -8,22 +8,51 @@ class SecureConfig {
   static bool _initialized = false;
   static bool _dotenvLoaded = false;
 
+  /// Production Firebase defaults when `.env` is absent (matches firebase_options).
+  static const String _fallbackStorageBucket =
+      'naijasingles-74a75.appspot.com';
+  static const String _fallbackProjectId = 'naijasingles-74a75';
+
   /// Initialize the configuration by loading environment variables
   static Future<void> initialize() async {
     if (_initialized) return;
 
     try {
-      await dotenv.load();
+      // Prefer local bundled env (assets/env/app.env from sync script).
+      // Fall back to optional root `.env` asset if present.
+      // isOptional: missing file must not leave dotenv uninitialized.
+      const String fromDefine = String.fromEnvironment('GOOGLE_MAPS_API_KEY');
+      try {
+        await dotenv.load(
+          fileName: 'assets/env/app.env',
+          isOptional: false,
+          mergeWith: fromDefine.isEmpty
+              ? const <String, String>{}
+              : <String, String>{'GOOGLE_MAPS_API_KEY': fromDefine},
+        );
+      } on Object {
+        await dotenv.load(
+          fileName: '.env',
+          isOptional: true,
+          mergeWith: fromDefine.isEmpty
+              ? const <String, String>{}
+              : <String, String>{'GOOGLE_MAPS_API_KEY': fromDefine},
+        );
+      }
       _initialized = true;
-      _dotenvLoaded = true;
+      _dotenvLoaded = dotenv.env.isNotEmpty;
       if (kDebugMode) {
-        AppLogger.info('✅ Secure configuration loaded successfully');
+        if (_dotenvLoaded) {
+          AppLogger.info('✅ Secure configuration loaded successfully');
+        } else {
+          AppLogger.info(
+            'ℹ️ .env empty or missing; using firebase_options.dart defaults',
+          );
+        }
       }
     } on Object catch (e) {
       _initialized = true;
       _dotenvLoaded = false;
-      // .env is optional at runtime because Firebase can use firebase_options.dart.
-      // Keep this as info-level in debug to avoid noisy false alarms.
       if (kDebugMode) {
         AppLogger.info(
           'ℹ️ .env not loaded; using firebase_options.dart defaults',
@@ -37,67 +66,72 @@ class SecureConfig {
     }
   }
 
+  /// Safe read — never throws [NotInitializedError].
+  static String? _env(String key) {
+    if (!dotenv.isInitialized) return null;
+    final String? value = dotenv.env[key];
+    if (value == null || value.isEmpty) return null;
+    return value;
+  }
+
   /// Get Firebase Web API Key
   static String get firebaseWebApiKey {
-    if (!_initialized || dotenv.env['FIREBASE_WEB_API_KEY'] == null) {
-      // Fallback for production when .env is not available
-      // These should match your actual Firebase project values
-      if (kReleaseMode) {
-        return 'AIzaSyDummyKeyForProduction'; // Will be overridden by firebase_options.dart
-      }
-      throw Exception('FIREBASE_WEB_API_KEY not found in environment');
+    final String? value = _env('FIREBASE_WEB_API_KEY');
+    if (value != null) return value;
+    if (kReleaseMode) {
+      return 'AIzaSyDummyKeyForProduction'; // overridden by firebase_options.dart
     }
-    return dotenv.env['FIREBASE_WEB_API_KEY']!;
+    throw Exception('FIREBASE_WEB_API_KEY not found in environment');
   }
 
   /// Get Firebase Android API Key
   static String get firebaseAndroidApiKey =>
-      dotenv.env['FIREBASE_ANDROID_API_KEY'] ??
+      _env('FIREBASE_ANDROID_API_KEY') ??
       (throw Exception('FIREBASE_ANDROID_API_KEY not found in environment'));
 
   /// Get Firebase iOS API Key
   static String get firebaseIosApiKey =>
-      dotenv.env['FIREBASE_IOS_API_KEY'] ??
+      _env('FIREBASE_IOS_API_KEY') ??
       (throw Exception('FIREBASE_IOS_API_KEY not found in environment'));
 
   /// Get Firebase Project ID
   static String get firebaseProjectId =>
-      dotenv.env['FIREBASE_PROJECT_ID'] ??
-      (throw Exception('FIREBASE_PROJECT_ID not found in environment'));
+      _env('FIREBASE_PROJECT_ID') ?? _fallbackProjectId;
 
   /// Get Firebase Messaging Sender ID
   static String get firebaseMessagingSenderId =>
-      dotenv.env['FIREBASE_MESSAGING_SENDER_ID'] ??
+      _env('FIREBASE_MESSAGING_SENDER_ID') ??
       (throw Exception(
         'FIREBASE_MESSAGING_SENDER_ID not found in environment',
       ));
 
   /// Get Firebase Storage Bucket
   static String get firebaseStorageBucket =>
-      dotenv.env['FIREBASE_STORAGE_BUCKET'] ??
-      (throw Exception('FIREBASE_STORAGE_BUCKET not found in environment'));
+      _env('FIREBASE_STORAGE_BUCKET') ?? _fallbackStorageBucket;
 
   /// Get Firebase Auth Domain
   static String get firebaseAuthDomain =>
-      dotenv.env['FIREBASE_AUTH_DOMAIN'] ??
-      (throw Exception('FIREBASE_AUTH_DOMAIN not found in environment'));
+      _env('FIREBASE_AUTH_DOMAIN') ?? '$_fallbackProjectId.firebaseapp.com';
 
   /// Get Firebase iOS Client ID
   static String get firebaseIosClientId =>
-      dotenv.env['FIREBASE_IOS_CLIENT_ID'] ??
+      _env('FIREBASE_IOS_CLIENT_ID') ??
       (throw Exception('FIREBASE_IOS_CLIENT_ID not found in environment'));
 
   /// Get Firebase iOS Bundle ID
   static String get firebaseIosBundleId =>
-      dotenv.env['FIREBASE_IOS_BUNDLE_ID'] ??
-      (throw Exception('FIREBASE_IOS_BUNDLE_ID not found in environment'));
+      _env('FIREBASE_IOS_BUNDLE_ID') ?? 'com.app.naijasingles';
 
   /// Get Google Maps API Key
-  static String? get googleMapsApiKey => dotenv.env['GOOGLE_MAPS_API_KEY'];
+  static String? get googleMapsApiKey {
+    const String fromDefine = String.fromEnvironment('GOOGLE_MAPS_API_KEY');
+    if (fromDefine.isNotEmpty) return fromDefine;
+    return _env('GOOGLE_MAPS_API_KEY');
+  }
 
   /// Get current environment
   static String get environment =>
-      dotenv.env['APP_ENVIRONMENT'] ?? 'development';
+      _env('APP_ENVIRONMENT') ?? 'development';
 
   /// Check if running in production
   static bool get isProduction => environment == 'production';
@@ -110,7 +144,6 @@ class SecureConfig {
   static void validate() {
     if (!_initialized) {
       if (kReleaseMode) {
-        // In production, .env may not be available - Firebase uses firebase_options.dart
         AppLogger.warning(
           '⚠️ SecureConfig not initialized - using Firebase defaults',
         );
@@ -141,14 +174,13 @@ class SecureConfig {
 
     final missingKeys = <String>[];
     for (final key in requiredKeys) {
-      if (dotenv.env[key] == null || dotenv.env[key]!.isEmpty) {
+      if (_env(key) == null) {
         missingKeys.add(key);
       }
     }
 
     if (missingKeys.isNotEmpty) {
       if (kReleaseMode) {
-        // In production, allow missing keys - Firebase will use firebase_options.dart
         AppLogger.warning(
           '⚠️ Some environment variables missing - using Firebase defaults',
         );

@@ -9,8 +9,7 @@ class SecureConfig {
   static bool _dotenvLoaded = false;
 
   /// Production Firebase defaults when `.env` is absent (matches firebase_options).
-  static const String _fallbackStorageBucket =
-      'naijasingles-74a75.appspot.com';
+  static const String _fallbackStorageBucket = 'naijasingles-74a75.appspot.com';
   static const String _fallbackProjectId = 'naijasingles-74a75';
 
   /// Initialize the configuration by loading environment variables
@@ -122,16 +121,24 @@ class SecureConfig {
   static String get firebaseIosBundleId =>
       _env('FIREBASE_IOS_BUNDLE_ID') ?? 'com.app.naijasingles';
 
-  /// Get Google Maps API Key
+  /// Get Google Maps API Key (Maps SDK / native)
   static String? get googleMapsApiKey {
     const String fromDefine = String.fromEnvironment('GOOGLE_MAPS_API_KEY');
     if (fromDefine.isNotEmpty) return fromDefine;
     return _env('GOOGLE_MAPS_API_KEY');
   }
 
+  /// Places/Geocoding HTTP key. Prefer a key with *no* iOS/Android app
+  /// restriction (API-restricted only). App-restricted keys work for the
+  /// Maps SDK but return REQUEST_DENIED for Dart HTTP Places/Geocode.
+  static String? get googleMapsWebApiKey {
+    const String fromDefine = String.fromEnvironment('GOOGLE_MAPS_WEB_API_KEY');
+    if (fromDefine.isNotEmpty) return fromDefine;
+    return _env('GOOGLE_MAPS_WEB_API_KEY') ?? googleMapsApiKey;
+  }
+
   /// Get current environment
-  static String get environment =>
-      _env('APP_ENVIRONMENT') ?? 'development';
+  static String get environment => _env('APP_ENVIRONMENT') ?? 'development';
 
   /// Check if running in production
   static bool get isProduction => environment == 'production';

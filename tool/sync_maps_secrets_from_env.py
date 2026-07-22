@@ -1,16 +1,27 @@
 #!/usr/bin/env python3
-"""Sync GOOGLE_MAPS_API_KEY from repo-root .env into iOS + Dart local secret files.
+"""Sync Maps keys from repo-root .env into iOS + Dart local secret files.
 
 Writes (gitignored):
   - ios/Flutter/Secrets.xcconfig
   - assets/env/app.env
 
-Safe to run locally; does not print the key.
+Reads:
+  - GOOGLE_MAPS_API_KEY (required) — Maps SDK / iOS bundle-restricted OK
+  - GOOGLE_MAPS_WEB_API_KEY (optional) — Places/Geocoding HTTP; must NOT be
+    iOS/Android app-restricted or REST calls return REQUEST_DENIED
 """
 
 from __future__ import annotations
 
 from pathlib import Path
+
+
+def _read_env_value(env_text: str, key: str) -> str | None:
+    prefix = f"{key}="
+    for line in env_text.splitlines():
+        if line.startswith(prefix):
+            return line.split("=", 1)[1].strip().strip('"').strip("'")
+    return None
 
 
 def main() -> None:
@@ -19,11 +30,9 @@ def main() -> None:
     if not env_path.is_file():
         raise SystemExit(f"Missing {env_path}. Copy env.example to .env first.")
 
-    key: str | None = None
-    for line in env_path.read_text().splitlines():
-        if line.startswith("GOOGLE_MAPS_API_KEY="):
-            key = line.split("=", 1)[1].strip().strip('"').strip("'")
-            break
+    env_text = env_path.read_text()
+    key = _read_env_value(env_text, "GOOGLE_MAPS_API_KEY")
+    web_key = _read_env_value(env_text, "GOOGLE_MAPS_WEB_API_KEY")
 
     if not key:
         raise SystemExit("GOOGLE_MAPS_API_KEY not set in .env")
@@ -34,12 +43,25 @@ def main() -> None:
         f"GOOGLE_MAPS_API_KEY={key}\n"
     )
 
+    asset_lines = [f"GOOGLE_MAPS_API_KEY={key}"]
+    if web_key:
+        asset_lines.append(f"GOOGLE_MAPS_WEB_API_KEY={web_key}")
+
     asset_dir = root / "assets" / "env"
     asset_dir.mkdir(parents=True, exist_ok=True)
-    (asset_dir / "app.env").write_text(f"GOOGLE_MAPS_API_KEY={key}\n")
+    (asset_dir / "app.env").write_text("\n".join(asset_lines) + "\n")
     (asset_dir / ".gitkeep").touch()
 
-    print(f"Synced Maps key (len={len(key)}) → {secrets.name} + assets/env/app.env")
+    print(
+        f"Synced Maps key (len={len(key)})"
+        + (f" + web key (len={len(web_key)})" if web_key else " (no WEB key)")
+        + f" → {secrets.name} + assets/env/app.env"
+    )
+    if not web_key:
+        print(
+            "NOTE: Without GOOGLE_MAPS_WEB_API_KEY, Places HTTP uses the SDK key. "
+            "App-restricted keys return REQUEST_DENIED for autocomplete/geocode."
+        )
 
 
 if __name__ == "__main__":

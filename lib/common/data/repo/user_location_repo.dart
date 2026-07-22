@@ -50,7 +50,7 @@ String privacyAwareLocationLabel(List<dynamic> addressComponents) {
     final String longName = row['long_name']?.toString() ?? '';
     final String shortName = row['short_name']?.toString() ?? '';
     if (types.contains('locality') || types.contains('postal_town')) {
-      locality = longName;
+      if (locality.isEmpty) locality = longName;
     } else if (types.contains('sublocality') ||
         types.contains('sublocality_level_1') ||
         types.contains('neighborhood')) {
@@ -88,6 +88,20 @@ String privacyAwareLocationLabel(List<dynamic> addressComponents) {
   return 'Unknown Location';
 }
 
+/// Prefer city from *any* reverse-geocode result's components.
+/// Street results usually include `locality`; state-level results do not.
+String privacyAwareLocationLabelFromResults(List<dynamic> results) {
+  final List<dynamic> merged = <dynamic>[];
+  for (final Object? item in results) {
+    if (item is! Map) continue;
+    final Object? components = item['address_components'];
+    if (components is List) {
+      merged.addAll(components);
+    }
+  }
+  return privacyAwareLocationLabel(merged);
+}
+
 bool _resultHasType(Map<String, dynamic> result, Set<String> wanted) {
   final Object? types = result['types'];
   if (types is! List) return false;
@@ -97,34 +111,18 @@ bool _resultHasType(Map<String, dynamic> result, Set<String> wanted) {
   return false;
 }
 
-/// Prefer locality/neighborhood geometry over street-level results.
-Map<String, dynamic> pickPrivacyGeocodeResult(List<dynamic> results) {
+/// City/locality geometry only — never snap to state/country.
+Map<String, dynamic>? pickLocalityGeocodeResult(List<dynamic> results) {
   const Set<String> preferred = <String>{
     'locality',
     'postal_town',
-    'administrative_area_level_3',
-    'neighborhood',
-    'sublocality',
-    'sublocality_level_1',
   };
-  const Set<String> fallbackTypes = <String>{
-    'administrative_area_level_2',
-    'administrative_area_level_1',
-  };
-
   for (final Object? item in results) {
     if (item is! Map) continue;
     final Map<String, dynamic> row = Map<String, dynamic>.from(item);
     if (_resultHasType(row, preferred)) return row;
   }
-  for (final Object? item in results) {
-    if (item is! Map) continue;
-    final Map<String, dynamic> row = Map<String, dynamic>.from(item);
-    if (_resultHasType(row, fallbackTypes)) return row;
-  }
-  final Object? first = results.first;
-  if (first is Map) return Map<String, dynamic>.from(first);
-  return <String, dynamic>{};
+  return null;
 }
 
 abstract class UserLocationReporistory {
@@ -261,15 +259,13 @@ class UserLocationReporistoryImpl implements UserLocationReporistory {
       if (results is! List || results.isEmpty) {
         throw Exception("Couldn't get the address from response");
       }
-      final Map<String, dynamic> chosen =
-          pickPrivacyGeocodeResult(results);
-      final List<dynamic> components =
-          chosen['address_components'] is List
-              ? chosen['address_components'] as List<dynamic>
-              : <dynamic>[];
-      final String label = privacyAwareLocationLabel(components);
+      final String label = privacyAwareLocationLabelFromResults(results);
+      final Map<String, dynamic>? locality = pickLocalityGeocodeResult(results);
+      final Object? first = results.first;
+      final String placeId = locality?['place_id']?.toString() ??
+          (first is Map ? first['place_id']?.toString() ?? '' : '');
       return ReverseGeocode(
-        placeId: chosen['place_id']?.toString() ?? '',
+        placeId: placeId,
         formattedAddress: label,
       );
     } on Object catch (e) {
@@ -301,10 +297,12 @@ class UserLocationReporistoryImpl implements UserLocationReporistory {
       }
       final Object? results = data['results'];
       if (results is! List || results.isEmpty) return null;
-      final Map<String, dynamic> item = pickPrivacyGeocodeResult(results);
-      final List<dynamic> components = item['address_components'] is List
-          ? item['address_components'] as List<dynamic>
-          : <dynamic>[];
+      final String label = privacyAwareLocationLabelFromResults(results);
+      final Map<String, dynamic>? locality = pickLocalityGeocodeResult(results);
+      final Map<String, dynamic> item = locality ??
+          (results.first is Map
+              ? Map<String, dynamic>.from(results.first as Map)
+              : <String, dynamic>{});
       final Object? geometry = item['geometry'];
       if (geometry is! Map) return null;
       final Object? location = geometry['location'];
@@ -315,7 +313,7 @@ class UserLocationReporistoryImpl implements UserLocationReporistory {
       return {
         'latitude': lat,
         'longitude': lng,
-        'PlaceName': privacyAwareLocationLabel(components),
+        'PlaceName': label,
       };
     } on Object catch (e) {
       log('Forward geocode error: $e');
@@ -507,31 +505,35 @@ class UserLocationReporistoryImpl implements UserLocationReporistory {
         log('No results in geocoding response');
         return fallback();
       }
-      final Map<String, dynamic> addressDetails =
-          pickPrivacyGeocodeResult(results);
-      final List<dynamic> addressComponents =
-          addressDetails['address_components'] is List
-              ? addressDetails['address_components'] as List<dynamic>
-              : <dynamic>[];
-      final String label = privacyAwareLocationLabel(addressComponents);
+      final String label = privacyAwareLocationLabelFromResults(results);
+      final Map<String, dynamic>? localityResult =
+          pickLocalityGeocodeResult(results);
+
       String countryName = '';
       String subLocality = '';
-      for (final Object? component in addressComponents) {
-        if (component is! Map) continue;
-        final List<String> types = List<String>.from(
-          (component['types'] as List?) ?? const <dynamic>[],
-        );
-        if (types.contains('country')) {
-          countryName = component['long_name']?.toString() ?? '';
-        }
-        if (types.contains('locality') || types.contains('postal_town')) {
-          subLocality = component['long_name']?.toString() ?? '';
+      for (final Object? item in results) {
+        if (item is! Map) continue;
+        final Object? comps = item['address_components'];
+        if (comps is! List) continue;
+        for (final Object? component in comps) {
+          if (component is! Map) continue;
+          final List<String> types = List<String>.from(
+            (component['types'] as List?) ?? const <dynamic>[],
+          );
+          if (types.contains('country') && countryName.isEmpty) {
+            countryName = component['long_name']?.toString() ?? '';
+          }
+          if ((types.contains('locality') || types.contains('postal_town')) &&
+              subLocality.isEmpty) {
+            subLocality = component['long_name']?.toString() ?? '';
+          }
         }
       }
 
+      // Keep GPS coords unless we have a true city/locality center.
       double outLat = lat;
       double outLng = lng;
-      final Object? geometry = addressDetails['geometry'];
+      final Object? geometry = localityResult?['geometry'];
       if (geometry is Map) {
         final Object? location = geometry['location'];
         if (location is Map) {

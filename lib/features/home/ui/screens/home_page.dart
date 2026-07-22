@@ -47,6 +47,14 @@ class _HomepageState extends State<Homepage>
     await controller.initialize(context);
     if (!mounted) return;
     setState(() {});
+    final String? uid = controller.currentUser.id;
+    if (uid != null && uid.isNotEmpty) {
+      unawaited(
+        firebaseFireStoreInstance.collection('users').doc(uid).update({
+          'lastvisited': DateTime.now(),
+        }),
+      );
+    }
     context
         .read<SearchUserBloc>()
         .add(LoadUserEvent(currentUser: controller.currentUser));
@@ -59,15 +67,6 @@ class _HomepageState extends State<Homepage>
   void dispose() {
     controller.dispose();
     super.dispose();
-  }
-
-  @override
-  Future<void> didChangeDependencies() async {
-    await firebaseFireStoreInstance
-        .collection('users')
-        .doc(controller.currentUser.id)
-        .update({'lastvisited': DateTime.now()});
-    super.didChangeDependencies();
   }
 
   @override

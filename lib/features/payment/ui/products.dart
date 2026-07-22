@@ -18,7 +18,7 @@ import '../../../common/widgets/afropeep_primary_button.dart';
 import '../../../common/widgets/state_views/state_views.dart';
 import '../../../config/app_config.dart';
 import '../../../models/user_model.dart';
-import '../../home/ui/tab/tabbar.dart';
+import '../../home/main_navigation_screen.dart';
 import '../iap_user_facing_message.dart';
 import '../presentation/bloc/subscription_bloc.dart';
 import 'in_app_purchase/buy_products/buyproducts_bloc.dart';
@@ -215,23 +215,68 @@ class _ProductsBodyState extends State<_ProductsBody> {
             context
                 .read<SubscriptionBloc>()
                 .add(const SubscriptionConsumeNavigateSuccess());
-            unawaited(
-              Navigator.pushReplacement(
-                context,
-                CupertinoPageRoute<void>(
-                  builder: (_) => Tabbar(
-                    isPaymentSuccess: true,
-                    currentUserId: uid,
+            // Defer so SnackBar/overlay dependents detach before route teardown.
+            // Prefer MainNavigationScreen over deprecated Tabbar.
+            WidgetsBinding.instance.addPostFrameCallback((_) async {
+              if (!context.mounted) return;
+              ScaffoldMessenger.maybeOf(context)?.clearSnackBars();
+              await showDialog<void>(
+                context: context,
+                builder: (BuildContext dialogContext) => AlertDialog(
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(20),
                   ),
+                  title: const Icon(
+                    Icons.check_circle,
+                    color: Colors.green,
+                    size: 60,
+                  ),
+                  content: const Text(
+                    'Payment Successful!',
+                    textAlign: TextAlign.center,
+                    style: TextStyle(
+                      fontSize: 18,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                  actions: [
+                    TextButton(
+                      onPressed: () => Navigator.of(dialogContext).pop(),
+                      child: const Text(
+                        'OK',
+                        style: TextStyle(
+                          color: Colors.green,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                    ),
+                  ],
                 ),
-              ),
-            );
+              );
+              if (!context.mounted) return;
+              // Prefer returning to the existing shell. Resetting to
+              // MainNavigationScreen re-runs registration checks and can open
+              // location/map flows while Maps SDK / UserBloc are settling.
+              if (Navigator.of(context).canPop()) {
+                Navigator.of(context).pop(true);
+              } else {
+                unawaited(
+                  Navigator.of(context).pushAndRemoveUntil(
+                    CupertinoPageRoute<void>(
+                      builder: (_) => const MainNavigationScreen(),
+                    ),
+                    (Route<dynamic> route) => false,
+                  ),
+                );
+              }
+            });
           },
         ),
         BlocListener<SubscriptionBloc, SubscriptionState>(
           listenWhen: (previous, current) =>
               current.userMessage != null &&
-              current.userMessage != previous.userMessage,
+              current.userMessage != previous.userMessage &&
+              !current.shouldNavigateToSuccess,
           listener: (context, state) {
             final String? message = state.userMessage;
             if (message == null) return;

@@ -6,6 +6,7 @@ import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:google_fonts/google_fonts.dart';
 
+import '../../../../common/bloc/user/user_bloc.dart';
 import '../../../../common/constants/app_colors.dart';
 import '../../../../common/constants/app_spacing.dart';
 import '../../../../common/widgets/custom_snackbar.dart';
@@ -111,8 +112,11 @@ class _DiscoveryPreferencesScreenState
                     context.read<UserfilterBloc>().add(
                           ChangefilterRequest(details: _buildPayload()),
                         );
+                    final UserModel seeker =
+                        context.read<UserBloc>().currentUser ??
+                            widget.currentUser;
                     context.read<SearchUserBloc>().add(
-                          LoadUserEvent(currentUser: widget.currentUser),
+                          LoadUserEvent(currentUser: seeker),
                         );
                   },
                   child: Text(
@@ -229,8 +233,44 @@ class _DiscoveryPreferencesScreenState
     context.read<UserfilterBloc>().add(
           ChangefilterRequest(details: _buildPayload()),
         );
+    // Reload from the edited screen model (age/distance/gender live here).
+    // UserBloc can lag behind when this route was opened with a fresh doc.
+    final UserModel seeker = widget.currentUser;
+    seeker.strictDistance = _strictDistance;
+
+    // Prefer freshest coordinates from UserBloc when location was updated
+    // this session (lat/lng are final on UserModel).
+    final UserModel? blocUser = context.read<UserBloc>().currentUser;
+    final UserModel reloadSeeker;
+    if (blocUser != null &&
+        blocUser.id == seeker.id &&
+        blocUser.latitude != null &&
+        blocUser.longitude != null &&
+        (blocUser.latitude != seeker.latitude ||
+            blocUser.longitude != seeker.longitude)) {
+      reloadSeeker = UserModel(
+        id: seeker.id,
+        name: seeker.name ?? blocUser.name,
+        age: seeker.age ?? blocUser.age,
+        address: seeker.address ?? blocUser.address,
+        latitude: blocUser.latitude,
+        longitude: blocUser.longitude,
+        showGender: seeker.showGender,
+        ageRange: seeker.ageRange,
+        maxDistance: seeker.maxDistance,
+        lookingFor: seeker.lookingFor,
+        userGender: seeker.userGender ?? blocUser.userGender,
+        imageUrl: seeker.imageUrl ?? blocUser.imageUrl,
+        editInfo: seeker.editInfo ?? blocUser.editInfo,
+        strictDistance: seeker.strictDistance,
+        isPremium: seeker.isPremium ?? blocUser.isPremium,
+      );
+    } else {
+      reloadSeeker = seeker;
+    }
+
     context.read<SearchUserBloc>().add(
-          LoadUserEvent(currentUser: widget.currentUser),
+          LoadUserEvent(currentUser: reloadSeeker),
         );
   }
 

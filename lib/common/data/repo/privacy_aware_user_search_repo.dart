@@ -62,64 +62,107 @@ class PrivacyAwareUserSearchRepo {
       debugPrint('🔍 Getting privacy-aware user list for: ${currentUser.id}');
       debugPrint('🔍 Effective intent filter: $effectiveIntent');
 
-      // Get already checked users
+      // Get already checked users (swipes) + existing matches.
+      // Doc id is canonical; LikedUser/DislikedUser are legacy field mirrors.
       final snapshot =
           await db.collection('users/${currentUser.id}/CheckedUser').get();
       if (snapshot.docs.isNotEmpty) {
         for (final doc in snapshot.docs) {
+          checkedUserIds.add(doc.id);
           final likedUser = doc.data()['LikedUser'];
           final dislikedUser = doc.data()['DislikedUser'];
 
           if (likedUser != null) {
-            checkedUserIds.add(likedUser);
+            checkedUserIds.add(likedUser.toString());
           }
           if (dislikedUser != null) {
-            checkedUserIds.add(dislikedUser);
+            checkedUserIds.add(dislikedUser.toString());
           }
         }
       }
 
+      try {
+        final matchesSnap =
+            await db.collection('users/${currentUser.id}/Matches').get();
+        for (final doc in matchesSnap.docs) {
+          checkedUserIds.add(doc.id);
+          final matchedId = doc.data()['Matches'];
+          if (matchedId != null) {
+            checkedUserIds.add(matchedId.toString());
+          }
+        }
+      } on Object catch (e) {
+        debugPrint('⚠️ Could not load Matches for exclusion: $e');
+      }
+
+      // Deduplicate while preserving list type expected below.
+      final List<String> uniqueChecked = checkedUserIds.toSet().toList();
+      checkedUserIds
+        ..clear()
+        ..addAll(uniqueChecked);
+
       debugPrint('🔍 Querying users with privacy filters...');
 
-      // Try to get users from public profiles first (privacy-aware)
-      List<UserModel> userList =
-          await _getPrivacyAwareUsers(currentUser, checkedUserIds);
+      List<UserModel> userList = <UserModel>[];
 
-      // If no privacy-aware users found, fallback to traditional method
+      // Prefer geo-local candidates first. A bare limit(50) on discoverable
+      // users returns an arbitrary global page (often overseas), which the
+      // distance filter then wipes to zero.
+      final bool hasSeekerLocation =
+          currentUser.latitude != null && currentUser.longitude != null;
+      if (hasSeekerLocation) {
+        final double maxMiles = _maxDistanceMiles(currentUser);
+        final List<UserModel> nearby =
+            await getUsersNearby(currentUser, maxMiles);
+        userList = applyDiscoveryPreferences(
+          nearby.where(
+            (UserModel u) =>
+                u.id != currentUser.id &&
+                !checkedUserIds.contains(u.id) &&
+                !(u.isBlocked ?? false),
+          ),
+          currentUser,
+          effectiveIntent,
+        );
+      }
+
+      // Continue broader scans when nearby results are empty *after*
+      // preference filters (e.g. wrong gender in the geohash neighborhood).
+      if (userList.isEmpty) {
+        debugPrint(
+          '📋 Nearby empty — scanning discoverable users within max distance',
+        );
+        userList = applyDiscoveryPreferences(
+          await _getPrivacyAwareUsers(currentUser, checkedUserIds),
+          currentUser,
+          effectiveIntent,
+        );
+      }
+
       if (userList.isEmpty) {
         debugPrint(
           '📋 No privacy-aware users found, falling back to traditional search',
         );
-        userList = await _getFallbackUsers(currentUser, checkedUserIds);
-      }
-
-      final int beforeGender = userList.length;
-      userList = userList
-          .where(
-            (UserModel u) =>
-                DiscoveryFiltering.matchesGenderPreference(u, currentUser),
-          )
-          .toList();
-      if (beforeGender != userList.length) {
-        debugPrint(
-          '📋 Gender filter (${currentUser.showGender}): '
-          '$beforeGender → ${userList.length}',
+        userList = applyDiscoveryPreferences(
+          await _getFallbackUsers(currentUser, checkedUserIds),
+          currentUser,
+          effectiveIntent,
         );
       }
 
-      final int beforeIntent = userList.length;
-      userList = userList
-          .where(
-            (UserModel u) => DiscoveryFiltering.matchesLookingForIntent(
-              u,
-              effectiveIntent,
-            ),
-          )
-          .toList();
-      if (beforeIntent != userList.length) {
-        debugPrint(
-          '📋 Intent filter ($effectiveIntent): '
-          '$beforeIntent → ${userList.length}',
+      // Sparse-market recovery: if maxDistance wiped the deck but candidates
+      // exist farther away, show the nearest ones so Connect is not empty
+      // after matching the only local profile — unless Strict distance is on.
+      final bool strictDistance = currentUser.strictDistance == true;
+      if (userList.isEmpty && hasSeekerLocation && !strictDistance) {
+        userList = applyDiscoveryPreferences(
+          await _getNearestUsersBeyondMaxDistance(
+            currentUser,
+            checkedUserIds,
+            intentFilter: effectiveIntent,
+          ),
+          currentUser,
+          effectiveIntent,
         );
       }
 
@@ -131,6 +174,45 @@ class PrivacyAwareUserSearchRepo {
     }
   }
 
+  /// Gender, intent, and age preferences shared across discovery stages.
+  @visibleForTesting
+  static List<UserModel> applyDiscoveryPreferences(
+    Iterable<UserModel> users,
+    UserModel currentUser,
+    String? effectiveIntent,
+  ) {
+    return users
+        .where(
+          (UserModel u) =>
+              DiscoveryFiltering.matchesGenderPreference(u, currentUser) &&
+              DiscoveryFiltering.matchesLookingForIntent(u, effectiveIntent) &&
+              DiscoveryFiltering.matchesAgePreference(u, currentUser),
+        )
+        .toList();
+  }
+
+  static const int _discoveryPageSize = 50;
+
+  /// Scan enough pages that age-biased overseas cohorts cannot empty the deck.
+  static const int _discoveryMaxPages = 20; // up to 1000 docs
+  static const int _discoveryTargetKeep = 25;
+
+  static double _maxDistanceMiles(UserModel currentUser) {
+    final int value =
+        currentUser.maxDistance ?? currentUser.distanceRange ?? 100;
+    return value.toDouble();
+  }
+
+  /// Equality filter for paginated distance scans.
+  ///
+  /// Intentionally avoids `orderBy('age')`, which front-loaded young overseas
+  /// profiles and caused 50→0 empty decks with a US maxDistance filter.
+  /// Firestore orders by document ID when no orderBy is set, which is enough
+  /// for startAfterDocument pagination without an extra composite index.
+  static Query _buildDiscoverableScanQuery() {
+    return docRef.where('isDiscoverable', isEqualTo: true);
+  }
+
   /// Get users using privacy-aware public profiles
   static Future<List<UserModel>> _getPrivacyAwareUsers(
     UserModel currentUser,
@@ -139,66 +221,81 @@ class PrivacyAwareUserSearchRepo {
     final List<UserModel> userList = [];
 
     try {
-      // Get all users (we'll filter by privacy settings)
-      final querySnapshot = await _buildPrivacyAwareQuery(currentUser).get();
+      QueryDocumentSnapshot? lastDoc;
+      final double maxMiles = _maxDistanceMiles(currentUser);
 
-      for (var doc in querySnapshot.docs) {
-        try {
-          final userId = doc.id;
+      for (int page = 0;
+          page < _discoveryMaxPages && userList.length < _discoveryTargetKeep;
+          page++) {
+        Query query = _buildDiscoverableScanQuery().limit(_discoveryPageSize);
+        if (lastDoc != null) {
+          query = query.startAfterDocument(lastDoc);
+        }
+        final querySnapshot = await query.get();
+        if (querySnapshot.docs.isEmpty) {
+          break;
+        }
+        lastDoc = querySnapshot.docs.last;
 
-          // Skip already checked users
-          if (checkedUserIds.contains(userId) || userId == currentUser.id) {
-            continue;
-          }
+        for (var doc in querySnapshot.docs) {
+          try {
+            final userId = doc.id;
 
-          // Use document data already returned by the list query.
-          // Re-fetching via getFilteredUserData would hit the stricter
-          // per-document `get` rule and fail with permission-denied.
-          final rawData = doc.data() as Map<String, dynamic>?;
-          if (rawData == null || rawData.isEmpty) {
-            continue;
-          }
-
-          // Apply default privacy masks (e.g. hide sexualOrientation)
-          // while preserving operational fields like lat/lng and photos.
-          final filteredData = _privacyService.filterForDiscovery(rawData);
-
-          final UserModel user =
-              await _createUserModelFromFilteredData(filteredData, userId);
-
-          // Calculate distance if location is available
-          if (user.latitude != null &&
-              user.longitude != null &&
-              currentUser.latitude != null &&
-              currentUser.longitude != null) {
-            final calculatedDistance = distance.calculateDistance(
-              currentUser.latitude!,
-              currentUser.longitude!,
-              user.latitude!,
-              user.longitude!,
-            );
-            user.distanceBW = calculatedDistance.round();
-
-            // Apply distance filter
-            if (calculatedDistance > currentUser.maxDistance!) {
+            if (checkedUserIds.contains(userId) || userId == currentUser.id) {
               continue;
             }
-          }
 
-          // Apply other filters
-          if (!user.isDiscoverable) {
+            final rawData = doc.data() as Map<String, dynamic>?;
+            if (rawData == null || rawData.isEmpty) {
+              continue;
+            }
+
+            final filteredData = _privacyService.filterForDiscovery(rawData);
+            final UserModel user =
+                await _createUserModelFromFilteredData(filteredData, userId);
+
+            if (user.latitude != null &&
+                user.longitude != null &&
+                currentUser.latitude != null &&
+                currentUser.longitude != null) {
+              final calculatedDistance = distance.calculateDistance(
+                currentUser.latitude!,
+                currentUser.longitude!,
+                user.latitude!,
+                user.longitude!,
+              );
+              user.distanceBW = calculatedDistance.round();
+
+              if (calculatedDistance > maxMiles) {
+                continue;
+              }
+            } else if (currentUser.latitude != null &&
+                currentUser.longitude != null) {
+              // Seeker has location; skip candidates we cannot place.
+              continue;
+            }
+
+            if (!user.isDiscoverable) {
+              continue;
+            }
+            if (user.isBlocked ?? false) {
+              continue;
+            }
+
+            userList.add(user);
+            if (userList.length >= _discoveryTargetKeep) {
+              break;
+            }
+          } on Object catch (e) {
+            debugPrint(
+              '⚠️ Error processing privacy-aware document ${doc.id}: $e',
+            );
             continue;
           }
-          if (user.isBlocked ?? false) {
-            continue;
-          }
+        }
 
-          userList.add(user);
-        } on Object catch (e) {
-          debugPrint(
-            '⚠️ Error processing privacy-aware document ${doc.id}: $e',
-          );
-          continue;
+        if (querySnapshot.docs.length < _discoveryPageSize) {
+          break;
         }
       }
 
@@ -217,30 +314,61 @@ class PrivacyAwareUserSearchRepo {
     final List<UserModel> userList = [];
 
     try {
-      final querySnapshot = await _buildTraditionalQuery(currentUser).get();
-      debugPrint(
-        '📋 Fallback query returned ${querySnapshot.docs.length} documents',
-      );
+      QueryDocumentSnapshot? lastDoc;
+      final double maxMiles = _maxDistanceMiles(currentUser);
 
-      for (var doc in querySnapshot.docs) {
-        try {
-          final UserModel temp = UserModel.fromDocument(doc);
+      for (int page = 0;
+          page < _discoveryMaxPages && userList.length < _discoveryTargetKeep;
+          page++) {
+        Query query = _buildDiscoverableScanQuery().limit(_discoveryPageSize);
+        if (lastDoc != null) {
+          query = query.startAfterDocument(lastDoc);
+        }
+        final querySnapshot = await query.get();
+        debugPrint(
+          '📋 Fallback query page $page returned '
+          '${querySnapshot.docs.length} documents',
+        );
+        if (querySnapshot.docs.isEmpty) {
+          break;
+        }
+        lastDoc = querySnapshot.docs.last;
 
-          final calculatedDistance = distance.calculateDistance(
-            currentUser.latitude!,
-            currentUser.longitude!,
-            temp.latitude!,
-            temp.longitude!,
-          );
-          temp.distanceBW = calculatedDistance.round();
+        for (var doc in querySnapshot.docs) {
+          try {
+            final UserModel temp = UserModel.fromDocument(doc);
 
-          if (checkedUserIds.contains(temp.id)) {
-            continue;
-          }
+            if (checkedUserIds.contains(temp.id)) {
+              continue;
+            }
+            if (temp.id == currentUser.id) {
+              continue;
+            }
 
-          if (calculatedDistance <= currentUser.maxDistance! &&
-              temp.id != currentUser.id &&
-              !temp.isBlocked!) {
+            final double? cLat = currentUser.latitude;
+            final double? cLng = currentUser.longitude;
+            final double? uLat = temp.latitude;
+            final double? uLng = temp.longitude;
+            if (cLat == null || cLng == null || uLat == null || uLng == null) {
+              continue;
+            }
+
+            final calculatedDistance = distance.calculateDistance(
+              cLat,
+              cLng,
+              uLat,
+              uLng,
+            );
+            temp.distanceBW = calculatedDistance.round();
+
+            if (calculatedDistance > maxMiles) {
+              continue;
+            }
+
+            if (temp.isBlocked ?? false) {
+              continue;
+            }
+
             debugPrint(
               '📋 Adding fallback user: ${temp.name} '
               '(lookingFor=${temp.lookingFor}, '
@@ -248,10 +376,17 @@ class PrivacyAwareUserSearchRepo {
               'distance=${temp.distanceBW})',
             );
             userList.add(temp);
+            if (userList.length >= _discoveryTargetKeep) {
+              break;
+            }
+          } on Object catch (e) {
+            debugPrint('⚠️ Error processing fallback document ${doc.id}: $e');
+            continue;
           }
-        } on Object catch (e) {
-          debugPrint('⚠️ Error processing fallback document ${doc.id}: $e');
-          continue;
+        }
+
+        if (querySnapshot.docs.length < _discoveryPageSize) {
+          break;
         }
       }
 
@@ -262,31 +397,74 @@ class PrivacyAwareUserSearchRepo {
     }
   }
 
-  /// Build privacy-aware query
-  static Query _buildPrivacyAwareQuery(UserModel currentUser) {
-    final Query query = docRef.where('isDiscoverable', isEqualTo: true);
+  /// When nobody is within [maxDistance], return the nearest discoverable
+  /// profiles (still excluding checked/matched) so sparse metros are usable.
+  ///
+  /// Preserves age / gender / intent preferences while relaxing distance.
+  static Future<List<UserModel>> _getNearestUsersBeyondMaxDistance(
+    UserModel currentUser,
+    List<String> checkedUserIds, {
+    String? intentFilter,
+    int limit = 15,
+  }) async {
+    final double? cLat = currentUser.latitude;
+    final double? cLng = currentUser.longitude;
+    if (cLat == null || cLng == null) return <UserModel>[];
 
-    return query.limit(50);
-  }
+    final List<UserModel> ranked = <UserModel>[];
+    QueryDocumentSnapshot? lastDoc;
 
-  /// Build traditional query (fallback)
-  static Query _buildTraditionalQuery(UserModel currentUser) {
-    Query query = docRef.where('isDiscoverable', isEqualTo: true);
+    for (int page = 0; page < _discoveryMaxPages; page++) {
+      Query query = _buildDiscoverableScanQuery().limit(_discoveryPageSize);
+      if (lastDoc != null) {
+        query = query.startAfterDocument(lastDoc);
+      }
+      final querySnapshot = await query.get();
+      if (querySnapshot.docs.isEmpty) break;
+      lastDoc = querySnapshot.docs.last;
 
-    if (currentUser.ageRange != null) {
-      query = query
-          .where(
-            'age',
-            isGreaterThanOrEqualTo: int.parse(currentUser.ageRange!['min']),
-          )
-          .where(
-            'age',
-            isLessThanOrEqualTo: int.parse(currentUser.ageRange!['max']),
-          )
-          .orderBy('age', descending: false);
+      for (final doc in querySnapshot.docs) {
+        try {
+          if (doc.id == currentUser.id || checkedUserIds.contains(doc.id)) {
+            continue;
+          }
+          final UserModel temp = UserModel.fromDocument(doc);
+          final double? uLat = temp.latitude;
+          final double? uLng = temp.longitude;
+          if (uLat == null || uLng == null) continue;
+          // Skip null-island defaults from incomplete profiles.
+          if (uLat == 0.0 && uLng == 0.0) continue;
+          if (temp.isBlocked ?? false) continue;
+          if (!DiscoveryFiltering.matchesAgePreference(temp, currentUser)) {
+            continue;
+          }
+          if (!DiscoveryFiltering.matchesGenderPreference(temp, currentUser)) {
+            continue;
+          }
+          if (!DiscoveryFiltering.matchesLookingForIntent(
+            temp,
+            intentFilter,
+          )) {
+            continue;
+          }
+
+          final double miles =
+              distance.calculateDistance(cLat, cLng, uLat, uLng);
+          temp.distanceBW = miles.round();
+          ranked.add(temp);
+        } on Object {
+          continue;
+        }
+      }
+
+      if (querySnapshot.docs.length < _discoveryPageSize) break;
     }
 
-    return query.limit(50);
+    ranked.sort(
+      (UserModel a, UserModel b) =>
+          (a.distanceBW ?? 1 << 30).compareTo(b.distanceBW ?? 1 << 30),
+    );
+    return ranked.take(limit).toList();
   }
 
   /// Create UserModel from privacy-filtered data (public method)
@@ -301,22 +479,29 @@ class PrivacyAwareUserSearchRepo {
     Map<String, dynamic> data,
     String userId,
   ) async {
-    // Handle location data based on privacy settings
+    // Prefer exact coordinates for distance filtering; GeoHash is a privacy
+    // fallback when lat/lng were stripped from public projections.
     double? latitude;
     double? longitude;
 
-    if (data.containsKey('geoHash')) {
-      // Use GeoHash for privacy-aware location
-      final geoHash = data['geoHash'] as String?;
-      if (geoHash != null) {
-        final coords = LocationPrivacyService.decodeGeoHash(geoHash);
-        latitude = coords['lat'];
-        longitude = coords['lng'];
-      }
-    } else if (data.containsKey('latitude') && data.containsKey('longitude')) {
-      // Fallback to exact coordinates if available
-      latitude = data['latitude']?.toDouble();
-      longitude = data['longitude']?.toDouble();
+    if (data.containsKey('latitude') && data.containsKey('longitude')) {
+      latitude = (data['latitude'] as num?)?.toDouble();
+      longitude = (data['longitude'] as num?)?.toDouble();
+    }
+    if ((latitude == null || longitude == null) &&
+        data.containsKey('location') &&
+        data['location'] is Map) {
+      final Map<dynamic, dynamic> loc = data['location'] as Map;
+      latitude ??= (loc['latitude'] as num?)?.toDouble();
+      longitude ??= (loc['longitude'] as num?)?.toDouble();
+    }
+    if ((latitude == null || longitude == null) &&
+        data['geoHash'] is String &&
+        (data['geoHash'] as String).isNotEmpty) {
+      final coords =
+          LocationPrivacyService.decodeGeoHash(data['geoHash'] as String);
+      latitude ??= coords['lat'];
+      longitude ??= coords['lng'];
     }
 
     return UserModel(

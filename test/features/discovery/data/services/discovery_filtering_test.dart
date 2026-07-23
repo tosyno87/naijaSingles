@@ -134,5 +134,46 @@ void main() {
       expect(DiscoveryFiltering.lookingForQueryValues('Mixed'), isEmpty);
       expect(DiscoveryFiltering.lookingForQueryValues(null), isEmpty);
     });
+
+    test('matchesAgePreference respects seeker ageRange', () {
+      final currentUser = UserModel(
+        id: 'current',
+        name: 'Current',
+        ageRange: <String, dynamic>{'min': 30, 'max': 40},
+      );
+      final inRange = UserModel(id: '1', name: 'A', age: 35);
+      final tooYoung = UserModel(id: '2', name: 'B', age: 18);
+      final tooOld = UserModel(id: '3', name: 'C', age: 70);
+      final missingAge = UserModel(id: '4', name: 'D');
+
+      expect(
+        DiscoveryFiltering.matchesAgePreference(inRange, currentUser),
+        isTrue,
+      );
+      expect(
+        DiscoveryFiltering.matchesAgePreference(tooYoung, currentUser),
+        isFalse,
+      );
+      expect(
+        DiscoveryFiltering.matchesAgePreference(tooOld, currentUser),
+        isFalse,
+      );
+      expect(
+        DiscoveryFiltering.matchesAgePreference(missingAge, currentUser),
+        isTrue,
+      );
+    });
+
+    test('matchesAgePreference allows missing seeker ageRange', () {
+      final currentUser = UserModel(id: 'current', name: 'Current');
+      final candidate = UserModel(id: '1', name: 'A', age: 70);
+
+      expect(
+        DiscoveryFiltering.matchesAgePreference(candidate, currentUser),
+        isTrue,
+      );
+      expect(currentUser.ageRangeMin, isNull);
+      expect(currentUser.ageRangeMax, isNull);
+    });
   });
 }

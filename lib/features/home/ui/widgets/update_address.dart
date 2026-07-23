@@ -5,10 +5,12 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:google_fonts/google_fonts.dart';
 
+import '../../../../common/bloc/user/user_bloc.dart';
 import '../../../../common/constants/app_colors.dart';
 import '../../../../common/constants/constants.dart';
 import '../../../../common/routes/route_name.dart';
 import '../../../../models/user_model.dart';
+import '../../../../services/location_privacy_service.dart';
 import '../../bloc/searchuser_bloc.dart';
 import 'subscription_dialog.dart';
 
@@ -267,6 +269,13 @@ class _UpdateAddressWidgetState extends State<UpdateAddressWidget> {
           'longitude': lng,
           'address': savedLabel,
         },
+        'latitude': lat,
+        'longitude': lng,
+        'geoHash': LocationPrivacyService.generateGeoHash(
+          lat,
+          lng,
+          LocationPrecision.medium,
+        ),
       });
 
       // latitude/longitude on UserModel are final — reload so discovery
@@ -277,6 +286,13 @@ class _UpdateAddressWidgetState extends State<UpdateAddressWidget> {
 
       final UserModel discoveryUser =
           snap.exists ? UserModel.fromDocument(snap) : widget.currentUser;
+
+      // Push fresh coords into UserBloc — latitude/longitude on [widget.currentUser]
+      // are final, so Apply filters / HomeController would otherwise keep scanning
+      // the previous city.
+      if (mounted) {
+        context.read<UserBloc>().add(UserDataUpdated(discoveryUser));
+      }
 
       setState(() {
         widget.currentUser.address = savedLabel;

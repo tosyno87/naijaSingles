@@ -55,11 +55,127 @@ class InAppPurchaseRepoImpl extends InAppPurchaseRepo {
           'store missing: ${response.notFoundIDs}',
         );
       }
-      return response.productDetails;
+      // Paywall must only show distinct subscription periods (not boost
+      // consumables or duplicate monthly SKUs that share the same price).
+      final List<ProductDetails> plans =
+          selectSubscriptionPlans(response.productDetails);
+      if (plans.isEmpty) {
+        log(
+          '[IAP] Store returned ${response.productDetails.length} product(s) '
+          'but none looked like subscription plans. ids='
+          '${response.productDetails.map((p) => p.id).join(", ")}',
+        );
+        throw Exception('No subscription plans available');
+      }
+      return plans;
     } on Object {
       rethrow;
     }
   }
+
+  /// Keeps one product per billing period (week / month / year), drops boost
+  /// consumables and unlabeled SKUs, and sorts week → month → year.
+  ///
+  /// Exposed for unit tests; [intervalOf] defaults to store period with
+  /// product-id fallback.
+  static List<ProductDetails> selectSubscriptionPlans(
+    List<ProductDetails> products, {
+    String Function(ProductDetails product)? intervalOf,
+  }) {
+    final String Function(ProductDetails) resolve =
+        intervalOf ?? _defaultIntervalKey;
+    final Map<String, ProductDetails> byInterval = <String, ProductDetails>{};
+
+    for (final ProductDetails product in products) {
+      if (isBoostProductId(product.id)) {
+        log('[IAP] Skipping boost product on paywall: ${product.id}');
+        continue;
+      }
+      final String interval = resolve(product);
+      if (interval.isEmpty) {
+        log(
+          '[IAP] Skipping unlabeled / non-subscription product: ${product.id}',
+        );
+        continue;
+      }
+      final ProductDetails? existing = byInterval[interval];
+      if (existing == null || _preferSubscriptionSku(product, existing)) {
+        if (existing != null) {
+          log(
+            '[IAP] Duplicate $interval plan; keeping ${product.id} '
+            'over ${existing.id}',
+          );
+        }
+        byInterval[interval] = product;
+      }
+    }
+
+    const List<String> order = <String>['week', 'month', 'year'];
+    return <ProductDetails>[
+      for (final String key in order)
+        if (byInterval.containsKey(key)) byInterval[key]!,
+    ];
+  }
+
+  /// True for profile-boost consumable product IDs.
+  static bool isBoostProductId(String productId) =>
+      productId.toLowerCase().contains('boost');
+
+  /// Prefer canonical `*.premium.{period}` IDs over legacy / ambiguous ones.
+  static bool _preferSubscriptionSku(
+    ProductDetails candidate,
+    ProductDetails incumbent,
+  ) {
+    final int candidateScore = _subscriptionSkuScore(candidate.id);
+    final int incumbentScore = _subscriptionSkuScore(incumbent.id);
+    if (candidateScore != incumbentScore) {
+      return candidateScore > incumbentScore;
+    }
+    // Stable tie-break: shorter / lexicographically smaller id.
+    return candidate.id.compareTo(incumbent.id) < 0;
+  }
+
+  static int _subscriptionSkuScore(String productId) {
+    final String id = productId.toLowerCase();
+    int score = 0;
+    if (id.contains('premium')) score += 2;
+    if (id.contains('afropeep')) score += 1;
+    if (id.contains('monthly') ||
+        id.contains('yearly') ||
+        id.contains('weekly') ||
+        id.contains('annual')) {
+      score += 2;
+    }
+    return score;
+  }
+
+  static String _defaultIntervalKey(ProductDetails product) {
+    try {
+      final InAppPurchaseRepoImpl repo = InAppPurchaseRepoImpl();
+      final String fromStore = product is AppStoreProductDetails
+          ? repo.getInterval(product)
+          : product is GooglePlayProductDetails
+              ? repo.getIntervalAndroid(product)
+              : '';
+      final String normalized = normalizeBillingInterval(fromStore);
+      if (normalized.isNotEmpty) return normalized;
+    } on Object catch (e) {
+      log('[IAP] Could not read store billing period for ${product.id}: $e');
+    }
+    return intervalKeyFromProductId(product.id);
+  }
+
+  /// Maps store / id strings to `week` | `month` | `year` | ``.
+  static String normalizeBillingInterval(String raw) {
+    final String lower = raw.toLowerCase();
+    if (lower.contains('year') || lower.contains('annual')) return 'year';
+    if (lower.contains('month')) return 'month';
+    if (lower.contains('week')) return 'week';
+    return '';
+  }
+
+  static String intervalKeyFromProductId(String productId) =>
+      normalizeBillingInterval(productId);
 
   static bool _iosPaymentQueueDelegateSet = false;
 
@@ -114,6 +230,9 @@ class InAppPurchaseRepoImpl extends InAppPurchaseRepo {
   }
 
   /// Fetches store product IDs from `Packages` (platform-specific when set).
+  ///
+  /// Excludes `packageType: boost` consumables — those belong on the profile
+  /// boost flow, not the Premium subscription paywall.
   Future<List<String>> _fetchPackageIds() async {
     final value = await firebaseFireStoreInstance
         .collection('Packages')
@@ -123,6 +242,11 @@ class InAppPurchaseRepoImpl extends InAppPurchaseRepo {
     final ids = <String>{};
     for (final doc in value.docs) {
       final data = doc.data();
+      final packageType =
+          data['packageType']?.toString().toLowerCase().trim() ?? '';
+      if (packageType == 'boost') {
+        continue;
+      }
       final legacy = data['id']?.toString();
       final ios = data['iosProductId']?.toString();
       final android = data['androidProductId']?.toString();
@@ -139,12 +263,18 @@ class InAppPurchaseRepoImpl extends InAppPurchaseRepo {
       }
       if (_isIOS) {
         final id = forPlatform ?? ios ?? legacy;
-        if (id != null && id.isNotEmpty) ids.add(id);
+        if (id != null && id.isNotEmpty && !isBoostProductId(id)) {
+          ids.add(id);
+        }
       } else if (_isAndroid) {
         final id = forPlatform ?? android ?? legacy;
-        if (id != null && id.isNotEmpty) ids.add(id);
+        if (id != null && id.isNotEmpty && !isBoostProductId(id)) {
+          ids.add(id);
+        }
       } else {
-        if (legacy != null && legacy.isNotEmpty) ids.add(legacy);
+        if (legacy != null && legacy.isNotEmpty && !isBoostProductId(legacy)) {
+          ids.add(legacy);
+        }
       }
     }
 
@@ -253,8 +383,13 @@ class InAppPurchaseRepoImpl extends InAppPurchaseRepo {
     if (product is! AppStoreProductDetails) {
       return '';
     }
-    final SKSubscriptionPeriodUnit periodUnit =
-        product.skProduct.subscriptionPeriod!.unit;
+    final SKProductSubscriptionPeriodWrapper? period =
+        product.skProduct.subscriptionPeriod;
+    if (period == null) {
+      // Consumables (e.g. boost) have no subscription period.
+      return '';
+    }
+    final SKSubscriptionPeriodUnit periodUnit = period.unit;
     if (SKSubscriptionPeriodUnit.month == periodUnit) {
       return 'Month(s)';
     } else if (SKSubscriptionPeriodUnit.week == periodUnit) {
@@ -273,12 +408,20 @@ class InAppPurchaseRepoImpl extends InAppPurchaseRepo {
     if (billingPeriod == null) {
       return '';
     }
-    if (billingPeriod.contains('M')) {
+    final String period = billingPeriod.trim();
+    if (period.isEmpty) {
+      return '';
+    }
+    // ISO-8601 style: P1M / P1Y / P1W (and legacy single-letter tokens).
+    if (period.contains('M')) {
       return 'Month(s)';
-    } else if (billingPeriod.contains('Y')) {
+    }
+    if (period.contains('Y')) {
       return 'Year';
-    } else {
+    }
+    if (period.contains('W')) {
       return 'Week(s)';
     }
+    return '';
   }
 }

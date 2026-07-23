@@ -269,12 +269,85 @@ void main() {
       expect(repo.getInterval(mockProduct), 'Month(s)');
     });
 
-    test('throws when subscriptionPeriod is null', () {
+    test('returns empty string when subscriptionPeriod is null', () {
       when(() => mockSKProduct.subscriptionPeriod).thenReturn(null);
 
+      expect(repo.getInterval(mockProduct), '');
+    });
+  });
+
+  // ---------------------------------------------------------------------------
+  // selectSubscriptionPlans (paywall catalog hygiene)
+  // ---------------------------------------------------------------------------
+  group('InAppPurchaseRepoImpl.selectSubscriptionPlans', () {
+    ProductDetails product(String id) => ProductDetails(
+          id: id,
+          title: id,
+          description: 'd',
+          price: '\$1.00',
+          rawPrice: 1,
+          currencyCode: 'USD',
+        );
+
+    test('drops boost consumables and unlabeled SKUs', () {
+      final List<ProductDetails> result =
+          InAppPurchaseRepoImpl.selectSubscriptionPlans(
+        <ProductDetails>[
+          product('com.afropeep.boost.1h'),
+          product('com.afropeep.premium.monthly'),
+          product('com.afropeep.premium.yearly'),
+          product('legacy.premium'),
+        ],
+      );
+
       expect(
-        () => repo.getInterval(mockProduct),
-        throwsA(isA<TypeError>()),
+        result.map((ProductDetails p) => p.id).toList(),
+        <String>[
+          'com.afropeep.premium.monthly',
+          'com.afropeep.premium.yearly',
+        ],
+      );
+    });
+
+    test('keeps one plan per billing period, preferring canonical IDs', () {
+      final List<ProductDetails> result =
+          InAppPurchaseRepoImpl.selectSubscriptionPlans(
+        <ProductDetails>[
+          product('premium'),
+          product('com.afropeep.premium.monthly'),
+          product('old.monthly'),
+          product('com.afropeep.premium.weekly'),
+          product('com.afropeep.premium.yearly'),
+        ],
+      );
+
+      expect(
+        result.map((ProductDetails p) => p.id).toList(),
+        <String>[
+          'com.afropeep.premium.weekly',
+          'com.afropeep.premium.monthly',
+          'com.afropeep.premium.yearly',
+        ],
+      );
+    });
+
+    test('orders week then month then year', () {
+      final List<ProductDetails> result =
+          InAppPurchaseRepoImpl.selectSubscriptionPlans(
+        <ProductDetails>[
+          product('com.afropeep.premium.yearly'),
+          product('com.afropeep.premium.weekly'),
+          product('com.afropeep.premium.monthly'),
+        ],
+      );
+
+      expect(
+        result.map((ProductDetails p) => p.id).toList(),
+        <String>[
+          'com.afropeep.premium.weekly',
+          'com.afropeep.premium.monthly',
+          'com.afropeep.premium.yearly',
+        ],
       );
     });
   });
@@ -307,10 +380,10 @@ void main() {
       expect(repo.getIntervalAndroid(mockProduct), 'Month(s)');
     });
 
-    test('returns "Week(s)" for billing period "m" (case-sensitive check)', () {
+    test('returns empty string for billing period "m" (case-sensitive)', () {
       when(() => mockPPW.billingPeriod).thenReturn('m');
 
-      expect(repo.getIntervalAndroid(mockProduct), 'Week(s)');
+      expect(repo.getIntervalAndroid(mockProduct), '');
     });
 
     test('returns "Year" for billing period "Y"', () {
@@ -319,13 +392,13 @@ void main() {
       expect(repo.getIntervalAndroid(mockProduct), 'Year');
     });
 
-    test('returns "Week(s)" for billing period "y" (case-sensitive check)', () {
+    test('returns empty string for billing period "y" (case-sensitive)', () {
       when(() => mockPPW.billingPeriod).thenReturn('y');
 
-      expect(repo.getIntervalAndroid(mockProduct), 'Week(s)');
+      expect(repo.getIntervalAndroid(mockProduct), '');
     });
 
-    test('returns "Week(s)" for unrecognised billing period', () {
+    test('returns "Week(s)" for weekly billing period "W"', () {
       when(() => mockPPW.billingPeriod).thenReturn('W');
 
       expect(repo.getIntervalAndroid(mockProduct), 'Week(s)');
@@ -337,16 +410,16 @@ void main() {
       expect(repo.getIntervalAndroid(mockProduct), '');
     });
 
-    test('returns "Week(s)" for empty billingPeriod string', () {
+    test('returns empty string for empty billingPeriod string', () {
       when(() => mockPPW.billingPeriod).thenReturn('');
 
-      expect(repo.getIntervalAndroid(mockProduct), 'Week(s)');
+      expect(repo.getIntervalAndroid(mockProduct), '');
     });
 
-    test('returns "Week(s)" for unrecognised period string "D"', () {
+    test('returns empty string for unrecognised period string "D"', () {
       when(() => mockPPW.billingPeriod).thenReturn('D');
 
-      expect(repo.getIntervalAndroid(mockProduct), 'Week(s)');
+      expect(repo.getIntervalAndroid(mockProduct), '');
     });
 
     test(
@@ -356,7 +429,7 @@ void main() {
       expect(repo.getIntervalAndroid(mockProduct), 'Month(s)');
 
       when(() => mockPPW.billingPeriod).thenReturn('m');
-      expect(repo.getIntervalAndroid(mockProduct), 'Week(s)');
+      expect(repo.getIntervalAndroid(mockProduct), '');
     });
 
     test(
@@ -366,7 +439,7 @@ void main() {
       expect(repo.getIntervalAndroid(mockProduct), 'Year');
 
       when(() => mockPPW.billingPeriod).thenReturn('y');
-      expect(repo.getIntervalAndroid(mockProduct), 'Week(s)');
+      expect(repo.getIntervalAndroid(mockProduct), '');
     });
 
     test('returns "Month(s)" for ISO 8601 duration "P1M"', () {
@@ -381,10 +454,10 @@ void main() {
       expect(repo.getIntervalAndroid(mockProduct), 'Year');
     });
 
-    test('returns "Week(s)" for whitespace-only billingPeriod', () {
+    test('returns empty string for whitespace-only billingPeriod', () {
       when(() => mockPPW.billingPeriod).thenReturn(' ');
 
-      expect(repo.getIntervalAndroid(mockProduct), 'Week(s)');
+      expect(repo.getIntervalAndroid(mockProduct), '');
     });
   });
 

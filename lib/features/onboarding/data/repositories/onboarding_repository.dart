@@ -8,6 +8,7 @@ import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/foundation.dart';
 
 import '../../../../common/utils/app_logger.dart';
+import '../../../../services/location_privacy_service.dart';
 import '../../bloc/onboarding_data.dart';
 
 /// Repository for saving onboarding data to Firestore and Storage
@@ -110,6 +111,11 @@ class OnboardingRepository {
         'locationName': d.locationName,
         'latitude': d.latitude ?? 6.5244,
         'longitude': d.longitude ?? 3.3792,
+        'geoHash': LocationPrivacyService.generateGeoHash(
+          d.latitude ?? 6.5244,
+          d.longitude ?? 3.3792,
+          LocationPrecision.medium,
+        ),
         'onboardingCompleted': true,
         'profileSetupComplete': true,
         'isProfileComplete': true,
@@ -295,6 +301,11 @@ class OnboardingRepository {
       'locationName': d.locationName,
       'latitude': d.latitude ?? 6.5244,
       'longitude': d.longitude ?? 3.3792,
+      'geoHash': LocationPrivacyService.generateGeoHash(
+        d.latitude ?? 6.5244,
+        d.longitude ?? 3.3792,
+        LocationPrecision.medium,
+      ),
       // Canonical flag + legacy synonyms for queries and older clients.
       // Firestore identity lock uses onboardingCompleted only (see firestore.rules).
       'onboardingCompleted': true,

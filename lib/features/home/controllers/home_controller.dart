@@ -6,7 +6,7 @@ import '../../../common/data/repo/user_search_repo.dart';
 import '../../../models/user_model.dart';
 
 class HomeController {
-  late final UserModel currentUser;
+  late UserModel currentUser;
   int swipedCount = 0;
   List<String> likedByList = [];
 
@@ -14,6 +14,13 @@ class HomeController {
     currentUser = context.read<UserBloc>().currentUser!;
     likedByList = await UserSearchRepo.getLikedByList(currentUser);
     swipedCount = await UserSearchRepo.getSwipedCount(currentUser);
+  }
+
+  /// Keep Connect's seeker in sync when UserBloc reloads (e.g. location save).
+  void syncFromUserBloc(UserModel? user) {
+    if (user != null) {
+      currentUser = user;
+    }
   }
 
   void incrementSwipe() {

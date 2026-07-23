@@ -6,6 +6,7 @@ import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:google_fonts/google_fonts.dart';
 
+import '../../../../common/bloc/user/user_bloc.dart';
 import '../../../../common/constants/app_colors.dart';
 import '../../../../common/constants/app_spacing.dart';
 import '../../../../common/widgets/custom_snackbar.dart';
@@ -111,8 +112,11 @@ class _DiscoveryPreferencesScreenState
                     context.read<UserfilterBloc>().add(
                           ChangefilterRequest(details: _buildPayload()),
                         );
+                    final UserModel seeker =
+                        context.read<UserBloc>().currentUser ??
+                            widget.currentUser;
                     context.read<SearchUserBloc>().add(
-                          LoadUserEvent(currentUser: widget.currentUser),
+                          LoadUserEvent(currentUser: seeker),
                         );
                   },
                   child: Text(
@@ -229,8 +233,12 @@ class _DiscoveryPreferencesScreenState
     context.read<UserfilterBloc>().add(
           ChangefilterRequest(details: _buildPayload()),
         );
+    // Prefer UserBloc's latest snapshot so location changes (final lat/lng on
+    // the widget's UserModel) are not ignored when reloading Connect.
+    final UserModel seeker =
+        context.read<UserBloc>().currentUser ?? widget.currentUser;
     context.read<SearchUserBloc>().add(
-          LoadUserEvent(currentUser: widget.currentUser),
+          LoadUserEvent(currentUser: seeker),
         );
   }
 

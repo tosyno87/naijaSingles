@@ -11,6 +11,7 @@ import '../../../../common/constants/app_colors.dart';
 import '../../../../common/data/repo/user_location_repo.dart';
 import '../../../../common/widgets/afropeep_primary_button.dart';
 import '../../../../common/widgets/hookup_circularbar.dart';
+import '../../../../common/widgets/native_maps_gate.dart';
 import '../../../../config/app_config.dart';
 import '../widgets/location_savedailog.dart';
 import 'place_search_page.dart';
@@ -322,7 +323,8 @@ class UpdateLocationState extends State<UpdateLocation> {
                     fit: StackFit.expand,
                     children: [
                       // Native Maps SDK uses platform keys; only wait for a
-                      // camera target before showing GoogleMap.
+                      // camera target before showing GoogleMap. Gate so we
+                      // never construct GoogleMap without GMSApiKey (crash).
                       if (target == null)
                         ColoredBox(
                           color: isDark
@@ -340,36 +342,54 @@ class UpdateLocationState extends State<UpdateLocation> {
                           ),
                         )
                       else
-                        GoogleMap(
-                          initialCameraPosition: CameraPosition(
-                            target: target,
-                            zoom: 16,
-                          ),
-                          onMapCreated: (GoogleMapController c) {
-                            googleMapController = c;
-                          },
-                          myLocationEnabled: false,
-                          zoomControlsEnabled: false,
-                          compassEnabled: false,
-                          mapToolbarEnabled: false,
-                          markers: <Marker>{
-                            Marker(
-                              markerId: const MarkerId('selected'),
-                              position: LatLng(latitude!, longitude!),
-                              draggable: true,
-                              onDragEnd: (LatLng loc) {
-                                unawaited(_refreshLabelForPin(loc));
-                              },
-                            ),
-                          },
-                          onLongPress: (LatLng position) {
-                            unawaited(_refreshLabelForPin(position));
-                            unawaited(
-                              googleMapController?.animateCamera(
-                                CameraUpdate.newLatLng(position),
+                        NativeMapsGate(
+                          fallback: (_) => ColoredBox(
+                            color: isDark
+                                ? const Color(0xFF2A2A2A)
+                                : const Color(0xFFE8E8E8),
+                            child: Center(
+                              child: Padding(
+                                padding: const EdgeInsets.all(24),
+                                child: Text(
+                                  'Map preview unavailable on this build. '
+                                  'You can still search or use current location.',
+                                  textAlign: TextAlign.center,
+                                  style: GoogleFonts.montserrat(color: muted),
+                                ),
                               ),
-                            );
-                          },
+                            ),
+                          ),
+                          builder: (_) => GoogleMap(
+                            initialCameraPosition: CameraPosition(
+                              target: target,
+                              zoom: 16,
+                            ),
+                            onMapCreated: (GoogleMapController c) {
+                              googleMapController = c;
+                            },
+                            myLocationEnabled: false,
+                            zoomControlsEnabled: false,
+                            compassEnabled: false,
+                            mapToolbarEnabled: false,
+                            markers: <Marker>{
+                              Marker(
+                                markerId: const MarkerId('selected'),
+                                position: LatLng(latitude!, longitude!),
+                                draggable: true,
+                                onDragEnd: (LatLng loc) {
+                                  unawaited(_refreshLabelForPin(loc));
+                                },
+                              ),
+                            },
+                            onLongPress: (LatLng position) {
+                              unawaited(_refreshLabelForPin(position));
+                              unawaited(
+                                googleMapController?.animateCamera(
+                                  CameraUpdate.newLatLng(position),
+                                ),
+                              );
+                            },
+                          ),
                         ),
                       if (_loadingGps)
                         const Positioned(

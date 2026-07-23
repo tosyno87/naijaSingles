@@ -19,7 +19,8 @@ from pathlib import Path
 
 def _read_env_value(env_text: str, key: str) -> str | None:
     prefix = f"{key}="
-    for line in env_text.splitlines():
+    for raw in env_text.splitlines():
+        line = raw.strip()
         if line.startswith(prefix):
             return line.split("=", 1)[1].strip().strip('"').strip("'")
     return None

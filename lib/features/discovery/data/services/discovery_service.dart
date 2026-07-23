@@ -564,18 +564,33 @@ class DiscoveryService {
       final snapshot =
           await _firestore.collection('users/$currentUserId/CheckedUser').get();
 
-      final List<String> checkedIds = [];
+      final Set<String> checkedIds = <String>{};
       for (var doc in snapshot.docs) {
+        checkedIds.add(doc.id);
         final data = doc.data();
         if (data['LikedUser'] != null) {
-          checkedIds.add(data['LikedUser']);
+          checkedIds.add(data['LikedUser'].toString());
         }
         if (data['DislikedUser'] != null) {
-          checkedIds.add(data['DislikedUser']);
+          checkedIds.add(data['DislikedUser'].toString());
         }
       }
 
-      return checkedIds;
+      try {
+        final matchesSnap =
+            await _firestore.collection('users/$currentUserId/Matches').get();
+        for (final doc in matchesSnap.docs) {
+          checkedIds.add(doc.id);
+          final matchedId = doc.data()['Matches'];
+          if (matchedId != null) {
+            checkedIds.add(matchedId.toString());
+          }
+        }
+      } on Object catch (e) {
+        AppLogger.warning('Could not load Matches for exclusion: $e');
+      }
+
+      return checkedIds.toList();
     } on FirebaseException catch (e) {
       AppLogger.error(
         'Firebase error getting checked users: ${e.code} - ${e.message}',
@@ -593,31 +608,22 @@ class DiscoveryService {
     if (!DiscoveryFiltering.matchesGenderPreference(user, currentUser)) {
       return false;
     }
-
     // Skip users who are not discoverable (paused, incognito, deleted, banned)
     if (!user.isDiscoverable) {
       return false;
     }
-
-    // Skip blocked users
     if (user.isBlocked ?? false) {
       return false;
     }
-
-    // Skip bots
     if (user.isBot ?? false) {
       return false;
     }
-
-    // Skip users without complete profiles
     if (user.name?.isEmpty ?? true) {
       return false;
     }
-
     if (user.imageUrl?.isEmpty ?? true) {
       return false;
     }
-
     return true;
   }
 

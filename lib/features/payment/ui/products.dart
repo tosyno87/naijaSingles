@@ -141,15 +141,11 @@ class _ProductsBodyState extends State<_ProductsBody> {
     final String interval = product is AppStoreProductDetails
         ? repo.getInterval(product)
         : repo.getIntervalAndroid(product);
-    if (interval.isNotEmpty) return interval.toLowerCase();
+    final String fromStore =
+        InAppPurchaseRepoImpl.normalizeBillingInterval(interval);
+    if (fromStore.isNotEmpty) return fromStore;
     // Fallback: derive from product ID for resilience and testability.
-    final id = product.id.toLowerCase();
-    if (id.contains('yearly') || id.contains('annual') || id.contains('year')) {
-      return 'year';
-    }
-    if (id.contains('monthly') || id.contains('month')) return 'month';
-    if (id.contains('weekly') || id.contains('week')) return 'week';
-    return '';
+    return InAppPurchaseRepoImpl.intervalKeyFromProductId(product.id);
   }
 
   String _userFacingLabel(ProductDetails product) {
@@ -327,8 +323,20 @@ class _ProductsBodyState extends State<_ProductsBody> {
             );
           }
           if (state is GetInAppProductsSuccessState) {
-            if (selectedProduct == null && state.result.isNotEmpty) {
-              selectedProduct = state.result.first;
+            // Defense in depth: never render unlabeled / non-period SKUs
+            // (repo already filters; this covers stale cache / partial catalogs).
+            final List<ProductDetails> plans = state.result
+                .where(
+                  (ProductDetails p) => _userFacingLabel(p).isNotEmpty,
+                )
+                .toList();
+
+            if (selectedProduct == null && plans.isNotEmpty) {
+              selectedProduct = _monthlyPlan(plans) ?? plans.first;
+            } else if (selectedProduct != null &&
+                !plans.any((ProductDetails p) => p.id == selectedProduct!.id)) {
+              selectedProduct =
+                  plans.isEmpty ? null : (_monthlyPlan(plans) ?? plans.first);
             }
 
             final String selectedLabel = selectedProduct != null
@@ -464,14 +472,14 @@ class _ProductsBodyState extends State<_ProductsBody> {
                               const SizedBox(height: AppSpacing.sm),
 
                               // --- Plan cards ---
-                              if (state.result.isNotEmpty)
+                              if (plans.isNotEmpty)
                                 Builder(
                                   builder: (context) {
-                                    final monthly = _monthlyPlan(state.result);
+                                    final monthly = _monthlyPlan(plans);
                                     return Row(
-                                      children: state.result.map((product) {
+                                      children: plans.map((product) {
                                         final bool isSelected =
-                                            selectedProduct == product;
+                                            selectedProduct?.id == product.id;
                                         final String label =
                                             _userFacingLabel(product);
                                         final String suffix =
@@ -497,10 +505,9 @@ class _ProductsBodyState extends State<_ProductsBody> {
                                         return Expanded(
                                           child: Padding(
                                             padding: EdgeInsets.only(
-                                              right:
-                                                  product == state.result.last
-                                                      ? 0
-                                                      : AppSpacing.sm,
+                                              right: product == plans.last
+                                                  ? 0
+                                                  : AppSpacing.sm,
                                             ),
                                             child: _buildPlanCard(
                                               product: product,

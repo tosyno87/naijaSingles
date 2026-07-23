@@ -105,4 +105,21 @@ class DiscoveryFiltering {
 
     return candidateGender == preference;
   }
+
+  /// Whether [candidate] falls within the seeker's preferred age band.
+  ///
+  /// Missing candidate age or seeker ageRange does not block discovery so
+  /// incomplete profiles are not wiped from the deck.
+  static bool matchesAgePreference(UserModel candidate, UserModel currentUser) {
+    final int? minAge = currentUser.ageRangeMin;
+    final int? maxAge = currentUser.ageRangeMax;
+    if (minAge == null || maxAge == null) {
+      return true;
+    }
+    final int? age = candidate.age;
+    if (age == null) {
+      return true;
+    }
+    return age >= minAge && age <= maxAge;
+  }
 }

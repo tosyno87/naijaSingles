@@ -103,28 +103,34 @@ class UserSearchRepo {
       final currentUserId = currentUser.id;
       final selectedUserId = selectedUser.id;
 
+      String? matchId;
       if (currentUserId != null && selectedUserId != null) {
         // Use MatchService which internally uses optimized LikesService
-        final matchId = await _matchService.handleLike(selectedUserId);
-
-        if (matchId != null) {
-          debugPrint('🎉 Match created! Match ID: $matchId');
-          return matchId;
-        }
+        matchId = await _matchService.handleLike(selectedUserId);
       }
 
-      // Update CheckedUser collection for swipe tracking
-      await docRef
-          .doc(currentUser.id)
-          .collection('CheckedUser')
-          .doc(selectedUser.id)
-          .set(
-        {
-          'LikedUser': selectedUser.id,
-          'timestamp': FieldValue.serverTimestamp(),
-        },
-        SetOptions(merge: true),
-      );
+      // Always record the swipe in CheckedUser — including when a match is
+      // created. Previously we returned early on match and skipped this write,
+      // so matched profiles (e.g. Wizkid) reappeared on the Connect deck.
+      if (currentUserId != null && selectedUserId != null) {
+        await docRef
+            .doc(currentUserId)
+            .collection('CheckedUser')
+            .doc(selectedUserId)
+            .set(
+          {
+            'LikedUser': selectedUserId,
+            'timestamp': FieldValue.serverTimestamp(),
+            if (matchId != null) 'matched': true,
+          },
+          SetOptions(merge: true),
+        );
+      }
+
+      if (matchId != null) {
+        debugPrint('🎉 Match created! Match ID: $matchId');
+        return matchId;
+      }
 
       return null; // No match created
     } on Object catch (e) {

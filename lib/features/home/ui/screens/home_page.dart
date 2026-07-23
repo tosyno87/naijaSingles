@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:swipable_stack/swipable_stack.dart';
 
+import '../../../../common/bloc/user/user_bloc.dart';
 import '../../../../common/constants/constants.dart';
 import '../../../../models/user_model.dart';
 import '../../bloc/searchuser_bloc.dart';
@@ -97,76 +98,97 @@ class _HomepageState extends State<Homepage>
               });
             }
           },
-          child: ClipRRect(
-            borderRadius: const BorderRadius.only(
-              topLeft: Radius.circular(50),
-              topRight: Radius.circular(50),
-            ),
-            child: Stack(
-              children: [
-                AbsorbPointer(
-                  absorbing: exceedSwipes,
-                  child: Stack(
-                    children: [
-                      SwipeCardList(
-                        controller: controller,
-                        stackController: stackController,
-                        onUserRemoved: (user) {
+          child: BlocListener<UserBloc, UserState>(
+            listenWhen: (UserState previous, UserState current) {
+              if (current is! UserLoaded || current.user == null) {
+                return false;
+              }
+              final UserModel next = current.user!;
+              final UserModel prev = controller.currentUser;
+              return next.latitude != prev.latitude ||
+                  next.longitude != prev.longitude ||
+                  next.maxDistance != prev.maxDistance ||
+                  next.lookingFor != prev.lookingFor ||
+                  next.showGender != prev.showGender;
+            },
+            listener: (BuildContext context, UserState state) {
+              if (state is! UserLoaded || state.user == null) return;
+              controller.syncFromUserBloc(state.user);
+              context.read<SearchUserBloc>().add(
+                    LoadUserEvent(currentUser: state.user!),
+                  );
+            },
+            child: ClipRRect(
+              borderRadius: const BorderRadius.only(
+                topLeft: Radius.circular(50),
+                topRight: Radius.circular(50),
+              ),
+              child: Stack(
+                children: [
+                  AbsorbPointer(
+                    absorbing: exceedSwipes,
+                    child: Stack(
+                      children: [
+                        SwipeCardList(
+                          controller: controller,
+                          stackController: stackController,
+                          onUserRemoved: (user) {
+                            setState(() {
+                              removedUsers
+                                ..clear()
+                                ..add(user);
+                            });
+                          },
+                        ),
+                        Padding(
+                          padding: const EdgeInsets.all(12),
+                          child: Align(
+                            alignment: Alignment.bottomCenter,
+                            child: SwipeButtons(
+                              stackController: stackController,
+                              onRewind: () {
+                                setState(removedUsers.clear);
+                              },
+                              hasRemoved: removedUsers.isNotEmpty,
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                  if (exceedSwipes)
+                    PremiumSwipePage(currentUser: controller.currentUser)
+                  else
+                    const SizedBox.shrink(),
+
+                  // Privacy Migration Prompt
+                  if (_shouldShowMigrationPrompt)
+                    Positioned(
+                      top: 50,
+                      left: 0,
+                      right: 0,
+                      child: PrivacyMigrationPrompt(
+                        onDismiss: () {
                           setState(() {
-                            removedUsers
-                              ..clear()
-                              ..add(user);
+                            _migrationPromptDismissed = true;
+                            _shouldShowMigrationPrompt = false;
+                          });
+                        },
+                        onMigrate: () {
+                          // Refresh user list after migration
+                          context.read<SearchUserBloc>().add(
+                                LoadUserEvent(
+                                  currentUser: controller.currentUser,
+                                ),
+                              );
+                          setState(() {
+                            _shouldShowMigrationPrompt = false;
                           });
                         },
                       ),
-                      Padding(
-                        padding: const EdgeInsets.all(12),
-                        child: Align(
-                          alignment: Alignment.bottomCenter,
-                          child: SwipeButtons(
-                            stackController: stackController,
-                            onRewind: () {
-                              setState(removedUsers.clear);
-                            },
-                            hasRemoved: removedUsers.isNotEmpty,
-                          ),
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-                if (exceedSwipes)
-                  PremiumSwipePage(currentUser: controller.currentUser)
-                else
-                  const SizedBox.shrink(),
-
-                // Privacy Migration Prompt
-                if (_shouldShowMigrationPrompt)
-                  Positioned(
-                    top: 50,
-                    left: 0,
-                    right: 0,
-                    child: PrivacyMigrationPrompt(
-                      onDismiss: () {
-                        setState(() {
-                          _migrationPromptDismissed = true;
-                          _shouldShowMigrationPrompt = false;
-                        });
-                      },
-                      onMigrate: () {
-                        // Refresh user list after migration
-                        context.read<SearchUserBloc>().add(
-                              LoadUserEvent(
-                                currentUser: controller.currentUser,
-                              ),
-                            );
-                        setState(() {
-                          _shouldShowMigrationPrompt = false;
-                        });
-                      },
                     ),
-                  ),
-              ],
+                ],
+              ),
             ),
           ),
         ),

@@ -13,6 +13,7 @@ import 'package:google_maps_flutter/google_maps_flutter.dart';
 import '../../common/bloc/theme/theme_bloc.dart';
 import '../../common/constants/app_colors.dart';
 import '../../common/data/repo/user_location_repo.dart';
+import '../../common/widgets/native_maps_gate.dart';
 import '../../models/user_model.dart';
 import 'bloc/explore_map_bloc.dart';
 
@@ -175,30 +176,32 @@ class _ExploreMapWidgetState extends State<ExploreMapWidget>
                         ],
                       ),
                     )
-                  : GoogleMap(
-                      // Native Maps SDK uses the platform key (iOS Secrets /
-                      // Android manifest), not the Dart env Places key.
-                      onMapCreated: (GoogleMapController controller) {
-                        // Map initialization
-                      },
-                      initialCameraPosition: CameraPosition(
-                        target: LatLng(
-                          widget.currentUser.latitude ?? 0.0,
-                          widget.currentUser.longitude ?? 0.0,
+                  : NativeMapsGate(
+                      builder: (_) => GoogleMap(
+                        // Native Maps SDK uses the platform key (iOS Secrets /
+                        // Android manifest), not the Dart env Places key.
+                        onMapCreated: (GoogleMapController controller) {
+                          // Map initialization
+                        },
+                        initialCameraPosition: CameraPosition(
+                          target: LatLng(
+                            widget.currentUser.latitude ?? 0.0,
+                            widget.currentUser.longitude ?? 0.0,
+                          ),
+                          zoom: 14,
                         ),
-                        zoom: 14,
-                      ),
-                      markers: Set<Marker>.from(
-                        state.users.map(
-                          (user) => Marker(
-                            markerId: MarkerId(user.id ?? ''),
-                            position: LatLng(
-                              user.latitude ?? 0.0,
-                              user.longitude ?? 0.0,
-                            ),
-                            infoWindow: InfoWindow(
-                              title: user.name,
-                              snippet: '${user.age} years old',
+                        markers: Set<Marker>.from(
+                          state.users.map(
+                            (user) => Marker(
+                              markerId: MarkerId(user.id ?? ''),
+                              position: LatLng(
+                                user.latitude ?? 0.0,
+                                user.longitude ?? 0.0,
+                              ),
+                              infoWindow: InfoWindow(
+                                title: user.name,
+                                snippet: '${user.age} years old',
+                              ),
                             ),
                           ),
                         ),

@@ -105,6 +105,11 @@ jobs:
           EOF
           # Strip accidental leading whitespace from indented heredoc lines.
           sed -i.bak 's/^[[:space:]]*//' .env && rm -f .env.bak
+          if ! grep -q '^GOOGLE_MAPS_API_KEY=.' .env; then
+            echo "::error::Repository secret GOOGLE_MAPS_API_KEY_PROD is missing or empty."
+            echo "::error::Add it in Settings → Secrets and variables → Actions, then re-run this workflow."
+            exit 1
+          fi
           python3 tool/sync_maps_secrets_from_env.py
           test -s ios/Flutter/Secrets.xcconfig
           test -s assets/env/app.env

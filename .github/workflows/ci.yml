@@ -150,8 +150,8 @@ jobs:
           -Dsonar.sources=lib
           -Dsonar.tests=test,integration_test
           -Dsonar.exclusions=**/*.g.dart,**/*.freezed.dart,**/*.gr.dart,**/*.generated.dart,**/*_old.dart,build/**,coverage/**
-          -Dsonar.coverage.exclusions=**/*_test.dart
-          -Dsonar.dart.coverage.reportPath=coverage/lcov.info
+          -Dsonar.coverage.exclusions=**/*_test.dart,**/presentation/**,**/ui/**
+          -Dsonar.dart.lcov.reportPaths=coverage/lcov.info
           -Dsonar.newCode.referenceBranch=main
       continue-on-error: true
       

@@ -114,7 +114,7 @@ class PrivacyAwareUserSearchRepo {
         final double maxMiles = _maxDistanceMiles(currentUser);
         final List<UserModel> nearby =
             await getUsersNearby(currentUser, maxMiles);
-        userList = _applyDiscoveryPreferences(
+        userList = applyDiscoveryPreferences(
           nearby.where(
             (UserModel u) =>
                 u.id != currentUser.id &&
@@ -132,7 +132,7 @@ class PrivacyAwareUserSearchRepo {
         debugPrint(
           '📋 Nearby empty — scanning discoverable users within max distance',
         );
-        userList = _applyDiscoveryPreferences(
+        userList = applyDiscoveryPreferences(
           await _getPrivacyAwareUsers(currentUser, checkedUserIds),
           currentUser,
           effectiveIntent,
@@ -143,7 +143,7 @@ class PrivacyAwareUserSearchRepo {
         debugPrint(
           '📋 No privacy-aware users found, falling back to traditional search',
         );
-        userList = _applyDiscoveryPreferences(
+        userList = applyDiscoveryPreferences(
           await _getFallbackUsers(currentUser, checkedUserIds),
           currentUser,
           effectiveIntent,
@@ -154,7 +154,7 @@ class PrivacyAwareUserSearchRepo {
       // exist farther away, show the nearest ones so Connect is not empty
       // after matching the only local profile.
       if (userList.isEmpty && hasSeekerLocation) {
-        userList = _applyDiscoveryPreferences(
+        userList = applyDiscoveryPreferences(
           await _getNearestUsersBeyondMaxDistance(
             currentUser,
             checkedUserIds,
@@ -174,12 +174,13 @@ class PrivacyAwareUserSearchRepo {
   }
 
   /// Gender, intent, and age preferences shared across discovery stages.
-  static List<UserModel> _applyDiscoveryPreferences(
+  @visibleForTesting
+  static List<UserModel> applyDiscoveryPreferences(
     Iterable<UserModel> users,
     UserModel currentUser,
     String? effectiveIntent,
   ) {
-    final List<UserModel> filtered = users
+    return users
         .where(
           (UserModel u) =>
               DiscoveryFiltering.matchesGenderPreference(u, currentUser) &&
@@ -187,7 +188,6 @@ class PrivacyAwareUserSearchRepo {
               DiscoveryFiltering.matchesAgePreference(u, currentUser),
         )
         .toList();
-    return filtered;
   }
 
   static const int _discoveryPageSize = 50;

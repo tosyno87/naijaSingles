@@ -152,8 +152,9 @@ class PrivacyAwareUserSearchRepo {
 
       // Sparse-market recovery: if maxDistance wiped the deck but candidates
       // exist farther away, show the nearest ones so Connect is not empty
-      // after matching the only local profile.
-      if (userList.isEmpty && hasSeekerLocation) {
+      // after matching the only local profile — unless Strict distance is on.
+      final bool strictDistance = currentUser.strictDistance == true;
+      if (userList.isEmpty && hasSeekerLocation && !strictDistance) {
         userList = applyDiscoveryPreferences(
           await _getNearestUsersBeyondMaxDistance(
             currentUser,

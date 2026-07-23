@@ -29,6 +29,7 @@ void main() {
     String showGender = 'everyone',
     String lookingFor = 'Dating',
     Map<String, dynamic>? ageRange,
+    bool strictDistance = false,
   }) {
     return UserModel(
       id: id,
@@ -39,6 +40,7 @@ void main() {
       showGender: showGender,
       lookingFor: lookingFor,
       ageRange: ageRange ?? <String, dynamic>{'min': 25, 'max': 45},
+      strictDistance: strictDistance,
     );
   }
 
@@ -210,6 +212,22 @@ void main() {
 
       expect(result.map((UserModel u) => u.id), contains('far1'));
       expect(result.map((UserModel u) => u.id), isNot(contains('far_old')));
+    });
+
+    test('does not soft-expand when strict distance is enabled', () async {
+      final UserModel current = seeker(maxDistance: 10, strictDistance: true);
+      await seedUser(
+        id: 'far_strict',
+        lat: 34.0522,
+        lng: -118.2437,
+        age: 32,
+        gender: 'female',
+      );
+
+      final List<UserModel> result =
+          await PrivacyAwareUserSearchRepo.getUserList(current);
+
+      expect(result, isEmpty);
     });
 
     test('excludes checked and matched users', () async {

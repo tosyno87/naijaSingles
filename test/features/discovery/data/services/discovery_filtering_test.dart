@@ -166,12 +166,14 @@ void main() {
 
     test('matchesAgePreference allows missing seeker ageRange', () {
       final currentUser = UserModel(id: 'current', name: 'Current');
-      final candidate = UserModel(id: '1', name: 'A', age: 18);
+      final candidate = UserModel(id: '1', name: 'A', age: 70);
 
       expect(
         DiscoveryFiltering.matchesAgePreference(candidate, currentUser),
         isTrue,
       );
+      expect(currentUser.ageRangeMin, isNull);
+      expect(currentUser.ageRangeMax, isNull);
     });
   });
 }

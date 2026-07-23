@@ -55,6 +55,7 @@ class UserModel {
     this.subscriptionPlanId,
     this.subscriptionExpiresAt,
     this.subscriptionStore,
+    this.strictDistance,
     bool? storedDiscoverable,
   }) : _storedDiscoverable = storedDiscoverable;
 
@@ -243,6 +244,7 @@ class UserModel {
         subscriptionExpiresAt:
             _parseSubscriptionExpiry(data['subscriptionExpiresAt']),
         subscriptionStore: safeGet<String>('subscriptionStore'),
+        strictDistance: safeGet<bool>('strict_distance', false),
       );
     } on Object catch (e) {
       debugPrint('Error creating UserModel from document ${doc.id}: $e');
@@ -424,6 +426,7 @@ class UserModel {
             ? DateTime.tryParse(map['lastSeen'].toString())
             : null,
         lookingFor: UserModel._resolveLookingFor(map['lookingFor']?.toString()),
+        strictDistance: map['strict_distance'] as bool? ?? false,
         // Cultural fields
         nationality: map['nationality']?.toString(),
         tribe: map['tribe']?.toString(),
@@ -478,6 +481,9 @@ class UserModel {
   final DateTime? lastSeen;
   String?
       lookingFor; // What the user is looking for: Dating, Friendship, Networking, Mixed
+
+  /// When true, discovery must not soft-expand beyond [maxDistance].
+  bool? strictDistance;
 
   // Cultural fields
   final String? nationality;
@@ -547,6 +553,7 @@ class UserModel {
         'smokingStatus': smokingStatus,
         'lastSeen': lastSeen?.toIso8601String(),
         'lookingFor': lookingFor,
+        'strict_distance': strictDistance,
         // Cultural fields
         'nationality': nationality,
         'tribe': tribe,
@@ -568,26 +575,34 @@ class UserModel {
   /// Get user's gender
   String? get gender => userGender;
 
-  /// Get minimum age preference
+  /// Get minimum age preference, or null when the seeker has no explicit band.
   int? get ageRangeMin {
-    if (ageRange != null && ageRange!['min'] != null) {
-      if (ageRange!['min'] is int) return ageRange!['min'] as int;
-      if (ageRange!['min'] is String) {
-        return int.tryParse(ageRange!['min'] as String);
-      }
+    if (ageRange == null || ageRange!['min'] == null) {
+      return null;
     }
-    return 18; // Default minimum age
+    if (ageRange!['min'] is int) return ageRange!['min'] as int;
+    if (ageRange!['min'] is String) {
+      return int.tryParse(ageRange!['min'] as String);
+    }
+    if (ageRange!['min'] is num) {
+      return (ageRange!['min'] as num).toInt();
+    }
+    return null;
   }
 
-  /// Get maximum age preference
+  /// Get maximum age preference, or null when the seeker has no explicit band.
   int? get ageRangeMax {
-    if (ageRange != null && ageRange!['max'] != null) {
-      if (ageRange!['max'] is int) return ageRange!['max'] as int;
-      if (ageRange!['max'] is String) {
-        return int.tryParse(ageRange!['max'] as String);
-      }
+    if (ageRange == null || ageRange!['max'] == null) {
+      return null;
     }
-    return 50; // Default maximum age
+    if (ageRange!['max'] is int) return ageRange!['max'] as int;
+    if (ageRange!['max'] is String) {
+      return int.tryParse(ageRange!['max'] as String);
+    }
+    if (ageRange!['max'] is num) {
+      return (ageRange!['max'] as num).toInt();
+    }
+    return null;
   }
 
   /// Get distance range preference

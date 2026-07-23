@@ -114,69 +114,54 @@ class PrivacyAwareUserSearchRepo {
         final double maxMiles = _maxDistanceMiles(currentUser);
         final List<UserModel> nearby =
             await getUsersNearby(currentUser, maxMiles);
-        userList = nearby
-            .where(
-              (UserModel u) =>
-                  u.id != currentUser.id &&
-                  !checkedUserIds.contains(u.id) &&
-                  !(u.isBlocked ?? false),
-            )
-            .toList();
+        userList = _applyDiscoveryPreferences(
+          nearby.where(
+            (UserModel u) =>
+                u.id != currentUser.id &&
+                !checkedUserIds.contains(u.id) &&
+                !(u.isBlocked ?? false),
+          ),
+          currentUser,
+          effectiveIntent,
+        );
       }
 
-      // Scan discoverable users page-by-page, keeping only in-range profiles.
+      // Continue broader scans when nearby results are empty *after*
+      // preference filters (e.g. wrong gender in the geohash neighborhood).
       if (userList.isEmpty) {
         debugPrint(
           '📋 Nearby empty — scanning discoverable users within max distance',
         );
-        userList =
-            await _getPrivacyAwareUsers(currentUser, checkedUserIds);
+        userList = _applyDiscoveryPreferences(
+          await _getPrivacyAwareUsers(currentUser, checkedUserIds),
+          currentUser,
+          effectiveIntent,
+        );
       }
 
       if (userList.isEmpty) {
         debugPrint(
           '📋 No privacy-aware users found, falling back to traditional search',
         );
-        userList = await _getFallbackUsers(currentUser, checkedUserIds);
+        userList = _applyDiscoveryPreferences(
+          await _getFallbackUsers(currentUser, checkedUserIds),
+          currentUser,
+          effectiveIntent,
+        );
       }
 
       // Sparse-market recovery: if maxDistance wiped the deck but candidates
       // exist farther away, show the nearest ones so Connect is not empty
       // after matching the only local profile.
       if (userList.isEmpty && hasSeekerLocation) {
-        userList = await _getNearestUsersBeyondMaxDistance(
+        userList = _applyDiscoveryPreferences(
+          await _getNearestUsersBeyondMaxDistance(
+            currentUser,
+            checkedUserIds,
+            intentFilter: effectiveIntent,
+          ),
           currentUser,
-          checkedUserIds,
-        );
-      }
-
-      final int beforeGender = userList.length;
-      userList = userList
-          .where(
-            (UserModel u) =>
-                DiscoveryFiltering.matchesGenderPreference(u, currentUser),
-          )
-          .toList();
-      if (beforeGender != userList.length) {
-        debugPrint(
-          '📋 Gender filter (${currentUser.showGender}): '
-          '$beforeGender → ${userList.length}',
-        );
-      }
-
-      final int beforeIntent = userList.length;
-      userList = userList
-          .where(
-            (UserModel u) => DiscoveryFiltering.matchesLookingForIntent(
-              u,
-              effectiveIntent,
-            ),
-          )
-          .toList();
-      if (beforeIntent != userList.length) {
-        debugPrint(
-          '📋 Intent filter ($effectiveIntent): '
-          '$beforeIntent → ${userList.length}',
+          effectiveIntent,
         );
       }
 
@@ -188,7 +173,25 @@ class PrivacyAwareUserSearchRepo {
     }
   }
 
+  /// Gender, intent, and age preferences shared across discovery stages.
+  static List<UserModel> _applyDiscoveryPreferences(
+    Iterable<UserModel> users,
+    UserModel currentUser,
+    String? effectiveIntent,
+  ) {
+    final List<UserModel> filtered = users
+        .where(
+          (UserModel u) =>
+              DiscoveryFiltering.matchesGenderPreference(u, currentUser) &&
+              DiscoveryFiltering.matchesLookingForIntent(u, effectiveIntent) &&
+              DiscoveryFiltering.matchesAgePreference(u, currentUser),
+        )
+        .toList();
+    return filtered;
+  }
+
   static const int _discoveryPageSize = 50;
+
   /// Scan enough pages that age-biased overseas cohorts cannot empty the deck.
   static const int _discoveryMaxPages = 20; // up to 1000 docs
   static const int _discoveryTargetKeep = 25;
@@ -395,9 +398,12 @@ class PrivacyAwareUserSearchRepo {
 
   /// When nobody is within [maxDistance], return the nearest discoverable
   /// profiles (still excluding checked/matched) so sparse metros are usable.
+  ///
+  /// Preserves age / gender / intent preferences while relaxing distance.
   static Future<List<UserModel>> _getNearestUsersBeyondMaxDistance(
     UserModel currentUser,
     List<String> checkedUserIds, {
+    String? intentFilter,
     int limit = 15,
   }) async {
     final double? cLat = currentUser.latitude;
@@ -428,6 +434,18 @@ class PrivacyAwareUserSearchRepo {
           // Skip null-island defaults from incomplete profiles.
           if (uLat == 0.0 && uLng == 0.0) continue;
           if (temp.isBlocked ?? false) continue;
+          if (!DiscoveryFiltering.matchesAgePreference(temp, currentUser)) {
+            continue;
+          }
+          if (!DiscoveryFiltering.matchesGenderPreference(temp, currentUser)) {
+            continue;
+          }
+          if (!DiscoveryFiltering.matchesLookingForIntent(
+            temp,
+            intentFilter,
+          )) {
+            continue;
+          }
 
           final double miles =
               distance.calculateDistance(cLat, cLng, uLat, uLng);

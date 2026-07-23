@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 
 import '../../common/constants/app_colors.dart';
+import '../../common/widgets/native_maps_gate.dart';
 import '../../models/user_model.dart';
 import '../payment/ui/products.dart';
 
@@ -40,18 +41,20 @@ class GoogleMapWidgetState extends State<GoogleMapWidget> {
   @override
   Widget build(BuildContext context) {
     // Native Maps SDK is keyed via platform config (AndroidManifest /
-    // GMSApiKey). Do not gate on the Dart/env Places HTTP key.
-    return GoogleMap(
-      mapToolbarEnabled: false,
-      myLocationButtonEnabled: false,
-      compassEnabled: false,
-      scrollGesturesEnabled: false,
-      initialCameraPosition: CameraPosition(
-        target: LatLng(
-          widget.currentUser.latitude!,
-          widget.currentUser.longitude!,
+    // GMSApiKey). Do not construct GoogleMap without a confirmed native key.
+    return NativeMapsGate(
+      builder: (_) => GoogleMap(
+        mapToolbarEnabled: false,
+        myLocationButtonEnabled: false,
+        compassEnabled: false,
+        scrollGesturesEnabled: false,
+        initialCameraPosition: CameraPosition(
+          target: LatLng(
+            widget.currentUser.latitude!,
+            widget.currentUser.longitude!,
+          ),
+          zoom: 15,
         ),
-        zoom: 15,
       ),
     );
   }

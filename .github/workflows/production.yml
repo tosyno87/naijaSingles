@@ -86,6 +86,8 @@ jobs:
           
       - name: Create .env file for CI
         # SonarQube: Values are securely injected from GitHub Secrets (not hard-coded)
+        # Also sync Maps keys into iOS Secrets.xcconfig + assets/env/app.env so
+        # TestFlight builds get GMSApiKey (avoids GoogleMap hard crash) and Places HTTP.
         run: |
           cat > .env << EOF
           FIREBASE_WEB_API_KEY=${{ secrets.FIREBASE_WEB_API_KEY_PROD }}
@@ -98,8 +100,15 @@ jobs:
           FIREBASE_IOS_CLIENT_ID=${{ secrets.FIREBASE_IOS_CLIENT_ID_PROD }}
           FIREBASE_IOS_BUNDLE_ID=com.app.naijasingles
           GOOGLE_MAPS_API_KEY=${{ secrets.GOOGLE_MAPS_API_KEY_PROD }}
+          GOOGLE_MAPS_WEB_API_KEY=${{ secrets.GOOGLE_MAPS_WEB_API_KEY_PROD || secrets.GOOGLE_MAPS_API_KEY_PROD }}
           APP_ENVIRONMENT=production
           EOF
+          # Strip accidental leading whitespace from indented heredoc lines.
+          sed -i.bak 's/^[[:space:]]*//' .env && rm -f .env.bak
+          python3 tool/sync_maps_secrets_from_env.py
+          test -s ios/Flutter/Secrets.xcconfig
+          test -s assets/env/app.env
+          echo "✅ Maps secrets synced for iOS + Dart assets"
           
       - name: Install dependencies
         run: flutter pub get
@@ -273,6 +282,8 @@ jobs:
           ./scripts/verify_release_firebase_config.sh
           flutter pub get
           flutter build ios --release --dart-define=ENV=production --no-codesign
+          chmod +x scripts/verify_ios_gms_api_key.sh
+          ./scripts/verify_ios_gms_api_key.sh
           cd ios
           bundle exec fastlane build_app
         
@@ -372,6 +383,8 @@ jobs:
               flutter clean
               flutter pub get
               flutter build ios --release --dart-define=ENV=production --no-codesign
+              chmod +x scripts/verify_ios_gms_api_key.sh
+              ./scripts/verify_ios_gms_api_key.sh
               cd ios
               pod install
               SKIP_FLUTTER_CLEAN=true bundle exec fastlane build_app

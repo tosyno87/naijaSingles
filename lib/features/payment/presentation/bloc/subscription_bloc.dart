@@ -375,6 +375,12 @@ class SubscriptionBloc extends Bloc<SubscriptionEvent, SubscriptionState> {
         continue;
       }
 
+      // Profile boost is a separate consumable — never treat it as Premium.
+      if (InAppPurchaseRepoImpl.isBoostProductId(purchase.productID)) {
+        _processedKeys.add(key);
+        continue;
+      }
+
       _processedKeys.add(key);
       emit(state.copyWith(purchaseInProgress: true));
 

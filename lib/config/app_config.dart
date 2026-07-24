@@ -23,12 +23,12 @@ class AppConfig {
 
   // Support
   static const String supportEmail = 'support@naijasingles.com';
-  static const String privacyPolicyUrl = 'https://naijasingles.com/privacy';
-  static const String termsOfServiceUrl = 'https://naijasingles.com/terms';
+  static const String privacyPolicyUrl = 'https://afropeep.com/privacy';
+  static const String termsOfServiceUrl = 'https://afropeep.com/terms';
 
   /// Community guidelines (settings / safety).
   static const String communityGuidelinesUrl =
-      'https://naijasingles.com/community-guidelines';
+      'https://afropeep.com/community-guidelines';
 
   /// Android `applicationId` (Google Play) — must match Play Console for receipt checks.
   static const String androidApplicationId = 'com.app.naijasingles';
@@ -42,8 +42,8 @@ class AppConfig {
 }
 
 // Privacy policy and terms URLs
-const String termConditionUrl = 'https://naijasingles.com/terms';
-const String privacyUrl = 'https://naijasingles.com/privacy';
+const String termConditionUrl = 'https://afropeep.com/terms';
+const String privacyUrl = 'https://afropeep.com/privacy';
 
 // Add google map key for google places search
 String get googleMapsKey {

@@ -17,12 +17,12 @@ class AppConfig {
   static const bool enablePushNotifications = true;
 
   // Social Media Links
-  static const String instagramUrl = 'https://instagram.com/naijasingles';
-  static const String twitterUrl = 'https://twitter.com/naijasingles';
-  static const String facebookUrl = 'https://facebook.com/naijasingles';
+  static const String instagramUrl = 'https://instagram.com/afropeep';
+  static const String twitterUrl = 'https://twitter.com/afropeep';
+  static const String facebookUrl = 'https://facebook.com/afropeep';
 
   // Support
-  static const String supportEmail = 'support@naijasingles.com';
+  static const String supportEmail = 'support@afropeep.com';
   static const String privacyPolicyUrl = 'https://afropeep.com/privacy';
   static const String termsOfServiceUrl = 'https://afropeep.com/terms';
 
@@ -71,7 +71,7 @@ String get googleMapsPlacesHttpKey {
 }
 
 //for support to user add you mail
-const adminMail = 'support@naijasingles.com';
+const adminMail = 'support@afropeep.com';
 // add bucket id from firebase or google-services-json
 String get bucketId => SecureConfig.firebaseStorageBucket;
 //for pagination set limit

@@ -17,18 +17,18 @@ class AppConfig {
   static const bool enablePushNotifications = true;
 
   // Social Media Links
-  static const String instagramUrl = 'https://instagram.com/naijasingles';
-  static const String twitterUrl = 'https://twitter.com/naijasingles';
-  static const String facebookUrl = 'https://facebook.com/naijasingles';
+  static const String instagramUrl = 'https://instagram.com/afropeep';
+  static const String twitterUrl = 'https://twitter.com/afropeep';
+  static const String facebookUrl = 'https://facebook.com/afropeep';
 
   // Support
-  static const String supportEmail = 'support@naijasingles.com';
-  static const String privacyPolicyUrl = 'https://naijasingles.com/privacy';
-  static const String termsOfServiceUrl = 'https://naijasingles.com/terms';
+  static const String supportEmail = 'support@afropeep.com';
+  static const String privacyPolicyUrl = 'https://afropeep.com/privacy';
+  static const String termsOfServiceUrl = 'https://afropeep.com/terms';
 
   /// Community guidelines (settings / safety).
   static const String communityGuidelinesUrl =
-      'https://naijasingles.com/community-guidelines';
+      'https://afropeep.com/community-guidelines';
 
   /// Android `applicationId` (Google Play) — must match Play Console for receipt checks.
   static const String androidApplicationId = 'com.app.naijasingles';
@@ -42,8 +42,8 @@ class AppConfig {
 }
 
 // Privacy policy and terms URLs
-const String termConditionUrl = 'https://naijasingles.com/terms';
-const String privacyUrl = 'https://naijasingles.com/privacy';
+const String termConditionUrl = 'https://afropeep.com/terms';
+const String privacyUrl = 'https://afropeep.com/privacy';
 
 // Add google map key for google places search
 String get googleMapsKey {
@@ -71,7 +71,7 @@ String get googleMapsPlacesHttpKey {
 }
 
 //for support to user add you mail
-const adminMail = 'support@naijasingles.com';
+const adminMail = 'support@afropeep.com';
 // add bucket id from firebase or google-services-json
 String get bucketId => SecureConfig.firebaseStorageBucket;
 //for pagination set limit

@@ -43,7 +43,9 @@ class UserSearchRepo {
 
   static Future<Set<String>> _activeBoostedUserIds() async {
     try {
+      // Must include isDiscoverable — Firestore list rules require it.
       final snapshot = await docRef
+          .where('isDiscoverable', isEqualTo: true)
           .where(
             'boostExpiresAt',
             isGreaterThan: Timestamp.now(),

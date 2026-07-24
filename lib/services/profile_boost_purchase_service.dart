@@ -2,7 +2,8 @@ import 'dart:async';
 import 'dart:developer';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:flutter/foundation.dart';
+import 'package:flutter/foundation.dart'
+    show TargetPlatform, defaultTargetPlatform, visibleForTesting;
 import 'package:in_app_purchase/in_app_purchase.dart';
 
 import '../common/constants/constants.dart';
@@ -71,6 +72,20 @@ class ProfileBoostPurchaseService {
     await _iap.buyConsumable(purchaseParam: param);
   }
 
+  /// Whether a store event should grant a new boost window.
+  ///
+  /// Consumable restores replay on every launch; only fresh `purchased`
+  /// (or unfinished restores that still need `completePurchase`) should activate.
+  @visibleForTesting
+  static bool shouldActivateFromPurchase(PurchaseDetails purchase) {
+    if (purchase.status == PurchaseStatus.purchased) return true;
+    if (purchase.status == PurchaseStatus.restored &&
+        purchase.pendingCompletePurchase) {
+      return true;
+    }
+    return false;
+  }
+
   /// Listens for a completed boost purchase and activates boost for [userId].
   StreamSubscription<List<PurchaseDetails>> listenForBoostActivation({
     required String userId,
@@ -83,6 +98,10 @@ class ProfileBoostPurchaseService {
             purchase.status == PurchaseStatus.restored) {
           final boostIds = await fetchBoostProductIds();
           if (!boostIds.contains(purchase.productID)) continue;
+
+          if (!shouldActivateFromPurchase(purchase)) {
+            continue;
+          }
 
           await _boostService.activateBoost(
             userId: userId,

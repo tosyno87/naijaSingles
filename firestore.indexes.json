@@ -143,6 +143,20 @@
           "order": "ASCENDING"
         },
         {
+          "fieldPath": "boostExpiresAt",
+          "order": "ASCENDING"
+        }
+      ]
+    },
+    {
+      "collectionGroup": "users",
+      "queryScope": "COLLECTION",
+      "fields": [
+        {
+          "fieldPath": "isDiscoverable",
+          "order": "ASCENDING"
+        },
+        {
           "fieldPath": "age",
           "order": "ASCENDING"
         }

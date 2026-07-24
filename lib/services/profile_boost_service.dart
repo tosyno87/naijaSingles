@@ -42,6 +42,20 @@ class ProfileBoostService {
     }
   }
 
+  /// Absolute boost expiry, or null if inactive / missing.
+  Future<DateTime?> boostExpiresAt(String userId) async {
+    try {
+      final doc = await _users.doc(userId).get();
+      final expiresAt = doc.data()?['boostExpiresAt'];
+      if (expiresAt is! Timestamp) return null;
+      final date = expiresAt.toDate();
+      return date.isAfter(DateTime.now()) ? date : null;
+    } on Object catch (e) {
+      debugPrint('ProfileBoostService.boostExpiresAt error: $e');
+      return null;
+    }
+  }
+
   /// Activates boost after successful IAP consumable purchase.
   Future<void> activateBoost({
     required String userId,

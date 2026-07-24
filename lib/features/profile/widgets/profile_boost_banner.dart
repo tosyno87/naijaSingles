@@ -39,6 +39,8 @@ class _ProfileBoostBannerState extends State<ProfileBoostBanner> {
       widget._purchaseService ?? ProfileBoostPurchaseService();
 
   StreamSubscription<List<PurchaseDetails>>? _purchaseSub;
+  Timer? _countdownTimer;
+  DateTime? _expiresAtCached;
   Duration? _remaining;
   bool _loading = true;
   bool _purchasing = false;
@@ -48,6 +50,30 @@ class _ProfileBoostBannerState extends State<ProfileBoostBanner> {
     super.initState();
     unawaited(_refresh());
     _listenForPurchases();
+  }
+
+  void _startCountdownTicker() {
+    _countdownTimer?.cancel();
+    if (_expiresAtCached == null) return;
+
+    _countdownTimer = Timer.periodic(const Duration(seconds: 1), (_) {
+      final expires = _expiresAtCached;
+      if (expires == null) return;
+
+      final live = expires.difference(DateTime.now());
+      if (!mounted) return;
+
+      if (live.isNegative) {
+        setState(() {
+          _remaining = null;
+          _expiresAtCached = null;
+        });
+        _countdownTimer?.cancel();
+        return;
+      }
+
+      setState(() => _remaining = live);
+    });
   }
 
   void _listenForPurchases() {
@@ -82,6 +108,7 @@ class _ProfileBoostBannerState extends State<ProfileBoostBanner> {
 
   @override
   void dispose() {
+    _countdownTimer?.cancel();
     unawaited(_purchaseSub?.cancel());
     super.dispose();
   }
@@ -93,11 +120,18 @@ class _ProfileBoostBannerState extends State<ProfileBoostBanner> {
       return;
     }
     final remaining = await _boostService.boostTimeRemaining(uid);
+    final expiresAt = await _boostService.boostExpiresAt(uid);
     if (!mounted) return;
     setState(() {
       _remaining = remaining;
+      _expiresAtCached = expiresAt;
       _loading = false;
     });
+    if (expiresAt != null && remaining != null) {
+      _startCountdownTicker();
+    } else {
+      _countdownTimer?.cancel();
+    }
   }
 
   Future<void> _purchaseBoost() async {
@@ -106,15 +140,18 @@ class _ProfileBoostBannerState extends State<ProfileBoostBanner> {
 
     setState(() => _purchasing = true);
     try {
+      final productIds = await _purchaseService.fetchBoostProductIds();
       final products = await _purchaseService.fetchBoostProducts();
       if (!mounted) return;
 
       if (products.isEmpty) {
         setState(() => _purchasing = false);
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
+          SnackBar(
             content: Text(
-              'Boost is not available right now. Configure a boost package in the store.',
+              productIds.isEmpty
+                  ? 'Boost is not configured yet. Add a Packages doc with packageType boost.'
+                  : 'Boost product ${productIds.first} is not available from the App Store. Create it in App Store Connect (consumable).',
             ),
           ),
         );
@@ -132,7 +169,7 @@ class _ProfileBoostBannerState extends State<ProfileBoostBanner> {
     }
   }
 
-  void _openProducts() {
+  void _openPremiumPlans() {
     unawaited(
       Navigator.of(context).push(
         MaterialPageRoute<void>(
@@ -144,6 +181,37 @@ class _ProfileBoostBannerState extends State<ProfileBoostBanner> {
             child: Products(widget.currentUser, null, const {}),
           ),
         ),
+      ),
+    );
+  }
+
+  void _showBoostInfo() {
+    showDialog<void>(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        title: Text(
+          'Profile Boost',
+          style: GoogleFonts.montserrat(fontWeight: FontWeight.w700),
+        ),
+        content: Text(
+          'Boost is a one-time purchase (not Premium). '
+          'It puts you higher in Connect for 1 hour. '
+          'Monthly Premium is a separate subscription.',
+          style: GoogleFonts.montserrat(fontSize: 14, height: 1.4),
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(ctx).pop(),
+            child: const Text('Got it'),
+          ),
+          TextButton(
+            onPressed: () {
+              Navigator.of(ctx).pop();
+              _openPremiumPlans();
+            },
+            child: const Text('View Premium'),
+          ),
+        ],
       ),
     );
   }
@@ -229,20 +297,12 @@ class _ProfileBoostBannerState extends State<ProfileBoostBanner> {
           ),
           const SizedBox(width: 10),
           if (active)
-            TextButton(
-              onPressed: _openProducts,
-              style: TextButton.styleFrom(
-                foregroundColor: AppColors.primaryGreen,
-                padding: const EdgeInsets.symmetric(horizontal: 8),
-                minimumSize: const Size(0, 36),
-                tapTargetSize: MaterialTapTargetSize.shrinkWrap,
-              ),
-              child: Text(
-                'Plans',
-                style: GoogleFonts.montserrat(
-                  fontSize: 13,
-                  fontWeight: FontWeight.w700,
-                ),
+            Text(
+              'Active',
+              style: GoogleFonts.montserrat(
+                fontSize: 13,
+                fontWeight: FontWeight.w700,
+                color: AppColors.primaryGreen,
               ),
             )
           else
@@ -277,8 +337,8 @@ class _ProfileBoostBannerState extends State<ProfileBoostBanner> {
             ),
           if (!active)
             IconButton(
-              onPressed: _openProducts,
-              tooltip: 'View plans',
+              onPressed: _showBoostInfo,
+              tooltip: 'About boost',
               visualDensity: VisualDensity.compact,
               icon: const Icon(
                 Icons.info_outline_rounded,
@@ -292,9 +352,12 @@ class _ProfileBoostBannerState extends State<ProfileBoostBanner> {
   }
 
   String _formatRemaining(Duration d) {
-    final minutes = d.inMinutes.remainder(60);
     final hours = d.inHours;
-    if (hours > 0) return '${hours}h ${minutes}m';
-    return '${minutes}m';
+    final minutes = d.inMinutes.remainder(60);
+    final seconds = d.inSeconds.remainder(60);
+    if (hours > 0) {
+      return '${hours}h ${minutes.toString().padLeft(2, '0')}m';
+    }
+    return '${minutes}m ${seconds.toString().padLeft(2, '0')}s';
   }
 }

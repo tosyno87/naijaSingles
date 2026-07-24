@@ -194,6 +194,43 @@ void main() {
     );
   });
 
+  group('SubscriptionBloc boost purchases', () {
+    blocTest<SubscriptionBloc, SubscriptionState>(
+      'ignores pending and purchased boost updates',
+      build: buildBloc,
+      act: (SubscriptionBloc bloc) async {
+        bloc.add(const SubscriptionUserChanged('user-a'));
+        await Future<void>.delayed(Duration.zero);
+        bloc
+          ..add(
+            SubscriptionPurchaseBatch([
+              _purchase(
+                productId: 'com.afropeep.boost.1h',
+                status: PurchaseStatus.pending,
+              ),
+            ]),
+          )
+          ..add(
+            SubscriptionPurchaseBatch([
+              _purchase(productId: 'com.afropeep.boost.1h'),
+            ]),
+          );
+      },
+      expect: () => <SubscriptionState>[],
+      verify: (_) {
+        verifyNever(
+          () => functions.verifySubscriptionPurchase(
+            platform: any(named: 'platform'),
+            productId: any(named: 'productId'),
+            purchaseToken: any(named: 'purchaseToken'),
+            receiptData: any(named: 'receiptData'),
+            packageName: any(named: 'packageName'),
+          ),
+        );
+      },
+    );
+  });
+
   group('SubscriptionBloc consume events', () {
     blocTest<SubscriptionBloc, SubscriptionState>(
       'consume user message clears it',

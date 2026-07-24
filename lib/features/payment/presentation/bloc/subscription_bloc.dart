@@ -342,6 +342,13 @@ class SubscriptionBloc extends Bloc<SubscriptionEvent, SubscriptionState> {
           '${purchase.purchaseID ?? ""}|${purchase.productID}|${purchase.status.name}';
       if (_processedKeys.contains(key)) continue;
 
+      // Profile boost is handled by ProfileBoostPurchaseService, including
+      // pending and terminal updates. Never expose it as Premium progress.
+      if (InAppPurchaseRepoImpl.isBoostProductId(purchase.productID)) {
+        _processedKeys.add(key);
+        continue;
+      }
+
       if (purchase.status == PurchaseStatus.pending) {
         emit(state.copyWith(purchaseInProgress: true));
         continue;
@@ -372,12 +379,6 @@ class SubscriptionBloc extends Bloc<SubscriptionEvent, SubscriptionState> {
 
       if (purchase.status != PurchaseStatus.purchased &&
           purchase.status != PurchaseStatus.restored) {
-        continue;
-      }
-
-      // Profile boost is a separate consumable — never treat it as Premium.
-      if (InAppPurchaseRepoImpl.isBoostProductId(purchase.productID)) {
-        _processedKeys.add(key);
         continue;
       }
 

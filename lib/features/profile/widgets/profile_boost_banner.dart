@@ -48,6 +48,9 @@ class _ProfileBoostBannerState extends State<ProfileBoostBanner> {
   bool _loading = true;
   bool _purchasing = false;
 
+  /// True after the UI spinner times out while StoreKit may still complete.
+  bool _waitingOnStore = false;
+
   @override
   void initState() {
     super.initState();
@@ -85,16 +88,23 @@ class _ProfileBoostBannerState extends State<ProfileBoostBanner> {
     // Do not clear the in-flight StoreKit marker here: the purchase sheet may
     // still complete after the UI spinner times out.
     if (!mounted) return;
-    if (_purchasing) {
-      setState(() => _purchasing = false);
-    }
+    setState(() {
+      _purchasing = false;
+      _waitingOnStore = false;
+    });
   }
 
   void _startPurchaseTimeout() {
     _purchaseTimeoutTimer?.cancel();
     _purchaseTimeoutTimer = Timer(_purchaseTimeout, () {
       if (!mounted || !_purchasing) return;
-      _clearPurchasing();
+      _purchaseTimeoutTimer = null;
+      // Unlock the spinner, but keep the Boost CTA locked while the original
+      // in-flight marker is still valid so a failed retry cannot wipe it.
+      setState(() {
+        _purchasing = false;
+        _waitingOnStore = _purchaseService.hasValidAwaitingBoostPurchase;
+      });
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
           content: Text(
@@ -169,7 +179,7 @@ class _ProfileBoostBannerState extends State<ProfileBoostBanner> {
 
   Future<void> _purchaseBoost() async {
     final uid = widget.currentUser.id ?? FirebaseAuth.instance.currentUser?.uid;
-    if (uid == null || _purchasing) return;
+    if (uid == null || _purchasing || _waitingOnStore) return;
 
     setState(() => _purchasing = true);
     _startPurchaseTimeout();
@@ -212,7 +222,18 @@ class _ProfileBoostBannerState extends State<ProfileBoostBanner> {
       await _purchaseService.buyBoost(products.first);
     } on Object catch (e) {
       if (mounted) {
-        _clearPurchasing();
+        // If a prior in-flight purchase is still pending, keep waiting for it
+        // instead of fully unlocking a retry that could clear that marker.
+        if (_purchaseService.hasValidAwaitingBoostPurchase) {
+          _purchaseTimeoutTimer?.cancel();
+          _purchaseTimeoutTimer = null;
+          setState(() {
+            _purchasing = false;
+            _waitingOnStore = true;
+          });
+        } else {
+          _clearPurchasing();
+        }
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(content: Text('Could not start purchase: $e')),
         );
@@ -358,7 +379,8 @@ class _ProfileBoostBannerState extends State<ProfileBoostBanner> {
             )
           else
             FilledButton(
-              onPressed: _purchasing ? null : _purchaseBoost,
+              onPressed:
+                  (_purchasing || _waitingOnStore) ? null : _purchaseBoost,
               style: FilledButton.styleFrom(
                 backgroundColor: AppColors.primaryGreen,
                 foregroundColor: Colors.white,
@@ -379,7 +401,7 @@ class _ProfileBoostBannerState extends State<ProfileBoostBanner> {
                       ),
                     )
                   : Text(
-                      'Boost',
+                      _waitingOnStore ? 'Waiting…' : 'Boost',
                       style: GoogleFonts.montserrat(
                         fontSize: 13,
                         fontWeight: FontWeight.w700,

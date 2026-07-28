@@ -153,6 +153,13 @@ class ProfileBoostPurchaseService {
     _awaitingBoostStartedAt = null;
   }
 
+  /// True while a [buyBoost] marker is still within [awaitingBoostTtl].
+  bool get hasValidAwaitingBoostPurchase {
+    final String? id = _awaitingBoostProductId;
+    if (id == null) return false;
+    return _isAwaitingPurchaseFor(id);
+  }
+
   bool _isAwaitingPurchaseFor(String productId) {
     final String? id = _awaitingBoostProductId;
     final DateTime? started = _awaitingBoostStartedAt;
@@ -167,19 +174,29 @@ class ProfileBoostPurchaseService {
   }
 
   Future<void> buyBoost(ProductDetails product) async {
-    _awaitingBoostProductId = product.id;
-    _awaitingBoostStartedAt = DateTime.now();
+    // Preserve an existing in-flight marker for this SKU. A retry after the UI
+    // timeout must not wipe it if StoreKit rejects the second buy while the
+    // original sheet/transaction is still pending.
+    final bool alreadyAwaiting = _isAwaitingPurchaseFor(product.id);
+    if (!alreadyAwaiting) {
+      _awaitingBoostProductId = product.id;
+      _awaitingBoostStartedAt = DateTime.now();
+    }
     try {
       final param = PurchaseParam(productDetails: product);
       final bool started = await _iap.buyConsumable(purchaseParam: param);
       if (!started) {
-        clearAwaitingBoostPurchase();
+        if (!alreadyAwaiting) {
+          clearAwaitingBoostPurchase();
+        }
         throw StateError(
           'Purchase could not be started. Wait a moment and try again.',
         );
       }
     } on Object {
-      clearAwaitingBoostPurchase();
+      if (!alreadyAwaiting) {
+        clearAwaitingBoostPurchase();
+      }
       rethrow;
     }
   }

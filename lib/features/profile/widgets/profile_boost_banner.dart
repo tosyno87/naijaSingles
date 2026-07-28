@@ -82,7 +82,8 @@ class _ProfileBoostBannerState extends State<ProfileBoostBanner> {
   void _clearPurchasing() {
     _purchaseTimeoutTimer?.cancel();
     _purchaseTimeoutTimer = null;
-    _purchaseService.clearAwaitingBoostPurchase();
+    // Do not clear the in-flight StoreKit marker here: the purchase sheet may
+    // still complete after the UI spinner times out.
     if (!mounted) return;
     if (_purchasing) {
       setState(() => _purchasing = false);
@@ -97,7 +98,7 @@ class _ProfileBoostBannerState extends State<ProfileBoostBanner> {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
           content: Text(
-            'Boost purchase timed out. Please try again.',
+            'Still waiting on the App Store. If you finish the purchase, boost will activate.',
           ),
         ),
       );

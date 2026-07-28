@@ -38,12 +38,18 @@ class _ProfileBoostBannerState extends State<ProfileBoostBanner> {
   late final ProfileBoostPurchaseService _purchaseService =
       widget._purchaseService ?? ProfileBoostPurchaseService();
 
+  static const Duration _purchaseTimeout = Duration(seconds: 90);
+
   StreamSubscription<List<PurchaseDetails>>? _purchaseSub;
   Timer? _countdownTimer;
+  Timer? _purchaseTimeoutTimer;
   DateTime? _expiresAtCached;
   Duration? _remaining;
   bool _loading = true;
   bool _purchasing = false;
+
+  /// True after the UI spinner times out while StoreKit may still complete.
+  bool _waitingOnStore = false;
 
   @override
   void initState() {
@@ -76,6 +82,39 @@ class _ProfileBoostBannerState extends State<ProfileBoostBanner> {
     });
   }
 
+  void _clearPurchasing() {
+    _purchaseTimeoutTimer?.cancel();
+    _purchaseTimeoutTimer = null;
+    // Do not clear the in-flight StoreKit marker here: the purchase sheet may
+    // still complete after the UI spinner times out.
+    if (!mounted) return;
+    setState(() {
+      _purchasing = false;
+      _waitingOnStore = false;
+    });
+  }
+
+  void _startPurchaseTimeout() {
+    _purchaseTimeoutTimer?.cancel();
+    _purchaseTimeoutTimer = Timer(_purchaseTimeout, () {
+      if (!mounted || !_purchasing) return;
+      _purchaseTimeoutTimer = null;
+      // Unlock the spinner, but keep the Boost CTA locked while the original
+      // in-flight marker is still valid so a failed retry cannot wipe it.
+      setState(() {
+        _purchasing = false;
+        _waitingOnStore = _purchaseService.hasValidAwaitingBoostPurchase;
+      });
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text(
+            'Still waiting on the App Store. If you finish the purchase, boost will activate.',
+          ),
+        ),
+      );
+    });
+  }
+
   void _listenForPurchases() {
     final uid = widget.currentUser.id ?? FirebaseAuth.instance.currentUser?.uid;
     if (uid == null) return;
@@ -84,7 +123,7 @@ class _ProfileBoostBannerState extends State<ProfileBoostBanner> {
       userId: uid,
       onActivated: () {
         if (!mounted) return;
-        setState(() => _purchasing = false);
+        _clearPurchasing();
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: Text(
@@ -96,9 +135,12 @@ class _ProfileBoostBannerState extends State<ProfileBoostBanner> {
         );
         unawaited(_refresh());
       },
+      onCanceled: () {
+        _clearPurchasing();
+      },
       onError: (message) {
         if (!mounted) return;
-        setState(() => _purchasing = false);
+        _clearPurchasing();
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(content: Text(message), backgroundColor: AppColors.error),
         );
@@ -109,6 +151,7 @@ class _ProfileBoostBannerState extends State<ProfileBoostBanner> {
   @override
   void dispose() {
     _countdownTimer?.cancel();
+    _purchaseTimeoutTimer?.cancel();
     unawaited(_purchaseSub?.cancel());
     super.dispose();
   }
@@ -136,22 +179,40 @@ class _ProfileBoostBannerState extends State<ProfileBoostBanner> {
 
   Future<void> _purchaseBoost() async {
     final uid = widget.currentUser.id ?? FirebaseAuth.instance.currentUser?.uid;
-    if (uid == null || _purchasing) return;
+    if (uid == null || _purchasing || _waitingOnStore) return;
 
     setState(() => _purchasing = true);
+    _startPurchaseTimeout();
     try {
+      final storeAvailable = await _purchaseService.isStoreAvailable();
+      if (!mounted) return;
+      if (!storeAvailable) {
+        _clearPurchasing();
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text(
+              'App Store is unavailable. Check your network connection and try again.',
+            ),
+          ),
+        );
+        return;
+      }
+
       final productIds = await _purchaseService.fetchBoostProductIds();
       final products = await _purchaseService.fetchBoostProducts();
       if (!mounted) return;
 
       if (products.isEmpty) {
-        setState(() => _purchasing = false);
+        _clearPurchasing();
+        final nonEmptyIds =
+            productIds.where((id) => id.trim().isNotEmpty).toList();
+        final configuredId = nonEmptyIds.isEmpty ? null : nonEmptyIds.first;
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: Text(
-              productIds.isEmpty
+              configuredId == null
                   ? 'Boost is not configured yet. Add a Packages doc with packageType boost.'
-                  : 'Boost product ${productIds.first} is not available from the App Store. Create it in App Store Connect (consumable).',
+                  : 'Boost product $configuredId is not available from the App Store. Create it in App Store Connect (consumable).',
             ),
           ),
         );
@@ -161,7 +222,18 @@ class _ProfileBoostBannerState extends State<ProfileBoostBanner> {
       await _purchaseService.buyBoost(products.first);
     } on Object catch (e) {
       if (mounted) {
-        setState(() => _purchasing = false);
+        // If a prior in-flight purchase is still pending, keep waiting for it
+        // instead of fully unlocking a retry that could clear that marker.
+        if (_purchaseService.hasValidAwaitingBoostPurchase) {
+          _purchaseTimeoutTimer?.cancel();
+          _purchaseTimeoutTimer = null;
+          setState(() {
+            _purchasing = false;
+            _waitingOnStore = true;
+          });
+        } else {
+          _clearPurchasing();
+        }
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(content: Text('Could not start purchase: $e')),
         );
@@ -307,7 +379,8 @@ class _ProfileBoostBannerState extends State<ProfileBoostBanner> {
             )
           else
             FilledButton(
-              onPressed: _purchasing ? null : _purchaseBoost,
+              onPressed:
+                  (_purchasing || _waitingOnStore) ? null : _purchaseBoost,
               style: FilledButton.styleFrom(
                 backgroundColor: AppColors.primaryGreen,
                 foregroundColor: Colors.white,
@@ -328,7 +401,7 @@ class _ProfileBoostBannerState extends State<ProfileBoostBanner> {
                       ),
                     )
                   : Text(
-                      'Boost',
+                      _waitingOnStore ? 'Waiting…' : 'Boost',
                       style: GoogleFonts.montserrat(
                         fontSize: 13,
                         fontWeight: FontWeight.w700,

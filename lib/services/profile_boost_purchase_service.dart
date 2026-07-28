@@ -139,10 +139,26 @@ class ProfileBoostPurchaseService {
   /// Whether the platform billing client is reachable.
   Future<bool> isStoreAvailable() => _iap.isAvailable();
 
+  /// Clears the in-flight buy marker so later restore replays cannot activate.
+  void clearAwaitingBoostPurchase() {
+    _awaitingBoostProductId = null;
+  }
+
   Future<void> buyBoost(ProductDetails product) async {
     _awaitingBoostProductId = product.id;
-    final param = PurchaseParam(productDetails: product);
-    await _iap.buyConsumable(purchaseParam: param);
+    try {
+      final param = PurchaseParam(productDetails: product);
+      final bool started = await _iap.buyConsumable(purchaseParam: param);
+      if (!started) {
+        clearAwaitingBoostPurchase();
+        throw StateError(
+          'Purchase could not be started. Wait a moment and try again.',
+        );
+      }
+    } on Object {
+      clearAwaitingBoostPurchase();
+      rethrow;
+    }
   }
 
   /// Whether a store event should grant a new boost window.

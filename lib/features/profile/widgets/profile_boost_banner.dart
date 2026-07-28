@@ -82,6 +82,7 @@ class _ProfileBoostBannerState extends State<ProfileBoostBanner> {
   void _clearPurchasing() {
     _purchaseTimeoutTimer?.cancel();
     _purchaseTimeoutTimer = null;
+    _purchaseService.clearAwaitingBoostPurchase();
     if (!mounted) return;
     if (_purchasing) {
       setState(() => _purchasing = false);

@@ -274,4 +274,87 @@ void main() {
       );
     });
   });
+
+  group('buyBoost awaiting marker', () {
+    late _MockBoostService boostService;
+    late _MockIap iap;
+    late ProfileBoostPurchaseService service;
+
+    ProductDetails product() => ProductDetails(
+          id: boostId,
+          title: 'Boost',
+          description: '1 hour',
+          price: '\$4.99',
+          rawPrice: 4.99,
+          currencyCode: 'USD',
+        );
+
+    setUpAll(() {
+      registerFallbackValue(PurchaseParam(productDetails: product()));
+      registerFallbackValue(details(status: PurchaseStatus.purchased));
+    });
+
+    setUp(() {
+      boostService = _MockBoostService();
+      iap = _MockIap();
+      service = ProfileBoostPurchaseService(
+        iap: iap,
+        boostService: boostService,
+        firestore: _MockFirestore(),
+        boostProductIds: () async => [boostId],
+      );
+      when(
+        () => boostService.activateBoost(
+          userId: any(named: 'userId'),
+          productId: any(named: 'productId'),
+        ),
+      ).thenAnswer((_) async {});
+    });
+
+    test('clears awaiting marker when buyConsumable returns false', () async {
+      when(
+        () => iap.buyConsumable(purchaseParam: any(named: 'purchaseParam')),
+      ).thenAnswer((_) async => false);
+
+      await expectLater(service.buyBoost(product()), throwsStateError);
+
+      var activated = false;
+      await service.handlePurchaseUpdate(
+        purchase: details(status: PurchaseStatus.restored),
+        userId: 'user-1',
+        onActivated: () => activated = true,
+      );
+      expect(activated, isFalse);
+    });
+
+    test('clears awaiting marker when buyConsumable throws', () async {
+      when(
+        () => iap.buyConsumable(purchaseParam: any(named: 'purchaseParam')),
+      ).thenThrow(Exception('store unavailable'));
+
+      await expectLater(service.buyBoost(product()), throwsException);
+
+      var activated = false;
+      await service.handlePurchaseUpdate(
+        purchase: details(status: PurchaseStatus.restored),
+        userId: 'user-1',
+        onActivated: () => activated = true,
+      );
+      expect(activated, isFalse);
+    });
+
+    test('clearAwaitingBoostPurchase blocks later restored activation',
+        () async {
+      service.debugSetAwaitingBoostProductId(boostId);
+      service.clearAwaitingBoostPurchase();
+
+      var activated = false;
+      await service.handlePurchaseUpdate(
+        purchase: details(status: PurchaseStatus.restored),
+        userId: 'user-1',
+        onActivated: () => activated = true,
+      );
+      expect(activated, isFalse);
+    });
+  });
 }

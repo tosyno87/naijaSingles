@@ -356,5 +356,48 @@ void main() {
       );
       expect(activated, isFalse);
     });
+
+    test('expired awaiting marker does not activate restored purchase',
+        () async {
+      service.debugSetAwaitingBoostProductId(
+        boostId,
+        startedAt: DateTime.now().subtract(
+          ProfileBoostPurchaseService.awaitingBoostTtl +
+              const Duration(seconds: 1),
+        ),
+      );
+
+      var activated = false;
+      await service.handlePurchaseUpdate(
+        purchase: details(status: PurchaseStatus.restored),
+        userId: 'user-1',
+        onActivated: () => activated = true,
+      );
+      expect(activated, isFalse);
+    });
+
+    test('failed retry preserves existing in-flight marker', () async {
+      service.debugSetAwaitingBoostProductId(boostId);
+      when(
+        () => iap.buyConsumable(purchaseParam: any(named: 'purchaseParam')),
+      ).thenAnswer((_) async => false);
+
+      await expectLater(service.buyBoost(product()), throwsStateError);
+      expect(service.hasValidAwaitingBoostPurchase, isTrue);
+
+      var activated = false;
+      await service.handlePurchaseUpdate(
+        purchase: details(status: PurchaseStatus.restored),
+        userId: 'user-1',
+        onActivated: () => activated = true,
+      );
+      expect(activated, isTrue);
+      verify(
+        () => boostService.activateBoost(
+          userId: 'user-1',
+          productId: boostId,
+        ),
+      ).called(1);
+    });
   });
 }

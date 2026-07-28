@@ -32,6 +32,14 @@ class ProfileBoostPurchaseService {
   /// for a user-initiated consumable buy. We only activate those while this is set,
   /// so cold-start restore replays still do not re-grant boost.
   String? _awaitingBoostProductId;
+  DateTime? _awaitingBoostStartedAt;
+
+  /// How long an in-flight buy marker remains valid after [buyBoost].
+  ///
+  /// Kept past the UI spinner timeout so a late StoreKit completion still
+  /// activates; expires eventually so abandoned markers cannot grant forever.
+  @visibleForTesting
+  static const Duration awaitingBoostTtl = Duration(minutes: 15);
 
   static const String _packageTypeBoost = 'boost';
 
@@ -142,21 +150,53 @@ class ProfileBoostPurchaseService {
   /// Clears the in-flight buy marker so later restore replays cannot activate.
   void clearAwaitingBoostPurchase() {
     _awaitingBoostProductId = null;
+    _awaitingBoostStartedAt = null;
+  }
+
+  /// True while a [buyBoost] marker is still within [awaitingBoostTtl].
+  bool get hasValidAwaitingBoostPurchase {
+    final String? id = _awaitingBoostProductId;
+    if (id == null) return false;
+    return _isAwaitingPurchaseFor(id);
+  }
+
+  bool _isAwaitingPurchaseFor(String productId) {
+    final String? id = _awaitingBoostProductId;
+    final DateTime? started = _awaitingBoostStartedAt;
+    if (id == null || id != productId || started == null) {
+      return false;
+    }
+    if (DateTime.now().difference(started) > awaitingBoostTtl) {
+      clearAwaitingBoostPurchase();
+      return false;
+    }
+    return true;
   }
 
   Future<void> buyBoost(ProductDetails product) async {
-    _awaitingBoostProductId = product.id;
+    // Preserve an existing in-flight marker for this SKU. A retry after the UI
+    // timeout must not wipe it if StoreKit rejects the second buy while the
+    // original sheet/transaction is still pending.
+    final bool alreadyAwaiting = _isAwaitingPurchaseFor(product.id);
+    if (!alreadyAwaiting) {
+      _awaitingBoostProductId = product.id;
+      _awaitingBoostStartedAt = DateTime.now();
+    }
     try {
       final param = PurchaseParam(productDetails: product);
       final bool started = await _iap.buyConsumable(purchaseParam: param);
       if (!started) {
-        clearAwaitingBoostPurchase();
+        if (!alreadyAwaiting) {
+          clearAwaitingBoostPurchase();
+        }
         throw StateError(
           'Purchase could not be started. Wait a moment and try again.',
         );
       }
     } on Object {
-      clearAwaitingBoostPurchase();
+      if (!alreadyAwaiting) {
+        clearAwaitingBoostPurchase();
+      }
       rethrow;
     }
   }
@@ -194,18 +234,18 @@ class ProfileBoostPurchaseService {
   }) async {
     try {
       final boostIds = await fetchBoostProductIds();
-      final bool awaitingUserPurchase = _awaitingBoostProductId != null &&
-          _awaitingBoostProductId == purchase.productID;
+      final bool awaitingUserPurchase =
+          _isAwaitingPurchaseFor(purchase.productID);
       if (!boostIds.contains(purchase.productID)) return;
 
       if (purchase.status == PurchaseStatus.canceled) {
-        _awaitingBoostProductId = null;
+        clearAwaitingBoostPurchase();
         onCanceled?.call();
         return;
       }
 
       if (purchase.status == PurchaseStatus.error) {
-        _awaitingBoostProductId = null;
+        clearAwaitingBoostPurchase();
         onError?.call(
           purchase.error?.message ?? 'Boost purchase failed',
         );
@@ -232,22 +272,27 @@ class ProfileBoostPurchaseService {
       if (purchase.pendingCompletePurchase) {
         await _iap.completePurchase(purchase);
       }
-      _awaitingBoostProductId = null;
+      clearAwaitingBoostPurchase();
       onActivated();
     } on Object catch (e, st) {
       log(
         'ProfileBoostPurchaseService: boost purchase handling failed: $e',
         stackTrace: st,
       );
-      _awaitingBoostProductId = null;
+      clearAwaitingBoostPurchase();
       onError?.call('Could not activate boost. Please try again.');
     }
   }
 
   /// Test-only: mark an in-flight boost buy (mirrors [buyBoost]).
   @visibleForTesting
-  void debugSetAwaitingBoostProductId(String? productId) {
+  void debugSetAwaitingBoostProductId(
+    String? productId, {
+    DateTime? startedAt,
+  }) {
     _awaitingBoostProductId = productId;
+    _awaitingBoostStartedAt =
+        productId == null ? null : (startedAt ?? DateTime.now());
   }
 
   /// Listens for a completed boost purchase and activates boost for [userId].

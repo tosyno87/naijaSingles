@@ -71,6 +71,28 @@ class _DiscoveryPreferencesScreenState
         _verifiedOnly;
   }
 
+  /// Reverts unsaved edits on the shared [UserModel] so callers that reuse
+  /// this instance after the route closes don't see discarded values.
+  void _restoreLastSavedValues() {
+    changeValues.clear();
+    widget.currentUser.maxDistance = _initialMaxDistance;
+    widget.currentUser.ageRange = Map<dynamic, dynamic>.from(_initialAgeRange);
+    widget.currentUser.showGender = _initialShowGender;
+    widget.currentUser.lookingFor = _initialLookingFor;
+  }
+
+  /// After a successful save, the current values become the new baseline for
+  /// discard/reset.
+  void _snapshotLastSavedValues() {
+    _initialMaxDistance = widget.currentUser.maxDistance ?? 10;
+    _initialAgeRange = Map<dynamic, dynamic>.from(
+      widget.currentUser.ageRange ??
+          <dynamic, dynamic>{'min': '18', 'max': '50'},
+    );
+    _initialShowGender = widget.currentUser.showGender;
+    _initialLookingFor = widget.currentUser.lookingFor;
+  }
+
   Future<bool> _onWillPop() async {
     final UserfilterState currentstate = context.read<UserfilterBloc>().state;
     if (currentstate is UpdatingUserFilter) {
@@ -93,7 +115,10 @@ class _DiscoveryPreferencesScreenState
           title: Text('Save Changes?'.tr()),
           actions: <Widget>[
             TextButton(
-              onPressed: () => Navigator.of(dialogContext).pop(true),
+              onPressed: () {
+                _restoreLastSavedValues();
+                Navigator.of(dialogContext).pop(true);
+              },
               child: Text(
                 'Close'.tr(),
                 style: const TextStyle(color: AppColors.primaryGreen),
@@ -183,20 +208,50 @@ class _DiscoveryPreferencesScreenState
     super.dispose();
   }
 
+  /// Restores app-default filters and saves them, so "Reset filters" is a
+  /// real reset rather than a local revert to the values from screen open.
   void _resetFilters() {
+    if (context.read<UserfilterBloc>().state is UpdatingUserFilter) {
+      return;
+    }
+    final int defaultDistance = widget.isPurchased ? paidR : freeR;
+    const Map<String, String> defaultAgeRange = <String, String>{
+      'min': '18',
+      'max': '50',
+    };
     setState(() {
       changeValues.clear();
-      widget.currentUser.maxDistance = _initialMaxDistance;
+      widget.currentUser.maxDistance = defaultDistance;
       widget.currentUser.ageRange =
-          Map<dynamic, dynamic>.from(_initialAgeRange);
-      widget.currentUser.showGender = _initialShowGender;
-      widget.currentUser.lookingFor = _initialLookingFor;
+          Map<dynamic, dynamic>.from(defaultAgeRange);
+      widget.currentUser.showGender = 'everyone';
+      widget.currentUser.lookingFor = 'Dating';
+      widget.currentUser.strictDistance = false;
       _strictAge = false;
       _strictDistance = false;
       _strictIntent = false;
       _verifiedOnly = false;
       _lookingForCardKey++;
     });
+    // Strict flags are written as false explicitly to clear any previously
+    // saved dealbreakers on the user doc.
+    context.read<UserfilterBloc>().add(
+          ChangefilterRequest(
+            details: <String, dynamic>{
+              'showGender': 'everyone',
+              'lookingFor': 'Dating',
+              'maximum_distance': defaultDistance,
+              'age_range': defaultAgeRange,
+              'strict_age': false,
+              'strict_distance': false,
+              'strict_intent': false,
+              'show_verified_only': false,
+            },
+          ),
+        );
+    context.read<SearchUserBloc>().add(
+          LoadUserEvent(currentUser: widget.currentUser),
+        );
   }
 
   String _ageSummary() {
@@ -301,6 +356,7 @@ class _DiscoveryPreferencesScreenState
           } else if (state is UserFilterUpdated) {
             unawaited(HapticFeedback.lightImpact());
             changeValues.clear();
+            _snapshotLastSavedValues();
             _appliedConfirmTimer?.cancel();
             setState(() {
               _strictAge = false;

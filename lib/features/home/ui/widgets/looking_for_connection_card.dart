@@ -83,6 +83,10 @@ class _LookingForConnectionCardState extends State<LookingForConnectionCard> {
                   if (value == null) return;
                   setState(() => _selected = value);
                   widget.changeValues['lookingFor'] = value;
+                  // Keep the shared in-memory model in sync (same pattern as
+                  // ShowmeWidget/DistanceWidget) so post-apply reloads and
+                  // screen re-opens reflect the new intent.
+                  widget.currentUser.lookingFor = value;
                 },
               ),
             ),

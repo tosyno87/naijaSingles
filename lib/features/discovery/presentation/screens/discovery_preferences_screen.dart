@@ -71,6 +71,28 @@ class _DiscoveryPreferencesScreenState
         _verifiedOnly;
   }
 
+  /// Reverts unsaved edits on the shared [UserModel] so callers that reuse
+  /// this instance after the route closes don't see discarded values.
+  void _restoreLastSavedValues() {
+    changeValues.clear();
+    widget.currentUser.maxDistance = _initialMaxDistance;
+    widget.currentUser.ageRange = Map<dynamic, dynamic>.from(_initialAgeRange);
+    widget.currentUser.showGender = _initialShowGender;
+    widget.currentUser.lookingFor = _initialLookingFor;
+  }
+
+  /// After a successful save, the current values become the new baseline for
+  /// discard/reset.
+  void _snapshotLastSavedValues() {
+    _initialMaxDistance = widget.currentUser.maxDistance ?? 10;
+    _initialAgeRange = Map<dynamic, dynamic>.from(
+      widget.currentUser.ageRange ??
+          <dynamic, dynamic>{'min': '18', 'max': '50'},
+    );
+    _initialShowGender = widget.currentUser.showGender;
+    _initialLookingFor = widget.currentUser.lookingFor;
+  }
+
   Future<bool> _onWillPop() async {
     final UserfilterState currentstate = context.read<UserfilterBloc>().state;
     if (currentstate is UpdatingUserFilter) {
@@ -93,7 +115,10 @@ class _DiscoveryPreferencesScreenState
           title: Text('Save Changes?'.tr()),
           actions: <Widget>[
             TextButton(
-              onPressed: () => Navigator.of(dialogContext).pop(true),
+              onPressed: () {
+                _restoreLastSavedValues();
+                Navigator.of(dialogContext).pop(true);
+              },
               child: Text(
                 'Close'.tr(),
                 style: const TextStyle(color: AppColors.primaryGreen),
@@ -301,6 +326,7 @@ class _DiscoveryPreferencesScreenState
           } else if (state is UserFilterUpdated) {
             unawaited(HapticFeedback.lightImpact());
             changeValues.clear();
+            _snapshotLastSavedValues();
             _appliedConfirmTimer?.cancel();
             setState(() {
               _strictAge = false;

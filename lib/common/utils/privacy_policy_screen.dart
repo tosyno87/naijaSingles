@@ -51,6 +51,11 @@ class PrivacyPolicyScreen extends StatelessWidget {
                     'When you sign in with phone or Google, we receive identifiers needed to create and secure your account. We do not receive or store your social account password. Authentication data is used only for sign-in and account linking.',
               ),
               _Section(
+                title: 'Voice and AI profile drafts',
+                body:
+                    'If you choose to talk or type during onboarding, we send that content to a server-side language model to draft profile fields for you to review. We do not keep the audio recording. You must confirm your name, gender, and date of birth before the profile is saved. You can skip this and fill in the form yourself.',
+              ),
+              _Section(
                 title: 'Location, profile, photos, and messages',
                 body:
                     'If you grant permission, we collect location data to show you nearby users and events. Profile and photo data are used to display your profile to other users and to moderate content. Messages are stored and processed to deliver chat and to enforce our policies.',

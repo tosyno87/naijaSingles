@@ -4,6 +4,10 @@ class RouteName {
   static const String mainNavigation = '/main_navigation';
   static const String onboarding = '/onboarding';
 
+  /// Existing 8-step form. Used when the user skips conversational intake
+  /// or when AI drafting is unavailable.
+  static const String onboardingForms = '/onboarding_forms';
+
   // ===== AUTHENTICATION ROUTES =====
   static const String authMethodSelection = '/auth_method_selection';
   static const String signInMethodSelection = '/sign_in_method_selection';

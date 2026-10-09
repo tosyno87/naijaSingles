@@ -1,20 +1,12 @@
 import 'package:flutter_test/flutter_test.dart';
+import 'package:naijasingles/features/home/main_nav_tabs.dart';
 
-// Note: Widget tests for DiscoverPageV2 require Firebase mocking
-// These tests are skipped for now as they require complex Firebase setup
-// The LocationFormatter tests provide unit test coverage for the critical logic
+// DiscoverPageV2 still requires Firebase. Tab order and isolated Houston
+// widgets are covered in main_nav_tabs_test and houston_home_widgets_test.
 
 void main() {
-  group('DiscoverPageV2 Widget Tests', () {
-    // TODO: Add Firebase mocks and implement widget tests
-    // These tests require:
-    // 1. Firebase initialization mocking
-    // 2. Firestore service mocking
-    // 3. UnifiedGroupService mocking
-    //
-    // For now, unit tests for LocationFormatter provide coverage for critical logic
-    test('placeholder test - widget tests require Firebase mocking', () {
-      expect(true, isTrue);
-    });
+  test('Discover remains the first main-nav tab', () {
+    expect(kMainNavTabs.first.label, 'Discover');
+    expect(kMainNavTabs.first.id, MainNavTabId.discover);
   });
 }

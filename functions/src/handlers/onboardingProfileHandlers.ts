@@ -202,6 +202,17 @@ export async function extractOnboardingProfileHandler(
       };
     }
 
+    // Only users still in onboarding may invoke the paid extract path.
+    // Review fixture UIDs are exempted above.
+    const userSnap = await deps.db.collection('users').doc(uid).get();
+    const userData = userSnap.data() ?? {};
+    if (userData.onboardingCompleted === true) {
+      throw new ExtractionValidationError(
+        'failed-precondition',
+        'onboarding already completed'
+      );
+    }
+
     const key = deps.openaiKey ?? process.env.OPENAI_API_KEY ?? '';
     const client = deps.openai ?? (key ? createOpenAiClient(key) : undefined);
     if (!client) {

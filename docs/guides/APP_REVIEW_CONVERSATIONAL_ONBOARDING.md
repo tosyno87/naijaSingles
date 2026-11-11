@@ -35,12 +35,16 @@ at least two published Houston events dated in the next 7 days.
 ```bash
 cd functions
 npx ts-node src/scripts/seedHoustonReviewEvents.ts --project naijasingles-staging
+npx ts-node src/scripts/seedHoustonReviewGroups.ts --project naijasingles-staging
 ```
 
-The script is idempotent (stable doc ids `houston-review-weekend-afrobeats`
-and `houston-review-weekend-brunch`). It **refuses production** project ids
+Event seed is idempotent (stable doc ids `houston-review-weekend-afrobeats`
+and `houston-review-weekend-brunch`). Group seed writes
+`houston-review-group-diaspora` and `houston-review-group-professionals`.
+Both **refuse production** project ids
 (`naijasingles-74a75`, `naijasingles-prod2`, `afropeep-prod-74a75`) unless
-you pass `--i-am-sure`.
+you pass `--i-am-sure`. Full cut checklist:
+[TESTFLIGHT_HOUSTON_OPS_CHECKLIST.md](TESTFLIGHT_HOUSTON_OPS_CHECKLIST.md).
 
 Reviewer account: `living_in` Houston, or empty so the client still prefers
 Houston in the event haystack.

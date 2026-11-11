@@ -36,6 +36,31 @@ describe('validateAnswers', () => {
       ])
     ).toThrow(/3 minutes/);
   });
+
+  it('rejects oversized per-answer text', () => {
+    expect(() =>
+      validateAnswers([
+        {promptId: 'who', text: 'x'.repeat(2001)},
+      ])
+    ).toThrow(/2000 characters/);
+  });
+
+  it('rejects oversized combined text', () => {
+    expect(() =>
+      validateAnswers([
+        {promptId: 'a', text: 'x'.repeat(2000)},
+        {promptId: 'b', text: 'y'.repeat(2000)},
+        {promptId: 'c', text: 'z'.repeat(2000)},
+        {promptId: 'd', text: 'w'},
+      ])
+    ).toThrow(/6000 characters/);
+  });
+
+  it('rejects oversized promptId', () => {
+    expect(() =>
+      validateAnswers([{promptId: 'p'.repeat(65), text: 'hi'}])
+    ).toThrow(/promptId exceeds/);
+  });
 });
 
 describe('dropUnder18Dob', () => {

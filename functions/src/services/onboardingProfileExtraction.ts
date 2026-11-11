@@ -7,6 +7,10 @@
 export const MAX_DURATION_MS = 3 * 60 * 1000;
 export const MAX_AUDIO_BYTES = 2 * 1024 * 1024;
 export const MAX_ANSWERS = 5;
+/** Prevents OpenAI cost amplification via oversized typed answers. */
+export const MAX_PROMPT_ID_LENGTH = 64;
+export const MAX_TEXT_CHARS_PER_ANSWER = 2000;
+export const MAX_TOTAL_TEXT_CHARS = 6000;
 export const MIN_CONFIDENCE = 0.5;
 export const DOB_MIN_CONFIDENCE = 0.7;
 export const COST_CENTS_PER_EXTRACT = 8;
@@ -170,7 +174,19 @@ export function validateAnswers(raw: unknown): ValidatedAnswer[] {
         'promptId is required'
       );
     }
+    if (promptId.length > MAX_PROMPT_ID_LENGTH) {
+      throw new ExtractionValidationError(
+        'invalid-argument',
+        `promptId exceeds ${MAX_PROMPT_ID_LENGTH} characters`
+      );
+    }
     const text = asString(row.text);
+    if (text.length > MAX_TEXT_CHARS_PER_ANSWER) {
+      throw new ExtractionValidationError(
+        'invalid-argument',
+        `each answer text must be at most ${MAX_TEXT_CHARS_PER_ANSWER} characters`
+      );
+    }
     const audioBase64 = asString(row.audioBase64);
     const mimeType = asString(row.mimeType) || 'audio/mp4';
     const durationMs =
@@ -213,6 +229,14 @@ export function validateAnswers(raw: unknown): ValidatedAnswer[] {
     }
 
     answers.push(validated);
+  }
+
+  const totalTextChars = answers.reduce((sum, a) => sum + a.text.length, 0);
+  if (totalTextChars > MAX_TOTAL_TEXT_CHARS) {
+    throw new ExtractionValidationError(
+      'invalid-argument',
+      `combined answer text exceeds ${MAX_TOTAL_TEXT_CHARS} characters`
+    );
   }
 
   return answers;

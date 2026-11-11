@@ -47,6 +47,8 @@ describe('extractOnboardingProfileHandler', () => {
 
   const extractionRef = {get: extractionGet, set: extractionSet};
   const budgetRef = {get: budgetGet, set: budgetSet};
+  const userGet = jest.fn();
+  const userRef = {get: userGet};
 
   const db = {
     collection: jest.fn(),
@@ -59,10 +61,14 @@ describe('extractOnboardingProfileHandler', () => {
       if (name === 'onboardingExtractions') {
         return {doc: () => extractionRef};
       }
+      if (name === 'users') {
+        return {doc: () => userRef};
+      }
       return {doc: () => budgetRef};
     });
     extractionGet.mockResolvedValue({data: () => undefined});
     budgetGet.mockResolvedValue({data: () => undefined});
+    userGet.mockResolvedValue({data: () => ({onboardingCompleted: false})});
     mockRunTransaction.mockImplementation(
       async (fn: (tx: FirebaseFirestore.Transaction) => Promise<void>) => {
         const tx = {
@@ -169,6 +175,29 @@ describe('extractOnboardingProfileHandler', () => {
         {db, now: () => new Date('2026-09-03T00:00:00.000Z')}
       )
     ).rejects.toMatchObject({code: 'failed-precondition'});
+    expect(mockRunTransaction).not.toHaveBeenCalled();
+  });
+
+  it('rejects callers who already completed onboarding', async () => {
+    userGet.mockResolvedValue({data: () => ({onboardingCompleted: true})});
+    const openai = {
+      transcribe: jest.fn(),
+      extract: jest.fn(),
+    };
+    await expect(
+      extractOnboardingProfileHandler(
+        request('u1', [{promptId: 'who', text: 'Ada in Houston'}]),
+        {
+          db,
+          now: () => new Date('2026-09-03T00:00:00.000Z'),
+          openai,
+        }
+      )
+    ).rejects.toMatchObject({
+      code: 'failed-precondition',
+      message: 'onboarding already completed',
+    });
+    expect(openai.extract).not.toHaveBeenCalled();
     expect(mockRunTransaction).not.toHaveBeenCalled();
   });
 

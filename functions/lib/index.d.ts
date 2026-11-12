@@ -30,6 +30,7 @@ export { validateIngestion, aggregateMetrics };
 export { onAuthUserDeleted };
 export { startDeletionOtp, confirmDeletionOtp, confirmDeletionAfterPhoneProof, deleteAccountDirect, };
 export { verifySubscriptionPurchase };
+export { extractOnboardingProfile } from './handlers/onboardingProfileHandlers';
 export declare const healthCheck: import("firebase-functions/v2/https").HttpsFunction;
 export declare const seedMatchTuningConfig: import("firebase-functions/v2/https").HttpsFunction;
 //# sourceMappingURL=index.d.ts.map

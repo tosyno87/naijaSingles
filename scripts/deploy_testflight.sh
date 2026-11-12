@@ -128,22 +128,22 @@ NEW_BUILD=$(cd ios && xcodebuild -showBuildSettings -project Runner.xcodeproj -t
 sed -i '' "s/version: [0-9.]\\+\\+[0-9]\\+/version: 1.0.0+$NEW_BUILD/" pubspec.yaml
 print_success "Updated pubspec.yaml to version: 1.0.0+$NEW_BUILD"
 
-# Handle CocoaPods compatibility issues by using Flutter's build process
-flutter build ios --release
+# Build a signed IPA for TestFlight upload (not just Runner.app).
+flutter build ipa --release
 
 if [ $? -eq 0 ]; then
-    print_success "iOS build completed successfully"
+    print_success "iOS IPA build completed successfully"
 else
-    print_error "iOS build failed"
+    print_error "iOS IPA build failed"
     exit 1
 fi
 
 # Step 5: Validate IPA
 print_status "Step 5: Validating IPA file..."
 
-IPA_PATH="build/ios/Runner.ipa"
-if [ ! -f "$IPA_PATH" ]; then
-    print_error "IPA file not found at $IPA_PATH"
+IPA_PATH="$(ls -1 build/ios/ipa/*.ipa 2>/dev/null | head -1)"
+if [ -z "$IPA_PATH" ] || [ ! -f "$IPA_PATH" ]; then
+    print_error "IPA file not found under build/ios/ipa/"
     exit 1
 fi
 

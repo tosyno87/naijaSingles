@@ -2,5 +2,23 @@
     "sonarlint.connectedMode.project": {
         "connectionId": "tosyno87",
         "projectKey": "tosyno87_naijaSingles"
-    }
+    },
+    "java.import.gradle.java.home": "/Library/Java/JavaVirtualMachines/openjdk-17.jdk/Contents/Home",
+    "java.jdt.ls.java.home": "/Library/Java/JavaVirtualMachines/openjdk-17.jdk/Contents/Home",
+    "java.configuration.runtimes": [
+        {
+            "name": "JavaSE-17",
+            "path": "/Library/Java/JavaVirtualMachines/openjdk-17.jdk/Contents/Home",
+            "default": true
+        }
+    ],
+    "gradle.nestedProjects": [
+        "android"
+    ],
+    "java.import.exclusions": [
+        "**/node_modules/**",
+        "**/.pub-cache/**",
+        "**/.dart_tool/**",
+        "**/build/**"
+    ]
 }

@@ -16,6 +16,8 @@ import 'screens/location_screen.dart';
 import 'screens/preferences_onboarding_screen.dart';
 import 'screens/tribe_selection_screen.dart';
 
+/// 8-step form onboarding. Kept as the skip / error / App Review fallback
+/// from conversational intake.
 class OnboardingMain extends StatefulWidget {
   const OnboardingMain({super.key});
 

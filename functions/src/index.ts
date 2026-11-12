@@ -55,6 +55,7 @@ export {
   deleteAccountDirect,
 };
 export {verifySubscriptionPurchase};
+export {extractOnboardingProfile} from './handlers/onboardingProfileHandlers';
 
 export const healthCheck = onRequest((req, res) => {
   res.status(200).json({

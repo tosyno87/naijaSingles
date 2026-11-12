@@ -75,10 +75,14 @@
 		<string>499452678798092</string>
 		<key>FacebookClientToken</key>
 		<string>499452678798092</string>
+		<key>NSMicrophoneUsageDescription</key>
+		<string>Afropeep uses the microphone so you can talk about yourself and we can draft your community profile. We do not keep the recording.</string>
+		<key>NSSpeechRecognitionUsageDescription</key>
+		<string>Afropeep may convert what you say into text to draft your community profile. You can type instead.</string>
 		<key>NSLocationWhenInUseUsageDescription</key>
-		<string>Afropeep uses your location to show you nearby singles and matches, set your distance preference, and improve your discovery experience.</string>
+		<string>Afropeep uses your location to show nearby community events, groups, and people in your city.</string>
 		<key>NSLocationAlwaysAndWhenInUseUsageDescription</key>
-		<string>Afropeep uses your location to show you nearby singles and matches, set your distance preference, and improve your discovery experience. Optional background location helps keep your distance settings accurate when you travel.</string>
+		<string>Afropeep uses your location to show nearby community events, groups, and people in your city. Optional background location helps keep distance settings accurate when you travel.</string>
 	<key>NSCameraUsageDescription</key>
 	<string>This app needs camera access to take photos for your profile pictures.</string>
 	<key>NSPhotoLibraryUsageDescription</key>

@@ -20,6 +20,7 @@ import '../communities/ui/screens/discover_page_v2.dart';
 import '../explore/explore_screen.dart';
 import '../messages/messages_screen.dart';
 import '../profile/profile_screen.dart';
+import 'main_nav_tabs.dart';
 
 class MainNavigationScreen extends StatefulWidget {
   const MainNavigationScreen({
@@ -40,14 +41,12 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
   late bool _backgroundTasksRunning;
   bool _hasCheckedRegistration = false;
 
-  // Define the pages to be shown for each tab
-  // Order matches the BottomNavigationBarItems below
-  // CONNECT-FIRST NAVIGATION (Connect is the home page)
+  // Order matches [kMainNavTabs]: Discover first, Connect second.
   List<Widget> get _pages => [
-        const ExploreScreen(), // Tab 0: Connect (Dating/Friendship) - HOME PAGE
-        const DiscoverPageV2(), // Tab 1: Discover (Events & Communities)
-        const MessagesScreen(), // Tab 2: Messages
-        const ProfileScreen(), // Tab 3: Profile
+        const DiscoverPageV2(),
+        const ExploreScreen(),
+        const MessagesScreen(),
+        const ProfileScreen(),
       ];
 
   // Deep green color for accents
@@ -312,58 +311,61 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
 
           // Main content fills remaining space.
           Expanded(
-            child: Stack(
-              children: [
-                IndexedStack(
-                  index: _validSelectedIndex,
-                  children: _pages,
-                ),
+            child: MainNavSwitcher(
+              switchToTab: _switchToTab,
+              child: Stack(
+                children: [
+                  IndexedStack(
+                    index: _validSelectedIndex,
+                    children: _pages,
+                  ),
 
-                // Background task indicator
-                if (_backgroundTasksRunning)
-                  Positioned(
-                    top: MediaQuery.of(context).padding.top + 8,
-                    right: 16,
-                    child: Container(
-                      padding: const EdgeInsets.symmetric(
-                        horizontal: 12,
-                        vertical: 6,
-                      ),
-                      decoration: BoxDecoration(
-                        color: AppColors.primaryGreen.withValues(alpha: 0.9),
-                        borderRadius: BorderRadius.circular(20),
-                        boxShadow: [
-                          BoxShadow(
-                            color: Colors.black.withValues(alpha: 0.1),
-                            blurRadius: 4,
-                            offset: const Offset(0, 2),
-                          ),
-                        ],
-                      ),
-                      child: Row(
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          const SizedBox(
-                            width: 12,
-                            height: 12,
-                            child: CircularProgressIndicator(
-                              strokeWidth: 2,
-                              color: Colors.white,
+                  // Background task indicator
+                  if (_backgroundTasksRunning)
+                    Positioned(
+                      top: MediaQuery.of(context).padding.top + 8,
+                      right: 16,
+                      child: Container(
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 12,
+                          vertical: 6,
+                        ),
+                        decoration: BoxDecoration(
+                          color: AppColors.primaryGreen.withValues(alpha: 0.9),
+                          borderRadius: BorderRadius.circular(20),
+                          boxShadow: [
+                            BoxShadow(
+                              color: Colors.black.withValues(alpha: 0.1),
+                              blurRadius: 4,
+                              offset: const Offset(0, 2),
                             ),
-                          ),
-                          const SizedBox(width: 8),
-                          Text(
-                            'Finishing setup...',
-                            style: GoogleFonts.montserrat(
-                              fontSize: 12,
-                              color: Colors.white,
+                          ],
+                        ),
+                        child: Row(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            const SizedBox(
+                              width: 12,
+                              height: 12,
+                              child: CircularProgressIndicator(
+                                strokeWidth: 2,
+                                color: Colors.white,
+                              ),
                             ),
-                          ),
-                        ],
+                            const SizedBox(width: 8),
+                            Text(
+                              'Finishing setup...',
+                              style: GoogleFonts.montserrat(
+                                fontSize: 12,
+                                color: Colors.white,
+                              ),
+                            ),
+                          ],
+                        ),
                       ),
                     ),
-                  ),
-              ],
+                ],
+              ),
             ),
           ),
         ],
@@ -386,20 +388,20 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
         ),
         items: [
           BottomNavigationBarItem(
-            icon: _buildPremiumNavIcon(FontAwesomeIcons.heart),
-            activeIcon: _buildPremiumNavIcon(
-              FontAwesomeIcons.solidHeart,
-              isActive: true,
-            ),
-            label: 'Connect',
-          ),
-          BottomNavigationBarItem(
             icon: _buildPremiumNavIcon(FontAwesomeIcons.compass),
             activeIcon: _buildPremiumNavIcon(
               FontAwesomeIcons.solidCompass,
               isActive: true,
             ),
-            label: 'Discover',
+            label: kMainNavTabs[0].label,
+          ),
+          BottomNavigationBarItem(
+            icon: _buildPremiumNavIcon(FontAwesomeIcons.heart),
+            activeIcon: _buildPremiumNavIcon(
+              FontAwesomeIcons.solidHeart,
+              isActive: true,
+            ),
+            label: kMainNavTabs[1].label,
           ),
           BottomNavigationBarItem(
             icon: _buildPremiumNavIcon(FontAwesomeIcons.comment),
@@ -407,7 +409,7 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
               FontAwesomeIcons.solidComment,
               isActive: true,
             ),
-            label: 'Messages',
+            label: kMainNavTabs[2].label,
           ),
           BottomNavigationBarItem(
             icon: _buildPremiumNavIcon(FontAwesomeIcons.user),
@@ -415,7 +417,7 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
               FontAwesomeIcons.solidUser,
               isActive: true,
             ),
-            label: 'Profile',
+            label: kMainNavTabs[3].label,
           ),
         ],
       ),

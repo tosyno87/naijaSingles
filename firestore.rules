@@ -813,6 +813,11 @@ service cloud.firestore {
       allow write: if false;
     }
 
+    // Conversational onboarding rate-limit stamps — Admin SDK only.
+    match /onboardingExtractions/{userId} {
+      allow read, write: if false;
+    }
+
     // IAP product catalog (store product ids, display metadata).
     // Clients need read to call queryProductDetails; only Admin SDK / Console should write.
     match /Packages/{packageId} {

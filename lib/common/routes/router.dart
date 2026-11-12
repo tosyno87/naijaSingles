@@ -36,6 +36,7 @@ import '../../features/home/ui/screens/splash.dart';
 import '../../features/home/ui/screens/user_filter/settings.dart';
 import '../../features/home/ui/tab/tabbar.dart';
 import '../../features/match/ui/screen/match_page.dart';
+import '../../features/onboarding/conversational/conversational_onboarding_flow.dart';
 import '../../features/onboarding/onboarding_main.dart';
 import '../../features/profile/edit_profile_screen.dart';
 import '../../features/profile/public_profile_screen.dart';
@@ -172,7 +173,8 @@ abstract class AppRouter {
       }
       return LargeImage(largeImage: args);
     },
-    RouteName.onboarding: (context) => const OnboardingMain(),
+    RouteName.onboarding: (context) => const ConversationalOnboardingFlow(),
+    RouteName.onboardingForms: (context) => const OnboardingMain(),
     RouteName.mainNavigation: (context) => const MainNavigationScreen(),
     RouteName.updatePhoneScreen: (context) {
       final args = ModalRoute.of(context)?.settings.arguments;
@@ -288,7 +290,7 @@ abstract class AppRouter {
     },
     // Keep legacy route alias for backward compatibility, but route all users
     // through the same canonical onboarding experience.
-    RouteName.onboardingFlow: (context) => const OnboardingMain(),
+    RouteName.onboardingFlow: (context) => const ConversationalOnboardingFlow(),
     RouteName.exploreScreen: (context) =>
         const ExploreScreen(), // No back button by default
     RouteName.groupsScreen: (context) => const UnifiedGroupsScreen(),

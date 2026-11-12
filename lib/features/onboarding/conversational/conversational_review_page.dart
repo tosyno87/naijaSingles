@@ -50,8 +50,7 @@ class _ConversationalReviewPageState extends State<ConversationalReviewPage> {
     _selectedDate = data?.dateOfBirth;
     _selectedGender = data?.gender ?? '';
     final looking = data?.lookingFor;
-    _lookingFor =
-        looking != null && looking.isNotEmpty ? looking : 'Dating';
+    _lookingFor = looking != null && looking.isNotEmpty ? looking : 'Dating';
     _dobController = TextEditingController();
     _formatDateIntoController();
   }

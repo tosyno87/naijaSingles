@@ -31,4 +31,6 @@ Updated during plan execution. Human follow-through for logged-in steps.
 - [ ] Replace placeholder `OPENAI_API_KEY` with a real key and redeploy `extractOnboardingProfile`
 - [ ] Set `ONBOARDING_AI_REVIEW_UIDS` for App Review accounts
 - [ ] Confirm App Check / TestFlight attestation in Firebase Console
-- [ ] Finish TestFlight upload if `scripts/deploy_testflight.sh` is still running / re-run after CI green
+- [ ] Install Apple Distribution certificate + App Store provisioning for `com.app.naijasingles`
+- [ ] Export IPA from `build/ios/archive/Runner.xcarchive` (Xcode Organizer) or re-run `./scripts/deploy_testflight.sh`
+- [ ] Capture App Review screenshots after sign-in (onboarding → Discover → event/group)

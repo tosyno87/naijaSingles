@@ -14,6 +14,8 @@ Updated during plan execution. Human follow-through for logged-in steps.
 | Houston public groups seeded | Pass | `houston-review-group-*` |
 | PR to develop | Pass | https://github.com/tosyno87/naijaSingles/pull/225 |
 | Pre-auth sim screenshot | Captured | `.playtest-houston/smoke/01_preauth.png` (auth gate) |
+| `flutter build ipa` archive | Pass | `build/ios/archive/Runner.xcarchive` (1.0.1+16) |
+| TestFlight IPA export / upload | Blocked | Needs Apple Distribution cert + App Store profile for `com.app.naijasingles` (team Adeola Babatunde lacks iOS App Store profile permission). Open archive in Xcode Organizer to distribute once certs are fixed. |
 
 ## Human smoke (post TestFlight / signed-in)
 

@@ -14,8 +14,8 @@ Updated during plan execution. Human follow-through for logged-in steps.
 | Houston public groups seeded | Pass | `houston-review-group-*` |
 | PR to develop | Pass | https://github.com/tosyno87/naijaSingles/pull/225 |
 | Pre-auth sim screenshot | Captured | `.playtest-houston/smoke/01_preauth.png` (auth gate) |
-| `flutter build ipa` archive | Pass | `build/ios/archive/Runner.xcarchive` (1.0.1+16) |
-| TestFlight IPA export / upload | Blocked | Needs Apple Distribution cert + App Store profile for `com.app.naijasingles` (team Adeola Babatunde lacks iOS App Store profile permission). Open archive in Xcode Organizer to distribute once certs are fixed. |
+| `flutter build ipa` archive | Stale / do not upload | Prior archive was 1.0.1+16 with Apple Development signing; may lack `ENV=production` dart-define. Rebuild via `./scripts/deploy_testflight.sh --build-only` before upload. |
+| TestFlight IPA export / upload | Blocked | Needs Apple Distribution cert + App Store profile. After device verify, upload the **same** IPA with `./scripts/deploy_testflight.sh --upload-only PATH.ipa` (or Organizer on that archive) — do not full-redeploy. |
 
 ## Human smoke (post TestFlight / signed-in)
 
@@ -32,5 +32,5 @@ Updated during plan execution. Human follow-through for logged-in steps.
 - [ ] Set `ONBOARDING_AI_REVIEW_UIDS` for App Review accounts
 - [ ] Confirm App Check / TestFlight attestation in Firebase Console
 - [ ] Install Apple Distribution certificate + App Store provisioning for `com.app.naijasingles`
-- [ ] Export IPA from `build/ios/archive/Runner.xcarchive` (Xcode Organizer) or re-run `./scripts/deploy_testflight.sh`
+- [ ] After `--build-only` + device launch OK: `./scripts/deploy_testflight.sh --upload-only PATH.ipa` or Organizer → Distribute on that same archive
 - [ ] Capture App Review screenshots after sign-in (onboarding → Discover → event/group)

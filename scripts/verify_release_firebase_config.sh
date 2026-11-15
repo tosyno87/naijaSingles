@@ -75,5 +75,51 @@ if grep -q "dart-define=ENV=next-production" "$PRODUCTION_WORKFLOW"; then
   exit 1
 fi
 
+DEPLOY_TESTFLIGHT="scripts/deploy_testflight.sh"
+if [[ ! -f "$DEPLOY_TESTFLIGHT" ]]; then
+  echo "::error::Missing $DEPLOY_TESTFLIGHT"
+  exit 1
+fi
+
+if ! grep -q -- '--dart-define=ENV=' "$DEPLOY_TESTFLIGHT"; then
+  echo "::error::$DEPLOY_TESTFLIGHT must pass --dart-define=ENV=… for release IPAs"
+  exit 1
+fi
+
+if ! grep -q 'RELEASE_ENV="production"' "$DEPLOY_TESTFLIGHT"; then
+  echo "::error::$DEPLOY_TESTFLIGHT must set RELEASE_ENV=production"
+  exit 1
+fi
+
+if grep -qE 'flutter build ipa --release[[:space:]]*$' "$DEPLOY_TESTFLIGHT"; then
+  echo "::error::$DEPLOY_TESTFLIGHT must not call flutter build ipa --release without dart-defines"
+  exit 1
+fi
+
+if ! grep -q -- '--upload-only' "$DEPLOY_TESTFLIGHT"; then
+  echo "::error::$DEPLOY_TESTFLIGHT must support --upload-only so verified IPAs are not rebuilt"
+  exit 1
+fi
+
+HOUSTON_OPS="scripts/testflight_houston_staging_ops.sh"
+if [[ -f "$HOUSTON_OPS" ]]; then
+  if ! grep -q 'naijasingles-74a75' "$HOUSTON_OPS"; then
+    echo "::error::$HOUSTON_OPS default project must target naijasingles-74a75 for Houston TestFlight"
+    exit 1
+  fi
+  if grep -qE 'PROJECT="\$\{1:-naijasingles-staging\}"' "$HOUSTON_OPS"; then
+    echo "::error::$HOUSTON_OPS must not default to empty naijasingles-staging alias"
+    exit 1
+  fi
+fi
+
+INFO_PLIST="ios/Runner/Info.plist"
+if [[ -f "$INFO_PLIST" ]]; then
+  if ! grep -q '<string>$(FLUTTER_BUILD_NUMBER)</string>' "$INFO_PLIST"; then
+    echo "::error::$INFO_PLIST CFBundleVersion must use \$(FLUTTER_BUILD_NUMBER), not a hardcoded build"
+    exit 1
+  fi
+fi
+
 echo "✅ Release Firebase config guard passed"
 echo "   productionProjectId=$PROD_PROJECT_ID"

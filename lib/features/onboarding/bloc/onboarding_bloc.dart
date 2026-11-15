@@ -58,6 +58,7 @@ class OnboardingBloc extends Bloc<OnboardingEvent, OnboardingState> {
     on<OnboardingProfilePhotoRemoved>(_onProfilePhotoRemoved);
     on<OnboardingProfilePhotosReordered>(_onProfilePhotosReordered);
     on<OnboardingSaveUserData>(_onSaveUserData);
+    on<OnboardingDraftApplied>(_onDraftApplied);
   }
 
   final OnboardingRepository repository;
@@ -73,6 +74,13 @@ class OnboardingBloc extends Bloc<OnboardingEvent, OnboardingState> {
       ...nonNull,
       ...List<File?>.filled(_maxProfilePhotos - nonNull.length, null),
     ];
+  }
+
+  void _onDraftApplied(
+    OnboardingDraftApplied e,
+    Emitter<OnboardingState> emit,
+  ) {
+    emit(OnboardingLoaded(e.data));
   }
 
   void _onFullNameUpdated(

@@ -321,3 +321,12 @@ final class OnboardingSaveUserData extends OnboardingEvent {
   @override
   List<Object?> get props => [context];
 }
+
+final class OnboardingDraftApplied extends OnboardingEvent {
+  const OnboardingDraftApplied(this.data);
+
+  final OnboardingData data;
+
+  @override
+  List<Object?> get props => [data];
+}

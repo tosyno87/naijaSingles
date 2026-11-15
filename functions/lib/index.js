@@ -39,7 +39,7 @@ var __importStar = (this && this.__importStar) || (function () {
     };
 })();
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.seedMatchTuningConfig = exports.healthCheck = exports.verifySubscriptionPurchase = exports.deleteAccountDirect = exports.confirmDeletionAfterPhoneProof = exports.confirmDeletionOtp = exports.startDeletionOtp = exports.onAuthUserDeleted = exports.aggregateMetrics = exports.validateIngestion = exports.createTestUsers = exports.onUserWritten = exports.onLikeCreated = exports.onSuperLikeCreated = exports.onMessageSent = exports.onMatchCreated = void 0;
+exports.seedMatchTuningConfig = exports.healthCheck = exports.extractOnboardingProfile = exports.verifySubscriptionPurchase = exports.deleteAccountDirect = exports.confirmDeletionAfterPhoneProof = exports.confirmDeletionOtp = exports.startDeletionOtp = exports.onAuthUserDeleted = exports.aggregateMetrics = exports.validateIngestion = exports.createTestUsers = exports.onUserWritten = exports.onLikeCreated = exports.onSuperLikeCreated = exports.onMessageSent = exports.onMatchCreated = void 0;
 const admin = __importStar(require("firebase-admin"));
 const https_1 = require("firebase-functions/v2/https");
 const matchHandlers_1 = require("./handlers/matchHandlers");
@@ -76,6 +76,8 @@ exports.createTestUsers = isTestEnvEnabled
     : (0, https_1.onRequest)((req, res) => {
         res.status(404).json({ error: 'Not available in production' });
     });
+var onboardingProfileHandlers_1 = require("./handlers/onboardingProfileHandlers");
+Object.defineProperty(exports, "extractOnboardingProfile", { enumerable: true, get: function () { return onboardingProfileHandlers_1.extractOnboardingProfile; } });
 exports.healthCheck = (0, https_1.onRequest)((req, res) => {
     res.status(200).json({
         status: 'healthy',

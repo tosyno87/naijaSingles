@@ -257,7 +257,28 @@ print_status "Step 4: Building iOS app..."
 # Single source of truth after bump: pubspec + Flutter --build-name/--build-number.
 # Info.plist must keep $(FLUTTER_BUILD_NUMBER) / $(FLUTTER_BUILD_NAME) — do not hardcode.
 print_status "Incrementing build number..."
-fastlane run increment_build_number xcodeproj:"ios/Runner.xcodeproj"
+increment_ios_build_number() {
+    # Prefer agvtool (ships with Xcode). Avoid rbenv shims that point at a Ruby
+    # without the fastlane gem installed.
+    if command -v agvtool >/dev/null 2>&1; then
+        (cd ios && agvtool next-version -all)
+        return
+    fi
+
+    if command -v fastlane >/dev/null 2>&1 && fastlane --version >/dev/null 2>&1; then
+        fastlane run increment_build_number xcodeproj:"ios/Runner.xcodeproj"
+        return
+    fi
+
+    if [ -x "${HOME}/.rbenv/versions/3.1.4/bin/fastlane" ]; then
+        RBENV_VERSION=3.1.4 fastlane run increment_build_number xcodeproj:"ios/Runner.xcodeproj"
+        return
+    fi
+
+    print_error "Neither agvtool nor fastlane is available to increment the build number"
+    exit 1
+}
+increment_ios_build_number
 
 NEW_BUILD=$(cd ios && xcodebuild -showBuildSettings -project Runner.xcodeproj -target Runner | grep CURRENT_PROJECT_VERSION | head -1 | cut -d'=' -f2 | xargs)
 MARKETING_VERSION=$(grep -E '^version:' pubspec.yaml | head -1 | sed -E 's/^version:[[:space:]]*([0-9]+\.[0-9]+\.[0-9]+).*/\1/')

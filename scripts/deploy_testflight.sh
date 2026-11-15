@@ -96,6 +96,20 @@ fi
 RELEASE_ENV="production"
 RELEASE_PROJECT_ID="naijasingles-74a75"
 
+# Flutter shells out to `pod`; rbenv shims fail when the active Ruby lacks the gem.
+ensure_ruby_ios_tooling() {
+    if pod --version >/dev/null 2>&1; then
+        return
+    fi
+    if [ -x "${HOME}/.rbenv/versions/3.1.4/bin/pod" ]; then
+        export RBENV_VERSION=3.1.4
+        print_status "Using RBENV_VERSION=3.1.4 so CocoaPods/fastlane shims resolve"
+        return
+    fi
+    print_error "CocoaPods (pod) is not working. Install/fix CocoaPods for the active Ruby."
+    exit 1
+}
+
 require_upload_credentials() {
     if [ ! -f ".env" ]; then
         print_error ".env file not found. Please create it with FASTLANE_USERNAME and FASTLANE_PASSWORD"
@@ -209,6 +223,7 @@ if ! command -v xcodebuild &> /dev/null; then
 fi
 
 print_success "Flutter and Xcode are available"
+ensure_ruby_ios_tooling
 print_status "Release dart-define: ENV=$RELEASE_ENV (Firebase project $RELEASE_PROJECT_ID)"
 
 # Step 2: Environment Setup (Optimized)
@@ -256,31 +271,28 @@ print_status "Step 4: Building iOS app..."
 
 # Single source of truth after bump: pubspec + Flutter --build-name/--build-number.
 # Info.plist must keep $(FLUTTER_BUILD_NUMBER) / $(FLUTTER_BUILD_NAME) — do not hardcode.
+# Do not use agvtool/fastlane increment here: both rewrite Info.plist to a literal build.
 print_status "Incrementing build number..."
-increment_ios_build_number() {
-    # Prefer agvtool (ships with Xcode). Avoid rbenv shims that point at a Ruby
-    # without the fastlane gem installed.
-    if command -v agvtool >/dev/null 2>&1; then
-        (cd ios && agvtool next-version -all)
-        return
-    fi
-
-    if command -v fastlane >/dev/null 2>&1 && fastlane --version >/dev/null 2>&1; then
-        fastlane run increment_build_number xcodeproj:"ios/Runner.xcodeproj"
-        return
-    fi
-
-    if [ -x "${HOME}/.rbenv/versions/3.1.4/bin/fastlane" ]; then
-        RBENV_VERSION=3.1.4 fastlane run increment_build_number xcodeproj:"ios/Runner.xcodeproj"
-        return
-    fi
-
-    print_error "Neither agvtool nor fastlane is available to increment the build number"
+PBXPROJ="ios/Runner.xcodeproj/project.pbxproj"
+CURRENT_BUILD=$(grep -E 'CURRENT_PROJECT_VERSION = [0-9]+;' "$PBXPROJ" | head -1 | sed -E 's/.*CURRENT_PROJECT_VERSION = ([0-9]+);/\1/')
+if [ -z "$CURRENT_BUILD" ]; then
+    print_error "Could not read CURRENT_PROJECT_VERSION from $PBXPROJ"
     exit 1
-}
-increment_ios_build_number
+fi
+NEW_BUILD=$((CURRENT_BUILD + 1))
+sed -i '' -E "s/CURRENT_PROJECT_VERSION = [0-9]+;/CURRENT_PROJECT_VERSION = ${NEW_BUILD};/g" "$PBXPROJ"
 
-NEW_BUILD=$(cd ios && xcodebuild -showBuildSettings -project Runner.xcodeproj -target Runner | grep CURRENT_PROJECT_VERSION | head -1 | cut -d'=' -f2 | xargs)
+# Restore Flutter placeholders if a prior agvtool/fastlane run hardcoded them.
+# Use sed (not PlistBuddy) so we do not rewrite the whole plist formatting.
+if ! grep -q '<string>$(FLUTTER_BUILD_NUMBER)</string>' ios/Runner/Info.plist; then
+    sed -i '' '/<key>CFBundleVersion<\/key>/{n;s#<string>[^<]*</string>#<string>$(FLUTTER_BUILD_NUMBER)</string>#;}' \
+        ios/Runner/Info.plist
+fi
+if ! grep -q '<string>$(FLUTTER_BUILD_NAME)</string>' ios/Runner/Info.plist; then
+    sed -i '' '/<key>CFBundleShortVersionString<\/key>/{n;s#<string>[^<]*</string>#<string>$(FLUTTER_BUILD_NAME)</string>#;}' \
+        ios/Runner/Info.plist
+fi
+
 MARKETING_VERSION=$(grep -E '^version:' pubspec.yaml | head -1 | sed -E 's/^version:[[:space:]]*([0-9]+\.[0-9]+\.[0-9]+).*/\1/')
 if [ -z "$MARKETING_VERSION" ] || [ -z "$NEW_BUILD" ]; then
     print_error "Could not resolve marketing version ($MARKETING_VERSION) or build number ($NEW_BUILD)"
@@ -288,7 +300,7 @@ if [ -z "$MARKETING_VERSION" ] || [ -z "$NEW_BUILD" ]; then
 fi
 
 sed -i '' -E "s/^version:[[:space:]]*[0-9]+\.[0-9]+\.[0-9]+\+[0-9]+/version: ${MARKETING_VERSION}+${NEW_BUILD}/" pubspec.yaml
-print_success "Synced pubspec.yaml to version: ${MARKETING_VERSION}+${NEW_BUILD}"
+print_success "Synced pubspec.yaml + Xcode to version: ${MARKETING_VERSION}+${NEW_BUILD}"
 
 print_status "Building IPA with ENV=$RELEASE_ENV, ${MARKETING_VERSION}+${NEW_BUILD}"
 flutter build ipa --release \

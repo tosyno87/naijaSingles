@@ -34,8 +34,8 @@ at least two published Houston events dated in the next 7 days.
 
 ```bash
 cd functions
-npx ts-node src/scripts/seedHoustonReviewEvents.ts --project naijasingles-staging
-npx ts-node src/scripts/seedHoustonReviewGroups.ts --project naijasingles-staging
+npx ts-node src/scripts/seedHoustonReviewEvents.ts --project naijasingles-74a75 --i-am-sure
+npx ts-node src/scripts/seedHoustonReviewGroups.ts --project naijasingles-74a75 --i-am-sure
 ```
 
 Event seed is idempotent (stable doc ids `houston-review-weekend-afrobeats`

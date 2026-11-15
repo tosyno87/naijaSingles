@@ -60,19 +60,19 @@ NEW_VERSION="$MAJOR.$MINOR.$PATCH+$BUILD_NUMBER"
 
 print_status "New version: $NEW_VERSION"
 
-# Update pubspec.yaml
+# Update pubspec.yaml — Flutter injects FLUTTER_BUILD_NAME / FLUTTER_BUILD_NUMBER
+# into Info.plist. Do not hardcode CFBundleVersion or CFBundleShortVersionString.
 sed -i '' "s/version: $CURRENT_VERSION/version: $NEW_VERSION/" pubspec.yaml
 
-# Update iOS Info.plist
-sed -i '' "s/<key>CFBundleShortVersionString<\/key>.*/<key>CFBundleShortVersionString<\/key>\n\t<string>$MAJOR.$MINOR.$PATCH<\/string>/" ios/Runner/Info.plist
-sed -i '' "s/<key>CFBundleVersion<\/key>.*/<key>CFBundleVersion<\/key>\n\t<string>$BUILD_NUMBER<\/string>/" ios/Runner/Info.plist
+# Keep Xcode CURRENT_PROJECT_VERSION aligned for Fastlane / Organizer.
+if [ -f "ios/Runner.xcodeproj/project.pbxproj" ]; then
+    sed -i '' -E "s/CURRENT_PROJECT_VERSION = [0-9]+;/CURRENT_PROJECT_VERSION = ${BUILD_NUMBER};/g" \
+        ios/Runner.xcodeproj/project.pbxproj
+fi
 
 print_status "✅ Version updated to $NEW_VERSION"
 print_status "📱 Version: $MAJOR.$MINOR.$PATCH"
 print_status "🔢 Build: $BUILD_NUMBER"
-
-# Commit version bump
-git add pubspec.yaml ios/Runner/Info.plist
-git commit -m "Bump version to $NEW_VERSION"
+print_status "ℹ️  Info.plist still uses \$(FLUTTER_BUILD_NAME) / \$(FLUTTER_BUILD_NUMBER)"
 
 print_status "🎉 Version bump complete!"

@@ -15,8 +15,8 @@ The Flutter client never seeds events or groups. Operators run (see also [TESTFL
 
 ```bash
 cd functions
-npx ts-node src/scripts/seedHoustonReviewEvents.ts --project naijasingles-staging
-npx ts-node src/scripts/seedHoustonReviewGroups.ts --project naijasingles-staging
+npx ts-node src/scripts/seedHoustonReviewEvents.ts --project naijasingles-74a75 --i-am-sure
+npx ts-node src/scripts/seedHoustonReviewGroups.ts --project naijasingles-74a75 --i-am-sure
 ```
 
 Idempotent stable ids. Production projects are refused unless `--i-am-sure`.

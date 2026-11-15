@@ -101,6 +101,21 @@ if ! grep -q -- '--upload-only' "$DEPLOY_TESTFLIGHT"; then
   exit 1
 fi
 
+if ! grep -Fq -- '--upload-only requires an explicit IPA path' "$DEPLOY_TESTFLIGHT"; then
+  echo "::error::$DEPLOY_TESTFLIGHT --upload-only must require an explicit IPA path (no alphabetical auto-pick)"
+  exit 1
+fi
+
+if ! grep -Fq 'find_unique_built_ipa' "$DEPLOY_TESTFLIGHT"; then
+  echo "::error::$DEPLOY_TESTFLIGHT must use find_unique_built_ipa (reject multiple IPAs)"
+  exit 1
+fi
+
+if grep -E 'ls -1 build/ios/ipa/\*\.ipa' "$DEPLOY_TESTFLIGHT" | grep -q 'head -1'; then
+  echo "::error::$DEPLOY_TESTFLIGHT must not alphabetically pick the first IPA via ls|head"
+  exit 1
+fi
+
 HOUSTON_OPS="scripts/testflight_houston_staging_ops.sh"
 if [[ -f "$HOUSTON_OPS" ]]; then
   if ! grep -q 'naijasingles-74a75' "$HOUSTON_OPS"; then

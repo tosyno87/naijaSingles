@@ -66,11 +66,11 @@ Merge `feature/houston-first-home` (or follow-up fixes) to `develop`, then:
 ```bash
 ./scripts/deploy_testflight.sh --build-only              # ENV=production; note the IPA path
 # Device-verify that exact build (startup: env=production project=naijasingles-74a75)
-./scripts/deploy_testflight.sh --upload-only PATH.ipa    # upload the SAME IPA — no rebuild
+./scripts/deploy_testflight.sh --upload-only PATH.ipa    # path required; upload the SAME IPA — no rebuild
 # Alternative: Xcode Organizer → open build/ios/archive/Runner.xcarchive → Distribute App
 ```
 
-Do **not** re-run a full deploy after `--build-only` — that increments the build number and uploads a different, unverified IPA. Do **not** upload an IPA built without `--dart-define=ENV=production` — release startup rejects staging.
+Do **not** re-run a full deploy after `--build-only` — that increments the build number and uploads a different, unverified IPA. Do **not** omit the IPA path on `--upload-only` (no auto-pick). Do **not** upload an IPA built without `--dart-define=ENV=production` — release startup rejects staging.
 
 ## 5. Screenshots (App Review order)
 

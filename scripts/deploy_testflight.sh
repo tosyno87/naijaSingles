@@ -7,11 +7,11 @@
 #   ./scripts/deploy_testflight.sh                         # Build + upload
 #   ./scripts/deploy_testflight.sh --fast                  # Build + upload (skip clean)
 #   ./scripts/deploy_testflight.sh --build-only            # Build IPA only (device-verify first)
-#   ./scripts/deploy_testflight.sh --upload-only           # Upload existing IPA under build/ios/ipa/
-#   ./scripts/deploy_testflight.sh --upload-only PATH.ipa  # Upload that exact verified IPA
+#   ./scripts/deploy_testflight.sh --upload-only PATH.ipa  # Upload that exact verified IPA (path required)
 #
-# After --build-only, upload the SAME artifact with --upload-only (or Xcode Organizer).
+# After --build-only, upload the SAME artifact with --upload-only PATH.ipa (or Xcode Organizer).
 # Do NOT re-run a full deploy: that increments the build number and ships an unverified IPA.
+# --upload-only never auto-picks from build/ios/ipa/ (avoids uploading a stale IPA).
 #
 # Prerequisites: .env with FASTLANE_USERNAME and FASTLANE_PASSWORD (upload paths only)
 #
@@ -48,7 +48,7 @@ print_error() {
 }
 
 usage() {
-    echo "Usage: $0 [--fast] [--build-only | --upload-only [IPA_PATH]]"
+    echo "Usage: $0 [--fast] [--build-only | --upload-only IPA_PATH]"
 }
 
 FAST_MODE=false
@@ -69,10 +69,13 @@ while [[ $# -gt 0 ]]; do
         --upload-only)
             UPLOAD_ONLY=true
             shift
-            if [[ $# -gt 0 && "$1" != -* ]]; then
-                UPLOAD_IPA_PATH="$1"
-                shift
+            if [[ $# -eq 0 || "$1" == -* ]]; then
+                print_error "--upload-only requires an explicit IPA path"
+                usage
+                exit 1
             fi
+            UPLOAD_IPA_PATH="$1"
+            shift
             ;;
         -h|--help)
             usage
@@ -127,37 +130,72 @@ require_upload_credentials() {
     print_success "Environment variables loaded"
 }
 
-resolve_ipa_path() {
+absolutize_path() {
+    local path="$1"
+    if command -v realpath >/dev/null 2>&1; then
+        realpath "$path"
+    else
+        local dir base
+        dir="$(cd "$(dirname "$path")" && pwd)"
+        base="$(basename "$path")"
+        echo "${dir}/${base}"
+    fi
+}
+
+resolve_explicit_ipa_path() {
     # Prints the absolute IPA path on stdout. Errors go to stderr; returns non-zero
     # on failure (safe under command substitution + set -e).
     local explicit_path="$1"
-    local resolved=""
 
-    if [ -n "$explicit_path" ]; then
-        if [ ! -f "$explicit_path" ]; then
-            print_error "IPA not found: $explicit_path"
+    if [ -z "$explicit_path" ]; then
+        print_error "IPA path is required"
+        return 1
+    fi
+    if [ ! -f "$explicit_path" ]; then
+        print_error "IPA not found: $explicit_path"
+        return 1
+    fi
+    case "$explicit_path" in
+        *.ipa|*.IPA) ;;
+        *)
+            print_error "Path must be an .ipa file: $explicit_path"
             return 1
-        fi
-        resolved="$explicit_path"
-    else
-        resolved="$(ls -1 build/ios/ipa/*.ipa 2>/dev/null | head -1 || true)"
-        if [ -z "$resolved" ] || [ ! -f "$resolved" ]; then
-            print_error "IPA file not found under build/ios/ipa/"
-            print_error "Pass an explicit path: $0 --upload-only /path/to/App.ipa"
-            return 1
-        fi
+            ;;
+    esac
+
+    absolutize_path "$explicit_path"
+}
+
+# Post-build only: accept exactly one IPA under build/ios/ipa/. Never pick alphabetically
+# among several — that can upload a stale artifact.
+find_unique_built_ipa() {
+    local ipa_dir="build/ios/ipa"
+    local -a ipas=()
+    local f
+
+    if [ ! -d "$ipa_dir" ]; then
+        print_error "IPA directory not found: $ipa_dir/"
+        return 1
     fi
 
-    # Prefer absolute path so logs are unambiguous.
-    if command -v realpath >/dev/null 2>&1; then
-        realpath "$resolved"
-    else
-        # macOS fallback without realpath
-        local dir base
-        dir="$(cd "$(dirname "$resolved")" && pwd)"
-        base="$(basename "$resolved")"
-        echo "${dir}/${base}"
+    shopt -s nullglob
+    ipas=("$ipa_dir"/*.ipa)
+    shopt -u nullglob
+
+    if [ "${#ipas[@]}" -eq 0 ]; then
+        print_error "IPA file not found under $ipa_dir/"
+        return 1
     fi
+    if [ "${#ipas[@]}" -gt 1 ]; then
+        print_error "Multiple IPAs under $ipa_dir/ — refusing to guess which to use:"
+        for f in "${ipas[@]}"; do
+            echo "  - $f" >&2
+        done
+        print_error "Remove stale IPAs or pass an explicit path to --upload-only"
+        return 1
+    fi
+
+    absolutize_path "${ipas[0]}"
 }
 
 upload_ipa() {
@@ -196,7 +234,7 @@ if [ "$UPLOAD_ONLY" = true ]; then
     print_status "Upload-only mode: will not increment build number or rebuild"
     require_upload_credentials
 
-    IPA_PATH="$(resolve_ipa_path "$UPLOAD_IPA_PATH")"
+    IPA_PATH="$(resolve_explicit_ipa_path "$UPLOAD_IPA_PATH")"
     print_success "Using verified IPA: $IPA_PATH"
     print_warning "Confirm this is the same artifact you device-tested (do not rebuild first)."
     upload_ipa "$IPA_PATH"
@@ -311,12 +349,15 @@ flutter build ipa --release \
 BUILD_EXIT=$?
 set -e
 
-IPA_PATH="$(ls -1 build/ios/ipa/*.ipa 2>/dev/null | head -1 || true)"
 ARCHIVE_PATH="build/ios/archive/Runner.xcarchive"
-if [ -z "$IPA_PATH" ] || [ ! -f "$IPA_PATH" ]; then
-    print_error "flutter build ipa did not produce build/ios/ipa/*.ipa (exit=$BUILD_EXIT)"
+set +e
+IPA_PATH="$(find_unique_built_ipa)"
+FIND_IPA_EXIT=$?
+set -e
+if [ "$FIND_IPA_EXIT" -ne 0 ] || [ -z "$IPA_PATH" ] || [ ! -f "$IPA_PATH" ]; then
+    print_error "flutter build ipa did not produce a unique IPA under build/ios/ipa/ (exit=$BUILD_EXIT)"
     if [ -d "$ARCHIVE_PATH" ]; then
-        print_warning "Archive exists at $ARCHIVE_PATH but App Store export failed."
+        print_warning "Archive exists at $ARCHIVE_PATH but App Store export failed or IPA is ambiguous."
         print_warning "Usually missing iOS Distribution cert / App Store profile."
         print_warning "Open in Organizer to export once signing is fixed:"
         echo "  open $ARCHIVE_PATH"
@@ -334,7 +375,6 @@ print_success "iOS IPA build completed successfully (${MARKETING_VERSION}+${NEW_
 # Step 5: Validate IPA
 print_status "Step 5: Validating IPA file..."
 
-IPA_PATH="$(resolve_ipa_path "$IPA_PATH")"
 IPA_SIZE=$(du -h "$IPA_PATH" | cut -f1)
 print_success "IPA file found: $IPA_PATH ($IPA_SIZE)"
 

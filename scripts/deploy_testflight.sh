@@ -303,17 +303,38 @@ sed -i '' -E "s/^version:[[:space:]]*[0-9]+\.[0-9]+\.[0-9]+\+[0-9]+/version: ${M
 print_success "Synced pubspec.yaml + Xcode to version: ${MARKETING_VERSION}+${NEW_BUILD}"
 
 print_status "Building IPA with ENV=$RELEASE_ENV, ${MARKETING_VERSION}+${NEW_BUILD}"
+set +e
 flutter build ipa --release \
     --build-name="$MARKETING_VERSION" \
     --build-number="$NEW_BUILD" \
     --dart-define=ENV="$RELEASE_ENV"
+BUILD_EXIT=$?
+set -e
+
+IPA_PATH="$(ls -1 build/ios/ipa/*.ipa 2>/dev/null | head -1 || true)"
+ARCHIVE_PATH="build/ios/archive/Runner.xcarchive"
+if [ -z "$IPA_PATH" ] || [ ! -f "$IPA_PATH" ]; then
+    print_error "flutter build ipa did not produce build/ios/ipa/*.ipa (exit=$BUILD_EXIT)"
+    if [ -d "$ARCHIVE_PATH" ]; then
+        print_warning "Archive exists at $ARCHIVE_PATH but App Store export failed."
+        print_warning "Usually missing iOS Distribution cert / App Store profile."
+        print_warning "Open in Organizer to export once signing is fixed:"
+        echo "  open $ARCHIVE_PATH"
+        print_warning "Do not treat this archive as uploaded; device-verify first, then export THAT archive."
+    fi
+    exit 1
+fi
+if [ "$BUILD_EXIT" -ne 0 ]; then
+    print_error "flutter build ipa exited $BUILD_EXIT"
+    exit "$BUILD_EXIT"
+fi
 
 print_success "iOS IPA build completed successfully (${MARKETING_VERSION}+${NEW_BUILD}, ENV=$RELEASE_ENV)"
 
 # Step 5: Validate IPA
 print_status "Step 5: Validating IPA file..."
 
-IPA_PATH="$(resolve_ipa_path "")"
+IPA_PATH="$(resolve_ipa_path "$IPA_PATH")"
 IPA_SIZE=$(du -h "$IPA_PATH" | cut -f1)
 print_success "IPA file found: $IPA_PATH ($IPA_SIZE)"
 

@@ -30,7 +30,7 @@ import 'features/notifications/data/services/notification_service.dart';
 import 'features/onboarding/bloc/onboarding_bloc.dart';
 import 'features/onboarding/data/repositories/onboarding_repository.dart';
 import 'features/payment/presentation/bloc/subscription_bloc.dart';
-// import 'debug/auto_login_service.dart'; // Uncomment if needed for testing
+import 'debug/auto_login_service.dart';
 import 'firebase_options.dart';
 import 'services/crashlytics_service.dart';
 import 'services/deep_link_service.dart';
@@ -46,6 +46,8 @@ Future<void> main() async {
     'STRICT_RELEASE_FIREBASE_GUARD',
     defaultValue: true,
   );
+  // Debug-only: pass --dart-define=ENABLE_AUTO_LOGIN=true plus TEST_EMAIL/TEST_PASSWORD.
+  const bool enableAutoLogin = bool.fromEnvironment('ENABLE_AUTO_LOGIN');
   WidgetsFlutterBinding.ensureInitialized();
   await EasyLocalization.ensureInitialized();
 
@@ -236,28 +238,29 @@ Future<void> main() async {
     },
   );
 
-  // Auto-login for testing in debug mode
-  // DISABLED: Commented out to ensure clean start with no authenticated user
-  // Uncomment below if you need auto-login for testing purposes
-  /*
-  try {
-    await AutoLoginService.autoLoginForTesting();
-  } on Object catch (e) {
-    log('⚠️ Auto-login error: $e');
+  // Auto-login for testing in debug mode (opt-in via ENABLE_AUTO_LOGIN).
+  if (kDebugMode && enableAutoLogin) {
+    try {
+      await AutoLoginService.autoLoginForTesting();
+    } on Object catch (e) {
+      log('⚠️ Auto-login error: $e');
+    }
   }
-  */
 
   // Ensure clean start: Sign out any existing authenticated user
   // This ensures new builds start with no user authenticated
   try {
     final currentUser = FirebaseAuth.instance.currentUser;
-    if (currentUser != null && kDebugMode && !preserveDebugSessionForE2E) {
+    if (currentUser != null &&
+        kDebugMode &&
+        !preserveDebugSessionForE2E &&
+        !enableAutoLogin) {
       log('🧹 Signing out existing user for clean start: ${currentUser.uid}');
       await FirebaseAuth.instance.signOut();
       log('✅ Signed out - app will start with no authenticated user');
     } else if (currentUser != null &&
         kDebugMode &&
-        preserveDebugSessionForE2E) {
+        (preserveDebugSessionForE2E || enableAutoLogin)) {
       log('🧪 Preserving debug auth session for E2E harness: ${currentUser.uid}');
     }
   } on Object catch (e) {
